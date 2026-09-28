@@ -730,7 +730,7 @@ export class SessionDetail implements ViewWillEnter {
   }
 
   nameOf(participant: SessionParticipant): string {
-    return displayName(participant.user, this._translateService.instant('sessions.someone'));
+    return displayName(participant.user, this._translateService.instant('common.someone'));
   }
 
   toneFor(participant: SessionParticipant): AvatarTone {

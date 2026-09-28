@@ -11,6 +11,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -39,6 +40,7 @@ import { GROUP_ICONS } from '../groups.icons';
     IonSpinner,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './photo-view.html',
   styleUrl: './photo-view.scss',
@@ -48,6 +50,7 @@ export class PhotoView {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _urls = signal<readonly string[]>([]);
   readonly index = signal(0);
@@ -61,7 +64,12 @@ export class PhotoView {
 
   /** "2 of 4" — only worth showing when there is more than one. */
   readonly counter = computed(() =>
-    this.total() > 1 ? `${this.index() + 1} of ${this.total()}` : '',
+    this.total() > 1
+      ? this._translateService.instant('groups.photos.counter', {
+          index: this.index() + 1,
+          total: this.total(),
+        })
+      : '',
   );
 
   constructor() {

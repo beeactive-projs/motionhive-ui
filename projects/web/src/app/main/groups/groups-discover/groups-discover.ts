@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -13,6 +12,7 @@ import {
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, take } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -41,17 +41,18 @@ import { GroupsEmptyState } from '../groups-empty-state/groups-empty-state';
     GroupCard,
     GroupCardSkeleton,
     GroupsEmptyState,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './groups-discover.html',
   styleUrl: './groups-discover.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupsDiscover implements OnInit {
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly JoinPolicies = JoinPolicies;
 
@@ -119,7 +120,12 @@ export class GroupsDiscover implements OnInit {
         },
         error: (err) => {
           this.loading.set(false);
-          showApiError(this._messageService, 'Could not load groups', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('groups.toast.discoverLoadFailed'),
+            '',
+            err,
+          );
         },
       });
   }
@@ -146,7 +152,12 @@ export class GroupsDiscover implements OnInit {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Could not load more groups', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('groups.toast.discoverLoadMoreFailed'),
+            '',
+            err,
+          );
         },
       });
   }
@@ -186,8 +197,8 @@ export class GroupsDiscover implements OnInit {
           this.total.update((n) => Math.max(0, n - 1));
           this._messageService.add({
             severity: 'success',
-            summary: 'Joined',
-            detail: `You're now a member of "${group.name}".`,
+            summary: this._translateService.instant('groups.toast.joined.summary'),
+            detail: this._translateService.instant('groups.toast.joined.detail', { name: group.name }),
           });
           this._groupsRefreshService.notify();
         } else {
@@ -198,14 +209,19 @@ export class GroupsDiscover implements OnInit {
           );
           this._messageService.add({
             severity: 'info',
-            summary: 'Request sent',
-            detail: 'The owner will review your request to join.',
+            summary: this._translateService.instant('groups.toast.requestSent.summary'),
+            detail: this._translateService.instant('groups.toast.requestSent.detail'),
           });
         }
       },
       error: (err) => {
         this.setBusy(group.id, false);
-        showApiError(this._messageService, 'Could not join group', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.joinFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -223,13 +239,18 @@ export class GroupsDiscover implements OnInit {
         );
         this._messageService.add({
           severity: 'success',
-          summary: 'Request cancelled',
+          summary: this._translateService.instant('groups.toast.requestCancelled'),
           detail: '',
         });
       },
       error: (err) => {
         this.setBusy(group.id, false);
-        showApiError(this._messageService, 'Could not cancel request', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.cancelRequestFailed'),
+          '',
+          err,
+        );
       },
     });
   }

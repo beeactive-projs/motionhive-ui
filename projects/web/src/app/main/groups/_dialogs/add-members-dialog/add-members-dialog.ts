@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   clientDisplayName,
   ClientService,
@@ -39,15 +39,16 @@ import { UserInfo } from '../../../../_shared/components/user-info/user-info';
     ProgressSpinner,
     SkeletonModule,
     TableModule,
+    TranslatePipe,
   ],
   templateUrl: './add-members-dialog.html',
   styleUrl: './add-members-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddMembersDialog {
   private readonly _clientService = inject(ClientService);
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly groupId = input.required<string>();
@@ -90,7 +91,12 @@ export class AddMembersDialog {
       },
       error: (err) => {
         this.loading.set(false);
-        showApiError(this._messageService, 'Error', 'Failed to load clients', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('groups.toast.clientsLoadFailed'),
+          err,
+        );
         this.visible.set(false);
       },
     });
@@ -122,14 +128,19 @@ export class AddMembersDialog {
           this.visible.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Members added',
-            detail: `${selected.length} ${selected.length === 1 ? 'member' : 'members'} added to the group`,
+            summary: this._translateService.instant('groups.toast.membersAdded.summary'),
+            detail: this._translateService.instant('groups.toast.membersAdded.detail', { count: selected.length }),
           });
           this.saved.emit();
         },
         error: (err) => {
           this.saving.set(false);
-          showApiError(this._messageService, 'Error', 'Failed to add members', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('groups.toast.addMembersFailed'),
+            err,
+          );
         },
       });
   }

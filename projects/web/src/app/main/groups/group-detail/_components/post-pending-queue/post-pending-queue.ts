@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -8,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -28,14 +28,22 @@ type ModerationDecision = ModeratePostPayload['decision'];
 
 @Component({
   selector: 'mh-post-pending-queue',
-  imports: [DatePipe, HexAvatar, ButtonDirective, CardModule, SkeletonModule, TagModule],
+  imports: [
+    DatePipe,
+    HexAvatar,
+    ButtonDirective,
+    CardModule,
+    SkeletonModule,
+    TagModule,
+    TranslatePipe,
+  ],
   templateUrl: './post-pending-queue.html',
   styleUrl: './post-pending-queue.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostPendingQueue {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly groupId = input.required<string>();
 
@@ -78,7 +86,7 @@ export class PostPendingQueue {
         this.loading.set(false);
         showApiError(
           this._messageService,
-          'Could not load pending posts',
+          this._translateService.instant('groups.toast.pendingPostsLoadFailed'),
           '',
           err,
         );
@@ -95,17 +103,18 @@ export class PostPendingQueue {
         this.pending.update((list) => list.filter((p) => p.id !== post.id));
         this._messageService.add({
           severity: 'success',
-          summary:
+          summary: this._translateService.instant(
             decision === PostApprovalStates.Approved
-              ? 'Post approved'
-              : 'Post rejected',
+              ? 'groups.toast.postApproved'
+              : 'groups.toast.postRejected',
+          ),
         });
       },
       error: (err) => {
         this.busyId.set(null);
         showApiError(
           this._messageService,
-          'Could not moderate post',
+          this._translateService.instant('groups.toast.moderateFailed'),
           '',
           err,
         );

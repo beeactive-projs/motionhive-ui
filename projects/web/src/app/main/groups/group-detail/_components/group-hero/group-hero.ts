@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Group, Hex, JoinPolicies, TagSeverity } from 'core';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -9,13 +10,13 @@ import { GroupDetailContext } from '../../group-detail.context';
 
 @Component({
   selector: 'mh-group-hero',
-  imports: [Hex, BreadcrumbModule, TagModule, Card, ButtonDirective],
+  imports: [Hex, BreadcrumbModule, TagModule, Card, ButtonDirective, TranslatePipe],
   templateUrl: './group-hero.html',
   styleUrl: './group-hero.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupHero {
   private readonly _context = inject(GroupDetailContext);
+  private readonly _translateService = inject(TranslateService);
 
   readonly group = input.required<Group>();
   readonly membersCount = input<number | null>(null);
@@ -23,18 +24,14 @@ export class GroupHero {
   readonly canLeave = this._context.canLeave;
 
   readonly breadcrumbItems = computed<MenuItem[]>(() => [
-    { label: 'Groups', routerLink: '/groups/your-groups' },
+    { label: this._translateService.instant('nav.groups'), routerLink: '/groups/your-groups' },
     { label: this.group().name },
   ]);
 
   readonly JoinPolicies = JoinPolicies;
 
-  readonly joinPolicyLabel = computed(() => {
-    const policy = this.group().joinPolicy;
-    if (policy === JoinPolicies.Open) return 'Open';
-    if (policy === JoinPolicies.Approval) return 'Approval required';
-    return 'Invite only';
-  });
+  /** Translation key for the join-policy tag ("Approval required" wording). */
+  readonly joinPolicyLabelKey = computed(() => `groups.joinPolicyLong.${this.group().joinPolicy}`);
 
   readonly joinPolicySeverity = computed<TagSeverity>(() => {
     const policy = this.group().joinPolicy;
@@ -43,12 +40,15 @@ export class GroupHero {
     return TagSeverity.Info;
   });
 
-  readonly memberCountLabel = computed(() => {
-    const n = this.membersCount() || 0;
-    return `${n} ${n === 1 ? 'member' : 'members'}`;
-  });
+  readonly memberCountLabel = computed(() =>
+    this._translateService.instant('count.members', { count: this.membersCount() || 0 }),
+  );
 
-  readonly visibilityLabel = computed(() => (this.group().isPublic ? 'Public' : 'Private'));
+  readonly visibilityLabel = computed(() =>
+    this._translateService.instant(
+      this.group().isPublic ? 'groups.visibility.public' : 'groups.visibility.private',
+    ),
+  );
 
   readonly avatarLabel = computed(() => {
     const name = this.group().name ?? '0';

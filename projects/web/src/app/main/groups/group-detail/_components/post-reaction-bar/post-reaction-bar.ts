@@ -1,25 +1,25 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
   input,
   signal,
 } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { Post, PostService, showApiError } from 'core';
 
 @Component({
   selector: 'mh-post-reaction-bar',
-  imports: [ButtonDirective],
+  imports: [ButtonDirective, TranslatePipe],
   templateUrl: './post-reaction-bar.html',
   styleUrl: './post-reaction-bar.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostReactionBar {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly post = input.required<Post>();
 
@@ -61,7 +61,7 @@ export class PostReactionBar {
         this._localCount.set(before.count);
         showApiError(
           this._messageService,
-          'Could not update reaction',
+          this._translateService.instant('groups.toast.reactionFailed'),
           '',
           err,
         );

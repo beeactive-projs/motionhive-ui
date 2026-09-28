@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,7 +9,9 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
+  EnumLabelPipe,
   GroupJoinRequest,
   GroupMember,
   GroupMemberRoles,
@@ -45,17 +46,19 @@ import { Badge } from "primeng/badge";
     TagModule,
     TooltipModule,
     EmptyMembers,
-    Badge
-],
+    Badge,
+    EnumLabelPipe,
+    TranslatePipe,
+  ],
   templateUrl: './members-tab.html',
   styleUrl: './members-tab.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MembersTab {
   readonly context = inject(GroupDetailContext);
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Roles = GroupMemberRoles;
 
@@ -168,26 +171,31 @@ export class MembersTab {
             this.context.loadGroup(id);
             this._messageService.add({
               severity: 'success',
-              summary: 'Request approved',
+              summary: this._translateService.instant('groups.toast.requestApproved'),
               detail: '',
             });
           } else {
             this._messageService.add({
               severity: 'info',
-              summary: 'Request rejected',
+              summary: this._translateService.instant('groups.toast.requestRejected'),
               detail: '',
             });
           }
         },
         error: (err) => {
           this.setRequestBusy(request.id, false);
-          showApiError(this._messageService, 'Could not update request', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('groups.toast.requestUpdateFailed'),
+            '',
+            err,
+          );
         },
       });
   }
 
   requestUserName(request: GroupJoinRequest): string {
-    if (!request.user) return 'Unknown user';
+    if (!request.user) return this._translateService.instant('groups.members.unknownUser');
     return `${request.user.firstName} ${request.user.lastName}`;
   }
 
@@ -210,14 +218,8 @@ export class MembersTab {
   }
 
   memberName(member: GroupMember): string {
-    if (!member.user) return 'Unknown';
+    if (!member.user) return this._translateService.instant('common.unknown');
     return `${member.user.firstName} ${member.user.lastName}`;
-  }
-
-  roleLabel(role: GroupMember['role']): string {
-    if (role === GroupMemberRoles.Owner) return 'Owner';
-    if (role === GroupMemberRoles.Moderator) return 'Moderator';
-    return 'Member';
   }
 
   roleSeverity(role: GroupMember['role']): TagSeverity {

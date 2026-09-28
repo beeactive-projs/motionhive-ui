@@ -1,16 +1,16 @@
 <div class="flex flex-col gap-4 max-w-3xl mx-auto w-full">
   <header class="space-y-1">
     <h1 class="font-heading font-semibold text-xl md:text-2xl">
-      Discover groups<span class="text-primary">.</span>
+      {{ 'groups.discover.title' | translate }}<span class="text-primary">.</span>
     </h1>
-    <p class="text-sm text-surface-600">Find communities to join.</p>
+    <p class="text-sm text-surface-600">{{ 'groups.discover.subtitle' | translate }}</p>
   </header>
 
   <!-- Search -->
   <div>
     <p-iconfield iconPosition="left" class="block">
       <p-inputicon class="pi pi-search"/>
-      <input pInputText fluid placeholder="Search groups" [formControl]="searchControl"/>
+      <input pInputText fluid [placeholder]="'groups.discover.searchPlaceholder' | translate" [formControl]="searchControl"/>
     </p-iconfield>
   </div>
 
@@ -53,7 +53,7 @@
       <div #scrollSentinel class="h-px"></div>
 
       @if (!hasMore() && results().length > 0) {
-        <p class="text-center text-xs text-surface-500 py-4">No more results.</p>
+        <p class="text-center text-xs text-surface-500 py-4">{{ 'groups.discover.noMore' | translate }}</p>
       }
     }
   </div>

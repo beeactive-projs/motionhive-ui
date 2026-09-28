@@ -1,38 +1,42 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" text="Cancel" />
+      <ion-back-button defaultHref="/tabs/groups" [text]="'button.cancel' | translate" />
     </ion-buttons>
-    <ion-title>{{ heading() }}</ion-title>
+    <ion-title>{{ headingKey() | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <h1 class="mh-visually-hidden">{{ heading() }}</h1>
+  <h1 class="mh-visually-hidden">{{ headingKey() | translate }}</h1>
 
   @if (notAllowed()) {
   <!-- The read succeeds for any member, so without this the form would
        populate for someone whose save is going to be refused. -->
-  <mh-empty-state icon="lock-closed-outline" heading="Only the owner can change this"
-    message="Ask the group's owner if something needs updating." />
+  <mh-empty-state icon="lock-closed-outline" [heading]="'groups.edit.notAllowed.title' | translate"
+    [message]="'groups.edit.notAllowed.message' | translate" />
   } @else if (loadError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.common.loadGroupError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else {
   <div class="mh-page">
     <ion-list [inset]="true" class="mh-card-list">
       <ion-item lines="full">
-        <ion-input label="Name" labelPlacement="stacked" placeholder="Morning Crew"
+        <ion-input [label]="'form.label.name' | translate" labelPlacement="stacked"
+          [placeholder]="'groups.edit.namePlaceholder' | translate"
           [maxlength]="nameMaxLength" [value]="name()"
           (ionInput)="name.set($event.detail.value ?? '')" />
       </ion-item>
       <ion-item lines="full">
-        <ion-textarea label="Description" labelPlacement="stacked" [autoGrow]="true" [rows]="3"
-          placeholder="What is this group for?" [maxlength]="descriptionMaxLength"
+        <ion-textarea [label]="'form.label.description' | translate" labelPlacement="stacked" [autoGrow]="true"
+          [rows]="3" [placeholder]="'groups.edit.descriptionPlaceholder' | translate"
+          [maxlength]="descriptionMaxLength"
           [value]="description()" (ionInput)="description.set($event.detail.value ?? '')" />
       </ion-item>
       <ion-item lines="none">
-        <ion-input label="City" labelPlacement="stacked" placeholder="Optional"
+        <ion-input [label]="'form.label.city' | translate" labelPlacement="stacked"
+          [placeholder]="'form.placeholder.optional' | translate"
           [value]="city()" (ionInput)="city.set($event.detail.value ?? '')" />
       </ion-item>
     </ion-list>
@@ -41,46 +45,46 @@
       <ion-item lines="none">
         <ion-toggle [checked]="isPublic()" (ionChange)="isPublic.set($event.detail.checked)">
           <ion-label>
-            <h2>Public group</h2>
-            <p>Anyone can find it in Discover.</p>
+            <h2>{{ 'groups.edit.public.label' | translate }}</h2>
+            <p>{{ 'groups.edit.public.hint' | translate }}</p>
           </ion-label>
         </ion-toggle>
       </ion-item>
     </ion-list>
 
     <section class="mh-section">
-      <h2 class="mh-kicker">Joining</h2>
+      <h2 class="mh-kicker">{{ 'groups.common.joining' | translate }}</h2>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-radio-group [value]="joinPolicy()" (ionChange)="setJoinPolicy($event.detail.value)">
           @for (option of joinPolicyOptions; track option.value; let last = $last) {
           <ion-item [lines]="last ? 'none' : 'full'">
             <ion-radio [value]="option.value" justify="start" labelPlacement="end">
               <ion-label>
-                <h2>{{ option.label }}</h2>
-                <p>{{ option.hint }}</p>
+                <h2>{{ option.label | translate }}</h2>
+                <p>{{ option.hint | translate }}</p>
               </ion-label>
             </ion-radio>
           </ion-item>
           }
         </ion-radio-group>
       </ion-list>
-      @if (joinPolicyNote(); as note) {
+      @if (joinPolicyNoteKey(); as note) {
       <!-- Said rather than silently corrected: the owner may be about to
            make the group public in the next breath. -->
-      <ion-note class="policy-note">{{ note }}</ion-note>
+      <ion-note class="policy-note">{{ note | translate }}</ion-note>
       }
     </section>
 
     <section class="mh-section">
-      <h2 class="mh-kicker">Posting</h2>
+      <h2 class="mh-kicker">{{ 'groups.edit.posting' | translate }}</h2>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-radio-group [value]="postPolicy()" (ionChange)="setPostPolicy($event.detail.value)">
           @for (option of postPolicyOptions; track option.value; let last = $last) {
           <ion-item [lines]="last ? 'none' : 'full'">
             <ion-radio [value]="option.value" justify="start" labelPlacement="end">
               <ion-label>
-                <h2>{{ option.label }}</h2>
-                <p>{{ option.hint }}</p>
+                <h2>{{ option.label | translate }}</h2>
+                <p>{{ option.hint | translate }}</p>
               </ion-label>
             </ion-radio>
           </ion-item>
@@ -90,23 +94,25 @@
     </section>
 
     <section class="mh-section">
-      <h2 class="mh-kicker">Tags</h2>
+      <h2 class="mh-kicker">{{ 'groups.edit.tags' | translate }}</h2>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item lines="none">
-          <ion-input label="Add a tag" labelPlacement="stacked" placeholder="strength"
+          <ion-input [label]="'groups.edit.tagLabel' | translate" labelPlacement="stacked"
+            [placeholder]="'groups.edit.tagPlaceholder' | translate"
             [maxlength]="tagMaxLength" [value]="tagDraft()"
             (ionInput)="tagDraft.set($event.detail.value ?? '')"
             (keydown.enter)="addTag()" />
-          <ion-button slot="end" fill="clear" [disabled]="!canAddTag()" aria-label="Add tag"
+          <ion-button slot="end" fill="clear" [disabled]="!canAddTag()"
+            [attr.aria-label]="'groups.edit.addTag' | translate"
             (click)="addTag()">
             <ion-icon slot="icon-only" name="add-outline" />
           </ion-button>
         </ion-item>
       </ion-list>
       @if (tags().length > 0) {
-      <div class="mh-chip-row" role="group" aria-label="Group tags">
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'groups.common.groupTags' | translate">
         @for (tag of tags(); track tag) {
-        <ion-chip color="medium" [attr.aria-label]="'Remove tag ' + tag" (click)="removeTag(tag)">
+        <ion-chip color="medium" [attr.aria-label]="'groups.edit.removeTag' | translate: { tag }" (click)="removeTag(tag)">
           {{ tag }}
           <ion-icon name="close-outline" aria-hidden="true" />
         </ion-chip>
@@ -120,7 +126,7 @@
     <div class="danger-row">
       <ion-button expand="block" fill="outline" color="danger" (click)="confirmDelete()">
         <ion-icon slot="start" name="trash-outline" />
-        Delete group
+        {{ 'groups.edit.delete.button' | translate }}
       </ion-button>
     </div>
     }
@@ -135,12 +141,13 @@
       @if (saving()) {
       <ion-spinner name="crescent" slot="start" />
       }
-      {{ saveLabel() }}
+      {{ saveLabelKey() | translate }}
     </ion-button>
   </ion-toolbar>
 </ion-footer>
 }
 
-<mh-confirm-sheet [(open)]="deleteOpen" title="Delete this group?"
-  body="Its posts, members and comments go with it." confirmLabel="Delete" tone="danger"
-  irreversible="This cannot be undone." [saving]="deleting()" (confirm)="deleteGroup()" />
+<mh-confirm-sheet [(open)]="deleteOpen" [title]="'groups.edit.delete.title' | translate"
+  [body]="'groups.edit.delete.body' | translate" [confirmLabel]="'button.delete' | translate"
+  tone="danger" [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deleting()"
+  (confirm)="deleteGroup()" />

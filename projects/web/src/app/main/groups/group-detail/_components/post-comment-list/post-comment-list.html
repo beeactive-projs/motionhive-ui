@@ -8,7 +8,7 @@
       fluid
       rows="2"
       [autoResize]="true"
-      placeholder="Write a comment..."
+      [placeholder]="'groups.comments.placeholder' | translate"
       [ngModel]="newComment()"
       (ngModelChange)="newComment.set($event)"
       maxlength="2000"
@@ -20,7 +20,7 @@
       (click)="postComment()"
     >
       @if (posting() && !replyingTo()) {<i class="pi pi-spinner pi-spin"></i>}
-      Post
+      {{ 'groups.comments.post' | translate }}
     </button>
   </div>
 
@@ -30,7 +30,7 @@
     <p-skeleton width="80%" height="2.5rem" />
   </div>
   } @else if (comments().length === 0) {
-  <p class="text-sm text-surface-500 italic">Be the first to comment.</p>
+  <p class="text-sm text-surface-500 italic">{{ 'groups.comments.empty' | translate }}</p>
   } @else {
   <div class="flex flex-col gap-3">
     @for (comment of comments(); track trackById($index, comment)) {
@@ -53,10 +53,10 @@
           </div>
           <div class="mt-1 flex items-center gap-2 text-xs">
             <button type="button" class="text-surface-500 hover:underline"
-              (click)="startReply(comment.id)">Reply</button>
+              (click)="startReply(comment.id)">{{ 'groups.comments.reply' | translate }}</button>
             @if (isMine(comment)) {
             <button type="button" class="text-surface-500 hover:underline"
-              (click)="confirmDelete(comment)">Delete</button>
+              (click)="confirmDelete(comment)">{{ 'button.delete' | translate }}</button>
             }
           </div>
 
@@ -68,7 +68,7 @@
               fluid
               rows="2"
               [autoResize]="true"
-              placeholder="Write a reply..."
+              [placeholder]="'groups.comments.replyPlaceholder' | translate"
               [ngModel]="replyContent()"
               (ngModelChange)="replyContent.set($event)"
               maxlength="2000"
@@ -76,9 +76,9 @@
             <div class="flex flex-col gap-1">
               <button pButton type="button" size="small" [disabled]="!replyContent().trim() || posting()" (click)="postReply(comment.id)">
                 @if (posting()) {<i class="pi pi-spinner pi-spin"></i>}
-                Reply
+                {{ 'groups.comments.reply' | translate }}
               </button>
-              <button pButton type="button" size="small" severity="secondary" text (click)="cancelReply()">Cancel</button>
+              <button pButton type="button" size="small" severity="secondary" text (click)="cancelReply()">{{ 'button.cancel' | translate }}</button>
             </div>
           </div>
           }
@@ -103,7 +103,7 @@
                 </div>
                 @if (isMine(reply)) {
                 <button type="button" class="mt-1 text-xs text-surface-500 hover:underline"
-                  (click)="confirmDelete(reply)">Delete</button>
+                  (click)="confirmDelete(reply)">{{ 'button.delete' | translate }}</button>
                 }
               </div>
             </div>
@@ -119,7 +119,7 @@
   @if (hasMore()) {
   <button pButton type="button" severity="secondary" text size="small" [disabled]="loading()" (click)="loadMore()" class="self-start">
     @if (loading()) {<i class="pi pi-spinner pi-spin"></i>}
-    Load more comments
+    {{ 'groups.comments.loadMore' | translate }}
   </button>
   }
   }

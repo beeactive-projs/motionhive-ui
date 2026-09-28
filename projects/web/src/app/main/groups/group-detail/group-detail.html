@@ -14,11 +14,11 @@
 <div>
   <p-message severity="warn" icon="pi pi-exclamation-triangle">
     <div class="flex flex-col gap-2">
-      <h2 class="m-0 text-base font-semibold">Group not found</h2>
-      <p class="m-0 text-sm">The group you are looking for does not exist or has been deleted.</p>
+      <h2 class="m-0 text-base font-semibold">{{ 'groups.common.notFound' | translate }}</h2>
+      <p class="m-0 text-sm">{{ 'groups.detail.notFoundMessage' | translate }}</p>
     </div>
   </p-message>
-  <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Back to groups</button>
+  <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> {{ 'groups.detail.backToGroups' | translate }}</button>
 </div>
 }
 

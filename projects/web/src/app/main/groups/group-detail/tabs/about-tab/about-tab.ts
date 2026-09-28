@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Group, JoinPolicies, TagSeverity } from 'core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -29,10 +30,9 @@ export type AboutTabGroup = Pick<
 
 @Component({
   selector: 'mh-group-about-tab',
-  imports: [DatePipe, ButtonDirective, CardModule, DividerModule, TagModule],
+  imports: [DatePipe, ButtonDirective, CardModule, DividerModule, TagModule, TranslatePipe],
   templateUrl: './about-tab.html',
   styleUrl: './about-tab.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutTab {
   /** Optional context — only present inside the member-only group detail page. */
@@ -50,12 +50,10 @@ export class AboutTab {
 
   readonly canManageJoinLink = computed(() => !!this.context?.isOwner());
 
-  readonly joinPolicyLabel = computed(() => {
-    const policy = this.currentGroup()?.joinPolicy;
-    if (policy === JoinPolicies.Open) return 'Open';
-    if (policy === JoinPolicies.Approval) return 'Approval required';
-    return 'Invite only';
-  });
+  /** Translation key for the join-policy tag ("Approval required" wording). */
+  readonly joinPolicyLabelKey = computed(
+    () => `groups.joinPolicyLong.${this.currentGroup()?.joinPolicy ?? JoinPolicies.InviteOnly}`,
+  );
 
   readonly joinPolicySeverity = computed<TagSeverity>(() => {
     const policy = this.currentGroup()?.joinPolicy;

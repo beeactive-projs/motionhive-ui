@@ -46,7 +46,7 @@ export class ParticipantNoteSheet {
     const participant = this.participant();
     if (!participant) return this._translateService.instant('sessions.noteSheet.title');
     return this._translateService.instant('sessions.noteSheet.titleWithName', {
-      name: displayName(participant.user, this._translateService.instant('sessions.someone')),
+      name: displayName(participant.user, this._translateService.instant('common.someone')),
     });
   });
 

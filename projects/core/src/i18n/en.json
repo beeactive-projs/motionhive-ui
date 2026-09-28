@@ -51,6 +51,7 @@
     "ok": "OK",
     "open": "Open",
     "previous": "Previous",
+    "reject": "Reject",
     "remove": "Remove",
     "resend": "Resend",
     "reset": "Reset",
@@ -88,6 +89,7 @@
     "or": "or",
     "pleaseTryAgain": "Please try again.",
     "session": "Session",
+    "someone": "Someone",
     "thisClient": "This client",
     "unknown": "Unknown",
     "you": "You"
@@ -150,6 +152,16 @@
       "MALE": "Male",
       "OTHER": "Other",
       "PREFER_NOT_TO_SAY": "Prefer not to say"
+    },
+    "groupMemberRole": {
+      "MEMBER": "Member",
+      "MODERATOR": "Moderator",
+      "OWNER": "Owner"
+    },
+    "joinPolicy": {
+      "APPROVAL": "Approval",
+      "INVITE_ONLY": "Invite only",
+      "OPEN": "Open"
     },
     "myTab": {
       "cancelled": "Cancelled",
@@ -246,7 +258,8 @@
       "tooManyRequestsSummary": "Slow down a moment",
       "unavailable": "The service is temporarily unavailable. Please try again in a moment.",
       "unexpected": "An unexpected error occurred. Please try again."
-    }
+    },
+    "staleData": "Couldn't refresh. Showing the last update."
   },
   "form": {
     "hint": {

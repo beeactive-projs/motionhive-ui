@@ -3,19 +3,19 @@
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
       <h1 class="font-heading font-semibold text-xl md:text-2xl">
-        Your groups<span class="text-primary">.</span>
+        {{ 'groups.yourGroups.title' | translate }}<span class="text-primary">.</span>
       </h1>
       <p class="text-sm text-surface-600">
         @if (isInstructor()) {
-          Organize your clients into groups for sessions and communication.
+          {{ 'groups.yourGroups.subtitleCoach' | translate }}
         } @else {
-          Groups you belong to.
+          {{ 'groups.yourGroups.subtitleMember' | translate }}
         }
       </p>
     </div>
     @if (isInstructor()) {
       <div class="flex flex-wrap">
-        <button pButton type="button" (click)="openCreateDialog()"><i class="pi pi-plus"></i> New group</button>
+        <button pButton type="button" (click)="openCreateDialog()"><i class="pi pi-plus"></i> {{ 'groups.yourGroups.newGroup' | translate }}</button>
       </div>
     }
   </header>

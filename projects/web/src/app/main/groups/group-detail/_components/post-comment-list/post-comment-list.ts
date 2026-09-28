@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -9,6 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Textarea } from 'primeng/textarea';
@@ -27,17 +27,18 @@ import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avat
     SkeletonModule,
     Textarea,
     ConfirmDialogModule,
+    TranslatePipe,
   ],
   providers: [ConfirmationService],
   templateUrl: './post-comment-list.html',
   styleUrl: './post-comment-list.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostCommentList {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly postId = input.required<string>();
   readonly active = input.required<boolean>();
@@ -80,7 +81,12 @@ export class PostCommentList {
         },
         error: (err) => {
           this.loading.set(false);
-          showApiError(this._messageService, 'Could not load comments', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('groups.toast.commentsLoadFailed'),
+            '',
+            err,
+          );
         },
       });
   }
@@ -104,7 +110,12 @@ export class PostCommentList {
       },
       error: (err) => {
         this.posting.set(false);
-        showApiError(this._messageService, 'Could not post comment', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.commentPostFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -141,15 +152,20 @@ export class PostCommentList {
         },
         error: (err) => {
           this.posting.set(false);
-          showApiError(this._messageService, 'Could not post reply', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('groups.toast.replyPostFailed'),
+            '',
+            err,
+          );
         },
       });
   }
 
   confirmDelete(comment: PostComment): void {
     this._confirmationService.confirm({
-      message: 'Delete this comment?',
-      header: 'Delete comment',
+      message: this._translateService.instant('groups.confirm.deleteComment.message'),
+      header: this._translateService.instant('groups.confirm.deleteComment.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this._delete(comment),
@@ -171,7 +187,12 @@ export class PostCommentList {
         this.total.update((n) => Math.max(0, n - 1));
       },
       error: (err) => {
-        showApiError(this._messageService, 'Could not delete comment', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.commentDeleteFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -183,7 +204,7 @@ export class PostCommentList {
   }
 
   fullName(c: PostComment): string {
-    if (!c.author) return 'Unknown';
+    if (!c.author) return this._translateService.instant('common.unknown');
     return `${c.author.firstName} ${c.author.lastName}`;
   }
 

@@ -26,6 +26,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
@@ -96,6 +97,7 @@ import { GroupDetailStore } from './group-detail.store';
     IonTitle,
     IonToolbar,
     PostGallery,
+    TranslatePipe,
   ],
   templateUrl: './group-detail.html',
   styleUrl: './group-detail.scss',
@@ -106,9 +108,10 @@ export class GroupDetail implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _auth = inject(AuthStore);
+  private readonly _authStore = inject(AuthStore);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Tabs = GroupTabs;
   readonly skeletonRows = [1, 2, 3, 4, 5];
@@ -125,7 +128,7 @@ export class GroupDetail implements ViewWillEnter {
   readonly postBeingDeleted = signal<Post | null>(null);
   readonly deletingPost = signal(false);
 
-  private readonly _viewerId = computed(() => this._auth.user()?.id ?? '');
+  private readonly _viewerId = computed(() => this._authStore.user()?.id ?? '');
 
   readonly isPosts = computed(() => this.store.tab() === GroupTabs.Posts);
   readonly isMembers = computed(() => this.store.tab() === GroupTabs.Members);
@@ -142,7 +145,7 @@ export class GroupDetail implements ViewWillEnter {
    * service runs. An owner-by-transfer without it would get a 403.
    */
   readonly canShareJoinLink = computed(() =>
-    canManageJoinLink(this.store.viewerRole(), this._auth.isInstructor()),
+    canManageJoinLink(this.store.viewerRole(), this._authStore.isInstructor()),
   );
 
   readonly canCompose = computed(() => {
@@ -150,10 +153,11 @@ export class GroupDetail implements ViewWillEnter {
     return !!group && canPost(this.store.viewerRole(), group);
   });
 
-  readonly memberCountLabel = computed(() => {
-    const count = this.store.group()?.memberCount ?? 0;
-    return `${count} ${count === 1 ? 'member' : 'members'}`;
-  });
+  readonly memberCountLabel = computed(() =>
+    this._translateService.instant('count.members', {
+      count: this.store.group()?.memberCount ?? 0,
+    }),
+  );
 
   readonly policyLabel = computed(() => {
     const group = this.store.group();
@@ -172,8 +176,8 @@ export class GroupDetail implements ViewWillEnter {
   readonly resultAnnouncement = computed(() => {
     if (!this.isMembers() || !this.store.memberQuery().trim()) return '';
     const count = this.store.visibleMembers().length;
-    if (count === 0) return 'No members match that.';
-    return `${count} ${count === 1 ? 'member' : 'members'}.`;
+    if (count === 0) return this._translateService.instant('groups.detail.announce.none');
+    return this._translateService.instant('groups.detail.announce.count', { count });
   });
 
   constructor() {
@@ -217,7 +221,7 @@ export class GroupDetail implements ViewWillEnter {
   // ── Display helpers ────────────────────────────────────────────────────
 
   authorName(post: Post): string {
-    return post.author ? displayName(post.author, 'Member') : 'Member';
+    return displayName(post.author, this._memberFallback());
   }
 
   postedAt(iso: string): string {
@@ -225,7 +229,7 @@ export class GroupDetail implements ViewWillEnter {
   }
 
   memberName(member: GroupMember): string {
-    return displayName(member.user, 'Member');
+    return displayName(member.user, this._memberFallback());
   }
 
   /**
@@ -250,6 +254,10 @@ export class GroupDetail implements ViewWillEnter {
     return memberRoleTone(member.role);
   }
 
+  private _memberFallback(): string {
+    return this._translateService.instant('groups.common.member');
+  }
+
   /** The author, or staff moderating the group. */
   mayDelete(post: Post): boolean {
     return canDeletePost(this.store.viewerRole(), this._viewerId(), post.authorId);
@@ -260,7 +268,10 @@ export class GroupDetail implements ViewWillEnter {
   like(post: Post): void {
     this.store.toggleReaction(post).subscribe({
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not save that reaction.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.reactionFailed'),
+        ),
     });
   }
 
@@ -278,11 +289,16 @@ export class GroupDetail implements ViewWillEnter {
       next: () => {
         this.deletingPost.set(false);
         this.deletePostOpen.set(false);
-        void this._feedbackService.success('Post deleted');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.post.toast.deleted'),
+        );
       },
       error: (error: unknown) => {
         this.deletingPost.set(false);
-        void this._feedbackService.error(error, 'Could not delete that post.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.deleteFailed'),
+        );
       },
     });
   }
@@ -321,12 +337,17 @@ export class GroupDetail implements ViewWillEnter {
         this.leaving.set(false);
         this.leaveOpen.set(false);
         this._groupsRefresh.notify();
-        void this._feedbackService.success('You left the group');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.detail.toast.left'),
+        );
         void this._router.navigateByUrl('/tabs/groups');
       },
       error: (error: unknown) => {
         this.leaving.set(false);
-        void this._feedbackService.error(error, 'Could not leave this group.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.detail.toast.leaveFailed'),
+        );
       },
     });
   }

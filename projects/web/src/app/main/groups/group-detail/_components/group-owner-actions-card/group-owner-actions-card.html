@@ -1,28 +1,28 @@
 <p-card class="mh-side-card shadow-md">
   <ng-template #title>
-    <span class="mh-side-card__title">Owner actions</span>
+    <span class="mh-side-card__title">{{ 'groups.ownerActions.title' | translate }}</span>
   </ng-template>
 
   <div class="mh-side-card__column-actions">
-    <button pButton type="button" fluid (click)="onAddMembers()"><i class="pi pi-user-plus"></i> Add members</button>
+    <button pButton type="button" fluid (click)="onAddMembers()"><i class="pi pi-user-plus"></i> {{ 'groups.common.addMembers' | translate }}</button>
     @if (hasActiveLink()) {
     <button pButton type="button" severity="secondary" outlined fluid (click)="onJoinLink()">
       <i class="pi pi-link"></i>
-      Copy join link
+      {{ 'groups.common.copyJoinLink' | translate }}
     </button>
     } @else {
     <button pButton type="button" severity="secondary" outlined fluid (click)="onJoinLink()" [disabled]="generating()">
       <i class="pi" [class]="generating() ? 'pi-spinner pi-spin' : 'pi-link'"></i>
-      Generate join link
+      {{ 'groups.common.generateJoinLink' | translate }}
     </button>
     }
     <button pButton type="button" severity="secondary" outlined fluid (click)="onEditGroup()">
       <i class="pi pi-pencil"></i>
-      Edit group
+      {{ 'groups.common.editGroup' | translate }}
     </button>
   </div>
 
   @if (hint(); as h) {
-  <p-message severity="info" class="mh-side-card__hint mt-5">{{ h }}</p-message>
+  <p-message severity="info" class="mh-side-card__hint mt-5">{{ h | translate }}</p-message>
   }
 </p-card>

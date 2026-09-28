@@ -504,6 +504,379 @@
       "navigator": "Navigare în săptămână"
     }
   },
+  "groups": {
+    "about": {
+      "contactTitle": "Informații de contact",
+      "joinLinkHint": "Trimite acest link persoanelor pe care vrei să le inviți. Oricine are linkul poate cere să se alăture.",
+      "joinLinkTitle": "Link de alăturare",
+      "noDescription": "Nicio descriere adăugată încă.",
+      "revokeLink": "Revocă linkul",
+      "title": "Despre",
+      "visibility": "Vizibilitate"
+    },
+    "activity": {
+      "lastMember": "Ultimul membru",
+      "lastPost": "Ultima postare",
+      "title": "Activitate"
+    },
+    "addMembers": {
+      "addCount": "{count, plural, one {Adaugă # membru} few {Adaugă # membri} other {Adaugă # de membri}}",
+      "empty": "Toți clienții tăi activi sunt deja membri ai acestui grup.",
+      "loading": "Se încarcă clienții...",
+      "searchPlaceholder": "Caută după nume sau email..."
+    },
+    "card": {
+      "actions": "Acțiuni pentru grup",
+      "inactive": "Inactiv",
+      "menu": {
+        "copyInviteLink": "Copiază linkul de invitație",
+        "delete": "Șterge grupul",
+        "invite": "Invită membri"
+      },
+      "visit": "Vezi grupul"
+    },
+    "comments": {
+      "empty": "Fii primul care comentează.",
+      "loadMore": "Încarcă mai multe comentarii",
+      "placeholder": "Scrie un comentariu...",
+      "post": "Publică",
+      "reply": "Răspunde",
+      "replyPlaceholder": "Scrie un răspuns..."
+    },
+    "common": {
+      "addMembers": "Adaugă membri",
+      "copyJoinLink": "Copiază linkul de alăturare",
+      "created": "Creat",
+      "editGroup": "Editează grupul",
+      "generateJoinLink": "Generează link de alăturare",
+      "joinPolicy": "Politică de alăturare",
+      "leaveGroup": "Părăsește grupul",
+      "members": "Membri",
+      "notFound": "Grupul nu a fost găsit",
+      "tags": "Etichete"
+    },
+    "confirm": {
+      "deleteComment": {
+        "header": "Șterge comentariul",
+        "message": "Ștergi acest comentariu?"
+      },
+      "deleteGroup": {
+        "accept": "Da, șterge",
+        "header": "Șterge grupul",
+        "message": "Sigur vrei să ștergi „{name}”? Acțiunea nu poate fi anulată."
+      },
+      "leave": {
+        "header": "Părăsește grupul",
+        "message": "Sigur vrei să părăsești „{name}”?"
+      },
+      "removeMember": {
+        "header": "Elimină membrul",
+        "message": "Sigur vrei să-l elimini pe {name} din acest grup?",
+        "messageUnknown": "Sigur vrei să elimini acest membru din grup?"
+      },
+      "revokeLink": {
+        "header": "Revocă linkul de alăturare",
+        "message": "Sigur vrei să revoci linkul de alăturare actual? Linkurile existente nu vor mai funcționa."
+      }
+    },
+    "deletePost": {
+      "header": "Șterge postarea",
+      "message": "Ștergi definitiv această postare? Comentariile, reacțiile și imaginile încărcate vor fi eliminate și ele."
+    },
+    "detail": {
+      "backToGroups": "Înapoi la grupuri",
+      "notFoundMessage": "Grupul pe care îl cauți nu există sau a fost șters."
+    },
+    "discover": {
+      "noMore": "Nu mai sunt rezultate.",
+      "searchPlaceholder": "Caută grupuri",
+      "subtitle": "Găsește comunități la care să te alături.",
+      "title": "Descoperă grupuri"
+    },
+    "emptyMembers": {
+      "addManually": "Adaugă manual",
+      "message": "Trimite un link de alăturare clienților tăi — se pot alătura dintr-o singură atingere, fără formular de înscriere.",
+      "title": "Deocamdată doar tu"
+    },
+    "emptyState": {
+      "discover": {
+        "message": "Încearcă o altă căutare sau revino mai târziu.",
+        "title": "Niciun grup nu corespunde căutării"
+      },
+      "manage": {
+        "cta": "Creează primul grup",
+        "message": "Organizează-ți clienții în grupuri pentru sesiuni și comunicare — începe cu cei mai activi 3–5 clienți.",
+        "title": "Niciun grup încă"
+      }
+    },
+    "feed": {
+      "caughtUp": "Ești la zi.",
+      "empty": {
+        "action": "Descoperă grupuri",
+        "message": "Alătură-te unor grupuri ca să vezi postări în flux.",
+        "title": "Fluxul tău e gol"
+      },
+      "subtitle": "Cele mai noi postări din grupurile din care faci parte.",
+      "title": "Flux"
+    },
+    "formDialog": {
+      "create": "Creează grupul",
+      "descriptionPlaceholder": "Descrie scopul acestui grup...",
+      "joinPolicyPlaceholder": "Alege politica de alăturare",
+      "namePlaceholder": "Introdu numele grupului",
+      "publicHint": "Vizibil în descoperirea grupurilor",
+      "publicLabel": "Grup public",
+      "tagPlaceholder": "Adaugă o etichetă și apasă Enter"
+    },
+    "join": {
+      "cancelRequest": "Anulează cererea",
+      "inviteOnly": "Doar cu invitație",
+      "joinGroup": "Alătură-te grupului",
+      "requestPending": "Cerere în așteptare",
+      "requestToJoin": "Cere să te alături"
+    },
+    "joinLink": {
+      "errorTitle": "Nu te-ai putut alătura",
+      "goToDashboard": "Mergi la panou",
+      "invalidOrExpired": "Acest link de alăturare este invalid sau a expirat.",
+      "joining": "Te alături grupului...",
+      "joiningA11y": "Alăturare la grup",
+      "missingToken": "Link de alăturare invalid. Lipsește tokenul.",
+      "successMessage": "Te-ai alăturat grupului cu succes.",
+      "successTitle": "Ai intrat!"
+    },
+    "joinPolicy": {
+      "APPROVAL": "Cu aprobare",
+      "INVITE_ONLY": "Doar cu invitație",
+      "OPEN": "Deschis"
+    },
+    "joinPolicyHint": {
+      "APPROVAL": "Membrii cer să se alăture, tu aprobi",
+      "INVITE_ONLY": "Membrii se pot alătura doar cu invitație",
+      "OPEN": "Oricine are linkul se poate alătura"
+    },
+    "joinPolicyLong": {
+      "APPROVAL": "Necesită aprobare",
+      "INVITE_ONLY": "Doar cu invitație",
+      "OPEN": "Deschis"
+    },
+    "layout": {
+      "createGroup": "Creează un grup nou",
+      "joinedNone": "Nu te-ai alăturat încă niciunui grup.",
+      "joinedTitle": "Grupuri în care te-ai alăturat"
+    },
+    "members": {
+      "demote": "Retrogradează la membru",
+      "empty": {
+        "message": "Încearcă un alt termen de căutare.",
+        "title": "Niciun membru nu corespunde căutării"
+      },
+      "joined": "Alăturat",
+      "pendingRequests": "Cereri în așteptare",
+      "promote": "Promovează la moderator",
+      "remove": "Elimină membrul",
+      "role": "Rol",
+      "searchPlaceholder": "Caută membri…",
+      "subtitle": "Gestionează persoanele din acest grup, rolurile și permisiunile lor.",
+      "title": "Membri · {count}",
+      "unknownUser": "Utilizator necunoscut"
+    },
+    "ownerActions": {
+      "hint": "Trimite linkul de alăturare clienților tăi ca să crească grupul.",
+      "title": "Acțiuni de administrator"
+    },
+    "ownerCard": {
+      "fallbackName": "Administratorul grupului",
+      "message": "Mesaj",
+      "profile": "Profil",
+      "title": "Administrator"
+    },
+    "pendingPosts": {
+      "images": "{count, plural, one {# imagine} few {# imagini} other {# de imagini}}",
+      "loadingA11y": "Se încarcă postările în așteptare",
+      "title": "În așteptarea aprobării"
+    },
+    "photoViewer": {
+      "alt": "Fotografia {index}",
+      "goBack": "Înapoi",
+      "loadFailed": "Nu am putut încărca această fotografie.",
+      "noPhotos": "Această postare nu are fotografii.",
+      "notFound": "Fotografia nu a fost găsită."
+    },
+    "post": {
+      "comment": "Comentează",
+      "imageAlt": "Imaginea {index} din postare",
+      "like": "Apreciază",
+      "openPhoto": "Deschide fotografia {index}",
+      "postedIn": "Postat în",
+      "readMore": "Citește mai mult",
+      "unknownAuthor": "Membru"
+    },
+    "postDialog": {
+      "addImages": "Adaugă imagini",
+      "contentLabel": "La ce te gândești?",
+      "contentPlaceholder": "Împărtășește o noutate cu grupul tău...",
+      "createTitle": "Creează o postare",
+      "editTitle": "Editează postarea",
+      "failed": "Eșuat",
+      "groupsLabel": "Publică în (unul sau mai multe)",
+      "groupsPlaceholder": "Alege grupuri...",
+      "imagesLabel": "Imagini (opțional, maximum {max})",
+      "noPostableGroups": "Nu ai niciun grup în care să poți posta.",
+      "removeImage": "Elimină imaginea",
+      "submit": "Publică",
+      "validation": {
+        "contentRequired": "Scrie ceva de împărtășit.",
+        "contentTooLong": "Postările trebuie să aibă sub {max} de caractere.",
+        "groupsRequired": "Alege cel puțin un grup."
+      }
+    },
+    "posts": {
+      "createFirst": "Creează prima postare",
+      "empty": {
+        "canPost": "Fii primul care împărtășește o noutate, pune o întrebare sau pornește o conversație.",
+        "readOnly": "Când membrii încep să posteze, le vei vedea aici.",
+        "title": "Nicio postare încă"
+      },
+      "newPost": "Postare nouă",
+      "title": "Postări ({count})"
+    },
+    "preview": {
+      "backToDiscover": "Înapoi la descoperire",
+      "breadcrumbFallback": "Previzualizare",
+      "coach": "Antrenor",
+      "notFoundMessage": "Acest grup este privat sau nu mai este disponibil.",
+      "upcomingSessions": "Sesiuni viitoare"
+    },
+    "toast": {
+      "addMembersFailed": "Membrii nu au putut fi adăugați",
+      "cancelRequestFailed": "Nu am putut anula cererea",
+      "changeRoleFailed": "Nu am putut schimba rolul",
+      "clientsLoadFailed": "Nu am putut încărca clienții",
+      "comingSoon": {
+        "detail": "Arhivarea grupurilor va fi disponibilă într-o actualizare viitoare.",
+        "summary": "În curând"
+      },
+      "commentDeleteFailed": "Nu am putut șterge comentariul",
+      "commentPostFailed": "Nu am putut publica comentariul",
+      "commentsLoadFailed": "Nu am putut încărca comentariile",
+      "deleteGroupFailed": "Grupul nu a putut fi șters",
+      "detailsLoadFailed": "Nu am putut încărca detaliile grupului",
+      "discoverLoadFailed": "Nu am putut încărca grupurile",
+      "discoverLoadMoreFailed": "Nu am putut încărca mai multe grupuri",
+      "feedLoadFailed": "Nu am putut încărca fluxul",
+      "generateLinkFailed": "Nu am putut genera linkul de alăturare",
+      "groupCreateFailed": "Grupul nu a putut fi creat",
+      "groupCreated": {
+        "detail": "Grupul tău nou a fost creat",
+        "summary": "Grup creat"
+      },
+      "groupDeleted": {
+        "detail": "„{name}” a fost șters",
+        "summary": "Grup șters"
+      },
+      "groupLoadFailed": "Nu am putut încărca grupul",
+      "groupUpdateFailed": "Grupul nu a putut fi actualizat",
+      "groupUpdated": {
+        "detail": "Grupul a fost actualizat",
+        "summary": "Grup actualizat"
+      },
+      "groupsLoadFailed": "Nu am putut încărca grupurile",
+      "imageLimit": {
+        "detail": "Maximum {max} imagini per postare.",
+        "summary": "Ai atins limita de imagini"
+      },
+      "imageUploadFailed": "Încărcarea imaginii a eșuat",
+      "inviteLinkCopied": "Linkul de invitație a fost copiat în clipboard.",
+      "joinFailed": "Nu te-ai putut alătura grupului",
+      "joinLinkCopied": "Linkul de alăturare a fost copiat în clipboard",
+      "joinLinkGenerated": {
+        "detail": "Linkul a fost copiat în clipboard",
+        "summary": "Link de alăturare generat"
+      },
+      "joined": {
+        "detail": "Acum ești membru al grupului „{name}”.",
+        "summary": "Te-ai alăturat"
+      },
+      "leaveFailed": "Nu am putut părăsi grupul",
+      "left": {
+        "detail": "Ai părăsit grupul „{name}”",
+        "summary": "Ai părăsit grupul"
+      },
+      "linkRevoked": {
+        "detail": "Linkul de alăturare a fost revocat",
+        "summary": "Link revocat"
+      },
+      "linkUnavailable": {
+        "detail": "Generează un link de alăturare nou ca să-l poți copia.",
+        "summary": "Link indisponibil"
+      },
+      "memberDemoted": "Membru retrogradat",
+      "memberPromoted": "Membru promovat",
+      "memberRemoved": {
+        "detail": "Membrul a fost eliminat din grup",
+        "summary": "Membru eliminat"
+      },
+      "membersAdded": {
+        "detail": "{count, plural, one {# membru adăugat în grup} few {# membri adăugați în grup} other {# de membri adăugați în grup}}",
+        "summary": "Membri adăugați"
+      },
+      "membersLoadFailed": "Nu am putut încărca membrii grupului",
+      "moderateFailed": "Nu am putut modera postarea",
+      "noInviteLink": {
+        "detail": "Generează mai întâi un link de invitație din setările grupului.",
+        "summary": "Niciun link de invitație"
+      },
+      "pendingPostsLoadFailed": "Nu am putut încărca postările în așteptare",
+      "photoLoadFailed": "Nu am putut încărca fotografia",
+      "postApproved": "Postare aprobată",
+      "postCreateFailed": "Nu am putut crea postarea",
+      "postCreated": {
+        "detail": "Postarea ta e publicată.",
+        "detailShared": "{count, plural, one {Distribuită în # grup.} few {Distribuită în # grupuri.} other {Distribuită în # de grupuri.}}",
+        "summary": "Postare creată"
+      },
+      "postDeleteFailed": "Nu am putut șterge postarea",
+      "postDeleted": "Postare ștearsă",
+      "postRejected": "Postare respinsă",
+      "postUpdateFailed": "Nu am putut actualiza postarea",
+      "postUpdated": {
+        "detail": "Modificările tale sunt publicate.",
+        "summary": "Postare actualizată"
+      },
+      "postsLoadFailed": "Nu am putut încărca postările",
+      "postsLoadMoreFailed": "Nu am putut încărca mai multe postări",
+      "reactionFailed": "Nu am putut actualiza reacția",
+      "removeMemberFailed": "Nu am putut elimina membrul",
+      "replyPostFailed": "Nu am putut publica răspunsul",
+      "requestApproved": "Cerere aprobată",
+      "requestCancelled": "Cerere anulată",
+      "requestRejected": "Cerere respinsă",
+      "requestSent": {
+        "detail": "Administratorul îți va analiza cererea de alăturare.",
+        "summary": "Cerere trimisă"
+      },
+      "requestUpdateFailed": "Nu am putut actualiza cererea",
+      "revokeLinkFailed": "Nu am putut revoca linkul de alăturare",
+      "skippedFile": {
+        "notImage": "{name}: nu este o imagine.",
+        "summary": "Fișier omis",
+        "tooLarge": "{name}: mai mare de 5 MB."
+      },
+      "yourGroupsLoadFailed": "Nu am putut încărca grupurile tale"
+    },
+    "visibility": {
+      "private": "Privat",
+      "privateHint": "Nu apare în căutare",
+      "public": "Public"
+    },
+    "yourGroups": {
+      "newGroup": "Grup nou",
+      "subtitleCoach": "Organizează-ți clienții în grupuri pentru sesiuni și comunicare.",
+      "subtitleMember": "Grupurile din care faci parte.",
+      "title": "Grupurile tale"
+    }
+  },
   "mySessions": {
     "book": {
       "approval": "Aprobare",

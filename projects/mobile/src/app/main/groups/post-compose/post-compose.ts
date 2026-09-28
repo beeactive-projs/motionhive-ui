@@ -15,6 +15,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { forkJoin, of, switchMap, take } from 'rxjs';
 
@@ -66,6 +67,7 @@ interface PendingImage {
     IonTextarea,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './post-compose.html',
   styleUrl: './post-compose.scss',
@@ -77,6 +79,7 @@ export class PostCompose {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
@@ -165,11 +168,17 @@ export class PostCompose {
 
     for (const file of files) {
       if (!this.canAddImage()) {
-        void this._feedbackService.error(null, `You can add up to ${this.maxImages} photos.`);
+        void this._feedbackService.error(
+          null,
+          this._translateService.instant('groups.compose.toast.tooMany', { count: this.maxImages }),
+        );
         return;
       }
       if (file.size > IMAGE_MAX_BYTES) {
-        void this._feedbackService.error(null, `${file.name} is larger than 5 MB.`);
+        void this._feedbackService.error(
+          null,
+          this._translateService.instant('groups.compose.toast.tooLarge', { name: file.name }),
+        );
         continue;
       }
       // Picking the same photo twice is a mis-tap, not an instruction to
@@ -229,7 +238,11 @@ export class PostCompose {
           // window would otherwise keep it.
           this._groupsRefresh.notify();
           void this._feedbackService.success(
-            this.needsApproval() ? 'Post sent for review' : 'Posted',
+            this._translateService.instant(
+              this.needsApproval()
+                ? 'groups.compose.toast.sentForReview'
+                : 'groups.compose.toast.posted',
+            ),
           );
           void this._router.navigate(['/tabs/groups', this._groupId()], { replaceUrl: true });
         },
@@ -240,9 +253,11 @@ export class PostCompose {
           // matched by equality — and both mean the same thing to a reader.
           void this._feedbackService.error(
             error,
-            isPostingBlockedError(message)
-              ? 'You can no longer post in this group.'
-              : 'Could not publish that post.',
+            this._translateService.instant(
+              isPostingBlockedError(message)
+                ? 'groups.compose.toast.blocked'
+                : 'groups.compose.toast.failed',
+            ),
           );
         },
       });

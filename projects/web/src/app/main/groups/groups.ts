@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   inject,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthStore, Group, GroupService, GroupsRefreshService, Hex, showApiError } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -27,11 +27,11 @@ import { monogramFromName, paletteFor } from './_utils/group-palette.util';
     ToastModule,
     GroupFormDialog,
     Hex,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './groups.html',
   styleUrl: './groups.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupsLayout implements OnInit {
   private readonly _groupService = inject(GroupService);
@@ -40,6 +40,7 @@ export class GroupsLayout implements OnInit {
   private readonly _router = inject(Router);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   readonly isInstructor = this._authStore.isInstructor;
 
@@ -76,7 +77,12 @@ export class GroupsLayout implements OnInit {
       },
       error: (err) => {
         this.loadingJoined.set(false);
-        showApiError(this._messageService, 'Error', 'Failed to load your groups', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('groups.toast.yourGroupsLoadFailed'),
+          err,
+        );
       },
     });
   }

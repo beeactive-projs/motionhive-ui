@@ -51,6 +51,7 @@
     "ok": "OK",
     "open": "Deschide",
     "previous": "Înapoi",
+    "reject": "Respinge",
     "remove": "Elimină",
     "resend": "Retrimite",
     "reset": "Resetează",
@@ -88,6 +89,7 @@
     "or": "sau",
     "pleaseTryAgain": "Încearcă din nou.",
     "session": "Sesiune",
+    "someone": "Cineva",
     "thisClient": "Acest client",
     "unknown": "Necunoscut",
     "you": "Tu"
@@ -150,6 +152,16 @@
       "MALE": "Masculin",
       "OTHER": "Altul",
       "PREFER_NOT_TO_SAY": "Prefer să nu spun"
+    },
+    "groupMemberRole": {
+      "MEMBER": "Membru",
+      "MODERATOR": "Moderator",
+      "OWNER": "Administrator"
+    },
+    "joinPolicy": {
+      "APPROVAL": "Cu aprobare",
+      "INVITE_ONLY": "Doar cu invitație",
+      "OPEN": "Deschis"
     },
     "myTab": {
       "cancelled": "Anulate",
@@ -246,7 +258,8 @@
       "tooManyRequestsSummary": "Mai încet puțin",
       "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în câteva momente.",
       "unexpected": "A apărut o eroare neașteptată. Încearcă din nou."
-    }
+    },
+    "staleData": "Actualizarea a eșuat. Vezi ultimele date."
   },
   "form": {
     "hint": {

@@ -21,6 +21,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
@@ -79,6 +80,7 @@ import { PostDetailStore } from './post-detail.store';
     IonToolbar,
     PostGallery,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.scss',
@@ -88,9 +90,10 @@ export class PostDetail implements ViewWillEnter {
   readonly store = inject(PostDetailStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _auth = inject(AuthStore);
+  private readonly _authStore = inject(AuthStore);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly maxLength = COMMENT_MAX_LENGTH;
@@ -115,7 +118,7 @@ export class PostDetail implements ViewWillEnter {
   readonly deletePostOpen = signal(false);
   readonly deletingPost = signal(false);
 
-  private readonly _viewerId = computed(() => this._auth.user()?.id ?? '');
+  private readonly _viewerId = computed(() => this._authStore.user()?.id ?? '');
 
   readonly canDeleteThisPost = computed(() => {
     const post = this.store.post();
@@ -152,14 +155,17 @@ export class PostDetail implements ViewWillEnter {
   /** Only worth showing as the limit comes into view. */
   readonly showRemaining = computed(() => this.remaining() <= 200);
 
-  readonly commentCountLabel = computed(() => {
-    const count = this.store.commentCount();
-    return `${count} ${count === 1 ? 'comment' : 'comments'}`;
-  });
+  readonly commentCountLabel = computed(() =>
+    this._translateService.instant('groups.post.commentCount', {
+      count: this.store.commentCount(),
+    }),
+  );
 
   readonly composerPlaceholder = computed(() => {
     const target = this.replyingTo();
-    return target ? `Reply to ${target.name}` : 'Add a comment';
+    return target
+      ? this._translateService.instant('groups.post.replyTo', { name: target.name })
+      : this._translateService.instant('groups.post.addComment');
   });
 
   constructor() {
@@ -181,7 +187,7 @@ export class PostDetail implements ViewWillEnter {
   // ── Display helpers ────────────────────────────────────────────────────
 
   authorName(row: Post | PostComment): string {
-    return row.author ? displayName(row.author, 'Member') : 'Member';
+    return displayName(row.author, this._translateService.instant('groups.common.member'));
   }
 
   avatarUrl(row: Post | PostComment): string | null {
@@ -254,7 +260,10 @@ export class PostDetail implements ViewWillEnter {
       },
       error: (error: unknown) => {
         this.sending.set(false);
-        void this._feedbackService.error(error, 'Could not post that comment.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.commentFailed'),
+        );
       },
     });
   }
@@ -264,7 +273,10 @@ export class PostDetail implements ViewWillEnter {
   like(): void {
     this.store.toggleReaction().subscribe({
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not save that reaction.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.reactionFailed'),
+        ),
     });
   }
 
@@ -282,11 +294,16 @@ export class PostDetail implements ViewWillEnter {
       next: () => {
         this.deletingComment.set(false);
         this.deleteCommentOpen.set(false);
-        void this._feedbackService.success('Comment deleted');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.post.toast.commentDeleted'),
+        );
       },
       error: (error: unknown) => {
         this.deletingComment.set(false);
-        void this._feedbackService.error(error, 'Could not delete that comment.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.deleteCommentFailed'),
+        );
       },
     });
   }
@@ -310,11 +327,16 @@ export class PostDetail implements ViewWillEnter {
         this.editOpen.set(false);
         // The feeds behind this screen are still showing the old text.
         this._groupsRefresh.notify();
-        void this._feedbackService.success('Post updated');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.post.toast.updated'),
+        );
       },
       error: (error: unknown) => {
         this.savingEdit.set(false);
-        void this._feedbackService.error(error, 'Could not save that change.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.editFailed'),
+        );
       },
     });
   }
@@ -333,14 +355,19 @@ export class PostDetail implements ViewWillEnter {
         this.deletePostOpen.set(false);
         // We are about to land on a feed that still lists this post.
         this._groupsRefresh.notify();
-        void this._feedbackService.success('Post deleted');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.post.toast.deleted'),
+        );
         // Back to the group: the screen it was deleted from no longer has
         // anything to show.
         void this._router.navigateByUrl('/tabs/groups');
       },
       error: (error: unknown) => {
         this.deletingPost.set(false);
-        void this._feedbackService.error(error, 'Could not delete that post.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.deleteFailed'),
+        );
       },
     });
   }

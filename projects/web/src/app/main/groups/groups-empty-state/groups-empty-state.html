@@ -13,21 +13,20 @@
 
     @if (variant() === 'manage') {
       <h3 class="text-lg font-bold">
-        No groups yet<span class="text-primary">.</span>
+        {{ 'groups.emptyState.manage.title' | translate }}<span class="text-primary">.</span>
       </h3>
       <p class="max-w-sm mx-auto mb-4 text-sm text-surface-600">
-        Organize your clients into groups for sessions and communication —
-        start with your most active 3 to 5 clients.
+        {{ 'groups.emptyState.manage.message' | translate }}
       </p>
       <div class="flex gap-2.5 justify-center">
-        <button pButton type="button" (click)="createGroup.emit()"><i class="pi pi-plus"></i> Create your first group</button>
+        <button pButton type="button" (click)="createGroup.emit()"><i class="pi pi-plus"></i> {{ 'groups.emptyState.manage.cta' | translate }}</button>
       </div>
     } @else {
       <h3 class="text-lg font-bold">
-        No groups match your search<span class="text-primary">.</span>
+        {{ 'groups.emptyState.discover.title' | translate }}<span class="text-primary">.</span>
       </h3>
       <p class="max-w-sm mx-auto text-sm text-surface-600">
-        Try a different search, or check back later.
+        {{ 'groups.emptyState.discover.message' | translate }}
       </p>
     }
   </div>

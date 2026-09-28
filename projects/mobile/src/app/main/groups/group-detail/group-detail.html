@@ -1,17 +1,17 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" text="Groups" />
+      <ion-back-button defaultHref="/tabs/groups" [text]="'nav.groups' | translate" />
     </ion-buttons>
-    <ion-title>{{ store.group()?.name ?? 'Group' }}</ion-title>
+    <ion-title>{{ store.group()?.name ?? ('groups.common.group' | translate) }}</ion-title>
     <ion-buttons slot="end">
       @if (canManage()) {
       <!-- Two separate destinations rather than one kebab: the queues are
            work that arrives, settings are a thing you go and change. -->
-      <ion-button shape="round" aria-label="Group settings" (click)="editGroup()">
+      <ion-button shape="round" [attr.aria-label]="'groups.detail.a11y.settings' | translate" (click)="editGroup()">
         <ion-icon slot="icon-only" name="settings-outline" />
       </ion-button>
-      <ion-button shape="round" aria-label="Review requests and posts" (click)="manage()">
+      <ion-button shape="round" [attr.aria-label]="'groups.detail.a11y.manage' | translate" (click)="manage()">
         <ion-icon slot="icon-only" name="shield-checkmark-outline" />
       </ion-button>
       }
@@ -34,13 +34,13 @@
   <ion-toolbar>
     <ion-segment [value]="store.tab()" (ionChange)="setTab($event.detail.value)">
       <ion-segment-button [value]="Tabs.Posts">
-        <ion-label>Posts</ion-label>
+        <ion-label>{{ 'groups.common.posts' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.Members">
-        <ion-label>Members</ion-label>
+        <ion-label>{{ 'groups.common.members' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.About">
-        <ion-label>About</ion-label>
+        <ion-label>{{ 'groups.common.about' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
@@ -50,7 +50,7 @@
 <ion-content [fullscreen]="true">
   <!-- `ion-title` is not a heading, so a screen reader had nothing to land
        on and the outline began at h2. -->
-  <h1 class="mh-visually-hidden">{{ store.group()?.name ?? 'Group' }}</h1>
+  <h1 class="mh-visually-hidden">{{ store.group()?.name ?? ('groups.common.group' | translate) }}</h1>
   <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
 
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
@@ -61,15 +61,16 @@
   <div class="stale" role="status">
     <div class="stale-bar">
       <ion-icon name="cloud-offline-outline" aria-hidden="true" />
-      <span>Couldn't refresh. Showing the last update.</span>
-      <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+      <span>{{ 'error.staleData' | translate }}</span>
+      <ion-button size="small" fill="clear" (click)="retry()">{{ 'button.tryAgain' | translate }}</ion-button>
     </div>
   </div>
   }
 
   @if (store.showGroupError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.common.loadGroupError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else if (store.showGroupSkeleton()) {
   <div class="mh-page" aria-busy="true">
     <ion-list [inset]="true" class="mh-card-list">
@@ -91,13 +92,14 @@
          floating button would sit on top of the newest post. -->
     <button type="button" class="compose" (click)="compose()">
       <ion-icon name="add-outline" aria-hidden="true" />
-      <span>Share something with the group</span>
+      <span>{{ 'groups.compose.placeholder' | translate }}</span>
     </button>
     }
 
     @if (store.showLoadError()) {
-    <mh-empty-state icon="alert-circle-outline" heading="Couldn't load posts"
-      message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+    <mh-empty-state icon="alert-circle-outline" [heading]="'groups.detail.posts.loadError' | translate"
+      [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()" />
     } @else if (store.showSkeleton()) {
     <div aria-busy="true">
       @for (_ of skeletonRows; track $index) {
@@ -115,8 +117,8 @@
       }
     </div>
     } @else if (store.isEmpty()) {
-    <mh-empty-state icon="chatbubble-outline" heading="No posts yet"
-      [message]="canCompose() ? 'Be the first to share something.' : 'Posts from this group will show up here.'" />
+    <mh-empty-state icon="chatbubble-outline" [heading]="'groups.detail.posts.empty.title' | translate"
+      [message]="(canCompose() ? 'groups.detail.posts.empty.canPost' : 'groups.detail.posts.empty.message') | translate" />
     } @else {
     @for (post of store.posts(); track post.id) {
     <article class="post-card">
@@ -127,7 +129,7 @@
           <p>{{ postedAt(post.postedAt) }}</p>
         </div>
         @if (mayDelete(post)) {
-        <ion-button fill="clear" shape="round" class="post-action" [attr.aria-label]="'Delete post by ' + authorName(post)"
+        <ion-button fill="clear" shape="round" class="post-action" [attr.aria-label]="'groups.post.a11y.deleteBy' | translate: { name: authorName(post) }"
           (click)="confirmDeletePost(post)">
           <ion-icon slot="icon-only" name="trash-outline" />
         </ion-button>
@@ -136,7 +138,7 @@
 
       <!-- The body opens the post; the buttons below it do their own thing,
            so the whole card is not one tap target. -->
-      <button type="button" class="post-body-button" [attr.aria-label]="'Open post by ' + authorName(post)"
+      <button type="button" class="post-body-button" [attr.aria-label]="'groups.post.a11y.openBy' | translate: { name: authorName(post) }"
         (click)="openPost(post.id)">
         <span class="post-body">{{ post.content }}</span>
       </button>
@@ -151,13 +153,13 @@
       <div class="post-meta">
         <ion-button fill="clear" size="small" class="meta-button"
           [class.reacted]="post.myReaction"
-          [attr.aria-label]="(post.myReaction ? 'Unlike' : 'Like') + ' post by ' + authorName(post)"
+          [attr.aria-label]="(post.myReaction ? 'groups.post.a11y.unlike' : 'groups.post.a11y.like') | translate: { name: authorName(post) }"
           [attr.aria-pressed]="!!post.myReaction" (click)="like(post)">
           <ion-icon slot="start" [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'" />
           {{ post.reactionCount }}
         </ion-button>
         <ion-button fill="clear" size="small" class="meta-button"
-          [attr.aria-label]="'Comments on post by ' + authorName(post)" (click)="openPost(post.id)">
+          [attr.aria-label]="'groups.post.a11y.comments' | translate: { name: authorName(post) }" (click)="openPost(post.id)">
           <ion-icon slot="start" name="chatbubble-outline" />
           {{ post.commentCount }}
         </ion-button>
@@ -169,8 +171,9 @@
   } @else if (isMembers()) {
   <div class="mh-page">
     @if (store.showLoadError()) {
-    <mh-empty-state icon="alert-circle-outline" heading="Couldn't load members"
-      message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+    <mh-empty-state icon="alert-circle-outline" [heading]="'groups.detail.members.loadError' | translate"
+      [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()" />
     } @else if (store.showSkeleton()) {
     <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
       @for (_ of skeletonRows; track $index; let last = $last) {
@@ -186,26 +189,27 @@
     @if (canManage()) {
     <ion-button expand="block" fill="outline" class="add-members" (click)="openAddMembers()">
       <ion-icon slot="start" name="person-add-outline" />
-      Add members
+      {{ 'groups.addMembers.title' | translate }}
     </ion-button>
     }
 
-    <ion-searchbar placeholder="Search members" aria-label="Search members" inputmode="search"
+    <ion-searchbar [placeholder]="'groups.detail.members.search' | translate"
+      [attr.aria-label]="'groups.detail.members.search' | translate" inputmode="search"
       [value]="store.memberQuery()" (ionInput)="onMemberQuery($event.detail.value ?? '')" />
 
     @if (store.searchNeedsMore()) {
     <!-- The search only sees rows already fetched, so in a big group the
          person may simply not be loaded yet. Saying "nobody matches" here
          would be wrong. -->
-    <mh-empty-state icon="people-outline" heading="Nobody matches yet"
-      message="Not everyone is loaded. Load more members and search again."
-      actionLabel="Load more" actionFill="outline" (action)="loadMoreMembers()" />
+    <mh-empty-state icon="people-outline" [heading]="'groups.detail.members.needsMore.title' | translate"
+      [message]="'groups.detail.members.needsMore.message' | translate"
+      [actionLabel]="'button.loadMore' | translate" actionFill="outline" (action)="loadMoreMembers()" />
     } @else if (store.isFilteredEmpty()) {
-    <mh-empty-state icon="people-outline" heading="Nobody matches"
-      message="No member matches that. Try a different name." />
+    <mh-empty-state icon="people-outline" [heading]="'groups.common.nobodyMatches' | translate"
+      [message]="'groups.detail.members.noMatch' | translate" />
     } @else if (store.isEmpty()) {
-    <mh-empty-state icon="people-outline" heading="No members yet"
-      message="People who join this group will show up here." />
+    <mh-empty-state icon="people-outline" [heading]="'groups.detail.members.empty.title' | translate"
+      [message]="'groups.detail.members.empty.message' | translate" />
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
       @for (member of store.visibleMembers(); track member.id; let last = $last) {
@@ -233,7 +237,7 @@
   <div class="mh-page about">
     @if (group.description) {
     <section class="mh-section">
-      <h2 class="mh-kicker">About</h2>
+      <h2 class="mh-kicker">{{ 'groups.common.about' | translate }}</h2>
       <p class="description">{{ group.description }}</p>
     </section>
     }
@@ -241,20 +245,20 @@
     <ion-list [inset]="true" class="mh-card-list">
       <ion-item lines="full">
         <ion-label>
-          <h2>Members</h2>
+          <h2>{{ 'groups.common.members' | translate }}</h2>
           <p>{{ memberCountLabel() }}</p>
         </ion-label>
       </ion-item>
       <ion-item [lines]="group.city ? 'full' : 'none'">
         <ion-label>
-          <h2>Joining</h2>
+          <h2>{{ 'groups.common.joining' | translate }}</h2>
           <p>{{ policyLabel() }}</p>
         </ion-label>
       </ion-item>
       @if (group.city) {
       <ion-item lines="none">
         <ion-label>
-          <h2>Where</h2>
+          <h2>{{ 'groups.common.where' | translate }}</h2>
           <p>{{ group.city }}@if (group.country) {, {{ group.country }}}</p>
         </ion-label>
       </ion-item>
@@ -262,7 +266,7 @@
     </ion-list>
 
     @if (group.tags?.length) {
-    <div class="mh-chip-row" role="group" aria-label="Group tags">
+    <div class="mh-chip-row" role="group" [attr.aria-label]="'groups.common.groupTags' | translate">
       @for (tag of group.tags; track tag) {
       <ion-chip color="medium" class="tag">{{ tag }}</ion-chip>
       }
@@ -277,8 +281,8 @@
       <ion-item button [detail]="true" lines="none" (click)="openJoinLink()">
         <ion-icon slot="start" name="link-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <h2>Invite link</h2>
-          <p>{{ group.joinToken ? 'A link is active' : 'No link yet' }}</p>
+          <h2>{{ 'groups.joinLink.title' | translate }}</h2>
+          <p>{{ (group.joinToken ? 'groups.detail.inviteLink.active' : 'groups.detail.inviteLink.none') | translate }}</p>
         </ion-label>
       </ion-item>
     </ion-list>
@@ -290,7 +294,7 @@
     <div class="leave-row">
       <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeave()">
         <ion-icon slot="start" name="exit-outline" />
-        Leave group
+        {{ 'groups.detail.leave.button' | translate }}
       </ion-button>
     </div>
     }
@@ -304,13 +308,13 @@
   }
 </ion-content>
 
-<mh-confirm-sheet [(open)]="leaveOpen" title="Leave this group?"
-  body="You'll stop seeing its posts. You can ask to join again later." confirmLabel="Leave"
+<mh-confirm-sheet [(open)]="leaveOpen" [title]="'groups.detail.leave.title' | translate"
+  [body]="'groups.detail.leave.body' | translate" [confirmLabel]="'button.leave' | translate"
   tone="danger" [saving]="leaving()" (confirm)="leave()" />
 
-<mh-confirm-sheet [(open)]="deletePostOpen" title="Delete this post?"
-  body="It will be removed for everyone, along with its comments." confirmLabel="Delete"
-  tone="danger" irreversible="This cannot be undone." [saving]="deletingPost()"
+<mh-confirm-sheet [(open)]="deletePostOpen" [title]="'groups.post.deletePost.title' | translate"
+  [body]="'groups.post.deletePost.body' | translate" [confirmLabel]="'button.delete' | translate"
+  tone="danger" [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deletingPost()"
   (confirm)="deletePost()" />
 
 @if (store.group(); as group) {

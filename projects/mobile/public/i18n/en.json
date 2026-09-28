@@ -210,8 +210,7 @@
       },
       "search": "Search clients",
       "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search every client.",
-      "searchScope": "{lens} · {filter}",
-      "stale": "Couldn't refresh. Showing the last update."
+      "searchScope": "{lens} · {filter}"
     },
     "notesSheet": {
       "helper": "Only you can see this. It stays with this client.",
@@ -325,6 +324,352 @@
       "note": "{needs} of {total, plural, one {# active client} other {# active clients}} {needs, plural, one {needs} other {need}} a look",
       "onTrack": "On track",
       "thisWeek": "This week"
+    }
+  },
+  "groups": {
+    "addMembers": {
+      "empty": {
+        "message": "Everyone you coach is already in this group.",
+        "title": "Nobody left to add"
+      },
+      "noMatch": "No client matches that name.",
+      "save": "Add {count}",
+      "search": "Search your clients",
+      "subtitle": "From the people you coach",
+      "title": "Add members",
+      "toast": {
+        "addFailed": "Could not add those members.",
+        "added": "{count, plural, one {# member added} other {# members added}}",
+        "loadFailed": "Could not load your clients."
+      }
+    },
+    "common": {
+      "about": "About",
+      "cannotBeUndone": "This cannot be undone.",
+      "group": "Group",
+      "groupTags": "Group tags",
+      "joining": "Joining",
+      "loadGroupError": "Couldn't load this group",
+      "member": "Member",
+      "members": "Members",
+      "nobodyMatches": "Nobody matches",
+      "postContent": "Post content",
+      "posts": "Posts",
+      "where": "Where"
+    },
+    "compose": {
+      "cannotPost": {
+        "message": "Only the group's owner and moderators can post in this group.",
+        "title": "Posting is off here"
+      },
+      "photo": "Photo",
+      "photos": "Photos on this post",
+      "placeholder": "Share something with the group",
+      "postingIn": "Posting in",
+      "remaining": "{count} left",
+      "removePhoto": "Remove {name}",
+      "reviewNote": "Posts here are reviewed before they appear.",
+      "submit": "Post",
+      "title": "New post",
+      "toast": {
+        "blocked": "You can no longer post in this group.",
+        "failed": "Could not publish that post.",
+        "posted": "Posted",
+        "sentForReview": "Post sent for review",
+        "tooLarge": "{name} is larger than 5 MB.",
+        "tooMany": "You can add up to {count, plural, one {# photo} other {# photos}}."
+      }
+    },
+    "detail": {
+      "a11y": {
+        "manage": "Review requests and posts",
+        "settings": "Group settings"
+      },
+      "announce": {
+        "count": "{count, plural, one {# member} other {# members}}.",
+        "none": "No members match that."
+      },
+      "inviteLink": {
+        "active": "A link is active",
+        "none": "No link yet"
+      },
+      "leave": {
+        "body": "You'll stop seeing its posts. You can ask to join again later.",
+        "button": "Leave group",
+        "title": "Leave this group?"
+      },
+      "members": {
+        "empty": {
+          "message": "People who join this group will show up here.",
+          "title": "No members yet"
+        },
+        "loadError": "Couldn't load members",
+        "needsMore": {
+          "message": "Not everyone is loaded. Load more members and search again.",
+          "title": "Nobody matches yet"
+        },
+        "noMatch": "No member matches that. Try a different name.",
+        "search": "Search members"
+      },
+      "posts": {
+        "empty": {
+          "canPost": "Be the first to share something.",
+          "message": "Posts from this group will show up here.",
+          "title": "No posts yet"
+        },
+        "loadError": "Couldn't load posts"
+      },
+      "toast": {
+        "leaveFailed": "Could not leave this group.",
+        "left": "You left the group"
+      }
+    },
+    "edit": {
+      "addTag": "Add tag",
+      "delete": {
+        "body": "Its posts, members and comments go with it.",
+        "button": "Delete group",
+        "title": "Delete this group?"
+      },
+      "descriptionPlaceholder": "What is this group for?",
+      "heading": {
+        "create": "New group",
+        "edit": "Edit group"
+      },
+      "namePlaceholder": "Morning Crew",
+      "notAllowed": {
+        "message": "Ask the group's owner if something needs updating.",
+        "title": "Only the owner can change this"
+      },
+      "posting": "Posting",
+      "privateNote": "This group is private, so people can only join from a link or an invite.",
+      "public": {
+        "hint": "Anyone can find it in Discover.",
+        "label": "Public group"
+      },
+      "removeTag": "Remove tag {tag}",
+      "saveCreate": "Create group",
+      "tagLabel": "Add a tag",
+      "tagPlaceholder": "strength",
+      "tags": "Tags",
+      "toast": {
+        "createFailed": "Could not create that group.",
+        "created": "Group created",
+        "deleteFailed": "Could not delete this group.",
+        "deleted": "Group deleted",
+        "saveFailed": "Could not save those changes.",
+        "updated": "Group updated"
+      }
+    },
+    "gallery": {
+      "openPhoto": "Open photo {index} of {total}",
+      "openPhotoBy": "Open photo {index} of {total} by {name}"
+    },
+    "join": {
+      "closed": "Invite only",
+      "join": "Join group",
+      "pending": "Request pending",
+      "request": "Request to join"
+    },
+    "joinLink": {
+      "create": "Create invite link",
+      "empty": {
+        "hint": "Create one to let people join without an invitation, even if the group is invite only.",
+        "title": "No invite link yet"
+      },
+      "hint": "Anyone with this link can join. Revoking it stops every copy you have already shared.",
+      "revoke": "Revoke",
+      "share": "Share link",
+      "shareText": "Join {name} on MotionHive",
+      "shareTextNoName": "Join my group on MotionHive",
+      "shareTitle": "Join my group",
+      "title": "Invite link",
+      "toast": {
+        "createFailed": "Could not create an invite link.",
+        "ready": "Invite link ready",
+        "revokeFailed": "Could not revoke that link.",
+        "revoked": "Invite link revoked"
+      }
+    },
+    "joinPolicy": {
+      "APPROVAL": "Approval required",
+      "INVITE_ONLY": "Invite only",
+      "OPEN": "Open"
+    },
+    "joinPolicyHint": {
+      "APPROVAL": "People request to join and you decide.",
+      "INVITE_ONLY": "Only people you invite can join.",
+      "OPEN": "Anyone can join instantly."
+    },
+    "list": {
+      "announce": {
+        "count": "{count, plural, one {# group} other {# groups}}.",
+        "none": "No groups match that."
+      },
+      "createGroup": "Create a group",
+      "discover": {
+        "empty": {
+          "message": "Public groups show up here as coaches create them.",
+          "title": "No public groups yet"
+        },
+        "noMatch": "No public group matches that. Try a different word."
+      },
+      "discoverGroups": "Discover groups",
+      "feed": {
+        "empty": {
+          "message": "Posts from your groups will show up here.",
+          "title": "Nothing posted yet"
+        },
+        "seeGroups": "See your groups"
+      },
+      "loadError": "Couldn't load groups",
+      "mine": {
+        "empty": {
+          "message": "Find a group to join and it shows up here.",
+          "title": "You're not in any groups"
+        }
+      },
+      "noGroups": {
+        "coachMessage": "Create a group to bring your clients together in one place.",
+        "memberMessage": "Join a group and posts from it show up here.",
+        "title": "No groups yet"
+      },
+      "private": "Private",
+      "search": "Search groups",
+      "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search.",
+      "segments": {
+        "discover": "Discover",
+        "feed": "Feed",
+        "mine": "Your groups"
+      }
+    },
+    "manage": {
+      "a11y": {
+        "approve": "Approve {name}",
+        "decline": "Decline {name}",
+        "publish": "Publish post by {name}",
+        "reject": "Reject post by {name}"
+      },
+      "asked": "Asked {time}",
+      "forbidden": {
+        "message": "Join requests and pending posts are handled by the group's owner.",
+        "title": "Only the owner can review these"
+      },
+      "heading": "Manage group",
+      "loadError": "Couldn't load these queues",
+      "posts": {
+        "empty": {
+          "message": "Posts waiting for approval will show up here.",
+          "title": "Nothing to review"
+        }
+      },
+      "publish": "Publish",
+      "requests": {
+        "empty": {
+          "message": "People asking to join will show up here.",
+          "title": "No requests waiting"
+        },
+        "tab": "Requests"
+      },
+      "title": "Manage",
+      "toast": {
+        "approved": "{name} joined",
+        "declined": "Request declined",
+        "failed": "Could not save that decision.",
+        "published": "Post published",
+        "rejected": "Post rejected"
+      },
+      "written": "Written {time}"
+    },
+    "photos": {
+      "alt": "Photo {index} of {total}",
+      "counter": "{index} of {total}",
+      "empty": {
+        "message": "It may have been edited since you opened it.",
+        "title": "No photos on this post"
+      },
+      "loadError": "Couldn't load these photos",
+      "next": "Next photo",
+      "previous": "Previous photo"
+    },
+    "post": {
+      "a11y": {
+        "comments": "Comments on post by {name}",
+        "deleteBy": "Delete post by {name}",
+        "deleteComment": "Delete comment by {name}",
+        "deleteThis": "Delete this post",
+        "editThis": "Edit this post",
+        "like": "Like post by {name}",
+        "likeThis": "Like this post",
+        "openBy": "Open post by {name}",
+        "openByMember": "Open post by a member",
+        "postComment": "Post comment",
+        "unlike": "Unlike post by {name}",
+        "unlikeThis": "Unlike this post",
+        "viewProfile": "View {name}’s profile"
+      },
+      "addComment": "Add a comment",
+      "commentCount": "{count, plural, one {# comment} other {# comments}}",
+      "comments": "Comments",
+      "commentsLoadError": "Couldn't load comments",
+      "deleteComment": {
+        "body": "It will be removed for everyone. Replies to it go too.",
+        "title": "Delete this comment?"
+      },
+      "deletePost": {
+        "body": "It will be removed for everyone, along with its comments.",
+        "title": "Delete this post?"
+      },
+      "editTitle": "Edit post",
+      "empty": {
+        "message": "Be the first to say something.",
+        "title": "No comments yet"
+      },
+      "loadError": {
+        "message": "It may have been deleted, or you may be offline.",
+        "title": "Couldn't load this post"
+      },
+      "remaining": "{count, plural, one {# character left} other {# characters left}}",
+      "reply": "Reply",
+      "replyTo": "Reply to {name}",
+      "replyingTo": "Replying to {name}",
+      "title": "Post",
+      "toast": {
+        "commentDeleted": "Comment deleted",
+        "commentFailed": "Could not post that comment.",
+        "deleteCommentFailed": "Could not delete that comment.",
+        "deleteFailed": "Could not delete that post.",
+        "deleted": "Post deleted",
+        "editFailed": "Could not save that change.",
+        "reactionFailed": "Could not save that reaction.",
+        "updated": "Post updated"
+      }
+    },
+    "postPolicy": {
+      "APPROVAL_REQUIRED": "Posts need approval",
+      "DISABLED": "Only staff can post",
+      "OPEN": "Anyone can post"
+    },
+    "postPolicyHint": {
+      "APPROVAL_REQUIRED": "You and your moderators review each one.",
+      "DISABLED": "Members can read and comment.",
+      "OPEN": "Members post straight to the feed."
+    },
+    "preview": {
+      "locked": "Posts and members are visible once you join.",
+      "notFound": {
+        "message": "Ask the owner for an invite, or look for another group.",
+        "title": "This group is private"
+      },
+      "runBy": "Run by",
+      "toast": {
+        "joinFailed": "Could not join this group.",
+        "joined": "You joined the group",
+        "requestSent": "Request sent",
+        "withdrawFailed": "Could not withdraw that request.",
+        "withdrawn": "Request withdrawn"
+      },
+      "withdraw": "Withdraw"
     }
   },
   "mySessions": {
@@ -785,7 +1130,6 @@
     "share": {
       "text": "{title} · {day}, {time}"
     },
-    "someone": "Someone",
     "status": {
       "approvalNeeded": "Approval needed",
       "conflict": "Conflict",

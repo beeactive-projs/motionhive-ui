@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ButtonDirective } from 'primeng/button';
@@ -22,11 +23,11 @@ import { GroupsEmptyState } from '../groups-empty-state/groups-empty-state';
     GroupCard,
     GroupCardSkeleton,
     GroupsEmptyState,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './your-groups.html',
   styleUrl: './your-groups.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YourGroups implements OnInit {
   private readonly _groupService = inject(GroupService);
@@ -35,6 +36,7 @@ export class YourGroups implements OnInit {
   private readonly _authStore = inject(AuthStore);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   readonly isInstructor = this._authStore.isInstructor;
 
@@ -64,8 +66,8 @@ export class YourGroups implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load groups',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('groups.toast.groupsLoadFailed'),
         });
       },
     });
@@ -92,8 +94,8 @@ export class YourGroups implements OnInit {
       case 'archive':
         this._messageService.add({
           severity: 'info',
-          summary: 'Coming soon',
-          detail: 'Archiving groups will be available in a future update.',
+          summary: this._translateService.instant('groups.toast.comingSoon.summary'),
+          detail: this._translateService.instant('groups.toast.comingSoon.detail'),
         });
         break;
       case 'delete':
@@ -106,27 +108,37 @@ export class YourGroups implements OnInit {
     if (!group.joinToken) {
       this._messageService.add({
         severity: 'warn',
-        summary: 'No invite link',
-        detail: 'Generate an invite link from the group settings first.',
+        summary: this._translateService.instant('groups.toast.noInviteLink.summary'),
+        detail: this._translateService.instant('groups.toast.noInviteLink.detail'),
       });
       return;
     }
-    const url = `${window.location.origin}/groups/join/${group.joinToken}`;
+    // `/join/:token` is where mainRoutes mounts the accept screen.
+    const url = `${window.location.origin}/join/${group.joinToken}`;
     navigator.clipboard.writeText(url).then(() => {
       this._messageService.add({
         severity: 'success',
-        summary: 'Copied',
-        detail: 'Invite link copied to clipboard.',
+        summary: this._translateService.instant('toast.summary.copied'),
+        detail: this._translateService.instant('groups.toast.inviteLinkCopied'),
       });
     });
   }
 
   private _confirmDelete(group: Group): void {
     this._confirmationService.confirm({
-      header: 'Delete group',
-      message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
-      acceptButtonProps: { severity: 'danger', label: 'Yes, delete', icon: 'pi pi-trash' },
-      rejectButtonProps: { severity: 'secondary', label: 'No', icon: 'pi pi-times', outlined: true },
+      header: this._translateService.instant('groups.confirm.deleteGroup.header'),
+      message: this._translateService.instant('groups.confirm.deleteGroup.message', { name: group.name }),
+      acceptButtonProps: {
+        severity: 'danger',
+        label: this._translateService.instant('groups.confirm.deleteGroup.accept'),
+        icon: 'pi pi-trash',
+      },
+      rejectButtonProps: {
+        severity: 'secondary',
+        label: this._translateService.instant('button.no'),
+        icon: 'pi pi-times',
+        outlined: true,
+      },
       accept: () => this._deleteGroup(group),
     });
   }
@@ -136,16 +148,16 @@ export class YourGroups implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Group deleted',
-          detail: `"${group.name}" has been deleted`,
+          summary: this._translateService.instant('groups.toast.groupDeleted.summary'),
+          detail: this._translateService.instant('groups.toast.groupDeleted.detail', { name: group.name }),
         });
         this.loadGroups();
       },
       error: () => {
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to delete group',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('groups.toast.deleteGroupFailed'),
         });
       },
     });

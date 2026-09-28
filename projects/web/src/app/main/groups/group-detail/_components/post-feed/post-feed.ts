@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -12,25 +11,26 @@ import {
   viewChild,
 } from '@angular/core';
 import { take } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 import { Post, PostService, showApiError } from 'core';
 import { PostCard } from '../post-card/post-card';
-import { Divider } from "primeng/divider";
+import { Divider } from 'primeng/divider';
 
 @Component({
   selector: 'mh-post-feed',
-  imports: [ButtonDirective, CardModule, SkeletonModule, PostCard, Divider],
+  imports: [ButtonDirective, CardModule, SkeletonModule, PostCard, Divider, TranslatePipe],
   templateUrl: './post-feed.html',
   styleUrl: './post-feed.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostFeed {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   readonly groupId = input.required<string>();
   readonly canPost = input.required<boolean>();
@@ -91,7 +91,12 @@ export class PostFeed {
       },
       error: (err) => {
         this.loading.set(false);
-        showApiError(this._messageService, 'Could not load posts', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.postsLoadFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -114,7 +119,12 @@ export class PostFeed {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Could not load more posts', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('groups.toast.postsLoadMoreFailed'),
+            '',
+            err,
+          );
         },
       });
   }

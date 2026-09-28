@@ -504,6 +504,379 @@
       "navigator": "Week navigator"
     }
   },
+  "groups": {
+    "about": {
+      "contactTitle": "Contact information",
+      "joinLinkHint": "Share this link with people you want to invite. Anyone with the link can request to join.",
+      "joinLinkTitle": "Join link",
+      "noDescription": "No description added yet.",
+      "revokeLink": "Revoke link",
+      "title": "About",
+      "visibility": "Visibility"
+    },
+    "activity": {
+      "lastMember": "Last member",
+      "lastPost": "Last post",
+      "title": "Activity"
+    },
+    "addMembers": {
+      "addCount": "{count, plural, one {Add # member} other {Add # members}}",
+      "empty": "All your active clients are already members of this group.",
+      "loading": "Loading clients...",
+      "searchPlaceholder": "Search by name or email..."
+    },
+    "card": {
+      "actions": "Group actions",
+      "inactive": "Inactive",
+      "menu": {
+        "copyInviteLink": "Copy invite link",
+        "delete": "Delete group",
+        "invite": "Invite members"
+      },
+      "visit": "Visit group"
+    },
+    "comments": {
+      "empty": "Be the first to comment.",
+      "loadMore": "Load more comments",
+      "placeholder": "Write a comment...",
+      "post": "Post",
+      "reply": "Reply",
+      "replyPlaceholder": "Write a reply..."
+    },
+    "common": {
+      "addMembers": "Add members",
+      "copyJoinLink": "Copy join link",
+      "created": "Created",
+      "editGroup": "Edit group",
+      "generateJoinLink": "Generate join link",
+      "joinPolicy": "Join policy",
+      "leaveGroup": "Leave group",
+      "members": "Members",
+      "notFound": "Group not found",
+      "tags": "Tags"
+    },
+    "confirm": {
+      "deleteComment": {
+        "header": "Delete comment",
+        "message": "Delete this comment?"
+      },
+      "deleteGroup": {
+        "accept": "Yes, delete",
+        "header": "Delete group",
+        "message": "Are you sure you want to delete \"{name}\"? This action cannot be undone."
+      },
+      "leave": {
+        "header": "Leave group",
+        "message": "Are you sure you want to leave \"{name}\"?"
+      },
+      "removeMember": {
+        "header": "Remove member",
+        "message": "Are you sure you want to remove {name} from this group?",
+        "messageUnknown": "Are you sure you want to remove this member from this group?"
+      },
+      "revokeLink": {
+        "header": "Revoke join link",
+        "message": "Are you sure you want to revoke the current join link? Existing links will stop working."
+      }
+    },
+    "deletePost": {
+      "header": "Delete post",
+      "message": "Delete this post permanently? Comments, reactions, and uploaded images will be removed too."
+    },
+    "detail": {
+      "backToGroups": "Back to groups",
+      "notFoundMessage": "The group you are looking for does not exist or has been deleted."
+    },
+    "discover": {
+      "noMore": "No more results.",
+      "searchPlaceholder": "Search groups",
+      "subtitle": "Find communities to join.",
+      "title": "Discover groups"
+    },
+    "emptyMembers": {
+      "addManually": "Add manually",
+      "message": "Send a join link to your clients — they can join in one tap, no signup form.",
+      "title": "Just you so far"
+    },
+    "emptyState": {
+      "discover": {
+        "message": "Try a different search, or check back later.",
+        "title": "No groups match your search"
+      },
+      "manage": {
+        "cta": "Create your first group",
+        "message": "Organize your clients into groups for sessions and communication — start with your most active 3 to 5 clients.",
+        "title": "No groups yet"
+      }
+    },
+    "feed": {
+      "caughtUp": "You're all caught up.",
+      "empty": {
+        "action": "Discover groups",
+        "message": "Join groups to see posts in your feed.",
+        "title": "Your feed is empty"
+      },
+      "subtitle": "Latest posts from groups you've joined.",
+      "title": "Feed"
+    },
+    "formDialog": {
+      "create": "Create group",
+      "descriptionPlaceholder": "Describe the purpose of this group...",
+      "joinPolicyPlaceholder": "Select join policy",
+      "namePlaceholder": "Enter group name",
+      "publicHint": "Visible in group discovery",
+      "publicLabel": "Public group",
+      "tagPlaceholder": "Add a tag and press Enter"
+    },
+    "join": {
+      "cancelRequest": "Cancel request",
+      "inviteOnly": "Invite only",
+      "joinGroup": "Join group",
+      "requestPending": "Request pending",
+      "requestToJoin": "Request to join"
+    },
+    "joinLink": {
+      "errorTitle": "Unable to join",
+      "goToDashboard": "Go to dashboard",
+      "invalidOrExpired": "This join link is invalid or has expired.",
+      "joining": "Joining group...",
+      "joiningA11y": "Joining group",
+      "missingToken": "Invalid join link. No token provided.",
+      "successMessage": "You have successfully joined the group.",
+      "successTitle": "You're in!"
+    },
+    "joinPolicy": {
+      "APPROVAL": "Approval",
+      "INVITE_ONLY": "Invite only",
+      "OPEN": "Open"
+    },
+    "joinPolicyHint": {
+      "APPROVAL": "Members request to join, you approve",
+      "INVITE_ONLY": "Members can only join with an invite",
+      "OPEN": "Anyone with the link can join"
+    },
+    "joinPolicyLong": {
+      "APPROVAL": "Approval required",
+      "INVITE_ONLY": "Invite only",
+      "OPEN": "Open"
+    },
+    "layout": {
+      "createGroup": "Create new group",
+      "joinedNone": "You haven't joined any groups yet.",
+      "joinedTitle": "Groups you've joined"
+    },
+    "members": {
+      "demote": "Demote to member",
+      "empty": {
+        "message": "Try a different search term.",
+        "title": "No members match your search"
+      },
+      "joined": "Joined",
+      "pendingRequests": "Pending requests",
+      "promote": "Promote to moderator",
+      "remove": "Remove member",
+      "role": "Role",
+      "searchPlaceholder": "Search members…",
+      "subtitle": "Manage the people in this group, their roles, and permissions.",
+      "title": "Members · {count}",
+      "unknownUser": "Unknown user"
+    },
+    "ownerActions": {
+      "hint": "Send the join link to your clients to grow the group.",
+      "title": "Owner actions"
+    },
+    "ownerCard": {
+      "fallbackName": "Group owner",
+      "message": "Message",
+      "profile": "Profile",
+      "title": "Owner"
+    },
+    "pendingPosts": {
+      "images": "{count, plural, one {# image} other {# images}}",
+      "loadingA11y": "Loading pending posts",
+      "title": "Pending approval"
+    },
+    "photoViewer": {
+      "alt": "Photo {index}",
+      "goBack": "Go back",
+      "loadFailed": "Could not load this photo.",
+      "noPhotos": "This post has no photos.",
+      "notFound": "Photo not found."
+    },
+    "post": {
+      "comment": "Comment",
+      "imageAlt": "Post image {index}",
+      "like": "Like",
+      "openPhoto": "Open photo {index}",
+      "postedIn": "Posted in",
+      "readMore": "Read more",
+      "unknownAuthor": "Member"
+    },
+    "postDialog": {
+      "addImages": "Add images",
+      "contentLabel": "What's on your mind?",
+      "contentPlaceholder": "Share an update with your group...",
+      "createTitle": "Create post",
+      "editTitle": "Edit post",
+      "failed": "Failed",
+      "groupsLabel": "Post to (1 or more)",
+      "groupsPlaceholder": "Pick groups...",
+      "imagesLabel": "Images (optional, up to {max})",
+      "noPostableGroups": "You don't have any groups where posting is allowed.",
+      "removeImage": "Remove image",
+      "submit": "Post",
+      "validation": {
+        "contentRequired": "Write something to share.",
+        "contentTooLong": "Keep posts under {max} characters.",
+        "groupsRequired": "Pick at least one group."
+      }
+    },
+    "posts": {
+      "createFirst": "Create the first post",
+      "empty": {
+        "canPost": "Be the first to share an update, ask a question, or kick off a conversation.",
+        "readOnly": "Once members start sharing updates, you'll see them here.",
+        "title": "No posts yet"
+      },
+      "newPost": "New post",
+      "title": "Posts ({count})"
+    },
+    "preview": {
+      "backToDiscover": "Back to discover",
+      "breadcrumbFallback": "Preview",
+      "coach": "Coach",
+      "notFoundMessage": "This group is private or no longer available.",
+      "upcomingSessions": "Upcoming sessions"
+    },
+    "toast": {
+      "addMembersFailed": "Failed to add members",
+      "cancelRequestFailed": "Could not cancel request",
+      "changeRoleFailed": "Could not change role",
+      "clientsLoadFailed": "Failed to load clients",
+      "comingSoon": {
+        "detail": "Archiving groups will be available in a future update.",
+        "summary": "Coming soon"
+      },
+      "commentDeleteFailed": "Could not delete comment",
+      "commentPostFailed": "Could not post comment",
+      "commentsLoadFailed": "Could not load comments",
+      "deleteGroupFailed": "Failed to delete group",
+      "detailsLoadFailed": "Failed to load group details",
+      "discoverLoadFailed": "Could not load groups",
+      "discoverLoadMoreFailed": "Could not load more groups",
+      "feedLoadFailed": "Could not load feed",
+      "generateLinkFailed": "Failed to generate join link",
+      "groupCreateFailed": "Failed to create group",
+      "groupCreated": {
+        "detail": "Your new group has been created successfully",
+        "summary": "Group created"
+      },
+      "groupDeleted": {
+        "detail": "\"{name}\" has been deleted",
+        "summary": "Group deleted"
+      },
+      "groupLoadFailed": "Failed to load group",
+      "groupUpdateFailed": "Failed to update group",
+      "groupUpdated": {
+        "detail": "Group has been updated successfully",
+        "summary": "Group updated"
+      },
+      "groupsLoadFailed": "Failed to load groups",
+      "imageLimit": {
+        "detail": "Up to {max} images per post.",
+        "summary": "Image limit reached"
+      },
+      "imageUploadFailed": "Image upload failed",
+      "inviteLinkCopied": "Invite link copied to clipboard.",
+      "joinFailed": "Could not join group",
+      "joinLinkCopied": "Join link copied to clipboard",
+      "joinLinkGenerated": {
+        "detail": "Link has been copied to your clipboard",
+        "summary": "Join link generated"
+      },
+      "joined": {
+        "detail": "You're now a member of \"{name}\".",
+        "summary": "Joined"
+      },
+      "leaveFailed": "Failed to leave group",
+      "left": {
+        "detail": "You have left \"{name}\"",
+        "summary": "Left group"
+      },
+      "linkRevoked": {
+        "detail": "The join link has been revoked",
+        "summary": "Link revoked"
+      },
+      "linkUnavailable": {
+        "detail": "Please generate a new join link to copy it.",
+        "summary": "Link unavailable"
+      },
+      "memberDemoted": "Member demoted",
+      "memberPromoted": "Member promoted",
+      "memberRemoved": {
+        "detail": "Member has been removed from the group",
+        "summary": "Member removed"
+      },
+      "membersAdded": {
+        "detail": "{count, plural, one {# member added to the group} other {# members added to the group}}",
+        "summary": "Members added"
+      },
+      "membersLoadFailed": "Failed to load group members",
+      "moderateFailed": "Could not moderate post",
+      "noInviteLink": {
+        "detail": "Generate an invite link from the group settings first.",
+        "summary": "No invite link"
+      },
+      "pendingPostsLoadFailed": "Could not load pending posts",
+      "photoLoadFailed": "Could not load photo",
+      "postApproved": "Post approved",
+      "postCreateFailed": "Could not create post",
+      "postCreated": {
+        "detail": "Your post is live.",
+        "detailShared": "{count, plural, one {Shared with # group.} other {Shared with # groups.}}",
+        "summary": "Post created"
+      },
+      "postDeleteFailed": "Could not delete post",
+      "postDeleted": "Post deleted",
+      "postRejected": "Post rejected",
+      "postUpdateFailed": "Could not update post",
+      "postUpdated": {
+        "detail": "Your changes are live.",
+        "summary": "Post updated"
+      },
+      "postsLoadFailed": "Could not load posts",
+      "postsLoadMoreFailed": "Could not load more posts",
+      "reactionFailed": "Could not update reaction",
+      "removeMemberFailed": "Failed to remove member",
+      "replyPostFailed": "Could not post reply",
+      "requestApproved": "Request approved",
+      "requestCancelled": "Request cancelled",
+      "requestRejected": "Request rejected",
+      "requestSent": {
+        "detail": "The owner will review your request to join.",
+        "summary": "Request sent"
+      },
+      "requestUpdateFailed": "Could not update request",
+      "revokeLinkFailed": "Failed to revoke join link",
+      "skippedFile": {
+        "notImage": "{name}: not an image.",
+        "summary": "Skipped file",
+        "tooLarge": "{name}: larger than 5 MB."
+      },
+      "yourGroupsLoadFailed": "Failed to load your groups"
+    },
+    "visibility": {
+      "private": "Private",
+      "privateHint": "Not discoverable in search",
+      "public": "Public"
+    },
+    "yourGroups": {
+      "newGroup": "New group",
+      "subtitleCoach": "Organize your clients into groups for sessions and communication.",
+      "subtitleMember": "Groups you belong to.",
+      "title": "Your groups"
+    }
+  },
   "mySessions": {
     "book": {
       "approval": "Approval",
