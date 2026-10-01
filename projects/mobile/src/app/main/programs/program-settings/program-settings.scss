@@ -49,3 +49,15 @@
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
 }
+
+/* The repeat choice, under the stepper it qualifies. Its label is a full
+   sentence, so it wraps instead of truncating. */
+.repeat {
+  width: 100%;
+  margin-top: 0.75rem;
+  font-size: var(--mh-text-sm);
+}
+
+.repeat::part(label) {
+  white-space: normal;
+}

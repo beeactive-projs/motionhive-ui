@@ -1794,6 +1794,11 @@
       "clearDayAria": "Golește {name}",
       "copyDayAria": "Copiază {name} în alte săptămâni",
       "daysFilled": "{filled} din {total} zile",
+      "deleteWeek": {
+        "body": "{days, plural, =0 {Săptămâna aceasta este goală.} one {Se șterge ziua ei de antrenament.} few {Se șterg cele # zile de antrenament din ea.} other {Se șterg cele # de zile de antrenament din ea.}} Săptămânile de după urcă, iar programul va avea {weeks, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}.",
+        "title": "Șterge săptămâna {week}"
+      },
+      "deleteWeekAria": "Șterge săptămâna {week}",
       "error": "Nu am putut deschide programul",
       "jumpToWeek": "Mergi la o săptămână",
       "restDay": "Zi liberă — atinge ca să adaugi",
@@ -1805,9 +1810,11 @@
         "dayCopiedToDay": "Am copiat {name} în {day}, săptămâna {week}",
         "dayCopiedToWeek": "Am copiat {name} în săptămâna {week}",
         "dayCopiedToWeeks": "Am copiat {name} în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
+        "deleteWeekFailed": "Nu am putut șterge săptămâna",
         "startFailed": "Nu am putut porni programul",
         "weekCopiedToWeek": "Săptămâna {from} a fost copiată în săptămâna {week}",
-        "weekCopiedToWeeks": "Săptămâna {from} a fost copiată în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}"
+        "weekCopiedToWeeks": "Săptămâna {from} a fost copiată în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
+        "weekDeleted": "Am șters săptămâna {week}"
       },
       "untitledProgram": "Program fără titlu"
     },
@@ -1939,6 +1946,7 @@
       },
       "publish": "Publică",
       "publishedNote": "Poți atribui acest program clienților.",
+      "repeat": "Repetă {built, plural, one {săptămâna 1} other {săptămânile 1–#}} în {empty, plural, one {săptămâna goală} few {cele # săptămâni goale} other {cele # de săptămâni goale}} de după",
       "title": "Setările programului",
       "toast": {
         "deleteFailed": "Nu am putut șterge programul",
@@ -1946,6 +1954,7 @@
         "duplicateFailed": "Nu am putut duplica programul",
         "duplicated": "Program duplicat",
         "published": "Program publicat",
+        "repeatFailed": "Am salvat, dar nu am putut repeta săptămânile",
         "saveFailed": "Nu am putut salva programul"
       },
       "viewAssignments": "Vezi atribuirile",

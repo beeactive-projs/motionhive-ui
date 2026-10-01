@@ -68,6 +68,16 @@
           outside this length and will be deleted.
         </p>
         }
+        <!-- A longer program is usually "more of the same": offered as a
+             choice, ticked by default when the length grows. -->
+        @if (isEdit() && emptyWeeks() > 0) {
+        <div class="flex items-start gap-2">
+          <p-checkbox inputId="repeatWeeks" formControlName="repeatWeeks" [binary]="true" />
+          <label for="repeatWeeks" class="cursor-pointer text-xs text-surface-700 dark:text-surface-200">
+            {{ repeatLabel() }}
+          </label>
+        </div>
+        }
       </div>
       <div class="flex flex-col gap-1.5">
         <label for="periodization"

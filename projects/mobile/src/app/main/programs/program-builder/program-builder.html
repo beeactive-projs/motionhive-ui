@@ -80,6 +80,18 @@
                 {{ 'button.copy' | translate }}
               </ion-button>
             }
+            <!-- A program keeps at least one week, so the last one has no delete. -->
+            @if (store.weekCount() > 1) {
+              <ion-button
+                fill="clear"
+                size="small"
+                color="medium"
+                [attr.aria-label]="'programs.builder.deleteWeekAria' | translate: { week: week.index + 1 }"
+                (click)="askDeleteWeek(week.index)"
+              >
+                <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+              </ion-button>
+            }
           </div>
 
           <ion-list [inset]="true" class="mh-card-list">
@@ -166,4 +178,14 @@
   [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   (confirm)="confirmClear()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="deleteWeekOpen"
+  [title]="deleteWeekTitle()"
+  [body]="deleteWeekBody()"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  tone="danger"
+  (confirm)="confirmDeleteWeek()"
 />

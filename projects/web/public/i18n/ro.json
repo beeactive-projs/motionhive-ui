@@ -3271,6 +3271,10 @@
       "removeSet": {
         "header": "Elimini seria?",
         "message": "Elimini seria {number}? Acțiunea nu poate fi anulată — dar clienții care au primit deja programul își păstrează copia."
+      },
+      "deleteWeek": {
+        "header": "Ștergi săptămâna {week}?",
+        "message": "{days, plural, =0 {Săptămâna aceasta este goală.} one {Se șterge antrenamentul din ea.} few {Se șterg cele # antrenamente din ea.} other {Se șterg cele # de antrenamente din ea.}} Săptămânile de după urcă, iar programul va avea {weeks, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}."
       }
     },
     "copyDay": {
@@ -3480,20 +3484,23 @@
       "unit": {
         "days": "Zile",
         "weeks": "Săptămâni"
-      }
+      },
+      "repeatWeeks": "Repetă {built, plural, one {săptămâna 1} other {săptămânile 1–#}} în {empty, plural, one {săptămâna goală} few {cele # săptămâni goale} other {cele # de săptămâni goale}} de după"
     },
     "rail": {
       "addWorkout": "Adaugă antrenament",
       "addWorkoutAnotherWeek": "Adaugă antrenament în altă săptămână",
       "addWorkoutToWeek": "Adaugă antrenament în săptămâna {week}",
       "copyWeek": "Copiază această săptămână",
-      "copyWeekAria": "Copiază săptămâna {week} în altă săptămână",
       "dragWeek": "Trage ca să reordonezi săptămâna",
       "exerciseCountShort": "{count} ex.",
       "noMatches": "Niciun antrenament nu se potrivește cu „{query}”.",
       "noWorkouts": "Încă nu ai antrenamente.",
       "outline": "Structura programului",
-      "searchPlaceholder": "Caută în acest program"
+      "searchPlaceholder": "Caută în acest program",
+      "deleteWeek": "Șterge această săptămână",
+      "weekActions": "Acțiuni pentru săptămână",
+      "weekActionsAria": "Acțiuni pentru săptămâna {week}"
     },
     "setForm": {
       "advanced": "Avansat (intensitate, timp, distanță, tempo)",
@@ -3618,7 +3625,10 @@
         "detail": "{name} → săptămâna {week}, ziua {day}.",
         "summary": "Antrenament mutat"
       },
-      "workoutUpdated": "Antrenament actualizat"
+      "workoutUpdated": "Antrenament actualizat",
+      "weekDeleted": "Săptămâna {week} a fost ștearsă",
+      "deleteWeekError": "Săptămâna nu s-a putut șterge",
+      "repeatWeeksError": "Am salvat, dar săptămânile nu s-au putut repeta"
     },
     "workoutForm": {
       "minutesSuffix": "— min",

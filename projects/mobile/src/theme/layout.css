@@ -195,3 +195,9 @@
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
+
+/* Only the first action is pushed to the far edge; a second sits beside it
+   rather than taking its own share of the free space. */
+.mh-section-head ion-button + ion-button {
+  margin-inline-start: 0;
+}

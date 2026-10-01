@@ -208,6 +208,51 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     if (day) this.store.clearDay(day.id);
   }
 
+  // ─── Delete a week ────────────────────────────────────────────
+
+  readonly deleteWeekIndex = signal<number | null>(null);
+  readonly deleteWeekOpen = signal(false);
+
+  readonly deleteWeekTitle = computed(() =>
+    this._translateService.instant('programs.builder.deleteWeek.title', {
+      week: (this.deleteWeekIndex() ?? 0) + 1,
+    }),
+  );
+
+  /** Says what goes and what the program becomes, before anything does. */
+  readonly deleteWeekBody = computed(() => {
+    const index = this.deleteWeekIndex();
+    if (index === null) return '';
+    return this._translateService.instant('programs.builder.deleteWeek.body', {
+      days: this.store.weeks()[index]?.filled ?? 0,
+      weeks: this.store.weekCount() - 1,
+    });
+  });
+
+  askDeleteWeek(weekIndex: number): void {
+    this.deleteWeekIndex.set(weekIndex);
+    this.deleteWeekOpen.set(true);
+  }
+
+  confirmDeleteWeek(): void {
+    const index = this.deleteWeekIndex();
+    this.deleteWeekOpen.set(false);
+    if (index === null) return;
+
+    this.store.deleteWeek(index, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.builder.toast.deleteWeekFailed'),
+        );
+        return;
+      }
+      void this._feedbackService.success(
+        this._translateService.instant('programs.builder.toast.weekDeleted', { week: index + 1 }),
+      );
+    });
+  }
+
   openCopy(weekIndex: number): void {
     this.copyFrom.set(weekIndex);
     this.copyOpen.set(true);
