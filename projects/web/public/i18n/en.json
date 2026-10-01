@@ -3271,6 +3271,10 @@
       "removeSet": {
         "header": "Remove set?",
         "message": "Remove set {number}? This can't be undone — but client copies of already-assigned programs keep their data."
+      },
+      "deleteWeek": {
+        "header": "Delete week {week}?",
+        "message": "{days, plural, =0 {This week is empty.} one {Its # workout is removed.} other {Its # workouts are removed.}} The weeks after it move up, and the program becomes {weeks, plural, one {# week} other {# weeks}} long."
       }
     },
     "copyDay": {
@@ -3480,20 +3484,23 @@
       "unit": {
         "days": "Days",
         "weeks": "Weeks"
-      }
+      },
+      "repeatWeeks": "Repeat {built, plural, one {week 1} other {weeks 1–#}} into the {empty, plural, one {empty week} other {# empty weeks}} after {built, plural, one {it} other {them}}"
     },
     "rail": {
       "addWorkout": "Add workout",
       "addWorkoutAnotherWeek": "Add workout in another week",
       "addWorkoutToWeek": "Add workout to week {week}",
       "copyWeek": "Copy this week",
-      "copyWeekAria": "Copy week {week} into another week",
       "dragWeek": "Drag to reorder week",
       "exerciseCountShort": "{count} ex",
       "noMatches": "No workouts match “{query}”.",
       "noWorkouts": "No workouts yet.",
       "outline": "Program outline",
-      "searchPlaceholder": "Search this program"
+      "searchPlaceholder": "Search this program",
+      "deleteWeek": "Delete this week",
+      "weekActions": "Week actions",
+      "weekActionsAria": "Actions for week {week}"
     },
     "setForm": {
       "advanced": "Advanced (intensity, time, distance, tempo)",
@@ -3618,7 +3625,10 @@
         "detail": "{name} → week {week}, day {day}.",
         "summary": "Workout moved"
       },
-      "workoutUpdated": "Workout updated"
+      "workoutUpdated": "Workout updated",
+      "weekDeleted": "Week {week} deleted",
+      "deleteWeekError": "Couldn't delete the week",
+      "repeatWeeksError": "Saved, but the weeks couldn't be repeated"
     },
     "workoutForm": {
       "minutesSuffix": "— min",

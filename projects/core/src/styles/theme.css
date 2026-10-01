@@ -228,12 +228,13 @@ h6 {
 /* Destructive item inside an overlay menu (p-menu / p-tieredmenu).
    Action System — Delete/Remove read as destructive (red). Global because
    these menus are appended to <body>, outside component encapsulation. */
-.mh-menu-danger .p-menuitem-link,
-.mh-menu-danger .p-menuitem-content,
-.mh-menu-danger .p-menuitem-icon {
+.mh-menu-danger .p-menu-item-link,
+.mh-menu-danger .p-menu-item-content,
+.mh-menu-danger .p-menu-item-label,
+.mh-menu-danger .p-menu-item-icon {
   color: var(--p-red-500, #ef4444);
 }
-.mh-menu-danger .p-menuitem-content:hover {
+.mh-menu-danger .p-menu-item-content:hover {
   background: color-mix(in srgb, var(--p-red-500, #ef4444) 10%, transparent);
 }
 

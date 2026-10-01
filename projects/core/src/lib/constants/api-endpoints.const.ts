@@ -216,6 +216,8 @@ export const API_ENDPOINTS = {
     /** One request to copy a whole week; the client used to walk the tree. */
     COPY_WEEK: (programId: string) => `/programs/${programId}/workouts/copy-week`,
     COPY_DAY: (programId: string) => `/programs/${programId}/workouts/copy-day`,
+    REPEAT_WEEKS: (programId: string) => `/programs/${programId}/workouts/repeat-weeks`,
+    WEEK: (programId: string, weekIndex: number) => `/programs/${programId}/weeks/${weekIndex}`,
     DUPLICATE: (programId: string) => `/programs/${programId}/duplicate`,
     WORKOUT_BY_ID: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}`,

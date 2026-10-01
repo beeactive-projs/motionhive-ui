@@ -110,7 +110,7 @@
       <mh-builder-rail [weeks]="weeks()" [selectedWorkoutId]="activeWorkout()?.id ?? null"
         [collapsedWeeks]="collapsedWeeks()" [totalWorkouts]="totalWorkouts()" (selectWorkout)="selectWorkout($event)"
         (toggleWeek)="toggleWeekCollapsed($event)" (addWorkout)="openAddWorkout($event)"
-        (copyWeek)="openCopyWeek($event)"
+        (copyWeek)="openCopyWeek($event)" (deleteWeek)="confirmDeleteWeek($event)"
         (workoutDropped)="onRailWorkoutDropped($event)" (weekDropped)="onRailWeekDropped($event)" />
     </aside>
 

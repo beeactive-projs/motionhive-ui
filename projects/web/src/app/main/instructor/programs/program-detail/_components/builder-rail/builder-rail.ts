@@ -13,6 +13,8 @@ import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
+import { MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
 
@@ -67,6 +69,7 @@ export interface RailWeekDrop {
     InputText,
     Tag,
     Tooltip,
+    Menu,
     TranslatePipe,
   ],
   templateUrl: './builder-rail.html',
@@ -87,6 +90,39 @@ export class BuilderRail {
   readonly addWorkout = output<number | null>();
   /** Emit source week index — parent opens the "Copy week…" picker. */
   readonly copyWeek = output<number>();
+  /** Emit the week to delete — parent confirms, since days may go with it. */
+  readonly deleteWeek = output<number>();
+
+  /** The week whose "⋯" menu is open; one menu instance serves every week. */
+  private readonly _menuWeek = signal<WeekGroup | null>(null);
+
+  readonly weekMenuItems = computed<MenuItem[]>(() => {
+    const week = this._menuWeek();
+    if (!week) return [];
+    const items: MenuItem[] = [];
+    // An empty week has nothing to copy; the only week cannot be deleted.
+    if (week.workouts.length > 0) {
+      items.push({
+        label: this._translateService.instant('programs.rail.copyWeek'),
+        icon: 'pi pi-copy',
+        command: () => this.copyWeek.emit(week.week),
+      });
+    }
+    if (this.weeks().length > 1) {
+      items.push({
+        label: this._translateService.instant('programs.rail.deleteWeek'),
+        icon: 'pi pi-trash',
+        styleClass: 'mh-menu-danger',
+        command: () => this.deleteWeek.emit(week.week),
+      });
+    }
+    return items;
+  });
+
+  openWeekMenu(event: Event, menu: Menu, week: WeekGroup): void {
+    this._menuWeek.set(week);
+    menu.toggle(event);
+  }
   readonly workoutDropped = output<RailWorkoutDrop>();
   readonly weekDropped = output<RailWeekDrop>();
 

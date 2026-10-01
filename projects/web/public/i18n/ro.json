@@ -8,7 +8,7 @@
       }
     },
     "postDetail": {
-      "addTag": "Adaugă eticheta",
+      "addTag": "Adaugă o etichetă",
       "author": "Autor",
       "backToPosts": "Înapoi la articole",
       "category": "Categorie",
@@ -22,8 +22,8 @@
       "editSlug": "Editează slug-ul",
       "excerpt": "Rezumat",
       "excerptPlaceholder": "Un scurt rezumat afișat în listele de articole...",
-      "guestByline": "Semnătură invitat (opțional)",
-      "guestBylineHint": "Lasă gol ca să publici sub propriul utilizator. Completează ca să atribui articolul unui colaborator invitat, fără cont MotionHive.",
+      "guestByline": "Autor invitat (opțional)",
+      "guestBylineHint": "Lasă gol ca să publici pe numele tău. Completează ca să atribui articolul unui autor invitat care nu are cont MotionHive.",
       "guestBylinePlaceholder": "ex. Sarah Johnson",
       "imageTips": {
         "format": "JPG pentru fotografii, PNG doar pentru grafică cu margini nete sau transparență.",
@@ -35,7 +35,7 @@
         "minimum": "Minim: 1200 × 675px. Imaginile mai mici arată neclar pe ecranele retina.",
         "portrait": "Fotografiile verticale vor fi decupate pe centru — partea de sus și cea de jos nu se vor vedea.",
         "recommended": {
-          "after": "pentru cele mai clare rezultate.",
+          "after": "pentru o imagine cât mai clară.",
           "before": "Recomandat:"
         },
         "title": "Sfaturi pentru imagine"
@@ -46,7 +46,7 @@
         "newPost": "Articol nou"
       },
       "languagePlaceholder": "Alege o limbă",
-      "ownBylineNote": "Acest articol va fi publicat sub contul tău. Administratorii pot schimba semnătura.",
+      "ownBylineNote": "Acest articol va fi publicat pe numele tău. Administratorii pot schimba autorul afișat.",
       "postSettings": "Setările articolului",
       "published": "Publicat",
       "publishedHint": "Vizibil pe blogul public",
@@ -131,7 +131,7 @@
         "invalidCredentials": "Email sau parolă greșită. Încearcă din nou."
       },
       "heroHighlight": "aici.",
-      "heroLine1": "Călătoria ta în fitness",
+      "heroLine1": "Drumul tău în fitness",
       "heroLine2": "începe",
       "heroSubtitle": "Ține evidența antrenamentelor, conectează-te cu antrenori și atinge-ți obiectivele — totul într-un singur loc, creat pentru oamenii care se mișcă.",
       "orContinueWith": "sau continuă cu",
@@ -146,7 +146,7 @@
         "resetFailed": "Parola nu a putut fi resetată. Este posibil ca linkul să fi expirat."
       },
       "heroHighlight": "noua parolă.",
-      "heroLine1": "Setează-ți",
+      "heroLine1": "Alege-ți",
       "heroSubtitle": "Alege o parolă puternică pentru a-ți păstra contul în siguranță. Aproape ai revenit pe drumul cel bun.",
       "newPasswordPlaceholder": "Introdu parola nouă",
       "submit": "Resetează parola",
@@ -266,7 +266,7 @@
         "pending": "în așteptare",
         "sent": "Trimisă"
       },
-      "unit": "Unitar"
+      "unit": "Preț unitar"
     },
     "myInvoices": {
       "due": "Scadență",
@@ -300,7 +300,7 @@
       "renews": "Se reînnoiește",
       "toast": {
         "cancelFailed": {
-          "detail": "Încearcă din nou peste câteva momente.",
+          "detail": "Încearcă din nou puțin mai târziu.",
           "summary": "Nu s-a putut anula"
         },
         "cancelScheduled": {
@@ -310,14 +310,14 @@
         "loadFailed": "Abonamentele nu au putut fi încărcate",
         "portalFailed": "Portalul de facturare nu a putut fi deschis"
       },
-      "trialUntil": "Probă până pe {date}"
+      "trialUntil": "Perioadă de probă până pe {date}"
     }
   },
   "clients": {
     "common": {
       "editNotes": "Editează notițele",
       "inviteClient": "Invită un client",
-      "retryInAMoment": "Reîncearcă în câteva momente.",
+      "retryInAMoment": "Reîncearcă puțin mai târziu.",
       "shownOfTotal": "{shown} din {total}",
       "thisClient": "acest client"
     },
@@ -333,7 +333,7 @@
         "message": "Sigur vrei să anulezi invitația trimisă către {name}?"
       },
       "cancelProgram": {
-        "accept": "Anulează planul",
+        "accept": "Anulează programul",
         "header": "Anulezi acest program?",
         "message": "Anulezi „{program}” pentru {name}? Antrenamentele deja înregistrate rămân în istoric, dar nu se vor mai programa alte sesiuni."
       },
@@ -369,10 +369,10 @@
     },
     "list": {
       "columns": {
-        "started": "Început"
+        "started": "Data începerii"
       },
       "empty": {
-        "message": "Invită primul tău client ca să începi să-ți construiești lista de clienți.",
+        "message": "Invită primul tău client și începe să-ți formezi lista de clienți.",
         "title": "Niciun client încă"
       },
       "emptyFiltered": {
@@ -475,7 +475,7 @@
           "finished": "Niciun program încheiat — încearcă Toate.",
           "finishedSearch": "Niciun program încheiat pentru „{term}” — încearcă Toate."
         },
-        "pause": "Pune pe pauză",
+        "pause": "Întrerupe",
         "scope": {
           "ariaLabel": "Filtru programe",
           "current": "Curente",
@@ -487,13 +487,13 @@
         "title": "Programe atribuite"
       },
       "progress": {
-        "back": "Înapoi la prezentare",
-        "hintOverview": "Progresul general dintr-o privire îl găsești în fila Prezentare.",
-        "hintWorkouts": "Pentru istoricul pe exercițiu, deschide un antrenament înregistrat din fila Antrenamente sau din Prezentare.",
+        "back": "Înapoi la rezumat",
+        "hintOverview": "Progresul general îl vezi pe scurt în fila Rezumat.",
+        "hintWorkouts": "Pentru istoricul fiecărui exercițiu, deschide un antrenament înregistrat din fila Antrenamente sau din Rezumat.",
         "title": "Progresul pe exercițiu nu este încă disponibil"
       },
       "sessions": {
-        "booked": "Rezervat",
+        "booked": "Rezervată",
         "cancelled": "Sesiune anulată",
         "emptyPast": "{name} nu a participat la niciuna dintre sesiunile tale în ultimele 3 luni.",
         "emptyUpcoming": "{name} nu are nimic rezervat în următoarele 3 luni.",
@@ -505,7 +505,7 @@
         "title": "Sesiuni"
       },
       "tabs": {
-        "overview": "Prezentare",
+        "overview": "Rezumat",
         "programs": "Programe",
         "progress": "Progres",
         "sessions": "Sesiuni",
@@ -518,12 +518,12 @@
         },
         "freestyle": "Antrenament liber",
         "loading": "Se încarcă antrenamentele…",
-        "prs": "{count, plural, one {# PR} few {# PR-uri} other {# de PR-uri}}",
+        "prs": "{count, plural, one {# record personal} few {# recorduri personale} other {# de recorduri personale}}",
         "title": "Antrenamente înregistrate"
       }
     },
     "roster": {
-      "adherence": "aderență",
+      "adherence": "consecvență",
       "allOnTrack": "Toată lumea e pe drumul cel bun.",
       "attention": {
         "detail": {
@@ -535,7 +535,7 @@
         },
         "hint": "cele mai urgente primele",
         "reason": {
-          "behind": "În urmă cu planul",
+          "behind": "Rămas în urmă cu planul",
           "dropped": "În scădere",
           "neverStarted": "Nu a început",
           "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}"
@@ -544,12 +544,12 @@
       },
       "daysAgo": "{days, plural, one {acum # zi} few {acum # zile} other {acum # de zile}}",
       "empty": {
-        "message": "Când cineva devine clientul tău, antrenamentele lui apar aici ca să vezi cine e pe drumul cel bun.",
+        "message": "Când cineva devine clientul tău, antrenamentele sale apar aici și vezi cine e pe drumul cel bun.",
         "title": "Niciun client încă"
       },
       "intro": "Clienții tăi și cum se antrenează.",
       "kpi": {
-        "adherence": "Aderență",
+        "adherence": "Consecvență",
         "adherenceSub": "la clienții cu antrenamente programate",
         "ariaLabel": "Sumarul listei de clienți",
         "clients": "Clienți",
@@ -661,7 +661,7 @@
       "title": "Bine ai revenit, {name}"
     },
     "invoices": {
-      "due": "Scadentă {date}",
+      "due": "Scadentă pe {date}",
       "empty": "Încă nu ai facturi.",
       "noDueDate": "Fără scadență",
       "title": "Facturi recente"
@@ -676,7 +676,7 @@
     "stats": {
       "exercise": {
         "emptyHint": "Asigură-te că ai adăugat clienți și le-ai configurat planurile de exerciții. Rezumatele săptămânale se calculează în fiecare duminică noaptea.",
-        "title": "Respectarea medie a exercițiilor"
+        "title": "Respectarea planului de exerciții (medie)"
       },
       "noStatsYet": "Hmmm... încă nu găsim statistici pentru grafic",
       "nutrition": {
@@ -703,7 +703,7 @@
     "calendar": {
       "conflict": "Suprapunere",
       "currentTime": "Ora curentă: {time}",
-      "moreCount": "+{count} în plus",
+      "moreCount": "încă {count}",
       "moreSessions": "{count, plural, one {încă # sesiune în această zi} few {încă # sesiuni în această zi} other {încă # de sesiuni în această zi}}",
       "now": "Acum · {time}",
       "recurring": "Recurentă",
@@ -725,7 +725,7 @@
           "title": "ex. Prezența la sesiune nu se salvează corect"
         },
         "OTHER": {
-          "message": "Ce ai în minte? Te ajutăm cu drag.",
+          "message": "Cu ce te putem ajuta? Spune-ne orice, te ajutăm cu drag.",
           "title": "ex. Întrebare despre gestionarea sesiunilor de grup"
         },
         "SUGGESTION": {
@@ -744,13 +744,13 @@
         "sendFailed": "Nu am putut trimite feedbackul. Încearcă din nou."
       },
       "type": {
-        "BUG": "Raportează o problemă",
+        "BUG": "Problemă tehnică",
         "OTHER": "Altceva",
         "SUGGESTION": "Sugestie"
       }
     },
     "impersonationBanner": {
-      "exit": "Ieși din impersonare",
+      "exit": "Revino la contul tău",
       "message": "Folosești contul altui utilizator (sesiune de administrator)."
     },
     "installApp": {
@@ -759,7 +759,7 @@
     "locationPicker": {
       "hint": "Începe să scrii pentru a căuta — alege o sugestie pentru a confirma.",
       "locked": "Blocat",
-      "noLocationLocked": "Nicio locație — blocat",
+      "noLocationLocked": "Nicio locație — blocată",
       "placeholder": "Caută un loc..."
     },
     "notificationBell": {
@@ -772,8 +772,8 @@
       "attended": "Prezent",
       "booked": "Rezervat",
       "empty": "Niciun participant încă.",
-      "markAttended": "Marchează prezent",
-      "markNoShow": "Marchează absent",
+      "markAttended": "Marchează ca prezent",
+      "markNoShow": "Marchează ca absent",
       "member": "Membru",
       "noShow": "Absent"
     },
@@ -804,8 +804,8 @@
       },
       "never": "Niciodată",
       "occurrencesHint": "repetări (maximum 24)",
-      "on": "În",
-      "onDate": "La o dată",
+      "on": "În zilele",
+      "onDate": "La o anumită dată",
       "period": {
         "DAILY": "{count, plural, one {zi} few {zile} other {de zile}}",
         "MONTHLY": "{count, plural, one {lună} few {luni} other {de luni}}",
@@ -888,7 +888,7 @@
       "switchToLight": "Treci la modul luminos"
     },
     "userSearch": {
-      "empty": "Niciun utilizator găsit. Încearcă să inviți pe email.",
+      "empty": "Niciun utilizator găsit. Încearcă să-l inviți prin email.",
       "placeholder": "Caută după nume sau email…"
     },
     "waitlistDialog": {
@@ -913,7 +913,7 @@
       }
     },
     "weekStrip": {
-      "navigator": "Navigare în săptămână"
+      "navigator": "Navigare între săptămâni"
     }
   },
   "discover": {
@@ -935,7 +935,7 @@
       "empty": "Niciun grup găsit — încearcă altă căutare."
     },
     "head": {
-      "subtitle": "Antrenori, sesiuni și grupuri — totul într-un singur loc. Folosește ⌘K de sus când știi deja ce cauți.",
+      "subtitle": "Antrenori, sesiuni și grupuri, totul într-un singur loc. Apasă ⌘K când știi deja ce cauți.",
       "title": "Găsește-ți oamenii în stup"
     },
     "search": {
@@ -951,7 +951,7 @@
     },
     "toast": {
       "cancelFailed": "Nu am putut anula cererea",
-      "joinFailed": "Nu te-am putut adăuga în grup",
+      "joinFailed": "Nu te-ai putut alătura grupului",
       "joined": {
         "detail": "Acum ești membru în „{name}”.",
         "summary": "Te-ai alăturat"
@@ -959,7 +959,7 @@
       "loadCoachesFailed": "Nu am putut încărca antrenorii",
       "loadGroupsFailed": "Nu am putut încărca grupurile",
       "requestSent": {
-        "detail": "Proprietarul grupului îți va analiza cererea."
+        "detail": "Administratorul grupului îți va analiza cererea de alăturare."
       }
     }
   },
@@ -1011,7 +1011,7 @@
       "clearAll": "Șterge tot",
       "clearAllFilters": "Șterge toate filtrele",
       "emptyFiltered": {
-        "message": "Relaxează un filtru sau caută altfel ca să vezi mai multe.",
+        "message": "Scoate un filtru sau caută altfel ca să vezi mai multe.",
         "title": "Niciun exercițiu nu se potrivește"
       },
       "emptyMine": {
@@ -1024,7 +1024,7 @@
       "ownership": {
         "aria": "Filtru după proprietar",
         "mine": "Exercițiile mele",
-        "publicOthers": "Publice · alții",
+        "publicOthers": "Publice, de la alții",
         "system": "Sistem"
       },
       "searchAria": "Caută exerciții",
@@ -1034,7 +1034,7 @@
         "menu": {
           "mostForked": "Cele mai copiate",
           "name": "Nume (A–Z)",
-          "newest": "Cele mai noi întâi"
+          "newest": "Cele mai recente"
         },
         "short": {
           "mostForked": "Cele mai copiate",
@@ -1056,7 +1056,7 @@
         "forked": "{count, plural, one {A fost deja copiat de # antrenor — copia lui e independentă și nu va fi afectată.} few {A fost deja copiat de # antrenori — copiile lor sunt independente și nu vor fi afectate.} other {A fost deja copiat de # de antrenori — copiile lor sunt independente și nu vor fi afectate.}}",
         "header": "Ștergi „{name}”?",
         "irreversible": "Nu îl vei putea recupera și va trebui să-l creezi de la zero dacă îl vrei înapoi mai târziu.",
-        "message": "Asta elimină definitiv „{name}” din biblioteca ta de exerciții."
+        "message": "„{name}” va fi eliminat definitiv din biblioteca ta de exerciții."
       }
     },
     "detail": {
@@ -1098,7 +1098,7 @@
       "mechanic": "Mecanică",
       "namePlaceholder": "de ex. Genuflexiune goblet cu tempo",
       "optionalSuffix": "— opțional",
-      "pattern": "Tipar",
+      "pattern": "Tipar de mișcare",
       "primaryMuscles": "Mușchi principali",
       "primaryMusclesPlaceholder": "Alege cel puțin unul",
       "primaryMusclesRange": "— între 1 și 3",
@@ -1115,7 +1115,7 @@
       "unilateralHint": "Un singur braț / un singur picior — permite ulterior urmărirea separată stânga / dreapta.",
       "visibility": "Vizibilitate",
       "youtube": {
-        "hint": "Încărcarea directă vine în V2. Lipește orice link YouTube ca să obții o miniatură.",
+        "hint": "Încărcarea directă va fi disponibilă în V2. Lipește orice link YouTube ca să obții o miniatură.",
         "invalid": "Lipește un link YouTube valid (youtube.com sau youtu.be).",
         "label": "Demonstrație YouTube",
         "thumbnailAlt": "Previzualizare miniatură YouTube",
@@ -1141,7 +1141,7 @@
       },
       "loadFailed": "Nu am putut încărca exercițiile",
       "loadOneFailed": {
-        "detail": "Poate a fost șters sau făcut privat.",
+        "detail": "Poate a fost șters sau setat ca privat.",
         "summary": "Nu am putut încărca exercițiul"
       },
       "madePrivate": {
@@ -1196,7 +1196,7 @@
       "empty": "Fii primul care comentează.",
       "loadMore": "Încarcă mai multe comentarii",
       "placeholder": "Scrie un comentariu...",
-      "post": "Publică",
+      "post": "Trimite",
       "reply": "Răspunde",
       "replyPlaceholder": "Scrie un răspuns..."
     },
@@ -1206,7 +1206,7 @@
       "created": "Creat",
       "editGroup": "Editează grupul",
       "generateJoinLink": "Generează link de alăturare",
-      "joinPolicy": "Politică de alăturare",
+      "joinPolicy": "Cine se poate alătura",
       "leaveGroup": "Părăsește grupul",
       "members": "Membri",
       "notFound": "Grupul nu a fost găsit",
@@ -1228,7 +1228,7 @@
       },
       "removeMember": {
         "header": "Elimină membrul",
-        "message": "Sigur vrei să-l elimini pe {name} din acest grup?",
+        "message": "Sigur vrei să elimini membrul {name} din acest grup?",
         "messageUnknown": "Sigur vrei să elimini acest membru din grup?"
       },
       "revokeLink": {
@@ -1247,7 +1247,7 @@
     "discover": {
       "noMore": "Nu mai sunt rezultate.",
       "searchPlaceholder": "Caută grupuri",
-      "subtitle": "Găsește comunități la care să te alături.",
+      "subtitle": "Găsește comunități în care să intri.",
       "title": "Descoperă grupuri"
     },
     "emptyMembers": {
@@ -1277,12 +1277,12 @@
       "title": "Flux"
     },
     "formDialog": {
-      "addTag": "Adaugă eticheta",
+      "addTag": "Adaugă etichetă",
       "create": "Creează grupul",
       "descriptionPlaceholder": "Descrie scopul acestui grup...",
-      "joinPolicyPlaceholder": "Alege politica de alăturare",
+      "joinPolicyPlaceholder": "Alege cine se poate alătura",
       "namePlaceholder": "Introdu numele grupului",
-      "publicHint": "Vizibil în descoperirea grupurilor",
+      "publicHint": "Apare când alții caută grupuri",
       "publicLabel": "Grup public",
       "tagPlaceholder": "Adaugă o etichetă și apasă Enter"
     },
@@ -1319,7 +1319,7 @@
     "layout": {
       "createGroup": "Creează un grup nou",
       "joinedNone": "Nu te-ai alăturat încă niciunui grup.",
-      "joinedTitle": "Grupuri în care te-ai alăturat"
+      "joinedTitle": "Grupurile din care faci parte"
     },
     "members": {
       "demote": "Retrogradează la membru",
@@ -1327,7 +1327,7 @@
         "message": "Încearcă un alt termen de căutare.",
         "title": "Niciun membru nu corespunde căutării"
       },
-      "joined": "Alăturat",
+      "joined": "Membru din",
       "pendingRequests": "Cereri în așteptare",
       "promote": "Promovează la moderator",
       "remove": "Elimină membrul",
@@ -1343,7 +1343,7 @@
     },
     "ownerCard": {
       "fallbackName": "Administratorul grupului",
-      "message": "Mesaj",
+      "message": "Trimite mesaj",
       "profile": "Profil",
       "title": "Administrator"
     },
@@ -1398,7 +1398,7 @@
       "title": "Postări ({count})"
     },
     "preview": {
-      "backToDiscover": "Înapoi la descoperire",
+      "backToDiscover": "Înapoi la Descoperă",
       "breadcrumbFallback": "Previzualizare",
       "coach": "Antrenor",
       "notFoundMessage": "Acest grup este privat sau nu mai este disponibil.",
@@ -1439,7 +1439,7 @@
       },
       "groupsLoadFailed": "Nu am putut încărca grupurile",
       "imageLimit": {
-        "detail": "Maximum {max} imagini per postare.",
+        "detail": "Maximum {max} imagini pe postare.",
         "summary": "Ai atins limita de imagini"
       },
       "imageUploadFailed": "Încărcarea imaginii a eșuat",
@@ -1539,7 +1539,7 @@
     "coaches": {
       "discoverMore": "Descoperă mai mulți",
       "empty": {
-        "sub": "Știi unul care s-ar potrivi perfect? Recomandă-l",
+        "sub": "Știi pe cineva potrivit? Recomandă-l",
         "title": "Încă nu avem antrenori de arătat"
       },
       "loading": "Se încarcă antrenorii",
@@ -1559,7 +1559,7 @@
     },
     "hero": {
       "body": "Câțiva antrenori, tot mai multe sesiuni și o comunitate care abia prinde contur. Un loc liniștit unde să te simți acasă și să continui de unde ai rămas.",
-      "fallbackName": "prietene",
+      "fallbackName": "din nou",
       "title": "Ne bucurăm să te vedem,",
       "titleName": "{name}."
     },
@@ -1567,7 +1567,7 @@
       "roleWithYears": "{specialization} · {count, plural, one {# an} few {# ani} other {# de ani}}"
     },
     "inviteBand": {
-      "body": "Stupul crește din vorbă în vorbă. MotionHive e gratuit — adu pe cineva cu care chiar te-ai antrena.",
+      "body": "Stupul crește din gură în gură. MotionHive e gratuit, adu pe cineva cu care chiar te-ai antrena.",
       "invite": "Invită un prieten",
       "suggestCoach": "Recomandă un antrenor",
       "title": "Știi pe cineva căruia i-ar plăcea aici?"
@@ -1590,7 +1590,7 @@
       },
       "tab": {
         "email": "Trimite un email",
-        "link": "Obține un link"
+        "link": "Copiază linkul"
       },
       "title": "Adu un prieten și antrenați-vă împreună.",
       "toast": {
@@ -1610,10 +1610,10 @@
       }
     },
     "journal": {
-      "empty": "Încă nu avem articole. Revino curând — primele lecturi sunt pe drum.",
+      "empty": "Încă nu avem articole. Revino curând, primele sunt pe drum.",
       "eyebrow": "Din jurnal",
       "loading": "Se încarcă articolele",
-      "minRead": "{minutes} min de citit",
+      "minRead": "{minutes} min de lectură",
       "readAll": "Citește tot",
       "title": "Lecturi din stup"
     },
@@ -1622,7 +1622,7 @@
     },
     "steps": {
       "coach": {
-        "sub": "Rezervă timp cu cineva pe care îl apreciezi.",
+        "sub": "Programează-te la cineva în care ai încredere.",
         "title": "Găsește-ți un antrenor"
       },
       "eyebrow": "Începe de aici",
@@ -1631,7 +1631,7 @@
         "title": "Completează-ți profilul"
       },
       "session": {
-        "sub": "Online sau față în față, în grup sau 1-la-1.",
+        "sub": "Online sau față în față, în grup sau individual.",
         "title": "Creează prima ta sesiune"
       }
     },
@@ -1647,7 +1647,7 @@
       },
       "success": {
         "directBody": "I-am trimis un email cu numele tău. Recomandă câți antrenori vrei.",
-        "directTitle": "E pe drum spre el.",
+        "directTitle": "Invitația e pe drum.",
         "teamBody": "Îl contactăm și îți spunem ce a răspuns. Recomandă câți antrenori vrei.",
         "teamTitle": "Mulțumim — ne ocupăm noi de aici."
       },
@@ -1678,7 +1678,7 @@
       }
     },
     "toast": {
-      "rateLimited": "Ai trimis multe recent — încearcă din nou peste o oră."
+      "rateLimited": "Ai trimis multe invitații în ultima vreme. Încearcă din nou peste o oră."
     }
   },
   "messages": {
@@ -1700,7 +1700,7 @@
       "placeholderNamed": "Mesaj către {name}…",
       "placeholderPick": "Alege cui vrei să scrii…",
       "placeholderThem": "Scrie un mesaj…",
-      "rateLimited": "Mai încet — încearcă din nou în {seconds} s",
+      "rateLimited": "Trimiți prea repede — încearcă din nou în {seconds} s",
       "sendMessage": "Trimite mesajul"
     },
     "emptyState": {
@@ -1721,7 +1721,7 @@
       "unread": "{count, plural, one {# necitit} few {# necitite} other {# de necitite}}"
     },
     "list": {
-      "emptySub": "Scrie un mesaj nou ca să începi una.",
+      "emptySub": "Scrie un mesaj nou ca să începi o conversație.",
       "emptyTitle": "Nicio conversație încă",
       "noMatchesSub": "Încearcă altă căutare sau alt filtru.",
       "noMatchesTitle": "Niciun rezultat"
@@ -1815,7 +1815,7 @@
     "book": {
       "approval": "Aprobare",
       "approvalHint": "Antrenorul îți va analiza cererea.",
-      "cancelUpTo": "Anulare până cu",
+      "cancelUpTo": "Anulare cu până la",
       "cancelUpToValue": "{hours} h înainte de început",
       "confirm": "Confirmă",
       "confirmBooking": "Confirmă rezervarea",
@@ -1826,7 +1826,7 @@
     "bookingConfirmed": {
       "appleIcs": "Apple / .ics",
       "calendarJoin": "Intră: {url}",
-      "confirmationOnWay": "Confirmarea e pe drum spre inboxul tău.",
+      "confirmationOnWay": "Îți trimitem confirmarea pe email.",
       "confirmedSummary": "{title} — {date}, la {time}.",
       "emailWhenApproved": "Primești un email când antrenorul îți aprobă cererea.",
       "freeToCancel": "Poți anula gratuit cu până la {hours} h înainte de început.",
@@ -1849,7 +1849,7 @@
     "common": {
       "book": "Rezervă",
       "booked": "Rezervat",
-      "bookedCount": "{confirmed} / {capacity} rezervate",
+      "bookedCount": "{confirmed} / {capacity} locuri ocupate",
       "bookedOn": "Rezervat pe {date}",
       "cancelBooking": "Anulează rezervarea",
       "free": "Gratuit",
@@ -1864,8 +1864,8 @@
       "expiredHint": "Ai întârziat? Linkul de intrare a rămas valabil 15 minute după început. După aceea expiră. Scrie-i antrenorului dacă mai ai nevoie de acces.",
       "eyebrow": {
         "active": "Poți intra acum",
-        "expired": "Fereastra a expirat",
-        "startsIn": "Începe în"
+        "expired": "Timpul de intrare a expirat",
+        "startsIn": "Începe peste"
       },
       "fallbackTitle": "Sesiune online",
       "goodToJoin": "Poți intra.",
@@ -1899,14 +1899,14 @@
       "emptyMessage": "Sesiunile pe care le rezervi apar aici. Găsește una ca să începi.",
       "noMatchMessage": "Încearcă alt filtru sau golește căutarea.",
       "noMatchTitle": "Nicio sesiune nu se potrivește filtrelor",
-      "subtitle": "Rezervările, listele de așteptare și sesiunile trecute.",
+      "subtitle": "Rezervările tale, listele de așteptare și sesiunile trecute.",
       "title": "Sesiuni"
     },
     "row": {
       "cancelPolicy": "Anulare gratuită cu până la {hours} h înainte",
-      "cancelReason": "Anulat: {reason}",
+      "cancelReason": "Anulată: {reason}",
       "join": "Intră",
-      "liveNow": "Live acum",
+      "liveNow": "În direct acum",
       "waitlistPosition": "{status} · #{position}"
     },
     "showcase": {
@@ -1924,7 +1924,7 @@
       "requestToJoinGroup": "Cere să intri în grup",
       "sessionFull": "Sesiune completă",
       "status": {
-        "confirmed": "Ai rezervat",
+        "confirmed": "Ai loc rezervat",
         "pending": "Așteaptă aprobarea antrenorului",
         "waitlisted": "Ești pe lista de așteptare"
       },
@@ -1957,7 +1957,7 @@
     "common": {
       "addExercise": "Adaugă exercițiu",
       "addSet": "Adaugă serie",
-      "addedToWeek": "Adăugat în săptămâna ta",
+      "addedToWeek": "Adăugată în săptămâna ta",
       "copyFailed": "Nu am putut salva copia",
       "copySaved": "Salvată în rutinele tale",
       "copySavedDetail": "„{name}” e a ta și o poți modifica.",
@@ -1968,14 +1968,14 @@
       "folder": "Dosar",
       "folderPlaceholder": "ex. Split PPL",
       "loadWorkoutFailed": "Nu am putut încărca antrenamentul",
-      "newPrs": "{count, plural, one {Record nou 1RM} few {Recorduri noi 1RM} other {Recorduri noi 1RM}}",
+      "newPrs": "{count, plural, one {Record nou la 1RM} few {Recorduri noi la 1RM} other {Recorduri noi la 1RM}}",
       "newRoutine": "Rutină nouă",
       "onSchedule": "{name} e în programul tău.",
       "pleaseRetry": "Încearcă din nou.",
       "reps": "Repetări",
       "routineNamePlaceholder": "ex. Ziua de împins A",
       "routineNameRequired": "Numele rutinei *",
-      "saveCopy": "Salvează o copie pe care o pot edita",
+      "saveCopy": "Salvează o copie editabilă",
       "saveRoutineFailed": "Nu am putut salva rutina",
       "setsDone": "Serii făcute",
       "setsOfTotal": "{done} / {total, plural, one {# serie} few {# serii} other {# de serii}}",
@@ -1993,8 +1993,8 @@
         "good": "Bine",
         "great": "Excelent",
         "ok": "OK",
-        "rough": "Greu de tot",
-        "tough": "Solicitant"
+        "rough": "Foarte greu",
+        "tough": "Greu"
       },
       "finish": "Termină",
       "finishedAt": "terminat la {time}",
@@ -2034,9 +2034,9 @@
     "library": {
       "confirm": {
         "delete": {
-          "acceptAndCancel": "Șterge și anulează",
+          "acceptAndCancel": "Șterge și anulează sesiunile",
           "header": "Ștergi rutina?",
-          "message": "Ștergi „{name}”? Antrenamentele deja înregistrate din ea rămân în istoric.",
+          "message": "Ștergi „{name}”? Antrenamentele pe care le-ai făcut deja după ea rămân în istoric.",
           "messageScheduled": "„{name}” are {count, plural, one {# sesiune programată} few {# sesiuni programate} other {# de sesiuni programate}} în calendar. Dacă ștergi rutina, le anulezi și pe acestea. Antrenamentele deja înregistrate din ea rămân în istoric."
         }
       },
@@ -2084,7 +2084,7 @@
           "message": "„{name}” și seriile lui goale dispar din acest antrenament."
         }
       },
-      "elapsed": "{time} scurse",
+      "elapsed": "Au trecut {time}",
       "empty": {
         "message": "Adaugă exerciții din catalog, înregistrează seriile pe parcurs și încheie când ești gata.",
         "title": "Construiește-ți antrenamentul"
@@ -2110,10 +2110,10 @@
       "progress": "Progres",
       "removeExercise": "Elimină exercițiul",
       "rest": {
-        "allDone": "Toate seriile sunt gata · apasă pe termină",
-        "minus10": "Cu 10 secunde mai puțină pauză",
+        "allDone": "Toate seriile sunt gata · apasă „Termină”",
+        "minus10": "Scade pauza cu 10 secunde",
         "next": "Urmează",
-        "plus10": "Cu 10 secunde mai multă pauză",
+        "plus10": "Mărește pauza cu 10 secunde",
         "skip": "Sari peste pauză"
       },
       "set": {
@@ -2137,13 +2137,13 @@
         "loadFailed": "Nu am putut încărca antrenamentul",
         "removeExerciseFailed": "Nu am putut elimina exercițiul",
         "saveSetFailed": "Nu am putut salva seria",
-        "skipFailed": "Nu am putut sări peste",
+        "skipFailed": "Nu am putut sări peste exercițiu",
         "skipped": "Ai sărit peste {name}",
         "skippedDetail": "Rămâne în jurnal, doar că nu se numără.",
         "swapFailed": "Nu am putut înlocui exercițiul",
         "swapped": "Înlocuit cu {name}",
         "swappedDetail": "Seriile înregistrate s-au păstrat.",
-        "undoSkipFailed": "Nu am putut anula săritul",
+        "undoSkipFailed": "Nu am putut readuce exercițiul",
         "welcomeBack": "Bine ai revenit",
         "welcomeBackDetail": "Ai lipsit o vreme — cronometrul de pauză a fost oprit. Continuă de unde ai rămas."
       },
@@ -2160,7 +2160,7 @@
       "prTag": "Record {weight} kg",
       "prTagDelta": "Record {weight} kg +{delta}",
       "readOnlyClientView": "doar citire · vizualizare client",
-      "swappedFrom": "Înlocuiește {name}",
+      "swappedFrom": "În locul exercițiului {name}",
       "table": {
         "result": "Rezultat"
       },
@@ -2174,7 +2174,7 @@
         "message": "Poate a fost ștearsă sau e a altcuiva.",
         "title": "Rutina nu a fost găsită"
       },
-      "rest": "{duration} pauză",
+      "rest": "Pauză de {duration}",
       "setRow": "Seria {index} · {target}",
       "setRowWeight": "Seria {index} · {target} · {weight} kg",
       "toast": {
@@ -2203,7 +2203,7 @@
       "restSeconds": "Pauză (s)",
       "setEachSeparately": "Setează fiecare serie separat",
       "setType": {
-        "drop": "Drop",
+        "drop": "Drop set",
         "failure": "Până la epuizare",
         "working": "De lucru"
       },
@@ -2224,17 +2224,17 @@
       "edit": "Editează rutina",
       "lastDone": "Ultima dată {date}",
       "moves": "{count, plural, one {exercițiu} few {exerciții} other {de exerciții}}",
-      "neverStarted": "Neînceput încă",
+      "neverStarted": "Încă nefolosită",
       "open": "Deschide {name}",
       "saveCopy": "Salvează o copie a rutinei",
       "schedule": "Programează rutina ca plan",
       "scheduleTooltip": "Programează — pune-o în calendar ca plan",
       "view": "Vezi rutina",
-      "viewTooltip": "Vezi — exercițiile, fără să le modifici"
+      "viewTooltip": "Vezi — exercițiile rutinei, fără să le modifici"
     },
     "schedule": {
       "everyWeek": "În fiecare săptămână",
-      "forBlock": "Pe un bloc",
+      "forBlock": "Pentru un număr de săptămâni",
       "howLong": "Cât timp",
       "introAfter": "în zilele în care te antrenezi. Apare în pagina Antrenamente ca orice alt plan.",
       "introBefore": "Pune",
@@ -2314,7 +2314,7 @@
     "home": "Acasă",
     "invoice": "Factură",
     "invoiceDetails": "Detalii factură",
-    "joinGroup": "Alătură-te grupului",
+    "joinGroup": "Intră în grup",
     "joinSession": "Intră în sesiune",
     "manageSessions": "Gestionează sesiunile",
     "membershipDetails": "Detalii abonament",
@@ -2329,7 +2329,7 @@
     "newPost": "Postare nouă",
     "onboarding": "Configurare",
     "overview": "Prezentare generală",
-    "pageNotFound": "Pagină negăsită",
+    "pageNotFound": "Pagina nu a fost găsită",
     "payment": "Plată",
     "payments": "Plăți",
     "pendingRequests": "Cereri în așteptare",
@@ -2346,8 +2346,8 @@
     "signIn": "Autentificare",
     "verifyEmail": "Verifică emailul",
     "workout": "Antrenament",
-    "workoutComplete": "Antrenament încheiat",
-    "workoutReplay": "Reluare antrenament",
+    "workoutComplete": "Antrenament terminat",
+    "workoutReplay": "Recapitulare antrenament",
     "workouts": "Antrenamente",
     "yourGroups": "Grupurile tale"
   },
@@ -2356,11 +2356,11 @@
       "activeClient": "Client activ",
       "addLineItem": "Adaugă articol",
       "autoSaveHint": "Modificările se salvează automat pe măsură ce scrii.",
-      "billTo": "Facturează către",
+      "billTo": "Facturat către",
       "billingClientHint": "Factura va fi trimisă pe emailul acestui client.",
       "closeTooltip": "Modificările rămân salvate ca ciornă",
       "createButton": "Creează factura",
-      "decreaseQuantity": "Scade cantitatea",
+      "decreaseQuantity": "Micșorează cantitatea",
       "delivery": "Trimitere",
       "deliveryHint": "Lasă nebifat ca s-o păstrezi ca ciornă — o poți verifica și trimite mai târziu din listă.",
       "descriptionOptional": "Descriere (opțional)",
@@ -2374,11 +2374,11 @@
       "dueOn": "Scadență {date}",
       "editAsCustom": "Editează manual",
       "editAsCustomTooltip": "Deblochează toate câmpurile. Produsul din lista de prețuri rămâne neschimbat.",
-      "emailNow": "Trimite acum factura pe email clientului",
+      "emailNow": "Trimite-i acum clientului factura pe email",
       "existingClient": "Client existent",
-      "fromPricing": "Din prețuri · {name}",
+      "fromPricing": "Din lista de prețuri · {name}",
       "guestEmailPlaceholder": "client@exemplu.ro",
-      "increaseQuantity": "Crește cantitatea",
+      "increaseQuantity": "Mărește cantitatea",
       "issueDate": "Data emiterii",
       "itemNumber": "Articolul {number}",
       "itemsCount": "{count, plural, one {# articol} few {# articole} other {# de articole}}",
@@ -2386,11 +2386,11 @@
       "lineSubtotal": "Subtotal articol",
       "loadingRecipient": "Se încarcă destinatarul…",
       "locked": "Blocat",
-      "namePlaceholder": "ex. Ședință PT individuală",
+      "namePlaceholder": "ex. Sesiune de antrenament personal",
       "newRecipient": "Destinatar nou",
       "notesOptional": "Note (opțional)",
-      "notesPlaceholder": "Apare pe factură. ex. „Mulțumesc — ne vedem săptămâna viitoare!”",
-      "oneOffPriceHint": "Ai nevoie de un preț sau o descriere unică pentru această factură?",
+      "notesPlaceholder": "Apare pe factură. De exemplu: „Mulțumesc — ne vedem săptămâna viitoare!”",
+      "oneOffPriceHint": "Ai nevoie de un preț sau de o descriere doar pentru această factură?",
       "orEnterCustom": "sau introdu manual",
       "pickFromPricing": "Alege din prețuri (opțional)",
       "pricingPlaceholder": "Alege un produs sau introdu manual mai jos",
@@ -2431,7 +2431,7 @@
         },
         "lineQuantityInvalid": "Articolul {line}: cantitatea trebuie să fie ≥ 1",
         "loadFailed": {
-          "detail": "Încearcă din nou peste câteva momente.",
+          "detail": "Încearcă din nou peste câteva clipe.",
           "summary": "Factura nu a putut fi încărcată"
         },
         "nameRequired": {
@@ -2453,8 +2453,8 @@
     },
     "createSubscription": {
       "client": "Client",
-      "firstChargeAfter": "de acum.",
-      "firstChargeBefore": "Prima plată are loc la",
+      "firstChargeAfter": ".",
+      "firstChargeBefore": "Prima plată va fi încasată peste",
       "freeTrial": "Perioadă de probă gratuită (opțional)",
       "noFreeTrial": "Fără perioadă de probă",
       "plan": "Plan",
@@ -2510,7 +2510,7 @@
       "descriptionPlaceholder": "Descriere opțională",
       "inactive": "Inactiv",
       "lockedInfo": "Prețul și tipul nu mai pot fi schimbate după creare. Ca să schimbi prețul, dezactivează acest produs și creează unul nou.",
-      "namePlaceholder": "ex. Ședință PT individuală",
+      "namePlaceholder": "ex. Sesiune de antrenament personal",
       "showOnProfile": "Afișează pe profilul public",
       "showOnProfileHint": "Apare la „Servicii” pe profilul tău public de antrenor.",
       "title": {
@@ -2536,18 +2536,18 @@
     },
     "refund": {
       "alreadyRefunded": "Deja rambursat: {amount}",
-      "amount": "Suma rambursată",
+      "amount": "Suma de rambursat",
       "notesOptional": "Note (opțional)",
       "notesPlaceholder": "Note interne despre această rambursare",
       "originalPayment": "Plata inițială",
       "reason": "Motiv",
       "selectReason": "Alege un motiv",
-      "submit": "Emite rambursarea",
+      "submit": "Rambursează",
       "title": "Emite o rambursare",
       "toast": {
         "failed": "Rambursarea nu a putut fi emisă",
         "issued": {
-          "detail": "Rambursarea de {amount} {currency} a fost emisă",
+          "detail": "Ai rambursat {amount} {currency}",
           "summary": "Rambursare emisă"
         }
       }
@@ -2579,7 +2579,7 @@
       "finishSetup": "Finalizează configurarea",
       "invoices": "Facturi",
       "memberships": "Abonamente",
-      "openDashboardFailed": "Nu am putut deschide Stripe Dashboard",
+      "openDashboardFailed": "Nu am putut deschide panoul Stripe",
       "paid": "Plătită",
       "perCycle": "per ciclu",
       "plan": "Plan",
@@ -2598,7 +2598,7 @@
       "nextPayout": "Următorul transfer",
       "noPaymentsYet": "Nicio plată încă",
       "noPayoutScheduled": "Niciun transfer programat",
-      "openStripeDashboard": "Deschide Stripe Dashboard",
+      "openStripeDashboard": "Deschide panoul Stripe",
       "outstandingInvoices": "Facturi neîncasate",
       "pageReport": "Plățile {first}–{last} din {total}",
       "pendingBalance": "Sold în așteptare",
@@ -2613,7 +2613,7 @@
         "loadSummaryFailed": "Nu am putut încărca sumarul câștigurilor",
         "startOnboardingFailed": "Nu am putut porni configurarea contului Stripe"
       },
-      "topClients": "Top clienți"
+      "topClients": "Clienți de top"
     },
     "hub": {
       "completeSetupFirst": "Finalizează mai întâi configurarea Stripe",
@@ -2650,7 +2650,7 @@
         "copyPaymentLink": "Copiază linkul de plată",
         "downloadInvoicePdf": "Descarcă factura PDF",
         "downloadPdf": "Descarcă PDF",
-        "markPaid": "Marchează plătită",
+        "markPaid": "Marchează ca plătită",
         "more": "Mai multe",
         "openHostedPage": "Deschide pagina facturii",
         "resendEmail": "Retrimite emailul",
@@ -2666,7 +2666,7 @@
       },
       "amountLabel": {
         "awaitingPayment": "Se așteaptă plata",
-        "due": "Sumă de plată",
+        "due": "Suma de plată",
         "paidInFull": "Plătită integral",
         "voided": "Anulată"
       },
@@ -2681,9 +2681,9 @@
         }
       },
       "draftHint": "Încă nu s-a trimis niciun email. Verifică, apoi trimite.",
-      "due": "Scadență {date}",
-      "guest": "Invitat",
-      "issued": "Emisă {date}",
+      "due": "Scadentă pe {date}",
+      "guest": "Client fără cont",
+      "issued": "Emisă pe {date}",
       "lineItems": {
         "count": "{count, plural, one {# articol} few {# articole} other {# de articole}}",
         "empty": "Niciun articol disponibil.",
@@ -2695,7 +2695,7 @@
       },
       "notSent": {
         "body": "După ce o trimiți, clientul primește un email cu un link de plată Stripe. Până atunci o poți anula sau edita.",
-        "title": "Netrimisă încă"
+        "title": "Nu a fost trimisă încă"
       },
       "notes": {
         "empty": "Nicio notă — adaugă un scurt mesaj înainte să trimiți.",
@@ -2726,7 +2726,7 @@
     "invoices": {
       "action": {
         "downloadPdf": "Descarcă PDF",
-        "markPaid": "Marchează plătită",
+        "markPaid": "Marchează ca plătită",
         "resendEmail": "Retrimite emailul",
         "viewHostedPage": "Vezi pagina facturii",
         "void": "Anulează"
@@ -2754,7 +2754,7 @@
       },
       "manualSuffix": "(manual)",
       "table": {
-        "invoiceNumber": "Factura nr."
+        "invoiceNumber": "Nr. factură"
       },
       "toast": {
         "loadFailed": "Nu am putut încărca facturile",
@@ -2781,7 +2781,7 @@
         "title": "Plăți activate"
       },
       "disconnected": {
-        "action": "Reconectează-te cu Stripe",
+        "action": "Reconectează contul Stripe",
         "body": "Contul tău Stripe a fost deconectat. Reconectează-l ca să poți accepta plăți în continuare.",
         "title": "Cont deconectat"
       },
@@ -2901,16 +2901,16 @@
         }
       },
       "detail": "Detalii",
-      "getConfirmationLink": "Obține linkul de confirmare",
+      "getConfirmationLink": "Generează linkul de confirmare",
       "membership": "Abonament",
       "paymentSetup": "Configurarea plății",
       "pendingSetup": {
         "body": "I-am trimis un email cu linkul de configurare. Abonamentul se activează automat după ce termină.",
         "title": "Așteptăm ca clientul să confirme și să plătească prima factură."
       },
-      "periodPending": "Datele perioadei sunt în așteptare — Stripe le completează după activare.",
+      "periodPending": "Datele de început și de sfârșit apar după ce Stripe activează abonamentul.",
       "renewsAutomatically": "Se reînnoiește automat la finalul perioadei",
-      "scheduledCancel": "Programat pentru anulare pe {date}",
+      "scheduledCancel": "Se anulează pe {date}",
       "setupHint": "Generează un link nou pe care să i-l trimiți clientului. Cel trimis inițial pe email funcționează în continuare.",
       "toast": {
         "alreadyActivated": {
@@ -2936,7 +2936,7 @@
       "confirm": {
         "cancel": {
           "header": "Anulează abonamentul",
-          "message": "Anulezi abonamentul la finalul perioadei de facturare curente?"
+          "message": "Anulezi abonamentul la finalul perioadei curente de facturare?"
         },
         "cancelImmediately": {
           "header": "Anulează imediat",
@@ -2977,12 +2977,12 @@
       "cta": "Devino antrenor"
     },
     "coaching": {
-      "accepting": "Acceptă clienți",
+      "accepting": "Disponibil pentru clienți noi",
       "edit": "Editează profilul de antrenor",
       "noBio": "Nu ai adăugat încă o descriere.",
       "notAccepting": "Nu acceptă clienți",
       "services": {
-        "emptyBefore": "Nu ai încă niciun produs. Adaugă-le în",
+        "emptyBefore": "Nu ai încă niciun produs. Poți adăuga produse din",
         "emptyLink": "Prețuri",
         "hidden": "Ascuns",
         "manageAll": "Gestionează toate prețurile →",
@@ -2996,7 +2996,7 @@
       "title": "Profil de antrenor",
       "toast": {
         "productHidden": {
-          "detail": "„{name}” e ascuns pe profilul tău public.",
+          "detail": "„{name}” nu mai apare pe profilul tău public.",
           "summary": "Produs ascuns"
         },
         "productVisible": {
@@ -3032,26 +3032,26 @@
       }
     },
     "editHandle": {
-      "intro": "Handle-ul este URL-ul scurt al profilului tău. Oamenii te pot găsi la",
-      "introExample": "/@handle-ul-tau",
+      "intro": "Numele de utilizator formează adresa scurtă a profilului tău. Oamenii te pot găsi la",
+      "introExample": "/@numele-tau",
       "placeholder": "ion-popescu",
       "preview": "Previzualizare:",
-      "title": "Editează handle-ul profilului",
+      "title": "Editează numele de utilizator",
       "toast": {
         "failed": {
-          "detail": "Handle-ul nu e disponibil. Încearcă altul.",
-          "summary": "Handle-ul nu a putut fi actualizat"
+          "detail": "Numele de utilizator e deja luat. Încearcă altul.",
+          "summary": "Numele de utilizator nu a putut fi actualizat"
         },
         "updated": {
           "detail": "Profilul tău e acum la @{handle}.",
-          "summary": "Handle actualizat"
+          "summary": "Nume de utilizator actualizat"
         }
       },
       "validation": {
         "maxLength": "Cel mult {max} caractere.",
         "minLength": "Cel puțin {min} caractere.",
         "pattern": "Folosește litere mici, cifre, „_” sau „-”. Trebuie să înceapă și să se termine cu o literă sau o cifră.",
-        "required": "Alege un handle."
+        "required": "Alege un nume de utilizator."
       }
     },
     "editPersonalInfo": {
@@ -3073,12 +3073,12 @@
     },
     "hero": {
       "changePhoto": "Schimbă fotografia",
-      "editHandle": "Editează handle-ul",
+      "editHandle": "Editează numele de utilizator",
       "editProfile": "Editează profilul",
       "joined": "Membru din {date}",
-      "noHandle": "Încă nu ai un handle",
-      "pickHandle": "Alege un handle",
-      "pickHandleFirst": "Alege mai întâi un handle",
+      "noHandle": "Încă nu ai un nume de utilizator",
+      "pickHandle": "Alege un nume de utilizator",
+      "pickHandleFirst": "Alege mai întâi un nume de utilizator",
       "resendVerification": "Retrimite emailul de verificare",
       "unverified": "Neverificat",
       "verified": "Verificat",
@@ -3118,7 +3118,7 @@
       "privacyFailed": "Vizibilitatea nu a putut fi actualizată.",
       "profileUpdated": "Profil actualizat",
       "verificationFailed": {
-        "detail": "Dacă emailul e deja verificat sau ai cerut recent, încearcă din nou mai târziu.",
+        "detail": "Dacă emailul e deja verificat sau ai cerut unul recent, încearcă din nou mai târziu.",
         "summary": "Nu am putut retrimite"
       },
       "verificationSent": {
@@ -3182,14 +3182,14 @@
     },
     "notifications": {
       "comingSoon": {
-        "message": "Notificările push în browser și aplicația mobilă sunt pe drum. Când vor fi gata, vei putea alege cum ajunge la tine fiecare categorie, pe fiecare dispozitiv.",
-        "title": "Mai multe canale de livrare în curând"
+        "message": "Lucrăm la notificările push în browser și la aplicația mobilă. Când vor fi gata, vei putea alege cum primești fiecare tip de notificare, pe fiecare dispozitiv.",
+        "title": "În curând, mai multe moduri de a primi notificări"
       },
       "custom": "personalizat",
       "customTooltip": "Ai schimbat setarea implicită",
       "emailToggleAria": "{category} — email",
       "resetAll": "Resetează tot la valorile implicite",
-      "subtitle": "Le vei vedea mereu în clopoțel. Alege ce categorii îți trimit și un email.",
+      "subtitle": "Le vei vedea mereu la clopoțelul de notificări. Alege pentru ce categorii primești și un email.",
       "title": "Preferințe de notificare",
       "toast": {
         "allReset": "Toate preferințele de notificare au revenit la valorile implicite.",
@@ -3209,7 +3209,7 @@
         "message": "Când blochezi pe cineva dintr-o conversație, va apărea aici, ca să-l poți debloca mai târziu dacă te răzgândești.",
         "title": "Niciun utilizator blocat"
       },
-      "lead": "Persoanele pe care le blochezi nu îți pot trimite mesaje, nu pot vedea istoricul conversației voastre și nu apar în lista ta de mesaje. Deblocarea le permite doar să te contacteze din nou — mesajele vechi rămân șterse din inbox.",
+      "lead": "Persoanele pe care le blochezi nu îți pot trimite mesaje, nu pot vedea istoricul conversației voastre și nu apar în lista ta de mesaje. Deblocarea le permite doar să te contacteze din nou — mesajele vechi rămân șterse din lista ta.",
       "title": "Utilizatori blocați",
       "toast": {
         "loadFailed": "Utilizatorii blocați nu au putut fi încărcați",
@@ -3253,7 +3253,7 @@
         "header": "Arhivezi programul?",
         "message": "„{name}” va fi ascuns din lista ta activă. Atribuirile existente își păstrează copia — doar că nu-l vei mai putea atribui clienților noi până nu-l restaurezi."
       },
-      "clientCopiesNote": "Copiile clienților din programele deja atribuite își păstrează datele.",
+      "clientCopiesNote": "Clienții care au primit deja programul își păstrează copia, cu tot cu date.",
       "deleteProgram": {
         "header": "Ștergi programul?",
         "message": "{name} va fi eliminat din biblioteca ta.",
@@ -3270,7 +3270,11 @@
       },
       "removeSet": {
         "header": "Elimini seria?",
-        "message": "Elimini seria {number}? Acțiunea nu poate fi anulată — dar copiile clienților din programele deja atribuite își păstrează datele."
+        "message": "Elimini seria {number}? Acțiunea nu poate fi anulată — dar clienții care au primit deja programul își păstrează copia."
+      },
+      "deleteWeek": {
+        "header": "Ștergi săptămâna {week}?",
+        "message": "{days, plural, =0 {Săptămâna aceasta este goală.} one {Se șterge antrenamentul din ea.} few {Se șterg cele # antrenamente din ea.} other {Se șterg cele # de antrenamente din ea.}} Săptămânile de după urcă, iar programul va avea {weeks, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}."
       }
     },
     "copyDay": {
@@ -3280,7 +3284,7 @@
         "before": "Copiază"
       },
       "landOn": "Ziua de destinație",
-      "nothingToOverwrite": "Nu se suprascrie nimic {day}.",
+      "nothingToOverwrite": "Nu ai nimic de înlocuit {day}.",
       "sourceLabel": "{name} · {day}, săptămâna {week}",
       "submitCopy": "{count, plural, one {Copiază în # săptămână} few {Copiază în # săptămâni} other {Copiază în # de săptămâni}}",
       "submitReplace": "{count, plural, one {Înlocuiește ziua} few {Înlocuiește în # săptămâni} other {Înlocuiește în # de săptămâni}}",
@@ -3308,7 +3312,7 @@
         "edit": "Editează programul"
       },
       "archivedBanner": {
-        "message": "E ascuns pentru atribuiri noi, dar nu e șters.",
+        "message": "Nu mai poate fi atribuit clienților noi, dar nu e șters.",
         "title": "Acest program este arhivat."
       },
       "assign": "Atribuie unui client",
@@ -3379,7 +3383,7 @@
       "create": "Creează program",
       "empty": {
         "all": {
-          "message": "Programele sunt felul în care îți construiești planurile de antrenament — antrenamente, exerciții și serii pe care le urmează clienții tăi. Creează-l pe primul ca să începi.",
+          "message": "În Programe îți construiești planurile pentru clienți: antrenamente, exerciții și serii pe care le urmează. Creează-l pe primul ca să începi.",
           "title": "Încă nu ai programe"
         },
         "archived": {
@@ -3400,7 +3404,7 @@
         "archive": "Arhivează…",
         "delete": "Șterge…",
         "publish": "Publică",
-        "restore": "Restaurează ca ciornă"
+        "restore": "Readu la ciornă"
       },
       "newProgram": "Program nou",
       "origin": {
@@ -3480,20 +3484,23 @@
       "unit": {
         "days": "Zile",
         "weeks": "Săptămâni"
-      }
+      },
+      "repeatWeeks": "Repetă {built, plural, one {săptămâna 1} other {săptămânile 1–#}} în {empty, plural, one {săptămâna goală} few {cele # săptămâni goale} other {cele # de săptămâni goale}} de după"
     },
     "rail": {
       "addWorkout": "Adaugă antrenament",
       "addWorkoutAnotherWeek": "Adaugă antrenament în altă săptămână",
       "addWorkoutToWeek": "Adaugă antrenament în săptămâna {week}",
       "copyWeek": "Copiază această săptămână",
-      "copyWeekAria": "Copiază săptămâna {week} în altă săptămână",
       "dragWeek": "Trage ca să reordonezi săptămâna",
       "exerciseCountShort": "{count} ex.",
       "noMatches": "Niciun antrenament nu se potrivește cu „{query}”.",
       "noWorkouts": "Încă nu ai antrenamente.",
       "outline": "Structura programului",
-      "searchPlaceholder": "Caută în acest program"
+      "searchPlaceholder": "Caută în acest program",
+      "deleteWeek": "Șterge această săptămână",
+      "weekActions": "Acțiuni pentru săptămână",
+      "weekActionsAria": "Acțiuni pentru săptămâna {week}"
     },
     "setForm": {
       "advanced": "Avansat (intensitate, timp, distanță, tempo)",
@@ -3595,7 +3602,7 @@
       "removeExerciseError": "Exercițiul nu s-a putut elimina",
       "removeSetError": "Seria nu s-a putut elimina",
       "reorderError": "Noua ordine nu s-a putut salva",
-      "restored": "Program restaurat ca ciornă",
+      "restored": "Programul a revenit la ciornă",
       "saveProgramError": "Programul nu s-a putut salva",
       "saveSetError": "Seria nu s-a putut salva",
       "saveWorkoutError": "Antrenamentul nu s-a putut salva",
@@ -3618,14 +3625,17 @@
         "detail": "{name} → săptămâna {week}, ziua {day}.",
         "summary": "Antrenament mutat"
       },
-      "workoutUpdated": "Antrenament actualizat"
+      "workoutUpdated": "Antrenament actualizat",
+      "weekDeleted": "Săptămâna {week} a fost ștearsă",
+      "deleteWeekError": "Săptămâna nu s-a putut șterge",
+      "repeatWeeksError": "Am salvat, dar săptămânile nu s-au putut repeta"
     },
     "workoutForm": {
       "minutesSuffix": "— min",
       "name": "Numele antrenamentului",
-      "namePlaceholder": "ex. Ziua 1 — Partea superioară",
+      "namePlaceholder": "ex. Ziua 1 — Trenul superior",
       "nameRequired": "Numele antrenamentului este obligatoriu.",
-      "notesPlaceholder": "Indicații, note de încălzire, scopul sesiunii…",
+      "notesPlaceholder": "Indicații, note de încălzire, scopul antrenamentului…",
       "phase": "Fază",
       "phasePlaceholder": "ex. acumulare",
       "submitAdd": "Adaugă antrenament",
@@ -3694,8 +3704,8 @@
         "new": "Complet începător"
       },
       "message": {
-        "label": "Altceva?",
-        "placeholder": "Salut! Merg la sală cu pauze de 2 ani și vreau să mă țin de treabă. Sunt liber în serile din timpul săptămânii."
+        "label": "Mai vrei să adaugi ceva?",
+        "placeholder": "Salut! De 2 ani merg la sală cu întreruperi și vreau să mă apuc serios. Sunt liber seara, în timpul săptămânii."
       },
       "optional": "opțional",
       "phone": "Telefon / WhatsApp",
@@ -3712,7 +3722,7 @@
     "groups": {
       "empty": "Încă nu există grupuri publice.",
       "joinAria": "Intră în {name}",
-      "subtitle": "Antrenează-te alături de oameni cu același drum",
+      "subtitle": "Antrenează-te alături de oameni cu aceleași obiective",
       "title": "Comunitățile mele"
     },
     "hero": {
@@ -3723,7 +3733,7 @@
       "message": "Mesaj",
       "saveProfile": "Salvează profilul",
       "shareMyProfile": "Distribuie profilul meu",
-      "yearsCoaching": "{count, plural, one {# an de antrenorat} few {# ani de antrenorat} other {# de ani de antrenorat}}"
+      "yearsCoaching": "{count, plural, one {# an ca antrenor} few {# ani ca antrenor} other {# de ani ca antrenor}}"
     },
     "mobileCta": {
       "messageCoach": "Scrie-i antrenorului",
@@ -3731,11 +3741,11 @@
     },
     "offerings": {
       "choosePlan": "Alege planul",
-      "empty": "Încă nu există oferte.",
+      "empty": "Încă nu există servicii.",
       "getStarted": "Începe",
       "popular": "Popular",
       "subtitle": "Alege cum vrei să ne antrenăm împreună",
-      "title": "Lucrează cu mine"
+      "title": "Hai să lucrăm împreună"
     },
     "page": {
       "backToExplore": "Înapoi la explorare",
@@ -3745,7 +3755,7 @@
       "stat": {
         "certifications": "{count, plural, one {Certificare} few {Certificări} other {Certificări}}",
         "specialties": "Specializări",
-        "yearsCoaching": "Ani de antrenorat"
+        "yearsCoaching": "Ani ca antrenor"
       },
       "toast": {
         "bookmarkSoon": "Salvarea profilurilor vine în curând."
@@ -3783,8 +3793,8 @@
       },
       "logIn": "Autentifică-te",
       "perk": {
-        "bookMessageSave": "Rezervă, scrie și salvează antrenori",
-        "freeForever": "Gratuit pentru totdeauna pentru clienți",
+        "bookMessageSave": "Rezervi sesiuni, le scrii antrenorilor și îi salvezi pe preferați",
+        "freeForever": "Mereu gratuit pentru clienți",
         "joinGroups": "Intră în grupuri și încearcă antrenamente"
       },
       "save": {
@@ -3809,7 +3819,7 @@
       "title": "Aprobări"
     },
     "attendance": {
-      "sendFollowUp": "Trimite follow-up",
+      "sendFollowUp": "Trimite un mesaj de după sesiune",
       "title": "Prezență",
       "titleWithSession": "Prezență · {title}"
     },
@@ -3822,9 +3832,9 @@
       "filtersAria": "Filtre calendar",
       "loadError": "Nu am putut încărca calendarul — {error}",
       "month": "Lună",
-      "monthSheetSubtitle": "Alege ziua la care vrei să sari",
+      "monthSheetSubtitle": "Alege o zi",
       "pickMonth": "Alege luna",
-      "subtitle": "Răsfoiește și programează sesiuni pe zi, săptămână și lună.",
+      "subtitle": "Vezi și programează sesiuni pe zile, săptămâni sau luni.",
       "tip": {
         "drag": "trage peste orice interval liber ca să creezi o sesiune.",
         "holdAfter": "pentru formularul complet.",
@@ -3840,12 +3850,12 @@
     "cancelDialog": {
       "cancelFailed": "Nu am putut anula",
       "help": {
-        "series": "Anulează toate sesiunile din această serie. Șablonul se încheie.",
+        "series": "Anulează toate sesiunile din această serie. Seria se oprește definitiv.",
         "this": "Anulează doar sesiunea de mai jos. Seria continuă.",
         "thisAndFuture": "Anulează această sesiune și toate cele care urmează."
       },
       "messageLabel": "Mesaj pentru participanți (opțional)",
-      "messagePlaceholder": "Îmi pare rău — nu mă simt bine. Reprogramez săptămâna viitoare.",
+      "messagePlaceholder": "Îmi pare rău — nu mă simt bine. O reprogramez săptămâna viitoare.",
       "noParticipants": "Momentan nu e nimeni înscris.",
       "participantsNotified": "{count, plural, one {participant va fi notificat.} few {participanți vor fi notificați.} other {de participanți vor fi notificați.}}",
       "reasonLabel": "Motiv (intern, opțional)",
@@ -3916,7 +3926,7 @@
       "loading": "Se încarcă sesiunea…",
       "message": "Mesaj",
       "moreActions": "Mai multe acțiuni",
-      "noVenue": "Nicio locație setată.",
+      "noVenue": "Nicio locație stabilită.",
       "participants": "Participanți",
       "reason": "Motiv:",
       "subtitle": "{date} · {minutes} min",
@@ -3925,7 +3935,7 @@
     "followUp": {
       "audienceLabel": "Trimite către",
       "error": {
-        "post": "Nu am putut trimite follow-up-ul",
+        "post": "Nu am putut trimite mesajul",
         "pre": "Nu am putut trimite mesajul"
       },
       "hint": "Fiecare destinatar îl primește ca notificare în aplicație și pe email.",
@@ -3942,11 +3952,11 @@
           "label": "Temă"
         },
         "nextReminder": {
-          "body": "Următoarea sesiune e deja programată — nu uitați să vă rezervați locul dacă e o clasă publică.",
+          "body": "Următoarea sesiune e deja programată — nu uitați să vă rezervați locul dacă e o sesiune publică.",
           "label": "Următoarea sesiune"
         },
         "runningLate": {
-          "body": "Atenție — întârzii cam 10 minute. Începem imediat ce ajung. Mersi pentru răbdare!",
+          "body": "Vă anunț că întârzii cam 10 minute. Începem imediat ce ajung. Mersi pentru răbdare!",
           "label": "Întârzii"
         },
         "thankYou": {
@@ -3954,7 +3964,7 @@
           "label": "Mulțumesc"
         },
         "venueUpdate": {
-          "body": "Un update rapid despre locul de întâlnire — aceeași oră, dar un loc puțin diferit. Vă trimit noua adresă în curând.",
+          "body": "O mică schimbare de locație — aceeași oră, dar ne vedem în alt loc, aproape. Vă trimit noua adresă în curând.",
           "label": "Schimbare de locație"
         },
         "whatToBring": {
@@ -3963,15 +3973,15 @@
         }
       },
       "title": {
-        "post": "Trimite follow-up",
+        "post": "Trimite un mesaj de după sesiune",
         "pre": "Scrie participanților"
       }
     },
     "formDialog": {
       "accessAria": "Cine are acces",
-      "basics": "De bază",
+      "basics": "Informații de bază",
       "cancelCutoff": "Termen de anulare (ore)",
-      "capacity": "Capacitate (gol = nelimitat)",
+      "capacity": "Număr de locuri (necompletat = nelimitat)",
       "capacitySection": "Capacitate și anulare",
       "descriptionLabel": "Descriere (opțional)",
       "descriptionPlaceholder": "Ce ar trebui să știe participanții?",
@@ -3982,7 +3992,7 @@
       "oneOff": "O singură dată",
       "pickDateTime": "Alege data și ora",
       "pickGroup": "Alege un grup",
-      "repeat": "Repetă după un program",
+      "repeat": "Repetă periodic",
       "repeatLocked": "(anulează și creează din nou ca s-o schimbi)",
       "repeatsWeekly": "Se repetă săptămânal",
       "requireApproval": "Cere aprobare înainte de confirmare",
@@ -4019,7 +4029,7 @@
           "summary": "Linkul întâlnirii e obligatoriu"
         },
         "pickDay": {
-          "detail": "Programele săptămânale au nevoie de cel puțin o zi a săptămânii.",
+          "detail": "Recurența săptămânală are nevoie de cel puțin o zi a săptămânii.",
           "summary": "Alege cel puțin o zi"
         },
         "saveFailed": "Nu am putut salva sesiunea",
@@ -4043,14 +4053,14 @@
         }
       },
       "venue": "Locație",
-      "waitlist": "Activează lista de așteptare când e plin",
+      "waitlist": "Activează lista de așteptare când sesiunea e plină",
       "when": "Când",
       "where": "Unde",
       "whoCanBook": "Cine poate rezerva"
     },
     "list": {
       "cancelledCapped": "100+ anulate (se afișează ultimele 100)",
-      "cancelledCount": "{count, plural, one {# anulată} few {# anulate} other {# de anulate}}",
+      "cancelledCount": "{count, plural, one {# anulată} few {# anulate} other {# de sesiuni anulate}}",
       "cancelledSession": "Sesiune anulată",
       "empty": {
         "cancelled": {
@@ -4069,12 +4079,12 @@
         },
         "recurring": {
           "action": "Creează o sesiune recurentă",
-          "message": "Creează o sesiune și bifează „Repetă după un program” ca să construiești o serie.",
+          "message": "Creează o sesiune și bifează „Repetă periodic” ca să creezi o serie.",
           "title": "Niciun șablon recurent"
         }
       },
       "endOfList": {
-        "cancelled": "Asta e tot — {count, plural, one {# anulată} few {# anulate} other {# de anulate}} în total.",
+        "cancelled": "Asta e tot — {count, plural, one {# sesiune anulată} few {# sesiuni anulate} other {# de sesiuni anulate}} în total.",
         "sessions": "Asta e tot — {count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}} în total.",
         "total": "Asta e tot — {count} în total."
       },
@@ -4091,7 +4101,7 @@
         "recurring": {
           "label": "Recurente",
           "sub": "Serii în desfășurare",
-          "value": "{count, plural, one {# activă} few {# active} other {# de active}}"
+          "value": "{count, plural, one {# activă} few {# active} other {# de serii active}}"
         },
         "thisWeek": {
           "label": "Săptămâna aceasta",
@@ -4153,7 +4163,7 @@
       },
       "conflict": "conflict",
       "endAfterWeek": "Încheie seria după săptămâna asta",
-      "endAfterWeekHint": "Anulează toate sesiunile de după următoarea și încheie seria.",
+      "endAfterWeekHint": "Anulează toate sesiunile de după cea următoare și încheie seria.",
       "ended": {
         "message": "Nu se vor mai genera sesiuni noi.",
         "title": "Serie încheiată."
@@ -4184,11 +4194,11 @@
       "toast": {
         "cancelSeriesFailed": "Nu am putut anula seria",
         "endFailed": "Nu am putut încheia seria",
-        "extendFailed": "Nu am putut extinde programul",
+        "extendFailed": "Nu am putut extinde seria",
         "extended": {
           "detail": "{count, plural, one {# sesiune nouă adăugată.} few {# sesiuni noi adăugate.} other {# de sesiuni noi adăugate.}}",
           "detailWithConflicts": "{count, plural, one {# sesiune nouă adăugată.} few {# sesiuni noi adăugate.} other {# de sesiuni noi adăugate.}} ({conflicts} cu conflicte)",
-          "summary": "Program extins"
+          "summary": "Calendar extins"
         },
         "loadFailed": "Nu am putut încărca șablonul",
         "nothingToCancel": {
@@ -4251,8 +4261,8 @@
       },
       "km": "{distance} km",
       "loadFailed": "Nu am putut încărca acest exercițiu",
-      "sessions": "Sesiuni",
-      "sessionsLogged": "{count, plural, one {# sesiune notată} few {# sesiuni notate} other {# de sesiuni notate}}",
+      "sessions": "Antrenamente",
+      "sessionsLogged": "{count, plural, one {# antrenament notat} few {# antrenamente notate} other {# de antrenamente notate}}",
       "weightTimesReps": "{weight} kg × {reps}"
     },
     "history": {
@@ -4275,7 +4285,7 @@
         "today": "Azi"
       },
       "lensAria": "Vizualizare antrenament",
-      "statsTitle": "Cum se adună",
+      "statsTitle": "Cum progresezi",
       "subtitle": {
         "exercises": "Toate mișcările din catalog, plus cele create de tine.",
         "plans": "Ce ai în lucru.",
@@ -4286,20 +4296,20 @@
     "myPlans": {
       "empty": {
         "action": "Programează o rutină",
-        "message": "Planurile sunt antrenamente cu date, întinse pe mai multe săptămâni. Un antrenor îți poate face unul sau poți repeta una dintre rutinele tale din fila Rutine.",
+        "message": "Planurile sunt antrenamente programate în calendar, pe mai multe săptămâni. Un antrenor îți poate pregăti unul sau poți repeta una dintre rutinele tale din fila Rutine.",
         "title": "Încă nu ai planuri"
       },
       "emptySearchTitle": "Niciun plan nu se potrivește căutării",
       "endOfList": "Asta e tot — {count, plural, one {# plan} few {# planuri} other {# de planuri}} în total.",
       "help": {
         "aria": "Care e diferența dintre un plan și o rutină?",
-        "tooltip": "O rutină e un antrenament salvat, gata oricând ești pregătit. Un plan e un antrenament cu date — fie ce ți-a pregătit un antrenor, fie o rutină de-a ta setată să se repete."
+        "tooltip": "O rutină e un antrenament salvat, pe care îl faci oricând vrei. Un plan e un antrenament programat în calendar — fie pregătit de un antrenor, fie o rutină de-a ta pe care ai programat-o să se repete."
       },
       "loadFailed": "Nu am putut încărca planurile tale",
       "searchAria": "Caută planuri",
       "searchPlaceholder": "Caută planuri…",
       "subtitleCount": "{count, plural, one {# plan în calendarul tău.} few {# planuri în calendarul tău.} other {# de planuri în calendarul tău.}}",
-      "subtitleEmpty": "Ce ai în lucru, fie că ți l-a setat un antrenor, fie că l-ai programat singur."
+      "subtitleEmpty": "Ce ai în lucru, fie că ți l-a pregătit un antrenor, fie că l-ai programat singur."
     },
     "planDetail": {
       "approxMinutes": "~{minutes} min",
@@ -4310,7 +4320,7 @@
         }
       },
       "cta": {
-        "allDone": "Toate antrenamentele sunt gata",
+        "allDone": "Ai terminat toate antrenamentele",
         "cancelled": "Plan anulat",
         "paused": "Plan pus pe pauză",
         "resume": "Reia antrenamentul",
@@ -4349,7 +4359,7 @@
           "title": "Plan finalizat"
         },
         "paused": {
-          "message": "Îl va relua când ești pregătit să continui.",
+          "message": "Antrenorul îl va relua când ești gata să continui.",
           "title": "Pus pe pauză de antrenorul tău"
         },
         "pending": {
@@ -4377,11 +4387,11 @@
           "summary": "Nu am putut încărca planul"
         },
         "nothingToReplay": {
-          "detail": "Ai sărit peste „{name}” — nu s-a notat nicio sesiune.",
+          "detail": "Ai sărit peste „{name}” — nu s-a notat niciun antrenament.",
           "summary": "Nimic de revăzut"
         },
         "openFailed": {
-          "detail": "Încearcă din nou peste câteva momente sau deschide antrenamentul din Antrenamente.",
+          "detail": "Încearcă din nou peste câteva clipe sau deschide antrenamentul din Antrenamente.",
           "summary": "Nu am putut deschide antrenamentul"
         },
         "paused": {
@@ -4397,7 +4407,7 @@
       "viewExerciseFallbackAria": "Vezi detaliile exercițiului",
       "week": "Săptămâna {week}",
       "withCoach": "cu {name}",
-      "workoutsDone": "{done} / {total} antrenamente gata"
+      "workoutsDone": "{done} / {total} antrenamente făcute"
     },
     "planRow": {
       "endsOn": "Se termină pe {date}",
@@ -4424,16 +4434,16 @@
       },
       "early": {
         "logNext": "Notează antrenamentul nr. {number}",
-        "message": "Fiecare primă ridicare e un record personal, deci ce ai notat acum e cifra de depășit. Mai notează câteva și tendințele și seriile de zile apar aici.",
-        "title": "Bravo, ai punctul de plecare."
+        "message": "Prima ridicare e mereu un record personal, așa că ce ai notat acum e cifra de depășit. Mai notează câteva antrenamente și aici apar tendințele și săptămânile la rând.",
+        "title": "Bravo, ai stabilit punctul de plecare."
       },
       "empty": {
-        "message": "Notează primul antrenament și recordurile, volumul și seriile de zile încep să apară aici.",
+        "message": "Notează primul antrenament și aici încep să apară recordurile, volumul și săptămânile la rând.",
         "title": "Încă niciun progres"
       },
       "kpi": {
-        "streak": "Serie de zile",
-        "volume": "Volum kg",
+        "streak": "Săptămâni la rând",
+        "volume": "Volum (kg)",
         "workouts": "Antrenamente"
       },
       "loadFailed": "Nu am putut încărca progresul tău",
@@ -4447,7 +4457,7 @@
       },
       "streakWeeks": "{count, plural, one {# săpt.} few {# săpt.} other {# de săpt.}}",
       "subtitle": {
-        "early": "Ai punctul de plecare. Continuă să notezi și apar tendințele.",
+        "early": "Ai stabilit punctul de plecare. Continuă să notezi și vei vedea tendințele.",
         "empty": "Recordurile și tendințele tale se adună aici pe măsură ce te antrenezi.",
         "summary": "{count, plural, one {# antrenament notat.} few {# antrenamente notate.} other {# de antrenamente notate.}}",
         "summaryWithHours": "{count, plural, one {# antrenament notat} few {# antrenamente notate} other {# de antrenamente notate}} · {hours} h de antrenament."
@@ -4467,7 +4477,7 @@
     "becomeCoach": {
       "acceptingClients": {
         "hint": "Permite clienților să-ți trimită cereri",
-        "label": "Accept clienți noi"
+        "label": "Accepți clienți noi"
       },
       "bio": {
         "placeholder": "Spune-le clienților despre tine, experiența ta și stilul tău de antrenament..."
@@ -4481,7 +4491,7 @@
         "year": "An"
       },
       "displayName": {
-        "placeholder": "Numele văzut de clienți"
+        "placeholder": "Numele afișat clienților"
       },
       "showOnProfile": "Afișează pe profil",
       "social": {
@@ -4496,7 +4506,7 @@
       "step": {
         "about": "Despre tine",
         "locationCertifications": "Locație și certificări",
-        "social": "Social"
+        "social": "Rețele sociale"
       },
       "submit": "Devino antrenor",
       "title": "Devino antrenor",
@@ -4514,7 +4524,7 @@
         "noResults": "Nu am găsit antrenori. Încearcă altă căutare.",
         "prompt": "Caută antrenori ca să începi."
       },
-      "request": "Solicită",
+      "request": "Trimite cerere",
       "requestDialog": {
         "messageLabel": "Mesaj (opțional)",
         "messagePlaceholder": "Prezintă-te sau spune de ce ți-ar plăcea să te antrenezi cu acest antrenor...",
@@ -4552,7 +4562,7 @@
       "address": "Adresă",
       "addressHint": "Alege locul din sugestii.",
       "editTitle": "Editează locația",
-      "meetingProvider": "Platformă de întâlnire",
+      "meetingProvider": "Platformă video",
       "meetingProviderPlaceholder": "Alege o platformă",
       "meetingUrl": "URL-ul întâlnirii",
       "namePlaceholder": "ex. FitZone Cluj — Centru",
@@ -4566,7 +4576,7 @@
       "CLIENT_HOME": "La client",
       "GYM": "Sală",
       "ONLINE": "Online",
-      "OTHER": "Altele",
+      "OTHER": "Alt tip",
       "OUTDOOR": "În aer liber",
       "PARK": "Parc",
       "STUDIO": "Studio"
@@ -4578,7 +4588,7 @@
       "OTHER": "Altceva.",
       "OUTDOOR": "Altă locație în aer liber (plajă, traseu etc.).",
       "PARK": "O locație în aer liber, într-un parc.",
-      "STUDIO": "Un spațiu de studio privat."
+      "STUDIO": "Un studio privat."
     },
     "section": {
       "add": "Adaugă locație",
@@ -4590,7 +4600,7 @@
       "archiveFailed": "Locația nu a putut fi arhivată",
       "archived": "Locație arhivată",
       "cityRequired": {
-        "detail": "Alege un loc pentru locațiile fizice.",
+        "detail": "Alege orașul pentru locațiile fizice.",
         "summary": "Orașul e obligatoriu"
       },
       "deleteFailed": "Locația nu a putut fi ștearsă",

@@ -142,6 +142,29 @@ export class ProgramService {
     );
   }
 
+  /**
+   * Repeat the weeks already built into the empty weeks after them, up to
+   * the program's length. The block cycles — three built weeks on a
+   * ten-week program fill weeks 4–10 as 1, 2, 3, 1, 2, 3, 1 — and nothing
+   * existing is replaced. Returns the program with its full tree.
+   */
+  repeatWeeks(programId: string): Observable<Program> {
+    return this._http.post<Program>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.REPEAT_WEEKS(programId)}`,
+      {},
+    );
+  }
+
+  /**
+   * Delete one week: its days go, later weeks move up, and the program is
+   * a week shorter. Returns the program with its full tree.
+   */
+  deleteWeek(programId: string, weekIndex: number): Observable<Program> {
+    return this._http.delete<Program>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WEEK(programId, weekIndex)}`,
+    );
+  }
+
   /** A full copy of a program, owned by the caller, as a fresh draft. */
   duplicate(programId: string): Observable<Program> {
     return this._http.post<Program>(

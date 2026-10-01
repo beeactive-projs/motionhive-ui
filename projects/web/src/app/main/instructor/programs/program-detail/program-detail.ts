@@ -387,10 +387,57 @@ export class ProgramDetail implements OnInit {
   }
 
   onEdited(p: Program): void {
-    // Preserve nested workouts (the edit payload returns the shell only).
     const existing = this.program();
-    this.program.set(existing ? { ...existing, ...p, workouts: existing.workouts } : p);
+    // A plain edit answers with the shell only, so the tree already here is
+    // kept — minus the weeks a shorter length just dropped on the server.
+    // An edit that repeated weeks answers with the whole tree, which wins.
+    const weeks = p.durationDays ? Math.ceil(p.durationDays / 7) : Infinity;
+    const kept = existing?.workouts?.filter((w) => w.weekIndex < weeks);
+    this.program.set(existing ? { ...existing, ...p, workouts: p.workouts ?? kept } : p);
     this.editDialogOpen.set(false);
+  }
+
+  // ── Delete week ──────────────────────────────────────────────────
+
+  confirmDeleteWeek(weekIndex: number): void {
+    const p = this.program();
+    if (!p) return;
+    const days = (p.workouts ?? []).filter((w) => w.weekIndex === weekIndex).length;
+    this._confirmationService.confirm({
+      header: this._translateService.instant('programs.confirm.deleteWeek.header', {
+        week: weekIndex + 1,
+      }),
+      message: this._translateService.instant('programs.confirm.deleteWeek.message', {
+        days,
+        weeks: this.weekCount() - 1,
+      }),
+      acceptLabel: this._translateService.instant('button.delete'),
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: this._translateService.instant('button.cancel'),
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._deleteWeek(weekIndex),
+    });
+  }
+
+  /** One request: the week goes, later weeks move up, the length drops by one. */
+  private _deleteWeek(weekIndex: number): void {
+    const p = this.program();
+    if (!p) return;
+    this._track(this._programService.deleteWeek(p.id, weekIndex)).subscribe({
+      next: (fresh) => {
+        this.program.set(fresh);
+        this._messageService.add({
+          severity: 'success',
+          summary: this._translateService.instant('programs.toast.weekDeleted', {
+            week: weekIndex + 1,
+          }),
+          life: 2500,
+        });
+      },
+      error: (err) => {
+        this._apiError('programs.toast.deleteWeekError', err);
+      },
+    });
   }
 
   // ── Workout CRUD ─────────────────────────────────────────────────

@@ -102,22 +102,23 @@
           >
             <i class="pi pi-plus"></i>
           </button>
-          @if (!searchActive() && g.workouts.length > 0) {
-            <!-- Only enabled when this week actually has something to copy;
-                 an empty source week has nothing to duplicate. -->
+          @if (!searchActive() && (g.workouts.length > 0 || weeks().length > 1)) {
+            <!-- Copy and delete share one menu: the rail is too narrow for a
+                 third icon without wrapping the week label. -->
             <button pButton
               type="button"
               size="small"
               severity="secondary"
               [text]="true"
               [rounded]="true"
-              [pTooltip]="'programs.rail.copyWeek' | translate"
+              [pTooltip]="'programs.rail.weekActions' | translate"
               tooltipPosition="right"
-              (click)="copyWeek.emit(g.week)"
-              [attr.aria-label]="'programs.rail.copyWeekAria' | translate: { week: g.week + 1 }"
+              (click)="openWeekMenu($event, weekMenu, g)"
+              [attr.aria-label]="'programs.rail.weekActionsAria' | translate: { week: g.week + 1 }"
+              aria-haspopup="menu"
               iconOnly
             >
-              <i class="pi pi-copy"></i>
+              <i class="pi pi-ellipsis-h"></i>
             </button>
           }
         </div>
@@ -210,3 +211,5 @@
     </span>
   </div>
 </div>
+
+<p-menu #weekMenu [model]="weekMenuItems()" [popup]="true" [appendTo]="'body'" />

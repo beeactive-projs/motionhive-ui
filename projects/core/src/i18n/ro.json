@@ -62,7 +62,7 @@
     "previous": "Înapoi",
     "reject": "Respinge",
     "remove": "Elimină",
-    "requestToJoin": "Cere să te alături",
+    "requestToJoin": "Cere acces",
     "resend": "Retrimite",
     "reset": "Resetează",
     "restore": "Restaurează",
@@ -100,11 +100,11 @@
     "filters": "Filtre",
     "filtersCount": "Filtre · {count}",
     "loading": "Se încarcă…",
-    "none": "Niciunul",
+    "none": "Fără",
     "oneOff": "Plată unică",
     "or": "sau",
     "pageTitle": "{page} - MotionHive",
-    "paginator": "Afișezi {first} - {last} din {total}",
+    "paginator": "Se afișează {first} - {last} din {total}",
     "pleaseTryAgain": "Încearcă din nou.",
     "session": "Sesiune",
     "someone": "Cineva",
@@ -161,7 +161,7 @@
       "AMRAP": "AMRAP",
       "CIRCUIT": "Circuit",
       "EMOM": "EMOM",
-      "NONE": "Niciunul",
+      "NONE": "Fără",
       "SUPERSET": "Superset",
       "TABATA": "Tabata"
     },
@@ -185,13 +185,13 @@
     },
     "exerciseMechanic": {
       "COMPOUND": "Compus",
-      "ISOLATION": "Izolare"
+      "ISOLATION": "De izolare"
     },
     "exerciseSetType": {
       "AMRAP": "AMRAP",
       "CLUSTER": "Cluster",
       "DROPSET": "Drop set",
-      "FAILURE": "Până la epuizare",
+      "FAILURE": "Până la cedare",
       "NORMAL": "Normală",
       "REST_PAUSE": "Rest-pause",
       "WARMUP": "Încălzire",
@@ -221,7 +221,7 @@
     },
     "invoiceStatus": {
       "draft": "Ciornă",
-      "open": "Deschisă",
+      "open": "Neachitată",
       "paid": "Plătită",
       "uncollectible": "Irecuperabilă",
       "void": "Anulată"
@@ -233,7 +233,7 @@
     },
     "movementPattern": {
       "ANTI_ROTATION": "Anti-rotație",
-      "CARRY": "Transport",
+      "CARRY": "Carat de greutăți",
       "HINGE": "Flexie din șold",
       "ISOLATION": "Izolare",
       "LOCOMOTION": "Locomoție",
@@ -271,7 +271,7 @@
       "ACCOUNT": "Schimbări ale stării contului Stripe care necesită atenția ta.",
       "COACHING": "Cereri de la clienți, invitații de la antrenori și noutăți despre colaborările de coaching.",
       "GROUPS": "Invitații, schimbări de membri și actualizări despre proprietarul grupului.",
-      "MESSAGING": "Mesaje noi de la clienții și antrenorii tăi. Grupăm alertele pe email, ca să primești cel mult unul pe conversație pe oră.",
+      "MESSAGING": "Mesaje noi de la clienții și antrenorii tăi. Grupăm alertele pe email, ca să primești cel mult una pe conversație pe oră.",
       "PAYMENTS": "Facturi, plăți, abonamente, rambursări, transferuri și dispute.",
       "POSTS": "Comentarii la postările tale, aprobări și rezultatele moderării.",
       "SESSIONS": "Mementouri, anulări, reprogramări și schimbări în lista participanților.",
@@ -298,7 +298,7 @@
       "ACTIVE": "Activ",
       "CANCELLED": "Anulat",
       "COMPLETED": "Finalizat",
-      "PAUSED": "Pe pauză",
+      "PAUSED": "În pauză",
       "PENDING": "În așteptare"
     },
     "programKind": {
@@ -314,14 +314,14 @@
     },
     "refundReason": {
       "duplicate": "Duplicat",
-      "fraudulent": "Fraudulos",
+      "fraudulent": "Fraudă",
       "requested_by_customer": "La cererea clientului"
     },
     "sessionAccess": {
-      "CLIENTS_ONLY": "Doar clienți",
-      "FREE": "Gratuit",
+      "CLIENTS_ONLY": "Doar clienții",
+      "FREE": "Gratuită",
       "GROUP_ONLY": "Membrii grupului",
-      "OPEN": "Plătit"
+      "OPEN": "Plătită"
     },
     "sessionAccessHint": {
       "CLIENTS_ONLY": "Doar clienții tăi activi pot rezerva.",
@@ -356,14 +356,14 @@
       "ENDED": "Încheiată"
     },
     "sessionType": {
-      "GROUP": "Grup",
+      "GROUP": "De grup",
       "OPEN": "Deschisă",
       "PRIVATE": "1 la 1"
     },
     "stripeAccountStatus": {
       "ACTIVE": "Activ",
       "DISCONNECTED": "Deconectat",
-      "NOT_STARTED": "Neînceput",
+      "NOT_STARTED": "Neconfigurat",
       "PENDING": "În așteptare",
       "RESTRICTED": "Restricționat"
     },
@@ -402,7 +402,7 @@
       "ABANDONED": "Abandonat",
       "COMPLETED": "Finalizat",
       "IN_PROGRESS": "În desfășurare",
-      "SKIPPED": "Sărit"
+      "SKIPPED": "Omis"
     }
   },
   "error": {
@@ -412,16 +412,16 @@
       "conflict": "Nu se poate acum",
       "generic": "Ceva nu a mers bine",
       "noConnection": "Fără conexiune",
-      "notFound": "Negăsit"
+      "notFound": "Nu a fost găsit"
     },
     "generic": "Ceva nu a mers bine. Încearcă din nou.",
     "http": {
-      "conflict": "Intră în conflict cu ceva ce există deja.",
+      "conflict": "Există deja un element care intră în conflict cu acesta.",
       "forbidden": "Nu ai permisiunea să faci asta.",
       "notFound": "Ce ai căutat nu a fost găsit.",
       "offline": "Se pare că nu ești conectat la internet. Verifică conexiunea și încearcă din nou.",
-      "server": "Ceva nu a mers bine la noi. Încearcă din nou.",
-      "timeout": "Serverul a răspuns prea greu. Încearcă din nou.",
+      "server": "A apărut o problemă de partea noastră. Încearcă din nou.",
+      "timeout": "Serverul a răspuns prea lent. Încearcă din nou.",
       "tooManyRequests": "Prea multe cereri deodată — așteaptă puțin și încearcă din nou.",
       "tooManyRequestsSummary": "Mai încet puțin",
       "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în câteva momente.",
@@ -437,7 +437,7 @@
       "rateLimitedRetry": "Mai încet — încearcă din nou în {seconds} s.",
       "sendFailed": "Nu s-a putut trimite. Încearcă din nou."
     },
-    "staleData": "Actualizarea a eșuat. Vezi ultimele date."
+    "staleData": "Nu am putut actualiza datele. Afișăm ultimele date disponibile."
   },
   "form": {
     "hint": {
@@ -461,7 +461,7 @@
       "endDate": "Data de sfârșit",
       "firstName": "Prenume",
       "fullName": "Nume complet",
-      "handle": "Handle",
+      "handle": "Nume de utilizator",
       "language": "Limbă",
       "lastName": "Nume",
       "location": "Locație",
@@ -486,13 +486,13 @@
     "placeholder": {
       "email": "tu@exemplu.ro",
       "notProvided": "Necompletat",
-      "notSet": "Nesetat",
+      "notSet": "Nespecificat",
       "optional": "Opțional",
       "pickDate": "Alege o dată",
       "search": "Caută",
       "select": "Alege",
       "social": {
-        "facebook": "facebook.com/paginata",
+        "facebook": "facebook.com/pagina-ta",
         "instagram": "instagram.com/numeletau",
         "linkedin": "linkedin.com/in/numeletau",
         "tiktok": "tiktok.com/@numeletau",
@@ -533,7 +533,7 @@
     "requests": "Cereri",
     "sessions": "Sesiuni",
     "settings": "Setări",
-    "train": "Cursant",
+    "train": "Sportiv",
     "users": "Utilizatori",
     "workouts": "Antrenamente"
   },
