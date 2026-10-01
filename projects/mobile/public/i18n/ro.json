@@ -1159,13 +1159,13 @@
       },
       "greeting": "Bine ai revenit, {name}.",
       "greetingNoName": "Bine ai revenit.",
-      "intro": "Un loc perfect unde poți continua de unde ai rămas.",
+      "intro": "Fără grabă, continuă de unde ai rămas.",
       "posts": {
         "byline": "{author} · {minutes} min de citit",
         "empty": "Încă nu sunt articole. Revino curând — primele sunt pe drum.",
         "eyebrow": "Din jurnal",
         "readAll": "Citește tot",
-        "title": "Lecturi din stup"
+        "title": "Povești din stup"
       },
       "resume": {
         "button": "Reia antrenamentul",

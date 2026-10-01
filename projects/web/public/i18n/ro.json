@@ -1558,7 +1558,7 @@
       "noDescription": "Încă nu are descriere."
     },
     "hero": {
-      "body": "Câțiva antrenori, tot mai multe sesiuni și o comunitate care abia prinde contur. Un loc liniștit unde să te simți acasă și să continui de unde ai rămas.",
+      "body": "Primii antrenori s-au înscris, sesiunile se înmulțesc, iar comunitatea începe să prindă contur. Continuă de unde ai rămas.",
       "fallbackName": "din nou",
       "title": "Ne bucurăm să te vedem,",
       "titleName": "{name}."
@@ -1615,7 +1615,7 @@
       "loading": "Se încarcă articolele",
       "minRead": "{minutes} min de lectură",
       "readAll": "Citește tot",
-      "title": "Lecturi din stup"
+      "title": "Povești din stup"
     },
     "resume": {
       "label": "Continuă de unde ai rămas"
@@ -1640,16 +1640,16 @@
       "direct": {
         "emailError": "Avem nevoie de un email valid ca să-l contactăm.",
         "emailPlaceholder": "antrenor@exemplu.com",
-        "hint": "Îi trimitem o invitație prietenoasă — și îi spunem că e de la tine.",
+        "hint": "Îi trimitem o invitație prietenoasă și îi spunem că e de la tine.",
         "nameError": "Numele ne ajută să ne adresăm corect în email.",
-        "noteLabel": "Câteva cuvinte despre tine",
-        "notePlaceholder": "Salut, Mia — orele tale de spinning sunt cele mai bune, platforma asta ți-ar plăcea."
+        "noteLabel": "Câteva cuvinte",
+        "notePlaceholder": "Salut, Mia, orele tale de spinning sunt cele mai tari, platforma asta ar fi pe placul tău."
       },
       "success": {
         "directBody": "I-am trimis un email cu numele tău. Recomandă câți antrenori vrei.",
         "directTitle": "Invitația e pe drum.",
         "teamBody": "Îl contactăm și îți spunem ce a răspuns. Recomandă câți antrenori vrei.",
-        "teamTitle": "Mulțumim — ne ocupăm noi de aici."
+        "teamTitle": "Mulțumim, ne ocupăm noi de aici."
       },
       "tab": {
         "direct": "Scrie-i antrenorului",
