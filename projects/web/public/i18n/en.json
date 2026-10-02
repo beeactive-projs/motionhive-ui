@@ -1581,7 +1581,7 @@
       "messageLabel": "Personal message",
       "messagePlaceholder": "Hey — come train with me on MotionHive.",
       "share": {
-        "text": "Come train with me on MotionHive — your first session's on us.",
+        "text": "Come train with me on MotionHive.",
         "title": "Train with me on MotionHive"
       },
       "success": {
@@ -1594,7 +1594,7 @@
       },
       "title": "Bring a friend, train together.",
       "toast": {
-        "copied": "Send it to your friend — first session is on us.",
+        "copied": "Link copied. Send it to your friend.",
         "copyFailed": {
           "detail": "Select the link and copy it manually.",
           "summary": "Couldn't copy"

@@ -1567,13 +1567,13 @@
       "roleWithYears": "{specialization} · {count, plural, one {# an} few {# ani} other {# de ani}}"
     },
     "inviteBand": {
-      "body": "Stupul crește din gură în gură. MotionHive e gratuit, adu pe cineva cu care chiar te-ai antrena.",
+      "body": "Stupul crește puțin câte puțin. Înscrierea e gratuită, așa că adu-ți prietenii cu tine.",
       "invite": "Invită un prieten",
       "suggestCoach": "Recomandă un antrenor",
-      "title": "Știi pe cineva căruia i-ar plăcea aici?"
+      "title": "Cu cine ți-ar plăcea să te antrenezi?"
     },
     "inviteFriend": {
-      "body": "MotionHive e gratuit. Trimite linkul cuiva cu care chiar te-ai antrena.",
+      "body": "Înscrierea e gratuită. Trimite linkul unui prieten cu care vrei să te antrenezi.",
       "emailHint": "Îi trimitem un mesaj prietenos cu linkul tău de invitație.",
       "emailPlaceholder": "prieten@exemplu.com",
       "linkFootnote": "Linkul îl duce direct la înregistrare.",
@@ -1581,7 +1581,7 @@
       "messageLabel": "Mesaj personal",
       "messagePlaceholder": "Hei — hai să ne antrenăm împreună pe MotionHive.",
       "share": {
-        "text": "Hai să ne antrenăm împreună pe MotionHive — prima sesiune e din partea noastră.",
+        "text": "Hai să ne antrenăm împreună pe MotionHive.",
         "title": "Antrenează-te cu mine pe MotionHive"
       },
       "success": {
@@ -1594,7 +1594,7 @@
       },
       "title": "Adu un prieten și antrenați-vă împreună.",
       "toast": {
-        "copied": "Trimite-l prietenului tău — prima sesiune e din partea noastră.",
+        "copied": "Linkul e copiat. Trimite-l prietenului tău.",
         "copyFailed": {
           "detail": "Selectează linkul și copiază-l manual.",
           "summary": "Nu s-a putut copia"
