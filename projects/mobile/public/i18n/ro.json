@@ -578,7 +578,7 @@
     "create": {
       "createExercise": "Creează exercițiul",
       "kindHint": "Stabilește ce se înregistrează când un client face acest exercițiu.",
-      "namePlaceholder": "ex. Genuflexiune goblet cu tempo",
+      "namePlaceholder": "ex. Genuflexiuni goblet cu tempo",
       "nextDetails": "Continuă · Detalii",
       "nextMuscles": "Continuă · Mușchi și echipament",
       "stepOf": "Pasul {step} din {total}",

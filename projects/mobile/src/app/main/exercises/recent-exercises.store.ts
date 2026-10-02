@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
-import { AuthStore, Exercise } from 'core';
+import { AuthStore, Exercise, appLanguage } from 'core';
 
 const STORAGE_PREFIX = 'mh.recentExercises.v1';
 const MAX_ENTRIES = 12;
@@ -16,7 +16,9 @@ const MAX_ENTRIES = 12;
  *
  * Keyed by user id, so two accounts on one phone never see each other's
  * picks. That is the whole logout story: nothing to clear, because the next
- * account reads a different key.
+ * account reads a different key. And by language, because the rows carry
+ * names in the language they were fetched in: after a switch the shortcut
+ * starts empty rather than showing the old language.
  *
  * The list row is stored whole, because that is what the picker hands back
  * to the program when it commits. It can go stale — a renamed or deleted
@@ -33,7 +35,8 @@ export class RecentExercisesStore {
   private readonly _version = signal(0);
 
   private readonly _key = computed(
-    () => `${STORAGE_PREFIX}.${this._authStore.user()?.id ?? 'anonymous'}`,
+    () =>
+      `${STORAGE_PREFIX}.${this._authStore.user()?.id ?? 'anonymous'}.${appLanguage()}`,
   );
 
   readonly exercises = computed<Exercise[]>(() => {

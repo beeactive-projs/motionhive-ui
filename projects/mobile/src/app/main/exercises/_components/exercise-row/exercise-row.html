@@ -6,6 +6,9 @@
 
   <ion-label>
     <h2>{{ name() }}</h2>
+    @if (originalName(); as original) {
+    <p class="original" lang="en">{{ original }}</p>
+    }
     <p>{{ subline() }}</p>
   </ion-label>
 

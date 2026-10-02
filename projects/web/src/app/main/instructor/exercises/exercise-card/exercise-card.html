@@ -39,8 +39,13 @@
   </ng-template>
 
   <div class="flex flex-col gap-2">
-    <div class="line-clamp-2 font-semibold text-surface-900 dark:text-surface-100">
-      {{ e.name }}
+    <div class="flex flex-col gap-0.5">
+      <div class="line-clamp-2 font-semibold text-surface-900 dark:text-surface-100">
+        {{ e.name }}
+      </div>
+      @if (e.originalName; as original) {
+      <div class="truncate text-xs text-surface-500 dark:text-surface-400" lang="en">{{ original }}</div>
+      }
     </div>
 
     <div class="flex flex-wrap items-center gap-2">

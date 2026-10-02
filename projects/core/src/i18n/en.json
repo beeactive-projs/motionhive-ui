@@ -99,6 +99,7 @@
     "appName": "MotionHive",
     "filters": "Filters",
     "filtersCount": "Filters · {count}",
+    "inEnglish": "In English:",
     "loading": "Loading…",
     "none": "None",
     "oneOff": "One-off",

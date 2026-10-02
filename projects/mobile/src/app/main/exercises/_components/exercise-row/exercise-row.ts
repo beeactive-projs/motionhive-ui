@@ -51,6 +51,8 @@ export class ExerciseRow {
   readonly select = output<void>();
 
   readonly name = computed(() => this.exercise().name);
+  /** The English name under a translated one: many people know a lift by it. */
+  readonly originalName = computed(() => this.exercise().originalName ?? null);
 
   readonly subline = computed(() => exerciseSubline(this.exercise()));
 
