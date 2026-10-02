@@ -11,7 +11,7 @@ const KEY_PATTERN = /^[a-z][A-Za-z0-9]*(\.[A-Za-z0-9]+)+$/;
  * Browser-tab titles in the UI language.
  *
  * A route's `title` holds a key (`title: 'pageTitle.sessions'`, app JSON), and
- * the tab reads "Sessions - MotionHive" through the shared `common.pageTitle`
+ * the tab reads "Sessions · MotionHive" through the shared `common.pageTitle`
  * format. A plain-text title is still shown as written, so a route nobody has
  * migrated keeps working. Routes with no title show the bare app name.
  */

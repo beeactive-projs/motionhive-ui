@@ -199,7 +199,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly timeRange = computed(() => {
     const instance = this.instance();
     if (!instance) return '';
-    return `${formatSessionTime(instance.startAt)} – ${formatSessionTime(instance.endAt)}`;
+    return `${formatSessionTime(instance.startAt)}-${formatSessionTime(instance.endAt)}`;
   });
 
   readonly durationLabel = computed(() => {

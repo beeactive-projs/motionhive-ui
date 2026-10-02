@@ -43,7 +43,7 @@ export const routes: Routes = [
         path: 'tools/calorie-calculator',
         loadComponent: () =>
           import('./tools/calorie-calculator/calorie-calculator').then((m) => m.CalorieCalculator),
-        title: $localize`Free TDEE & macro calculator - MotionHive`,
+        title: $localize`Free TDEE & macro calculator | MotionHive`,
       },
       {
         path: 'legal',

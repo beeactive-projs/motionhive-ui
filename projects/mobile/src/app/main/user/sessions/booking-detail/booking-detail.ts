@@ -202,7 +202,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
       : this.blockedInstance()!.template.durationMinutes;
     return [
       formatSessionDayShort(instance.startAt),
-      `${formatSessionTime(instance.startAt)} – ${formatSessionTime(instance.endAt)}`,
+      `${formatSessionTime(instance.startAt)}-${formatSessionTime(instance.endAt)}`,
       minutes ? this._translateService.instant('time.minutesShort', { minutes }) : '',
     ]
       .filter(Boolean)

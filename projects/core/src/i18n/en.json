@@ -103,8 +103,8 @@
     "none": "None",
     "oneOff": "One-off",
     "or": "or",
-    "pageTitle": "{page} - MotionHive",
-    "paginator": "View {first} - {last} of {total}",
+    "pageTitle": "{page} · MotionHive",
+    "paginator": "View {first}-{last} of {total}",
     "pleaseTryAgain": "Please try again.",
     "session": "Session",
     "someone": "Someone",
@@ -422,7 +422,7 @@
       "offline": "You seem to be offline. Check your connection and try again.",
       "server": "Something went wrong on our side. Please try again.",
       "timeout": "The server took too long to respond. Please try again.",
-      "tooManyRequests": "Too many requests at once — give it a moment and try again.",
+      "tooManyRequests": "Too many requests at once. Give it a moment and try again.",
       "tooManyRequestsSummary": "Slow down a moment",
       "unavailable": "The service is temporarily unavailable. Please try again in a moment.",
       "unexpected": "An unexpected error occurred. Please try again."
@@ -433,8 +433,8 @@
       "notDelivered": "Message couldn’t be delivered. They may have left or blocked messages from you.",
       "notSent": "Message couldn’t be sent.",
       "offline": "You’re offline. Check your connection.",
-      "rateLimited": "Slow down — too many messages.",
-      "rateLimitedRetry": "Slow down — try again in {seconds}s.",
+      "rateLimited": "Slow down, too many messages.",
+      "rateLimitedRetry": "Slow down. Try again in {seconds}s.",
       "sendFailed": "Couldn’t send. Try again."
     },
     "staleData": "Couldn't refresh. Showing the last update."
