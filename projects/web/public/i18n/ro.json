@@ -1656,7 +1656,7 @@
         "team": "Povestește-ne despre el"
       },
       "team": {
-        "contactError": "Mai multe detalii, te rugăm.",
+        "contactError": "Mai multe detalii.",
         "contactLabel": "Cum îl putem contacta",
         "contactPlaceholder": "email, cont de Instagram, telefon…",
         "hint": "Nu ai adresa de email? Trimite-ne orice: Instagram, telefon, un nume. Îl găsim noi.",
@@ -1668,7 +1668,7 @@
       "title": "Știi un antrenor grozav?",
       "toast": {
         "sendFailed": {
-          "detail": "Încearcă din nou peste puțin timp sau folosește cealaltă filă.",
+          "detail": "Încearcă din nou peste puțin timp sau folosește cealaltă pagină.",
           "summary": "Recomandarea nu a putut fi trimisă"
         },
         "teamFailed": {

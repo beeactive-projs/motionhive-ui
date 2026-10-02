@@ -138,3 +138,14 @@ ion-label .prose {
   color: var(--ion-color-medium);
   text-align: center;
 }
+
+/* The full name, which the toolbar cuts off past ~25 characters. */
+.title-block {
+  padding-inline: 0.5rem;
+}
+
+/* Type comes from the global page-title h1; it only needs to wrap tightly. */
+.exercise-title {
+  margin-block-end: 0.25rem;
+  line-height: 1.25;
+}

@@ -9,7 +9,12 @@
     @if (originalName(); as original) {
     <p class="original" lang="en">{{ original }}</p>
     }
-    <p>{{ subline() }}</p>
+    <p class="meta">
+      @if (!isPicker()) {
+      <ion-badge [attr.data-tone]="levelTone()">{{ levelLabel() }}</ion-badge>
+      }
+      <span>{{ subline() }}</span>
+    </p>
   </ion-label>
 
   @if (isPicker()) {
@@ -17,11 +22,10 @@
   <ion-icon class="tick" slot="end" name="checkmark-circle" aria-hidden="true" />
   }
   } @else {
+  @if (ownership(); as chip) {
   <div class="chips" slot="end">
-    @if (ownership(); as chip) {
     <ion-badge class="ownership" [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
-    }
-    <ion-badge [attr.data-tone]="levelTone()">{{ levelLabel() }}</ion-badge>
   </div>
+  }
   }
 </ion-item>
