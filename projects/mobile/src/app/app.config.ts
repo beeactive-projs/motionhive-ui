@@ -5,6 +5,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 import {
   MESSAGING_ROUTES,
   authInterceptor,
+  languageInterceptor,
   errorInterceptor,
   loadingInterceptor,
   provideAppI18n,
@@ -27,7 +28,12 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(
       withXhr(),
-      withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor]),
+      withInterceptors([
+        languageInterceptor,
+        authInterceptor,
+        errorInterceptor,
+        loadingInterceptor,
+      ]),
     ),
     provideAppI18n(),
   ],

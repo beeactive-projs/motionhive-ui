@@ -6,6 +6,7 @@ import { providePrimeNG } from 'primeng/config';
 
 import {
   authInterceptor,
+  languageInterceptor,
   environment,
   errorInterceptor,
   loadingInterceptor,
@@ -21,7 +22,12 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
     provideHttpClient(
       withXhr(),
-      withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor]),
+      withInterceptors([
+        languageInterceptor,
+        authInterceptor,
+        errorInterceptor,
+        loadingInterceptor,
+      ]),
     ),
     provideAppI18n(),
     providePrimeNG({

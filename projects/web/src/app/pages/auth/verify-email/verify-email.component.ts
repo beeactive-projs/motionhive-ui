@@ -83,11 +83,10 @@ export class VerifyEmailComponent implements OnInit {
       .verifyEmail(token)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
-        next: (res) => {
+        next: () => {
           this.state.set('success');
-          // Use the BE's message verbatim when present — it
-          // distinguishes "verified now" from "already verified".
-          if (res?.message) this.successMessage.set(res.message);
+          // Our own translated sentence, not the API's English text:
+          // "verified now" and "already verified" both mean you're set.
           setTimeout(() => {
             // Skip the redirect if the user navigated away.
             if (this.state() === 'success') {

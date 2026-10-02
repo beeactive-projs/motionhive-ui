@@ -268,6 +268,7 @@ export * from './lib/stores/messaging.store';
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';
 export * from './lib/interceptors/error.interceptor';
+export * from './lib/interceptors/language.interceptor';
 export * from './lib/interceptors/loading.interceptor';
 export * from './lib/interceptors/silent-request.context';
 
