@@ -62,6 +62,14 @@
   }
 
   <div class="mh-page">
+    <!-- The toolbar truncates; the full name lives here, wrapping, with the
+         English one under it when the name was translated. -->
+    <div class="title-block">
+      <h1 class="exercise-title">{{ name() }}</h1>
+      @if (exercise.originalName; as original) {
+      <p class="mh-footnote">{{ 'common.inEnglish' | translate }} <span lang="en">{{ original }}</span></p>
+      }
+    </div>
     <!-- What it is, a category per row: the tile carries the category's
          colour, the label names it, and the chips under it are the facts.
          Grouped the way the create form asks for them, in the card a

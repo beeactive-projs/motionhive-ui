@@ -78,7 +78,13 @@ export interface ExerciseForkSourceRef {
  */
 export interface Exercise {
   id: string;
+  /** In the reader's language (the API translates MotionHive's own rows). */
   name: string;
+  /**
+   * The English name, present only when `name` was translated. Shown as a
+   * muted second line, since many people know a lift by its English name.
+   */
+  originalName?: string | null;
   slug: string;
   description: string | null;
   instructions: string | null;

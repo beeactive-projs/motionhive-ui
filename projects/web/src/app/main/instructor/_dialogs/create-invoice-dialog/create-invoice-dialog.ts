@@ -499,7 +499,7 @@ export class CreateInvoiceDialog {
         this.productOptions.set(
           response.items.map((p) => ({
             // The product's own currency — not a hardcoded RON.
-            label: `${p.name} — ${this._currencyPipe.transform(p.amountCents, p.currency, 'code')}`,
+            label: `${p.name} · ${this._currencyPipe.transform(p.amountCents, p.currency, 'code')}`,
             value: p.id,
             product: p,
           })),
@@ -808,7 +808,7 @@ export class CreateInvoiceDialog {
     const lineItems = raw.lineItems.map((li: Record<string, unknown>) => {
       const name = ((li['name'] as string) || '').trim();
       const desc = ((li['description'] as string) || '').trim();
-      const combined = name && desc ? `${name} — ${desc}` : name || desc || 'Item';
+      const combined = name && desc ? `${name}: ${desc}` : name || desc || 'Item';
       return {
         description: combined.slice(0, 255),
         amountCents: Math.round(((li['amount'] as number) ?? 0) * 100),

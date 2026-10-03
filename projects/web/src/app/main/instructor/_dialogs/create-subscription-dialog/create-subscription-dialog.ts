@@ -91,7 +91,7 @@ export class CreateSubscriptionDialog {
         next: (res) => {
           this.productOptions.set(
             res.items.map((p) => ({
-              label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} ${p.currency}/${this.intervalShort(p.interval)}`,
+              label: `${p.name} · ${(p.amountCents / 100).toFixed(2)} ${p.currency}/${this.intervalShort(p.interval)}`,
               value: p.id,
               product: p,
             })),

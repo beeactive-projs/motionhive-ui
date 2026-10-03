@@ -19,11 +19,11 @@ import {
 } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
-import { Checkbox } from 'primeng/checkbox';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
+import { RadioButton } from 'primeng/radiobutton';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
@@ -49,6 +49,8 @@ import {
 import { PERIODIZATION_MODELS } from '../program-labels';
 
 type DurationUnit = 'weeks' | 'days';
+/** What a longer program puts in the weeks it gains. */
+type NewWeeksChoice = 'repeat' | 'empty';
 
 const parseTags = (raw: string): string[] =>
   raw
@@ -82,11 +84,11 @@ const maxTagsValidator =
   imports: [
     ReactiveFormsModule,
     ButtonDirective,
-    Checkbox,
     Dialog,
     InputNumber,
     InputText,
     Message,
+    RadioButton,
     Select,
     SelectButton,
     Textarea,
@@ -126,8 +128,8 @@ export class ProgramFormDialog {
     durationValue: [null as number | null],
     periodizationModel: [''],
     goalTags: ['', maxTagsValidator(10)],
-    /** Fill the empty weeks a longer program gains. Not part of the payload. */
-    repeatWeeks: [false],
+    /** The coach's answer for the empty weeks. Not part of the payload. */
+    newWeeks: [null as NewWeeksChoice | null],
   });
 
   // ── Options ──────────────────────────────────────────────────────
@@ -209,13 +211,47 @@ export class ProgramFormDialog {
     return weeks == null || built === 0 ? 0 : Math.max(0, weeks - built);
   });
 
-  private readonly _lengthening = computed(() => (this._typedWeeks() ?? 0) > this._openedWeeks());
+  /**
+   * Asked only while the program is being made longer, and with neither
+   * answer preselected. A ticked default copied training into weeks the
+   * coach had not thought about; an unticked one left a ten-week plan with
+   * nine empty weeks. Both are a choice, so the coach makes it.
+   */
+  readonly askNewWeeks = computed(
+    () =>
+      this.isEdit() &&
+      (this._typedWeeks() ?? 0) > this._openedWeeks() &&
+      this.emptyWeeks() > 0,
+  );
+
+  /** Tracks the answer, which is a form value rather than a signal. */
+  private readonly _newWeeksValue = computed(() => this._formValue()?.newWeeks ?? null);
+
+  /** A save was tried without an answer. */
+  private readonly _newWeeksTried = signal(false);
+
+  readonly newWeeksMissing = computed(
+    () => this._newWeeksTried() && this.askNewWeeks() && this._newWeeksValue() === null,
+  );
+
+  /** The weeks the question is about, as the label and both answers name them. */
+  private readonly _newWeeksParams = computed(() => ({
+    built: this.builtWeeks(),
+    empty: this.emptyWeeks(),
+    first: this.builtWeeks() + 1,
+    last: this._typedWeeks() ?? 0,
+  }));
+
+  readonly newWeeksQuestion = computed(() =>
+    this._translateService.instant('programs.programForm.newWeeks.question', this._newWeeksParams()),
+  );
 
   readonly repeatLabel = computed(() =>
-    this._translateService.instant('programs.programForm.repeatWeeks', {
-      built: this.builtWeeks(),
-      empty: this.emptyWeeks(),
-    }),
+    this._translateService.instant('programs.programForm.newWeeks.copy', this._newWeeksParams()),
+  );
+
+  readonly leaveEmptyLabel = computed(() =>
+    this._translateService.instant('programs.programForm.newWeeks.leaveEmpty', this._newWeeksParams()),
   );
 
   // ── Derived ──────────────────────────────────────────────────────
@@ -267,17 +303,6 @@ export class ProgramFormDialog {
         this._hydrate(this.program());
       }
     });
-
-    // Ticked by default while the program is being made longer — "ten weeks"
-    // on a one-week plan means nine more of these — and left alone once the
-    // coach has answered for themselves.
-    effect(() => {
-      const on = this._lengthening();
-      const control = this.form.controls.repeatWeeks;
-      if (control.pristine && control.value !== on) {
-        control.setValue(on, { emitEvent: false });
-      }
-    });
   }
 
   // ── Actions ──────────────────────────────────────────────────────
@@ -294,6 +319,10 @@ export class ProgramFormDialog {
       if (this.form.controls.name.invalid) {
         this._nameInput()?.nativeElement.focus();
       }
+      return;
+    }
+    if (this.askNewWeeks() && this.form.controls.newWeeks.value === null) {
+      this._newWeeksTried.set(true);
       return;
     }
 
@@ -321,7 +350,7 @@ export class ProgramFormDialog {
 
     this.submitting.set(true);
     const existing = this.program();
-    const repeat = !!existing && this.emptyWeeks() > 0 && value.repeatWeeks;
+    const repeat = !!existing && this.askNewWeeks() && value.newWeeks === 'repeat';
     const req$ = existing
       ? this._programService.update(existing.id, payload as UpdateProgramPayload).pipe(
           // The length is saved either way; a failed repeat leaves empty
@@ -378,6 +407,7 @@ export class ProgramFormDialog {
   // ── Internals ────────────────────────────────────────────────────
 
   private _hydrate(p: Program | null): void {
+    this._newWeeksTried.set(false);
     if (!p) {
       this._openedWeeks.set(0);
       this.form.reset();

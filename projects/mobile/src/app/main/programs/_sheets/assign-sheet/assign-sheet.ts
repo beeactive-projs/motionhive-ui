@@ -133,14 +133,17 @@ export class AssignSheet {
   );
 
   readonly dayHint = computed(() => {
-    const n = this.programDays().length;
     if (this.chosenDays().length === 0) {
-      return `Trains ${n} ${n === 1 ? 'day' : 'days'} a week. Leave these alone to count forward from the start date.`;
+      return this._translateService.instant('programs.assign.dayHint.unchosen', {
+        count: this.programDays().length,
+      });
     }
     if (this.daysRemaining() > 0) {
-      return `Pick ${this.daysRemaining()} more.`;
+      return this._translateService.instant('programs.assign.dayHint.remaining', {
+        count: this.daysRemaining(),
+      });
     }
-    return 'Each training day moves to the weekday you picked, in order.';
+    return this._translateService.instant('programs.assign.dayHint.done');
   });
 
   /** Program day slot -> chosen weekday, once the picks are complete. */

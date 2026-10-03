@@ -51,7 +51,7 @@ export class CalorieCalculator {
     });
     this._meta.updateTag({
       property: 'og:title',
-      content: $localize`:@@calorie.og.title:Free TDEE & macro calculator - MotionHive`,
+      content: $localize`:@@calorie.og.title:Free TDEE & macro calculator | MotionHive`,
     });
     this._meta.updateTag({
       property: 'og:description',

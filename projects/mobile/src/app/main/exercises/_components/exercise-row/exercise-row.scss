@@ -23,14 +23,40 @@ mh-hex-avatar {
   margin-inline-end: 0.875rem;
 }
 
-/* One line each, always. "Advanced Kettlebell Windmill" is a real row in the
-   seeded catalogue, and letting it wrap makes that row twice the height of
-   its neighbours — a list you scan by shape stops being scannable. */
-ion-label h2,
+/* The name wraps to two lines, then ellipsizes. In Romanian three names in
+   four outgrow one line at phone width ("Împins la piept cu bara, priză
+   medie"), and a list where every name ends in an ellipsis cannot be told
+   apart. Two lines fit all but a few dozen; the detail page shows the rest.
+   The English name and the facts line stay one line each. */
+ion-label h2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal;
+}
+
 ion-label p {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* Level leads the facts line: under the name it costs nothing, at the end
+   of the row it took a third of the width the name needs. */
+ion-label p.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+ion-label p.meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ion-label p.meta ion-badge {
+  flex: none;
 }
 
 ion-label h2 {

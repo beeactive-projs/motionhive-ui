@@ -67,7 +67,7 @@ export class EventBlock {
     };
     const e = this.event();
     const locale = appLocale();
-    return `${e.start.toLocaleTimeString(locale, fmt)} – ${e.end.toLocaleTimeString(locale, fmt)}`;
+    return `${e.start.toLocaleTimeString(locale, fmt)}-${e.end.toLocaleTimeString(locale, fmt)}`;
   }
 
   protected hasBadge(name: 'online' | 'recurring' | 'cancelled'): boolean {

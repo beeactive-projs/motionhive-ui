@@ -118,7 +118,7 @@ export class BlogArticleComponent {
       if (!p) return;
 
       this._seo.setArticle({
-        title: `${p.title} - MotionHive`,
+        title: `${p.title} | MotionHive`,
         description: p.excerpt,
         image: p.coverImage || undefined,
         publishedTime: p.publishedAt,

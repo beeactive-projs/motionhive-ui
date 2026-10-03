@@ -150,6 +150,46 @@ export const MotionHiveLara = definePreset(Lara, {
         },
       },
     },
+    radiobutton: {
+      // Lara fills a checked radio with the brand colour and draws a 14px dot
+      // in its contrast colour (navy here): a thin amber ring round a heavy
+      // dark dot. A choice reads better kept light, as an amber ring and a
+      // small amber dot. Light mode takes the 600 shade, the lightest amber
+      // that clears 3:1 against white for a control; 500 is only 2.2:1.
+      icon: {
+        size: '0.625rem',
+        sm: { size: '0.5rem' },
+        lg: { size: '0.875rem' },
+      },
+      colorScheme: {
+        light: {
+          root: {
+            checkedBackground: '{form.field.background}',
+            checkedHoverBackground: '{form.field.background}',
+            checkedBorderColor: '{primary.600}',
+            checkedHoverBorderColor: '{primary.700}',
+            checkedFocusBorderColor: '{primary.600}',
+          },
+          icon: {
+            checkedColor: '{primary.600}',
+            checkedHoverColor: '{primary.700}',
+          },
+        },
+        dark: {
+          root: {
+            checkedBackground: '{form.field.background}',
+            checkedHoverBackground: '{form.field.background}',
+            checkedBorderColor: '{primary.500}',
+            checkedHoverBorderColor: '{primary.400}',
+            checkedFocusBorderColor: '{primary.500}',
+          },
+          icon: {
+            checkedColor: '{primary.500}',
+            checkedHoverColor: '{primary.400}',
+          },
+        },
+      },
+    },
     card: {
       colorScheme: {
         light: {

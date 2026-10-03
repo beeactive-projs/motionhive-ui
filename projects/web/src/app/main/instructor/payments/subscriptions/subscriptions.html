@@ -62,7 +62,7 @@
         <td class="text-center">
           @if (sub.currentPeriodStart && sub.currentPeriodEnd) {
           <span class="text-sm whitespace-nowrap">
-            {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+            {{ sub.currentPeriodStart | date:'dd MMM' }} → {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
           </span>
           } @else {
           <span class="text-sm text-surface-500">—</span>

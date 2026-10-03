@@ -178,7 +178,7 @@ export class SessionsCalendar implements OnInit {
       case 'week': {
         const endDisplay = new Date(r.end);
         endDisplay.setDate(r.end.getDate() - 1);
-        return `${r.start.toLocaleDateString(appLocale(), opts)} – ${endDisplay.toLocaleDateString(appLocale(), { ...opts, year: 'numeric' })}`;
+        return `${r.start.toLocaleDateString(appLocale(), opts)} → ${endDisplay.toLocaleDateString(appLocale(), { ...opts, year: 'numeric' })}`;
       }
       case 'month':
         return r.start.toLocaleDateString(appLocale(), {

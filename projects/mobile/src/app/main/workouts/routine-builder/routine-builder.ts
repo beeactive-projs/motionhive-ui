@@ -350,7 +350,7 @@ export class RoutineBuilder implements ViewWillEnter {
     }
     const { targetRepsMin: min, targetRepsMax: max } = row;
     if (min == null && max == null) return '–';
-    if (min != null && max != null && min !== max) return `${min}–${max}`;
+    if (min != null && max != null && min !== max) return `${min}-${max}`;
     return `${min ?? max}`;
   }
 
