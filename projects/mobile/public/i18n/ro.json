@@ -1799,6 +1799,7 @@
         "title": "Șterge săptămâna {week}"
       },
       "deleteWeekAria": "Șterge săptămâna {week}",
+      "emptyWeek": "Încă nu are antrenamente",
       "error": "Nu am putut deschide programul",
       "jumpToWeek": "Mergi la o săptămână",
       "restDay": "Zi liberă · atinge ca să adaugi",

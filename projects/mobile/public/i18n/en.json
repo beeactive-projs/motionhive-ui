@@ -1799,6 +1799,7 @@
         "title": "Delete week {week}"
       },
       "deleteWeekAria": "Delete week {week}",
+      "emptyWeek": "No training yet",
       "error": "Couldn't open this program",
       "jumpToWeek": "Jump to week",
       "restDay": "Rest · tap to add",
