@@ -3241,7 +3241,12 @@
       },
       "submit": "Atribuie programul",
       "title": "Atribuie programul",
-      "trainingDays": "Zile de antrenament"
+      "trainingDays": "Zile de antrenament",
+      "dayHint": {
+        "unchosen": "Programul are {count, plural, one {o zi} few {# zile} other {# de zile}} de antrenament pe săptămână. Lasă gol ca zilele să se numere de la data de început.",
+        "remaining": "Mai alege {count, plural, one {o zi} few {# zile} other {# de zile}}.",
+        "done": "Zilele de antrenament se mută, în ordine, pe zilele alese de tine."
+      }
     },
     "common": {
       "approxMinutes": "~{minutes} min",
@@ -3486,7 +3491,13 @@
         "days": "Zile",
         "weeks": "Săptămâni"
       },
-      "repeatWeeks": "Repetă {built, plural, one {săptămâna 1} other {săptămânile 1-#}} în {empty, plural, one {săptămâna goală} few {cele # săptămâni goale} other {cele # de săptămâni goale}} de după"
+      "newWeeks": {
+        "question": "{empty, plural, one {Săptămâna {first} nu are încă antrenamente} few {Săptămânile de la {first} la {last} nu au încă antrenamente} other {Săptămânile de la {first} la {last} nu au încă antrenamente}}",
+        "copy": "{built, plural, one {Copiază antrenamentele din săptămâna 1 în {empty, plural, one {ea} few {ele} other {ele}}} =2 {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile 1 și 2} few {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile de la 1 la {built}} other {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile de la 1 la {built}}}",
+        "leaveEmpty": "{empty, plural, one {Las-o goală deocamdată} few {Las-le goale deocamdată} other {Las-le goale deocamdată}}",
+        "required": "Alege o variantă ca să salvezi noua durată."
+      },
+      "shrinkWarning": "{count, plural, one {O zi rămâne} few {# zile rămân} other {# de zile rămân}} în afara acestei durate și {count, plural, one {va fi ștearsă} other {vor fi șterse}}."
     },
     "rail": {
       "addWorkout": "Adaugă antrenament",

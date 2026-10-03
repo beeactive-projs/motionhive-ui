@@ -63,7 +63,7 @@
   <!-- Which weekdays the program's days land on. Optional: left alone, the
        plan counts forward from the start date as it always has. -->
   @if (canChooseDays()) {
-    <div class="mh-section-label">Training days</div>
+    <div class="mh-section-label">{{ 'programs.assign.trainingDays' | translate }}</div>
     <div class="mh-chip-row days">
       @for (day of weekdayOptions; track day.iso) {
         <ion-chip

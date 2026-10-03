@@ -127,14 +127,17 @@ export class AssignProgramDialog {
   readonly canChooseDays = computed(() => this.programDays().length > 0);
 
   readonly dayHint = computed(() => {
-    const n = this.programDays().length;
     if (this.chosenDays().length === 0) {
-      return `This program trains ${n} ${n === 1 ? 'day' : 'days'} a week. Leave empty to count forward from the start date.`;
+      return this._translateService.instant('programs.assignDialog.dayHint.unchosen', {
+        count: this.programDays().length,
+      });
     }
     if (this.daysRemaining() > 0) {
-      return `Pick ${this.daysRemaining()} more.`;
+      return this._translateService.instant('programs.assignDialog.dayHint.remaining', {
+        count: this.daysRemaining(),
+      });
     }
-    return 'Each training day moves to the weekday you picked, in order.';
+    return this._translateService.instant('programs.assignDialog.dayHint.done');
   });
 
   toggleDay(iso: number): void {

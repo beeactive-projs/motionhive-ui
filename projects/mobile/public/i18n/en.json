@@ -1756,6 +1756,11 @@
     "assign": {
       "assign": "Assign",
       "client": "Client",
+      "dayHint": {
+        "done": "Each training day moves to the weekday you picked, in order.",
+        "remaining": "Pick {count, plural, one {# more day} other {# more days}}.",
+        "unchosen": "Trains {count, plural, one {# day} other {# days}} a week. Leave these alone to count forward from the start date."
+      },
       "loadingClients": "Loading your clients…",
       "more": "+ {count} more",
       "noClients": "No active clients yet. A client has to accept before they can be given work.",
@@ -1763,7 +1768,8 @@
       "program": "Program",
       "schedule": "Schedule",
       "starts": "Starts",
-      "title": "Assign program"
+      "title": "Assign program",
+      "trainingDays": "Training days"
     },
     "assignment": {
       "notStarted": "Not started",
@@ -1945,9 +1951,15 @@
         "days": "Needs at least one day of work before it can be assigned.",
         "name": "Needs a name before it can be assigned."
       },
+      "newWeeks": {
+        "copy": "{built, plural, one {Copy the training from week 1 into {empty, plural, one {it} other {them}}} =2 {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 and 2} other {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 to {built}}}",
+        "leaveEmpty": "{empty, plural, one {Leave it empty for now} other {Leave them empty for now}}",
+        "question": "{empty, plural, one {Week {first} has no training yet} other {Weeks {first} to {last} have no training yet}}",
+        "required": "Choose one to save the new length."
+      },
       "publish": "Publish",
       "publishedNote": "Clients can be assigned to this program.",
-      "repeat": "Repeat {built, plural, one {week 1} other {weeks 1 to #}} into the {empty, plural, one {empty week} other {# empty weeks}} after {built, plural, one {it} other {them}}",
+      "shrinkWarning": "{count, plural, one {# day falls} other {# days fall}} outside this length and will be deleted.",
       "title": "Program settings",
       "toast": {
         "deleteFailed": "Could not delete the program",

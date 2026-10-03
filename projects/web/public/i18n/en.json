@@ -3241,7 +3241,12 @@
       },
       "submit": "Assign program",
       "title": "Assign program",
-      "trainingDays": "Training days"
+      "trainingDays": "Training days",
+      "dayHint": {
+        "unchosen": "This program trains {count, plural, one {# day} other {# days}} a week. Leave empty to count forward from the start date.",
+        "remaining": "Pick {count, plural, one {# more day} other {# more days}}.",
+        "done": "Each training day moves to the weekday you picked, in order."
+      }
     },
     "common": {
       "approxMinutes": "~{minutes}m",
@@ -3486,7 +3491,13 @@
         "days": "Days",
         "weeks": "Weeks"
       },
-      "repeatWeeks": "Repeat {built, plural, one {week 1} other {weeks 1 to #}} into the {empty, plural, one {empty week} other {# empty weeks}} after {built, plural, one {it} other {them}}"
+      "newWeeks": {
+        "question": "{empty, plural, one {Week {first} has no training yet} other {Weeks {first} to {last} have no training yet}}",
+        "copy": "{built, plural, one {Copy the training from week 1 into {empty, plural, one {it} other {them}}} =2 {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 and 2} other {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 to {built}}}",
+        "leaveEmpty": "{empty, plural, one {Leave it empty for now} other {Leave them empty for now}}",
+        "required": "Choose one to save the new length."
+      },
+      "shrinkWarning": "{count, plural, one {# day falls} other {# days fall}} outside this length and will be deleted."
     },
     "rail": {
       "addWorkout": "Add workout",

@@ -1756,6 +1756,11 @@
     "assign": {
       "assign": "Atribuie",
       "client": "Client",
+      "dayHint": {
+        "done": "Zilele de antrenament se mută, în ordine, pe zilele alese de tine.",
+        "remaining": "Mai alege {count, plural, one {o zi} few {# zile} other {# de zile}}.",
+        "unchosen": "Se antrenează {count, plural, one {o zi} few {# zile} other {# de zile}} pe săptămână. Dacă nu alegi nimic, zilele se numără de la data de început."
+      },
       "loadingClients": "Se încarcă clienții…",
       "more": "+ încă {count}",
       "noClients": "Încă nu ai clienți activi. Un client trebuie să accepte înainte să-i poți atribui ceva.",
@@ -1763,7 +1768,8 @@
       "program": "Program",
       "schedule": "Calendar",
       "starts": "Data de început",
-      "title": "Atribuie programul"
+      "title": "Atribuie programul",
+      "trainingDays": "Zile de antrenament"
     },
     "assignment": {
       "notStarted": "Neînceput",
@@ -1945,9 +1951,15 @@
         "days": "Ca să-l poți atribui, adaugă cel puțin o zi de antrenament.",
         "name": "Ca să-l poți atribui, dă-i un nume."
       },
+      "newWeeks": {
+        "copy": "{built, plural, one {Copiază antrenamentele din săptămâna 1 în {empty, plural, one {ea} few {ele} other {ele}}} =2 {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile 1 și 2} few {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile de la 1 la {built}} other {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile de la 1 la {built}}}",
+        "leaveEmpty": "{empty, plural, one {Las-o goală deocamdată} few {Las-le goale deocamdată} other {Las-le goale deocamdată}}",
+        "question": "{empty, plural, one {Săptămâna {first} nu are încă antrenamente} few {Săptămânile de la {first} la {last} nu au încă antrenamente} other {Săptămânile de la {first} la {last} nu au încă antrenamente}}",
+        "required": "Alege o variantă ca să salvezi noua durată."
+      },
       "publish": "Publică",
       "publishedNote": "Poți atribui acest program clienților.",
-      "repeat": "Repetă {built, plural, one {săptămâna 1} other {săptămânile 1-#}} în {empty, plural, one {săptămâna goală} few {cele # săptămâni goale} other {cele # de săptămâni goale}} de după",
+      "shrinkWarning": "{count, plural, one {O zi rămâne} few {# zile rămân} other {# de zile rămân}} în afara acestei durate și {count, plural, one {va fi ștearsă} other {vor fi șterse}}.",
       "title": "Setările programului",
       "toast": {
         "deleteFailed": "Nu am putut șterge programul",
