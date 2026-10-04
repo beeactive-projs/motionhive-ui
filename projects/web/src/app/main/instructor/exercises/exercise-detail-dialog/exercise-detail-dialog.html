@@ -6,6 +6,12 @@
   </div>
   } @else if (exercise(); as e) {
   <div class="flex flex-col gap-5">
+    @if (e.originalName; as original) {
+    <!-- The dialog header carries the name; this is the one people may know it by. -->
+    <p class="-mb-2 text-sm text-surface-500 dark:text-surface-400">
+      {{ 'common.inEnglish' | translate }} <span lang="en">{{ original }}</span>
+    </p>
+    }
     <!-- Hero media — inline YouTube player for custom demos, else the
          start/end image cycle for system exercises. -->
     @let frames = imageFrames();

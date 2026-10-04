@@ -2,6 +2,8 @@
 
 Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 scope is auth + coach clients. These rules are binding for all work in this project and complement the root `CLAUDE.md` (naming, terminology, copy rules all still apply). Where the root file says "PrimeNG", this project says "Ionic" — PrimeNG is banned here.
 
+**Two languages, always.** Every string a person can read, including toasts, `aria-label`s and error text, is a key in both `public/i18n/en.json` and `public/i18n/ro.json` (shared text in `projects/core/src/i18n`). No literals in templates or TS. Rules and syntax: root `CLAUDE.md`, "Two languages, always" and "Translations (i18n)".
+
 ## Tooling priority (strict order)
 
 1. **Ionic components — always.** Never use unstyled HTML interactive elements when an Ionic equivalent exists:

@@ -24,14 +24,14 @@ describe('AppTitleStrategy', () => {
     strategy.updateTitle({} as RouterStateSnapshot);
   }
 
-  it('formats a translated key as "<page> - MotionHive"', () => {
+  it('formats a translated key as "<page> · MotionHive"', () => {
     updateWith('nav.clients');
-    expect(setTitle).toHaveBeenCalledWith('Clients - MotionHive');
+    expect(setTitle).toHaveBeenCalledWith('Clients · MotionHive');
   });
 
   it('shows a plain-text title as written', () => {
     updateWith('Legacy page');
-    expect(setTitle).toHaveBeenCalledWith('Legacy page - MotionHive');
+    expect(setTitle).toHaveBeenCalledWith('Legacy page · MotionHive');
   });
 
   it('shows the app name for a route with no title', () => {

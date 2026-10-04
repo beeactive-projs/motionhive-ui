@@ -23,12 +23,14 @@ import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
+import { RadioButton } from 'primeng/radiobutton';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
+import { catchError, of, switchMap } from 'rxjs';
 
 import {
   CreateProgramPayload,
@@ -47,6 +49,8 @@ import {
 import { PERIODIZATION_MODELS } from '../program-labels';
 
 type DurationUnit = 'weeks' | 'days';
+/** What a longer program puts in the weeks it gains. */
+type NewWeeksChoice = 'repeat' | 'empty';
 
 const parseTags = (raw: string): string[] =>
   raw
@@ -84,6 +88,7 @@ const maxTagsValidator =
     InputNumber,
     InputText,
     Message,
+    RadioButton,
     Select,
     SelectButton,
     Textarea,
@@ -123,6 +128,8 @@ export class ProgramFormDialog {
     durationValue: [null as number | null],
     periodizationModel: [''],
     goalTags: ['', maxTagsValidator(10)],
+    /** The coach's answer for the empty weeks. Not part of the payload. */
+    newWeeks: [null as NewWeeksChoice | null],
   });
 
   // ── Options ──────────────────────────────────────────────────────
@@ -188,6 +195,64 @@ export class ProgramFormDialog {
     if (weeks == null || !workouts?.length) return 0;
     return workouts.filter((w) => w.weekIndex >= weeks).length;
   });
+
+  /** The length in weeks when the dialog opened, to tell lengthening apart. */
+  private readonly _openedWeeks = signal(0);
+
+  /** Weeks 1…n that hold the work so far — the block a longer program repeats. */
+  readonly builtWeeks = computed(() =>
+    (this.program()?.workouts ?? []).reduce((max, w) => Math.max(max, w.weekIndex + 1), 0),
+  );
+
+  /** Empty weeks after the built ones, at the length now typed. */
+  readonly emptyWeeks = computed(() => {
+    const weeks = this._typedWeeks();
+    const built = this.builtWeeks();
+    return weeks == null || built === 0 ? 0 : Math.max(0, weeks - built);
+  });
+
+  /**
+   * Asked only while the program is being made longer, and with neither
+   * answer preselected. A ticked default copied training into weeks the
+   * coach had not thought about; an unticked one left a ten-week plan with
+   * nine empty weeks. Both are a choice, so the coach makes it.
+   */
+  readonly askNewWeeks = computed(
+    () =>
+      this.isEdit() &&
+      (this._typedWeeks() ?? 0) > this._openedWeeks() &&
+      this.emptyWeeks() > 0,
+  );
+
+  /** Tracks the answer, which is a form value rather than a signal. */
+  private readonly _newWeeksValue = computed(() => this._formValue()?.newWeeks ?? null);
+
+  /** A save was tried without an answer. */
+  private readonly _newWeeksTried = signal(false);
+
+  readonly newWeeksMissing = computed(
+    () => this._newWeeksTried() && this.askNewWeeks() && this._newWeeksValue() === null,
+  );
+
+  /** The weeks the question is about, as the label and both answers name them. */
+  private readonly _newWeeksParams = computed(() => ({
+    built: this.builtWeeks(),
+    empty: this.emptyWeeks(),
+    first: this.builtWeeks() + 1,
+    last: this._typedWeeks() ?? 0,
+  }));
+
+  readonly newWeeksQuestion = computed(() =>
+    this._translateService.instant('programs.programForm.newWeeks.question', this._newWeeksParams()),
+  );
+
+  readonly repeatLabel = computed(() =>
+    this._translateService.instant('programs.programForm.newWeeks.copy', this._newWeeksParams()),
+  );
+
+  readonly leaveEmptyLabel = computed(() =>
+    this._translateService.instant('programs.programForm.newWeeks.leaveEmpty', this._newWeeksParams()),
+  );
 
   // ── Derived ──────────────────────────────────────────────────────
 
@@ -256,6 +321,10 @@ export class ProgramFormDialog {
       }
       return;
     }
+    if (this.askNewWeeks() && this.form.controls.newWeeks.value === null) {
+      this._newWeeksTried.set(true);
+      return;
+    }
 
     const value = this.form.getRawValue();
     const goalTags = parseTags(value.goalTags);
@@ -281,8 +350,27 @@ export class ProgramFormDialog {
 
     this.submitting.set(true);
     const existing = this.program();
+    const repeat = !!existing && this.askNewWeeks() && value.newWeeks === 'repeat';
     const req$ = existing
-      ? this._programService.update(existing.id, payload as UpdateProgramPayload)
+      ? this._programService.update(existing.id, payload as UpdateProgramPayload).pipe(
+          // The length is saved either way; a failed repeat leaves empty
+          // weeks and says so, rather than failing the whole edit.
+          switchMap((saved) =>
+            repeat
+              ? this._programService.repeatWeeks(existing.id).pipe(
+                  catchError((err: unknown) => {
+                    showApiError(
+                      this._messageService,
+                      this._translateService.instant('programs.toast.repeatWeeksError'),
+                      this._translateService.instant('common.pleaseTryAgain'),
+                      err,
+                    );
+                    return of(saved);
+                  }),
+                )
+              : of(saved),
+          ),
+        )
       : this._programService.create(payload);
 
     req$.subscribe({
@@ -319,7 +407,9 @@ export class ProgramFormDialog {
   // ── Internals ────────────────────────────────────────────────────
 
   private _hydrate(p: Program | null): void {
+    this._newWeeksTried.set(false);
     if (!p) {
+      this._openedWeeks.set(0);
       this.form.reset();
       return;
     }
@@ -336,6 +426,10 @@ export class ProgramFormDialog {
         durationValue = p.durationDays;
       }
     }
+    // An open-ended program has no declared length; what is built stands in.
+    this._openedWeeks.set(
+      p.durationDays != null ? Math.ceil(p.durationDays / 7) : this.builtWeeks(),
+    );
     this.form.reset({
       name: p.name,
       description: p.description ?? '',

@@ -62,9 +62,12 @@
   transform: translateX(-50%);
 }
 
-/* A jump lands the week header just under the sticky rail. */
+/* A jump lands the week header just under the sticky rail. The content
+   scrolls beneath the translucent header, so the margin is the header's
+   height (Ionic's --offset-top, safe area included) plus the 3.25rem rail
+   and a little air. 3.5rem alone left the title hidden behind the rail. */
 .week {
-  scroll-margin-top: 3.5rem;
+  scroll-margin-top: calc(var(--offset-top, 0px) + 3.75rem);
 }
 
 /* The weekday at the start of each row, at a fixed width so the names align. */
@@ -75,5 +78,58 @@
 
 /* A rest day is an invitation, quieter than a day with a name. */
 ion-item.rest p {
+  color: var(--ion-color-medium);
+}
+
+/* ─── Open and closed weeks ───────────────────────────────────────
+   The header's toggle sits at the start of the row; the shared section-head
+   rule pushes a header's first button to the far edge, which is where Copy
+   and delete belong, not this. Auto margin on its right sends them there. */
+.mh-section-head .week-toggle {
+  --padding-start: 0;
+  --padding-end: 0.25rem;
+  height: 2.25rem;
+  margin: 0 auto 0 0;
+  font-weight: inherit;
+}
+
+.week-toggle .mh-kicker {
+  margin-inline-end: 0.375rem;
+}
+
+.chevron {
+  margin-inline-end: 0.25rem;
+  font-size: 0.875rem;
+  transition: transform 150ms ease;
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+/* What a closed week holds, on one line: day, then name, dot between. */
+.week-summary .entry + .entry::before {
+  content: '·';
+  margin: 0 0.375rem;
+  color: var(--ion-color-medium);
+}
+
+/* The weekday in the kicker's face, but inline: the kicker role is a block
+   and would put each day on its own line. */
+.week-summary .entry-dow {
+  margin-inline-end: 0.25rem;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+.week-summary .empty {
   color: var(--ion-color-medium);
 }

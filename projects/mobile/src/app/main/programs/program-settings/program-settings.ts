@@ -13,6 +13,8 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonRadio,
+  IonRadioGroup,
   IonSpinner,
   IonSkeletonText,
   IonTextarea,
@@ -25,6 +27,9 @@ import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
 import { Program, ProgramService, ProgramStatus } from 'core';
+
+/** What a longer program puts in the weeks it gains. */
+type NewWeeksChoice = 'repeat' | 'empty';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
@@ -62,6 +67,8 @@ import {
     IonItem,
     IonLabel,
     IonList,
+    IonRadio,
+    IonRadioGroup,
     IonSpinner,
     IonSkeletonText,
     IonTextarea,
@@ -92,6 +99,12 @@ export class ProgramSettings implements ViewWillEnter {
   readonly weeks = signal(DEFAULT_PROGRAM_WEEKS);
 
   private _id: string | null = null;
+  /** The length as last saved, so lengthening can be told from any other save. */
+  private readonly _savedWeeks = signal(DEFAULT_PROGRAM_WEEKS);
+  /** The coach's answer for the empty weeks; nothing until they pick. */
+  readonly newWeeksChoice = signal<NewWeeksChoice | null>(null);
+  /** Set when a save was tried without an answer, so the question says why. */
+  readonly newWeeksMissing = signal(false);
 
   readonly showSkeleton = computed(() => this.loading() && !this.program());
   readonly showError = computed(() => this.error() && !this.program());
@@ -112,6 +125,46 @@ export class ProgramSettings implements ViewWillEnter {
     const weeks = this.weeks();
     return workouts.filter((w) => w.weekIndex >= weeks).length;
   });
+
+  /** Weeks 1…n that hold the work so far — the block a longer program repeats. */
+  readonly builtWeeks = computed(() =>
+    (this.program()?.workouts ?? []).reduce((max, w) => Math.max(max, w.weekIndex + 1), 0),
+  );
+
+  /** Empty weeks after the built ones, at the length now on the stepper. */
+  readonly emptyWeeks = computed(() =>
+    this.builtWeeks() > 0 ? Math.max(0, this.weeks() - this.builtWeeks()) : 0,
+  );
+
+  /**
+   * Asked only while the program is being made longer, and with neither
+   * answer preselected. A ticked default copied training into weeks the
+   * coach had not thought about; an unticked one left a ten-week plan with
+   * nine empty weeks. Both are a choice, so the coach makes it.
+   */
+  readonly askNewWeeks = computed(
+    () => this.weeks() > this._savedWeeks() && this.emptyWeeks() > 0,
+  );
+
+  /** The weeks the question is about, as the label and both answers name them. */
+  private readonly _newWeeksParams = computed(() => ({
+    built: this.builtWeeks(),
+    empty: this.emptyWeeks(),
+    first: this.builtWeeks() + 1,
+    last: this.weeks(),
+  }));
+
+  readonly newWeeksQuestion = computed(() =>
+    this._translateService.instant('programs.settings.newWeeks.question', this._newWeeksParams()),
+  );
+
+  readonly repeatLabel = computed(() =>
+    this._translateService.instant('programs.settings.newWeeks.copy', this._newWeeksParams()),
+  );
+
+  readonly leaveEmptyLabel = computed(() =>
+    this._translateService.instant('programs.settings.newWeeks.leaveEmpty', this._newWeeksParams()),
+  );
 
   /** "9 days of work so far" — the status card counts what is actually built. */
   readonly dayCountLabel = computed(() =>
@@ -173,6 +226,8 @@ export class ProgramSettings implements ViewWillEnter {
           this.name.set(program.name);
           this.description.set(program.description ?? '');
           this.weeks.set(weeksOf(program) ?? DEFAULT_PROGRAM_WEEKS);
+          this._savedWeeks.set(this.weeks());
+          this._resetNewWeeks();
           this.loading.set(false);
         },
         error: () => {
@@ -186,10 +241,24 @@ export class ProgramSettings implements ViewWillEnter {
     this.weeks.update((w) => Math.max(1, Math.min(MAX_PROGRAM_WEEKS, w + delta)));
   }
 
+  chooseNewWeeks(choice: NewWeeksChoice): void {
+    this.newWeeksChoice.set(choice);
+    this.newWeeksMissing.set(false);
+  }
+
   save(publish = false): void {
     const id = this._id;
     if (!id || !this.canSave()) return;
     if (publish && !this.canPublish()) return;
+
+    // Save stays tappable and points at the question instead: a disabled
+    // button in the toolbar would not say what it is waiting for.
+    if (this.askNewWeeks() && !this.newWeeksChoice()) {
+      this.newWeeksMissing.set(true);
+      document.getElementById('new-weeks')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const repeat = this.askNewWeeks() && this.newWeeksChoice() === 'repeat';
 
     this.saving.set(true);
     this._programService
@@ -201,15 +270,30 @@ export class ProgramSettings implements ViewWillEnter {
       })
       .pipe(take(1))
       .subscribe({
-        next: (program) => {
-          this.saving.set(false);
-          this.program.set(program);
-          void this._feedbackService.success(
-            this._translateService.instant(
-              publish ? 'programs.settings.toast.published' : 'toast.summary.saved',
-            ),
-          );
-          if (publish) void this._router.navigate(['/tabs/programs/program', id]);
+        next: (saved) => {
+          this._adoptSaved(saved);
+          if (!repeat) {
+            this._finishSave(id, publish);
+            return;
+          }
+          // A second request on purpose: the length is saved either way, and
+          // a failed repeat leaves empty weeks rather than an unsaved form.
+          this._programService
+            .repeatWeeks(id)
+            .pipe(take(1))
+            .subscribe({
+              next: (full) => {
+                this.program.set(full);
+                this._finishSave(id, publish);
+              },
+              error: (err) => {
+                this.saving.set(false);
+                void this._feedbackService.error(
+                  err,
+                  this._translateService.instant('programs.settings.toast.repeatFailed'),
+                );
+              },
+            });
         },
         error: (err) => {
           this.saving.set(false);
@@ -219,6 +303,34 @@ export class ProgramSettings implements ViewWillEnter {
           );
         },
       });
+  }
+
+  /**
+   * The update answers with the program alone, not its days. Keep the tree
+   * this screen already has, minus the weeks a shorter length just dropped,
+   * so the counts on the card still describe the plan.
+   */
+  private _adoptSaved(saved: Program): void {
+    const weeks = this.weeks();
+    const kept = (this.program()?.workouts ?? []).filter((w) => w.weekIndex < weeks);
+    this.program.set({ ...saved, workouts: saved.workouts ?? kept });
+    this._savedWeeks.set(weeks);
+    this._resetNewWeeks();
+  }
+
+  private _resetNewWeeks(): void {
+    this.newWeeksChoice.set(null);
+    this.newWeeksMissing.set(false);
+  }
+
+  private _finishSave(id: string, publish: boolean): void {
+    this.saving.set(false);
+    void this._feedbackService.success(
+      this._translateService.instant(
+        publish ? 'programs.settings.toast.published' : 'toast.summary.saved',
+      ),
+    );
+    if (publish) void this._router.navigate(['/tabs/programs/program', id]);
   }
 
   publish(): void {

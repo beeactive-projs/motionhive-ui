@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, Injector, afterNextRender, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
@@ -94,6 +94,7 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _injector = inject(Injector);
 
   readonly dayLabels = dayLabels();
   readonly weekLabel = weekLabel;
@@ -106,6 +107,16 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   readonly clearOpen = signal(false);
 
   private _id: string | null = null;
+
+  /**
+   * Which weeks show their days. Only the first when a program opens: with
+   * every week open a twelve-week plan is eighty-four rows of scrolling, and
+   * the rail already jumps anywhere. Kept while this screen lives, so coming
+   * back from a day lands on the weeks the coach left open.
+   */
+  readonly openWeeks = signal<ReadonlySet<number>>(new Set([0]));
+  /** The program `openWeeks` describes; another program starts closed again. */
+  private _openFor: string | null = null;
 
   readonly title = computed(
     () => this.store.program()?.name ?? this._translateService.instant('programs.builder.titleFallback'),
@@ -160,9 +171,35 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     }
 
     if (!id) return;
+    if (id !== this._openFor) {
+      this._openFor = id;
+      this.openWeeks.set(new Set([0]));
+    }
     // Always re-read: a day edited on the pushed screen changes this grid.
     this._id = id;
     this.store.load(id);
+  }
+
+  // ─── Open and closed weeks ────────────────────────────────────
+
+  isWeekOpen(index: number): boolean {
+    return this.openWeeks().has(index);
+  }
+
+  toggleWeek(index: number): void {
+    this.openWeeks.update((open) => {
+      const next = new Set(open);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }
+
+  /** The days with work in a closed week, so it can be judged unopened. */
+  weekEntries(week: WeekCard): { day: number; label: string; name: string }[] {
+    return week.days.flatMap((day, index) =>
+      day ? [{ day: index, label: this.dayLabels[index], name: day.name }] : [],
+    );
   }
 
   retry(): void {
@@ -206,6 +243,56 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     this.clearOpen.set(false);
     this.clearTarget.set(null);
     if (day) this.store.clearDay(day.id);
+  }
+
+  // ─── Delete a week ────────────────────────────────────────────
+
+  readonly deleteWeekIndex = signal<number | null>(null);
+  readonly deleteWeekOpen = signal(false);
+
+  readonly deleteWeekTitle = computed(() =>
+    this._translateService.instant('programs.builder.deleteWeek.title', {
+      week: (this.deleteWeekIndex() ?? 0) + 1,
+    }),
+  );
+
+  /** Says what goes and what the program becomes, before anything does. */
+  readonly deleteWeekBody = computed(() => {
+    const index = this.deleteWeekIndex();
+    if (index === null) return '';
+    return this._translateService.instant('programs.builder.deleteWeek.body', {
+      days: this.store.weeks()[index]?.filled ?? 0,
+      weeks: this.store.weekCount() - 1,
+    });
+  });
+
+  askDeleteWeek(weekIndex: number): void {
+    this.deleteWeekIndex.set(weekIndex);
+    this.deleteWeekOpen.set(true);
+  }
+
+  confirmDeleteWeek(): void {
+    const index = this.deleteWeekIndex();
+    this.deleteWeekOpen.set(false);
+    if (index === null) return;
+
+    this.store.deleteWeek(index, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.builder.toast.deleteWeekFailed'),
+        );
+        return;
+      }
+      // Later weeks moved up one, so their open state moves with them.
+      this.openWeeks.update(
+        (open) =>
+          new Set([...open].filter((w) => w !== index).map((w) => (w > index ? w - 1 : w))),
+      );
+      void this._feedbackService.success(
+        this._translateService.instant('programs.builder.toast.weekDeleted', { week: index + 1 }),
+      );
+    });
   }
 
   openCopy(weekIndex: number): void {
@@ -361,10 +448,35 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     }
   }
 
+  /**
+   * The rail opens the week it jumps to, then scrolls once its rows have a
+   * height. Ionic's list lays itself out a beat after Angular renders it, so
+   * scrolling on render alone fell short on a late week: the page still
+   * ended before the week could reach the top.
+   */
   scrollToWeek(index: number): void {
-    document
-      .getElementById(`week-${index}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const scroll = () =>
+      document
+        .getElementById(`week-${index}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (this.isWeekOpen(index)) {
+      scroll();
+      return;
+    }
+    this.toggleWeek(index);
+    afterNextRender(
+      {
+        read: () => {
+          const list = document.getElementById(`week-days-${index}`) as
+            | (HTMLElement & { componentOnReady?: () => Promise<unknown> })
+            | null;
+          void Promise.resolve(list?.componentOnReady?.()).then(() =>
+            requestAnimationFrame(scroll),
+          );
+        },
+      },
+      { injector: this._injector },
+    );
   }
 
   /**
@@ -383,6 +495,8 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
         next: (program) => {
           this.store.adopt({ ...program, workouts: program.workouts ?? [] });
           this._id = program.id;
+          // Same program under its real id: keep the weeks as they are.
+          this._openFor = program.id;
           void this._router.navigate(['/tabs/programs/program', program.id], {
             replaceUrl: true,
           });

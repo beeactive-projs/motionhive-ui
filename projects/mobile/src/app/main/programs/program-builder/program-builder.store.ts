@@ -178,6 +178,31 @@ export class ProgramBuilderStore {
   }
 
   /**
+   * Delete one week: its days go, later weeks move up, and the program is
+   * a week shorter. One request; the server answers with the new tree.
+   */
+  deleteWeek(weekIndex: number, done?: (error?: unknown) => void): void {
+    const program = this._program();
+    if (!program) return;
+
+    this._saving.set(true);
+    this._programService
+      .deleteWeek(program.id, weekIndex)
+      .pipe(take(1))
+      .subscribe({
+        next: (fresh) => {
+          this._saving.set(false);
+          this._program.set(fresh);
+          done?.();
+        },
+        error: (error: unknown) => {
+          this._saving.set(false);
+          done?.(error);
+        },
+      });
+  }
+
+  /**
    * Copy one day into the same slot of several weeks, in one request.
    *
    * Unlike `copyWeek`, the endpoint takes every target at once — so there is

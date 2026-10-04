@@ -46,11 +46,14 @@
     @for (c of visibleCoaches(); track c.id; let i = $index) {
     <article class="disc__coach">
       <div class="disc__coach-top">
+        <!-- Their photo when they have one; the toned hexagon with initials
+             is the fallback, not the default. -->
         <mh-hex
           [tone]="toneFor(i)"
           [size]="82"
           [round]="7"
           orientation="pointy"
+          [img]="c.avatarUrl"
           [sheen]="true"
           [shadow]="true"
         >{{ coachInitials(c) }}</mh-hex>
@@ -114,6 +117,7 @@
         [size]="64"
         [round]="7"
         orientation="pointy"
+        [img]="g.logoUrl"
         [sheen]="true"
         [shadow]="true"
       >{{ groupInitials(g.name) }}</mh-hex>

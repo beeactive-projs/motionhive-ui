@@ -49,3 +49,31 @@
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
 }
+
+/* The question about the empty weeks, under the stepper it qualifies. Its
+   answers are full sentences, so they wrap instead of truncating. */
+.new-weeks {
+  margin-top: 1rem;
+}
+
+.new-weeks ion-list {
+  margin-inline: 0;
+}
+
+.new-weeks ion-radio::part(label) {
+  white-space: normal;
+  line-height: var(--mh-leading-body);
+}
+
+/* An attempted save without an answer outlines the question in the danger
+   ink, with the reason written under it. */
+.new-weeks ion-list.missing {
+  outline: 1px solid var(--ion-color-danger);
+}
+
+.choice-error {
+  margin: 0;
+  padding-inline: 0.875rem;
+  color: var(--ion-color-danger);
+  font-size: var(--mh-text-sm);
+}

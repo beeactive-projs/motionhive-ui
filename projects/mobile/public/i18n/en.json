@@ -55,9 +55,9 @@
       "channels": {
         "email": "Email",
         "inApp": "In-app",
-        "inAppNote": "Always on — the bell is your inbox.",
+        "inAppNote": "Always on. The bell is your inbox.",
         "inAppOnly": "In-app only",
-        "messagesNote": "Always on — the Messages tab is that inbox.",
+        "messagesNote": "Always on. The Messages tab is that inbox.",
         "messagesOnly": "Messages only",
         "push": "Push",
         "toggleLabel": "{channel} for {category}"
@@ -178,7 +178,7 @@
       }
     },
     "phone": {
-      "hint": "Your phone number stays private — it's only used for account security.",
+      "hint": "Your phone number stays private. It's only used for account security.",
       "invalid": "That doesn't look like a valid number for the selected country.",
       "phoneNumber": "Phone number",
       "placeholder": "Leave empty to remove",
@@ -336,7 +336,7 @@
     "empty": {
       "byEmailHint": "Works before they join",
       "cta": "Invite your first client",
-      "message": "Invite the people you already train, or wait for requests — anyone on MotionHive can find you on Discover and ask to connect.",
+      "message": "Invite the people you already train, or wait for requests. Anyone on MotionHive can find you on Discover and ask to connect.",
       "onPlatformHint": "Already on MotionHive",
       "title": "No clients yet"
     },
@@ -354,7 +354,7 @@
       "emailPlaceholder": "client@example.com",
       "expiry": "Invitations expire after {count, plural, one {# day} other {# days}}.",
       "messageLabel": "Message",
-      "messagePlaceholder": "A personal note to include — optional",
+      "messagePlaceholder": "A personal note to include (optional)",
       "minChars": "Type at least {count, plural, one {# character} other {# characters}}.",
       "noResults": {
         "message": "Check the spelling, or try their email.",
@@ -558,12 +558,12 @@
     },
     "search": {
       "coaches": "Coaches",
-      "empty": "No coaches or sessions match that — try fewer words.",
+      "empty": "No coaches or sessions match that. Try fewer words.",
       "error": {
         "heading": "Couldn't search",
         "message": "Check your connection and try typing again."
       },
-      "hint": "Keep typing — search starts at two letters and looks across coaches and sessions.",
+      "hint": "Keep typing. Search starts at two letters and looks across coaches and sessions.",
       "placeholder": "Search coaches and sessions",
       "sessions": "Sessions"
     }
@@ -595,7 +595,7 @@
       "fallbackName": "Exercise",
       "forkAction": "Fork to my exercises",
       "forkConfirm": {
-        "body": "A copy lands in your exercises. Edit anything — name, cues, media — without touching the original. Your version will say it was forked from this one.",
+        "body": "A copy lands in your exercises. Edit the name, cues, media or anything else without touching the original. Your version will say it was forked from this one.",
         "confirm": "Fork exercise",
         "irreversible": "You can keep one live fork of each exercise. If you already have one, we'll take you to it instead.",
         "title": "Fork {name}?"
@@ -612,7 +612,7 @@
       },
       "toast": {
         "alreadyForked": "You already have a fork of this exercise.",
-        "existingFork": "You already have a copy — here it is",
+        "existingFork": "You already have a copy, here it is",
         "forkFailed": "Could not fork this exercise.",
         "forked": "Copied to your exercises"
       }
@@ -625,7 +625,7 @@
       "unilateral": "Unilateral"
     },
     "detailsFields": {
-      "classificationHint": "All optional — leave them for later if you like.",
+      "classificationHint": "All optional. Leave them for later if you like.",
       "demo": "Demo & cues",
       "descriptionPlaceholder": "One to three sentences about the movement",
       "force": "Force",
@@ -634,7 +634,7 @@
       "pattern": "Pattern",
       "privateHint": "Only you can see and use it. Turn off to publish it for other coaches.",
       "unilateral": "Unilateral movement",
-      "unilateralHint": "Single-arm or single-leg — drives left vs right tracking later.",
+      "unilateralHint": "Single-arm or single-leg, which drives left vs right tracking later.",
       "youtube": "YouTube demo",
       "youtubeHint": "Uploading your own video comes later. A YouTube link gives the exercise a thumbnail.",
       "youtubeInvalid": "That does not look like a YouTube link. Paste a watch, youtu.be or shorts URL."
@@ -648,7 +648,7 @@
         "titleFallback": "Delete this exercise?"
       },
       "deleteHint": "Programs that already use it keep working.",
-      "forkNote": "{count, plural, one {# coach has} other {# coaches have}} forked this. Their copies keep what they have — your changes do not reach them.",
+      "forkNote": "{count, plural, one {# coach has} other {# coaches have}} forked this. Their copies keep what they have, and your changes do not reach them.",
       "loadError": {
         "message": "This exercise is not available to edit.",
         "title": "Couldn't open this exercise"
@@ -683,7 +683,7 @@
       "BODYWEIGHT": "Reps, no load",
       "CARDIO": "Duration + distance + HR",
       "DISTANCE": "Distance only",
-      "DURATION": "Time only — e.g. plank",
+      "DURATION": "Time only, e.g. plank",
       "MOBILITY": "Time / reps, mobility",
       "STRENGTH": "Reps + weight"
     },
@@ -697,7 +697,7 @@
       "mineEmpty": {
         "action": "Create your first exercise",
         "browse": "Browse public exercises to fork",
-        "message": "The system library already covers hundreds of movements. Create a custom one when a client needs something specific — or fork a public exercise and tweak it.",
+        "message": "The system library already covers hundreds of movements. Create a custom one when a client needs something specific, or fork a public exercise and tweak it.",
         "title": "No exercises of your own yet"
       },
       "newExercise": "New exercise",
@@ -709,7 +709,7 @@
       "bodyweight": "Bodyweight",
       "noneYet": "None yet",
       "optional": "Optional",
-      "primaryHint": "Pick up to three — the muscles this movement is actually for.",
+      "primaryHint": "Pick up to three: the muscles this movement is actually for.",
       "required": "Required",
       "searchEquipment": "Search equipment",
       "searchMuscles": "Search muscles"
@@ -1137,7 +1137,7 @@
     },
     "switchRole": {
       "comingSoon": "Coming soon",
-      "footnote": "Your data stays in one account — switching only changes what you see.",
+      "footnote": "Your data stays in one account. Switching only changes what you see.",
       "intro": "Changes your home, tabs and notifications."
     },
     "switchRoleLabel": "Switch role, currently {role}",
@@ -1162,7 +1162,7 @@
       "intro": "A calm place to settle in and pick up where you left off.",
       "posts": {
         "byline": "{author} · {minutes} min read",
-        "empty": "No posts yet. Check back soon — our first reads are landing.",
+        "empty": "No posts yet. Check back soon, our first reads are landing.",
         "eyebrow": "From the journal",
         "readAll": "Read all",
         "title": "Reads from the hive"
@@ -1276,11 +1276,11 @@
       "late": {
         "detail": "{name} may still charge for this spot by invoice.",
         "detailNoCoach": "The coach may still charge for this spot by invoice.",
-        "hoursBefore": "It's {count} h before start — this is a late cancel",
-        "minutesBefore": "It's {count} min before start — this is a late cancel",
-        "started": "The session has already started — this is a late cancel"
+        "hoursBefore": "It's {count} h before start, so this is a late cancel",
+        "minutesBefore": "It's {count} min before start, so this is a late cancel",
+        "started": "The session has already started, so this is a late cancel"
       },
-      "nothingCharged": "Nothing is charged for this — your spot simply goes back to the coach.",
+      "nothingCharged": "Nothing is charged for this. Your spot simply goes back to the coach.",
       "pending": {
         "dismiss": "Keep request",
         "save": "Withdraw request",
@@ -1288,8 +1288,8 @@
         "title": "Withdraw request?"
       },
       "terms": {
-        "anyTime": "Your terms — free cancellation any time",
-        "cutoff": "Your terms — free cancel up to {hours} h before start"
+        "anyTime": "Your terms: free cancellation any time",
+        "cutoff": "Your terms: free cancel up to {hours} h before start"
       },
       "waitlisted": {
         "dismiss": "Keep my spot",
@@ -1325,13 +1325,13 @@
         "cancelUntil": "Free to cancel until {date} {time} · {hours} h before start",
         "live": "Live now",
         "pending": "Awaiting approval",
-        "pendingDetail": "{name} approves bookings for this session — you'll get a notification either way.",
-        "pendingDetailNoCoach": "You'll get a notification either way — nothing else to do.",
+        "pendingDetail": "{name} approves bookings for this session. You'll get a notification either way.",
+        "pendingDetailNoCoach": "You'll get a notification either way, so there's nothing else to do.",
         "startedAgo": "Started {minutes} min ago · join closes {time}",
         "startingNow": "Starting now · join closes {time}",
         "startsIn": "Starts in {minutes} min · join closes {time}",
         "waitlist": "You're on the waitlist",
-        "waitlistDetail": "If a spot opens you're booked automatically — we'll notify you."
+        "waitlistDetail": "If a spot opens you're booked automatically and we'll notify you."
       },
       "blocked": {
         "message": "Join the club to see where and book.",
@@ -1354,7 +1354,7 @@
         "leaveWaitlist": "Leave the waitlist",
         "withdraw": "Withdraw request"
       },
-      "invoiceNote": "Settled by invoice — nothing to pay now.",
+      "invoiceNote": "Settled by invoice. Nothing to pay now.",
       "link": {
         "afterBooking": "The meeting link appears here once you're booked.",
         "availableFrom": "Available from {time}",
@@ -1386,7 +1386,7 @@
         "message": "Sessions you've been to show up here.",
         "title": "No past sessions yet"
       },
-      "truncated": "Showing your next 100 bookings — the rest appear as these pass.",
+      "truncated": "Showing your next 100 bookings. The rest appear as these pass.",
       "upcoming": "Upcoming",
       "upcomingCount": "Upcoming · {count}"
     },
@@ -1401,12 +1401,12 @@
       "gotIt": "Got it",
       "pending": {
         "badge": "Pending",
-        "copy": "{name} approves bookings for this session. You'll get a notification either way — nothing else to do.",
-        "copyNoCoach": "The coach approves bookings for this session. You'll get a notification either way — nothing else to do.",
+        "copy": "{name} approves bookings for this session. You'll get a notification either way, so there's nothing else to do.",
+        "copyNoCoach": "The coach approves bookings for this session. You'll get a notification either way, so there's nothing else to do.",
         "title": "Request sent"
       },
       "waitlisted": {
-        "copy": "This session is full. If a spot opens you're booked automatically — we'll notify you.",
+        "copy": "This session is full. If a spot opens you're booked automatically and we'll notify you.",
         "footnote": "Spots go in the order people joined the list.",
         "title": "You're on the waitlist"
       }
@@ -1422,8 +1422,8 @@
       "calendarDownloaded": "Calendar file downloaded",
       "calendarFailed": "Couldn't download the invite.",
       "cancelFailed": "Couldn't cancel this booking.",
-      "cancelledOutside": "Cancelled — outside the window, charges may still apply.",
-      "cancelledWithin": "Booking cancelled — no charge.",
+      "cancelledOutside": "Cancelled outside the window, so charges may still apply.",
+      "cancelledWithin": "Booking cancelled, no charge.",
       "copyFailed": "Couldn't copy the link.",
       "linkFailed": "Couldn't get the meeting link."
     }
@@ -1456,7 +1456,7 @@
     "filter": {
       "applyCount": "{count, plural, one {Apply · # filter} other {Apply · # filters}}",
       "category": "Category",
-      "note": "Pick as many categories as you like. New messages never land here — the Messages tab is that inbox.",
+      "note": "Pick as many categories as you like. New messages go to the Messages tab, never here.",
       "unread": "Unread"
     },
     "filterBar": "Filter notifications",
@@ -1598,7 +1598,7 @@
         "title": "Delete this draft?"
       },
       "markPaid": {
-        "body": "Use this when the client paid you directly — cash or a bank transfer. Stripe records it as paid outside the platform.",
+        "body": "Use this when the client paid you directly, in cash or by bank transfer. Stripe records it as paid outside the platform.",
         "confirm": "Mark paid",
         "title": "Mark as paid?"
       },
@@ -1611,7 +1611,7 @@
       "send": {
         "body": "This finalises the invoice and generates its payment page and PDF. Stripe emails it to the client.",
         "confirm": "Send it",
-        "irreversible": "A sent invoice can no longer be edited — only voided.",
+        "irreversible": "A sent invoice can no longer be edited, only voided.",
         "title": "Send this invoice?"
       },
       "void": {
@@ -1756,6 +1756,11 @@
     "assign": {
       "assign": "Assign",
       "client": "Client",
+      "dayHint": {
+        "done": "Each training day moves to the weekday you picked, in order.",
+        "remaining": "Pick {count, plural, one {# more day} other {# more days}}.",
+        "unchosen": "Trains {count, plural, one {# day} other {# days}} a week. Leave these alone to count forward from the start date."
+      },
       "loadingClients": "Loading your clients…",
       "more": "+ {count} more",
       "noClients": "No active clients yet. A client has to accept before they can be given work.",
@@ -1763,12 +1768,13 @@
       "program": "Program",
       "schedule": "Schedule",
       "starts": "Starts",
-      "title": "Assign program"
+      "title": "Assign program",
+      "trainingDays": "Training days"
     },
     "assignment": {
       "notStarted": "Not started",
       "pause": "Pause",
-      "pausedSubline": "Paused — resuming shifts the remaining schedule forward",
+      "pausedSubline": "Paused. Resuming shifts the remaining schedule forward",
       "percentDone": "{percent}% done",
       "starts": "Starts {date}"
     },
@@ -1794,9 +1800,15 @@
       "clearDayAria": "Clear {name}",
       "copyDayAria": "Copy {name} to other weeks",
       "daysFilled": "{filled} of {total} days",
+      "deleteWeek": {
+        "body": "{days, plural, =0 {This week is empty.} one {Its # day of work is removed.} other {Its # days of work are removed.}} The weeks after it move up, and the program becomes {weeks, plural, one {# week} other {# weeks}} long.",
+        "title": "Delete week {week}"
+      },
+      "deleteWeekAria": "Delete week {week}",
+      "emptyWeek": "No training yet",
       "error": "Couldn't open this program",
       "jumpToWeek": "Jump to week",
-      "restDay": "Rest — tap to add",
+      "restDay": "Rest · tap to add",
       "subtitle": "{weeks, plural, one {# week} other {# weeks}} · {days, plural, one {# day} other {# days}} of work",
       "titleFallback": "Program",
       "toast": {
@@ -1805,9 +1817,11 @@
         "dayCopiedToDay": "{name} copied to {day}, week {week}",
         "dayCopiedToWeek": "{name} copied to week {week}",
         "dayCopiedToWeeks": "{name} copied to {count, plural, one {# week} other {# weeks}}",
+        "deleteWeekFailed": "Could not delete the week",
         "startFailed": "Could not start the program",
         "weekCopiedToWeek": "Week {from} copied to week {week}",
-        "weekCopiedToWeeks": "Week {from} copied to {count, plural, one {# week} other {# weeks}}"
+        "weekCopiedToWeeks": "Week {from} copied to {count, plural, one {# week} other {# weeks}}",
+        "weekDeleted": "Week {week} deleted"
       },
       "untitledProgram": "Untitled program"
     },
@@ -1862,7 +1876,7 @@
       "contextFallback": "this day",
       "dayName": "Day name",
       "dayNamePlaceholder": "Push day",
-      "empty": "No exercises yet — add the movements in the order they should be done.",
+      "empty": "No exercises yet. Add the movements in the order they should be done.",
       "error": {
         "heading": "Couldn't open this day",
         "message": "It may have been cleared from the program. Go back and try again."
@@ -1888,7 +1902,7 @@
     "library": {
       "empty": {
         "browseStarters": "Or browse our starters",
-        "message": "Build a multi-week program or a single routine — both live here."
+        "message": "Build a multi-week program or a single routine. Both live here."
       },
       "error": "Couldn't load your library",
       "filteredEmpty": {
@@ -1937,8 +1951,15 @@
         "days": "Needs at least one day of work before it can be assigned.",
         "name": "Needs a name before it can be assigned."
       },
+      "newWeeks": {
+        "copy": "{built, plural, one {Copy the training from week 1 into {empty, plural, one {it} other {them}}} =2 {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 and 2} other {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 to {built}}}",
+        "leaveEmpty": "{empty, plural, one {Leave it empty for now} other {Leave them empty for now}}",
+        "question": "{empty, plural, one {Week {first} has no training yet} other {Weeks {first} to {last} have no training yet}}",
+        "required": "Choose one to save the new length."
+      },
       "publish": "Publish",
       "publishedNote": "Clients can be assigned to this program.",
+      "shrinkWarning": "{count, plural, one {# day falls} other {# days fall}} outside this length and will be deleted.",
       "title": "Program settings",
       "toast": {
         "deleteFailed": "Could not delete the program",
@@ -1946,6 +1967,7 @@
         "duplicateFailed": "Could not duplicate the program",
         "duplicated": "Program duplicated",
         "published": "Program published",
+        "repeatFailed": "Saved, but the weeks could not be repeated",
         "saveFailed": "Could not save the program"
       },
       "viewAssignments": "View assignments",
@@ -2009,19 +2031,19 @@
       "helper": "Everyone who signed up is notified either way. This adds your reason.",
       "message": "Message · optional",
       "messageTo": "{count, plural, one {Message to # signup · optional} other {Message to # signups · optional}}",
-      "placeholder": "Sorry — have to cancel. Let's regroup next week.",
+      "placeholder": "Sorry, have to cancel. Let's regroup next week.",
       "recurringNote": "This is part of a recurring series. Choose what to cancel.",
       "scope": {
         "series": "Every session in this series. The template is ended.",
         "this": "The series continues.",
         "thisAndFuture": "This and every later occurrence.",
-        "thisOnDay": "{day} — the series continues."
+        "thisOnDay": "Only {day}, the series continues."
       },
       "title": "Cancel session"
     },
     "capacitySheet": {
       "alreadyBooked": "{count, plural, one {# person is already booked in.} other {# people are already booked in.}}",
-      "helper": "This changes only this session, not the rest of the series. People on the waitlist are not moved in automatically when you raise capacity — message them to let them know there is room.",
+      "helper": "This changes only this session, not the rest of the series. People on the waitlist are not moved in automatically when you raise capacity, so message them to let them know there is room.",
       "max": "The most a session can hold is {max}.",
       "save": "Save capacity",
       "spots": "Spots",
@@ -2093,7 +2115,7 @@
       "waiting": "{count} waiting for a place",
       "waitingSince": "Waiting since {since}",
       "waitlist": "Waitlist",
-      "waitlistHint": "The next in line moves in automatically when someone cancels, up to two hours before the start. Raising capacity does not move anyone in — tell them yourself if you open more spots."
+      "waitlistHint": "The next in line moves in automatically when someone cancels, up to two hours before the start. Raising capacity does not move anyone in, so tell them yourself if you open more spots."
     },
     "empty": {
       "create": "Create your first session",
@@ -2130,7 +2152,7 @@
       },
       "cancellation": "Cancellation",
       "cancellationCutoff": "Cancellation cutoff",
-      "cancellationHint": "hours before start — signups can cancel until then",
+      "cancellationHint": "hours before start. Signups can cancel until then",
       "capacity": "Capacity",
       "conflict": {
         "anotherSession": "another session",
@@ -2139,7 +2161,7 @@
       },
       "createAndPublish": "Create & publish",
       "createSession": "Create session",
-      "descriptionPlaceholder": "What signups should know — optional",
+      "descriptionPlaceholder": "What signups should know (optional)",
       "duration": {
         "hours": "{hours} h",
         "hoursMinutes": "{hours} h {minutes} min",
@@ -2157,7 +2179,7 @@
       "lastSession": "Last session",
       "meetingLink": "Meeting link",
       "meetingLinkHint": "Signups see this link once they're confirmed.",
-      "noGroup": "You don't have a group yet — group members access needs one.",
+      "noGroup": "You don't have a group yet. Group members access needs one.",
       "noVenue": "No venue",
       "occurrences": "Occurrences",
       "occurrencesUnit": "{count, plural, one {occurrence} other {occurrences}}",
@@ -2176,7 +2198,7 @@
         "never": "Every {days}, with no end date",
         "noDays": "Pick at least one day",
         "onDate": "Every {days} until {date}",
-        "onDateMissing": "Every {days} — pick an end date"
+        "onDateMissing": "Every {days} · pick an end date"
       },
       "short": {
         "after": "{count, plural, one {{days} · # occurrence} other {{days} · # occurrences}}",
@@ -2187,7 +2209,7 @@
       },
       "spots": "Spots",
       "spotsUnit": "spots",
-      "startLocked": "Start time can't be changed — duplicate the session to move it.",
+      "startLocked": "Start time can't be changed. Duplicate the session to move it.",
       "starts": "Starts",
       "subtitleOneOff": "One-off · {date}",
       "title": {
@@ -2214,8 +2236,8 @@
       },
       "suggestions": {
         "bring": "Don't forget water and a towel.",
-        "change": "Change of plan for this one — details to follow.",
-        "late": "Running a few minutes late — see you shortly."
+        "change": "Change of plan for this one. Details to follow.",
+        "late": "Running a few minutes late, see you shortly."
       },
       "title": "Message signups"
     },
@@ -2226,7 +2248,7 @@
     },
     "noteSheet": {
       "helper": "Only you can see this. It stays with this person on this session.",
-      "placeholder": "Kept favouring the left knee — check next week.",
+      "placeholder": "Kept favouring the left knee. Check next week.",
       "save": "Save note",
       "title": "Note",
       "titleWithName": "Note · {name}"
@@ -2380,14 +2402,14 @@
         "time": "time",
         "weight": "kg"
       },
-      "defaultName": "Workout — {date}",
+      "defaultName": "Workout · {date}",
       "discard": {
         "irreversible": "This cannot be undone",
-        "message": "Everything logged in this session is deleted. Skipping a planned workout is a different thing — that keeps the record.",
+        "message": "Everything logged in this session is deleted. Skipping a planned workout is a different thing: that keeps the record.",
         "title": "Discard workout"
       },
       "empty": {
-        "message": "Pick the movements as you go — nothing has to be planned up front.",
+        "message": "Pick the movements as you go. Nothing has to be planned up front.",
         "title": "Add your first exercise"
       },
       "fieldLabel": {
@@ -2480,7 +2502,7 @@
         "label": "Routine name",
         "placeholder": "Push day"
       },
-      "noExercises": "No exercises yet — add the movements in the order you do them.",
+      "noExercises": "No exercises yet. Add the movements in the order you do them.",
       "starterNote": "A MotionHive starter. Start it and it becomes yours to edit.",
       "stepper": {
         "fewer": "One set fewer for {name}",
@@ -2527,7 +2549,7 @@
         "message": "MotionHive's starter routines are not available right now. Try again in a moment.",
         "title": "No starters yet"
       },
-      "note": "Pick one to try — it becomes yours to edit."
+      "note": "Pick one to try. It becomes yours to edit."
     },
     "tiles": {
       "distance": "Distance",

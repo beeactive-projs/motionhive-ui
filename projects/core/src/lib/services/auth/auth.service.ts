@@ -16,6 +16,7 @@ import { UserRole } from '../../models/user/role.enums';
 import { TokenService } from './token.service';
 import { AuthStore } from '../../stores/auth.store';
 import { LanguageService } from '../i18n/language.service';
+import { appLanguage } from '../../i18n/app-language';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
 
@@ -71,11 +72,20 @@ export class AuthService implements OnDestroy {
 
   register(data: RegisterRequest): Observable<User> {
     return this._http
-      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`, data)
+      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`, this.withLanguage(data))
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
         switchMap(() => this.fetchAndStoreProfile()),
       );
+  }
+
+  /**
+   * A new account starts in the language the person signed up in, so the
+   * emails and notifications the API sends match the app from day one.
+   * The API ignores it for an account that already exists.
+   */
+  private withLanguage<T extends object>(body: T): T & { language: string } {
+    return { ...body, language: appLanguage() };
   }
 
   logout(): Observable<void> {
@@ -88,7 +98,7 @@ export class AuthService implements OnDestroy {
 
   googleLogin(request: GoogleLoginRequest): Observable<User> {
     return this._http
-      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.GOOGLE}`, request)
+      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.GOOGLE}`, this.withLanguage(request))
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
         switchMap(() => this.fetchAndStoreProfile()),
@@ -97,7 +107,7 @@ export class AuthService implements OnDestroy {
 
   facebookLogin(request: FacebookLoginRequest): Observable<User> {
     return this._http
-      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.FACEBOOK}`, request)
+      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.FACEBOOK}`, this.withLanguage(request))
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
         switchMap(() => this.fetchAndStoreProfile()),

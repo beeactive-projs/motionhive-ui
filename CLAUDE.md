@@ -2,6 +2,12 @@
 
 > **Naming note:** The product is **MotionHive**. The repo directory is still `beeactive-ui` (historical, not renamed). Angular selector prefix is `mh-`. Any `bee-`/`beeactive` references in existing code are historical leftovers — leave them alone unless explicitly renaming.
 
+## Two languages, always (English + Romanian)
+
+Every sentence a person can read ships in English **and** Romanian in the same change: labels, buttons, placeholders, `aria-label`s, toasts, confirm dialogs, empty states, hints, validation and error messages. In `web` and `mobile` that is a key in both `en.json` and `ro.json` (shared text in `projects/core/src/i18n`); in `website` it is both `messages.xlf` and `messages.ro.xlf`. No string literals in templates or TS, and no "translate later". The usual slips are a `return 'Pick 2 more.'` in a `computed()` and a hand-rolled `n === 1 ? 'day' : 'days'`. Romanian plurals need `one` / `few` / `other`. No dashes as punctuation in either language. `npm run i18n:check` must pass before a change is done.
+
+The API follows the same rule for its errors, emails and notifications, and answers in the language the app sends (`Accept-Language`, set by core's `languageInterceptor`), so server messages are shown as sent. Detail: Translations (i18n), below.
+
 ## Project Overview
 
 MotionHive fitness platform frontend. Angular monorepo with three projects:
@@ -170,7 +176,7 @@ Single braces: `"Member since {date}"`. Plurals: `"{count, plural, one {# member
 - Enum labels: `value | enumLabel: 'invoiceStatus'` → `enum.invoiceStatus.<VALUE>` (humanised fallback if the key is missing). Core's label maps (`GenderLabels`, `ClientStatusLabels`, `SESSION_*` metadata) are built with `enumLabelMap` / `withEnumLabels` — getters that translate on read — so `Labels[value]` call sites need no change.
 - Validation: `validationMessage(control.errors, overrides?)` or `control.errors | fieldError`. Don't write new `getFieldError()` text; per-form wording goes in the overrides map (`{ required: 'auth.signUp.termsRequired' }`).
 - Dates/numbers: `LOCALE_ID` follows the language (en → `en-GB`, ro → `ro-RO`), so `DatePipe` is localised. In TS use `appLocale()` from `core` — never a literal `'en-GB'` or `undefined` in `toLocale*` / `Intl`. Weekday/month names come from `weekdayNames()` / `monthNames()`, not hand-written arrays.
-- Backend error messages (`err.error.message`) are shown as the server sends them — not translatable client-side.
+- Backend error messages (`err.error.message`) arrive already in the reader's language: core's `languageInterceptor` sends `Accept-Language` and the API translates. Show them as sent; don't reword them client-side.
 
 ### Switching language
 

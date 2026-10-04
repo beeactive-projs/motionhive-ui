@@ -72,68 +72,122 @@
       @for (week of store.weeks(); track week.index) {
         <section class="mh-section week" [id]="'week-' + week.index">
           <div class="mh-section-head">
-            <span class="mh-kicker">{{ weekLabel(week.index) }}</span>
-            <ion-note>{{ daysLabel(week) }}</ion-note>
+            <!-- The header opens and closes the week. Copy and delete stay
+                 beside it as their own buttons, never inside it. -->
+            <ion-button
+              fill="clear"
+              color="medium"
+              class="week-toggle"
+              [attr.aria-expanded]="isWeekOpen(week.index)"
+              [attr.aria-controls]="'week-days-' + week.index"
+              (click)="toggleWeek(week.index)"
+            >
+              <ion-icon
+                slot="start"
+                name="chevron-forward"
+                class="chevron"
+                [class.open]="isWeekOpen(week.index)"
+                aria-hidden="true"
+              />
+              <span class="mh-kicker">{{ weekLabel(week.index) }}</span>
+              <ion-note>{{ daysLabel(week) }}</ion-note>
+            </ion-button>
             @if (week.filled > 0) {
               <ion-button fill="clear" size="small" (click)="openCopy(week.index)">
                 <ion-icon slot="start" name="copy-outline" aria-hidden="true" />
                 {{ 'button.copy' | translate }}
               </ion-button>
             }
+            <!-- A program keeps at least one week, so the last one has no delete. -->
+            @if (store.weekCount() > 1) {
+              <ion-button
+                fill="clear"
+                size="small"
+                color="medium"
+                [attr.aria-label]="'programs.builder.deleteWeekAria' | translate: { week: week.index + 1 }"
+                (click)="askDeleteWeek(week.index)"
+              >
+                <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+              </ion-button>
+            }
           </div>
 
-          <ion-list [inset]="true" class="mh-card-list">
-            @for (day of week.days; track $index; let last = $last) {
+          @if (!isWeekOpen(week.index)) {
+            <!-- A closed week is one row naming what is in it; tapping it opens
+                 the week, the same as the header. -->
+            <ion-list [inset]="true" class="mh-card-list">
               <ion-item
                 button
                 detail="false"
-                [lines]="last ? 'none' : 'full'"
-                [class.rest]="!day"
-                (click)="openDay(week, $index)"
+                lines="none"
+                class="week-summary"
+                [attr.aria-expanded]="false"
+                [attr.aria-controls]="'week-days-' + week.index"
+                (click)="toggleWeek(week.index)"
               >
-                <ion-note slot="start" class="mh-kicker dow">{{ dayLabels[$index] }}</ion-note>
                 <ion-label>
-                  @if (day) {
-                    <h2>{{ day.name }}</h2>
-                  } @else {
-                    <!-- A rest day is the absence of work, so it reads as a quiet
-                         invitation rather than an empty record. -->
-                    <p>{{ 'programs.builder.restDay' | translate }}</p>
+                  @for (entry of weekEntries(week); track entry.day) {
+                    <span class="entry"><span class="entry-dow">{{ entry.label }}</span> {{ entry.name }}</span>
+                  } @empty {
+                    <span class="empty">{{ 'programs.builder.emptyWeek' | translate }}</span>
                   }
                 </ion-label>
+              </ion-item>
+            </ion-list>
+          } @else {
+            <ion-list [inset]="true" class="mh-card-list" [id]="'week-days-' + week.index">
+              @for (day of week.days; track $index; let last = $last) {
+                <ion-item
+                  button
+                  detail="false"
+                  [lines]="last ? 'none' : 'full'"
+                  [class.rest]="!day"
+                  (click)="openDay(week, $index)"
+                >
+                  <ion-note slot="start" class="mh-kicker dow">{{ dayLabels[$index] }}</ion-note>
+                  <ion-label>
+                    @if (day) {
+                      <h2>{{ day.name }}</h2>
+                    } @else {
+                      <!-- A rest day is the absence of work, so it reads as a quiet
+                           invitation rather than an empty record. -->
+                      <p>{{ 'programs.builder.restDay' | translate }}</p>
+                    }
+                  </ion-label>
 
-                @if (day) {
-                  <!-- Two verbs, two buttons: a kebab would hide both behind a
-                       tap for no saving at this count. Copy sits first because
-                       it is the one used while building. -->
-                  @if (store.weekCount() > 1) {
+                  @if (day) {
+                    <!-- Two verbs, two buttons: a kebab would hide both behind a
+                         tap for no saving at this count. Copy sits first because
+                         it is the one used while building. -->
+                    @if (store.weekCount() > 1) {
+                      <ion-button
+                        slot="end"
+                        fill="clear"
+                        shape="round"
+                        color="medium"
+                        [attr.aria-label]="'programs.builder.copyDayAria' | translate: { name: day.name }"
+                        (click)="openCopyDay(week.index, $index, day, $event)"
+                      >
+                        <ion-icon slot="icon-only" name="copy-outline" aria-hidden="true" />
+                      </ion-button>
+                    }
                     <ion-button
                       slot="end"
                       fill="clear"
                       shape="round"
                       color="medium"
-                      [attr.aria-label]="'programs.builder.copyDayAria' | translate: { name: day.name }"
-                      (click)="openCopyDay(week.index, $index, day, $event)"
+                      [attr.aria-label]="'programs.builder.clearDayAria' | translate: { name: day.name }"
+                      (click)="askClear(day, $event)"
                     >
-                      <ion-icon slot="icon-only" name="copy-outline" aria-hidden="true" />
+                      <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
                     </ion-button>
+                  } @else {
+                    <ion-icon slot="end" name="add-outline" color="medium" aria-hidden="true" />
                   }
-                  <ion-button
-                    slot="end"
-                    fill="clear"
-                    shape="round"
-                    color="medium"
-                    [attr.aria-label]="'programs.builder.clearDayAria' | translate: { name: day.name }"
-                    (click)="askClear(day, $event)"
-                  >
-                    <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
-                  </ion-button>
-                } @else {
-                  <ion-icon slot="end" name="add-outline" color="medium" aria-hidden="true" />
-                }
-              </ion-item>
-            }
-          </ion-list>
+                </ion-item>
+              }
+            </ion-list>
+          }
         </section>
       }
     </div>
@@ -166,4 +220,14 @@
   [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   (confirm)="confirmClear()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="deleteWeekOpen"
+  [title]="deleteWeekTitle()"
+  [body]="deleteWeekBody()"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  tone="danger"
+  (confirm)="confirmDeleteWeek()"
 />

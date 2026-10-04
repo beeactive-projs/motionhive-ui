@@ -753,7 +753,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
       parts.push(
         a.targetRepsMin === a.targetRepsMax
           ? `${a.targetRepsMin}`
-          : `${a.targetRepsMin}–${a.targetRepsMax}`,
+          : `${a.targetRepsMin}-${a.targetRepsMax}`,
       );
     } else if (a.targetRepsMin != null) {
       parts.push(`${a.targetRepsMin}+`);

@@ -61,9 +61,32 @@
         </div>
         @if (doomedDays() > 0) {
           <p class="shrink-warning">
-            {{ doomedDays() === 1 ? '1 day falls' : doomedDays() + ' days fall' }}
-            outside this length and will be deleted.
+            {{ 'programs.settings.shrinkWarning' | translate: { count: doomedDays() } }}
           </p>
+        }
+        <!-- Asked whenever the program gains weeks, with neither answer
+             picked: the coach decides what goes in them. -->
+        @if (askNewWeeks()) {
+          <div class="mh-section new-weeks" id="new-weeks">
+            <span class="mh-kicker" id="new-weeks-question">{{ newWeeksQuestion() }}</span>
+            <ion-list [inset]="true" class="mh-card-list" [class.missing]="newWeeksMissing()">
+              <ion-radio-group
+                aria-labelledby="new-weeks-question"
+                [value]="newWeeksChoice()"
+                (ionChange)="chooseNewWeeks($event.detail.value)"
+              >
+                <ion-item lines="full">
+                  <ion-radio value="repeat" justify="start" labelPlacement="end">{{ repeatLabel() }}</ion-radio>
+                </ion-item>
+                <ion-item lines="none">
+                  <ion-radio value="empty" justify="start" labelPlacement="end">{{ leaveEmptyLabel() }}</ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
+            @if (newWeeksMissing()) {
+              <p class="choice-error" role="alert">{{ 'programs.settings.newWeeks.required' | translate }}</p>
+            }
+          </div>
         }
       </section>
 

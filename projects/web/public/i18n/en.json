@@ -18,7 +18,7 @@
       "coverImage": "Cover image",
       "coverPreviewAlt": "Cover image preview",
       "createPost": "Create post",
-      "draftHint": "Draft — only you can see it",
+      "draftHint": "Draft, only you can see it",
       "editSlug": "Edit slug",
       "excerpt": "Excerpt",
       "excerptPlaceholder": "A short summary shown in post listings...",
@@ -33,7 +33,7 @@
           "emphasis": "landscape"
         },
         "minimum": "Minimum: 1200 × 675px. Smaller images look soft on retina screens.",
-        "portrait": "Tall portrait photos will be center-cropped — the top and bottom won't show.",
+        "portrait": "Tall portrait photos will be center-cropped, so the top and bottom won't show.",
         "recommended": {
           "after": "for sharpest results.",
           "before": "Recommended:"
@@ -133,7 +133,7 @@
       "heroHighlight": "here.",
       "heroLine1": "Your fitness journey",
       "heroLine2": "starts",
-      "heroSubtitle": "Track workouts, connect with trainers, and crush your goals — all in one place built for people who move.",
+      "heroSubtitle": "Track workouts, connect with trainers, and crush your goals, all in one place built for people who move.",
       "orContinueWith": "or continue with",
       "passwordPlaceholder": "Enter your password",
       "termsIntro": "By signing in, you agree to our",
@@ -163,7 +163,7 @@
       },
       "heroHighlight": "password.",
       "heroLine1": "Reset your",
-      "heroSubtitle": "No worries — it happens to the best of us. We'll help you get back on track in no time.",
+      "heroSubtitle": "No worries, it happens to the best of us. We'll help you get back on track in no time.",
       "instructions": "Enter the email address associated with your account and we'll send you a link to reset your password.",
       "sent": "If an account exists with this email, you will receive password reset instructions shortly.",
       "submit": "Send reset instructions"
@@ -450,7 +450,7 @@
         },
         "recentWorkouts": {
           "empty": "No workouts yet",
-          "emptyHint": "Workouts this client logs — assigned or freestyle — will appear here.",
+          "emptyHint": "Workouts this client logs, assigned or freestyle, will appear here.",
           "loading": "Loading recent workouts…",
           "title": "Recent workouts"
         },
@@ -470,10 +470,10 @@
         "ends": "ends {date}",
         "loading": "Loading programs…",
         "noMatch": {
-          "current": "No current programs — try All.",
-          "currentSearch": "No current programs for “{term}” — try All.",
-          "finished": "No finished programs — try All.",
-          "finishedSearch": "No finished programs for “{term}” — try All."
+          "current": "No current programs. Try All.",
+          "currentSearch": "No current programs for “{term}”. Try All.",
+          "finished": "No finished programs. Try All.",
+          "finishedSearch": "No finished programs for “{term}”. Try All."
         },
         "pause": "Pause",
         "scope": {
@@ -757,9 +757,9 @@
       "install": "Install app"
     },
     "locationPicker": {
-      "hint": "Start typing to search — select a suggestion to confirm.",
+      "hint": "Start typing to search, then select a suggestion to confirm.",
       "locked": "Locked",
-      "noLocationLocked": "No location — locked",
+      "noLocationLocked": "No location (locked)",
       "placeholder": "Search for a place..."
     },
     "notificationBell": {
@@ -823,8 +823,8 @@
     },
     "requestToBeClientDialog": {
       "header": "Send a request",
-      "intro": "Tell {name} a bit about you and what you're looking for. A short note helps them respond faster — but it's optional.",
-      "introNoName": "Tell this coach a bit about you and what you're looking for. A short note helps them respond faster — but it's optional.",
+      "intro": "Tell {name} a bit about you and what you're looking for. A short note helps them respond faster, but it's optional.",
+      "introNoName": "Tell this coach a bit about you and what you're looking for. A short note helps them respond faster, but it's optional.",
       "messageLabel": "Message",
       "placeholder": "Hi! I'd love to train with you.",
       "toast": {
@@ -859,7 +859,7 @@
       }
     },
     "sessionCard": {
-      "blockedHint": "Description and signup hidden — members only",
+      "blockedHint": "Members only: description and signup hidden",
       "cta": {
         "becomeClient": "Become a client",
         "book": "Book",
@@ -926,23 +926,23 @@
         "strength": "Strength",
         "yoga": "Yoga"
       },
-      "empty": "No coaches match yet — try a different search.",
+      "empty": "No coaches match yet. Try a different search.",
       "experience": "{count, plural, one {# yr experience} other {# yrs experience}}",
       "newCoach": "New coach",
       "online": "Online"
     },
     "groups": {
-      "empty": "No groups found — try a different search."
+      "empty": "No groups found. Try a different search."
     },
     "head": {
-      "subtitle": "Coaches, sessions, and groups — all in one place. Use ⌘K up top when you already know what you want.",
+      "subtitle": "Coaches, sessions, and groups, all in one place. Use ⌘K up top when you already know what you want.",
       "title": "Find your people in the hive"
     },
     "search": {
       "placeholder": "Search coaches, sessions, venues…"
     },
     "sessions": {
-      "empty": "No sessions found — try a different search or filter."
+      "empty": "No sessions found. Try a different search or filter."
     },
     "tabs": {
       "coaches": "Coaches",
@@ -969,7 +969,7 @@
     "goHome": "Go home",
     "homeLink": "MotionHive home",
     "notFound": {
-      "message": "This page doesn't exist — but your next workout does. Let's get you back on track.",
+      "message": "This page doesn't exist, but your next workout does. Let's get you back on track.",
       "title": "Off the beaten track."
     },
     "serverError": {
@@ -1033,7 +1033,7 @@
       "sort": {
         "menu": {
           "mostForked": "Most forked",
-          "name": "Name (A–Z)",
+          "name": "Name (A-Z)",
           "newest": "Newest first"
         },
         "short": {
@@ -1053,7 +1053,7 @@
     "confirm": {
       "delete": {
         "accept": "Yes, delete",
-        "forked": "{count, plural, one {It's already been forked by # coach — their copies are independent and won't be affected.} other {It's already been forked by # coaches — their copies are independent and won't be affected.}}",
+        "forked": "{count, plural, one {It's already been forked by # coach. Their copies are independent and won't be affected.} other {It's already been forked by # coaches. Their copies are independent and won't be affected.}}",
         "header": "Delete \"{name}\"?",
         "irreversible": "You won't be able to recover it, and you'll need to recreate it from scratch if you want it back later.",
         "message": "This permanently removes \"{name}\" from your exercise library."
@@ -1078,11 +1078,11 @@
       "autoPick": "Auto / pick",
       "classification": "Classification",
       "creating": "Creating…",
-      "descriptionPlaceholder": "1–3 sentences about the movement…",
-      "equipmentHint": "— Bodyweight if none",
+      "descriptionPlaceholder": "1 to 3 sentences about the movement…",
+      "equipmentHint": "(bodyweight if none)",
       "force": "Force",
       "forkWarning": {
-        "message": "Their copies are independent — your edits won't change them.",
+        "message": "Their copies are independent, so your edits won't change them.",
         "title": "{count, plural, one {# coach has forked this.} other {# coaches have forked this.}}"
       },
       "instructionsPlaceholder": "Step-by-step form cues…",
@@ -1091,17 +1091,17 @@
         "BODYWEIGHT": "Reps, no load",
         "CARDIO": "Duration + distance + HR",
         "DISTANCE": "Distance only",
-        "DURATION": "Time only — e.g. plank",
+        "DURATION": "Time only, e.g. plank",
         "MOBILITY": "Time / reps, mobility",
         "STRENGTH": "Reps + weight"
       },
       "mechanic": "Mechanic",
       "namePlaceholder": "e.g. Tempo goblet squat",
-      "optionalSuffix": "— optional",
+      "optionalSuffix": "(optional)",
       "pattern": "Pattern",
       "primaryMuscles": "Primary muscles",
       "primaryMusclesPlaceholder": "Pick at least one",
-      "primaryMusclesRange": "— 1 to 3",
+      "primaryMusclesRange": "(1 to 3)",
       "privateHint": "Only you can see and use it.",
       "publicHint": "Any coach can view and fork this. You stay the only editor.",
       "saving": "Saving…",
@@ -1112,7 +1112,7 @@
         "edit": "Edit exercise"
       },
       "unilateral": "Unilateral movement",
-      "unilateralHint": "Single-arm / single-leg — drives L vs R tracking later.",
+      "unilateralHint": "Single-arm / single-leg. Drives L vs R tracking later.",
       "visibility": "Visibility",
       "youtube": {
         "hint": "Native upload comes in V2. Paste any YouTube URL to get a thumbnail.",
@@ -1136,7 +1136,7 @@
         "summary": "Fork failed"
       },
       "forked": {
-        "detail": "\"{name}\" is now private — edit anytime.",
+        "detail": "\"{name}\" is now private. Edit it anytime.",
         "summary": "Forked to your library"
       },
       "loadFailed": "Couldn't load exercises",
@@ -1252,7 +1252,7 @@
     },
     "emptyMembers": {
       "addManually": "Add manually",
-      "message": "Send a join link to your clients — they can join in one tap, no signup form.",
+      "message": "Send a join link to your clients. They can join in one tap, no signup form.",
       "title": "Just you so far"
     },
     "emptyState": {
@@ -1262,7 +1262,7 @@
       },
       "manage": {
         "cta": "Create your first group",
-        "message": "Organize your clients into groups for sessions and communication — start with your most active 3 to 5 clients.",
+        "message": "Organize your clients into groups for sessions and communication. Start with your most active 3 to 5 clients.",
         "title": "No groups yet"
       }
     },
@@ -1567,7 +1567,7 @@
       "roleWithYears": "{specialization} · {count, plural, one {# yr} other {# yrs}}"
     },
     "inviteBand": {
-      "body": "The hive grows by word of mouth. MotionHive is free to join — bring someone you'd actually train with.",
+      "body": "The hive grows by word of mouth. MotionHive is free to join, so bring someone you'd actually train with.",
       "invite": "Invite a friend",
       "suggestCoach": "Suggest a coach",
       "title": "Know someone who'd love it here?"
@@ -1577,11 +1577,11 @@
       "emailHint": "We'll send them a friendly note with your invite link.",
       "emailPlaceholder": "friend@example.com",
       "linkFootnote": "The link drops them straight on sign-up.",
-      "linkHint": "Share this link anywhere — WhatsApp, Slack, a text message.",
+      "linkHint": "Share this link anywhere: WhatsApp, Slack, a text message.",
       "messageLabel": "Personal message",
-      "messagePlaceholder": "Hey — come train with me on MotionHive.",
+      "messagePlaceholder": "Hey, come train with me on MotionHive.",
       "share": {
-        "text": "Come train with me on MotionHive — your first session's on us.",
+        "text": "Come train with me on MotionHive.",
         "title": "Train with me on MotionHive"
       },
       "success": {
@@ -1594,7 +1594,7 @@
       },
       "title": "Bring a friend, train together.",
       "toast": {
-        "copied": "Send it to your friend — first session is on us.",
+        "copied": "Link copied. Send it to your friend.",
         "copyFailed": {
           "detail": "Select the link and copy it manually.",
           "summary": "Couldn't copy"
@@ -1610,7 +1610,7 @@
       }
     },
     "journal": {
-      "empty": "No posts yet. Check back soon — our first reads are landing.",
+      "empty": "No posts yet. Check back soon. Our first reads are landing.",
       "eyebrow": "From the journal",
       "loading": "Loading articles",
       "minRead": "{minutes} min read",
@@ -1640,16 +1640,16 @@
       "direct": {
         "emailError": "We need a valid email to reach them.",
         "emailPlaceholder": "coach@example.com",
-        "hint": "We'll send them a friendly invite — and let them know you sent it.",
+        "hint": "We'll send them a friendly invite and let them know you sent it.",
         "nameError": "Their name helps us address the email.",
         "noteLabel": "A line about you",
-        "notePlaceholder": "Hey Mia — your spin classes are the best, you'd love this platform."
+        "notePlaceholder": "Hey Mia, your spin classes are the best. You'd love this platform."
       },
       "success": {
         "directBody": "We've emailed them with your name on it. Suggest as many as you like.",
         "directTitle": "On its way to them.",
         "teamBody": "We'll reach out and let you know what they say. Suggest as many as you like.",
-        "teamTitle": "Thanks — we'll take it from here."
+        "teamTitle": "Thanks, we'll take it from here."
       },
       "tab": {
         "direct": "Email the coach",
@@ -1659,10 +1659,10 @@
         "contactError": "A bit more detail, please.",
         "contactLabel": "How to reach them",
         "contactPlaceholder": "email, Instagram handle, phone…",
-        "hint": "Don't have their email? Send us anything — Instagram, phone, a name. We'll find them.",
+        "hint": "Don't have their email? Send us anything: Instagram, phone, a name. We'll find them.",
         "nameError": "Their name helps us find them.",
         "noteLabel": "What makes them great?",
-        "notePlaceholder": "A line or two — we'll mention you when we reach out.",
+        "notePlaceholder": "A line or two. We'll mention you when we reach out.",
         "submit": "Send suggestion"
       },
       "title": "Know a great coach?",
@@ -1678,7 +1678,7 @@
       }
     },
     "toast": {
-      "rateLimited": "You've sent a lot recently — try again in an hour."
+      "rateLimited": "You've sent a lot recently. Try again in an hour."
     }
   },
   "messages": {
@@ -1700,7 +1700,7 @@
       "placeholderNamed": "Message {name}…",
       "placeholderPick": "Pick someone to message…",
       "placeholderThem": "Message them…",
-      "rateLimited": "Slow down — try again in {seconds}s",
+      "rateLimited": "Slow down. Try again in {seconds}s",
       "sendMessage": "Send message"
     },
     "emptyState": {
@@ -1764,7 +1764,7 @@
     "reportDialog": {
       "header": "Report conversation",
       "issue": "What's the issue?",
-      "leadAfter": "go to MotionHive's safety team. They review every report — please pick the closest category and add any details that help.",
+      "leadAfter": "go to MotionHive's safety team. They review every report, so please pick the closest category and add any details that help.",
       "leadBefore": "Reports about",
       "notes": "Additional details (optional)",
       "notesPlaceholder": "What happened? Include message snippets or context if it helps.",
@@ -1786,7 +1786,7 @@
       "loadingEarlier": "Loading earlier messages…"
     },
     "threat": {
-      "copy": "Keep payments and identity verification on MotionHive — we can't help recover funds or accounts after off-platform exchanges.",
+      "copy": "Keep payments and identity verification on MotionHive. We can't help recover funds or accounts after off-platform exchanges.",
       "dismiss": "Dismiss safety notice",
       "reason": {
         "links": "{count, plural, one {a link} other {links}}",
@@ -1832,7 +1832,7 @@
       "freeToCancel": "Free to cancel until {hours}h before the start.",
       "headerConfirmed": "You're in!",
       "headerPending": "Request sent!",
-      "pendingSummary": "{title} — {date}. The coach will review your request.",
+      "pendingSummary": "{title} on {date}. The coach will review your request.",
       "reminder": "We'll send you a reminder 24h and 1h before.",
       "whatNext": "What happens next"
     },
@@ -1873,13 +1873,13 @@
       "joinProvider": "Join {provider}",
       "joinUnavailable": "Join info not available yet. Try again closer to the start.",
       "notVisible": "This session is not visible to you.",
-      "preHint": "The Join button activates 5 minutes before the start. Keep this tab open — we'll flip it on automatically.",
+      "preHint": "The Join button activates 5 minutes before the start. Keep this tab open and we'll flip it on automatically.",
       "subtitle": "Starts at {time} · {minutes} min"
     },
     "discover": {
       "emptyMessage": "Try a different search or filter to find a session to book.",
       "emptyTitle": "No sessions found",
-      "loadError": "Couldn't load sessions — {error}",
+      "loadError": "Couldn't load sessions: {error}",
       "showing": "Showing {shown} of {total}",
       "subtitle": "Find and book sessions from coaches across MotionHive.",
       "title": "Discover sessions"
@@ -1929,7 +1929,7 @@
         "waitlisted": "You're on the waitlist"
       },
       "waitlistClosed": "This session is full and the waitlist is closed.",
-      "waitlistHint": "Join the waitlist — you'll get a notification if a spot opens.",
+      "waitlistHint": "Join the waitlist and you'll get a notification if a spot opens.",
       "with": "with"
     },
     "toast": {
@@ -1940,9 +1940,9 @@
       "bookFailed": "Could not book",
       "cancelFailed": "Could not cancel",
       "cancelled": {
-        "outsideWindow": "Booking cancelled (outside cancel window — charges may still apply).",
+        "outsideWindow": "Booking cancelled (outside cancel window, charges may still apply).",
         "summary": "Cancelled",
-        "withinWindow": "Booking cancelled — no charge."
+        "withinWindow": "Booking cancelled, no charge."
       },
       "downloadFailed": "Could not download calendar file",
       "joinUnavailable": {
@@ -2047,7 +2047,7 @@
           "title": "You haven't saved a routine yet"
         },
         "none": {
-          "message": "Save a workout shape — name, exercises, default sets — and start it again with one tap.",
+          "message": "Save a workout shape (name, exercises, default sets) and start it again with one tap.",
           "title": "No routines yet"
         },
         "search": {
@@ -2076,8 +2076,8 @@
       "confirm": {
         "discard": {
           "header": "Cancel this workout?",
-          "message": "This deletes the workout. It won't show as skipped — it will be as if you never started.",
-          "messageWithSets": "This deletes the workout and the {count, plural, one {# set} other {# sets}} you logged. It won't show as skipped — it will be as if you never started."
+          "message": "This deletes the workout. It won't show as skipped: it will be as if you never started.",
+          "messageWithSets": "This deletes the workout and the {count, plural, one {# set} other {# sets}} you logged. It won't show as skipped: it will be as if you never started."
         },
         "removeExercise": {
           "header": "Remove this exercise?",
@@ -2145,7 +2145,7 @@
         "swappedDetail": "Your logged sets carried over.",
         "undoSkipFailed": "Couldn't undo the skip",
         "welcomeBack": "Welcome back",
-        "welcomeBackDetail": "You've been away a while — your rest timer was dismissed. Pick up where you left off."
+        "welcomeBackDetail": "You've been away a while, so your rest timer was dismissed. Pick up where you left off."
       },
       "undo": "Undo",
       "workoutCompleted": "Workout completed"
@@ -2191,7 +2191,7 @@
       "exercises": "Exercises",
       "moveDown": "Move down",
       "moveUp": "Move up",
-      "noExercises": "No exercises yet — tap \"Add exercise\" to start building.",
+      "noExercises": "No exercises yet. Tap \"Add exercise\" to start building.",
       "notesPlaceholder": "Anything to remember about this routine…",
       "pickDay": "Pick at least one day, or turn the repeat off.",
       "removeSet": "Remove set",
@@ -2228,9 +2228,9 @@
       "open": "Open {name}",
       "saveCopy": "Save a copy of this routine",
       "schedule": "Schedule this routine as a plan",
-      "scheduleTooltip": "Schedule — put this on your calendar as a plan",
+      "scheduleTooltip": "Schedule: put this on your calendar as a plan",
       "view": "View routine",
-      "viewTooltip": "View — see the exercises without changing them"
+      "viewTooltip": "View: see the exercises without changing them"
     },
     "schedule": {
       "everyWeek": "Every week",
@@ -2362,7 +2362,7 @@
       "createButton": "Create invoice",
       "decreaseQuantity": "Decrease quantity",
       "delivery": "Delivery",
-      "deliveryHint": "Leave unchecked to keep it as a draft — you can review it and send it from the list later.",
+      "deliveryHint": "Leave unchecked to keep it as a draft. You can review it and send it from the list later.",
       "descriptionOptional": "Description (optional)",
       "descriptionPlaceholder": "Longer details shown on the invoice",
       "draft": "Draft",
@@ -2389,7 +2389,7 @@
       "namePlaceholder": "e.g. Single PT Session",
       "newRecipient": "New recipient",
       "notesOptional": "Notes (optional)",
-      "notesPlaceholder": "Shown on the invoice. e.g. “Thanks — see you next week!”",
+      "notesPlaceholder": "Shown on the invoice. e.g. “Thanks, see you next week!”",
       "oneOffPriceHint": "Need a one-off price or description for this invoice?",
       "orEnterCustom": "or enter custom",
       "pickFromPricing": "Pick from pricing (optional)",
@@ -2627,13 +2627,13 @@
           "title": "Set up payments to offer memberships"
         },
         "pricing": {
-          "description": "Define your service packages and set your rates — once your Stripe account is connected, clients will be able to browse and purchase your plans directly.",
-          "title": "Your plans are ready — finish Stripe setup"
+          "description": "Define your service packages and set your rates. Once your Stripe account is connected, clients will be able to browse and purchase your plans directly.",
+          "title": "Your plans are ready, now finish Stripe setup"
         }
       },
       "kpi": {
         "available": "Available",
-        "inTransit": "In transit · 2–3 days",
+        "inTransit": "In transit · 2-3 days",
         "openInvoices": "{count, plural, one {# open invoice} other {# open invoices}}",
         "outstanding": "Outstanding",
         "overdue": "{count} overdue",
@@ -2698,7 +2698,7 @@
         "title": "Not sent yet"
       },
       "notes": {
-        "empty": "No notes — add a short message before sending.",
+        "empty": "No notes. Add a short message before sending.",
         "title": "Notes to client"
       },
       "paidOutOfBand": "Paid out of band",
@@ -2908,7 +2908,7 @@
         "body": "An email with the setup link was sent. The membership activates automatically once they're done.",
         "title": "Waiting for the client to confirm and pay the first invoice."
       },
-      "periodPending": "Period dates pending — Stripe will populate once activated.",
+      "periodPending": "Period dates pending. Stripe will populate them once activated.",
       "renewsAutomatically": "Renews automatically at period end",
       "scheduledCancel": "Scheduled to cancel on {date}",
       "setupHint": "Generate a fresh hosted link to share with the client. The original one we emailed still works too.",
@@ -3013,7 +3013,7 @@
       },
       "locationNote": {
         "after": "section on your profile.",
-        "before": "Your country and city live on your personal information — edit them from the",
+        "before": "Your country and city live on your personal information. Edit them from the",
         "middle": "dialog. Where you actually hold sessions (gyms, parks, online) is managed from the"
       },
       "placeholder": {
@@ -3087,7 +3087,7 @@
     "intro": {
       "title": "Intro"
     },
-    "lockedPublic": "Always public — shown to everyone.",
+    "lockedPublic": "Always public, shown to everyone.",
     "page": {
       "empty": {
         "message": "We couldn't load your profile. Please try again.",
@@ -3164,7 +3164,7 @@
       },
       "outgoing": {
         "title": "Your pending requests ({count})",
-        "waiting": "— waiting for response"
+        "waiting": "Waiting for response"
       },
       "toast": {
         "acceptFailed": "Failed to accept request",
@@ -3187,7 +3187,7 @@
       },
       "custom": "custom",
       "customTooltip": "You've changed this from the default",
-      "emailToggleAria": "{category} — email",
+      "emailToggleAria": "{category}: email",
       "resetAll": "Reset all to default",
       "subtitle": "You'll always see these in the bell. Choose which categories also send you an email.",
       "title": "Notification preferences",
@@ -3209,7 +3209,7 @@
         "message": "When you block someone from a conversation, they'll appear here so you can unblock them later if you change your mind.",
         "title": "No blocked users"
       },
-      "lead": "People you block can't send you messages, see your conversation history with them, or appear in your message list. Unblocking only restores their ability to contact you — old messages stay removed from your inbox.",
+      "lead": "People you block can't send you messages, see your conversation history with them, or appear in your message list. Unblocking only restores their ability to contact you. Old messages stay removed from your inbox.",
       "title": "Blocked users",
       "toast": {
         "loadFailed": "Could not load blocked users",
@@ -3240,7 +3240,13 @@
         "before": "Day 1 of the program lands on"
       },
       "submit": "Assign program",
-      "title": "Assign program"
+      "title": "Assign program",
+      "trainingDays": "Training days",
+      "dayHint": {
+        "unchosen": "This program trains {count, plural, one {# day} other {# days}} a week. Leave empty to count forward from the start date.",
+        "remaining": "Pick {count, plural, one {# more day} other {# more days}}.",
+        "done": "Each training day moves to the weekday you picked, in order."
+      }
     },
     "common": {
       "approxMinutes": "~{minutes}m",
@@ -3251,7 +3257,7 @@
     "confirm": {
       "archiveProgram": {
         "header": "Archive program?",
-        "message": "\"{name}\" will be hidden from your active list. Existing client assignments keep their copy — you just won't be able to assign it to new clients until you restore it."
+        "message": "\"{name}\" will be hidden from your active list. Existing client assignments keep their copy, but you won't be able to assign it to new clients until you restore it."
       },
       "clientCopiesNote": "Client copies of already-assigned programs keep their data.",
       "deleteProgram": {
@@ -3270,13 +3276,17 @@
       },
       "removeSet": {
         "header": "Remove set?",
-        "message": "Remove set {number}? This can't be undone — but client copies of already-assigned programs keep their data."
+        "message": "Remove set {number}? This can't be undone, but client copies of already-assigned programs keep their data."
+      },
+      "deleteWeek": {
+        "header": "Delete week {week}?",
+        "message": "{days, plural, =0 {This week is empty.} one {Its # workout is removed.} other {Its # workouts are removed.}} The weeks after it move up, and the program becomes {weeks, plural, one {# week} other {# weeks}} long."
       }
     },
     "copyDay": {
       "clash": "{count, plural, one {One of those weeks already has training on {day}. It will be replaced.} other {# of those weeks already have training on {day}. They will be replaced.}}",
       "intro": {
-        "after": "— exercises and prescribed sets included — into other weeks. The rest of those weeks is left alone.",
+        "after": "with its exercises and prescribed sets into other weeks. The rest of those weeks is left alone.",
         "before": "Copy"
       },
       "landOn": "Land it on",
@@ -3290,9 +3300,9 @@
       "weeksPlaceholder": "Pick one or more weeks"
     },
     "copyWeek": {
-      "empty": "Week {week} is empty — nothing to overwrite.",
+      "empty": "Week {week} is empty, so there's nothing to overwrite.",
       "intro": {
-        "after": "— exercises and prescribed sets included — into another week.",
+        "after": "with their exercises and prescribed sets into another week.",
         "before": "Copy every workout of"
       },
       "occupied": "Week {week} already has {count, plural, one {# workout} other {# workouts}}. They will be replaced.",
@@ -3371,7 +3381,7 @@
     },
     "form": {
       "day": "Day",
-      "optional": "— optional",
+      "optional": "(optional)",
       "week": "Week"
     },
     "list": {
@@ -3379,7 +3389,7 @@
       "create": "Create program",
       "empty": {
         "all": {
-          "message": "Programs are how you author your coaching plans — workouts, exercises, and sets your clients follow. Create your first one to get started.",
+          "message": "Programs are how you author your coaching plans: workouts, exercises, and sets your clients follow. Create your first one to get started.",
           "title": "No programs yet"
         },
         "archived": {
@@ -3421,7 +3431,7 @@
       "destination": "Destination workout",
       "destinationPlaceholder": "Pick a workout",
       "exerciseFallback": "Exercise",
-      "exerciseHint": "The exercise lands at the end of the destination workout — fine-tune with the Move… menu afterwards.",
+      "exerciseHint": "The exercise lands at the end of the destination workout. Fine-tune with the Move… menu afterwards.",
       "move": "Move",
       "titleExercise": "Move exercise",
       "titleWorkout": "Move workout",
@@ -3429,7 +3439,7 @@
         "after": "go?",
         "before": "Where should"
       },
-      "workoutOption": "Week {week} · {day} — {name}"
+      "workoutOption": "Week {week} · {day} · {name}"
     },
     "periodization": {
       "block": "Block",
@@ -3460,40 +3470,49 @@
     "programForm": {
       "createNote": "After creating the program shell, you'll add weeks, workouts, and exercises from the program detail page.",
       "descriptionPlaceholder": "What this program covers, who it's for, how often it should be done…",
-      "durationHint": "— {unit, select, weeks {weeks} other {days}}, optional",
+      "durationHint": "({unit, select, weeks {weeks} other {days}}, optional)",
       "goalTags": "Goal tags",
-      "goalTagsError": "Up to {max} tags allowed — you have {count}.",
-      "goalTagsHint": "— comma-separated, up to {max}",
+      "goalTagsError": "Up to {max} tags allowed. You have {count}.",
+      "goalTagsHint": "(comma-separated, up to {max})",
       "goalTagsPlaceholder": "e.g. hypertrophy, fat loss, beginner",
       "kind": "Kind",
       "nameMinLength": "Name must be at least {min} characters.",
-      "namePlaceholder": "e.g. Strength foundations — 8 weeks",
+      "namePlaceholder": "e.g. Strength foundations (8 weeks)",
       "nameRequired": "Name is required.",
       "periodization": "Periodization",
       "statusOption": {
-        "ARCHIVED": "Archived — hidden, not deleted",
-        "DRAFT": "Draft — only you can see it",
-        "PUBLISHED": "Published — ready to assign"
+        "ARCHIVED": "Archived (hidden, not deleted)",
+        "DRAFT": "Draft (only you can see it)",
+        "PUBLISHED": "Published (ready to assign)"
       },
       "titleEdit": "Edit program",
       "titleNew": "New program",
       "unit": {
         "days": "Days",
         "weeks": "Weeks"
-      }
+      },
+      "newWeeks": {
+        "question": "{empty, plural, one {Week {first} has no training yet} other {Weeks {first} to {last} have no training yet}}",
+        "copy": "{built, plural, one {Copy the training from week 1 into {empty, plural, one {it} other {them}}} =2 {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 and 2} other {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 to {built}}}",
+        "leaveEmpty": "{empty, plural, one {Leave it empty for now} other {Leave them empty for now}}",
+        "required": "Choose one to save the new length."
+      },
+      "shrinkWarning": "{count, plural, one {# day falls} other {# days fall}} outside this length and will be deleted."
     },
     "rail": {
       "addWorkout": "Add workout",
       "addWorkoutAnotherWeek": "Add workout in another week",
       "addWorkoutToWeek": "Add workout to week {week}",
       "copyWeek": "Copy this week",
-      "copyWeekAria": "Copy week {week} into another week",
       "dragWeek": "Drag to reorder week",
       "exerciseCountShort": "{count} ex",
       "noMatches": "No workouts match “{query}”.",
       "noWorkouts": "No workouts yet.",
       "outline": "Program outline",
-      "searchPlaceholder": "Search this program"
+      "searchPlaceholder": "Search this program",
+      "deleteWeek": "Delete this week",
+      "weekActions": "Week actions",
+      "weekActionsAria": "Actions for week {week}"
     },
     "setForm": {
       "advanced": "Advanced (intensity, time, distance, tempo)",
@@ -3508,11 +3527,11 @@
       "repsRangeError": "Min reps can't exceed max reps.",
       "restAfter": "Rest after (s)",
       "rir": "RIR",
-      "rpe": "RPE (1–10)",
+      "rpe": "RPE (1-10)",
       "setType": "Set type",
       "submitAdd": "{count, plural, one {Add set} other {Add # sets}}",
       "tempo": "Tempo",
-      "tempoHint": "— e.g. 3-1-1-0",
+      "tempoHint": "(e.g. 3-1-1-0)",
       "tempoPattern": "Tempo must be four dash-separated digits, e.g. 3-1-1-0.",
       "tempoPlaceholder": "e.g. 3-1-1-0",
       "titleAdd": "Add set",
@@ -3523,14 +3542,14 @@
       "meters": "{value}m",
       "percent1rm": "{value}% 1RM",
       "repsPlus": "{min}+ reps",
-      "repsRange": "{min}–{max} reps",
+      "repsRange": "{min}-{max} reps",
       "rir": "{value} RIR",
       "rpe": "RPE {value}",
       "weightKg": "{value} kg"
     },
     "toast": {
       "addExercisesError": {
-        "partial": "{count} added before the error — the rest are still selected.",
+        "partial": "{count} added before the error. The rest are still selected.",
         "summary": "Couldn't add all exercises"
       },
       "addSetsError": "Couldn't add all sets",
@@ -3579,11 +3598,11 @@
       "moveExerciseError": "Couldn't move exercise",
       "moveWorkoutError": "Couldn't move workout",
       "programCreated": {
-        "detail": "{name} is ready — add workouts to it next.",
+        "detail": "{name} is ready. Add workouts to it next.",
         "summary": "Program created"
       },
       "programDuplicated": {
-        "detail": "Opened the copy — the original is unchanged.",
+        "detail": "Opened the copy. The original is unchanged.",
         "error": "Couldn't duplicate the program",
         "summary": "Program duplicated"
       },
@@ -3618,12 +3637,15 @@
         "detail": "{name} → week {week}, day {day}.",
         "summary": "Workout moved"
       },
-      "workoutUpdated": "Workout updated"
+      "workoutUpdated": "Workout updated",
+      "weekDeleted": "Week {week} deleted",
+      "deleteWeekError": "Couldn't delete the week",
+      "repeatWeeksError": "Saved, but the weeks couldn't be repeated"
     },
     "workoutForm": {
-      "minutesSuffix": "— min",
+      "minutesSuffix": "(min)",
       "name": "Workout name",
-      "namePlaceholder": "e.g. Day 1 — Upper",
+      "namePlaceholder": "e.g. Day 1: Upper",
       "nameRequired": "Workout name is required.",
       "notesPlaceholder": "Coaching cues, warm-up notes, intent of the session…",
       "phase": "Phase",
@@ -3636,7 +3658,7 @@
   "publicProfile": {
     "about": {
       "certifications": "Certifications",
-      "empty": "No bio yet — check back soon.",
+      "empty": "No bio yet. Check back soon.",
       "specializeIn": "I specialize in",
       "title": "About",
       "venueKind": {
@@ -3702,7 +3724,7 @@
       "privacy": "Privacy",
       "privacyNote": "{name} only sees your name, email and message.",
       "send": "Send message",
-      "subtitle": "No account needed — your message lands straight in {name}'s inbox.",
+      "subtitle": "No account needed. Your message lands straight in {name}'s inbox.",
       "toast": {
         "sentDetail": "{name} will get back to you. We've sent a copy to your email.",
         "sentSummary": "Message sent"
@@ -3803,7 +3825,7 @@
   },
   "sessions": {
     "approvals": {
-      "empty": "You're all caught up — no pending approvals.",
+      "empty": "You're all caught up. No pending approvals.",
       "intro": "Approvals inbox shows sessions waiting on your decision. Click a row to open the session and approve / decline each participant.",
       "refresh": "Refresh",
       "title": "Approvals"
@@ -3820,7 +3842,7 @@
       "day": "Day",
       "emptyWeek": "No sessions this week.",
       "filtersAria": "Calendar filters",
-      "loadError": "Couldn't load calendar — {error}",
+      "loadError": "Couldn't load calendar: {error}",
       "month": "Month",
       "monthSheetSubtitle": "Pick a day to jump to",
       "pickMonth": "Pick month",
@@ -3845,7 +3867,7 @@
         "thisAndFuture": "Cancel this session and every later occurrence."
       },
       "messageLabel": "Message to attendees (optional)",
-      "messagePlaceholder": "Sorry — I'm feeling unwell. I'll reschedule next week.",
+      "messagePlaceholder": "Sorry, I'm feeling unwell. I'll reschedule next week.",
       "noParticipants": "No participants are currently booked.",
       "participantsNotified": "participant(s) will be notified.",
       "reasonLabel": "Reason (internal, optional)",
@@ -3885,7 +3907,7 @@
       "loading": "Loading conflicting sessions…",
       "meta": "{confirmed} confirmed · {pending} pending",
       "partial": {
-        "detail": "{count} session(s) couldn’t be loaded — they may have already been cancelled or moved.",
+        "detail": "{count} session(s) couldn’t be loaded. They may have already been cancelled or moved.",
         "summary": "Some conflicts already resolved"
       },
       "pastDate": {
@@ -3932,29 +3954,29 @@
       "messageLabel": "Message",
       "placeholder": {
         "post": "Thanks for joining! Here’s the recording link…",
-        "pre": "Running 10 min late — apologies! See you soon."
+        "pre": "Running 10 min late, apologies! See you soon."
       },
       "quickTemplates": "Quick templates",
       "recipientsNotified": "{count} recipient(s) notified.",
       "template": {
         "homework": {
-          "body": "Here's what to practise before our next session — three sets of the breath work we covered, daily if you can.",
+          "body": "Here's what to practise before our next session: three sets of the breath work we covered, daily if you can.",
           "label": "Homework"
         },
         "nextReminder": {
-          "body": "Our next session is on the books — don't forget to book in if it's a public class.",
+          "body": "Our next session is on the books. Don't forget to book in if it's a public class.",
           "label": "Next reminder"
         },
         "runningLate": {
-          "body": "Heads up — I'm running about 10 minutes behind. We'll start as soon as I'm there. Thanks for your patience!",
+          "body": "Heads up, I'm running about 10 minutes behind. We'll start as soon as I'm there. Thanks for your patience!",
           "label": "Running late"
         },
         "thankYou": {
-          "body": "Thanks for joining today — great work in there. Let me know how your body feels tomorrow.",
+          "body": "Thanks for joining today. Great work in there. Let me know how your body feels tomorrow.",
           "label": "Thank you"
         },
         "venueUpdate": {
-          "body": "Quick update on where we're meeting — same time, but a slightly different spot. I'll share the new address shortly.",
+          "body": "Quick update on where we're meeting: same time, but a slightly different spot. I'll share the new address shortly.",
           "label": "Venue update"
         },
         "whatToBring": {
@@ -3990,12 +4012,12 @@
         "create": "Create session",
         "edit": "Edit session"
       },
-      "titlePlaceholder": "e.g. Vinyasa flow — Tuesday morning",
+      "titlePlaceholder": "e.g. Tuesday morning Vinyasa flow",
       "toast": {
-        "conflicts": "{count} occurrence(s) had conflicts — review in the calendar.",
+        "conflicts": "{count} occurrence(s) had conflicts. Review them in the calendar.",
         "created": "Session created",
         "duration": {
-          "detail": "Duration must be 5–480 minutes.",
+          "detail": "Duration must be between 5 and 480 minutes.",
           "summary": "Duration"
         },
         "groupRequired": {
@@ -4059,7 +4081,7 @@
         },
         "default": {
           "action": "Create your first session",
-          "message": "Sessions let you schedule training and showcase your availability. People can see your public sessions on your profile — even if they're not signed up to MotionHive yet.",
+          "message": "Sessions let you schedule training and showcase your availability. People can see your public sessions on your profile, even if they're not signed up to MotionHive yet.",
           "title": "No sessions yet"
         },
         "past": {
@@ -4074,9 +4096,9 @@
         }
       },
       "endOfList": {
-        "cancelled": "That's everything — {count} cancelled total.",
-        "sessions": "That's everything — {count, plural, one {# session} other {# sessions}} total.",
-        "total": "That's everything — {count} total."
+        "cancelled": "That's everything: {count} cancelled total.",
+        "sessions": "That's everything: {count, plural, one {# session} other {# sessions}} total.",
+        "total": "That's everything: {count} total."
       },
       "filters": {
         "quick": "Quick filters"
@@ -4120,7 +4142,7 @@
     },
     "quickCreate": {
       "ariaLabel": "Quick create session",
-      "eyebrow": "{start} – {end} · {minutes} min",
+      "eyebrow": "{start}-{end} · {minutes} min",
       "openFullForm": "Open full form",
       "titlePlaceholder": "Session title"
     },
@@ -4175,7 +4197,7 @@
       },
       "past": "Past",
       "regenerate": {
-        "introAfter": "— past occurrences stay untouched.",
+        "introAfter": "without touching past occurrences.",
         "introBefore": "Append more occurrences after",
         "title": "Regenerate forward"
       },
@@ -4261,7 +4283,7 @@
         "title": "No workouts yet"
       },
       "emptySearchTitle": "No workouts match that",
-      "endOfList": "That's everything — {count, plural, one {# workout} other {# workouts}} total.",
+      "endOfList": "That's everything: {count, plural, one {# workout} other {# workouts}} total.",
       "loadFailed": "Couldn't load your history",
       "searchAria": "Search workouts",
       "searchPlaceholder": "Search your workouts…"
@@ -4290,10 +4312,10 @@
         "title": "No plans yet"
       },
       "emptySearchTitle": "No plans match your search",
-      "endOfList": "That's everything — {count, plural, one {# plan} other {# plans}} total.",
+      "endOfList": "That's everything: {count, plural, one {# plan} other {# plans}} total.",
       "help": {
         "aria": "What is the difference between a plan and a routine?",
-        "tooltip": "A routine is one workout you saved, ready whenever you are. A plan is training with dates on it — either what a coach set for you, or a routine of yours set to repeat."
+        "tooltip": "A routine is one workout you saved, ready whenever you are. A plan is training with dates on it: either what a coach set for you, or a routine of yours set to repeat."
       },
       "loadFailed": "Couldn't load your plans",
       "searchAria": "Search plans",
@@ -4338,14 +4360,14 @@
       "skipWorkout": "Skip workout",
       "status": {
         "active": {
-          "message": "Keep going — pick up your next workout.",
+          "message": "Keep going, pick up your next workout.",
           "title": "Plan in progress"
         },
         "cancelled": {
           "message": "This plan is no longer active."
         },
         "completed": {
-          "message": "Nice work — every workout is done.",
+          "message": "Nice work, every workout is done.",
           "title": "Plan complete"
         },
         "paused": {
@@ -4353,7 +4375,7 @@
           "title": "Paused by your coach"
         },
         "pending": {
-          "message": "You can start early — dates are guidance, not gates."
+          "message": "You can start early. Dates are guidance, not gates."
         }
       },
       "table": {
@@ -4366,7 +4388,7 @@
         "percent1rm": "{percent}% 1RM",
         "reps": "{count, plural, one {# rep} other {# reps}}",
         "repsMin": "{min}+ reps",
-        "repsRange": "{min}–{max} reps",
+        "repsRange": "{min}-{max} reps",
         "rir": "@ RIR {value}",
         "rpe": "@ RPE {value}",
         "seconds": "{seconds}s",
@@ -4377,7 +4399,7 @@
           "summary": "Couldn't load your plan"
         },
         "nothingToReplay": {
-          "detail": "\"{name}\" was skipped — no session was logged.",
+          "detail": "\"{name}\" was skipped, so no session was logged.",
           "summary": "Nothing to replay"
         },
         "openFailed": {
@@ -4555,7 +4577,7 @@
       "meetingProvider": "Meeting provider",
       "meetingProviderPlaceholder": "Choose a provider",
       "meetingUrl": "Meeting URL",
-      "namePlaceholder": "e.g. FitZone Cluj — Downtown",
+      "namePlaceholder": "e.g. FitZone Cluj Downtown",
       "notesPlaceholder": "Meet at the main entrance…",
       "providerOther": "Other",
       "travelRadius": "Travel radius (km)",
