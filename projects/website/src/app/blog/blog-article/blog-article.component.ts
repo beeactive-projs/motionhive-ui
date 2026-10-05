@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   ElementRef,
   inject,
@@ -9,7 +10,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DOCUMENT, DatePipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, of, shareReplay, switchMap } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { ButtonDirective } from 'primeng/button';
@@ -48,7 +49,6 @@ import { SITE_ORIGIN } from '../../_shared/site.const';
 })
 export class BlogArticleComponent {
   private readonly _blogService = inject(BlogService);
-  private readonly _router = inject(Router);
   private readonly _seo = inject(SeoService);
   private readonly _document = inject(DOCUMENT);
 
@@ -60,22 +60,28 @@ export class BlogArticleComponent {
     .toLowerCase()
     .startsWith('ro');
 
+  /** The post for the current slug, or `null` when it can't be loaded. */
   private readonly _post$ = inject(ActivatedRoute).paramMap.pipe(
     map((p) => p.get('slug') ?? ''),
     filter((slug) => slug.length > 0),
     switchMap((slug) =>
-      this._blogService.getBySlug(slug).pipe(
-        catchError(() => {
-          this._router.navigate(['/blog']);
-          return of(null as BlogPost | null);
-        }),
-      ),
+      this._blogService.getBySlug(slug).pipe(catchError(() => of(null as BlogPost | null))),
     ),
     shareReplay(1),
   );
 
-  readonly post = toSignal<BlogPost | null>(this._post$, { initialValue: null });
-  readonly isLoading = computed(() => this.post() === null);
+  /** `undefined` while loading. */
+  private readonly _result = toSignal<BlogPost | null | undefined>(this._post$, {
+    initialValue: undefined,
+  });
+  readonly post = computed(() => this._result() ?? null);
+  readonly isLoading = computed(() => this._result() === undefined);
+  /**
+   * Shown in place (no redirect to /blog) so the page answers as a
+   * not-found page. Vercel serves unknown slugs with a 404 status (see
+   * vercel.json); this view adds noindex for the client side.
+   */
+  readonly notFound = computed(() => this._result() === null);
 
   /** Content HTML enriched with heading anchor ids, plus the TOC headings. */
   private readonly _enriched = computed(() => enrichArticleContent(this.post()?.content));
@@ -109,6 +115,19 @@ export class BlogArticleComponent {
   );
 
   constructor() {
+    effect(() => {
+      if (this.isLoading()) return;
+      const found = !this.notFound();
+      this._seo.setIndexable(found);
+      if (!found) {
+        this._seo.set({
+          title: $localize`:@@blog.article.notFound.pageTitle:Article not found | MotionHive`,
+          description: $localize`:@@blog.article.notFound.metaDescription:This article doesn't exist or is no longer available.`,
+        });
+      }
+    });
+    inject(DestroyRef).onDestroy(() => this._seo.setIndexable(true));
+
     // Per-article SEO/social tags + JSON-LD. Runs when the post resolves;
     // during prerender that's before serialization (SSR waits for the
     // fetch), so the article's own metadata + structured data bake into
