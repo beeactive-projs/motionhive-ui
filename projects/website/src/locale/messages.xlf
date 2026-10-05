@@ -2118,6 +2118,34 @@
           <context context-type="linenumber">123,125</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="blog.article.notFound.title" datatype="html">
+        <source> Article not found </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">131,135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.notFound.body" datatype="html">
+        <source> This article doesn&apos;t exist or is no longer available. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">136,138</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.notFound.pageTitle" datatype="html">
+        <source>Article not found | MotionHive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.notFound.metaDescription" datatype="html">
+        <source>This article doesn&apos;t exist or is no longer available.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="blog.byline.editorialBio" datatype="html">
         <source>The MotionHive team, writing about coaching, training, and building a business around helping people move.</source>
         <context-group purpose="location">

@@ -1,28 +1,37 @@
 {
-  "redirects": [
+  "routes": [
     {
-      "source": "/en",
-      "destination": "/",
-      "permanent": true
+      "src": "^/en/?$",
+      "status": 308,
+      "headers": { "Location": "/" }
     },
     {
-      "source": "/en/:path*",
-      "destination": "/:path*",
-      "permanent": true
-    }
-  ],
-  "rewrites": [
+      "src": "^/en/(.*)$",
+      "status": 308,
+      "headers": { "Location": "/$1" }
+    },
+    { "handle": "filesystem" },
     {
-      "source": "/blog/sitemap.xml",
-      "destination": "https://motionhive-api-production.up.railway.app/blog/sitemap.xml"
+      "src": "^/blog/sitemap\\.xml$",
+      "dest": "https://motionhive-api-production.up.railway.app/blog/sitemap.xml"
     },
     {
-      "source": "/ro/:path*",
-      "destination": "/ro/index.html"
+      "src": "^/ro/blog/[^/]+/?$",
+      "status": 404,
+      "dest": "/ro/index.csr.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "^/blog/[^/]+/?$",
+      "status": 404,
+      "dest": "/index.csr.html"
+    },
+    {
+      "src": "^/ro(/.*)?$",
+      "dest": "/ro/index.html"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/index.html"
     }
   ]
 }

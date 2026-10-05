@@ -26,6 +26,9 @@ function currentLocale(): string {
   return (l ?? 'en').split('-')[0];
 }
 
+/** A slug that forms one clean path segment: no whitespace, `/`, `?`, `#`. */
+const BLOG_SLUG_PATTERN = /^[^\s/?#\\]+$/;
+
 /**
  * Fetch the published blog slugs FOR THE BUILD'S LOCALE so each article gets its
  * own prerendered page in the right language.
@@ -53,7 +56,16 @@ async function fetchPublishedBlogSlugs(): Promise<string[]> {
       const body = (await res.json()) as { items?: Array<{ slug?: string }> };
       const items = body.items ?? [];
       for (const item of items) {
-        if (item.slug) slugs.push(item.slug);
+        if (!item.slug) continue;
+        // Same rule as the API sitemap: only a slug that already is one clean
+        // path segment gets a page. A legacy slug stored with a leading space
+        // would otherwise prerender to `blog/ <slug>/`, a URL nobody links to.
+        if (!BLOG_SLUG_PATTERN.test(item.slug)) {
+          // eslint-disable-next-line no-console
+          console.warn(`[prerender] Skipping blog slug ${JSON.stringify(item.slug)}.`);
+          continue;
+        }
+        slugs.push(item.slug);
       }
       if (items.length < limit) break;
     }
@@ -80,8 +92,10 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: 'blog/:slug',
     renderMode: RenderMode.Prerender,
-    // A slug published after this build (not in the prerendered set) still
-    // renders client-side instead of returning a 404.
+    // Emits `index.csr.html` (per locale). On Vercel, a slug with no
+    // prerendered page gets that shell with a 404 status (see vercel.json):
+    // an unknown slug shows "Article not found", and a post published since
+    // this build still renders until the deploy hook's rebuild lands.
     fallback: PrerenderFallback.Client,
     async getPrerenderParams() {
       const slugs = await fetchPublishedBlogSlugs();

@@ -76,6 +76,16 @@ export class SeoService {
   }
 
   /**
+   * Toggle the `robots` meta (`index, follow` in index.html). A page that
+   * can't show its content (e.g. an article that doesn't exist) passes
+   * `false`, and must pass `true` again on leaving, since the tag outlives
+   * client navigation.
+   */
+  setIndexable(indexable: boolean): void {
+    this._meta.updateTag({ name: 'robots', content: indexable ? 'index, follow' : 'noindex' });
+  }
+
+  /**
    * Upsert a JSON-LD `<script>` in `<head>`, keyed by `id` so a
    * client-side navigation replaces rather than stacks it. Runs during
    * prerender (plain element creation, no innerHTML) so the structured
