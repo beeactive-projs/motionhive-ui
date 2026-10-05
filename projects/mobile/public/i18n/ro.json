@@ -1523,7 +1523,7 @@
     "routine": "Rutină",
     "session": "Sesiune",
     "signIn": "Autentificare",
-    "starterRoutines": "Rutine gata făcute",
+    "starterRoutines": "Antrenamente predefinite",
     "training": "Antrenamente",
     "verifyEmail": "Verifică emailul",
     "workout": "Antrenament",
@@ -2312,7 +2312,7 @@
       "progress": "Progres",
       "startFailed": "Nu am putut începe antrenamentul",
       "startWorkout": "Începe antrenamentul",
-      "starterRoutines": "Rutine de start",
+      "starterRoutines": "Antrenamente predefinite",
       "upNext": "Urmează",
       "workout": "Antrenament"
     },
@@ -2356,8 +2356,8 @@
     },
     "home": {
       "coldStart": {
-        "action": "Începe un antrenament gol",
-        "browseStarters": "Vezi rutinele de start",
+        "action": "Începe un antrenament nou",
+        "browseStarters": "Vezi antrenamentele predefinite",
         "buildOwn": "Sau creează-ți propria rutină",
         "message": "Antrenamentele pe care le începi, le salvezi sau le urmezi vor apărea aici.",
         "title": "Hai să ne mișcăm"
@@ -2366,7 +2366,7 @@
       "inProgress": "În desfășurare · {elapsed}",
       "noRoutines": "Salvează un antrenament ca rutină și va apărea aici, gata de repetat.",
       "percentDone": "{percent}% gata",
-      "startEmpty": "Începe un antrenament gol",
+      "startEmpty": "Începe un antrenament nou",
       "yourCoach": "Antrenorul tău",
       "yourRoutines": "Rutinele tale"
     },
@@ -2384,7 +2384,7 @@
       "plan": "Nu am putut deschide planul",
       "progress": "Nu am putut încărca progresul",
       "routine": "Nu am putut deschide rutina",
-      "starters": "Nu am putut încărca rutinele de start",
+      "starters": "Nu am putut încărca antrenamentele predefinite",
       "training": "Nu am putut încărca antrenamentele",
       "workout": "Nu am putut deschide antrenamentul"
     },
@@ -2531,7 +2531,7 @@
     },
     "routineRow": {
       "lastDone": "Ultima dată: {day}",
-      "starter": "Predefinită"
+      "starter": "Predefinit"
     },
     "setRow": {
       "cellLabel": "{field, select, weight {greutate} reps {repetări} duration {durată} distance {distanță} other {{field}}} pentru seria {number}",
@@ -2546,8 +2546,8 @@
     },
     "starters": {
       "empty": {
-        "message": "Rutinele de start MotionHive nu sunt disponibile acum. Încearcă din nou puțin mai târziu.",
-        "title": "Nicio rutină de start încă"
+        "message": "Antrenamentele predefinite MotionHive nu sunt disponibile acum. Încearcă din nou puțin mai târziu.",
+        "title": "Niciun antrenament predefinit încă"
       },
       "note": "Alege una de încercat. Devine a ta și o poți edita."
     },

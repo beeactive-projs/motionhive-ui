@@ -2,4 +2,3 @@ User-agent: *
 Disallow: /app/
 Disallow: /auth/
 Sitemap: https://www.motionhive.fit/sitemap.xml
-Sitemap: https://motionhive-api-production.up.railway.app/blog/sitemap.xml
