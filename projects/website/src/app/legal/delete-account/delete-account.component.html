@@ -1,0 +1,212 @@
+<section class="hero-section">
+  <div class="max-w-7xl text-center px-4 sm:px-6 lg:px-8">
+    <div class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/15 text-red-500 mb-4">
+      <i class="pi pi-trash text-sm"></i>
+      <span class="text-sm font-semibold" i18n="@@deleteAccount.pill">Your data</span>
+    </div>
+    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
+      i18n="@@deleteAccount.h1">
+      Delete your MotionHive account.
+    </h1>
+
+    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto"
+      i18n="@@deleteAccount.lastUpdated">
+      Last updated: {{ lastUpdated() | date: 'longDate' }}.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Intro -->
+    <section class="legal-section">
+      <p class="legal-body" i18n="@@deleteAccount.intro">
+        This page explains how to delete your MotionHive account, run by HIVECRAFT S.R.L., and what happens to your
+        information afterwards. It covers both deleting your whole account and deleting only part of your data while
+        keeping the account. MotionHive is the app published on Google Play and the App Store, and the website at
+        <a href="https://motionhive.fit" class="text-brand hover:underline">https://motionhive.fit</a>.
+      </p>
+    </section>
+
+    <!-- How to delete the whole account -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s1.h2">1. Delete your account</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s1.p1">
+        Send an email to
+        <a href="mailto:contact@motionhive.fit?subject=Delete%20my%20account"
+          class="text-brand hover:underline">contact&#64;motionhive.fit</a>
+        from the address you use to sign in, with the subject "Delete my account".
+      </p>
+
+      <p class="legal-body" i18n="@@deleteAccount.s1.p2">
+        Writing from your own sign-in address is how we confirm the request is really yours. If you signed up with
+        Google or Facebook, use the email address attached to that account. If you can no longer access that mailbox,
+        write to us anyway and we will ask you for another way to prove the account is yours.
+      </p>
+
+      <p class="legal-body" i18n="@@deleteAccount.s1.p3">
+        We confirm by email when we receive your request, and again once the deletion is done. You do not need to give a
+        reason, and we will not try to talk you out of it.
+      </p>
+    </section>
+
+    <!-- Timeline -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s2.h2">2. How long it takes</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s2.p1">
+        We deactivate your account within 72 hours of confirming your request, so you stop appearing to other people
+        straight away. We then permanently erase your personal information within 30 days.
+      </p>
+
+      <p class="legal-body" i18n="@@deleteAccount.s2.p2">
+        Backups are kept on a rolling schedule and are overwritten within 90 days. Until a backup rolls over, your
+        information may still exist inside it, isolated and not used for anything.
+      </p>
+    </section>
+
+    <!-- What is deleted -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s3.h2">3. What gets deleted</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s3.p1">
+        Everything below is permanently erased:
+      </p>
+
+      <ul class="legal-body">
+        <li i18n="@@deleteAccount.s3.li1">Your account: name, email address, password, phone number, city and country,
+          profile photo and profile handle.</li>
+        <li i18n="@@deleteAccount.s3.li2">Any Google, Facebook or Apple sign-in linked to your account.</li>
+        <li i18n="@@deleteAccount.s3.li3">Your coach profile, if you have one: biography, specialisations, experience,
+          social links and venues.</li>
+        <li i18n="@@deleteAccount.s3.li4">Your workout history: logged workouts, sets, personal records and any notes you
+          wrote.</li>
+        <li i18n="@@deleteAccount.s3.li5">Training programs and routines you created, and programs assigned to you.</li>
+        <li i18n="@@deleteAccount.s3.li6">Your group memberships, posts and comments, and your session bookings.</li>
+        <li i18n="@@deleteAccount.s3.li7">Your messages, and your relationships with coaches or clients.</li>
+        <li i18n="@@deleteAccount.s3.li8">Your saved payment details. These are held by Stripe, not by us, and we ask
+          Stripe to delete them too.</li>
+      </ul>
+    </section>
+
+    <!-- What is kept -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s4.h2">4. What we have to keep, and for how long</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s4.p1">
+        Romanian law requires us to keep some records even after you leave. We keep only these, we do not use them for
+        anything else, and they are deleted when the period below ends.
+      </p>
+
+      <div class="legal-table-wrap">
+        <table class="legal-table">
+          <thead>
+            <tr>
+              <th i18n="@@deleteAccount.s4.th1">What</th>
+              <th i18n="@@deleteAccount.s4.th2">How long</th>
+              <th i18n="@@deleteAccount.s4.th3">Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td i18n="@@deleteAccount.s4.r1c1">Invoices and payment records, including the name and amount on them
+              </td>
+              <td i18n="@@deleteAccount.s4.r1c2">5 years</td>
+              <td i18n="@@deleteAccount.s4.r1c3">Romanian accounting and tax law</td>
+            </tr>
+            <tr>
+              <td i18n="@@deleteAccount.s4.r2c1">A record that your account was deleted, and when</td>
+              <td i18n="@@deleteAccount.s4.r2c2">3 years</td>
+              <td i18n="@@deleteAccount.s4.r2c3">Proof that we honoured your request</td>
+            </tr>
+            <tr>
+              <td i18n="@@deleteAccount.s4.r3c1">Records tied to an open dispute, chargeback or legal claim</td>
+              <td i18n="@@deleteAccount.s4.r3c2">Until it is resolved</td>
+              <td i18n="@@deleteAccount.s4.r3c3">Defending or settling the claim</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="legal-body mt-3" i18n="@@deleteAccount.s4.p2">
+        Content you posted in a group stays visible to that group, but it is anonymised: your name and photo are
+        removed, so it is no longer linked to you. If you want a specific post or comment removed as well, say so in
+        your email and we will delete it.
+      </p>
+    </section>
+
+    <!-- Partial deletion -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s5.h2">5. Delete some of your data, keep your account</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s5.p1">
+        You do not have to delete your whole account to remove information. Email
+        <a href="mailto:contact@motionhive.fit?subject=Delete%20some%20of%20my%20data"
+          class="text-brand hover:underline">contact&#64;motionhive.fit</a>
+        and tell us what you want removed. The same 30-day timeline applies.
+      </p>
+
+      <p class="legal-body" i18n="@@deleteAccount.s5.p2">
+        People most often ask us to delete their workout history, their posts and comments, their messages, their coach
+        profile while keeping the account, or their profile photo. Anything else you can name, we will look at.
+      </p>
+
+      <p class="legal-body" i18n="@@deleteAccount.s5.p3">
+        You can also edit or remove most of this yourself inside the app, under your profile, without writing to us at
+        all.
+      </p>
+    </section>
+
+    <!-- Get a copy first -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s6.h2">6. Get a copy before you go</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s6.p1">
+        Deletion cannot be undone, and we cannot bring your training history back afterwards. If you want to keep it,
+        ask us for a copy of your data in the same email and we will send it to you before anything is deleted.
+      </p>
+    </section>
+
+    <!-- Rights -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@deleteAccount.s7.h2">7. If something goes wrong</h2>
+
+      <p class="legal-body" i18n="@@deleteAccount.s7.p1">
+        If we have not replied within 30 days, or you are not happy with how we handled your request, you can complain
+        to the Romanian data protection authority, ANSPDCP, at
+        <a href="https://www.dataprotection.ro" rel="noopener" target="_blank"
+          class="text-brand hover:underline">dataprotection.ro</a>.
+      </p>
+
+      <p class="legal-body" i18n="@@deleteAccount.s7.p2">
+        Our contact details: HIVECRAFT S.R.L., Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58, Cluj-Napoca, Cluj 400482,
+        Romania. Email
+        <a href="mailto:contact@motionhive.fit" class="text-brand hover:underline">contact&#64;motionhive.fit</a>.
+      </p>
+    </section>
+
+  </div>
+</section>
+
+<section class="footer-section py-7 sm:py-10">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-sm" i18n="@@deleteAccount.footer.also">
+        Also read our
+        <a routerLink="/legal/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</a>
+      </div>
+      <div class="flex gap-3">
+        <button pButton type="button" outlined routerLink="/">
+          <i class="pi pi-home"></i>
+          <span i18n="@@legal.footer.goToHome">Go to Home</span>
+        </button>
+        <button pButton type="button" (click)="scrollToTop()">
+          <i class="pi pi-arrow-up"></i>
+          <span i18n="@@legal.footer.scrollToTop">Scroll to Top</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
