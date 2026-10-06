@@ -39,6 +39,7 @@ export class PublicFooterComponent {
   readonly support: FooterLink[] = [
     { label: $localize`Terms of Service`, path: '/legal/terms-of-service' },
     { label: $localize`Privacy Policy`, path: '/legal/privacy-policy' },
+    { label: $localize`Delete Your Account`, path: '/legal/delete-account' },
   ];
 
   readonly social = [

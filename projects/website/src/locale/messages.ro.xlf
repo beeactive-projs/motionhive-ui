@@ -7570,6 +7570,382 @@
           <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="deleteAccount.pill" datatype="html">
+        <source>Your data</source>
+        <target state="translated">Datele tale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.h1" datatype="html">
+        <source>Delete your MotionHive account.</source>
+        <target state="translated">Ștergerea contului tău MotionHive.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.lastUpdated" datatype="html">
+        <source> Last updated: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() | date: 'longDate' }}"/>. </source>
+        <target state="translated"> Ultima actualizare: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() | date: 'longDate' }}"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.intro" datatype="html">
+        <source>intro</source>
+        <target state="translated">Pagina aceasta îți explică cum îți ștergi contul MotionHive, administrat de HIVECRAFT S.R.L., și ce se întâmplă cu informațiile tale după aceea. Acoperă atât ștergerea întregului cont, cât și ștergerea doar a unei părți din date, păstrând contul. MotionHive este aplicația publicată pe Google Play și App Store, și site-ul de la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;>"/>https://motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s1.h2" datatype="html">
+        <source>1. Delete your account</source>
+        <target state="translated">1. Ștergerea contului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s1.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Trimite un email la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot; class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> de pe adresa cu care te autentifici, cu subiectul „Ștergeți contul meu”.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s1.p2" datatype="html">
+        <source>p2</source>
+        <target state="translated">Faptul că scrii de pe propria adresă de autentificare este modul în care confirmăm că cererea este într-adevăr a ta. Dacă te-ai înregistrat cu Google sau Facebook, folosește adresa de email asociată acelui cont. Dacă nu mai ai acces la acea căsuță, scrie-ne oricum și îți vom cere altă modalitate de a dovedi că este contul tău.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s1.p3" datatype="html">
+        <source>p3</source>
+        <target state="translated">Confirmăm prin email când primim cererea și încă o dată după ce ștergerea este făcută. Nu trebuie să dai niciun motiv și nu vom încerca să te convingem să rămâi.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s2.h2" datatype="html">
+        <source>2. How long it takes</source>
+        <target state="translated">2. Cât durează</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s2.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Dezactivăm contul în 72 de ore de la confirmarea cererii, așa că nu mai apari imediat pentru ceilalți. Apoi ștergem definitiv informațiile tale personale în 30 de zile.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s2.p2" datatype="html">
+        <source>p2</source>
+        <target state="translated">Copiile de siguranță se păstrează pe un ciclu continuu și sunt suprascrise în 90 de zile. Până când o copie este suprascrisă, informațiile tale pot exista încă în interiorul ei, izolate și nefolosite pentru nimic.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.h2" datatype="html">
+        <source>3. What gets deleted</source>
+        <target state="translated">3. Ce se șterge</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Tot ce urmează este șters definitiv:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li1" datatype="html">
+        <source>li1</source>
+        <target state="translated">Contul tău: nume, adresă de email, parolă, număr de telefon, oraș și țară, fotografie de profil și numele tău de utilizator.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li2" datatype="html">
+        <source>li2</source>
+        <target state="translated">Orice autentificare Google, Facebook sau Apple asociată contului.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li3" datatype="html">
+        <source>li3</source>
+        <target state="translated">Profilul tău de antrenor, dacă ai unul: descriere, specializări, experiență, linkuri sociale și locații.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li4" datatype="html">
+        <source>li4</source>
+        <target state="translated">Istoricul tău de antrenamente: antrenamente înregistrate, serii, recorduri personale și orice notițe ai scris.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li5" datatype="html">
+        <source>li5</source>
+        <target state="translated">Programele și rutinele pe care le-ai creat, precum și programele atribuite ție.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li6" datatype="html">
+        <source>li6</source>
+        <target state="translated">Apartenența la grupuri, postările și comentariile tale, și rezervările la sesiuni.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li7" datatype="html">
+        <source>li7</source>
+        <target state="translated">Mesajele tale și relațiile cu antrenori sau clienți.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s3.li8" datatype="html">
+        <source>li8</source>
+        <target state="translated">Datele tale de plată salvate. Acestea sunt păstrate de Stripe, nu de noi, și cerem și companiei Stripe să le șteargă.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.h2" datatype="html">
+        <source>4. What we have to keep, and for how long</source>
+        <target state="translated">4. Ce suntem obligați să păstrăm și pentru cât timp</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Legea română ne obligă să păstrăm anumite documente chiar și după ce pleci. Păstrăm doar acestea, nu le folosim pentru nimic altceva și sunt șterse la finalul perioadei de mai jos.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.th1" datatype="html">
+        <source>What</source>
+        <target state="translated">Ce anume</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.th2" datatype="html">
+        <source>How long</source>
+        <target state="translated">Cât timp</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.th3" datatype="html">
+        <source>Why</source>
+        <target state="translated">De ce</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r1c1" datatype="html">
+        <source>r1c1</source>
+        <target state="translated">Facturi și documente de plată, inclusiv numele și suma de pe ele</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r1c2" datatype="html">
+        <source>r1c2</source>
+        <target state="translated">5 ani</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r1c3" datatype="html">
+        <source>r1c3</source>
+        <target state="translated">Legislația contabilă și fiscală din România</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r2c1" datatype="html">
+        <source>r2c1</source>
+        <target state="translated">O înregistrare a faptului că ți-ai șters contul și când</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r2c2" datatype="html">
+        <source>r2c2</source>
+        <target state="translated">3 ani</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r2c3" datatype="html">
+        <source>r2c3</source>
+        <target state="translated">Dovada că ți-am respectat cererea</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r3c1" datatype="html">
+        <source>r3c1</source>
+        <target state="translated">Documente legate de un litigiu, o contestație de plată sau o acțiune în instanță în curs</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r3c2" datatype="html">
+        <source>r3c2</source>
+        <target state="translated">Până la soluționare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.r3c3" datatype="html">
+        <source>r3c3</source>
+        <target state="translated">Susținerea sau soluționarea cauzei</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s4.p2" datatype="html">
+        <source>p2</source>
+        <target state="translated">Conținutul pe care l-ai publicat într-un grup rămâne vizibil pentru acel grup, însă este anonimizat: numele și fotografia ta sunt eliminate, așa că nu mai este legat de tine. Dacă vrei ca o anumită postare sau un anumit comentariu să fie șterse, spune-ne în email și le ștergem.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s5.h2" datatype="html">
+        <source>5. Delete some of your data, keep your account</source>
+        <target state="translated">5. Ștergerea unei părți din date, păstrând contul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s5.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Nu trebuie să îți ștergi tot contul ca să elimini informații. Scrie la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20some%20of%20my%20data&quot; class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> și spune-ne ce vrei să eliminăm. Se aplică același termen de 30 de zile.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s5.p2" datatype="html">
+        <source>p2</source>
+        <target state="translated">Cel mai des ni se cere ștergerea istoricului de antrenamente, a postărilor și comentariilor, a mesajelor, a profilului de antrenor păstrând contul, sau a fotografiei de profil. Orice altceva poți numi, ne uităm.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s5.p3" datatype="html">
+        <source>p3</source>
+        <target state="translated">Poți de asemenea să modifici sau să elimini singur cea mai mare parte din acestea direct în aplicație, în secțiunea de profil, fără să ne scrii.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s6.h2" datatype="html">
+        <source>6. Get a copy before you go</source>
+        <target state="translated">6. Cere o copie înainte să pleci</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s6.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Ștergerea nu poate fi anulată și nu îți putem recupera istoricul de antrenamente după aceea. Dacă vrei să îl păstrezi, cere-ne o copie a datelor tale în același email și ți-o trimitem înainte să ștergem ceva.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s7.h2" datatype="html">
+        <source>7. If something goes wrong</source>
+        <target state="translated">7. Dacă ceva nu merge bine</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s7.p1" datatype="html">
+        <source>p1</source>
+        <target state="translated">Dacă nu ți-am răspuns în 30 de zile sau nu ești mulțumit de felul în care ți-am tratat cererea, poți depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal, ANSPDCP, la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://www.dataprotection.ro&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot; class=&quot;text-brand hover:underline&quot;>"/>dataprotection.ro<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s7.p2" datatype="html">
+        <source>p2</source>
+        <target state="translated">Datele noastre de contact: HIVECRAFT S.R.L., Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58, Cluj-Napoca, Cluj 400482, România. Email <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.footer.also" datatype="html">
+        <source>footer</source>
+        <target state="translated">Citește și <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/privacy-policy&quot; class=&quot;text-brand hover:underline font-medium&quot;>"/>Politica de confidențialitate<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4397178425705775032" datatype="html">
+        <source>Delete Your Account</source>
+        <target>Ștergerea contului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

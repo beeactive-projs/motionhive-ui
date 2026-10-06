@@ -22,6 +22,12 @@ export const legalRoutes: Routes = [
     title: 'Cookie Policy | MotionHive',
   },
   {
+    path: 'delete-account',
+    loadComponent: () =>
+      import('./delete-account/delete-account.component').then((m) => m.DeleteAccountComponent),
+    title: 'Delete Your Account | MotionHive',
+  },
+  {
     path: '',
     redirectTo: 'terms-of-service',
     pathMatch: 'full',
