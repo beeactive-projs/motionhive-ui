@@ -54,6 +54,17 @@ export const ProgramAssignmentStatus = {
 export type ProgramAssignmentStatus =
   (typeof ProgramAssignmentStatus)[keyof typeof ProgramAssignmentStatus];
 
+/**
+ * Who put a plan on the calendar. COACH: an instructor assigned it. SELF: you
+ * scheduled one of your own routines.
+ */
+export const ProgramAssignmentKind = {
+  Coach: 'COACH',
+  Self: 'SELF',
+} as const;
+export type ProgramAssignmentKind =
+  (typeof ProgramAssignmentKind)[keyof typeof ProgramAssignmentKind];
+
 export const WorkoutLogStatus = {
   InProgress: 'IN_PROGRESS',
   Completed: 'COMPLETED',

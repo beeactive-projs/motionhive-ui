@@ -236,6 +236,15 @@
   --mh-color-selected-background: var(--mh-primary-50);
 
   /*
+   * A day a coach's plan was trained on, in the workout history calendar.
+   * Navy as a surface, never a selection. Its own role because the navy slot
+   * does not flip in dark mode, and navy 500 on a navy 800 card stops reading
+   * as a fill.
+   */
+  --mh-color-calendar-coach: var(--ion-color-secondary);
+  --mh-color-calendar-coach-contrast: var(--ion-color-secondary-contrast);
+
+  /*
    * ── Tier 1: Ionic global tokens ─────────────────────────────────────────
    * Light surfaces — slate page, white cards. Ionic's default light
    * background is pure white, which makes a white card invisible; the
@@ -466,6 +475,11 @@
 
   /* Selection inverts like the washes: deep honey fill, light ink. */
   --mh-color-selected-background: var(--mh-warning-950);
+
+  /* The coach day lifts off the navy card: light navy fill, deep navy ink
+     (5.9:1). */
+  --mh-color-calendar-coach: var(--mh-navy-400);
+  --mh-color-calendar-coach-contrast: var(--mh-navy-900);
 
   /* Wash inverts: deep fill (step 900; honey 950), light ink (step 200;
      honey 300). */

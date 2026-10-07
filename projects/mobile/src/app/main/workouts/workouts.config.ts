@@ -1,13 +1,20 @@
 import {
   AssignedWorkout,
+  ExerciseProgress,
   ExerciseSetType,
   LoggedExercise,
   LoggedSet,
+  OneRepMaxSource,
+  ProgramAssignmentKind,
+  ProgressRange,
   WorkoutLog,
   WorkoutLogStatus,
   appLocale,
   enumLabel,
   formatTotalDuration,
+  localDayKey,
+  startOfDay,
+  startOfMonth,
   translate,
 } from 'core';
 import {
@@ -17,8 +24,10 @@ import {
   barbellOutline,
   checkmarkCircleOutline,
   checkmarkOutline,
+  chevronBack,
   chevronDownOutline,
   chevronForward,
+  chevronUpOutline,
   ellipsisHorizontal,
   flashOutline,
   playOutline,
@@ -46,8 +55,10 @@ export const WORKOUT_ICONS = {
   barbellOutline,
   checkmarkCircleOutline,
   checkmarkOutline,
+  chevronBack,
   chevronDownOutline,
   chevronForward,
+  chevronUpOutline,
   ellipsisHorizontal,
   flashOutline,
   playOutline,
@@ -87,6 +98,16 @@ const ROUTINE_TONES: readonly SpineTone[] = [
 
 export function routineTone(index: number): SpineTone {
   return ROUTINE_TONES[index % ROUTINE_TONES.length];
+}
+
+/**
+ * The hexagon tile behind each starter on the cold-start rail. Ionic palette
+ * names with a `-wash` step, rotated by position like the routine spines.
+ */
+const STARTER_TILE_COLORS = ['primary', 'teal', 'info'] as const;
+
+export function starterTileColor(index: number): string {
+  return STARTER_TILE_COLORS[index % STARTER_TILE_COLORS.length];
 }
 
 /**
@@ -135,6 +156,28 @@ export function logChip(log: WorkoutLog): { label: string; tone: BadgeTone } | n
   }
 }
 
+/** Where a logged workout came from, as far as the history row tells it. */
+export const LogSources = {
+  Coach: 'coach',
+  Self: 'self',
+} as const;
+
+export type LogSource = (typeof LogSources)[keyof typeof LogSources];
+
+/**
+ * A coach assignment is the only source a row names. Routines, freestyle
+ * sessions and plans you scheduled yourself are the default and stay silent,
+ * for the same reason Completed carries no chip. An assignment without a kind
+ * comes from an API that predates the field and was always a coach's.
+ */
+export function logSource(log: WorkoutLog): LogSource {
+  const assignment = log.assignment;
+  if (!assignment || assignment.assignmentKind === ProgramAssignmentKind.Self) {
+    return LogSources.Self;
+  }
+  return LogSources.Coach;
+}
+
 // ─── Copy ─────────────────────────────────────────────────────────────────
 
 /** "6 exercises · ~55 min · Barbell" — only the parts we actually know. */
@@ -178,16 +221,25 @@ export function workoutDuration(seconds: number | null | undefined): string {
 }
 
 /**
- * "31m · felt 4/5" — the line under a logged workout's name, on the history
- * list and on a client's training page alike. Silent about anything the
- * session did not record.
+ * "31m · 16 sets · felt 4/5" — the line under a logged workout's name, on the
+ * history list and on a client's training page alike. Silent about anything
+ * the session did not record. Sets are the completed ones the list endpoint
+ * eager-loads for exactly this count.
  */
 export function logMeta(log: WorkoutLog): string {
   const parts: string[] = [];
   const duration = workoutDuration(log.durationSeconds);
   if (duration) parts.push(duration);
+  const sets = completedSetCount(log);
+  if (sets > 0) parts.push(translate('count.sets', { count: sets }));
   if (log.feelingRating) parts.push(translate('workouts.meta.felt', { rating: log.feelingRating }));
   return parts.join(' · ');
+}
+
+function completedSetCount(log: WorkoutLog): number {
+  return (log.exercises ?? [])
+    .flatMap((exercise) => exercise.sets ?? [])
+    .filter((set) => set.isCompleted).length;
 }
 
 /** How long the in-progress log has been open, as the resume banner says it. */
@@ -229,6 +281,305 @@ function calendarDate(when: string): Date {
     return new Date(y, m - 1, d);
   }
   return new Date(when);
+}
+
+// ─── History calendar ─────────────────────────────────────────────────────
+
+/** How a day reads on the history calendar. */
+export const CalendarDayStates = {
+  Coach: 'coach',
+  Self: 'self',
+  Skipped: 'skipped',
+  None: 'none',
+  Future: 'future',
+} as const;
+
+export type CalendarDayState = (typeof CalendarDayStates)[keyof typeof CalendarDayStates];
+
+export interface CalendarCell {
+  /** `yyyy-mm-dd`, local. */
+  key: string;
+  day: number;
+  inMonth: boolean;
+  isToday: boolean;
+  state: CalendarDayState;
+  /** The day's logs a tap can open, newest first. Empty on spill-over days. */
+  logIds: string[];
+}
+
+/**
+ * One day's fill. A finished workout outranks a skipped one, and a coach's
+ * plan outranks your own: the calendar shows the most meaningful thing that
+ * happened. An open or abandoned log is not history yet, so it counts as
+ * nothing.
+ */
+export function calendarDayState(logs: WorkoutLog[], isFuture: boolean): CalendarDayState {
+  if (isFuture) return CalendarDayStates.Future;
+  const completed = logs.filter((log) => log.status === WorkoutLogStatus.Completed);
+  if (completed.length) {
+    return completed.some((log) => logSource(log) === LogSources.Coach)
+      ? CalendarDayStates.Coach
+      : CalendarDayStates.Self;
+  }
+  if (logs.some((log) => log.status === WorkoutLogStatus.Skipped)) return CalendarDayStates.Skipped;
+  return CalendarDayStates.None;
+}
+
+/**
+ * The month as 42 cells, Monday first, with the neighbouring months' days
+ * filling the edges. Six rows always, like the sessions month sheet: a fixed
+ * height stops the page jumping between months. Logs land on their local day,
+ * never the UTC one.
+ */
+export function calendarCells(month: Date, logs: WorkoutLog[], today: Date): CalendarCell[] {
+  const first = startOfMonth(month);
+  const start = new Date(first);
+  start.setDate(first.getDate() - ((first.getDay() + 6) % 7));
+  const todayKey = localDayKey(today);
+
+  const byDay = new Map<string, WorkoutLog[]>();
+  const newestFirst = [...logs].sort(
+    (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
+  );
+  for (const log of newestFirst) {
+    const key = localDayKey(new Date(log.startedAt));
+    byDay.set(key, [...(byDay.get(key) ?? []), log]);
+  }
+
+  return Array.from({ length: 42 }, (_, offset) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + offset);
+    const key = localDayKey(date);
+    const inMonth = date.getMonth() === first.getMonth();
+    const dayLogs = inMonth ? (byDay.get(key) ?? []) : [];
+    const state = inMonth ? calendarDayState(dayLogs, key > todayKey) : CalendarDayStates.None;
+    return {
+      key,
+      day: date.getDate(),
+      inMonth,
+      isToday: key === todayKey,
+      state,
+      logIds:
+        state === CalendarDayStates.None || state === CalendarDayStates.Future
+          ? []
+          : dayLogs.map((log) => log.id),
+    };
+  });
+}
+
+/** "6 done" — finished workouts in the month shown, nothing else. */
+export function monthDoneCount(logs: WorkoutLog[], month: Date): number {
+  return logs.filter((log) => {
+    const at = new Date(log.startedAt);
+    return (
+      log.status === WorkoutLogStatus.Completed &&
+      at.getFullYear() === month.getFullYear() &&
+      at.getMonth() === month.getMonth()
+    );
+  }).length;
+}
+
+/**
+ * The one week a collapsed calendar keeps: the row holding `focusKey` (today
+ * or the day last tapped), else the month's first week.
+ */
+export function calendarWeek(cells: CalendarCell[], focusKey: string | null): CalendarCell[] {
+  const index = cells.findIndex((cell) => cell.inMonth && cell.key === focusKey);
+  const row = index < 0 ? 0 : Math.floor(index / 7);
+  return cells.slice(row * 7, row * 7 + 7);
+}
+
+// ─── Exercise progress ────────────────────────────────────────────────────
+
+type OneRepMaxPoint = ExerciseProgress['oneRepMaxSeries'][number];
+type ExerciseSession = ExerciseProgress['sessions'][number];
+
+/** The windows an exercise's progress reads, shortest first. */
+export const PROGRESS_RANGES: readonly ProgressRange[] = ['4w', '12w', '1y'];
+
+export const RANGE_DAYS: Record<ProgressRange, number> = { '4w': 28, '12w': 84, '1y': 365 };
+
+/** Local midnight on the first day a range covers, `now` being its last. */
+export function rangeStart(range: ProgressRange, now: number): number {
+  const start = startOfDay(new Date(now));
+  start.setDate(start.getDate() - RANGE_DAYS[range]);
+  return start.getTime();
+}
+
+/** The items whose local day falls inside the range, its first day included. */
+export function inRange<T>(
+  items: readonly T[],
+  at: (item: T) => string,
+  range: ProgressRange,
+  now: number,
+): T[] {
+  const from = rangeStart(range, now);
+  return items.filter((item) => calendarDate(at(item)).getTime() >= from);
+}
+
+export interface TrendPoint {
+  /** Epoch ms. */
+  x: number;
+  y: number;
+}
+
+/**
+ * The estimated 1RM across a range, as a line. The API only writes a 1RM
+ * when a session beats the best before it, so the series is a staircase:
+ * the best carried in from before the range opens the line, and the latest
+ * holds until today. A quiet month then reads as flat, not as missing.
+ */
+export function oneRepMaxPoints(
+  series: readonly OneRepMaxPoint[],
+  range: ProgressRange,
+  now: number,
+): TrendPoint[] {
+  const from = rangeStart(range, now);
+  const timed = series
+    .map((point) => ({ x: new Date(point.recordedAt).getTime(), y: point.weightKg }))
+    .filter((point) => point.x <= now)
+    .sort((a, b) => a.x - b.x);
+  const before = timed.filter((point) => point.x < from);
+  const inside = timed.filter((point) => point.x >= from);
+  const points: TrendPoint[] = [];
+  const carried = before.at(-1);
+  if (carried) points.push({ x: from, y: carried.y });
+  points.push(...inside);
+  // A lone first-ever record stays a dot: holding it flat to today would draw
+  // a trend out of a single number.
+  const last = points.at(-1);
+  if (last && last.x < now && (carried || inside.length > 1)) points.push({ x: now, y: last.y });
+  return points;
+}
+
+/** How far the estimate moved across the range; null when it has no span. */
+export function oneRepMaxDelta(
+  series: readonly OneRepMaxPoint[],
+  range: ProgressRange,
+  now: number,
+): number | null {
+  const points = oneRepMaxPoints(series, range, now);
+  if (points.length < 2) return null;
+  return Math.round((points[points.length - 1].y - points[0].y) * 100) / 100;
+}
+
+/**
+ * The best top set by estimated 1RM (Epley: weight × (1 + reps / 30)), so
+ * 72.5 × 5 outranks 75 × 2. A tie goes to the heavier weight.
+ */
+export function bestTopSet(
+  sessions: readonly ExerciseSession[],
+): { weightKg: number; reps: number } | null {
+  let best: { weightKg: number; reps: number; score: number } | null = null;
+  for (const session of sessions) {
+    if (session.topWeightKg == null || session.topReps == null) continue;
+    const score = session.topWeightKg * (1 + session.topReps / 30);
+    if (!best || score > best.score || (score === best.score && session.topWeightKg > best.weightKg)) {
+      best = { weightKg: session.topWeightKg, reps: session.topReps, score };
+    }
+  }
+  return best ? { weightKg: best.weightKg, reps: best.reps } : null;
+}
+
+/**
+ * Sessions that set a new best. An estimated 1RM row is only ever written
+ * when a session beats the previous best, so its day marks the record. A
+ * tested or hand-entered 1RM is not something a session did.
+ */
+export function recordSessionIds(progress: ExerciseProgress): Set<string> {
+  const estimated = new Set<string>([
+    OneRepMaxSource.EstimatedEpley,
+    OneRepMaxSource.EstimatedBrzycki,
+  ]);
+  const days = new Set(
+    progress.oneRepMaxSeries
+      .filter((point) => estimated.has(point.source))
+      .map((point) => localDayKey(new Date(point.recordedAt))),
+  );
+  return new Set(
+    progress.sessions
+      .filter((session) => days.has(localDayKey(new Date(session.performedAt))))
+      .map((session) => session.workoutLogId),
+  );
+}
+
+/**
+ * The best a session managed, for exercises judged on something other than
+ * load: the longest hold, the furthest distance, or the most reps.
+ */
+export function sessionBestValue(session: ExerciseSession): string | null {
+  if (session.bestDurationSeconds) return secondsToClock(session.bestDurationSeconds);
+  if (session.bestDistanceMeters) {
+    return translate('workouts.units.meters', { value: formatMeasure(session.bestDistanceMeters) });
+  }
+  if (session.topReps) return translate('count.reps', { count: session.topReps });
+  return null;
+}
+
+/** "3 sets · top 72.5 × 5", or "3 sets · best 1:30" for a hold. */
+export function exerciseSessionLine(session: ExerciseSession): string {
+  const sets = translate('count.sets', { count: session.setCount });
+  if (session.topWeightKg != null && session.topReps != null) {
+    return translate('workouts.exerciseProgress.sessionLine', {
+      sets,
+      weight: formatMeasure(session.topWeightKg),
+      reps: session.topReps,
+    });
+  }
+  const best = sessionBestValue(session);
+  return best ? translate('workouts.exerciseProgress.sessionLineBest', { sets, value: best }) : sets;
+}
+
+export interface TrendGeometry {
+  /** SVG paths in a 0–100 box, y pointing down; empty for a single point. */
+  line: string;
+  area: string;
+  /** Gridlines top to bottom: the domain's max, middle and min. */
+  ticks: { value: number; y: number }[];
+  /** Where the latest point sits, in percent of the plot. */
+  end: { x: number; y: number };
+}
+
+/**
+ * A trend line's shape in percent of its plot, so the chart can draw the
+ * line in a stretched SVG and place labels and the end dot in HTML, where
+ * they keep their proportions. The y domain pads the data by one unit each
+ * way so the line never rides an edge.
+ */
+export function trendGeometry(
+  points: readonly TrendPoint[],
+  from: number,
+  to: number,
+): TrendGeometry | null {
+  if (!points.length) return null;
+  const values = points.map((point) => point.y);
+  const lo = Math.floor(Math.min(...values) - 1);
+  const hi = Math.ceil(Math.max(...values) + 1);
+  const span = Math.max(to - from, 1);
+  const x = (at: number) => round2(((at - from) / span) * 100);
+  const y = (value: number) => round2(((hi - value) / (hi - lo)) * 100);
+
+  const coords = points.map((point) => `${x(point.x)} ${y(point.y)}`);
+  const line = points.length > 1 ? `M${coords.join(' L')}` : '';
+  const area = line ? `${line} L${x(points[points.length - 1].x)} 100 L${x(points[0].x)} 100 Z` : '';
+  const mid = Math.round((lo + hi) / 2);
+  const last = points[points.length - 1];
+  return {
+    line,
+    area,
+    ticks: [hi, mid, lo].map((value) => ({ value, y: y(value) })),
+    end: { x: x(last.x), y: y(last.y) },
+  };
+}
+
+/** `count` instants evenly spread from `from` to `to`, both ends included. */
+export function trendTicks(from: number, to: number, count: number): number[] {
+  if (count < 2) return [to];
+  return Array.from({ length: count }, (_, i) => from + ((to - from) * i) / (count - 1));
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 // ─── Set rows ─────────────────────────────────────────────────────────────

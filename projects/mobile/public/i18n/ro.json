@@ -1492,6 +1492,7 @@
     "editExercise": "Editează exercițiul",
     "editGroup": "Editează grupul",
     "exercise": "Exercițiu",
+    "exerciseProgress": "Progres exercițiu",
     "exercises": "Exerciții",
     "group": "Grup",
     "groups": "Grupuri",
@@ -2326,6 +2327,28 @@
     "exerciseCard": {
       "actionsFor": "Acțiuni pentru {name}"
     },
+    "exerciseProgress": {
+      "best": "Cel mai bun",
+      "bestSet": "Cea mai bună serie",
+      "chartLabel": "1RM estimat a trecut de la {from} la {to} kg",
+      "delta": "{sign}{value} kg în {range}",
+      "empty": {
+        "message": "Fă exercițiul într-un antrenament și apare aici.",
+        "title": "Încă nicio sesiune"
+      },
+      "emptyRange": "Nimic înregistrat în perioada asta",
+      "oneRepMax": "1RM estimat",
+      "range": {
+        "12w": "12 săptămâni",
+        "1y": "1 an",
+        "4w": "4 săptămâni"
+      },
+      "record": "Record",
+      "sessionLine": "{sets} · maxim {weight} × {reps}",
+      "sessionLineBest": "{sets} · cel mai bun {value}",
+      "sessions": "Sesiuni",
+      "setValue": "{weight} × {reps}"
+    },
     "finish": {
       "done": "Gata",
       "howDidItFeel": "Cum te-ai simțit?",
@@ -2348,6 +2371,22 @@
       "whatYouDid": "Ce ai făcut"
     },
     "history": {
+      "calendar": {
+        "collapse": "Arată o săptămână",
+        "dayLabel": "{date}: {state}",
+        "done": "{count, plural, one {# făcut} few {# făcute} other {# de făcute}}",
+        "expand": "Arată toată luna",
+        "legendCoach": "Planul antrenorului",
+        "legendSelf": "Antrenamentul meu",
+        "legendSkipped": "Sărit",
+        "loadError": "Nu am putut încărca luna",
+        "state": {
+          "coach": "plan de la antrenor, făcut",
+          "none": "niciun antrenament",
+          "self": "antrenament făcut",
+          "skipped": "sărit"
+        }
+      },
       "count": "{count, plural, one {# antrenament înregistrat} few {# antrenamente înregistrate} other {# de antrenamente înregistrate}}",
       "empty": {
         "message": "Termină un antrenament și îl vei vedea aici.",
@@ -2365,6 +2404,7 @@
       "fromYourCoach": "De la antrenorul tău",
       "inProgress": "În desfășurare · {elapsed}",
       "noRoutines": "Salvează un antrenament ca rutină și va apărea aici, gata de repetat.",
+      "openHistory": "Deschide istoricul",
       "percentDone": "{percent}% gata",
       "startEmpty": "Începe un antrenament nou",
       "yourCoach": "Antrenorul tău",
@@ -2380,6 +2420,7 @@
       "stepSeconds": "{step}s"
     },
     "loadError": {
+      "exercise": "Nu am putut încărca exercițiul",
       "history": "Nu am putut încărca istoricul",
       "plan": "Nu am putut deschide planul",
       "progress": "Nu am putut încărca progresul",
@@ -2389,6 +2430,7 @@
       "workout": "Nu am putut deschide antrenamentul"
     },
     "logRow": {
+      "coach": "Antrenor",
       "repeat": "Repetă {name}"
     },
     "logger": {

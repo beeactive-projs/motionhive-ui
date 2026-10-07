@@ -3,16 +3,17 @@ import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { SessionInstance, appLocale, localDayKey, startOfDay } from 'core';
+import {
+  SessionInstance,
+  appLocale,
+  dayFromKey,
+  localDayKey,
+  startOfDay,
+  startOfMonth,
+} from 'core';
 
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
-import {
-  MONTH_LEGEND,
-  SESSION_ICONS,
-  dayFromKey,
-  instanceTone,
-  weekdayLetters,
-} from '../../sessions.config';
+import { MONTH_LEGEND, SESSION_ICONS, instanceTone, weekdayLetters } from '../../sessions.config';
 
 interface MonthCell {
   key: string;
@@ -160,8 +161,4 @@ export class MonthSheet {
     this.daySelected.emit(staged);
     this.open.set(false);
   }
-}
-
-function startOfMonth(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
 }

@@ -1492,6 +1492,7 @@
     "editExercise": "Edit exercise",
     "editGroup": "Edit group",
     "exercise": "Exercise",
+    "exerciseProgress": "Exercise progress",
     "exercises": "Exercises",
     "group": "Group",
     "groups": "Groups",
@@ -2326,6 +2327,28 @@
     "exerciseCard": {
       "actionsFor": "Actions for {name}"
     },
+    "exerciseProgress": {
+      "best": "Best",
+      "bestSet": "Best set",
+      "chartLabel": "Estimated 1-rep max went from {from} to {to} kg",
+      "delta": "{sign}{value} kg in {range}",
+      "empty": {
+        "message": "Log this exercise in a workout and it shows up here.",
+        "title": "No sessions yet"
+      },
+      "emptyRange": "Nothing logged in this period",
+      "oneRepMax": "Estimated 1-rep max",
+      "range": {
+        "12w": "12 weeks",
+        "1y": "1 year",
+        "4w": "4 weeks"
+      },
+      "record": "Record",
+      "sessionLine": "{sets} · top {weight} × {reps}",
+      "sessionLineBest": "{sets} · best {value}",
+      "sessions": "Sessions",
+      "setValue": "{weight} × {reps}"
+    },
     "finish": {
       "done": "Done",
       "howDidItFeel": "How did it feel?",
@@ -2348,6 +2371,22 @@
       "whatYouDid": "What you did"
     },
     "history": {
+      "calendar": {
+        "collapse": "Show one week",
+        "dayLabel": "{date}: {state}",
+        "done": "{count, plural, one {# done} other {# done}}",
+        "expand": "Show the whole month",
+        "legendCoach": "Coach plan",
+        "legendSelf": "My workout",
+        "legendSkipped": "Skipped",
+        "loadError": "Couldn't load this month",
+        "state": {
+          "coach": "coach plan done",
+          "none": "no workout",
+          "self": "workout done",
+          "skipped": "skipped"
+        }
+      },
       "count": "{count, plural, one {# workout logged} other {# workouts logged}}",
       "empty": {
         "message": "Finish a workout and it will show up here.",
@@ -2365,6 +2404,7 @@
       "fromYourCoach": "From your coach",
       "inProgress": "In progress · {elapsed}",
       "noRoutines": "Save a workout as a routine and it will show up here, ready to repeat.",
+      "openHistory": "Open history",
       "percentDone": "{percent}% done",
       "startEmpty": "Start empty workout",
       "yourCoach": "Your coach",
@@ -2380,6 +2420,7 @@
       "stepSeconds": "{step}s"
     },
     "loadError": {
+      "exercise": "Couldn't load this exercise",
       "history": "Couldn't load your history",
       "plan": "Couldn't open this plan",
       "progress": "Couldn't load your progress",
@@ -2389,6 +2430,7 @@
       "workout": "Couldn't open this workout"
     },
     "logRow": {
+      "coach": "Coach",
       "repeat": "Repeat {name}"
     },
     "logger": {

@@ -1,0 +1,28 @@
+@if (geometry(); as shape) {
+  <div class="y-axis" aria-hidden="true">
+    @for (tick of shape.ticks; track $index) {
+      <span [style.top.%]="tick.y">{{ tick.value }}</span>
+    }
+  </div>
+
+  <div class="plot" aria-hidden="true">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+      @for (tick of shape.ticks; track $index) {
+        <line class="grid" x1="0" x2="100" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+      }
+      @if (shape.area) {
+        <path class="area" [attr.d]="shape.area" />
+      }
+      @if (shape.line) {
+        <path class="line" [attr.d]="shape.line" />
+      }
+    </svg>
+    <span class="dot" [style.left.%]="shape.end.x" [style.top.%]="shape.end.y"></span>
+  </div>
+
+  <div class="x-axis" aria-hidden="true">
+    @for (tick of xTicks(); track $index) {
+      <span [attr.data-align]="tick.align" [style.left.%]="tick.left">{{ tick.label }}</span>
+    }
+  </div>
+}

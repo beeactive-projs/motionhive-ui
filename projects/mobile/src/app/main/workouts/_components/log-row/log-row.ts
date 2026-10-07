@@ -2,9 +2,10 @@ import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { WorkoutLog } from 'core';
+import { WorkoutLog, translate } from 'core';
 
-import { dateRail, logChip, logMeta, logTone } from '../../workouts.config';
+import { BadgeTones } from '../../../exercises/exercises.config';
+import { LogSources, dateRail, logChip, logMeta, logSource, logTone } from '../../workouts.config';
 
 /**
  * One logged workout: a date rail on the left, the name and what the session
@@ -26,6 +27,8 @@ export class LogRow {
   readonly log = input.required<WorkoutLog>();
   /** Offers the Repeat control. Off where the reader is not the one training. */
   readonly repeatable = input(false);
+  /** Names the coach on assigned work. Off where the reader is the coach. */
+  readonly showSource = input(false);
 
   readonly select = output<void>();
   readonly repeat = output<void>();
@@ -37,6 +40,12 @@ export class LogRow {
   readonly meta = computed(() => logMeta(this.log()));
 
   readonly chip = computed(() => logChip(this.log()));
+
+  readonly sourceChip = computed(() =>
+    this.showSource() && logSource(this.log()) === LogSources.Coach
+      ? { label: translate('workouts.logRow.coach'), tone: BadgeTones.Navy }
+      : null,
+  );
 
   onRepeat(event: Event): void {
     // Inside the row's own tap target; without this Repeat also opens the log.

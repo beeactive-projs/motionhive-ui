@@ -20,32 +20,53 @@
       [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
-  } @else if (store.showSkeleton()) {
-    <!-- Mirrors the row shape so nothing shifts when the rows land. -->
-    <div class="mh-page">
-      <span class="mh-kicker meta">
-        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
-      </span>
-      <div>
-        @for (_ of skeletonRows; track $index) {
-          <mh-session-row-skeleton />
-        }
-      </div>
-    </div>
-  } @else if (store.isEmpty()) {
-    <mh-empty-state
-      icon="time-outline"
-      [heading]="'workouts.history.empty.title' | translate"
-      [message]="'workouts.history.empty.message' | translate"
-    />
   } @else {
     <div class="mh-page">
-      <span class="mh-kicker meta">{{ store.countLabel() }}</span>
-      <div>
-        @for (log of store.items(); track log.id) {
-          <mh-log-row [log]="log" [repeatable]="true" (select)="open(log)" (repeat)="repeat(log)" />
-        }
-      </div>
+      <!-- An empty month is still a month: the calendar stays above the empty state. -->
+      <mh-history-calendar
+        [cells]="store.calendarCells()"
+        [month]="store.month()"
+        [doneCount]="store.monthDoneCount()"
+        [collapsed]="store.collapsed()"
+        [loading]="store.monthSkeleton()"
+        [error]="store.monthError()"
+        (collapsedChange)="store.setCollapsed($event)"
+        (monthChange)="store.setMonth($event)"
+        (daySelect)="onDaySelect($event)"
+        (retry)="store.refreshMonth()"
+      />
+
+      @if (store.showSkeleton()) {
+        <!-- Mirrors the row shape so nothing shifts when the rows land. -->
+        <span class="mh-kicker meta">
+          <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
+        </span>
+        <div>
+          @for (_ of skeletonRows; track $index) {
+            <mh-session-row-skeleton />
+          }
+        </div>
+      } @else if (store.isEmpty()) {
+        <mh-empty-state
+          icon="time-outline"
+          [heading]="'workouts.history.empty.title' | translate"
+          [message]="'workouts.history.empty.message' | translate"
+        />
+      } @else {
+        <span class="mh-kicker meta">{{ store.countLabel() }}</span>
+        <div>
+          @for (log of store.items(); track log.id) {
+            <mh-log-row
+              [attr.data-day]="dayKeys().get(log.id)"
+              [log]="log"
+              [repeatable]="true"
+              [showSource]="true"
+              (select)="open(log)"
+              (repeat)="repeat(log)"
+            />
+          }
+        </div>
+      }
     </div>
 
     <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">

@@ -1,0 +1,92 @@
+/* No chart library: a value axis, a plot and a time axis on a grid. The plot
+   is a stretched SVG; everything that must keep its shape (labels, the end
+   dot) sits in HTML over it. Emerald, never honey: a trend is a status, and
+   honey means "press this". */
+
+:host {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: 8.75rem auto;
+  column-gap: 0.5rem;
+  row-gap: 0.375rem;
+}
+
+.y-axis,
+.x-axis {
+  position: relative;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--mh-leading-none);
+}
+
+.y-axis {
+  min-width: 1.5rem;
+}
+
+.y-axis span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.plot {
+  position: relative;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--mh-color-divider);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.area {
+  fill: var(--ion-color-success-wash);
+}
+
+.line {
+  fill: none;
+  stroke: var(--ion-color-success);
+  stroke-width: 0.125rem;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.dot {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: var(--mh-ring-width) solid var(--ion-card-background);
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-text-color);
+  box-sizing: content-box;
+  transform: translate(-50%, -50%);
+}
+
+.x-axis {
+  grid-column: 2;
+  height: var(--mh-text-xs);
+}
+
+.x-axis span {
+  position: absolute;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.x-axis span[data-align='start'] {
+  transform: none;
+}
+
+.x-axis span[data-align='end'] {
+  transform: translateX(-100%);
+}

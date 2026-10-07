@@ -1,0 +1,89 @@
+<ion-card>
+  <ion-card-content>
+    <div class="nav">
+      <span class="label">{{ monthLabel() }}</span>
+      <ion-button fill="clear" [attr.aria-label]="'a11y.previousMonth' | translate" (click)="step(-1)">
+        <ion-icon slot="icon-only" name="chevron-back" aria-hidden="true" />
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [disabled]="isCurrentMonth()"
+        [attr.aria-label]="'a11y.nextMonth' | translate"
+        (click)="step(1)"
+      >
+        <ion-icon slot="icon-only" name="chevron-forward" aria-hidden="true" />
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [attr.aria-label]="
+          (collapsed() ? 'workouts.history.calendar.expand' : 'workouts.history.calendar.collapse')
+            | translate
+        "
+        [attr.aria-expanded]="!collapsed()"
+        (click)="toggle()"
+      >
+        <ion-icon
+          slot="icon-only"
+          [name]="collapsed() ? 'chevron-down-outline' : 'chevron-up-outline'"
+          aria-hidden="true"
+        />
+      </ion-button>
+    </div>
+
+    <div class="grid heading" aria-hidden="true">
+      @for (label of weekdayLabels; track $index) {
+        <span class="weekday">{{ label }}</span>
+      }
+    </div>
+
+    <div class="grid">
+      @if (loading()) {
+        @for (_ of skeletonDays(); track $index) {
+          <ion-skeleton-text class="cell" [animated]="true" />
+        }
+      } @else {
+        @for (day of days(); track day.cell.key) {
+          <button
+            type="button"
+            class="cell"
+            [attr.data-state]="day.cell.state"
+            [class.muted]="!day.cell.inMonth"
+            [class.today]="day.cell.isToday"
+            [class.selected]="day.cell.key === selectedKey()"
+            [disabled]="!day.tappable"
+            [attr.aria-disabled]="!day.tappable"
+            [attr.aria-label]="day.label"
+            (click)="pick(day.cell)"
+          >
+            {{ day.cell.day }}
+          </button>
+        }
+      }
+    </div>
+
+    @if (error()) {
+      <div class="error">
+        <ion-note>{{ 'workouts.history.calendar.loadError' | translate }}</ion-note>
+        <ion-button fill="clear" size="small" (click)="retry.emit()">
+          {{ 'button.tryAgain' | translate }}
+        </ion-button>
+      </div>
+    }
+
+    <div class="legend">
+      @for (entry of legend; track entry.state) {
+        <span class="entry">
+          <i [attr.data-state]="entry.state" aria-hidden="true"></i>
+          {{ entry.label | translate }}
+        </span>
+      }
+      @if (loading()) {
+        <ion-skeleton-text class="done" [animated]="true" style="width: 3rem; height: 0.75rem" />
+      } @else {
+        <span class="done">
+          {{ 'workouts.history.calendar.done' | translate: { count: doneCount() } }}
+        </span>
+      }
+    </div>
+  </ion-card-content>
+</ion-card>

@@ -2,6 +2,7 @@ import type { AssignedSet } from './assignment.model';
 import type { ExerciseKind } from '../exercise/exercise.enums';
 import type {
   ExerciseSetType,
+  ProgramAssignmentKind,
   SetField,
   WorkoutLogStatus,
 } from './workout.enums';
@@ -51,6 +52,8 @@ export interface WorkoutLog {
     id: string;
     programNameSnapshot: string;
     masterProgramId: string | null;
+    /** Absent from APIs that predate it; read a missing kind as COACH. */
+    assignmentKind?: ProgramAssignmentKind;
   } | null;
   /**
    * 1RM personal records broken in this session (Epley-estimated from

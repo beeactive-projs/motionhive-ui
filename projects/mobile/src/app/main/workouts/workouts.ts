@@ -24,16 +24,17 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { Routine, TrainingDayPlan, displayName } from 'core';
+import { ProgramAssignmentKind, Routine, TrainingDayPlan, displayName } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
 import { ClockService } from '../../_shared/services/clock.service';
 import { RoutineRow } from './_components/routine-row/routine-row';
 import { TodayHero } from './_components/today-hero/today-hero';
-import { WORKOUT_ICONS, elapsedLabel, routineTone } from './workouts.config';
+import { WORKOUT_ICONS, elapsedLabel, routineTone, starterTileColor } from './workouts.config';
 import { WorkoutsStore } from './workouts.store';
 
 /**
@@ -48,6 +49,7 @@ import { WorkoutsStore } from './workouts.store';
   selector: 'mh-workouts',
   imports: [
     EmptyState,
+    HexAvatar,
     IonButton,
     IonButtons,
     IonCard,
@@ -84,6 +86,7 @@ export class Workouts implements ViewWillEnter {
 
   readonly skeletonRows = [1, 2, 3];
   readonly routineTone = routineTone;
+  readonly starterTileColor = starterTileColor;
 
   /** How long the abandoned session has been open, for the resume banner. */
   readonly elapsed = computed(() => {
@@ -114,7 +117,7 @@ export class Workouts implements ViewWillEnter {
   /** "Alex Dima · 23% done" — the coach only when there is one to name. */
   planSubline(plan: TrainingDayPlan): string {
     const parts: string[] = [];
-    if (plan.instructor && plan.assignmentKind !== 'SELF') {
+    if (plan.instructor && plan.assignmentKind !== ProgramAssignmentKind.Self) {
       parts.push(
         displayName(plan.instructor, this._translateService.instant('workouts.home.yourCoach')),
       );

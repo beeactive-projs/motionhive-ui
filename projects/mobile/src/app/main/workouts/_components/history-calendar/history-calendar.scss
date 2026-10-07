@@ -1,0 +1,155 @@
+/* The sessions month sheet's grid (geometry, weekday letters, today ring,
+   legend) so the app's two calendars read as one. Fills follow the brand
+   rule: navy is a surface (a coach's plan), its wash is your own workout,
+   honey is only ever the day you tapped. */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.nav .label {
+  flex: 1;
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+}
+
+/* A month is a 7-column grid; ion-grid brings gutters and a row wrapper that
+   would fight the fixed six-row height. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.125rem;
+}
+
+.grid.heading {
+  margin-bottom: 0.25rem;
+}
+
+.weekday {
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--mh-radius-control);
+  background: transparent;
+  color: var(--ion-text-color);
+  font: inherit;
+  font-size: var(--mh-text-base);
+  font-weight: 500;
+}
+
+.cell:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+}
+
+ion-skeleton-text.cell {
+  --border-radius: var(--mh-radius-control);
+}
+
+/* Days spilling in from the neighbouring months, and days still to come,
+   stay visible but recede. Medium against the text colour, not the month
+   sheet's dark/medium-tint pair: in dark mode that pair inverts (medium-tint
+   is the lighter step) and the receding days would outshine the real ones. */
+.cell.muted,
+.cell[data-state='future'] {
+  color: var(--ion-color-medium);
+}
+
+.cell[data-state='coach'] {
+  background: var(--mh-color-calendar-coach);
+  color: var(--mh-color-calendar-coach-contrast);
+  font-weight: 600;
+}
+
+.cell[data-state='self'] {
+  background: var(--ion-color-secondary-wash);
+  color: var(--ion-color-secondary-wash-contrast);
+  font-weight: 600;
+}
+
+.cell[data-state='skipped'] {
+  border: 1px dashed var(--ion-color-medium-tint);
+  color: var(--ion-color-medium);
+}
+
+/* Today keeps a ring and the tapped day takes the honey fill: a day is
+   routinely both, and they answer different questions. */
+.cell.today {
+  border-style: solid;
+  border-color: var(--ion-color-primary);
+}
+
+.cell.selected {
+  border-color: transparent;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-weight: 700;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ion-border-color);
+}
+
+.legend .entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.legend i {
+  box-sizing: border-box;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 0.125rem;
+}
+
+.legend i[data-state='coach'] {
+  background: var(--mh-color-calendar-coach);
+}
+
+.legend i[data-state='self'] {
+  background: var(--ion-color-secondary-wash);
+}
+
+.legend i[data-state='skipped'] {
+  border: 1px dashed var(--ion-color-medium-tint);
+}
+
+.legend .done {
+  margin-inline-start: auto;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}

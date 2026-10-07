@@ -17,4 +17,6 @@
   /** Per-program collapse state in the program builder (suffix = program id). */
   PROGRAM_BUILDER_EXPANDED: (programId: string) =>
     `motionhive_program_builder_expanded_${programId}`,
+  /** Whether the workout history calendar is folded down to one week. */
+  HISTORY_CALENDAR_COLLAPSED: 'motionhive_history_calendar_collapsed',
 } as const;

@@ -2,6 +2,13 @@
   <ion-toolbar>
     <ion-title>{{ 'nav.workouts' | translate }}</ion-title>
     <ion-buttons slot="end">
+      <ion-button
+        class="history"
+        [attr.aria-label]="'workouts.home.openHistory' | translate"
+        (click)="openHistory()"
+      >
+        <ion-icon slot="icon-only" name="time-outline" aria-hidden="true" />
+      </ion-button>
       <mh-notification-bell />
     </ion-buttons>
   </ion-toolbar>
@@ -58,38 +65,45 @@
 
       @if (store.isColdStart()) {
         <!-- Two real actions and one line of promise — never an empty void. -->
-        <mh-empty-state
-          icon="flash-outline"
-          [heading]="'workouts.home.coldStart.title' | translate"
-          [message]="'workouts.home.coldStart.message' | translate"
-          [actionLabel]="'workouts.home.coldStart.action' | translate"
-          (action)="startEmpty()"
-        />
-        <div class="secondary-actions">
-          <ion-button fill="outline" (click)="openStarters()">{{ 'workouts.home.coldStart.browseStarters' | translate }}</ion-button>
-          <!-- Building your own has to be reachable from the state you are in
-               before you own anything. -->
-          <ion-button fill="clear" size="small" (click)="newRoutine()">
-            {{ 'workouts.home.coldStart.buildOwn' | translate }}
-          </ion-button>
-        </div>
+        <ion-card class="cold-start">
+          <ion-card-content>
+            <mh-hex-avatar size="lg" color="primary" tone="wash" icon="flash-outline" />
+            <h2>{{ 'workouts.home.coldStart.title' | translate }}</h2>
+            <p>{{ 'workouts.home.coldStart.message' | translate }}</p>
+            <ion-button expand="block" (click)="startEmpty()">
+              {{ 'workouts.home.coldStart.action' | translate }}
+            </ion-button>
+            <ion-button class="neutral" expand="block" fill="outline" (click)="openStarters()">
+              {{ 'workouts.home.coldStart.browseStarters' | translate }}
+            </ion-button>
+            <!-- Building your own has to be reachable from the state you are in
+                 before you own anything. -->
+            <ion-button class="build-own" fill="clear" size="small" (click)="newRoutine()">
+              {{ 'workouts.home.coldStart.buildOwn' | translate }}
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
 
         @if (store.starterPreview().length) {
           <section class="mh-section">
-            <div class="mh-section-head">
+            <div class="mh-section-head warm">
               <span class="mh-kicker">{{ 'workouts.common.starterRoutines' | translate }}</span>
-              <ion-button fill="clear" size="small" (click)="openStarters()">{{ 'button.seeAll' | translate }}</ion-button>
+              <ion-button fill="clear" size="small" (click)="openStarters()">
+                {{ 'button.seeAllCount' | translate: { count: store.starterTotal() } }}
+              </ion-button>
             </div>
-            <div>
+            <ion-list [inset]="true" class="mh-card-list">
               @for (routine of store.starterPreview(); track routine.id; let i = $index) {
-                <mh-routine-row
-                  [routine]="routine"
-                  [tone]="routineTone(i)"
-                  [starter]="true"
+                <mh-settings-row
+                  [label]="routine.name"
+                  [note]="'count.exercises' | translate: { count: routine.exerciseCount }"
+                  icon="flash-outline"
+                  [iconColor]="starterTileColor(i)"
+                  iconTone="wash"
                   (select)="openRoutine(routine)"
                 />
               }
-            </div>
+            </ion-list>
           </section>
         }
       } @else {

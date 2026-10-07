@@ -34,6 +34,15 @@ export const workoutRoutes: Routes = [
     title: 'pageTitle.progress',
   },
   {
+    // One exercise's progress, opened from a record on Progress. A sibling
+    // rather than a child route, so the tab stays lit and back returns to
+    // Progress.
+    path: 'progress/:exerciseId',
+    loadComponent: () =>
+      import('./exercise-progress/exercise-progress').then((m) => m.ExerciseProgress),
+    title: 'pageTitle.exerciseProgress',
+  },
+  {
     // The catalog list, in this stack too — reachable from the training
     // surface without a detour through the menu or a tab switch.
     path: 'exercises',
