@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
@@ -9,10 +9,13 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonNote,
+  IonItem,
+  IonLabel,
+  IonProgressBar,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  NavController,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
@@ -37,6 +40,7 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
+import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
@@ -49,7 +53,14 @@ import {
   KeypadField,
   KeypadFields,
   WORKOUT_ICONS,
+  elapsedLabel,
+  formatMeasure,
+  secondsToClock,
+  setPlaceholder,
+  exerciseDoneSummary,
   exerciseSetSummary,
+  isExerciseDone,
+  lastTimeSummary,
 } from '../workouts.config';
 import { LoggerStore } from './logger.store';
 
@@ -76,14 +87,6 @@ const KEYPAD_FIELD: Record<SetField, KeypadField> = {
   [SetFields.Distance]: KeypadFields.Distance,
 };
 
-/** What the keypad's context line calls each field — translation keys. */
-const FIELD_LABELS: Record<SetField, string> = {
-  [SetFields.Weight]: 'workouts.logger.fieldLabel.weight',
-  [SetFields.Reps]: 'workouts.logger.fieldLabel.reps',
-  [SetFields.Duration]: 'workouts.logger.fieldLabel.duration',
-  [SetFields.Distance]: 'workouts.logger.fieldLabel.distance',
-};
-
 /** The set grid's column heading for each field — translation keys. */
 const COLUMN_LABELS: Record<SetField, string> = {
   [SetFields.Weight]: 'workouts.logger.columns.weight',
@@ -102,6 +105,10 @@ const COLUMN_LABELS: Record<SetField, string> = {
  * The bottom slot is shared and mutually exclusive — the keypad while a cell
  * is being edited, the rest timer while resting, and nothing otherwise. Both
  * dock rather than overlay so the set grid stays readable.
+ *
+ * Leaving is not ending. The chevron takes you back to the Workouts tab with
+ * the session still open, where the resume banner waits; Finish and Discard
+ * are the two ways a session actually ends.
  */
 @Component({
   selector: 'mh-logger',
@@ -119,7 +126,9 @@ const COLUMN_LABELS: Record<SetField, string> = {
     IonFooter,
     IonHeader,
     IonIcon,
-    IonNote,
+    IonItem,
+    IonLabel,
+    IonProgressBar,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
@@ -140,15 +149,40 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _restAlertService = inject(RestAlertService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _navController = inject(NavController);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly skeletonCards = [1, 2];
 
   /** The cell bound to the keypad, or null when nothing is being edited. */
   readonly editing = signal<EditTarget | null>(null);
   readonly draft = signal('');
+  /** What the keypad has typed so far, echoed into the open cell. */
+  readonly typed = signal('');
+
+  /**
+   * Ticks once a second for as long as this page exists — the session clock
+   * is the one number here that should visibly move. Not tied to Ionic's
+   * enter/leave hooks: a missed re-enter would leave the clock frozen on a
+   * workout that is still running. One page at a time, one signal write a
+   * second; the time itself always comes from `startedAt`, never a count.
+   */
+  private readonly _now = signal(Date.now());
+  private _ticker: ReturnType<typeof setInterval> | null = null;
+
+  /**
+   * Done exercises the user has opened again. Folding is otherwise automatic:
+   * tick the last set and the exercise folds to its check row.
+   */
+  private readonly _unfolded = signal<ReadonlySet<string>>(new Set());
 
   /** Epoch ms when rest ends. Null parks the timer and frees the slot. */
   readonly restEndsAt = signal<number | null>(null);
+  /** When the current rest began — the bar's progress measures from it. */
+  readonly restStartedAt = signal<number | null>(null);
+  /** The exercise whose set started the rest; "next up" looks on from there. */
+  private readonly _restFrom = signal<string | null>(null);
 
   readonly pickerOpen = signal(false);
   /**
@@ -181,19 +215,47 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
    * sheets, so a bare `viewChild(ConfirmSheet)` would pick the wrong one.
    */
   private readonly _discardSheet = viewChild<ConfirmSheet>('discardSheet');
+  /** Read when focus jumps to another cell, so what was typed is kept. */
+  private readonly _keypad = viewChild(NumericKeypad);
   private readonly _finishSheet = viewChild<ConfirmSheet>('finishSheet');
 
   /** Per-exercise "last time" sets, keyed by exercise id. */
   private readonly _previous = signal<Record<string, LoggedSet[]>>({});
+
+  /** Identifies the open cell for the keypad, so it re-seeds on every move. */
+  readonly editingKey = computed(() => {
+    const target = this.editing();
+    return target ? `${target.setId}:${target.field}` : '';
+  });
 
   readonly keypadField = computed<KeypadField>(() => {
     const target = this.editing();
     return target ? KEYPAD_FIELD[target.field] : KeypadFields.Reps;
   });
 
+  /** "Back squat · Set 3 · kg" — which cell the pad is filling, in the grid's words. */
   readonly keypadLabel = computed(() => {
     const target = this.editing();
-    return target ? this._translateService.instant(FIELD_LABELS[target.field]) : '';
+    if (!target) return '';
+    const exercise = this.store.exercises().find((e) => e.id === target.exerciseId);
+    const index = (exercise?.sets ?? []).findIndex((s) => s.id === target.setId);
+    return [
+      exercise?.exerciseNameSnapshot,
+      this._translateService.instant('workouts.logger.setNumber', { number: index + 1 }),
+      exercise ? this._columnLabel(exercise, target.field) : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  });
+
+  readonly elapsed = computed(() => {
+    const log = this.store.log();
+    return log ? elapsedLabel(log.startedAt, this._now()) : '';
+  });
+
+  readonly progressRatio = computed(() => {
+    const { done, total } = this.store.progress();
+    return total > 0 ? done / total : 0;
   });
 
   readonly pickerTitle = computed(() =>
@@ -237,6 +299,42 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     });
   });
 
+  /**
+   * The set to do after this rest: the next unticked one in the exercise just
+   * worked, then on through the exercises below, wrapping round to any left
+   * open above. Null once everything is ticked.
+   */
+  readonly nextUp = computed(() => {
+    const exercises = this.store.exercises().filter((e) => !e.isSkipped);
+    const from = Math.max(0, exercises.findIndex((e) => e.id === this._restFrom()));
+    const order = [...exercises.slice(from), ...exercises.slice(0, from)];
+
+    for (const exercise of order) {
+      const sets = exercise.sets ?? [];
+      const index = sets.findIndex((s) => !s.isCompleted);
+      if (index < 0) continue;
+
+      const set = sets[index];
+      const target = this._targetText(exercise, set, index);
+      const isLast = sets.slice(index + 1).every((s) => s.isCompleted);
+      return {
+        title: [
+          this._translateService.instant('workouts.logger.setNumber', { number: index + 1 }),
+          target,
+        ]
+          .filter(Boolean)
+          .join(' · '),
+        detail: [
+          exercise.exerciseNameSnapshot,
+          isLast ? this._translateService.instant('workouts.restTimer.lastSet') : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      };
+    }
+    return null;
+  });
+
   readonly showKeypad = computed(() => this.editing() !== null);
   readonly showRest = computed(() => !this.showKeypad() && this.restEndsAt() !== null);
 
@@ -248,9 +346,15 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     // so the alert follows it without a call at each of those sites. The
     // service only reaches the OS once the app is backgrounded.
     effect(() => this._restAlertService.track(this.restEndsAt()));
+
+    this._startTicker();
+    this._destroyRef.onDestroy(() => this._stopTicker());
   }
 
   ionViewWillEnter(): void {
+    // Catch the clock up at once rather than on the next tick.
+    this._now.set(Date.now());
+
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) return;
 
@@ -265,6 +369,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.editing.set(null);
   }
 
+  /** Back to the Workouts tab with the session still running. */
+  leave(): void {
+    void this._navController.navigateBack('/tabs/workouts');
+  }
+
   retry(): void {
     this.ionViewWillEnter();
   }
@@ -272,13 +381,20 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   // ─── Sets ─────────────────────────────────────────────────────
 
   toggleSet(exercise: LoggedExercise, set: LoggedSet): void {
+    // A tick while typing is a Done: keep the number, close the pad.
+    this._keepTyped();
+    this.editing.set(null);
+
     const next = !set.isCompleted;
     this.store.logSet(exercise.id, set.id, { isCompleted: next });
 
     // Completing a set starts the rest it prescribes. Un-ticking cancels it —
     // the user is correcting a mistake, not resting.
     if (next) {
-      this.restEndsAt.set(Date.now() + this._restSecondsFor(set) * 1000);
+      const now = Date.now();
+      this._restFrom.set(exercise.id);
+      this.restStartedAt.set(now);
+      this.restEndsAt.set(now + this._restSecondsFor(set) * 1000);
     } else {
       this.restEndsAt.set(null);
     }
@@ -297,26 +413,103 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   editCell(exercise: LoggedExercise, set: LoggedSet, field: SetField): void {
+    // Tapping another cell is a Done for this one: what was typed stays.
+    this._keepTyped();
     this.editing.set({ exerciseId: exercise.id, setId: set.id, field });
+    this.typed.set('');
     const current = cellValue(set, field);
     this.draft.set(current == null ? '' : String(current));
   }
 
   commitCell(typed: string): void {
+    this._save(typed);
+    this.editing.set(null);
+  }
+
+  /**
+   * "Next field": save this cell and open the one after it — across the row,
+   * then down to the next set, then into the next exercise. Past the last
+   * cell the pad simply closes.
+   */
+  nextCell(typed: string): void {
+    const target = this.editing();
+    this._save(typed);
+    if (!target) return;
+
+    const cells = this.store
+      .exercises()
+      .filter((e) => !e.isSkipped)
+      .flatMap((exercise) =>
+        (exercise.sets ?? []).flatMap((set) =>
+          this._fieldsFor(exercise).map((field) => ({ exercise, set, field })),
+        ),
+      );
+    const at = cells.findIndex(
+      (c) => c.set.id === target.setId && c.field === target.field,
+    );
+    const next = at >= 0 ? cells[at + 1] : undefined;
+    if (!next) {
+      this.editing.set(null);
+      return;
+    }
+    // The store has the value just saved; read the next cell from it fresh.
+    this.editCell(next.exercise, next.set, next.field);
+  }
+
+  /**
+   * "82.5 kg × 6–8": what the set asks for, field by field — the number
+   * already typed, else the target or last time, the same grey the cell shows.
+   */
+  private _targetText(exercise: LoggedExercise, set: LoggedSet, index: number): string {
+    const previous = this.previousFor(exercise, index);
+    return this._fieldsFor(exercise)
+      .map((field) => {
+        const typed = cellValue(set, field);
+        const text =
+          typed == null
+            ? setPlaceholder(set, field, previous)
+            : field === SetFields.Duration
+              ? secondsToClock(typed)
+              : formatMeasure(typed);
+        if (!text) return '';
+        if (field === SetFields.Weight) {
+          return this._translateService.instant('workouts.units.kg', { value: text });
+        }
+        if (field === SetFields.Distance) {
+          return this._translateService.instant('workouts.units.meters', { value: text });
+        }
+        return text;
+      })
+      .filter(Boolean)
+      .join(' × ');
+  }
+
+  /** Saves whatever the open keypad holds — before focus leaves its cell. */
+  private _keepTyped(): void {
+    const keypad = this._keypad();
+    if (this.editing() && keypad) this._save(keypad.committed());
+  }
+
+  /** Writes the typed value into the cell the pad is bound to. */
+  private _save(typed: string): void {
     const target = this.editing();
     if (!target) return;
 
     const raw = typed.trim();
     const value = raw === '' ? null : Number(raw);
-    if (value !== null && Number.isNaN(value)) {
-      this.editing.set(null);
-      return;
-    }
+    if (value !== null && Number.isNaN(value)) return;
+
+    // Unchanged is not a write: moving through cells should not hit the API.
+    const set = this.store
+      .exercises()
+      .find((e) => e.id === target.exerciseId)
+      ?.sets?.find((s) => s.id === target.setId);
+    // `?? null`: a cleared cell is patched to undefined locally, never null.
+    if (set && (cellValue(set, target.field) ?? null) === value) return;
 
     this.store.logSet(target.exerciseId, target.setId, {
       [PAYLOAD_KEY[target.field]]: value ?? undefined,
     });
-    this.editing.set(null);
   }
 
   /** Offer the weight column only where it is missing and would mean something. */
@@ -338,23 +531,51 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   /** Column headings for this exercise, which vary with its kind. */
   columnsFor(exercise: LoggedExercise): string[] {
+    return this._fieldsFor(exercise).map((field) => this._columnLabel(exercise, field));
+  }
+
+  /** The cells a set row draws for this exercise, in order — the same rule `mh-set-row` uses. */
+  private _fieldsFor(exercise: LoggedExercise): SetField[] {
     const fields = setFieldsFor(exercise.exercise?.kind);
-    const all =
-      this.hasAddedWeight(exercise) && !fields.includes(SetFields.Weight)
-        ? [SetFields.Weight, ...fields]
-        : fields;
-    return all.map((field) =>
-      this._translateService.instant(
-        field === SetFields.Reps && this.isUnilateral(exercise)
-          ? 'workouts.logger.columns.repsEach'
-          : COLUMN_LABELS[field],
-      ),
+    return this.hasAddedWeight(exercise) && !fields.includes(SetFields.Weight)
+      ? [SetFields.Weight, ...fields]
+      : fields;
+  }
+
+  private _columnLabel(exercise: LoggedExercise, field: SetField): string {
+    return this._translateService.instant(
+      field === SetFields.Reps && this.isUnilateral(exercise)
+        ? 'workouts.logger.columns.repsEach'
+        : COLUMN_LABELS[field],
     );
   }
 
-  /** "2 of 4 sets" under the name — the whole-workout state at a glance. */
-  setsLabel(exercise: LoggedExercise): string {
-    return exerciseSetSummary(exercise);
+  /**
+   * Under the name: what last time held, when there was a last time — the
+   * number you are trying to beat. Otherwise "2 of 4 sets".
+   */
+  cardMeta(exercise: LoggedExercise): string {
+    const previous = exercise.exerciseId ? this._previous()[exercise.exerciseId] : undefined;
+    const summary = previous ? lastTimeSummary(previous) : '';
+    return summary
+      ? this._translateService.instant('workouts.setRow.lastTime', { value: summary })
+      : exerciseSetSummary(exercise);
+  }
+
+  // ─── Folding ──────────────────────────────────────────────────
+
+  /** A finished exercise folds to its check row unless it was opened again. */
+  isFolded(exercise: LoggedExercise): boolean {
+    return isExerciseDone(exercise) && !this._unfolded().has(exercise.id);
+  }
+
+  unfold(exercise: LoggedExercise): void {
+    this._unfolded.update((set) => new Set(set).add(exercise.id));
+  }
+
+  /** "3 sets done · 2,140 kg". */
+  doneSummary(exercise: LoggedExercise): string {
+    return exerciseDoneSummary(exercise);
   }
 
   editingFieldFor(setId: string): SetField | null {
@@ -370,6 +591,16 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   addSet(exercise: LoggedExercise): void {
     this.store.addSet(exercise.id);
+  }
+
+  removeSet(exercise: LoggedExercise, set: LoggedSet): void {
+    if (this.editing()?.setId === set.id) this.editing.set(null);
+    this.store.removeSet(exercise.id, set.id, () => {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('workouts.logger.toast.removeSetFailed'),
+      );
+    });
   }
 
   // ─── Rest ─────────────────────────────────────────────────────
@@ -525,24 +756,33 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       }),
     });
 
-    this._workoutLogService
-      .start({ name })
-      .pipe(take(1))
-      .subscribe({
-        next: (log) => {
-          this.store.adopt(log);
-          // Replace, so a back-swipe does not start a second empty workout.
-          void this._router.navigate(['/tabs/workouts/log', log.id], {
-            replaceUrl: true,
-          });
-          if (from) this._carryOver(from);
-        },
-        error: (err) =>
-          void this._feedbackService.error(
-            err,
-            this._translateService.instant('workouts.common.startFailed'),
-          ),
-      });
+    // `new` means "start one", so with one already open this route becomes
+    // that one — replaced, so back does not land on `new` and try again.
+    this._activeWorkoutService.startOrResume(
+      () =>
+        this._workoutLogService
+          .start({ name })
+          .pipe(take(1))
+          .subscribe({
+            next: (log) => {
+              this.store.adopt(log);
+              // Replace, so a back-swipe does not start a second empty workout.
+              void this._router.navigate(['/tabs/workouts/log', log.id], {
+                replaceUrl: true,
+              });
+              if (from) this._carryOver(from);
+            },
+            error: (err) =>
+              void this._feedbackService.error(
+                err,
+                this._translateService.instant('workouts.common.startFailed'),
+              ),
+          }),
+      {
+        onBlocked: (open) => this.store.load(open.id, () => this._loadLastTimes()),
+        replaceUrl: true,
+      },
+    );
   }
 
   /**
@@ -597,6 +837,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             this._translateService.instant('workouts.logger.toast.repeatFailed'),
           ),
       });
+  }
+
+  private _startTicker(): void {
+    this._stopTicker();
+    this._now.set(Date.now());
+    this._ticker = setInterval(() => this._now.set(Date.now()), 1000);
+  }
+
+  private _stopTicker(): void {
+    if (this._ticker !== null) clearInterval(this._ticker);
+    this._ticker = null;
   }
 }
 

@@ -10,8 +10,8 @@
     <p class="original" lang="en">{{ original }}</p>
     }
     <p class="meta">
-      @if (!isPicker()) {
-      <ion-badge [attr.data-tone]="levelTone()">{{ levelLabel() }}</ion-badge>
+      @if (!isPicker() && levelLabel(); as level) {
+      <ion-badge [attr.data-tone]="levelTone()">{{ level }}</ion-badge>
       }
       <span>{{ subline() }}</span>
     </p>

@@ -1,27 +1,13 @@
-<ion-item
-  class="mh-session-row mh-list-row"
-  button
-  detail="false"
-  lines="none"
-  [attr.data-tone]="tone()"
-  (click)="select.emit()"
->
-  <ion-label>
+<ion-item button [detail]="detail()" lines="none" (click)="select.emit()">
+  <!-- Decorative: the name it would announce is the very next thing in the row. -->
+  <mh-hex-avatar slot="start" size="md" tone="wash" icon="flash-outline" [color]="color()" />
+
+  <ion-label class="ion-text-wrap">
     <h2>{{ routine().name }}</h2>
-    <div class="tags">
-      @if (starter()) {
-        <ion-badge data-tone="medium">{{ 'workouts.routineRow.starter' | translate }}</ion-badge>
-      }
-      <ion-note>{{ exerciseCount() }}</ion-note>
-    </div>
-    @if (lastDone()) {
-      <p class="last">{{ lastDone() }}</p>
-    }
+    <p>{{ meta() }}</p>
   </ion-label>
 
-  <!-- A chevron, not a play button. One row, one outcome: it opens the
-       routine, where Start is the primary action alongside the exercise list
-       you probably wanted to check first. Two targets on one row left people
-       guessing which half they had hit. -->
-  <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+  @if (level(); as value) {
+    <ion-badge slot="end" [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
+  }
 </ion-item>

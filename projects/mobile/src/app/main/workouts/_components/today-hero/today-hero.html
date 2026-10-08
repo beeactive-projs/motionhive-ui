@@ -1,20 +1,66 @@
+<span class="mh-kicker">{{ eyebrow() }}</span>
+
 <ion-card>
   <ion-card-content>
-    <span class="mh-kicker eyebrow">{{ eyebrow() }}</span>
-
-    <h2>{{ workout().name }}</h2>
-
     @if (position()) {
       <span class="mh-kicker position">{{ position() }}</span>
     }
+
+    <h2>{{ workout().name }}</h2>
 
     @if (meta()) {
       <p class="meta">{{ meta() }}</p>
     }
 
-    <ion-button expand="block" (click)="start.emit()">
-      <ion-icon slot="start" name="play-outline" aria-hidden="true" />
-      {{ 'workouts.common.startWorkout' | translate }}
-    </ion-button>
+    @if (exercises().length) {
+      <ion-list class="exercises" lines="full">
+        @for (row of exercises(); track row.key) {
+          <ion-item>
+            <ion-label>{{ row.name }}</ion-label>
+            @if (row.prescription) {
+              <ion-note slot="end">{{ row.prescription }}</ion-note>
+            }
+          </ion-item>
+        }
+      </ion-list>
+      @if (moreCount()) {
+        <p class="more">{{ 'workouts.todayHero.more' | translate: { count: moreCount() } }}</p>
+      }
+    }
+
+    @switch (state()) {
+      @case (States.Done) {
+        <p class="status">
+          <ion-icon name="checkmark-circle" color="success" aria-hidden="true" />
+          {{ 'workouts.todayHero.done' | translate }}
+        </p>
+        <ion-button class="neutral" expand="block" fill="outline" (click)="summary.emit()">
+          {{ 'workouts.todayHero.seeSummary' | translate }}
+        </ion-button>
+      }
+      @case (States.Skipped) {
+        <p class="status">{{ 'workouts.todayHero.skipped' | translate }}</p>
+        <ion-button class="neutral" expand="block" fill="outline" (click)="open.emit()">
+          <ion-icon slot="start" name="eye-outline" aria-hidden="true" />
+          {{ 'workouts.todayHero.seeWorkout' | translate }}
+        </ion-button>
+      }
+      <!-- With another session open this day can't start, so it doesn't offer
+           to: honey would be asking for a tap that only bounces. Looking at it
+           is still fine. -->
+      @case (States.Blocked) {
+        <ion-button class="neutral" expand="block" fill="outline" (click)="open.emit()">
+          <ion-icon slot="start" name="eye-outline" aria-hidden="true" />
+          {{ 'workouts.todayHero.seeWorkout' | translate }}
+        </ion-button>
+        <p class="blocked-note">{{ 'workouts.todayHero.finishFirst' | translate }}</p>
+      }
+      @default {
+        <ion-button expand="block" (click)="open.emit()">
+          <ion-icon slot="start" name="play-outline" aria-hidden="true" />
+          {{ 'workouts.common.startWorkout' | translate }}
+        </ion-button>
+      }
+    }
   </ion-card-content>
 </ion-card>

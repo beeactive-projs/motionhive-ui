@@ -6,6 +6,7 @@ import { OneRepMaxSource, ProgramAssignmentKind, WorkoutLogStatus } from 'core';
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   CalendarDayStates,
+  HeroStates,
   LogSources,
   WORKOUT_ICONS,
   assignedDayTone,
@@ -15,11 +16,18 @@ import {
   calendarWeek,
   clockDigitsToDisplay,
   clockDigitsToSeconds,
+  compactPrescription,
   dateRail,
+  heroState,
   elapsedLabel,
   exerciseSessionLine,
+  exerciseDoneSummary,
   exerciseSetSummary,
+  isExerciseDone,
+  lastTimeSummary,
+  setPlaceholder,
   inRange,
+  lastDoneLabel,
   logChip,
   logMeta,
   logSource,
@@ -28,8 +36,10 @@ import {
   oneRepMaxDelta,
   oneRepMaxPoints,
   planPositionLabel,
+  planWeekLabel,
+  prescriptionLine,
   recordSessionIds,
-  routineTone,
+  routineTileColor,
   secondsToClock,
   trendGeometry,
   workoutDuration,
@@ -114,10 +124,22 @@ describe('workouts config', () => {
     }
   });
 
-  it('rotates routine tones so a list never reads as one grey block', () => {
-    expect(routineTone(0)).not.toBe(routineTone(1));
+  it('rotates routine tiles so a list never reads as one grey block', () => {
+    expect(routineTileColor(0)).not.toBe(routineTileColor(1));
     // Stable per index, so a row keeps its colour across a re-render.
-    expect(routineTone(0)).toBe(routineTone(5));
+    expect(routineTileColor(0)).toBe(routineTileColor(4));
+  });
+
+  it('says when a routine was last done in the fewest words', () => {
+    const now = new Date(2026, 9, 8, 18, 0);
+    const at = (y: number, m: number, d: number) => new Date(y, m, d, 9, 30).toISOString();
+    expect(lastDoneLabel(at(2026, 9, 8), now)).toBe('last done today');
+    expect(lastDoneLabel(at(2026, 9, 7), now)).toBe('last done yesterday');
+    // Within the week: the weekday. 6 October 2026 is a Tuesday.
+    expect(lastDoneLabel(at(2026, 9, 6), now)).toBe('last done Tuesday');
+    // Older: the date, with the year only once it is not this one.
+    expect(lastDoneLabel(at(2026, 7, 30), now)).toBe('last done 30 Aug');
+    expect(lastDoneLabel(at(2025, 11, 30), now)).toBe('last done 30 Dec 2025');
   });
 
   // Every tone a row can wear must be one the `.mh-session-row` skin paints;
@@ -339,6 +361,113 @@ describe('workouts config', () => {
     expect(workoutMetaLine(null, null)).toBe('');
   });
 
+  it('folds an exercise once every set is ticked, with its volume', () => {
+    const set = (done: boolean, weightKg: number | null, reps: number | null) =>
+      ({ isCompleted: done, weightKg, reps, durationSeconds: null }) as never;
+    const done = { isSkipped: false, sets: [set(true, 100, 10), set(true, 100, 8), set(true, 120, 2)] };
+    expect(isExerciseDone(done as never)).toBe(true);
+    expect(isExerciseDone({ ...done, sets: [set(true, 100, 10), set(false, null, null)] } as never)).toBe(false);
+    expect(isExerciseDone({ isSkipped: false, sets: [] } as never)).toBe(false);
+    expect(exerciseDoneSummary(done as never)).toBe('3 sets done · 2,040 kg');
+    expect(lastTimeSummary([set(true, 80, 8), set(true, 80, 8), set(true, 75, 7)])).toBe('80 kg · 8 · 8 · 7');
+    expect(lastTimeSummary([])).toBe('');
+  });
+
+  it('shows the target as a placeholder, then last time', () => {
+    const empty = { assignedSet: null } as never;
+    const planned = {
+      assignedSet: { targetRepsMin: 6, targetRepsMax: 8, targetWeightKg: null, resolvedWeightKg: 82.5 },
+    } as never;
+    const previous = { weightKg: 80, reps: 8 } as never;
+    expect(setPlaceholder(planned, 'reps', null)).toBe('6–8');
+    expect(setPlaceholder(planned, 'weight', previous)).toBe('82.5');
+    expect(setPlaceholder(empty, 'weight', previous)).toBe('80');
+    expect(setPlaceholder(empty, 'reps', null)).toBe('');
+  });
+
+  it('describes a prescription before Start', () => {
+    const set = {
+      targetRepsMin: 8,
+      targetRepsMax: 8,
+      targetWeightKg: 70,
+      targetDurationSeconds: null,
+    };
+    expect(prescriptionLine([set, set, set, set])).toBe('4 sets · 8 reps · 70 kg');
+    expect(
+      prescriptionLine([
+        { ...set, targetRepsMin: 6, targetWeightKg: 80 },
+        { ...set, targetWeightKg: 82.5 },
+      ]),
+    ).toBe('2 sets · 6–8 reps · 82.5 kg top set');
+    expect(
+      prescriptionLine([
+        { ...set, targetWeightKg: null, targetWeightPercent1rm: 75 },
+        { ...set, targetWeightKg: null, targetWeightPercent1rm: 80 },
+      ]),
+    ).toBe('2 sets · 8 reps · 80% 1RM');
+    expect(
+      prescriptionLine([
+        { ...set, targetWeightKg: null, targetWeightPercent1rm: 75, resolvedWeightKg: 90 },
+      ]),
+    ).toBe('1 set · 8 reps · 90 kg');
+    const hold = { targetRepsMin: null, targetRepsMax: null, targetWeightKg: null, targetDurationSeconds: 45 };
+    expect(prescriptionLine([hold, hold, hold])).toBe('3 sets · 45 sec hold');
+    expect(prescriptionLine([])).toBe('');
+  });
+
+  it('cuts a prescription down to the hero card column', () => {
+    const set = {
+      targetRepsMin: 8,
+      targetRepsMax: 8,
+      targetWeightKg: 70,
+      targetDurationSeconds: null,
+    };
+    expect(compactPrescription([set, set, set, set])).toBe('4 × 8 · 70 kg');
+    expect(
+      compactPrescription([
+        { ...set, targetRepsMin: 6, targetWeightKg: 80 },
+        { ...set, targetWeightKg: 82.5 },
+      ]),
+    ).toBe('2 × 6–8 · 82.5 kg');
+    expect(
+      compactPrescription([{ ...set, targetWeightKg: null, targetWeightPercent1rm: 75 }]),
+    ).toBe('1 × 8 · 75% 1RM');
+    const hold = { targetRepsMin: null, targetRepsMax: null, targetWeightKg: null, targetDurationSeconds: 45 };
+    expect(compactPrescription([hold, hold, hold])).toBe('3 × 45 s');
+    const bare = { targetRepsMin: null, targetRepsMax: null, targetWeightKg: null, targetDurationSeconds: null };
+    expect(compactPrescription([bare, bare])).toBe('2 sets');
+    expect(compactPrescription([])).toBe('');
+  });
+
+  it('lets a settled day outrank a session open elsewhere', () => {
+    const day = (status: WorkoutLogStatus | null) =>
+      ({ status }) as Parameters<typeof heroState>[0];
+    expect(heroState(day(null), false)).toBe(HeroStates.Ready);
+    expect(heroState(day(null), true)).toBe(HeroStates.Blocked);
+    expect(heroState(day(WorkoutLogStatus.Completed), true)).toBe(HeroStates.Done);
+    expect(heroState(day(WorkoutLogStatus.Skipped), true)).toBe(HeroStates.Skipped);
+  });
+
+  it('places a plan in its weeks, with a total only for a coach plan', () => {
+    const plan = (over: Record<string, unknown> = {}) =>
+      ({
+        startDate: '2026-09-21',
+        endDate: '2026-12-13',
+        assignmentKind: ProgramAssignmentKind.Coach,
+        ...over,
+      }) as Parameters<typeof planWeekLabel>[0];
+    // Day 17 of a 12-week block.
+    expect(planWeekLabel(plan(), '2026-10-08')).toBe('Week 3 of 12');
+    expect(planWeekLabel(plan(), '2026-09-21')).toBe('Week 1 of 12');
+    // Past the end it holds at the last week rather than counting on.
+    expect(planWeekLabel(plan(), '2027-01-10')).toBe('Week 12 of 12');
+    expect(planWeekLabel(plan({ endDate: null }), '2026-10-08')).toBe('Week 3');
+    expect(planWeekLabel(plan({ assignmentKind: ProgramAssignmentKind.Self }), '2026-10-08')).toBe(
+      'Week 3',
+    );
+    expect(planWeekLabel(plan({ startDate: '2026-10-12' }), '2026-10-08')).toMatch(/^Starts /);
+  });
+
   it('counts weeks and days from one, not zero', () => {
     expect(planPositionLabel('Strength block', 2, 1)).toBe('Strength block · Week 3 · Day 2');
     expect(planPositionLabel(null, 0, 0)).toBe('Week 1 · Day 1');
@@ -389,8 +518,8 @@ describe('workouts config', () => {
     const started = new Date('2026-09-12T10:00:00Z');
     const now = started.getTime() + 74_000;
     expect(elapsedLabel(started.toISOString(), now)).toBe('1:14');
-    // An hour in, minutes alone would be ambiguous.
-    expect(elapsedLabel(started.toISOString(), started.getTime() + 3_900_000)).toBe('1:05');
+    // An hour in, the seconds stay: "1:05" would read as minutes and look frozen.
+    expect(elapsedLabel(started.toISOString(), started.getTime() + 3_912_000)).toBe('1:05:12');
     // A clock that has not moved is 0:00, never negative.
     expect(elapsedLabel(started.toISOString(), started.getTime() - 5_000)).toBe('0:00');
   });

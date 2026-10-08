@@ -1,46 +1,13 @@
-/* The hero card: the phase in the honey ink, the day's name, and where it sits
-   in the plan. */
-.hero .phase {
-  color: var(--mh-color-honey-deep);
+/* The layout lives in `mh-workout-overview`; only the loading stand-in is here. */
+.hero-skeleton {
+  padding-inline: 0.25rem;
 }
 
-.hero h2 {
-  margin: 0.25rem 0 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+.hero-skeleton ion-skeleton-text {
+  margin: 0.5rem 0;
 }
 
-.hero .position {
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--ion-color-medium);
-}
-
-.hero .meta {
-  margin: 0.5rem 0 0;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-}
-
-.hero ion-skeleton-text {
-  margin: 0.375rem 0;
-}
-
-/* The coach's note sits on the honey wash — the one thing on the page that
-   came from a person rather than the plan. */
-.note ion-item {
-  --background: var(--ion-color-primary-wash);
-  --color: var(--ion-color-primary-wash-contrast);
-}
-
-.note p {
-  margin-top: 0.375rem;
-  color: var(--ion-text-color);
-  font-size: var(--mh-text-sm);
-  line-height: var(--mh-leading-body);
-}
-
-/* Tile then name, the same gap the library row uses. */
+/* Tile then name, the same gap the overview rows use. */
 mh-hex-avatar {
   margin-inline-end: 0.875rem;
 }

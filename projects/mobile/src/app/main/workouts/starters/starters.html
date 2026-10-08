@@ -5,6 +5,11 @@
     </ion-buttons>
     <ion-title>{{ 'workouts.common.starterRoutines' | translate }}</ion-title>
   </ion-toolbar>
+  <!-- Said before the list, not inside it: starting one copies it into your
+       own library, and that should not come as a surprise later. -->
+  <ion-toolbar class="note-bar">
+    <ion-note>{{ 'workouts.starters.note' | translate }}</ion-note>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -27,26 +32,31 @@
     />
   } @else {
     <div class="mh-page">
-      <ion-note class="mh-note-block">{{ 'workouts.starters.note' | translate }}</ion-note>
-
       @if (showSkeleton()) {
         <!-- Mirrors the row shape so nothing shifts when the rows land. -->
-        <div>
-          @for (_ of skeletonRows; track $index) {
-            <mh-session-row-skeleton [rail]="false" />
+        <ion-list [inset]="true" class="mh-card-list" aria-hidden="true">
+          @for (_ of skeletonRows; track $index; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'">
+              <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+              <ion-label>
+                <ion-skeleton-text [animated]="true" style="width: 55%" />
+                <ion-skeleton-text [animated]="true" style="width: 35%" />
+              </ion-label>
+            </ion-item>
           }
-        </div>
+        </ion-list>
       } @else {
-        <div>
+        <ion-list [inset]="true" class="mh-card-list">
           @for (routine of routines(); track routine.id; let i = $index) {
             <mh-routine-row
               [routine]="routine"
-              [tone]="routineTone(i)"
-              [starter]="true"
+              [color]="routineTileColor(i)"
+              [showLevel]="true"
+              [detail]="false"
               (select)="open(routine)"
             />
           }
-        </div>
+        </ion-list>
       }
     </div>
   }

@@ -1,34 +1,97 @@
-/* The card chrome comes from the ion-card skin; this is the hero's type. */
+/* The card chrome comes from the ion-card skin and the label-above-card
+   spacing from `.mh-section` on the host; this is the hero's own type. */
 
-:host {
+/* The plan's position, in the honey ink: it names where you are, not a
+   status. */
+.position {
   display: block;
-}
-
-/* The moment, in the honey ink: it names when, not a status. */
-.eyebrow {
   color: var(--mh-color-honey-deep);
 }
 
+/* Ionic's card inks its content medium; the workout name is the headline. */
 h2 {
   margin: 0.375rem 0 0;
+  color: var(--ion-text-color);
   font-size: var(--mh-text-lg);
   font-weight: 700;
 }
 
-/* The plan's own position line, quieter than the eyebrow above it so the two
-   mono rows do not compete. */
-.position {
-  display: block;
-  margin-top: 0.25rem;
+.meta {
+  margin: 0.25rem 0 0;
   color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
 }
 
-.meta {
+/* The session at a glance: rows flush with the card's own padding, name on
+   the left, the prescription in the mono face on the right. */
+.exercises {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  background: transparent;
+}
+
+.exercises ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  /* Read-only rows, not tap targets: sized to the text, like the mockup. */
+  --min-height: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --border-color: var(--mh-color-divider);
+  font-size: var(--mh-text-base);
+}
+
+.exercises ion-label,
+.exercises ion-note {
+  margin-block: 0.625rem;
+  padding-block: 0;
+}
+
+.exercises ion-note {
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+}
+
+.more {
   margin: 0.5rem 0 0;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
 }
 
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0.875rem 0 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-base);
+}
+
+.status ion-icon {
+  font-size: var(--mh-text-lg);
+}
+
 ion-button {
   margin: 0.875rem 0 0;
+}
+
+.status + ion-button {
+  margin-top: 0.625rem;
+}
+
+/* Neutral, not honey: either the open session is the thing to get back to,
+   or the day is already settled. */
+ion-button.neutral {
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --color: var(--ion-text-color);
+}
+
+.blocked-note {
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-align: center;
 }

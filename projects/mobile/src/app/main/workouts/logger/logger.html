@@ -1,15 +1,31 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <!-- Down, not back: the workout keeps running and waits on the Workouts
+         tab. Leaving is neither finishing nor discarding. -->
     <ion-buttons slot="start">
-      <ion-button (click)="finish()">{{ 'workouts.logger.finish' | translate }}</ion-button>
-    </ion-buttons>
-    <ion-title>{{ store.log()?.name ?? ('workouts.common.workout' | translate) }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-note class="progress">{{ store.progress().done }}/{{ store.progress().total }}</ion-note>
-      <ion-button [attr.aria-label]="'workouts.logger.discard.title' | translate" (click)="discardConfirmOpen.set(true)">
-        <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+      <ion-button [attr.aria-label]="'workouts.logger.leave' | translate" (click)="leave()">
+        <ion-icon slot="icon-only" name="chevron-down-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
+    <ion-title>
+      <span class="name">{{ store.log()?.name ?? ('workouts.common.workout' | translate) }}</span>
+      @if (elapsed()) {
+        <span class="timer" role="timer">{{ elapsed() }}</span>
+      }
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="finish" fill="solid" shape="round" [disabled]="!store.log()" (click)="finish()">
+        {{ 'workouts.logger.finish' | translate }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- The whole workout at a glance: how far along, in sets. -->
+  <ion-toolbar class="progress">
+    <div class="progress-row">
+      <ion-progress-bar [value]="progressRatio()" />
+      <span class="mh-kicker">{{ 'workouts.meta.setsDone' | translate: { done: store.progress().done, total: store.progress().total } }}</span>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -39,56 +55,80 @@
   } @else {
     <div class="mh-page">
       @for (exercise of store.exercises(); track exercise.id) {
-        <mh-exercise-card
-          [name]="exercise.exerciseNameSnapshot"
-          [meta]="setsLabel(exercise)"
-          [skipped]="exercise.isSkipped"
-          [showActions]="true"
-          (open)="openExercise(exercise)"
-          (actions)="openActions(exercise)"
-        >
-          @if (!exercise.isSkipped) {
-            <!-- Column labels, once per exercise — the set rows stay wordless. -->
-            <div class="grid-head">
-              <span class="num">{{ 'workouts.logger.gridHead.set' | translate }}</span>
-              <span class="prev">{{ 'workouts.logger.gridHead.prev' | translate }}</span>
-              @for (column of columnsFor(exercise); track column) {
-                <span class="col">{{ column }}</span>
+        @if (isFolded(exercise)) {
+          <!-- Done: folded to one check row so the open exercise stays near
+               the top. Tapping it opens the sets again. -->
+          <ion-card class="folded">
+            <ion-item
+              button
+              detail="false"
+              lines="none"
+              [attr.aria-label]="'workouts.logger.expand' | translate: { name: exercise.exerciseNameSnapshot }"
+              (click)="unfold(exercise)"
+            >
+              <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
+              <ion-label>
+                <h2>{{ exercise.exerciseNameSnapshot }}</h2>
+                <p>{{ doneSummary(exercise) }}</p>
+              </ion-label>
+              <ion-icon slot="end" name="chevron-down-outline" color="medium" aria-hidden="true" />
+            </ion-item>
+          </ion-card>
+        } @else {
+          <mh-exercise-card
+            [name]="exercise.exerciseNameSnapshot"
+            [meta]="cardMeta(exercise)"
+            [kind]="exercise.exercise?.kind ?? null"
+            [skipped]="exercise.isSkipped"
+            [showActions]="true"
+            (open)="openExercise(exercise)"
+            (actions)="openActions(exercise)"
+          >
+            @if (!exercise.isSkipped) {
+              <!-- Column labels, once per exercise — the set rows stay wordless. -->
+              <div class="grid-head">
+                <span class="num">{{ 'workouts.logger.gridHead.set' | translate }}</span>
+                <span class="prev">{{ 'workouts.logger.gridHead.prev' | translate }}</span>
+                @for (column of columnsFor(exercise); track column) {
+                  <span class="col">{{ column }}</span>
+                }
+                <span class="tick-head"></span>
+              </div>
+
+              @for (set of exercise.sets ?? []; track set.id; let i = $index) {
+                <mh-set-row
+                  [set]="set"
+                  [index]="i"
+                  [kind]="exercise.exercise?.kind ?? null"
+                  [unilateral]="isUnilateral(exercise)"
+                  [showAddedWeight]="hasAddedWeight(exercise)"
+                  [previous]="previousFor(exercise, i)"
+                  [editing]="editingFieldFor(set.id)"
+                  [draft]="editingFieldFor(set.id) ? typed() : null"
+                  (toggle)="toggleSet(exercise, set)"
+                  (edit)="editCell(exercise, set, $event)"
+                  (remove)="removeSet(exercise, set)"
+                />
               }
-              <span class="tick-head"></span>
-            </div>
 
-            @for (set of exercise.sets ?? []; track set.id; let i = $index) {
-              <mh-set-row
-                [set]="set"
-                [index]="i"
-                [kind]="exercise.exercise?.kind ?? null"
-                [unilateral]="isUnilateral(exercise)"
-                [showAddedWeight]="hasAddedWeight(exercise)"
-                [previous]="previousFor(exercise, i)"
-                [editing]="editingFieldFor(set.id)"
-                (toggle)="toggleSet(exercise, set)"
-                (edit)="editCell(exercise, set, $event)"
-              />
-            }
-
-            <div class="ex-actions">
-              <ion-button fill="clear" size="small" (click)="addSet(exercise)">
-                <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                {{ 'workouts.logger.addSet' | translate }}
-              </ion-button>
-
-              <!-- Weighted pull-ups and dips still deserve a volume number, and
-                   push-ups still deserve not to be asked. -->
-              @if (canAddWeight(exercise)) {
-                <ion-button fill="clear" size="small" (click)="addWeight(exercise)">
+              <div class="ex-actions">
+                <ion-button fill="clear" size="small" (click)="addSet(exercise)">
                   <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                  {{ 'workouts.logger.addWeight' | translate }}
+                  {{ 'workouts.logger.addSet' | translate }}
                 </ion-button>
-              }
-            </div>
-          }
-        </mh-exercise-card>
+
+                <!-- Weighted pull-ups and dips still deserve a volume number, and
+                     push-ups still deserve not to be asked. -->
+                @if (canAddWeight(exercise)) {
+                  <ion-button fill="clear" size="small" (click)="addWeight(exercise)">
+                    <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                    {{ 'workouts.logger.addWeight' | translate }}
+                  </ion-button>
+                }
+              </div>
+            }
+          </mh-exercise-card>
+        }
       }
 
       @if (store.exercises().length) {
@@ -108,6 +148,14 @@
           (action)="addExercise()"
         />
       }
+
+      <!-- Last and quiet: throwing the session away is the rare path, and
+           leaving the page is not it. -->
+      @if (store.log()) {
+        <ion-button class="discard" expand="block" fill="clear" color="danger" size="small" (click)="discardConfirmOpen.set(true)">
+          {{ 'workouts.logger.discard.title' | translate }}
+        </ion-button>
+      }
     </div>
   }
 </ion-content>
@@ -121,12 +169,19 @@
       [field]="keypadField()"
       [label]="keypadLabel()"
       [value]="draft()"
+      [cell]="editingKey()"
+      [showNext]="true"
       (commit)="commitCell($event)"
+      (next)="nextCell($event)"
+      (preview)="typed.set($event)"
       (dismiss)="editing.set(null)"
     />
   } @else if (showRest()) {
     <mh-rest-timer-bar
       [endsAt]="restEndsAt()"
+      [startedAt]="restStartedAt()"
+      [nextTitle]="nextUp()?.title ?? ''"
+      [nextDetail]="nextUp()?.detail ?? ''"
       (nudge)="nudgeRest($event)"
       (skip)="skipRest()"
       (finished)="onRestFinished()"

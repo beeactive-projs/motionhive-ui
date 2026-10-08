@@ -18,6 +18,10 @@ ion-item h2 {
   font-weight: 700;
 }
 
+mh-hex-avatar {
+  margin-inline-end: 0.875rem;
+}
+
 /* The header already pads the top; the body only needs air below the rows. */
 ion-card-content {
   padding-top: 0;

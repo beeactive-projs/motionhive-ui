@@ -7,9 +7,14 @@ import {
   OneRepMaxSource,
   ProgramAssignmentKind,
   ProgressRange,
+  SetField,
+  SetFields,
+  TrainingDayPlan,
+  TrainingDayWorkout,
   WorkoutLog,
   WorkoutLogStatus,
   appLocale,
+  dayFromKey,
   enumLabel,
   formatTotalDuration,
   localDayKey,
@@ -22,6 +27,7 @@ import {
   alertCircleOutline,
   backspaceOutline,
   barbellOutline,
+  checkmarkCircle,
   checkmarkCircleOutline,
   checkmarkOutline,
   chevronBack,
@@ -29,6 +35,8 @@ import {
   chevronForward,
   chevronUpOutline,
   ellipsisHorizontal,
+  ellipsisVertical,
+  eyeOutline,
   flashOutline,
   playOutline,
   playSkipForwardOutline,
@@ -53,6 +61,7 @@ export const WORKOUT_ICONS = {
   alertCircleOutline,
   backspaceOutline,
   barbellOutline,
+  checkmarkCircle,
   checkmarkCircleOutline,
   checkmarkOutline,
   chevronBack,
@@ -60,6 +69,8 @@ export const WORKOUT_ICONS = {
   chevronForward,
   chevronUpOutline,
   ellipsisHorizontal,
+  ellipsisVertical,
+  eyeOutline,
   flashOutline,
   playOutline,
   playSkipForwardOutline,
@@ -84,30 +95,15 @@ export const DEFAULT_SETS = 3;
 // ─── Spine tones ──────────────────────────────────────────────────────────
 
 /**
- * Spine tones for routine rows, rotated by position the way the Discover
- * rails do it. Routines carry no inherent category, so a stable per-index
- * tone is what stops a list of them reading as one grey block.
+ * The hexagon tile behind each routine row, yours or a starter. Ionic palette
+ * names with a `-wash` step, rotated by position the way the Discover rails
+ * do it: routines carry no inherent category, so a stable per-index colour
+ * is what stops a list of them reading as one grey block.
  */
-const ROUTINE_TONES: readonly SpineTone[] = [
-  SpineTones.Honey,
-  SpineTones.Teal,
-  SpineTones.Violet,
-  SpineTones.Navy,
-  SpineTones.Coral,
-];
+const ROUTINE_TILE_COLORS = ['primary', 'teal', 'info', 'coral'] as const;
 
-export function routineTone(index: number): SpineTone {
-  return ROUTINE_TONES[index % ROUTINE_TONES.length];
-}
-
-/**
- * The hexagon tile behind each starter on the cold-start rail. Ionic palette
- * names with a `-wash` step, rotated by position like the routine spines.
- */
-const STARTER_TILE_COLORS = ['primary', 'teal', 'info'] as const;
-
-export function starterTileColor(index: number): string {
-  return STARTER_TILE_COLORS[index % STARTER_TILE_COLORS.length];
+export function routineTileColor(index: number): string {
+  return ROUTINE_TILE_COLORS[index % ROUTINE_TILE_COLORS.length];
 }
 
 /**
@@ -211,6 +207,190 @@ export function planPositionLabel(
   return parts.filter(Boolean).join(' · ');
 }
 
+/** What the Workouts hero can offer for its day. */
+export const HeroStates = {
+  /** Nothing in the way: start it. */
+  Ready: 'ready',
+  /** Another workout is open, so this one can be looked at, not started. */
+  Blocked: 'blocked',
+  /** Finished already: its summary is what is left to see. */
+  Done: 'done',
+  /** Skipped on purpose: still there to look at. */
+  Skipped: 'skipped',
+} as const;
+export type HeroState = (typeof HeroStates)[keyof typeof HeroStates];
+
+/**
+ * The day's own outcome wins over an open session elsewhere: a finished day
+ * stays finished whatever else is running.
+ */
+export function heroState(workout: TrainingDayWorkout, blocked: boolean): HeroState {
+  if (workout.status === WorkoutLogStatus.Completed) return HeroStates.Done;
+  if (workout.status === WorkoutLogStatus.Skipped) return HeroStates.Skipped;
+  return blocked ? HeroStates.Blocked : HeroStates.Ready;
+}
+
+/**
+ * "Week 3 of 12" under a plan's name, or "Starts Mon 12 Oct" before it has.
+ * The total only for a coach's plan: a self-scheduled routine rolls on, so
+ * its end date is a horizon, not a length.
+ */
+export function planWeekLabel(plan: TrainingDayPlan, todayKey: string): string {
+  const elapsed = daysBetween(plan.startDate, todayKey);
+  if (elapsed < 0) {
+    return translate('workouts.home.startsOn', { date: shortDayLabel(plan.startDate) });
+  }
+  const week = Math.floor(elapsed / 7) + 1;
+  if (!plan.endDate || plan.assignmentKind === ProgramAssignmentKind.Self) {
+    return translate('workouts.meta.week', { number: week });
+  }
+  const total = Math.max(1, Math.ceil((daysBetween(plan.startDate, plan.endDate) + 1) / 7));
+  return translate('workouts.home.weekOf', { week: Math.min(week, total), total });
+}
+
+/**
+ * "last done Tuesday" for a routine's meta line. Lower case because it
+ * follows the exercise count and a separator. Today and yesterday by name,
+ * the rest of the past week by weekday, anything older by date.
+ */
+export function lastDoneLabel(performedAt: string, now: Date): string {
+  const dayKey = localDayKey(new Date(performedAt));
+  const days = daysBetween(dayKey, localDayKey(now));
+  if (days <= 0) return translate('workouts.routineRow.lastDoneToday');
+  if (days === 1) return translate('workouts.routineRow.lastDoneYesterday');
+
+  const date = dayFromKey(dayKey);
+  const day =
+    days < 7
+      ? date.toLocaleDateString(appLocale(), { weekday: 'long' })
+      : date.toLocaleDateString(appLocale(), {
+          day: 'numeric',
+          month: 'short',
+          ...(date.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
+        });
+  return translate('workouts.routineRow.lastDoneOn', { day });
+}
+
+/** Whole calendar days from one `YYYY-MM-DD` to another; rounding absorbs DST. */
+function daysBetween(fromKey: string, toKey: string): number {
+  return Math.round((dayFromKey(toKey).getTime() - dayFromKey(fromKey).getTime()) / 86_400_000);
+}
+
+/**
+ * The target fields every prescribed set carries. A routine's sets and an
+ * assigned day's sets both fit, so one line describes either.
+ */
+export interface SetTarget {
+  targetRepsMin: number | null;
+  targetRepsMax: number | null;
+  targetWeightKg: number | null;
+  targetDurationSeconds: number | null;
+  targetWeightPercent1rm?: number | null;
+  /** The %1RM already turned into kilograms, when the API has done it. */
+  resolvedWeightKg?: number | null;
+}
+
+/**
+ * "4 sets · 6–8 reps · 82.5 kg top set" for an exercise row before Start.
+ *
+ * Reps span the lowest floor to the highest ceiling across the sets. A load
+ * that changes from set to set names the heaviest one as the top set; a
+ * percentage stands in only when no kilograms are known yet. A set with no
+ * reps but a duration is a hold.
+ */
+export function prescriptionLine(sets: readonly SetTarget[]): string {
+  if (!sets.length) return '';
+  const parts = [translate('count.sets', { count: sets.length })];
+
+  const floors = present(sets.map((s) => s.targetRepsMin ?? s.targetRepsMax));
+  const ceilings = present(sets.map((s) => s.targetRepsMax ?? s.targetRepsMin));
+  if (floors.length) {
+    const min = Math.min(...floors);
+    const max = Math.max(...ceilings);
+    parts.push(
+      min === max
+        ? translate('count.reps', { count: min })
+        : translate('workouts.prescription.repsRange', { min, max }),
+    );
+  } else {
+    const holds = present(sets.map((s) => s.targetDurationSeconds));
+    if (holds.length) {
+      parts.push(translate('workouts.prescription.hold', { seconds: Math.max(...holds) }));
+    }
+  }
+
+  const loads = present(sets.map((s) => s.resolvedWeightKg ?? s.targetWeightKg)).filter((kg) => kg > 0);
+  if (loads.length) {
+    const top = Math.max(...loads);
+    const varied = loads.length < sets.length || loads.some((kg) => kg !== top);
+    parts.push(
+      varied
+        ? translate('workouts.prescription.topSet', { weight: formatMeasure(top) })
+        : translate('workouts.units.kg', { value: formatMeasure(top) }),
+    );
+  } else {
+    const percents = present(sets.map((s) => s.targetWeightPercent1rm ?? null));
+    if (percents.length) {
+      parts.push(
+        translate('workouts.prescription.percent1rm', {
+          percent: formatMeasure(Math.max(...percents)),
+        }),
+      );
+    }
+  }
+
+  return parts.join(' · ');
+}
+
+/**
+ * "4 × 6–8 · 82.5 kg": `prescriptionLine` cut to fit a right-aligned column,
+ * where "sets", "reps" and "top set" go without saying. Same reading of the
+ * sets: rep span from lowest floor to highest ceiling, heaviest load, a
+ * percentage only when no kilograms are known.
+ */
+export function compactPrescription(sets: readonly SetTarget[]): string {
+  if (!sets.length) return '';
+  const parts: string[] = [];
+
+  const floors = present(sets.map((s) => s.targetRepsMin ?? s.targetRepsMax));
+  const ceilings = present(sets.map((s) => s.targetRepsMax ?? s.targetRepsMin));
+  const holds = present(sets.map((s) => s.targetDurationSeconds));
+  if (floors.length) {
+    const min = Math.min(...floors);
+    const max = Math.max(...ceilings);
+    const reps =
+      min === max ? String(min) : translate('workouts.prescription.compactRange', { min, max });
+    parts.push(translate('workouts.prescription.compact', { sets: sets.length, reps }));
+  } else if (holds.length) {
+    parts.push(
+      translate('workouts.prescription.compactHold', {
+        sets: sets.length,
+        seconds: Math.max(...holds),
+      }),
+    );
+  } else {
+    parts.push(translate('count.sets', { count: sets.length }));
+  }
+
+  const loads = present(sets.map((s) => s.resolvedWeightKg ?? s.targetWeightKg)).filter((kg) => kg > 0);
+  const percents = present(sets.map((s) => s.targetWeightPercent1rm ?? null));
+  if (loads.length) {
+    parts.push(translate('workouts.units.kg', { value: formatMeasure(Math.max(...loads)) }));
+  } else if (percents.length) {
+    parts.push(
+      translate('workouts.prescription.percent1rm', {
+        percent: formatMeasure(Math.max(...percents)),
+      }),
+    );
+  }
+
+  return parts.join(' · ');
+}
+
+function present(values: readonly (number | null | undefined)[]): number[] {
+  return values.filter((v): v is number => v != null);
+}
+
 /**
  * A finished workout's length. Delegates to core's formatter so a duration
  * reads the same here as it does on a session.
@@ -248,7 +428,11 @@ export function elapsedLabel(startedAt: string, now: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   const hrs = Math.floor(mins / 60);
-  if (hrs > 0) return `${hrs}:${String(mins % 60).padStart(2, '0')}`;
+  // Past an hour the seconds stay: "1:05:12", not "1:05", which both reads as
+  // minutes and only moves once a minute, so a running clock looks stopped.
+  if (hrs > 0) {
+    return `${hrs}:${String(mins % 60).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
@@ -719,6 +903,102 @@ export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
 
 function loadedVolume(set: LoggedSet): number {
   return set.weightKg != null && set.reps != null ? set.weightKg * set.reps : 0;
+}
+
+/** Every set ticked, and there was at least one: the exercise folds to a check row. */
+export function isExerciseDone(exercise: LoggedExercise): boolean {
+  const sets = exercise.sets ?? [];
+  return !exercise.isSkipped && sets.length > 0 && sets.every((set) => set.isCompleted);
+}
+
+/** Kilograms moved across the completed sets — weight × reps, nothing else counted. */
+export function exerciseVolumeKg(exercise: LoggedExercise): number {
+  return (exercise.sets ?? [])
+    .filter((set) => set.isCompleted)
+    .reduce((sum, set) => sum + loadedVolume(set), 0);
+}
+
+/**
+ * "3 sets done · 2,140 kg" on a folded exercise. Grouped, unlike a single
+ * measure: a volume is a total you read at a glance, not a number you type.
+ */
+export function exerciseDoneSummary(exercise: LoggedExercise): string {
+  const done = (exercise.sets ?? []).filter((set) => set.isCompleted).length;
+  const parts = [translate('workouts.logger.setsDone', { count: done })];
+  const volume = Math.round(exerciseVolumeKg(exercise));
+  if (volume > 0) {
+    parts.push(
+      translate('workouts.units.kg', { value: new Intl.NumberFormat(appLocale()).format(volume) }),
+    );
+  }
+  return parts.join(' · ');
+}
+
+/**
+ * "80 kg · 8 · 8 · 7" — last time's top weight, then each set's reps, so the
+ * line answers "what did I manage" before the grid asks "what now". A hold
+ * reads as its clocks instead. Empty when there is no last time.
+ */
+export function lastTimeSummary(sets: readonly LoggedSet[]): string {
+  const done = sets.filter((set) => set.isCompleted);
+  const rows = done.length ? done : sets;
+  if (!rows.length) return '';
+
+  const weights = rows.map((set) => set.weightKg).filter((kg): kg is number => kg != null && kg > 0);
+  const reps = rows.map((set) => set.reps).filter((n): n is number => n != null);
+  const parts: string[] = [];
+  if (weights.length) {
+    parts.push(translate('workouts.units.kg', { value: formatMeasure(Math.max(...weights)) }));
+  }
+  if (reps.length) {
+    parts.push(...reps.map((n) => formatMeasure(n)));
+  } else {
+    const holds = rows
+      .map((set) => set.durationSeconds)
+      .filter((s): s is number => s != null)
+      .map(secondsToClock);
+    parts.push(...holds);
+  }
+  return parts.join(' · ');
+}
+
+/**
+ * What an empty cell shows in grey: the coach's target for this set when the
+ * plan names one ("6–8", "82.5", the %1RM already in kilograms), otherwise
+ * what the same set held last time. Empty when neither exists.
+ */
+export function setPlaceholder(
+  set: LoggedSet,
+  field: SetField,
+  previous: LoggedSet | null,
+): string {
+  const target = set.assignedSet;
+  switch (field) {
+    case SetFields.Weight: {
+      const kg = target?.resolvedWeightKg ?? target?.targetWeightKg ?? previous?.weightKg ?? null;
+      return kg == null ? '' : formatMeasure(kg);
+    }
+    case SetFields.Reps: {
+      const min = target?.targetRepsMin ?? null;
+      const max = target?.targetRepsMax ?? null;
+      if (min != null && max != null && min !== max) {
+        return translate('workouts.prescription.compactRange', {
+          min: formatMeasure(min),
+          max: formatMeasure(max),
+        });
+      }
+      const reps = min ?? max ?? previous?.reps ?? null;
+      return reps == null ? '' : formatMeasure(reps);
+    }
+    case SetFields.Duration: {
+      const seconds = target?.targetDurationSeconds ?? previous?.durationSeconds ?? null;
+      return seconds == null ? '' : secondsToClock(seconds);
+    }
+    case SetFields.Distance: {
+      const meters = target?.targetDistanceMeters ?? previous?.distanceMeters ?? null;
+      return meters == null ? '' : formatMeasure(meters);
+    }
+  }
 }
 
 /**

@@ -71,6 +71,20 @@ export class WorkoutsStore {
     return week.find((w) => !!w.scheduledDate && w.scheduledDate > todayKey) ?? null;
   });
 
+  /** The plan day the hero shows: today's, or the next one on a rest day. */
+  readonly heroWorkout = computed(() => this.today() ?? this.upNext());
+
+  /**
+   * The open session is the hero's own day, begun earlier and left. The
+   * resume banner already is that workout, so the hero steps aside rather
+   * than show it twice.
+   */
+  readonly heroIsOpen = computed(() => {
+    const open = this._inProgress();
+    const hero = this.heroWorkout();
+    return !!open && !!hero && open.assignedWorkoutId === hero.assignedWorkoutId;
+  });
+
   /** Nothing assigned, nothing saved, nothing logged — the cold start. */
   readonly isColdStart = computed(
     () =>

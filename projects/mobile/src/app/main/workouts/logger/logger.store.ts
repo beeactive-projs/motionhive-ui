@@ -29,6 +29,16 @@ export class LoggerStore {
   private readonly _error = signal(false);
   private readonly _saving = signal(0);
 
+  /**
+   * One write in flight per set; changes made meanwhile wait here, merged.
+   * Two parallel PATCHes to the same set race on the server: each reply is
+   * built from the row as that request read it, so the later-arriving one
+   * can carry a stale field and wipe a value the user just typed (ticking a
+   * set with the keypad still open did exactly that to its reps).
+   */
+  private readonly _inFlight = new Set<string>();
+  private readonly _queued = new Map<string, { exerciseId: string; payload: LogSetPayload }>();
+
   readonly log = this._log.asReadonly();
   readonly loading = this._loading.asReadonly();
   /** True while any set write is in flight — drives the quiet saving hint. */
@@ -81,10 +91,23 @@ export class LoggerStore {
   // ─── Sets ─────────────────────────────────────────────────────
 
   logSet(exerciseId: string, setId: string, payload: LogSetPayload): void {
+    if (!this._log()) return;
+
+    this._patchSet(exerciseId, setId, payload as Partial<LoggedSet>);
+
+    if (this._inFlight.has(setId)) {
+      const waiting = this._queued.get(setId);
+      this._queued.set(setId, { exerciseId, payload: { ...waiting?.payload, ...payload } });
+      return;
+    }
+    this._sendSet(exerciseId, setId, payload);
+  }
+
+  private _sendSet(exerciseId: string, setId: string, payload: LogSetPayload): void {
     const log = this._log();
     if (!log) return;
 
-    this._patchSet(exerciseId, setId, payload as Partial<LoggedSet>);
+    this._inFlight.add(setId);
     this._saving.update((n) => n + 1);
 
     this._workoutLogService
@@ -95,6 +118,16 @@ export class LoggerStore {
       )
       .subscribe((saved) => {
         this._saving.update((n) => Math.max(0, n - 1));
+        this._inFlight.delete(setId);
+
+        const next = this._queued.get(setId);
+        if (next) {
+          // The local row already holds these newer edits; this reply would
+          // only roll them back. Send them, and take the server's row after.
+          this._queued.delete(setId);
+          this._sendSet(next.exerciseId, setId, next.payload);
+          return;
+        }
         if (saved) this._replaceSet(exerciseId, saved);
       });
   }
@@ -111,6 +144,36 @@ export class LoggerStore {
           ...ex,
           sets: [...(ex.sets ?? []), set],
         }));
+      });
+  }
+
+  /**
+   * Optimistic like every write here, but a failed delete cannot be shrugged
+   * off — the row would be gone locally and back on the next load. So a
+   * failure re-reads the log and tells the caller.
+   */
+  removeSet(exerciseId: string, setId: string, onError?: () => void): void {
+    const log = this._log();
+    if (!log) return;
+    // Edits still waiting on an in-flight write would only 404 once it lands.
+    this._queued.delete(setId);
+    this._updateExercise(exerciseId, (ex) => ({
+      ...ex,
+      sets: (ex.sets ?? []).filter((s) => s.id !== setId),
+    }));
+    this._workoutLogService
+      .removeSet(log.id, setId)
+      .pipe(take(1))
+      .subscribe({
+        error: () => {
+          onError?.();
+          this._workoutLogService
+            .get(log.id)
+            .pipe(take(1), catchError(() => of(null)))
+            .subscribe((fresh) => {
+              if (fresh) this._log.set(fresh);
+            });
+        },
       });
   }
 

@@ -18,6 +18,15 @@
   color: var(--ion-color-primary);
 }
 
+/* The live dot before the kicker: something is running. */
+.resume .live-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-inline-end: 0.75rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-color-primary);
+}
+
 .resume h2 {
   color: inherit;
   font-weight: 600;

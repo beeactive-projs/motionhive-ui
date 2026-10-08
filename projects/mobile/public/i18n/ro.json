@@ -2305,6 +2305,7 @@
   "workouts": {
     "common": {
       "addExercises": "Adaugă exerciții",
+      "alreadyInProgress": "{name} este încă în desfășurare. Termină-l sau renunță la el înainte să începi alt antrenament.",
       "exercise": "Exercițiu",
       "exercises": "Exerciții",
       "history": "Istoric",
@@ -2407,6 +2408,8 @@
       "openHistory": "Deschide istoricul",
       "percentDone": "{percent}% gata",
       "startEmpty": "Începe un antrenament nou",
+      "startsOn": "Începe {date}",
+      "weekOf": "Săptămâna {week} din {total}",
       "yourCoach": "Antrenorul tău",
       "yourRoutines": "Rutinele tale"
     },
@@ -2454,12 +2457,7 @@
         "message": "Alege mișcările din mers. Nu trebuie să planifici nimic dinainte.",
         "title": "Adaugă primul exercițiu"
       },
-      "fieldLabel": {
-        "distance": "Distanță (m)",
-        "duration": "Timp (mm:ss)",
-        "reps": "Repetări",
-        "weight": "Greutate (kg)"
-      },
+      "expand": "Arată seriile pentru {name}",
       "finish": "Termină",
       "finishConfirm": {
         "message": "{count, plural, one {# serie nu e bifată încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.} few {# serii nu sunt bifate încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.} other {# de serii nu sunt bifate încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.}}",
@@ -2469,6 +2467,8 @@
         "prev": "Anterior",
         "set": "Serie"
       },
+      "leave": "Ieși și lasă antrenamentul în desfășurare",
+      "nextField": "Câmpul următor",
       "picker": {
         "replacing": "Înlocuiești {name}",
         "swapFor": "Schimbă cu"
@@ -2478,10 +2478,13 @@
         "messageWithSets": "{name} are {count, plural, one {# serie finalizată} few {# serii finalizate} other {# de serii finalizate}}. Dacă îl elimini, se șterg și ele.",
         "title": "Elimină exercițiul"
       },
+      "setNumber": "Seria {number}",
+      "setsDone": "{count, plural, one {# serie făcută} few {# serii făcute} other {# de serii făcute}}",
       "toast": {
         "discardFailed": "Nu am putut renunța la antrenament",
         "discarded": "Ai renunțat la antrenament",
         "nothingToRepeat": "Antrenamentul acela nu avea exerciții de repetat",
+        "removeSetFailed": "Nu am putut elimina seria",
         "removed": "Am eliminat {name}",
         "repeatFailed": "Nu am putut încărca antrenamentul de repetat"
       }
@@ -2503,17 +2506,28 @@
       "title": "Plan",
       "yourCoach": "antrenorul tău"
     },
+    "prescription": {
+      "compact": "{sets} × {reps}",
+      "compactHold": "{sets} × {seconds} s",
+      "compactRange": "{min}–{max}",
+      "hold": "{seconds} s menținere",
+      "percent1rm": "{percent}% din 1RM",
+      "repsRange": "{min}–{max} repetări",
+      "topSet": "{weight} kg la seria de vârf"
+    },
     "preview": {
       "empty": {
         "message": "Planul nu are încă antrenamente. Poate că antrenorul tău încă lucrează la el.",
         "title": "Nimic de făcut încă"
       },
+      "noteFrom": "Notă de la {name}",
       "noteFromCoach": "Notă de la antrenorul tău",
       "skipToday": "Sari peste azi",
       "toast": {
         "skipFailed": "Nu am putut marca ziua ca omisă",
         "skipped": "Ai sărit peste antrenamentul de azi"
-      }
+      },
+      "todaysWorkout": "Antrenamentul de azi"
     },
     "progress": {
       "empty": {
@@ -2528,8 +2542,9 @@
       "title": "Pauza s-a terminat"
     },
     "restTimer": {
+      "lastSet": "ultima serie",
       "minusSeconds": "Minus {seconds} secunde",
-      "next": "Urmează: {target}",
+      "nextUp": "Urmează",
       "plusSeconds": "Plus {seconds} secunde",
       "rest": "Pauză",
       "restOver": "Pauza s-a terminat"
@@ -2573,12 +2588,21 @@
     },
     "routineRow": {
       "lastDone": "Ultima dată: {day}",
-      "starter": "Predefinit"
+      "lastDoneOn": "ultima dată {day}",
+      "lastDoneToday": "ultima dată azi",
+      "lastDoneYesterday": "ultima dată ieri"
+    },
+    "routineView": {
+      "about": "Despre această rutină",
+      "notes": "Notițele tale",
+      "starter": "Rutină de start MotionHive",
+      "yours": "Rutina ta"
     },
     "setRow": {
       "cellLabel": "{field, select, weight {greutate} reps {repetări} duration {durată} distance {distanță} other {{field}}} pentru seria {number}",
       "complete": "Seria {number} finalizată",
-      "lastTime": "Data trecută: {value}"
+      "lastTime": "Data trecută: {value}",
+      "options": "Opțiuni pentru seria {number}"
     },
     "setTypeMark": {
       "DROPSET": "Drop set",
@@ -2602,6 +2626,13 @@
       "workouts": "Antrenamente"
     },
     "todayHero": {
+      "done": "Gata pe azi. Bravo!",
+      "finishFirst": "Termină antrenamentul în desfășurare ca să îl poți începe pe acesta.",
+      "more": "+ încă {count}",
+      "seeSummary": "Vezi rezumatul",
+      "seeWorkout": "Vezi antrenamentul",
+      "skipped": "Ai sărit peste antrenamentul acesta.",
+      "summaryFailed": "Nu am putut deschide rezumatul",
       "upNextWithDate": "Urmează · {date}"
     },
     "units": {

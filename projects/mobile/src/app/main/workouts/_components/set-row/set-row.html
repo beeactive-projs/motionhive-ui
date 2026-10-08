@@ -1,34 +1,57 @@
-<div class="row" [class.done]="set().isCompleted">
-  <span class="num">
-    {{ index() + 1 }}
-    @if (typeMark()) {
-      <em class="type">{{ typeMark() }}</em>
-    }
-  </span>
+<!-- Swipe the row left to remove it, or tap its number: the number is the
+     visible way in, the swipe the quick one. -->
+<ion-item-sliding #sliding>
+  <ion-item lines="none" class="set-item">
+    <div class="row" [class.done]="set().isCompleted">
+      <button
+        class="num"
+        type="button"
+        [attr.aria-label]="'workouts.setRow.options' | translate: { number: index() + 1 }"
+        (click)="openOptions()"
+      >
+        <!-- A warm-up or drop set wears its mark in place of the number. -->
+        @if (typeMark(); as mark) {
+          <span class="mark">{{ mark }}</span>
+        } @else {
+          {{ index() + 1 }}
+        }
+      </button>
 
-  <span class="prev" [attr.title]="'workouts.setRow.lastTime' | translate: { value: previousLabel() }">{{ previousLabel() }}</span>
+      <span class="prev" [attr.title]="'workouts.setRow.lastTime' | translate: { value: previousLabel() }">{{ previousLabel() }}</span>
 
-  @for (field of fields(); track field) {
-    <button
-      class="cell"
-      type="button"
-      [class.active]="editing() === field"
-      [attr.aria-label]="'workouts.setRow.cellLabel' | translate: { field: field, number: index() + 1 }"
-      (click)="edit.emit(field)"
-    >
-      {{ cellValue(field) || '–' }}
-    </button>
-  }
+      @for (cell of cells(); track cell.field) {
+        <button
+          class="cell"
+          type="button"
+          [class.active]="cell.active"
+          [class.placeholder]="!cell.value"
+          [attr.aria-label]="'workouts.setRow.cellLabel' | translate: { field: cell.field, number: index() + 1 }"
+          (click)="edit.emit(cell.field)"
+        >
+          {{ cell.value || cell.placeholder || '–' }}
+        </button>
+      }
 
-  <!-- The minimum bar: a tick alone is a valid log, so it is never gated on
-       a value being entered. -->
-  <button
-    class="tick"
-    type="button"
-    [attr.aria-pressed]="set().isCompleted"
-    [attr.aria-label]="'workouts.setRow.complete' | translate: { number: index() + 1 }"
-    (click)="toggle.emit()"
-  >
-    <ion-icon name="checkmark-outline" aria-hidden="true" />
-  </button>
-</div>
+      <!-- The minimum bar: a tick alone is a valid log, so it is never gated on
+           a value being entered. -->
+      <button
+        class="tick"
+        type="button"
+        [attr.aria-pressed]="set().isCompleted"
+        [attr.aria-label]="'workouts.setRow.complete' | translate: { number: index() + 1 }"
+        (click)="toggle.emit()"
+      >
+        @if (set().isCompleted) {
+          <ion-icon name="checkmark-outline" aria-hidden="true" />
+        }
+      </button>
+    </div>
+  </ion-item>
+
+  <ion-item-options side="end">
+    <ion-item-option color="danger" (click)="onRemove()">
+      <ion-icon slot="start" name="trash-outline" aria-hidden="true" />
+      {{ 'button.remove' | translate }}
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>

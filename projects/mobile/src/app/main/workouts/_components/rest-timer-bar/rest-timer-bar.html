@@ -1,23 +1,33 @@
-<div class="bar" [class.done]="done()" role="timer" aria-live="polite">
-  <div class="count">
-    <span class="mh-kicker">{{ (done() ? 'workouts.restTimer.restOver' : 'workouts.restTimer.rest') | translate }}</span>
-    <strong>{{ display() }}</strong>
+<div class="bar" [class.done]="done()">
+  <!-- How much of the rest has gone, along the top edge. -->
+  <div class="elapsed" aria-hidden="true">
+    <span [style.width.%]="elapsedPercent()"></span>
   </div>
 
-  @if (nextTarget()) {
-    <span class="next">{{ 'workouts.restTimer.next' | translate: { target: nextTarget() } }}</span>
-  }
+  <div class="body">
+    <div class="count" role="timer" aria-live="polite">
+      <span class="mh-kicker">{{ (done() ? 'workouts.restTimer.restOver' : 'workouts.restTimer.rest') | translate }}</span>
+      <strong>{{ display() }}</strong>
+    </div>
+
+    @if (nextTitle()) {
+      <div class="next">
+        <span class="mh-kicker">{{ 'workouts.restTimer.nextUp' | translate }}</span>
+        <strong>{{ nextTitle() }}</strong>
+        @if (nextDetail()) {
+          <span class="detail">{{ nextDetail() }}</span>
+        }
+      </div>
+    }
+  </div>
 
   <div class="actions">
-    <ion-button size="small" shape="round" fill="outline" color="medium" [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: 10 }" (click)="subtract()">
-      −10
-    </ion-button>
-    <ion-button size="small" shape="round" fill="outline" color="medium" [attr.aria-label]="'workouts.restTimer.plusSeconds' | translate: { seconds: 10 }" (click)="add()">
-      +10
-    </ion-button>
-    <ion-button size="small" shape="round" class="skip" (click)="skip.emit()">
-      <ion-icon slot="start" name="play-skip-forward-outline" aria-hidden="true" />
-      {{ 'button.skip' | translate }}
-    </ion-button>
+    <button type="button" [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: nudgeSeconds }" (click)="subtract()">
+      −{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
+    </button>
+    <button type="button" [attr.aria-label]="'workouts.restTimer.plusSeconds' | translate: { seconds: nudgeSeconds }" (click)="add()">
+      +{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
+    </button>
+    <button type="button" class="skip" (click)="skip.emit()">{{ 'button.skip' | translate }}</button>
   </div>
 </div>

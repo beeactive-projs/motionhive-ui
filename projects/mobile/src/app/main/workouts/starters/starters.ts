@@ -5,7 +5,11 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
+  IonItem,
+  IonLabel,
+  IonList,
   IonNote,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
@@ -17,9 +21,9 @@ import { take } from 'rxjs/operators';
 import { Routine, RoutineService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { RoutineRow } from '../_components/routine-row/routine-row';
-import { WORKOUT_ICONS, routineTone } from '../workouts.config';
+import { WORKOUT_ICONS, routineTileColor } from '../workouts.config';
 
 const STARTER_LIMIT = 50;
 
@@ -34,15 +38,19 @@ const STARTER_LIMIT = 50;
   selector: 'mh-starters',
   imports: [
     EmptyState,
+    HexAvatar,
     IonBackButton,
     IonButtons,
     IonContent,
     IonHeader,
+    IonItem,
+    IonLabel,
+    IonList,
     IonNote,
+    IonSkeletonText,
     IonTitle,
     IonToolbar,
     RoutineRow,
-    SessionRowSkeleton,
     TranslatePipe,
   ],
   templateUrl: './starters.html',
@@ -58,7 +66,7 @@ export class Starters implements ViewWillEnter {
   readonly error = signal(false);
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6];
-  readonly routineTone = routineTone;
+  readonly routineTileColor = routineTileColor;
 
   readonly showSkeleton = computed(() => this.loading() && this.routines().length === 0);
   readonly showError = computed(() => this.error() && this.routines().length === 0);

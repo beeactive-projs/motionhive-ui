@@ -83,6 +83,7 @@ function toRoutine(p: ProgramWire): Routine {
     notes: p.description,
     folder: p.folder,
     lastPerformedAt: p.lastPerformedAt,
+    level: p.level ?? null,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
     deletedAt: p.deletedAt,
