@@ -1,12 +1,19 @@
 apply plugin: 'com.android.application'
 
-// Upload-key credentials for Play releases. android/keystore.properties and the .jks are
-// gitignored; without them, release builds come out unsigned.
+// Upload-key credentials for Play releases. CI passes them as KEYSTORE_* env vars; locally they
+// come from android/keystore.properties (gitignored, like the .jks). Without either, release
+// builds come out unsigned.
 def keystorePropertiesFile = rootProject.file('keystore.properties')
 def keystoreProperties = new Properties()
-if (keystorePropertiesFile.exists()) {
+if (System.getenv('KEYSTORE_PATH')) {
+    keystoreProperties['storeFile'] = System.getenv('KEYSTORE_PATH')
+    keystoreProperties['storePassword'] = System.getenv('KEYSTORE_PASSWORD')
+    keystoreProperties['keyAlias'] = System.getenv('KEY_ALIAS')
+    keystoreProperties['keyPassword'] = System.getenv('KEY_PASSWORD')
+} else if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
+def hasReleaseKeystore = keystoreProperties['storeFile'] != null
 
 android {
     namespace = "fit.motionhive.app"
@@ -15,8 +22,9 @@ android {
         applicationId "fit.motionhive.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // CI passes VERSION_CODE; local builds fall back to 1.
+        versionCode = Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
+        versionName "1.0." + (System.getenv('VERSION_CODE') ?: '0')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -26,7 +34,7 @@ android {
     }
     signingConfigs {
         release {
-            if (keystorePropertiesFile.exists()) {
+            if (hasReleaseKeystore) {
                 storeFile rootProject.file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
@@ -36,7 +44,7 @@ android {
     }
     buildTypes {
         release {
-            if (keystorePropertiesFile.exists()) {
+            if (hasReleaseKeystore) {
                 signingConfig signingConfigs.release
             }
             minifyEnabled false
