@@ -50,6 +50,14 @@
     animation: orbFloat 8s ease-in-out infinite alternate;
   }
 
+  // Drifting 100px blurs are heavy work for a phone GPU and show up as scroll
+  // jank. Below the desktop breakpoint (and for reduced motion) they hold still.
+  @media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+    .orb {
+      animation: none;
+    }
+  }
+
   @keyframes orbFloat {
     0% {
       transform: translate(0, 0) scale(1);

@@ -293,22 +293,25 @@
 .mobile-ctrls {
   display: none;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.125rem;
 
   @media (max-width: 1023px) {
     display: flex;
   }
 }
 
-/* ===== Mobile drawer ===== */
+/* ===== Mobile drawer =====
+   Built to "Mobile Landing Proposals", menu drawer option A. Square corners:
+   the sheet runs the full height of the screen. Head and foot stay put; only
+   the nav in between scrolls. */
 .drawer-backdrop {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.45);
+  background: color-mix(in oklab, var(--p-slate-900) 45%, transparent);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 200ms ease;
 
   &.open {
     opacity: 1;
@@ -321,78 +324,303 @@
   top: 0;
   right: 0;
   z-index: 201;
-  height: 100dvh;
-  width: min(88vw, 360px);
-  padding: 1.5rem 1.35rem calc(1.5rem + env(safe-area-inset-bottom));
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  width: min(330px, 85vw);
+  height: 100dvh;
   background: var(--p-surface-0);
-  box-shadow: -8px 0 32px color-mix(in oklab, black 22%, transparent);
+  /* Closing: ease-in and quicker than opening. `visibility` flips only after
+     the slide, so the closed panel can't be reached by focus. */
+  visibility: hidden;
   transform: translateX(100%);
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 220ms cubic-bezier(0.4, 0, 1, 1),
+    visibility 0s linear 220ms;
+  /* Horizontal drags belong to swipe-to-close (SwipeDismissDirective). */
+  touch-action: pan-y;
 
+  /* Opening: fast out, soft landing. --swipe-x follows the finger. */
   &.open {
-    transform: translateX(0);
+    visibility: visible;
+    transform: translateX(var(--swipe-x, 0px));
+    box-shadow: -20px 0 60px color-mix(in oklab, var(--p-slate-900) 18%, transparent);
+    transition:
+      transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s;
   }
 
+  &.is-dragging {
+    transition: none;
+  }
+
+  &__head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
+    padding: 0 0.625rem 0 1.25rem;
+    border-bottom: 1px solid var(--p-surface-200);
+  }
+
+  &__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.625rem;
+    background: none;
+    color: var(--p-surface-900);
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.5rem 1.25rem;
+  }
+
+  /* Top-level rows: Features (group), Pricing, Blog, Calorie calculator. */
   &__link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 0.25rem;
-    font-family: var(--font-heading);
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--p-surface-900);
-    text-decoration: none;
-    border: none;
-    border-bottom: 1px solid var(--p-surface-100);
+    gap: 0.75rem;
     width: 100%;
+    padding: 0.875rem 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--p-surface-200);
+    font-family: var(--font-heading);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    text-align: left;
+    text-decoration: none;
     cursor: pointer;
 
+    &:last-child {
+      border-bottom: none;
+    }
     &--active {
       color: var(--p-primary-700);
     }
-    .chev {
-      font-size: 0.8rem;
-      transition: transform 0.2s ease;
+  }
+
+  /* Features: the row and its list share one bottom border. */
+  &__group {
+    border-bottom: 1px solid var(--p-surface-200);
+
+    .drawer__link {
+      border-bottom: none;
     }
-    &.is-open .chev {
-      transform: rotate(180deg);
+    .drawer__link[aria-expanded='true'] {
+      padding-bottom: 0.375rem;
     }
   }
 
-  &__sub {
-    display: flex;
-    flex-direction: column;
-    padding: 0.4rem 0 0.6rem 0.4rem;
+  &__chev {
+    font-size: 1.125rem;
+    transition: transform 0.2s ease;
   }
+  &__link[aria-expanded='true'] &__chev {
+    transform: rotate(180deg);
+  }
+
+  &__feats {
+    margin: 0;
+    padding: 0 0 0.3125rem;
+    list-style: none;
+  }
+
   &__feat {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    padding: 0.6rem 0.25rem;
-    font-size: 0.95rem;
-    color: var(--p-surface-600);
+    gap: 0.75rem;
+    padding: 0.5625rem 0;
     text-decoration: none;
+  }
 
-    &--all {
-      justify-content: space-between;
-      font-weight: 600;
-      color: var(--p-primary-700);
-      i {
-        font-size: 0.75rem;
-      }
+  /* Tile colours per `FeatureMenuTint`. */
+  &__tile {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 0.625rem;
+    background: var(--tile-bg);
+    color: var(--tile-fg);
+    font-size: 1.125rem;
+
+    &--amber {
+      --tile-bg: var(--p-amber-100);
+      --tile-fg: var(--p-amber-700);
+      --tile-dark: var(--p-amber-300);
+    }
+    &--navy {
+      --tile-bg: var(--p-navy-100);
+      --tile-fg: var(--p-navy-500);
+      --tile-dark: var(--p-navy-200);
+    }
+    &--teal {
+      --tile-bg: color-mix(in srgb, var(--p-teal-700) 14%, var(--p-surface-0));
+      --tile-fg: var(--p-teal-700);
+      --tile-dark: var(--p-teal-300);
+    }
+    &--pink {
+      --tile-bg: var(--p-pink-100);
+      --tile-fg: var(--p-pink-800);
+      --tile-dark: var(--p-pink-300);
+    }
+    &--violet {
+      --tile-bg: var(--p-violet-100);
+      --tile-fg: var(--p-violet-800);
+      --tile-dark: var(--p-violet-300);
     }
   }
 
-  &__foot {
-    margin-top: auto;
-    padding-top: 1.25rem;
+  &__feat-txt {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: normal;
+  }
+  &__feat-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--p-surface-900);
+  }
+  &__feat-one {
+    font-size: 0.75rem;
+    color: var(--p-surface-500);
+  }
 
-    .mh-btn {
-      width: 100%;
+  &__badge {
+    flex: none;
+    padding: 0.25rem 0.4375rem;
+    border-radius: 0.375rem;
+    background: var(--p-amber-100);
+    color: var(--p-amber-700);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__foot {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem calc(1.625rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--p-surface-200);
+  }
+
+  &__setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  &__setting-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--p-surface-500);
+
+    mh-line-icon {
+      font-size: 1.125rem;
+    }
+  }
+
+}
+
+/* Opening stagger: rows slide in 12px and fade, 30ms apart, starting 80ms
+   after the panel; the footer fades in last. Closing has no stagger (the
+   rule stops matching and the rows travel with the panel). */
+.drawer.open .drawer__stagger {
+  animation: drawer-row-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(80ms + var(--i, 0) * 30ms);
+}
+.drawer.open .drawer__foot {
+  animation: drawer-fade-in 200ms ease-out both;
+  animation-delay: calc(80ms + var(--i, 0) * 30ms);
+}
+
+@keyframes drawer-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+@keyframes drawer-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: no slide, no stagger; panel and scrim just fade. */
+@media (prefers-reduced-motion: reduce) {
+  .drawer-backdrop {
+    transition-duration: 150ms;
+  }
+  .drawer {
+    opacity: 0;
+    transform: none;
+    transition:
+      opacity 150ms ease,
+      visibility 0s linear 150ms;
+
+    &.open {
+      opacity: 1;
+      transition:
+        opacity 150ms ease,
+        visibility 0s;
+    }
+  }
+  .drawer.open .drawer__stagger,
+  .drawer.open .drawer__foot {
+    animation: none;
+  }
+}
+
+/* Dark-mode switch: navy when on in light mode, honey on dark (see Dark). */
+.switch {
+  position: relative;
+  flex: none;
+  width: 2.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--p-surface-200);
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &__thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: var(--p-surface-0);
+    box-shadow: 0 1px 2px color-mix(in oklab, black 20%, transparent);
+    transition: transform 0.2s ease;
+  }
+
+  &[aria-checked='true'] {
+    background: var(--p-navy-500);
+
+    .switch__thumb {
+      transform: translateX(1rem);
     }
   }
 }
@@ -429,7 +657,8 @@
   }
   .mega__name,
   .mega__pv-name,
-  .drawer__link {
+  .drawer__link,
+  .drawer__feat-name {
     color: var(--p-surface-50);
   }
   .mega__preview {
@@ -443,12 +672,36 @@
   .mega__media {
     background: color-mix(in oklab, white 4%, var(--p-content-background));
   }
+  .drawer__head,
+  .drawer__foot,
+  .drawer__group,
   .drawer__link {
-    border-bottom-color: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+  .drawer__close {
+    color: var(--p-surface-50);
+  }
+  .drawer__feat-one,
+  .drawer__setting-label {
+    color: var(--p-surface-400);
+  }
+  .drawer__tile {
+    background: color-mix(in oklab, var(--tile-dark) 20%, transparent);
+    color: var(--tile-dark);
+  }
+  .drawer__badge {
+    background: color-mix(in oklab, var(--p-primary-500) 20%, transparent);
+    color: var(--p-primary-300);
+  }
+  .switch {
+    background: var(--p-surface-700);
+    &[aria-checked='true'] {
+      background: var(--p-primary-500);
+    }
   }
   .link--active,
   .mega__all,
-  .drawer__feat--all {
+  .drawer__link--active {
     color: var(--p-primary-400);
   }
 }

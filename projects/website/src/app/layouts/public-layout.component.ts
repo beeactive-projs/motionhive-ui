@@ -16,11 +16,12 @@ import { filter, startWith, throttleTime } from 'rxjs/operators';
 
 import { PublicHeaderComponent } from './header/header.component';
 import { PublicFooterComponent } from './footer/footer.component';
+import { RouteProgress } from '../_shared/route-progress/route-progress';
 import { SITE_ORIGIN } from '../_shared/site.const';
 
 @Component({
   selector: 'mh-public-layout',
-  imports: [RouterOutlet, PublicHeaderComponent, PublicFooterComponent],
+  imports: [RouterOutlet, PublicHeaderComponent, PublicFooterComponent, RouteProgress],
   templateUrl: './public-layout.component.html',
   styleUrl: './public-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

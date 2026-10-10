@@ -114,63 +114,135 @@
       </a>
     </div>
 
-    <!-- Mobile controls -->
+    <!-- Mobile: language at a glance + menu; theme lives in the drawer -->
     <div class="mobile-ctrls">
+      <mh-language-switcher variant="compact" />
       <button
-        type="button"
-        class="icon-btn"
-        (click)="toggleTheme()"
-        [attr.aria-label]="isDark() ? switchLightLabel : switchDarkLabel">
-        <i [class]="isDark() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
-      </button>
-      <button
+        #burgerButton
         type="button"
         class="icon-btn burger"
-        (click)="toggleMobile()"
+        (click)="openMobile()"
         [attr.aria-expanded]="mobileOpen()"
+        aria-controls="mobile-drawer"
         aria-label="Menu"
         i18n-aria-label="@@header.toggleNav">
-        <i [class]="mobileOpen() ? 'pi pi-times' : 'pi pi-bars'" aria-hidden="true"></i>
+        <i class="pi pi-bars" aria-hidden="true"></i>
       </button>
     </div>
   </nav>
 </header>
 
-<!-- Mobile drawer -->
+<!-- Mobile drawer (design: Mobile Landing Proposals, menu drawer option A).
+     Rows carry `--i` so they stagger in on open (see .drawer__stagger). -->
 <div class="drawer-backdrop" [class.open]="mobileOpen()" (click)="closeMobile()" aria-hidden="true"></div>
-<aside class="drawer" [class.open]="mobileOpen()" aria-label="Menu" i18n-aria-label="@@header.ariaMobile">
-  <!-- Features accordion -->
-  <button
-    type="button"
-    class="drawer__link drawer__acc"
-    [class.is-open]="mobileFeaturesOpen()"
-    (click)="toggleMobileFeatures()"
-    [attr.aria-expanded]="mobileFeaturesOpen()">
-    <span i18n="@@header.features">Features</span>
-    <i class="pi pi-angle-down chev" aria-hidden="true"></i>
-  </button>
-  @if (mobileFeaturesOpen()) {
-    <div class="drawer__sub">
-      @for (f of features; track f.slug) {
-        <a class="drawer__feat" [routerLink]="'/features/' + f.slug" (click)="closeMobile()">
-          <mh-hex [size]="28" [tone]="f.tone">{{ f.icon }}</mh-hex>
-          <span>{{ f.name }}</span>
-        </a>
-      }
-      <a class="drawer__feat drawer__feat--all" routerLink="/features" (click)="closeMobile()">
-        <span i18n="@@header.viewAllFeatures">View all features</span>
-        <i class="pi pi-arrow-right" aria-hidden="true"></i>
-      </a>
-    </div>
-  }
-
-  <a routerLink="/pricing" routerLinkActive="drawer__link--active" (click)="closeMobile()" class="drawer__link" i18n="@@header.pricing">Pricing</a>
-  <a routerLink="/blog" routerLinkActive="drawer__link--active" (click)="closeMobile()" class="drawer__link" i18n="@@header.blog">Blog</a>
-  <a routerLink="/tools/calorie-calculator" (click)="closeMobile()" class="drawer__link" i18n="@@header.calorieCalc">Calorie calculator</a>
-
-  <div class="drawer__foot">
-    <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@header.startCoaching">
-      Create your free account
+<div
+  #drawer
+  id="mobile-drawer"
+  class="drawer"
+  [class.open]="mobileOpen()"
+  [attr.inert]="mobileOpen() ? null : ''"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menu"
+  i18n-aria-label="@@header.ariaMobile"
+  [mhSwipeDismiss]="mobileOpen()"
+  (dismissed)="closeMobile()"
+  (keydown)="onDrawerKeydown($event)">
+  <div class="drawer__head">
+    <a routerLink="/" class="brand" (click)="closeMobile()" aria-label="MotionHive home" i18n-aria-label="@@header.ariaHome">
+      <mh-logo size="sm" styleClass="w-6.5" />
     </a>
+    <button
+      #closeButton
+      type="button"
+      class="drawer__close"
+      (click)="closeMobile()"
+      aria-label="Close menu"
+      i18n-aria-label="@@header.closeMenu">
+      <mh-line-icon name="close" />
+    </button>
   </div>
-</aside>
+
+  <nav class="drawer__body">
+    <div class="drawer__group">
+      <button
+        type="button"
+        class="drawer__link drawer__stagger"
+        [style.--i]="0"
+        [attr.aria-expanded]="mobileFeaturesOpen()"
+        aria-controls="drawer-features"
+        (click)="toggleMobileFeatures()">
+        <span i18n="@@header.features">Features</span>
+        <mh-line-icon class="drawer__chev" name="chevron-down" />
+      </button>
+      @if (mobileFeaturesOpen()) {
+        <ul id="drawer-features" class="drawer__feats">
+          @for (f of menuFeatures; track f.slug) {
+            <li class="drawer__stagger" [style.--i]="$index + 1">
+              <a class="drawer__feat" [routerLink]="'/features/' + f.slug" (click)="closeMobile()">
+                <span class="drawer__tile" [class]="'drawer__tile--' + f.menu.tint">
+                  <mh-line-icon [name]="f.menu.icon" />
+                </span>
+                <span class="drawer__feat-txt">
+                  <span class="drawer__feat-name">{{ f.menu.label ?? f.name }}</span>
+                  <span class="drawer__feat-one">{{ f.menu.blurb }}</span>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <a
+      class="drawer__link drawer__stagger"
+      [style.--i]="staggerAfterFeatures()"
+      routerLink="/pricing"
+      routerLinkActive="drawer__link--active"
+      (click)="closeMobile()"
+      i18n="@@header.pricing">Pricing</a>
+    <a
+      class="drawer__link drawer__stagger"
+      [style.--i]="staggerAfterFeatures() + 1"
+      routerLink="/blog"
+      routerLinkActive="drawer__link--active"
+      (click)="closeMobile()"
+      i18n="@@header.blog">Blog</a>
+    <a
+      class="drawer__link drawer__stagger"
+      [style.--i]="staggerAfterFeatures() + 2"
+      routerLink="/tools/calorie-calculator"
+      routerLinkActive="drawer__link--active"
+      (click)="closeMobile()">
+      <span i18n="@@header.calorieCalc">Calorie calculator</span>
+      <span class="drawer__badge" i18n="@@header.freeTool">Free tool</span>
+    </a>
+  </nav>
+
+  <div class="drawer__foot" [style.--i]="staggerAfterFeatures() + 3">
+    <div class="drawer__setting">
+      <span class="drawer__setting-label">
+        <mh-line-icon name="globe" />
+        <span i18n="@@header.language">Language</span>
+      </span>
+      <mh-language-switcher variant="segmented" />
+    </div>
+    <div class="drawer__setting">
+      <span class="drawer__setting-label">
+        <mh-line-icon name="moon" />
+        <span id="drawer-dark-mode" i18n="@@header.darkMode">Dark mode</span>
+      </span>
+      <!-- Plain switch: the site shell ships no PrimeNG form controls. -->
+      <button
+        type="button"
+        role="switch"
+        class="switch"
+        [attr.aria-checked]="isDark()"
+        aria-labelledby="drawer-dark-mode"
+        (click)="toggleTheme()">
+        <span class="switch__thumb"></span>
+      </button>
+    </div>
+    <mh-cta-pair class="drawer__cta" />
+  </div>
+</div>

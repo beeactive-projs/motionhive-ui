@@ -8,13 +8,15 @@ import {
 import {
   provideClientHydration,
   withEventReplay,
+  withI18nSupport,
   withNoIncrementalHydration,
 } from '@angular/platform-browser';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
+import { NetworkAwarePreloadingStrategy } from './_shared/network-aware-preloading.strategy';
 import { MotionHiveLara } from '../../../core/src/styles/styles.primeng';
 import { environment } from 'core';
 
@@ -24,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' }),
+      withPreloading(NetworkAwarePreloadingStrategy),
     ),
     // Fragment links (e.g. the privacy policy TOC) scroll under the sticky
     // header without this offset (header bar is 4.4rem tall).
@@ -34,7 +37,12 @@ export const appConfig: ApplicationConfig = {
     // server's blog fetches instead of re-fetching, so first paint matches the
     // prerendered HTML (no skeleton/content hydration mismatch).
     provideHttpClient(withFetch()),
-    provideClientHydration(withEventReplay(), withNoIncrementalHydration()),
+    // withI18nSupport() is load-bearing: without it Angular marks every
+    // component that holds `i18n` text (header, footer, every page) with
+    // `ngSkipHydration`, then throws the prerendered DOM away and renders the
+    // whole page again once the JS arrives. That re-render was the slow,
+    // flashing first load on phones.
+    provideClientHydration(withEventReplay(), withI18nSupport(), withNoIncrementalHydration()),
     providePrimeNG({
       theme: {
         preset: MotionHiveLara,

@@ -1,3 +1,5 @@
+import type { LineIconName } from '../_shared/ui/line-icon/line-icon';
+
 /**
  * Single source of truth for the product features surfaced on the marketing
  * site. Drives the nav Features mega-menu, the homepage feature grid, the
@@ -5,7 +7,8 @@
  * edit a feature here, not in page markup.
  *
  * `tone` maps to `mh-hex` / `mh-kicker` tones. `icon` is a projected emoji
- * glyph. `preview` is the muted-video source for the mega-menu / feature-hero
+ * glyph. `menu` (optional) lists the feature in the mobile menu drawer (see
+ * `MENU_FEATURES`). `preview` is the muted-video source for the mega-menu / feature-hero
  * demo — null for now (a poster placeholder renders until the asset exists);
  * dropping a file path here lights it up with no code change.
  *
@@ -13,6 +16,19 @@
  * no AI tells, concrete over clever. RO strings come from the i18n catalogue.
  */
 export type FeatureTone = 'amber' | 'teal';
+
+/** Icon tile colour in the mobile menu (pairs defined in header.component.scss). */
+export type FeatureMenuTint = 'amber' | 'navy' | 'teal' | 'pink' | 'violet';
+
+/** How a feature appears in the mobile menu drawer. */
+export interface FeatureMenuEntry {
+  /** Menu label when it differs from the page name. Defaults to `name`. */
+  label?: string;
+  /** Short line under the label; keep it to one line on a phone. */
+  blurb: string;
+  icon: LineIconName;
+  tint: FeatureMenuTint;
+}
 
 export interface FeatureBenefit {
   icon: string;
@@ -30,6 +46,8 @@ export interface MarketingFeature {
   name: string;
   icon: string;
   tone: FeatureTone;
+  /** Present on the features listed in the mobile menu, in array order. */
+  menu?: FeatureMenuEntry;
   /** One-line description for the mega-menu row + overview card. */
   oneLiner: string;
   /** Muted autoplay preview clip (poster fallback until provided). */
@@ -110,6 +128,11 @@ export const FEATURES: MarketingFeature[] = [
     name: $localize`:@@feat.sessions.name:Sessions`,
     icon: '📅',
     tone: 'amber',
+    menu: {
+      blurb: $localize`:@@feat.sessions.menuBlurb:Bookings and group classes`,
+      icon: 'calendar',
+      tint: 'amber',
+    },
     oneLiner: $localize`:@@feat.sessions.one:Class & 1:1 scheduling with bookings`,
     preview: '/videos/feature-sessions.en.mp4',
     poster: '/videos/feature-sessions.en.jpg',
@@ -164,6 +187,11 @@ export const FEATURES: MarketingFeature[] = [
     name: $localize`:@@feat.programs.name:Programs`,
     icon: '📋',
     tone: 'amber',
+    menu: {
+      blurb: $localize`:@@feat.programs.menuBlurb:Plans clients follow week by week`,
+      icon: 'program',
+      tint: 'navy',
+    },
     oneLiner: $localize`:@@feat.programs.one:Build training plans clients follow`,
     preview: '/videos/feature-programs.en.mp4',
     poster: '/videos/feature-programs.en.jpg',
@@ -272,6 +300,12 @@ export const FEATURES: MarketingFeature[] = [
     name: $localize`:@@feat.progress.name:Progress`,
     icon: '📈',
     tone: 'teal',
+    menu: {
+      label: $localize`:@@feat.progress.menuLabel:Workout tracking`,
+      blurb: $localize`:@@feat.progress.menuBlurb:Log sets, see your records`,
+      icon: 'dumbbell',
+      tint: 'teal',
+    },
     oneLiner: $localize`:@@feat.progress.one:Log every workout, see your progress`,
     preview: '/videos/feature-progress.en.mp4',
     poster: '/videos/feature-progress.en.jpg',
@@ -326,6 +360,11 @@ export const FEATURES: MarketingFeature[] = [
     name: $localize`:@@feat.payments.name:Payments`,
     icon: '💳',
     tone: 'amber',
+    menu: {
+      blurb: $localize`:@@feat.payments.menuBlurb:Get paid, no subscription`,
+      icon: 'card',
+      tint: 'pink',
+    },
     oneLiner: $localize`:@@feat.payments.one:Get paid without chasing bank transfers`,
     preview: '/videos/feature-payments.en.mp4',
     poster: '/videos/feature-payments.en.jpg',
@@ -434,6 +473,11 @@ export const FEATURES: MarketingFeature[] = [
     name: $localize`:@@feat.community.name:Community`,
     icon: '👥',
     tone: 'teal',
+    menu: {
+      blurb: $localize`:@@feat.community.menuBlurb:Groups around your coaching`,
+      icon: 'people',
+      tint: 'violet',
+    },
     oneLiner: $localize`:@@feat.community.one:Groups that keep clients coming back`,
     preview: '/videos/feature-community.en.mp4',
     poster: '/videos/feature-community.en.jpg',
@@ -484,6 +528,11 @@ export const FEATURES: MarketingFeature[] = [
     metaDescription: $localize`:@@feat.community.md:Give clients a room to belong to: groups, invite links, updates and join approvals. Free for coaches, with no client limit.`,
   },
 ];
+
+/** Features shown in the mobile menu, in display order. */
+export const MENU_FEATURES = FEATURES.filter(
+  (f): f is MarketingFeature & { menu: FeatureMenuEntry } => !!f.menu
+);
 
 /** Lookup used by the /features/:slug page. */
 export function featureBySlug(slug: string): MarketingFeature | undefined {

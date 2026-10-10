@@ -1724,125 +1724,6 @@
           <context context-type="linenumber">23,24</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="waitlist.header.title" datatype="html">
-        <source>Stay in the loop</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">12,13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.header.sub" datatype="html">
-        <source>Product news and the occasional update</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">13,16</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.desc" datatype="html">
-        <source> Building MotionHive in the open. Drop your email for product news and the occasional update. </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">21,24</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.name.label" datatype="html">
-        <source>Name</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">26,27</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.optional" datatype="html">
-        <source>(optional)</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">27,29</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.name.placeholder" datatype="html">
-        <source>Your name</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">30,33</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.email.label" datatype="html">
-        <source>Email</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">34,35</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.email.placeholder" datatype="html">
-        <source>your@email.com</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">36,37</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.email.error" datatype="html">
-        <source>Please enter a valid email address.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">39,41</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.role.label" datatype="html">
-        <source>How will you use MotionHive?</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">45,46</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.success.h4" datatype="html">
-        <source>You&apos;re in!</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">63,64</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.success.p" datatype="html">
-        <source> You&apos;re on the list. Thanks for following along. </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">65,69</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.btn.notify" datatype="html">
-        <source>Notify me</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">73</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.btn.later" datatype="html">
-        <source>Maybe later</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">76</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.role.lead" datatype="html">
-        <source>I lead activities</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
-          <context context-type="linenumber">36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.role.join" datatype="html">
-        <source>I join activities</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
-          <context context-type="linenumber">37</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.toast.error.detail" datatype="html">
-        <source>Could not join the waitlist. Please try again.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
-          <context context-type="linenumber">68</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="about.pill" datatype="html">
         <source>Our story</source>
         <context-group purpose="location">
@@ -3237,6 +3118,118 @@
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
           <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.closeMenu" datatype="html">
+        <source>Close menu</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">151</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.freeTool" datatype="html">
+        <source>Free tool</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">210</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.language" datatype="html">
+        <source>Language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">218</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.darkMode" datatype="html">
+        <source>Dark mode</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">225</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ctaPair.logIn" datatype="html">
+        <source>Log in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/ui/cta-pair/cta-pair.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ctaPair.startFree" datatype="html">
+        <source>Start free</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/ui/cta-pair/cta-pair.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="stickyCta.aria" datatype="html">
+        <source>Sign up</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/sticky-cta/sticky-cta.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="langSwitcher.change" datatype="html">
+        <source>Change language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/language-switcher/language-switcher.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="routeProgress.aria" datatype="html">
+        <source>Loading page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/route-progress/route-progress.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.sessions.menuBlurb" datatype="html">
+        <source>Bookings and group classes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.programs.menuBlurb" datatype="html">
+        <source>Plans clients follow week by week</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.menuLabel" datatype="html">
+        <source>Workout tracking</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">304</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.menuBlurb" datatype="html">
+        <source>Log sets, see your records</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">305</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.payments.menuBlurb" datatype="html">
+        <source>Get paid, no subscription</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">364</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.community.menuBlurb" datatype="html">
+        <source>Groups around your coaching</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">477</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.clearFilters" datatype="html">
+        <source>Clear filters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">253</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.ariaMobile" datatype="html">

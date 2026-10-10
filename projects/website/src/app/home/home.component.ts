@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DOCUMENT,
+  ElementRef,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
@@ -15,6 +22,7 @@ import { MediaDemo } from '../_shared/ui/media-demo/media-demo';
 import { FeatureCard } from '../_shared/ui/feature-card/feature-card';
 import { Stat } from '../_shared/ui/stat/stat';
 import { BlogPostCard } from '../blog/_shared/blog-post-card/blog-post-card';
+import { StickyCta } from '../_shared/sticky-cta/sticky-cta';
 
 /**
  * Hero cluster hex — the pre-redesign diamond of 4 (top / two middle /
@@ -55,12 +63,17 @@ interface CommunityCard {
     FeatureCard,
     Stat,
     BlogPostCard,
+    StickyCta,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
+  /** The sticky CTA shows between these two (see StickyCta). */
+  protected readonly heroElement = viewChild<ElementRef<HTMLElement>>('hero');
+  protected readonly finalCtaElement = viewChild('finalCta', { read: ElementRef<HTMLElement> });
+
   readonly features = FEATURES;
   readonly signupUrl = SIGNUP_URL;
 

@@ -31,7 +31,7 @@
         (click)="form.controls.type.setValue(t.key)"
       >
         <span class="flex flex-col md:flex-row items-center gap-1">
-          <span class="material-symbols-outlined" style="font-size: 1.1rem; line-height: 1;">{{ t.icon }}</span>
+          <i [class]="t.icon" class="text-lg leading-none" aria-hidden="true"></i>
           <span class="text-xs font-semibold">{{ t.label }}</span>
         </span>
       </button>
@@ -41,8 +41,9 @@
     <!-- Title -->
     <div class="flex flex-col gap-1.5">
       <label i18n="@@feedback.title.label" for="fb-title" class="text-xs font-semibold">Title</label>
-      <input pInputText id="fb-title" formControlName="title" [placeholder]="placeholders().title" fluid
-        [pAutoFocus]="true" />
+      <!-- No pAutoFocus: the dialog moves focus on show, and the blur it caused
+           marked the title touched, flashing its error before any typing. -->
+      <input pInputText id="fb-title" formControlName="title" [placeholder]="placeholders().title" fluid />
       @if (form.controls.title.invalid && form.controls.title.touched) {
       <p-message variant="simple" severity="error" size="small">
         <span i18n="@@feedback.title.error">Please write at least 3 characters.</span>

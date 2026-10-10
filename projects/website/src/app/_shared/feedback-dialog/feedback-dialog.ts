@@ -10,7 +10,6 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { AutoFocusModule } from 'primeng/autofocus';
 import { FeedbackService, AuthStore, FeedbackCategory, FeedbackCategories } from 'core';
 
 @Component({
@@ -23,7 +22,6 @@ import { FeedbackService, AuthStore, FeedbackCategory, FeedbackCategories } from
     TextareaModule,
     MessageModule,
     ToastModule,
-    AutoFocusModule,
   ],
   providers: [MessageService],
   templateUrl: './feedback-dialog.html',
@@ -46,19 +44,19 @@ export class FeedbackDialog {
     {
       key: FeedbackCategories.Suggestion,
       label: $localize`:@@feedback.type.suggestion:Suggestion`,
-      icon: 'lightbulb',
+      icon: 'pi pi-lightbulb',
       severity: 'warn',
     },
     {
       key: FeedbackCategories.Bug,
       label: $localize`:@@feedback.type.bug:Bug report`,
-      icon: 'bug_report',
+      icon: 'pi pi-exclamation-triangle',
       severity: 'danger',
     },
     {
       key: FeedbackCategories.Other,
       label: $localize`:@@feedback.type.other:Other`,
-      icon: 'chat',
+      icon: 'pi pi-comment',
       severity: 'info',
     },
   ];

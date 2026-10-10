@@ -1,6 +1,16 @@
 {
   "routes": [
     {
+      "src": "^/(?:ro/)?(?:(?:main|polyfills|styles|chunk)-[A-Za-z0-9_-]+\\.(?:js|css)|media/.+)$",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" },
+      "continue": true
+    },
+    {
+      "src": "^/videos/.+$",
+      "headers": { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800" },
+      "continue": true
+    },
+    {
       "src": "^/en/?$",
       "status": 308,
       "headers": { "Location": "/" }
