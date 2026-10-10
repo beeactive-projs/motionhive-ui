@@ -5,6 +5,7 @@ import { take } from 'rxjs/operators';
 import {
   AssignedWorkout,
   ProgramAssignment,
+  ProgramAssignmentKind,
   ProgramAssignmentService,
   WorkoutLogStatus,
   displayName,
@@ -47,7 +48,7 @@ export class PlanStore {
     const assignment = this._assignment();
     // Your own scheduled routine has no coach to name, whatever the row's
     // `instructor` says — it is you.
-    if (!assignment || assignment.assignmentKind === 'SELF') return null;
+    if (!assignment || assignment.assignmentKind === ProgramAssignmentKind.Self) return null;
     if (!assignment.instructor) return null;
     return displayName(
       assignment.instructor,

@@ -64,14 +64,28 @@ export class NumericKeypad {
 
   readonly field = input.required<KeypadField>();
   readonly value = input('');
+  /**
+   * Which cell the pad is bound to. Two cells can hold the same value — two
+   * empty ones, say — and a re-seed keyed on the value alone would then skip,
+   * carrying the last cell's typing into the next.
+   */
+  readonly cell = input('');
   /** What the row above is editing, so the pad says what it is changing. */
   readonly label = input('');
+  /** Offer "Next field" in place of the close chevron — the logger walks its grid. */
+  readonly showNext = input(false);
 
   /** Emits the committed value: seconds for a clock, the typed number otherwise. */
   readonly commit = output<string>();
   readonly dismiss = output<void>();
-
-  readonly keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  /** Commit this value and move to the next cell. */
+  readonly next = output<string>();
+  /**
+   * What the cell being edited should show while typing — formatted, and
+   * empty until something is typed so the cell keeps its placeholder. One
+   * way only: the parent never feeds it back into `value`.
+   */
+  readonly preview = output<string>();
 
   /** The decimal key's face: "." in English, "," in Romanian. */
   readonly decimalMark = decimalSeparator();
@@ -109,7 +123,11 @@ export class NumericKeypad {
 
   constructor() {
     // Re-seed whenever the parent points the pad at a different cell.
-    effect(() => this.draft.set(this.value()));
+    effect(() => {
+      this.cell();
+      this.draft.set(this.value());
+    });
+    effect(() => this.preview.emit(this.draft() ? this.display() : ''));
   }
 
   press(key: string): void {

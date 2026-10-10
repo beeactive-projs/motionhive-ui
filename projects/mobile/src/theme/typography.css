@@ -32,7 +32,7 @@ h1 {
   font-weight: 600;
 }
 
-/* The mono micro-label above a heading or inside a card header. Sentence case
+/* The micro-label above a heading or inside a card header. Sentence case
    like every other visible string — never pair it with `ion-text-uppercase`
    or a `text-transform`. */
 .mh-kicker {
@@ -42,8 +42,7 @@ h1 {
      leaves the outline running straight from the page title into the row
      names, with nothing between the lists to navigate by. */
   margin: 0;
-  font-family: var(--mh-font-mono);
-  font-size: var(--mh-text-xs);
+  font-size: var(--mh-text-sm);
   font-weight: 600;
   letter-spacing: var(--mh-tracking-kicker);
 }

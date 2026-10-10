@@ -1,41 +1,49 @@
 <div class="pad" role="group" [attr.aria-label]="label() || ('workouts.keypad.numberPad' | translate)">
   <div class="head">
-    @if (label()) {
-      <span class="mh-kicker">{{ label() }}</span>
+    <span class="label">{{ label() }}</span>
+    <!-- The cell above shows the number being built; this keeps it announced. -->
+    <output class="mh-visually-hidden" aria-live="polite">{{ display() }}</output>
+    @if (showNext()) {
+      <ion-button fill="clear" size="small" (click)="next.emit(committed())">
+        {{ 'workouts.logger.nextField' | translate }}
+      </ion-button>
+    } @else {
+      <ion-button fill="clear" shape="round" color="medium" [attr.aria-label]="'workouts.keypad.close' | translate" (click)="dismiss.emit()">
+        <ion-icon slot="icon-only" name="chevron-down-outline" aria-hidden="true" />
+      </ion-button>
     }
-    <output class="draft">{{ display() }}</output>
-
-    <div class="steppers">
-      <button type="button" [attr.aria-label]="'workouts.keypad.minus' | translate: { step: stepLabel() }" (click)="step(-1)">
-        −{{ stepLabel() }}
-      </button>
-      <button type="button" [attr.aria-label]="'workouts.keypad.plus' | translate: { step: stepLabel() }" (click)="step(1)">
-        +{{ stepLabel() }}
-      </button>
-    </div>
-
-    <ion-button fill="clear" shape="round" color="medium" [attr.aria-label]="'workouts.keypad.close' | translate" (click)="dismiss.emit()">
-      <ion-icon slot="icon-only" name="chevron-down-outline" aria-hidden="true" />
-    </ion-button>
   </div>
 
+  <!-- Four columns: the digits, and the ±step keys and backspace down the
+       right edge, where the thumb already is. -->
   <div class="keys">
-    @for (key of keys; track key) {
-      <button type="button" (click)="press(key)">{{ key }}</button>
-    }
+    <button type="button" (click)="press('1')">1</button>
+    <button type="button" (click)="press('2')">2</button>
+    <button type="button" (click)="press('3')">3</button>
+    <button type="button" class="side" [attr.aria-label]="'workouts.keypad.plus' | translate: { step: stepLabel() }" (click)="step(1)">
+      +{{ stepLabel() }}
+    </button>
+
+    <button type="button" (click)="press('4')">4</button>
+    <button type="button" (click)="press('5')">5</button>
+    <button type="button" (click)="press('6')">6</button>
+    <button type="button" class="side" [attr.aria-label]="'workouts.keypad.minus' | translate: { step: stepLabel() }" (click)="step(-1)">
+      −{{ stepLabel() }}
+    </button>
+
+    <button type="button" (click)="press('7')">7</button>
+    <button type="button" (click)="press('8')">8</button>
+    <button type="button" (click)="press('9')">9</button>
+    <button type="button" class="side" [attr.aria-label]="'workouts.keypad.backspace' | translate" (click)="backspace()">
+      <ion-icon name="backspace-outline" aria-hidden="true" />
+    </button>
 
     @if (allowsDecimal() && !isClock()) {
       <button type="button" [attr.aria-label]="'workouts.keypad.decimal' | translate" (click)="press('.')">{{ decimalMark }}</button>
     } @else {
       <button type="button" class="ghost" [attr.aria-label]="'button.clear' | translate" (click)="clear()">C</button>
     }
-
     <button type="button" (click)="press('0')">0</button>
-
-    <button type="button" class="ghost" [attr.aria-label]="'workouts.keypad.backspace' | translate" (click)="backspace()">
-      <ion-icon name="backspace-outline" aria-hidden="true" />
-    </button>
+    <ion-button class="done" (click)="commit.emit(committed())">{{ 'button.done' | translate }}</ion-button>
   </div>
-
-  <ion-button expand="block" class="done" (click)="commit.emit(committed())">{{ 'button.done' | translate }}</ion-button>
 </div>

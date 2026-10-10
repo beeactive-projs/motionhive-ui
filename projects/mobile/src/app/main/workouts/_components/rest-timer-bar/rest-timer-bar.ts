@@ -8,7 +8,6 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
 /** How much a nudge moves the finish line. */
@@ -26,23 +25,34 @@ const NUDGE_SECONDS = 10;
  * and suspended outright on iOS, so a ticking counter drifts or freezes;
  * deriving the remainder from a deadline means resuming the app is correct
  * with no correction step. The interval here only drives repaint.
+ *
+ * Navy, like the resume banner: it is the session talking, not an action.
+ * Honey is kept for the count itself. The nudge and skip keys are plain
+ * buttons for the same reason the keypad's are — three equal targets in a
+ * row, which Ionic's button chrome fights.
  */
 @Component({
   selector: 'mh-rest-timer-bar',
-  imports: [IonButton, IonIcon, TranslatePipe],
+  imports: [TranslatePipe],
   templateUrl: './rest-timer-bar.html',
   styleUrl: './rest-timer-bar.scss',
 })
 export class RestTimerBar {
   /** Epoch ms when rest is over. Null parks the bar. */
   readonly endsAt = input.required<number | null>();
-  /** The set the user is resting before, so they stay in flow. */
-  readonly nextTarget = input('');
+  /** Epoch ms when rest began — the bar along the top measures from here. */
+  readonly startedAt = input<number | null>(null);
+  /** "Set 4 · 82.5 kg × 6–8": the set the user is resting before. */
+  readonly nextTitle = input('');
+  /** "Back squat · last set". */
+  readonly nextDetail = input('');
 
   readonly nudge = output<number>();
   readonly skip = output<void>();
   /** Fired once, the moment the deadline passes. */
   readonly finished = output<void>();
+
+  readonly nudgeSeconds = NUDGE_SECONDS;
 
   private readonly _now = signal(Date.now());
   private readonly _destroyRef = inject(DestroyRef);
@@ -59,6 +69,14 @@ export class RestTimerBar {
     const mins = Math.floor(total / 60);
     const secs = total % 60;
     return `${mins}:${String(secs).padStart(2, '0')}`;
+  });
+
+  /** Share of the rest already gone, 0 to 100. A nudge moves the whole scale. */
+  readonly elapsedPercent = computed(() => {
+    const start = this.startedAt();
+    const end = this.endsAt();
+    if (start === null || end === null || end <= start) return 0;
+    return Math.min(100, Math.max(0, ((this._now() - start) / (end - start)) * 100));
   });
 
   readonly done = computed(() => this.endsAt() !== null && this.remainingMs() === 0);

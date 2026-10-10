@@ -80,7 +80,7 @@
    day header does for today: it names the moment, not a status. */
 .mh-section-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.375rem;
   padding-inline: 0.875rem;
 }
@@ -117,6 +117,21 @@
 
 .mh-cta-bar ion-button {
   margin: 0;
+}
+
+/* The quiet text actions under the one honey CTA — edit, skip. A row of
+   clear buttons in the muted ink: decisions, not the thing we are asking for. */
+.mh-cta-bar .mh-quiet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+}
+
+.mh-cta-bar .mh-quiet-actions ion-button {
+  --color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
 }
 
 /* A grouped − value + control that names its own unit ("3 sets", "6 weeks").

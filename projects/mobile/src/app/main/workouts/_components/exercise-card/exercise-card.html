@@ -2,6 +2,10 @@
   <!-- The name is the way into the movement itself: mid-session, or while
        building, you often need to check what an exercise actually is. -->
   <ion-item button detail="false" lines="none" (click)="open.emit()">
+    @if (tile(); as tile) {
+      <!-- Decorative: the name it would announce is the very next thing in the row. -->
+      <mh-hex-avatar slot="start" size="md" tone="wash" aria-hidden="true" [color]="tile.tone" [icon]="tile.icon" />
+    }
     <ion-label>
       <h2>{{ name() }}</h2>
       @if (meta(); as text) {
@@ -18,7 +22,7 @@
         [attr.aria-label]="'workouts.exerciseCard.actionsFor' | translate: { name: name() }"
         (click)="onActions($event)"
       >
-        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+        <ion-icon slot="icon-only" name="ellipsis-vertical" aria-hidden="true" />
       </ion-button>
     } @else {
       <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />

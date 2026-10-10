@@ -1,1 +1,22 @@
 /* Layout comes from `.mh-page`; the rows carry their own spacing. */
+
+/* The sub-header under the title — part of the chrome, so it stays put while
+   the list scrolls under it. */
+.note-bar {
+  --min-height: 0;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0;
+  --padding-bottom: 0.75rem;
+}
+
+.note-bar ion-note {
+  display: block;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* Tile then name, the same gap the rows use. */
+mh-hex-avatar {
+  margin-inline-end: 0.875rem;
+}

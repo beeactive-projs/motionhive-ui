@@ -4,12 +4,9 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
   IonContent,
   IonFooter,
   IonHeader,
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
@@ -27,15 +24,18 @@ import {
   AssignedWorkout,
   ExerciseKind,
   ProgramAssignment,
+  ProgramAssignmentKind,
   ProgramAssignmentService,
   WorkoutLogService,
+  localDayKey,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { kindIcon, kindTone } from '../../exercises/exercises.config';
-import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.config';
+import { ActiveWorkoutService } from '../_services/active-workout.service';
+import { OverviewExercise, WorkoutOverview } from '../_components/workout-overview/workout-overview';
+import { WORKOUT_ICONS, planPositionLabel, prescriptionLine } from '../workouts.config';
 
 /**
  * What today's prescribed workout holds, before committing to it.
@@ -52,12 +52,9 @@ import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.c
     IonBackButton,
     IonButton,
     IonButtons,
-    IonCard,
-    IonCardContent,
     IonContent,
     IonFooter,
     IonHeader,
-    IonIcon,
     IonItem,
     IonLabel,
     IonList,
@@ -65,6 +62,7 @@ import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.c
     IonTitle,
     IonToolbar,
     TranslatePipe,
+    WorkoutOverview,
   ],
   templateUrl: './preview.html',
   styleUrl: './preview.scss',
@@ -75,6 +73,7 @@ export class Preview implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
 
   readonly assignment = signal<ProgramAssignment | null>(null);
@@ -82,7 +81,6 @@ export class Preview implements ViewWillEnter {
   readonly loading = signal(false);
   readonly error = signal(false);
   readonly starting = signal(false);
-  readonly noteOpen = signal(false);
 
   readonly skeletonRows = [1, 2, 3, 4];
 
@@ -94,21 +92,67 @@ export class Preview implements ViewWillEnter {
     () => !this.loading() && !this.error() && !!this.assignment() && !this.workout(),
   );
 
-  readonly position = computed(() => {
+  /** "Today's workout" only when it is — the same screen opens the next day too. */
+  readonly title = computed(() =>
+    this._translateService.instant(
+      this.workout()?.scheduledDate === localDayKey(new Date())
+        ? 'workouts.preview.todaysWorkout'
+        : 'workouts.common.workout',
+    ),
+  );
+
+  /** "Strength block · Week 3 · Day 2": the phase when the plan names one. */
+  readonly eyebrow = computed(() => {
     const workout = this.workout();
     if (!workout) return '';
     return planPositionLabel(
-      this.assignment()?.programNameSnapshot ?? null,
+      workout.phase ?? this.assignment()?.programNameSnapshot ?? null,
       workout.weekIndex,
       workout.dayIndex,
     );
   });
 
-  readonly meta = computed(() => {
+  readonly chips = computed(() => {
     const workout = this.workout();
-    if (!workout) return '';
-    return workoutMetaLine(workout.exercises?.length ?? null, workout.estimatedDurationMinutes);
+    if (!workout) return [];
+    const chips: string[] = [];
+    if (workout.estimatedDurationMinutes != null) {
+      chips.push(
+        this._translateService.instant('workouts.meta.aboutMinutes', {
+          minutes: workout.estimatedDurationMinutes,
+        }),
+      );
+    }
+    chips.push(
+      this._translateService.instant('count.exercises', { count: workout.exercises?.length ?? 0 }),
+    );
+    return chips;
   });
+
+  /** The coach by first name; a plan you scheduled yourself has no coach to name. */
+  readonly noteLabel = computed(() => {
+    const assignment = this.assignment();
+    if (assignment?.assignmentKind === ProgramAssignmentKind.Self) {
+      return this._translateService.instant('workouts.routineView.notes');
+    }
+    const name = assignment?.instructor?.firstName;
+    return name
+      ? this._translateService.instant('workouts.preview.noteFrom', { name })
+      : this._translateService.instant('workouts.preview.noteFromCoach');
+  });
+
+  readonly exercises = computed<OverviewExercise[]>(() =>
+    (this.workout()?.exercises ?? []).map((exercise) => ({
+      key: exercise.id,
+      exercise: {
+        id: exercise.exerciseId,
+        name: exercise.exercise?.name ?? this._translateService.instant('workouts.common.exercise'),
+        kind: this._kindOf(exercise),
+        thumbnailUrl: exercise.exercise?.thumbnailUrl ?? null,
+      },
+      prescription: prescriptionLine(exercise.sets ?? []),
+    })),
+  );
 
   constructor() {
     addIcons(WORKOUT_ICONS);
@@ -151,25 +195,9 @@ export class Preview implements ViewWillEnter {
       });
   }
 
-  exerciseName(exercise: AssignedExercise): string {
-    return exercise.exercise?.name ?? this._translateService.instant('workouts.common.exercise');
-  }
-
-  setsLabel(exercise: AssignedExercise): string {
-    return this._translateService.instant('count.sets', { count: (exercise.sets ?? []).length });
-  }
-
-  /** The kind-tinted hex tile, same as the library row draws it. */
-  tileIcon(exercise: AssignedExercise): string {
-    return kindIcon(this._kindOf(exercise));
-  }
-
-  tileTone(exercise: AssignedExercise): string {
-    return kindTone(this._kindOf(exercise));
-  }
-
-  toggleNote(): void {
-    this.noteOpen.update((open) => !open);
+  /** The catalog page, pushed onto this stack so back returns here. */
+  openExercise(exerciseId: string): void {
+    void this._router.navigate(['/tabs/workouts/exercise', exerciseId]);
   }
 
   start(): void {
@@ -177,6 +205,14 @@ export class Preview implements ViewWillEnter {
     if (!workout || this.starting()) return;
 
     this.starting.set(true);
+    this._activeWorkoutService.startOrResume(() => this._start(workout), {
+      // This very day, begun earlier and left: just carry on with it.
+      isSame: (open) => open.assignedWorkoutId === workout.id,
+      onBlocked: () => this.starting.set(false),
+    });
+  }
+
+  private _start(workout: AssignedWorkout): void {
     this._workoutLogService
       .start({ assignedWorkoutId: workout.id })
       .pipe(take(1))

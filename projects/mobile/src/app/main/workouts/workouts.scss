@@ -1,3 +1,9 @@
+/* The History shortcut sits beside the bell and matches its glyph size, which
+   the bell sets in its own skin. */
+.history ion-icon {
+  font-size: var(--mh-text-2xl);
+}
+
 /* ─── Resume ──────────────────────────────────────────────────────
    Navy, not honey. Resuming an abandoned session and starting a new one are
    different offers, and the design is explicit that these must never be
@@ -10,6 +16,15 @@
 
 .resume .mh-kicker {
   color: var(--ion-color-primary);
+}
+
+/* The live dot before the kicker: something is running. */
+.resume .live-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-inline-end: 0.75rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-color-primary);
 }
 
 .resume h2 {
@@ -27,14 +42,51 @@
   font-weight: 600;
 }
 
-/* The two other ways out of a cold start, under the primary one. Quiet: they
-   are the alternatives, not the thing we are asking for. */
-.secondary-actions {
+/* ─── Cold start ──────────────────────────────────────────────────
+   One card holding the promise and both ways in: the empty workout as the
+   honey ask, the starters as its quiet neutral alternative. */
+.cold-start ion-card-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  margin-top: -0.5rem;
+  padding: 2rem 1.5rem 1.25rem;
+  text-align: center;
+}
+
+.cold-start h2 {
+  margin: 1.25rem 0 0;
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}
+
+.cold-start p {
+  margin: 0.5rem 0 1.5rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+}
+
+.cold-start ion-button {
+  align-self: stretch;
+  margin: 0;
+  font-weight: 600;
+}
+
+.cold-start ion-button + ion-button {
+  margin-top: 0.75rem;
+}
+
+/* Neutral, not honey: honey is the one thing we are asking for. */
+.cold-start ion-button.neutral {
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --color: var(--ion-text-color);
+}
+
+.cold-start ion-button.build-own {
+  align-self: center;
+  margin-top: 0.25rem;
 }
 
 /* Where you are in a plan, under its name. Honey because it is the plan's

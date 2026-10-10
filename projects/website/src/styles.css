@@ -18,3 +18,11 @@
 .hero-section h1 .text-brand {
   color: var(--p-primary-color);
 } */
+
+/* The homepage sticky CTA bar (phones) is fixed to the bottom; give the footer
+   room so the bar never covers its last line. */
+@media (max-width: 767.98px) {
+  body:has(mh-sticky-cta) .site-footer {
+    padding-bottom: 100px;
+  }
+}

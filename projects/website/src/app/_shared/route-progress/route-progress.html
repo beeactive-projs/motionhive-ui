@@ -1,0 +1,8 @@
+@if (state() !== 'idle') {
+  <div
+    class="bar"
+    [class.bar--done]="state() === 'done'"
+    role="progressbar"
+    aria-label="Loading page"
+    i18n-aria-label="@@routeProgress.aria"></div>
+}

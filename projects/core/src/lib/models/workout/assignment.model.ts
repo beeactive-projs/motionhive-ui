@@ -1,5 +1,6 @@
 import type {
   ExerciseSetType,
+  ProgramAssignmentKind,
   ProgramAssignmentStatus,
   WorkoutLogStatus,
 } from './workout.enums';
@@ -16,7 +17,7 @@ export interface ProgramAssignment {
    * own routines. Without this a self-scheduled plan rendered your own
    * name under a "coach" label.
    */
-  assignmentKind?: 'COACH' | 'SELF';
+  assignmentKind?: ProgramAssignmentKind;
   id: string;
   instructorId: string;
   clientId: string;

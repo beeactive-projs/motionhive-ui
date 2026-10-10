@@ -16,6 +16,17 @@ import {
 } from '../../exercises.config';
 
 /**
+ * Enough of an exercise to draw the row: what a routine or a plan's day
+ * carries about each movement, short of the full library record.
+ */
+export type ExerciseRef = Pick<Exercise, 'id' | 'name' | 'kind' | 'thumbnailUrl'>;
+
+/** The library record carries provenance; a slim reference does not. */
+function isLibraryExercise(exercise: Exercise | ExerciseRef): exercise is Exercise {
+  return 'source' in exercise;
+}
+
+/**
  * One row of the exercise library: a tile, the name, what it trains, and a
  * level chip.
  *
@@ -34,6 +45,12 @@ import {
  * than a link: pass `selected` and the chevron becomes a check mark and the
  * chips step aside — a row you are ticking needs its name and its tick, not
  * its difficulty.
+ *
+ * And it serves a workout before Start, where `prescription` replaces the
+ * facts line with the sets and targets ("4 sets · 6–8 reps · 70 kg"). That
+ * row is about the work, not the movement's profile, so the level and
+ * ownership chips step aside; the chevron stays, since it still opens the
+ * movement.
  */
 @Component({
   selector: 'mh-exercise-row',
@@ -42,27 +59,50 @@ import {
   styleUrl: './exercise-row.scss',
 })
 export class ExerciseRow {
-  readonly exercise = input.required<Exercise>();
+  readonly exercise = input.required<Exercise | ExerciseRef>();
   /** Whose library this is, so "Mine" can be told from someone else's public row. */
   readonly myUserId = input<string | null>(null);
   /** Set (true or false) in a picker; left null where the row is a link. */
   readonly selected = input<boolean | null>(null);
+  /** The sets and targets, in place of the library facts line. */
+  readonly prescription = input<string | null>(null);
 
   readonly select = output<void>();
 
+  /** The full record when the row is in the library, and no prescription overrides it. */
+  private readonly _library = computed(() => {
+    const exercise = this.exercise();
+    return this.prescription() === null && isLibraryExercise(exercise) ? exercise : null;
+  });
+
   readonly name = computed(() => this.exercise().name);
   /** The English name under a translated one: many people know a lift by it. */
-  readonly originalName = computed(() => this.exercise().originalName ?? null);
+  readonly originalName = computed(() => {
+    const exercise = this.exercise();
+    return isLibraryExercise(exercise) ? (exercise.originalName ?? null) : null;
+  });
 
-  readonly subline = computed(() => exerciseSubline(this.exercise()));
+  readonly subline = computed(() => {
+    const library = this._library();
+    return library ? exerciseSubline(library) : (this.prescription() ?? '');
+  });
 
-  readonly levelLabel = computed(() => levelLabel(this.exercise().level));
+  readonly levelLabel = computed(() => {
+    const library = this._library();
+    return library ? levelLabel(library.level) : null;
+  });
 
-  readonly levelTone = computed(() => levelTone(this.exercise().level));
+  readonly levelTone = computed(() => {
+    const library = this._library();
+    return library ? levelTone(library.level) : null;
+  });
 
   readonly kindTone = computed(() => kindTone(this.exercise().kind));
 
-  readonly ownership = computed(() => ownershipChip(this.exercise(), this.myUserId()));
+  readonly ownership = computed(() => {
+    const library = this._library();
+    return library ? ownershipChip(library, this.myUserId()) : null;
+  });
 
   readonly thumbnailUrl = computed(() => this.exercise().thumbnailUrl || null);
 

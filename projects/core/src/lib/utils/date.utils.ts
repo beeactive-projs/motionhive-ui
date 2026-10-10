@@ -46,6 +46,17 @@ export function localDayKey(date: Date): string {
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
+/** The inverse of `localDayKey` — 'yyyy-mm-dd' back to a local midnight. */
+export function dayFromKey(key: string): Date {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/** Local midnight on the first of the month containing `date`. */
+export function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
 /**
  * Calendar-relative short time: `08:00` today, `Wed` inside the last week,
  * `9 Aug` before that.

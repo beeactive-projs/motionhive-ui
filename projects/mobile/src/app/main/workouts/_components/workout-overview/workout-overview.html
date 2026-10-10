@@ -1,0 +1,46 @@
+<header class="hero">
+  @if (eyebrow(); as text) {
+    <span class="mh-kicker eyebrow">{{ text }}</span>
+  }
+  <h1>{{ title() }}</h1>
+
+  @if (chips().length) {
+    <div class="chips">
+      @for (chip of chips(); track $index) {
+        <ion-badge data-tone="medium">{{ chip }}</ion-badge>
+      }
+    </div>
+  }
+
+  @if (hint(); as text) {
+    <p class="hint">{{ text }}</p>
+  }
+</header>
+
+<!-- Coach notes run long: two lines, then the reader decides. -->
+@if (note(); as text) {
+  <ion-card class="note">
+    <ion-card-content>
+      <span class="mh-kicker">{{ noteLabel() }}</span>
+      <p #noteText [class.clamped]="!noteOpen()">{{ text }}</p>
+      @if (noteOverflows() || noteOpen()) {
+        <ion-button fill="clear" size="small" [attr.aria-expanded]="noteOpen()" (click)="toggleNote()">
+          {{ (noteOpen() ? 'button.showLess' : 'button.showMore') | translate }}
+        </ion-button>
+      }
+    </ion-card-content>
+  </ion-card>
+}
+
+<section class="mh-section">
+  <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (row of exercises(); track row.key) {
+      <mh-exercise-row
+        [exercise]="row.exercise"
+        [prescription]="row.prescription"
+        (select)="exerciseSelect.emit(row.exercise.id)"
+      />
+    }
+  </ion-list>
+</section>

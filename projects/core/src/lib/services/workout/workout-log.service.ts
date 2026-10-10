@@ -221,6 +221,13 @@ export class WorkoutLogService {
     );
   }
 
+  /** Drop one set from an exercise mid-session — same path the set is logged on. */
+  removeSet(workoutLogId: string, setId: string): Observable<void> {
+    return this._http.delete<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.LOG_SET(workoutLogId, setId)}`,
+    );
+  }
+
   /**
    * "Last time you did this" — most-recent completed log's actuals for
    * a catalog exercise. Returns up to 6 sets (one workout's worth).

@@ -1,5 +1,5 @@
 <!-- ===== Hero ===== -->
-<section class="hero">
+<section class="hero" #hero>
   <div class="mh-wrap hero__grid">
     <div class="hero__copy">
       <mh-kicker tone="teal" i18n="@@home.hero.kicker">For coaches and the communities they build</mh-kicker>
@@ -190,7 +190,7 @@
 }
 
 <!-- ===== Final CTA ===== -->
-<mh-cta-band variant="amber">
+<mh-cta-band variant="amber" #finalCta>
   <mh-kicker kicker i18n="@@home.cta.kicker">Ready when you are</mh-kicker>
   <ng-container heading i18n="@@home.cta.h">Your coaching, all in one
     place.</ng-container>
@@ -200,3 +200,6 @@
     <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/pricing" i18n="@@home.cta.btn2">See pricing</a>
   </div>
 </mh-cta-band>
+
+<!-- Phones only: sign-up bar while the hero CTA is scrolled away -->
+<mh-sticky-cta [start]="heroElement()?.nativeElement" [end]="finalCtaElement()?.nativeElement" />

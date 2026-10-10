@@ -1,0 +1,47 @@
+/* The estimated 1RM leads the card; its change sits beside it and wraps
+   under it when the width runs out. */
+.hero .headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.625rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.hero .value {
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-2xl);
+  font-weight: 700;
+  line-height: var(--mh-leading-tight);
+}
+
+.hero .delta {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.hero .delta[data-trend='up'] {
+  color: var(--ion-color-success-wash-contrast);
+}
+
+.hero .delta[data-trend='down'] {
+  color: var(--ion-color-danger-wash-contrast);
+}
+
+/* The workout a session belonged to, quiet beside its date. */
+.workout {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 400;
+}
+
+/* Sets and the top set — mono and tabular, the way every number in a column
+   is (see the records on Progress). */
+.line {
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+  font-variant-numeric: tabular-nums;
+}

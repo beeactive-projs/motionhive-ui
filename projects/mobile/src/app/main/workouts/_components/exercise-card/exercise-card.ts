@@ -1,8 +1,13 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { chevronForward, ellipsisHorizontal } from 'ionicons/icons';
+import { chevronForward, ellipsisVertical } from 'ionicons/icons';
+
+import { ExerciseKind } from 'core';
+
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { kindIcon, kindTone } from '../../../exercises/exercises.config';
 
 /**
  * One exercise as a card: its name up top, opening the catalogue page for
@@ -20,7 +25,7 @@ import { chevronForward, ellipsisHorizontal } from 'ionicons/icons';
  */
 @Component({
   selector: 'mh-exercise-card',
-  imports: [IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel, TranslatePipe],
+  imports: [HexAvatar, IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel, TranslatePipe],
   templateUrl: './exercise-card.html',
   styleUrl: './exercise-card.scss',
   host: {
@@ -35,14 +40,22 @@ export class ExerciseCard {
   readonly skipped = input(false);
   /** Shows the ellipsis in place of the chevron and emits `actions` from it. */
   readonly showActions = input(false);
+  /** The exercise's kind, for the tinted hexagon beside the name. Omit for none. */
+  readonly kind = input<ExerciseKind | null>(null);
 
   readonly open = output<void>();
   readonly actions = output<void>();
 
+  /** The kind-tinted hex tile, same as the library row draws it. */
+  readonly tile = computed(() => {
+    const kind = this.kind();
+    return kind ? { icon: kindIcon(kind), tone: kindTone(kind) } : null;
+  });
+
   constructor() {
     // The card is hosted by three features; none of them should have to
     // know which glyphs it draws.
-    addIcons({ chevronForward, ellipsisHorizontal });
+    addIcons({ chevronForward, ellipsisVertical });
   }
 
   onActions(event: Event): void {

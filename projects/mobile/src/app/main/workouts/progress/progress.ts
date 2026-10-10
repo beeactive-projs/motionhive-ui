@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
@@ -16,7 +17,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { ProgressOverview, ProgressRange, ProgressService } from 'core';
+import { ProgressOverview, ProgressRange, ProgressRecord, ProgressService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
@@ -55,6 +56,7 @@ const RANGE: ProgressRange = '12w';
 export class Progress implements ViewWillEnter {
   private readonly _progressService = inject(ProgressService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _router = inject(Router);
 
   readonly overview = signal<ProgressOverview | null>(null);
   readonly loading = signal(false);
@@ -98,6 +100,13 @@ export class Progress implements ViewWillEnter {
 
   constructor() {
     addIcons(WORKOUT_ICONS);
+  }
+
+  /** The name rides along so the next page can title itself before it loads. */
+  openExercise(record: ProgressRecord): void {
+    void this._router.navigate(['/tabs/workouts/progress', record.exerciseId], {
+      state: { exerciseName: record.exerciseName },
+    });
   }
 
   /** "82.5 kg" — a record's weight, in the reader's number format. */

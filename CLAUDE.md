@@ -14,7 +14,7 @@ MotionHive fitness platform frontend. Angular monorepo with three projects:
 
 - **`core`** — shared library (models, services, stores, guards, interceptors, constants, enums, environment config). Imported as `'core'`. Everything re-exported from `public-api.ts`.
 - **`web`** — authenticated application (dashboard, instructor/user/super-admin/writer areas, payments, groups, sessions). Uses `SidenavLayout` + `authGuard`.
-- **`website`** — public marketing site (home, about, blog, contact, legal pages, tools like calorie calculator, feedback/waitlist dialogs). Uses `PublicLayout`. **Separate Angular application**, not a section of `web`.
+- **`website`** — public marketing site (home, about, blog, contact, legal pages, tools like calorie calculator, feedback dialog). Uses `PublicLayout`. **Separate Angular application**, not a section of `web`.
 - **Future: Ionic mobile app** — planned, not yet scaffolded. When it lands, anything shared across web + website + mobile belongs in `core`.
 
 **Tech Stack**: Angular 22, PrimeNG 22 (Lara preset), Tailwind CSS 4 + PrimeUI, ngx-translate, Vitest
@@ -47,7 +47,7 @@ Package manager is **npm**. Prettier config is inline in `package.json`. Angular
   - `app/pages/error/*` — 404, 500
 - **`projects/website/`** — public marketing site. Structure:
   - `app/home`, `app/about`, `app/contact`, `app/blog`, `app/legal/*`, `app/tools/*`
-  - `app/_shared/*` — website-only shared components (waitlist dialog, language switcher, feedback dialog)
+  - `app/_shared/*` — website-only shared components (language switcher, feedback dialog, route progress bar, preloading strategy)
   - `app/layouts/public-layout`, `app/layouts/header`, `app/layouts/footer`
 
 ### Routing

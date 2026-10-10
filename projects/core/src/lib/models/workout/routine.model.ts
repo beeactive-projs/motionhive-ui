@@ -1,3 +1,4 @@
+import type { ExerciseLevel } from '../exercise/exercise.enums';
 import type { RoutineSource } from './workout.enums';
 
 export type { RoutineSource } from './workout.enums';
@@ -30,6 +31,8 @@ export interface Routine {
   folder: string | null;
   /** Bumped on every successful start; sorts the list. */
   lastPerformedAt: string | null;
+  /** Editorial difficulty. Starters carry one; a user's own routine is never graded. */
+  level: ExerciseLevel | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -120,6 +123,8 @@ export interface ProgramWire {
   description: string | null;
   folder: string | null;
   isSingleWorkout: boolean;
+  /** Curated content only; null on user routines. */
+  level?: ExerciseLevel | null;
   lastPerformedAt: string | null;
   createdAt: string;
   updatedAt: string;

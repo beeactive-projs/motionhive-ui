@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, computed, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
@@ -19,13 +19,17 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { WorkoutLog } from 'core';
+import { WorkoutLog, localDayKey } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { HistoryCalendar } from '../_components/history-calendar/history-calendar';
 import { LogRow } from '../_components/log-row/log-row';
 import { WORKOUT_ICONS } from '../workouts.config';
 import { HistoryStore } from './history.store';
+
+/** Breathing room above a row the calendar scrolls to, in CSS pixels. */
+const ROW_SCROLL_GAP = 12;
 
 /**
  * Everything logged, newest first.
@@ -39,6 +43,7 @@ import { HistoryStore } from './history.store';
   selector: 'mh-workout-history',
   imports: [
     EmptyState,
+    HistoryCalendar,
     IonBackButton,
     IonButtons,
     IonContent,
@@ -61,8 +66,15 @@ import { HistoryStore } from './history.store';
 export class History implements ViewWillEnter {
   readonly store = inject(HistoryStore);
   private readonly _router = inject(Router);
+  private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly _content = viewChild(IonContent);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
+
+  /** Each row's local day, the hook a calendar tap scrolls to. */
+  readonly dayKeys = computed(
+    () => new Map(this.store.items().map((log) => [log.id, localDayKey(new Date(log.startedAt))])),
+  );
 
   constructor() {
     addIcons(WORKOUT_ICONS);
@@ -88,7 +100,44 @@ export class History implements ViewWillEnter {
   }
 
   open(log: WorkoutLog): void {
-    void this._router.navigate(['/tabs/workouts/finish', log.id]);
+    this._openLog(log.id);
+  }
+
+  /**
+   * A tapped calendar day. One workout opens like its row would; several
+   * scroll the list to that day so you can pick, or, when the day is further
+   * back than the list has loaded, open the newest of them.
+   */
+  async onDaySelect(key: string): Promise<void> {
+    const ids = this.store.calendarCells().find((cell) => cell.key === key)?.logIds ?? [];
+    if (!ids.length) return;
+    if (ids.length === 1) {
+      this._openLog(ids[0]);
+      return;
+    }
+
+    const row = this._elementRef.nativeElement.querySelector<HTMLElement>(`[data-day="${key}"]`);
+    const content = this._content();
+    if (!row || !content) {
+      this._openLog(ids[0]);
+      return;
+    }
+
+    const scroller = await content.getScrollElement();
+    // The scroller's top padding is the header the page scrolls under; the
+    // row lands just below it rather than behind it.
+    const headerOffset = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+    const y =
+      row.getBoundingClientRect().top -
+      scroller.getBoundingClientRect().top +
+      scroller.scrollTop -
+      headerOffset -
+      ROW_SCROLL_GAP;
+    await content.scrollToPoint(0, Math.max(0, y), 300);
+  }
+
+  private _openLog(id: string): void {
+    void this._router.navigate(['/tabs/workouts/finish', id]);
   }
 
   /**

@@ -1,0 +1,117 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts/progress" />
+    </ion-buttons>
+    <ion-title>{{ title() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'workouts.loadError.exercise' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="load()"
+    />
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="trending-up-outline"
+      [heading]="'workouts.exerciseProgress.empty.title' | translate"
+      [message]="'workouts.exerciseProgress.empty.message' | translate"
+    />
+  } @else {
+    <div class="mh-page">
+      <ion-segment [value]="range()" (ionChange)="setRange($event.detail.value)">
+        @for (option of ranges; track option) {
+          <ion-segment-button [value]="option">
+            <ion-label>{{ 'workouts.exerciseProgress.range.' + option | translate }}</ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+
+      @if (showSkeleton()) {
+        <!-- The loaded geometry, so nothing shifts when the numbers land. -->
+        <ion-card>
+          <ion-card-content>
+            <span class="mh-kicker">{{ 'workouts.exerciseProgress.oneRepMax' | translate }}</span>
+            <ion-skeleton-text [animated]="true" style="width: 6rem; height: 1.5rem" />
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 8.75rem" />
+          </ion-card-content>
+        </ion-card>
+        <div class="mh-tiles">
+          @for (_ of skeletonItems; track $index) {
+            <mh-stat-tile label="" value="" [loading]="true" />
+          }
+        </div>
+        <div>
+          @for (_ of skeletonItems; track $index) {
+            <mh-session-row-skeleton [rail]="false" />
+          }
+        </div>
+      } @else if (emptyRange()) {
+        <ion-note class="mh-note-block">
+          {{ 'workouts.exerciseProgress.emptyRange' | translate }}
+        </ion-note>
+      } @else {
+        @if (hasSeries()) {
+          <ion-card class="hero">
+            <ion-card-content>
+              <span class="mh-kicker">{{ 'workouts.exerciseProgress.oneRepMax' | translate }}</span>
+              <div class="headline">
+                <span class="value">{{ heroValue() }}</span>
+                @if (deltaLabel()) {
+                  <span class="delta" [attr.data-trend]="deltaTrend()">{{ deltaLabel() }}</span>
+                }
+              </div>
+              @if (chartPoints().length) {
+                <mh-trend-chart
+                  [points]="chartPoints()"
+                  [from]="rangeFrom()"
+                  [to]="now()"
+                  [xLabels]="xLabels()"
+                  [label]="chartLabel()"
+                />
+              }
+            </ion-card-content>
+          </ion-card>
+        }
+
+        <div class="mh-tiles">
+          @for (tile of tiles(); track tile.label) {
+            <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+          }
+        </div>
+
+        <section class="mh-section">
+          <span class="mh-kicker">{{ 'workouts.exerciseProgress.sessions' | translate }}</span>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (row of sessionRows(); track row.id; let last = $last) {
+              <ion-item
+                button
+                [detail]="true"
+                [lines]="last ? 'none' : 'full'"
+                (click)="openSession(row.id)"
+              >
+                <ion-label>
+                  <h2>
+                    {{ row.date }}
+                    <span class="workout">{{ row.workout }}</span>
+                  </h2>
+                  <p class="line">{{ row.line }}</p>
+                </ion-label>
+                @if (row.record) {
+                  <ion-badge slot="end" [attr.data-tone]="Tones.Honey">
+                    {{ 'workouts.exerciseProgress.record' | translate }}
+                  </ion-badge>
+                }
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+    </div>
+  }
+</ion-content>

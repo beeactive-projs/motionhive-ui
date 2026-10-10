@@ -1,0 +1,32 @@
+:host {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 300;
+  height: 3px;
+  pointer-events: none;
+}
+
+/* Creeps towards 90% while the page loads (it can't know the real progress),
+   then fills and fades once the router lands. */
+.bar {
+  height: 100%;
+  background: var(--p-primary-color);
+  transform-origin: left center;
+  animation: route-progress-creep 6s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+
+  &--done {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+}
+
+@keyframes route-progress-creep {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.9);
+  }
+}

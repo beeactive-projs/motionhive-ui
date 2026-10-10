@@ -1,11 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
   IonContent,
   IonFooter,
   IonHeader,
@@ -27,23 +25,31 @@ import { take } from 'rxjs/operators';
 import {
   CreateRoutineExercisePayload,
   Exercise,
+  ExerciseKind,
   Routine,
   RoutineService,
   RoutineSources,
+  dayDividerLabel,
+  localDayKey,
 } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
+import { levelLabel } from '../../exercises/exercises.config';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
+import { OverviewExercise, WorkoutOverview } from '../_components/workout-overview/workout-overview';
 import {
   DEFAULT_SETS,
   KeypadField,
   KeypadFields,
   WORKOUT_ICONS,
   formatMeasure,
+  prescriptionLine,
 } from '../workouts.config';
 
 /** The two targets a routine prescribes per exercise. */
@@ -84,8 +90,12 @@ const NEW = 'new';
  * movements in order is still a useful routine.
  *
  * Handles `new` and an existing id on the same screen — the only difference
- * is whether the save is a create or an update. A starter opens here too,
- * read-only: runnable and copyable, never editable.
+ * is whether the save is a create or an update.
+ *
+ * A saved routine opens read first, in the same overview a plan's day uses,
+ * with Start as the one ask and Edit as a quiet text action that swaps the
+ * builder in. A starter only ever reads: runnable and copyable, never
+ * editable.
  */
 @Component({
   selector: 'mh-routine-builder',
@@ -94,11 +104,10 @@ const NEW = 'new';
     EmptyState,
     ExerciseCard,
     ExercisePickerSheet,
+    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,
-    IonCard,
-    IonCardContent,
     IonContent,
     IonFooter,
     IonHeader,
@@ -113,6 +122,7 @@ const NEW = 'new';
     IonToolbar,
     NumericKeypad,
     TranslatePipe,
+    WorkoutOverview,
   ],
   templateUrl: './routine-builder.html',
   styleUrl: './routine-builder.scss',
@@ -122,10 +132,11 @@ export class RoutineBuilder implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
 
   readonly Targets = TargetFields;
-  readonly skeletonCards = [1, 2];
+  readonly skeletonRows = [1, 2, 3, 4];
 
   readonly routine = signal<Routine | null>(null);
   readonly name = signal('');
@@ -138,10 +149,23 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly pickerOpen = signal(false);
   readonly deleteOpen = signal(false);
   readonly deleting = signal(false);
+  /** A saved routine reads until Edit is tapped. */
+  readonly editMode = signal(false);
 
   /** The target cell the keypad is editing, or null when it is closed. */
   readonly editing = signal<TargetEdit | null>(null);
   readonly draft = signal('');
+  /** What the keypad has typed so far, echoed into the open target cell. */
+  readonly typed = signal('');
+
+  /** Read when focus jumps to another target, so what was typed is kept. */
+  private readonly _keypad = viewChild(NumericKeypad);
+
+  /** Identifies the open target for the keypad, so it re-seeds on every move. */
+  readonly editingKey = computed(() => {
+    const edit = this.editing();
+    return edit ? `${edit.index}:${edit.field}` : '';
+  });
 
   /**
    * A signal, not a field: `isNew` is a computed over it, and a computed
@@ -160,10 +184,74 @@ export class RoutineBuilder implements ViewWillEnter {
   /** A starter belongs to nobody: runnable and copyable, never editable. */
   readonly readOnly = computed(() => this.routine()?.source === RoutineSources.System);
 
-  readonly title = computed(() =>
-    this.isNew()
-      ? this._translateService.instant('workouts.common.newRoutine')
-      : (this.routine()?.name ?? this._translateService.instant('workouts.routineBuilder.title')),
+  /** The read view: any saved routine, unless you are editing your own. */
+  readonly showOverview = computed(
+    () => !this.isNew() && !!this.routine() && (this.readOnly() || !this.editMode()),
+  );
+
+  /** Editing a routine that already exists — Cancel puts it back. */
+  readonly editingSaved = computed(() => !this.isNew() && this.editMode() && !this.readOnly());
+
+  readonly title = computed(() => {
+    if (this.isNew()) return this._translateService.instant('workouts.common.newRoutine');
+    // The overview carries the name as its heading; the bar names the kind of page.
+    if (this.showOverview()) return this._translateService.instant('workouts.routineBuilder.title');
+    return this.routine()?.name ?? this._translateService.instant('workouts.routineBuilder.title');
+  });
+
+  /** Whose it is, or when you last did it — the fact that places it. */
+  readonly eyebrow = computed(() => {
+    const routine = this.routine();
+    if (!routine) return null;
+    if (this.readOnly()) return this._translateService.instant('workouts.routineView.starter');
+    return routine.lastPerformedAt
+      ? this._translateService.instant('workouts.routineRow.lastDone', {
+          day: dayDividerLabel(localDayKey(new Date(routine.lastPerformedAt))),
+        })
+      : this._translateService.instant('workouts.routineView.yours');
+  });
+
+  readonly chips = computed(() => {
+    const routine = this.routine();
+    if (!routine) return [];
+    const chips: string[] = [
+      this._translateService.instant('count.exercises', { count: routine.exerciseCount }),
+    ];
+    if (routine.level) chips.push(levelLabel(routine.level));
+    return chips;
+  });
+
+  readonly noteLabel = computed(() =>
+    this._translateService.instant(
+      this.readOnly() ? 'workouts.routineView.about' : 'workouts.routineView.notes',
+    ),
+  );
+
+  /**
+   * The saved routine, not the draft: the overview shows what Start will run.
+   * A routine saved by the simple editor may carry only the flat summary, so
+   * that stands in for the per-set rows when there are none.
+   */
+  readonly overviewExercises = computed<OverviewExercise[]>(() =>
+    (this.routine()?.exercises ?? []).map((e) => ({
+      key: e.id,
+      exercise: {
+        id: e.exerciseId,
+        name: e.exercise?.name ?? this._translateService.instant('workouts.common.exercise'),
+        kind: (e.exercise?.kind as ExerciseKind | undefined) ?? ExerciseKind.Strength,
+        thumbnailUrl: e.exercise?.thumbnailUrl ?? null,
+      },
+      prescription: prescriptionLine(
+        e.sets.length
+          ? e.sets
+          : Array.from({ length: e.defaultSets || DEFAULT_SETS }, () => ({
+              targetRepsMin: e.targetRepsMin,
+              targetRepsMax: e.targetRepsMax,
+              targetWeightKg: e.targetWeightKg,
+              targetDurationSeconds: null,
+            })),
+      ),
+    })),
   );
 
   readonly canSave = computed(
@@ -215,6 +303,7 @@ export class RoutineBuilder implements ViewWillEnter {
 
     if (id === this._id()) return;
     this._id.set(id);
+    this.editMode.set(false);
     this.load();
   }
 
@@ -230,18 +319,7 @@ export class RoutineBuilder implements ViewWillEnter {
       .subscribe({
         next: (routine) => {
           this.routine.set(routine);
-          this.name.set(routine.name);
-          this.exercises.set(
-            (routine.exercises ?? []).map((e) => ({
-              key: e.id,
-              exerciseId: e.exerciseId,
-              name: e.exercise?.name ?? this._translateService.instant('workouts.common.exercise'),
-              sets: e.defaultSets || DEFAULT_SETS,
-              targetRepsMin: e.targetRepsMin,
-              targetRepsMax: e.targetRepsMax,
-              targetWeightKg: e.targetWeightKg,
-            })),
-          );
+          this._resetDraft(routine);
           this.loading.set(false);
         },
         error: () => {
@@ -252,6 +330,20 @@ export class RoutineBuilder implements ViewWillEnter {
   }
 
   // ─── Editing ──────────────────────────────────────────────────
+
+  edit(): void {
+    if (this.readOnly()) return;
+    this.editMode.set(true);
+  }
+
+  /** Drops the draft and returns to the read view of what is saved. */
+  cancelEdit(): void {
+    const routine = this.routine();
+    if (routine) this._resetDraft(routine);
+    this.editing.set(null);
+    this.pickerOpen.set(false);
+    this.editMode.set(false);
+  }
 
   /**
    * Adds the picked movements, skipping any already in the routine. Adding
@@ -292,7 +384,11 @@ export class RoutineBuilder implements ViewWillEnter {
 
   /** The catalog page, pushed onto this stack so the draft survives. */
   openExercise(row: DraftExercise): void {
-    void this._router.navigate(['/tabs/workouts/exercise', row.exerciseId]);
+    this.openExerciseById(row.exerciseId);
+  }
+
+  openExerciseById(exerciseId: string): void {
+    void this._router.navigate(['/tabs/workouts/exercise', exerciseId]);
   }
 
   setCount(index: number, delta: number): void {
@@ -312,6 +408,10 @@ export class RoutineBuilder implements ViewWillEnter {
   // ─── Targets ──────────────────────────────────────────────────
 
   editTarget(index: number, field: TargetField): void {
+    // Tapping another target is a Done for this one: what was typed stays.
+    const keypad = this._keypad();
+    if (this.editing() && keypad) this._applyTarget(keypad.committed());
+    this.typed.set('');
     this.editing.set({ index, field });
     const row = this.exercises()[index];
     const current = field === TargetFields.Weight ? row?.targetWeightKg : row?.targetRepsMin;
@@ -324,8 +424,12 @@ export class RoutineBuilder implements ViewWillEnter {
   }
 
   commitTarget(typed: string): void {
-    const edit = this.editing();
+    this._applyTarget(typed);
     this.editing.set(null);
+  }
+
+  private _applyTarget(typed: string): void {
+    const edit = this.editing();
     if (!edit) return;
 
     const raw = typed.trim();
@@ -371,7 +475,8 @@ export class RoutineBuilder implements ViewWillEnter {
       })),
     };
 
-    const request = this.isNew()
+    const creating = this.isNew();
+    const request = creating
       ? this._routineService.create(payload)
       : this._routineService.update(this._id()!, payload);
 
@@ -381,7 +486,14 @@ export class RoutineBuilder implements ViewWillEnter {
         void this._feedbackService.success(
           this._translateService.instant('workouts.routineBuilder.toast.saved'),
         );
-        void this._router.navigate(['/tabs/workouts']);
+        if (creating) {
+          void this._router.navigate(['/tabs/workouts']);
+          return;
+        }
+        // An edit lands back on the read view, showing what was just saved.
+        this.editing.set(null);
+        this.editMode.set(false);
+        this.load();
       },
       error: (err) => {
         this.saving.set(false);
@@ -426,6 +538,12 @@ export class RoutineBuilder implements ViewWillEnter {
     if (!id || id === NEW || this.starting()) return;
 
     this.starting.set(true);
+    this._activeWorkoutService.startOrResume(() => this._start(id), {
+      onBlocked: () => this.starting.set(false),
+    });
+  }
+
+  private _start(id: string): void {
     this._routineService
       .start(id)
       .pipe(take(1))
@@ -442,5 +560,21 @@ export class RoutineBuilder implements ViewWillEnter {
           );
         },
       });
+  }
+
+  /** The builder's rows, rebuilt from what is saved. */
+  private _resetDraft(routine: Routine): void {
+    this.name.set(routine.name);
+    this.exercises.set(
+      (routine.exercises ?? []).map((e) => ({
+        key: e.id,
+        exerciseId: e.exerciseId,
+        name: e.exercise?.name ?? this._translateService.instant('workouts.common.exercise'),
+        sets: e.defaultSets || DEFAULT_SETS,
+        targetRepsMin: e.targetRepsMin,
+        targetRepsMax: e.targetRepsMax,
+        targetWeightKg: e.targetWeightKg,
+      })),
+    );
   }
 }

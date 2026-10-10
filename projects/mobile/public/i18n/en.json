@@ -1492,6 +1492,7 @@
     "editExercise": "Edit exercise",
     "editGroup": "Edit group",
     "exercise": "Exercise",
+    "exerciseProgress": "Exercise progress",
     "exercises": "Exercises",
     "group": "Group",
     "groups": "Groups",
@@ -2304,6 +2305,7 @@
   "workouts": {
     "common": {
       "addExercises": "Add exercises",
+      "alreadyInProgress": "{name} is still in progress. Finish or discard it before starting another workout.",
       "exercise": "Exercise",
       "exercises": "Exercises",
       "history": "History",
@@ -2325,6 +2327,28 @@
     },
     "exerciseCard": {
       "actionsFor": "Actions for {name}"
+    },
+    "exerciseProgress": {
+      "best": "Best",
+      "bestSet": "Best set",
+      "chartLabel": "Estimated 1-rep max went from {from} to {to} kg",
+      "delta": "{sign}{value} kg in {range}",
+      "empty": {
+        "message": "Log this exercise in a workout and it shows up here.",
+        "title": "No sessions yet"
+      },
+      "emptyRange": "Nothing logged in this period",
+      "oneRepMax": "Estimated 1-rep max",
+      "range": {
+        "12w": "12 weeks",
+        "1y": "1 year",
+        "4w": "4 weeks"
+      },
+      "record": "Record",
+      "sessionLine": "{sets} · top {weight} × {reps}",
+      "sessionLineBest": "{sets} · best {value}",
+      "sessions": "Sessions",
+      "setValue": "{weight} × {reps}"
     },
     "finish": {
       "done": "Done",
@@ -2348,6 +2372,22 @@
       "whatYouDid": "What you did"
     },
     "history": {
+      "calendar": {
+        "collapse": "Show one week",
+        "dayLabel": "{date}: {state}",
+        "done": "{count, plural, one {# done} other {# done}}",
+        "expand": "Show the whole month",
+        "legendCoach": "Coach plan",
+        "legendSelf": "My workout",
+        "legendSkipped": "Skipped",
+        "loadError": "Couldn't load this month",
+        "state": {
+          "coach": "coach plan done",
+          "none": "no workout",
+          "self": "workout done",
+          "skipped": "skipped"
+        }
+      },
       "count": "{count, plural, one {# workout logged} other {# workouts logged}}",
       "empty": {
         "message": "Finish a workout and it will show up here.",
@@ -2365,8 +2405,11 @@
       "fromYourCoach": "From your coach",
       "inProgress": "In progress · {elapsed}",
       "noRoutines": "Save a workout as a routine and it will show up here, ready to repeat.",
+      "openHistory": "Open history",
       "percentDone": "{percent}% done",
       "startEmpty": "Start empty workout",
+      "startsOn": "Starts {date}",
+      "weekOf": "Week {week} of {total}",
       "yourCoach": "Your coach",
       "yourRoutines": "Your routines"
     },
@@ -2380,6 +2423,7 @@
       "stepSeconds": "{step}s"
     },
     "loadError": {
+      "exercise": "Couldn't load this exercise",
       "history": "Couldn't load your history",
       "plan": "Couldn't open this plan",
       "progress": "Couldn't load your progress",
@@ -2389,6 +2433,7 @@
       "workout": "Couldn't open this workout"
     },
     "logRow": {
+      "coach": "Coach",
       "repeat": "Repeat {name}"
     },
     "logger": {
@@ -2412,12 +2457,7 @@
         "message": "Pick the movements as you go. Nothing has to be planned up front.",
         "title": "Add your first exercise"
       },
-      "fieldLabel": {
-        "distance": "Distance (m)",
-        "duration": "Time (mm:ss)",
-        "reps": "Reps",
-        "weight": "Weight (kg)"
-      },
+      "expand": "Show the sets for {name}",
       "finish": "Finish",
       "finishConfirm": {
         "message": "{count, plural, one {# set is still unticked. Finishing now records the workout as it stands.} other {# sets are still unticked. Finishing now records the workout as it stands.}}",
@@ -2427,6 +2467,8 @@
         "prev": "Prev",
         "set": "Set"
       },
+      "leave": "Leave and keep the workout going",
+      "nextField": "Next field",
       "picker": {
         "replacing": "Replacing {name}",
         "swapFor": "Swap for"
@@ -2436,10 +2478,13 @@
         "messageWithSets": "{name} has {count, plural, one {# completed set} other {# completed sets}}. Removing it deletes them.",
         "title": "Remove exercise"
       },
+      "setNumber": "Set {number}",
+      "setsDone": "{count, plural, one {# set done} other {# sets done}}",
       "toast": {
         "discardFailed": "Could not discard the workout",
         "discarded": "Workout discarded",
         "nothingToRepeat": "That workout had no exercises to repeat",
+        "removeSetFailed": "Could not remove that set",
         "removed": "Removed {name}",
         "repeatFailed": "Could not load that workout to repeat"
       }
@@ -2461,17 +2506,28 @@
       "title": "Plan",
       "yourCoach": "your coach"
     },
+    "prescription": {
+      "compact": "{sets} × {reps}",
+      "compactHold": "{sets} × {seconds} s",
+      "compactRange": "{min}–{max}",
+      "hold": "{seconds} sec hold",
+      "percent1rm": "{percent}% 1RM",
+      "repsRange": "{min}–{max} reps",
+      "topSet": "{weight} kg top set"
+    },
     "preview": {
       "empty": {
         "message": "This plan has no workouts in it. Your coach may still be building it.",
         "title": "Nothing to do yet"
       },
+      "noteFrom": "Note from {name}",
       "noteFromCoach": "Note from your coach",
       "skipToday": "Skip today",
       "toast": {
         "skipFailed": "Could not skip that",
         "skipped": "Marked as skipped"
-      }
+      },
+      "todaysWorkout": "Today's workout"
     },
     "progress": {
       "empty": {
@@ -2486,8 +2542,9 @@
       "title": "Rest over"
     },
     "restTimer": {
+      "lastSet": "last set",
       "minusSeconds": "Minus {seconds} seconds",
-      "next": "Next: {target}",
+      "nextUp": "Next up",
       "plusSeconds": "Plus {seconds} seconds",
       "rest": "Rest",
       "restOver": "Rest over"
@@ -2531,12 +2588,21 @@
     },
     "routineRow": {
       "lastDone": "Last done {day}",
-      "starter": "Starter"
+      "lastDoneOn": "last done {day}",
+      "lastDoneToday": "last done today",
+      "lastDoneYesterday": "last done yesterday"
+    },
+    "routineView": {
+      "about": "About this routine",
+      "notes": "Your notes",
+      "starter": "MotionHive starter",
+      "yours": "Your routine"
     },
     "setRow": {
       "cellLabel": "{field, select, weight {weight} reps {reps} duration {duration} distance {distance} other {{field}}} for set {number}",
       "complete": "Set {number} complete",
-      "lastTime": "Last time: {value}"
+      "lastTime": "Last time: {value}",
+      "options": "Options for set {number}"
     },
     "setTypeMark": {
       "DROPSET": "Dropset",
@@ -2560,6 +2626,13 @@
       "workouts": "Workouts"
     },
     "todayHero": {
+      "done": "Done for today. Nice work.",
+      "finishFirst": "Finish the workout in progress to start this one.",
+      "more": "+ {count} more",
+      "seeSummary": "See summary",
+      "seeWorkout": "See workout",
+      "skipped": "You skipped this one.",
+      "summaryFailed": "Could not open the summary",
       "upNextWithDate": "Up next · {date}"
     },
     "units": {

@@ -49,7 +49,12 @@
           <span class="mh-kicker">{{ 'workouts.progress.records' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
             @for (record of records(); track record.exerciseId; let last = $last) {
-              <ion-item [lines]="last ? 'none' : 'full'">
+              <ion-item
+                button
+                [detail]="true"
+                [lines]="last ? 'none' : 'full'"
+                (click)="openExercise(record)"
+              >
                 <ion-label>
                   <h2>{{ record.exerciseName }}</h2>
                 </ion-label>

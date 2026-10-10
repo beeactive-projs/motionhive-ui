@@ -72,6 +72,7 @@
     "saveChanges": "Save changes",
     "search": "Search",
     "seeAll": "See all",
+    "seeAllCount": "See all {count}",
     "select": "Select",
     "send": "Send",
     "sendRequest": "Send request",

@@ -54,6 +54,15 @@
   margin-top: 0.625rem;
 }
 
-ion-card ion-skeleton-text {
-  margin: 0.375rem 0;
+/* The overview's loading stand-in: heading lines on the page, then rows. */
+.hero-skeleton {
+  padding-inline: 0.25rem;
+}
+
+.hero-skeleton ion-skeleton-text {
+  margin: 0.5rem 0;
+}
+
+mh-hex-avatar {
+  margin-inline-end: 0.875rem;
 }

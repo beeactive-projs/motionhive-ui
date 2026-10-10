@@ -12,6 +12,9 @@ export const WEB_APP_URL = environment.webAppUrl;
 /** Signup / register page on the web app. */
 export const SIGNUP_URL = `${WEB_APP_URL}/auth/signup`;
 
+/** Login page on the web app. */
+export const LOGIN_URL = `${WEB_APP_URL}/auth/login`;
+
 /**
  * Public marketing site — a third deploy, separate from both the API and the
  * web app, so it is not derived from `environment`. Blog articles are only

@@ -1,3 +1,4 @@
+import type { AssignedExercise } from './assignment.model';
 import type { WorkoutLogStatus } from './workout.enums';
 
 /**
@@ -28,7 +29,17 @@ export interface TrainingDayWorkout {
   /** Denormalised so a card renders without a second lookup. */
   planName: string | null;
   instructor: TrainingDayInstructor | null;
+  /**
+   * Only on `today`, in order: what the session holds, so the card can list
+   * it without reading the whole plan. Absent on the week entries.
+   */
+  exercises?: TrainingDayExercise[];
 }
+
+/** One of today's exercises — enough to list it, not the full assigned tree. */
+export type TrainingDayExercise = Pick<AssignedExercise, 'id' | 'exerciseId' | 'orderIndex' | 'sets'> & {
+  exercise?: { id: string; name: string };
+};
 
 export interface TrainingDayPlan {
   id: string;

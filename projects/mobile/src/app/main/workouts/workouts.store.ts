@@ -36,6 +36,7 @@ export class WorkoutsStore {
   private readonly _trainingDay = signal<TrainingDay | null>(null);
   private readonly _routines = signal<Routine[]>([]);
   private readonly _starters = signal<Routine[]>([]);
+  private readonly _starterTotal = signal(0);
   private readonly _inProgress = signal<WorkoutLog | null>(null);
 
   private readonly _loading = signal(false);
@@ -47,6 +48,8 @@ export class WorkoutsStore {
   readonly inProgress = this._inProgress.asReadonly();
   readonly routines = this._routines.asReadonly();
   readonly starters = this._starters.asReadonly();
+  /** The whole starter catalogue, for the "See all" count — not just the page we read. */
+  readonly starterTotal = this._starterTotal.asReadonly();
 
   /** What a plan says to do today. Null on a rest day, which is an answer. */
   readonly today = computed<TrainingDayWorkout | null>(
@@ -66,6 +69,20 @@ export class WorkoutsStore {
     const week = this._trainingDay()?.week ?? [];
     const todayKey = localDayKey(new Date());
     return week.find((w) => !!w.scheduledDate && w.scheduledDate > todayKey) ?? null;
+  });
+
+  /** The plan day the hero shows: today's, or the next one on a rest day. */
+  readonly heroWorkout = computed(() => this.today() ?? this.upNext());
+
+  /**
+   * The open session is the hero's own day, begun earlier and left. The
+   * resume banner already is that workout, so the hero steps aside rather
+   * than show it twice.
+   */
+  readonly heroIsOpen = computed(() => {
+    const open = this._inProgress();
+    const hero = this.heroWorkout();
+    return !!open && !!hero && open.assignedWorkoutId === hero.assignedWorkoutId;
   });
 
   /** Nothing assigned, nothing saved, nothing logged — the cold start. */
@@ -104,7 +121,10 @@ export class WorkoutsStore {
         next: ({ day, routines, starters, inProgress }) => {
           if (day) this._trainingDay.set(day);
           if (routines) this._routines.set(routines.items);
-          if (starters) this._starters.set(starters.items);
+          if (starters) {
+            this._starters.set(starters.items);
+            this._starterTotal.set(starters.total);
+          }
           this._inProgress.set(inProgress);
 
           // Only the plan read is load-bearing for the page's shape.

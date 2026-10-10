@@ -1,3 +1,7 @@
 <router-outlet />
-<mh-feedback-dialog />
-<mh-waitlist-dialog />
+
+<!-- Loaded on first open, so the dialog, its form and PrimeNG's dialog/toast
+     code stay out of the download every visitor pays on every page. -->
+@defer (when feedbackOpen()) {
+  <mh-feedback-dialog />
+}

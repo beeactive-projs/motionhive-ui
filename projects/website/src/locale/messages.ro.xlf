@@ -1650,30 +1650,6 @@
           <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="waitlist.email.label" datatype="html">
-        <source>Email</source>
-        <target state="translated">Email</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">34</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.email.placeholder" datatype="html">
-        <source>your@email.com</source>
-        <target state="translated">adresa@email.com</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.email.error" datatype="html">
-        <source>Please enter a valid email address.</source>
-        <target state="translated">Te rugăm să introduci o adresă de email validă.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">39</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="feedback.success.h4" datatype="html">
         <source>Thank you!</source>
         <target state="translated">Mulțumim!</target>
@@ -3350,6 +3326,134 @@
           <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="header.closeMenu" datatype="html">
+        <source>Close menu</source>
+        <target state="translated">Închide meniul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">151</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.freeTool" datatype="html">
+        <source>Free tool</source>
+        <target state="translated">Gratuit</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">210</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.language" datatype="html">
+        <source>Language</source>
+        <target state="translated">Limbă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">218</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.darkMode" datatype="html">
+        <source>Dark mode</source>
+        <target state="translated">Mod întunecat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">225</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ctaPair.logIn" datatype="html">
+        <source>Log in</source>
+        <target state="translated">Autentifică-te</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/ui/cta-pair/cta-pair.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ctaPair.startFree" datatype="html">
+        <source>Start free</source>
+        <target state="translated">Începe gratuit</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/ui/cta-pair/cta-pair.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="stickyCta.aria" datatype="html">
+        <source>Sign up</source>
+        <target state="translated">Înregistrare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/sticky-cta/sticky-cta.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="langSwitcher.change" datatype="html">
+        <source>Change language</source>
+        <target state="translated">Schimbă limba</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/language-switcher/language-switcher.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="routeProgress.aria" datatype="html">
+        <source>Loading page</source>
+        <target state="translated">Se încarcă pagina</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/route-progress/route-progress.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.sessions.menuBlurb" datatype="html">
+        <source>Bookings and group classes</source>
+        <target state="translated">Rezervări și clase de grup</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.programs.menuBlurb" datatype="html">
+        <source>Plans clients follow week by week</source>
+        <target state="translated">Planuri urmate săptămână de săptămână</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.menuLabel" datatype="html">
+        <source>Workout tracking</source>
+        <target state="translated">Jurnal de antrenament</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">304</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.menuBlurb" datatype="html">
+        <source>Log sets, see your records</source>
+        <target state="translated">Notezi seturile, îți vezi recordurile</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">305</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.payments.menuBlurb" datatype="html">
+        <source>Get paid, no subscription</source>
+        <target state="translated">Încasezi plăți, fără abonament</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">364</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.community.menuBlurb" datatype="html">
+        <source>Groups around your coaching</source>
+        <target state="translated">Grupuri în jurul antrenamentelor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">477</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.clearFilters" datatype="html">
+        <source>Clear filters</source>
+        <target state="translated">Șterge filtrele</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">253</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="header.ariaMobile" datatype="html">
         <source>Menu</source>
         <target>Navigare mobilă</target>
@@ -3856,118 +3960,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_shared/language-switcher/language-switcher.html</context>
           <context context-type="linenumber">2</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.header.title" datatype="html">
-        <source>Stay in the loop</source>
-        <target state="translated">Rămâi la curent</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">12,13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.header.sub" datatype="html">
-        <source>Product news and the occasional update</source>
-        <target state="translated">Noutăți despre produs, din când în când</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">13,16</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.desc" datatype="html">
-        <source> Building MotionHive in the open. Drop your email for product news and the occasional update. </source>
-        <target state="translated"> Construim MotionHive la vedere. Lasă-ne emailul pentru noutăți despre produs. </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">21</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.name.label" datatype="html">
-        <source>Name</source>
-        <target state="translated">Nume</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">26</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.optional" datatype="html">
-        <source>(optional)</source>
-        <target state="translated">(opțional)</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">27</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.name.placeholder" datatype="html">
-        <source>Your name</source>
-        <target state="translated">Numele tău</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">30</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.role.label" datatype="html">
-        <source>How will you use MotionHive?</source>
-        <target state="translated">Cum vei folosi MotionHive?</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">45</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.success.h4" datatype="html">
-        <source>You're in!</source>
-        <target state="translated">Ești înscris!</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">63</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.success.p" datatype="html">
-        <source> You're on the list. Thanks for following along. </source>
-        <target state="translated"> Ești pe listă. Mulțumim că ne urmărești. </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">65</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.btn.later" datatype="html">
-        <source>Maybe later</source>
-        <target state="translated">Mai târziu</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">76</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.btn.notify" datatype="html">
-        <source>Notify me</source>
-        <target state="translated">Vreau să fiu anunțat</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
-          <context context-type="linenumber">73</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.role.lead" datatype="html">
-        <source>I lead activities</source>
-        <target state="translated">Organizez activități</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
-          <context context-type="linenumber">36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.role.join" datatype="html">
-        <source>I join activities</source>
-        <target state="translated">Particip la activități</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
-          <context context-type="linenumber">37</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="waitlist.toast.error.detail" datatype="html">
-        <source>Could not join the waitlist. Please try again.</source>
-        <target state="translated">Nu te-ai putut înscrie pe lista de așteptare. Te rugăm să încerci din nou.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
-          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.pill" datatype="html">

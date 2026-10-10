@@ -753,12 +753,6 @@ export interface DayWindow {
   end: Date;
 }
 
-/** The inverse of `localDayKey` — 'yyyy-mm-dd' back to a local midnight. */
-export function dayFromKey(key: string): Date {
-  const [year, month, day] = key.split('-').map(Number);
-  return new Date(year, month - 1, day);
-}
-
 /**
  * Whole calendar days spanned, measured midnight-to-midnight.
  *

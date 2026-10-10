@@ -48,6 +48,8 @@ export const routes: Routes = [
       {
         path: 'legal',
         loadChildren: () => import('./legal/legal.routes').then((m) => m.legalRoutes),
+        // Long, rarely opened pages: not worth preloading on every visit.
+        data: { preload: false },
       },
     ],
   },
