@@ -19,6 +19,18 @@
 
   <meta name="google-site-verification" content="Nr8YFa7gIwiJD5BbBFl4gajZfo7FXdQug4VY_EBaNDo" />
 
+  <!-- Before the app has loaded (on a slow phone, a second or two after the page
+       shows), a tap on the mobile menu button is queued and replayed once it is
+       ready, so the menu opens a moment later. Mark the button meanwhile so the
+       tap visibly landed. `[jsaction]` only exists until the app takes over; the
+       header clears the mark when the menu opens. -->
+  <script>
+    document.addEventListener('click', function (event) {
+      var button = event.target instanceof Element && event.target.closest('.burger[jsaction]');
+      if (button) button.classList.add('is-waking');
+    }, true);
+  </script>
+
   <!-- Default favicon (honey) - no media query so crawlers and all browsers pick these up -->
   <link rel="icon" type="image/x-icon" href="favicon-honey/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-honey/favicon-32x32.png">

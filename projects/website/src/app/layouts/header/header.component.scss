@@ -300,6 +300,30 @@
   }
 }
 
+/* Tapped before the app finished loading: the tap is queued and replayed once
+   it has, so pulse meanwhile to show it landed (class set by index.html,
+   cleared in openMobile). */
+.burger.is-waking {
+  color: var(--p-primary-600);
+  animation: burger-waking 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes burger-waking {
+  from {
+    background: color-mix(in oklab, var(--p-primary-500) 10%, transparent);
+  }
+  to {
+    background: color-mix(in oklab, var(--p-primary-500) 28%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burger.is-waking {
+    animation: none;
+    background: color-mix(in oklab, var(--p-primary-500) 20%, transparent);
+  }
+}
+
 /* ===== Mobile drawer =====
    Built to "Mobile Landing Proposals", menu drawer option A. Square corners:
    the sheet runs the full height of the screen. Head and foot stay put; only

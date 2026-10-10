@@ -1,4 +1,4 @@
-import { Component, DestroyRef, afterNextRender, inject, signal } from '@angular/core';
+import { Component, DestroyRef, afterNextRender, computed, inject, signal } from '@angular/core';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -6,6 +6,8 @@ import {
   NavigationStart,
   Router,
 } from '@angular/router';
+
+import { PageLoadService } from '../page-load.service';
 
 /** Navigations faster than this never show the bar, so cached pages don't flash it. */
 const SHOW_DELAY_MS = 150;
@@ -16,7 +18,9 @@ type ProgressState = 'idle' | 'loading' | 'done';
 
 /**
  * Thin bar along the top of the viewport while the router fetches the next
- * page. Without it a tap on a slow connection looked like nothing happened.
+ * page, or while a full page load we started is on its way (PageLoadService,
+ * e.g. switching language). Without it a tap on a slow connection looked like
+ * nothing happened.
  */
 @Component({
   selector: 'mh-route-progress',
@@ -26,8 +30,12 @@ type ProgressState = 'idle' | 'loading' | 'done';
 export class RouteProgress {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _pageLoadService = inject(PageLoadService);
 
-  protected readonly state = signal<ProgressState>('idle');
+  private readonly _routerState = signal<ProgressState>('idle');
+  protected readonly state = computed<ProgressState>(() =>
+    this._pageLoadService.isLoading() ? 'loading' : this._routerState()
+  );
 
   constructor() {
     // Browser only: a pending timer during prerender would hold the page open.
@@ -41,7 +49,7 @@ export class RouteProgress {
     const subscription = this._router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         clearTimeout(hideTimer);
-        showTimer = setTimeout(() => this.state.set('loading'), SHOW_DELAY_MS);
+        showTimer = setTimeout(() => this._routerState.set('loading'), SHOW_DELAY_MS);
         return;
       }
       const finished =
@@ -51,9 +59,9 @@ export class RouteProgress {
       if (!finished) return;
 
       clearTimeout(showTimer);
-      if (this.state() !== 'loading') return;
-      this.state.set('done');
-      hideTimer = setTimeout(() => this.state.set('idle'), FADE_OUT_MS);
+      if (this._routerState() !== 'loading') return;
+      this._routerState.set('done');
+      hideTimer = setTimeout(() => this._routerState.set('idle'), FADE_OUT_MS);
     });
 
     this._destroyRef.onDestroy(() => {

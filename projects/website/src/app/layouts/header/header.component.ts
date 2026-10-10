@@ -117,6 +117,8 @@ export class PublicHeaderComponent {
   }
 
   openMobile(): void {
+    // Set by index.html when the button was tapped before the app was ready.
+    this._burgerButton()?.nativeElement.classList.remove('is-waking');
     this.mobileOpen.set(true);
     this._lockScroll();
     // The drawer stays `inert` until this render lands, so focus it after.

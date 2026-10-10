@@ -1,6 +1,7 @@
 import { Component, computed, signal, inject, input } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
+import { PageLoadService } from '../page-load.service';
 import { LineIcon } from '../ui/line-icon/line-icon';
 
 const EN = { code: 'en', label: 'EN' } as const;
@@ -22,6 +23,7 @@ type LocaleCode = (typeof EN | typeof RO)['code'];
 })
 export class LanguageSwitcher {
   private readonly _document = inject(DOCUMENT);
+  private readonly _pageLoadService = inject(PageLoadService);
 
   readonly variant = input<'inline' | 'segmented' | 'compact'>('inline');
 
@@ -39,7 +41,8 @@ export class LanguageSwitcher {
   protected readonly changeLabel = $localize`:@@langSwitcher.change:Change language`;
 
   switchLocale(code: LocaleCode): void {
-    if (code === this.currentLocale()) return;
+    // Ignore repeat taps while the other language's site is already loading.
+    if (code === this.currentLocale() || this._pageLoadService.isLoading()) return;
 
     // Remember the explicit choice so the geo middleware never overrides it.
     // Matches the cookie the edge middleware reads (`mh_lang`).
@@ -49,6 +52,8 @@ export class LanguageSwitcher {
     // Strip any existing locale prefix (/en/ or /ro/)
     const basePath = path.replace(/^\/(en|ro)(\/|$)/, '/') || '/';
 
+    // A full page load of the other language's bundle: show progress meanwhile.
+    this._pageLoadService.start();
     this._document.location.href = code === 'en' ? basePath : '/ro' + basePath;
   }
 }
