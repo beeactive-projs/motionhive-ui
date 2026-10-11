@@ -12,7 +12,13 @@ import { catchError, map, of } from 'rxjs';
 import { BlogService, Hex, type BlogPost, type HexTone, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
-import { isRoLocale, SITE_LOGO_URL, SITE_ORIGIN, siteUrl } from '../_shared/site.const';
+import {
+  isRoLocale,
+  SITE_LOGO_URL,
+  SITE_ORIGIN,
+  siteUrl,
+  webAppLink,
+} from '../_shared/site.const';
 import { FEATURES } from '../_data/features';
 import { Kicker } from '../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../_shared/ui/section-header/section-header';
@@ -75,7 +81,7 @@ export class HomeComponent {
   protected readonly finalCtaElement = viewChild('finalCta', { read: ElementRef<HTMLElement> });
 
   readonly features = FEATURES;
-  readonly signupUrl = SIGNUP_URL;
+  readonly signupUrl = webAppLink(SIGNUP_URL);
 
   readonly guarantees = [
     $localize`:@@home.g1:Unlimited clients`,

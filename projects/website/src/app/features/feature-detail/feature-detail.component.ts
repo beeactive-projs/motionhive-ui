@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { Hex, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../../_shared/seo.service';
-import { isRoLocale, siteUrl } from '../../_shared/site.const';
+import { isRoLocale, siteUrl, webAppLink } from '../../_shared/site.const';
 import { featureBySlug, relatedFeatures } from '../../_data/features';
 import { Kicker } from '../../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../../_shared/ui/section-header/section-header';
@@ -32,7 +32,7 @@ export class FeatureDetailComponent {
   private readonly _seo = inject(SeoService);
   private readonly _isRo = isRoLocale(inject(DOCUMENT));
 
-  readonly signupUrl = SIGNUP_URL;
+  readonly signupUrl = webAppLink(SIGNUP_URL);
 
   readonly feature = toSignal(
     inject(ActivatedRoute).paramMap.pipe(map((p) => featureBySlug(p.get('slug') ?? ''))),

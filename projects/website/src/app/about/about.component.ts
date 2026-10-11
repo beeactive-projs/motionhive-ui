@@ -3,7 +3,13 @@ import { RouterLink } from '@angular/router';
 import { Hex, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
-import { isRoLocale, SITE_LOGO_URL, SITE_ORIGIN, siteUrl } from '../_shared/site.const';
+import {
+  isRoLocale,
+  SITE_LOGO_URL,
+  SITE_ORIGIN,
+  siteUrl,
+  webAppLink,
+} from '../_shared/site.const';
 
 @Component({
   selector: 'mh-about',
@@ -13,7 +19,7 @@ import { isRoLocale, SITE_LOGO_URL, SITE_ORIGIN, siteUrl } from '../_shared/site
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
-  readonly signupUrl = SIGNUP_URL;
+  readonly signupUrl = webAppLink(SIGNUP_URL);
 
   constructor() {
     const isRo = isRoLocale(inject(DOCUMENT));

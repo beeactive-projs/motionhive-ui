@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { Hex, type HexTone, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
-import { isRoLocale, SITE_ORIGIN, siteUrl } from '../_shared/site.const';
+import { isRoLocale, SITE_ORIGIN, siteUrl, webAppLink } from '../_shared/site.const';
 import { FEATURES } from '../_data/features';
 import { Kicker } from '../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../_shared/ui/section-header/section-header';
@@ -31,7 +31,7 @@ interface RoadmapLane {
 })
 export class FeaturesComponent {
   readonly features = FEATURES;
-  readonly signupUrl = SIGNUP_URL;
+  readonly signupUrl = webAppLink(SIGNUP_URL);
 
   readonly members: MemberCard[] = [
     {

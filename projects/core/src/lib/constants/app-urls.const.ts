@@ -1,4 +1,6 @@
 import { environment } from '../../environments/environment';
+import { AppLanguage } from '../models/common/language.enums';
+import { LANGUAGE_URL_PARAM } from './languages.const';
 
 /**
  * Base origin of the authenticated MotionHive web app (e.g.
@@ -14,6 +16,17 @@ export const SIGNUP_URL = `${WEB_APP_URL}/auth/signup`;
 
 /** Login page on the web app. */
 export const LOGIN_URL = `${WEB_APP_URL}/auth/login`;
+
+/**
+ * A web app link that opens the app in `language` rather than the device's
+ * stored or browser language, for links out of a page the visitor reads in a
+ * known language (the marketing site's sign-up and login buttons).
+ */
+export function withAppLanguage(url: string, language: AppLanguage): string {
+  const target = new URL(url);
+  target.searchParams.set(LANGUAGE_URL_PARAM, language);
+  return target.toString();
+}
 
 /**
  * Public marketing site — a third deploy, separate from both the API and the
