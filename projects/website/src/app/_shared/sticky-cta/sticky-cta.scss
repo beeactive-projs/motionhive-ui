@@ -14,6 +14,16 @@
   transition: transform 200ms ease-in;
 }
 
+/* iOS Safari only. While its toolbar is collapsed, the first tap in the strip
+   where the toolbar comes back just brings the toolbar back, so the buttons
+   needed two taps. Keep them above that strip. While the toolbar shows, the
+   safe area inset already covers it and the first value wins, as before. */
+@supports (-webkit-touch-callout: none) {
+  :host {
+    padding-bottom: max(calc(1.375rem + env(safe-area-inset-bottom)), 5.75rem);
+  }
+}
+
 :host(.is-visible) {
   transform: translateY(0);
   transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1);

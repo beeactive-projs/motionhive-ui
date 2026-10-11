@@ -1,10 +1,19 @@
-.container {
+/* Not `.container`: Tailwind has a global utility by that name (width: 100%). */
+.logo {
   display: flex;
   align-items: center;
   gap: 1rem;
 
   &--sm {
     gap: 0.5rem;
+  }
+
+  /* A fixed-size mark. Sized only by max-width, the SVG (viewBox, no size)
+     changed size when it loaded, and Safari then sometimes measured the logo
+     far too wide and pushed the header's menu button off the screen. */
+  img {
+    flex: none;
+    height: auto;
   }
 }
 
