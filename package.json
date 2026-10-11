@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build web",
     "build:core": "ng build core",
+    "build:website": "ng build core && ng build website --configuration production && node scripts/patch-ro-index.mjs && node scripts/website-preload-hints.mjs",
     "start:admin": "ng serve admin",
     "build:admin": "ng build admin",
     "build:admin:prod": "ng build admin --configuration production",

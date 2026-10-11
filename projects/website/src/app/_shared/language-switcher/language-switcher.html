@@ -4,7 +4,7 @@
   <span>{{ currentLabel() }}</span>
 </button>
 } @else {
-<div class="flex items-center" [class]="variant() === 'segmented' ? 'gap-1' : 'gap-0.5'" role="group" i18n-aria-label="@@langSwitcher.aria" aria-label="Language selection">
+<div class="flex items-center" [class]="variant() === 'segmented' ? 'segs' : 'gap-0.5'" role="group" i18n-aria-label="@@langSwitcher.aria" aria-label="Language selection">
   @for (locale of locales(); track locale.code) {
   @let active = currentLocale() === locale.code;
   @if (variant() === 'segmented') {

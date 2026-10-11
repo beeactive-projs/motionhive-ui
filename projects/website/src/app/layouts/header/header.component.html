@@ -220,29 +220,31 @@
   </nav>
 
   <div class="drawer__foot" [style.--i]="staggerAfterFeatures() + 3">
-    <div class="drawer__setting">
-      <span class="drawer__setting-label">
-        <mh-line-icon name="globe" />
-        <span i18n="@@header.language">Language</span>
-      </span>
-      <mh-language-switcher variant="segmented" />
-    </div>
-    <div class="drawer__setting">
-      <span class="drawer__setting-label">
-        <mh-line-icon name="moon" />
-        <span id="drawer-dark-mode" i18n="@@header.darkMode">Dark mode</span>
-      </span>
-      <!-- Plain switch: the site shell ships no PrimeNG form controls. -->
+    <div class="drawer__settings">
+      <div class="drawer__setting">
+        <span class="drawer__setting-label">
+          <mh-line-icon name="globe" />
+          <span i18n="@@header.language">Language</span>
+        </span>
+        <mh-language-switcher variant="segmented" />
+      </div>
+      <!-- The whole row is the switch, so the label is a tap target too. Plain
+           button: the site shell ships no PrimeNG form controls. -->
       <button
         type="button"
         role="switch"
-        class="switch"
+        class="drawer__setting drawer__setting--switch"
         [attr.aria-checked]="isDark()"
-        aria-labelledby="drawer-dark-mode"
         (click)="toggleTheme()">
-        <span class="switch__thumb"></span>
+        <span class="drawer__setting-label">
+          <mh-line-icon name="moon" />
+          <span i18n="@@header.darkMode">Dark mode</span>
+        </span>
+        <span class="switch">
+          <span class="switch__thumb"></span>
+        </span>
       </button>
     </div>
-    <mh-cta-pair class="drawer__cta" />
+    <mh-cta-pair class="drawer__cta" stacked />
   </div>
 </div>

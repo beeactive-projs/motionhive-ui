@@ -5,8 +5,9 @@
   z-index: 150;
   display: block;
   padding: 0.75rem 1rem calc(1.375rem + env(safe-area-inset-bottom));
-  background: color-mix(in oklab, var(--p-surface-0) 96%, transparent);
-  backdrop-filter: blur(8px);
+  /* Solid, no backdrop-filter: blurring the page scrolling underneath on
+     every frame was more than iOS Safari could paint (blank tiles). */
+  background: var(--p-surface-0);
   border-top: 1px solid var(--p-surface-200);
   box-shadow: 0 -10px 30px color-mix(in oklab, var(--p-slate-900) 8%, transparent);
   transform: translateY(110%);
@@ -19,7 +20,7 @@
 }
 
 :host-context(.dark) {
-  background: color-mix(in oklab, var(--p-content-background) 96%, transparent);
+  background: var(--p-content-background);
   border-top-color: var(--p-surface-700);
 }
 

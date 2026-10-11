@@ -3408,7 +3408,7 @@
       </trans-unit>
       <trans-unit id="feat.programs.menuBlurb" datatype="html">
         <source>Plans clients follow week by week</source>
-        <target state="translated">Planuri urmate săptămână de săptămână</target>
+        <target state="translated">Planuri săptămânale pentru clienți</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">191</context>
