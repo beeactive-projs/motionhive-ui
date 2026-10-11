@@ -58,6 +58,17 @@
     }
   }
 
+  // Phones drop the blur too. Each blurred 500px orb became a ~1100px layer
+  // (about 40 MB at 3x), and with three of them iOS Safari ran out of tile
+  // memory and left blank white areas while scrolling. The radial gradients
+  // already fade out; half opacity keeps them as soft as the blurred ones.
+  @media (max-width: 1023px) {
+    .orb {
+      filter: none;
+      opacity: 0.5;
+    }
+  }
+
   @keyframes orbFloat {
     0% {
       transform: translate(0, 0) scale(1);

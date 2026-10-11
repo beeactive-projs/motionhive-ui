@@ -1,7 +1,13 @@
+/* Never narrower than a label: a column takes its 1fr / 1.6fr share, or its
+   label's full width when that's wider (e.g. Romanian "Autentifică-te"). */
 :host {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  grid-template-columns: minmax(max-content, 1fr) minmax(max-content, 1.6fr);
   gap: 0.625rem;
+}
+
+:host(.is-stacked) {
+  grid-template-columns: 1fr;
 }
 
 /* Sizing only; colours come from the shared mh-btn variants. */
@@ -11,4 +17,5 @@
   padding: 0 0.75rem;
   border-radius: 0.75rem;
   font-size: 0.95rem;
+  white-space: nowrap;
 }

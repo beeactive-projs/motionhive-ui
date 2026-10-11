@@ -1,2 +1,8 @@
+<!-- DOM order follows the visual order, so focus order does too. -->
+@if (stacked()) {
+<a class="mh-btn mh-btn--primary btn" [href]="signupUrl" i18n="@@ctaPair.startFree">Start free</a>
+<a class="mh-btn mh-btn--ghost btn" [href]="loginUrl" i18n="@@ctaPair.logIn">Log in</a>
+} @else {
 <a class="mh-btn mh-btn--ghost btn" [href]="loginUrl" i18n="@@ctaPair.logIn">Log in</a>
 <a class="mh-btn mh-btn--primary btn" [href]="signupUrl" i18n="@@ctaPair.startFree">Start free</a>
+}

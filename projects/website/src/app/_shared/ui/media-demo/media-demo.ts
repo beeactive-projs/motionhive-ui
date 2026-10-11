@@ -1,8 +1,11 @@
 import {
+  afterNextRender,
   afterRenderEffect,
   booleanAttribute,
   Component,
+  DestroyRef,
   ElementRef,
+  inject,
   input,
   signal,
   viewChild,
@@ -31,8 +34,15 @@ import {
       </div>
       <div class="screen">
         @if (src(); as s) {
-          <video #vid [src]="s" [poster]="poster() || ''" muted loop playsinline
-            preload="none"></video>
+          <!-- The poster is an <img> under the video, added once the demo is
+               about a screen away, not the video's poster attribute: browsers
+               fetch that (and lazy images up to 2500px ahead) during first
+               load, where its ~110 KB slowed the page becoming tappable. The
+               video covers it once frames arrive. -->
+          @if ((eagerPoster() || posterNear()) && poster(); as p) {
+            <img class="poster" [src]="p" alt="" decoding="async" />
+          }
+          <video #vid [src]="s" muted loop playsinline preload="none"></video>
           @if (enlargeable()) {
             <button type="button" class="expand" (click)="open()" aria-label="Enlarge video">
               <i class="pi pi-window-maximize" aria-hidden="true"></i>
@@ -73,14 +83,33 @@ export class MediaDemo {
   readonly caption = input('');
   /** Show the expand affordance + allow the full-screen lightbox. */
   readonly enlargeable = input(true, { transform: booleanAttribute });
+  /** Poster in the prerendered page, for a demo in the first screen (a hero). */
+  readonly eagerPoster = input(false, { transform: booleanAttribute });
 
   /** Lightbox open state. Renders nothing until opened (browser-only). */
   readonly expanded = signal(false);
+  /** The demo is within about a screen of the viewport (browser-only). */
+  protected readonly posterNear = signal(false);
 
+  private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly _destroyRef = inject(DestroyRef);
   private readonly _video = viewChild<ElementRef<HTMLVideoElement>>('vid');
   private readonly _closeBtn = viewChild<ElementRef<HTMLButtonElement>>('closeBtn');
 
   constructor() {
+    afterNextRender(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          this.posterNear.set(true);
+          observer.disconnect();
+        },
+        { rootMargin: '100% 0px' },
+      );
+      observer.observe(this._elementRef.nativeElement);
+      this._destroyRef.onDestroy(() => observer.disconnect());
+    });
+
     // Plays while at least a quarter of the clip is visible, pauses otherwise.
     // afterRenderEffect is browser-only (calling play() during prerender threw)
     // and re-runs when the <video> inside the @if resolves.
