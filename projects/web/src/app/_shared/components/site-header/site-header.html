@@ -1,0 +1,10 @@
+<header class="mx-auto flex h-full max-w-285 items-center gap-4 px-4 sm:px-7">
+  <a [href]="homeUrl" class="inline-flex items-center" [attr.aria-label]="'components.siteHeader.homeLink' | translate">
+    <mh-logo />
+  </a>
+  <div class="ml-auto flex items-center gap-1">
+    <mh-language-switcher />
+    <mh-theme-toggle [outlined]="false" />
+    <ng-content />
+  </div>
+</header>

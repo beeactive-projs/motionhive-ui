@@ -39,16 +39,7 @@ import { ProfileBilling } from './tabs/billing/billing';
 import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
 import { EditHandle } from './_dialogs/edit-handle/edit-handle';
 import { ShareDialog } from '../../_shared/components/share-dialog/share-dialog';
-
-export const ProfileTabs = {
-  Details: 'details',
-  Coaches: 'coaches',
-  Billing: 'billing',
-  Notifications: 'notifications',
-  Safety: 'safety',
-} as const;
-
-export type ProfileTab = (typeof ProfileTabs)[keyof typeof ProfileTabs];
+import { ProfileTab, ProfileTabs } from './profile.enums';
 
 const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
 

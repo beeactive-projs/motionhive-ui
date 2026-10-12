@@ -1,0 +1,60 @@
+<mh-auth-header title="auth.login.title">
+  {{ 'auth.common.noAccount' | translate }}
+  <a routerLink="/auth/signup" [queryParams]="queryParams" class="mh-link">
+    {{ 'auth.common.createOneFree' | translate }}
+  </a>
+</mh-auth-header>
+
+<div class="flex flex-col gap-6 animate-fade-in">
+  @if (invite()) {
+  <p-message severity="info" icon="pi pi-envelope">
+    {{ 'auth.login.inviteBanner' | translate: { coach: coachName() } }}
+  </p-message>
+  } @else if (inviteInvalid()) {
+  <p-message severity="error">{{ 'auth.signUp.error.invalidInvitation' | translate }}</p-message>
+  }
+
+  @if (errorMessage(); as message) {
+  <p-message severity="error">{{ message }}</p-message>
+  }
+
+  <form [formRoot]="form" class="flex flex-col gap-5">
+    @let email = form.email();
+    <div class="flex flex-col gap-1">
+      <label for="email" class="text-xs font-semibold text-surface-900 dark:text-surface-100">{{ 'auth.common.emailAddress' | translate }}</label>
+      <input pInputText id="email" type="email" [formField]="form.email" autocomplete="email" fluid pSize="large"
+        [placeholder]="'form.placeholder.email' | translate"
+        [attr.aria-invalid]="isInvalid(email)" [attr.aria-describedby]="isInvalid(email) ? 'email-error' : null" />
+      @if (isInvalid(email)) {
+      <p-message id="email-error" severity="error" size="small" variant="simple">
+        {{ email.errors() | fieldError: fieldErrors.email }}
+      </p-message>
+      }
+    </div>
+
+    @let password = form.password();
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center justify-between gap-3">
+        <label for="password" class="text-xs font-semibold text-surface-900 dark:text-surface-100">{{ 'form.label.password' | translate }}</label>
+        <a routerLink="/auth/reset-password" class="mh-link text-xs">{{ 'auth.common.forgotPassword' | translate }}</a>
+      </div>
+      <mh-password-input inputId="password" [formField]="form.password" autocomplete="current-password"
+        errorId="password-error" [placeholder]="'auth.login.passwordPlaceholder' | translate" />
+      @if (isInvalid(password)) {
+      <p-message id="password-error" severity="error" size="small" variant="simple">
+        {{ password.errors() | fieldError: fieldErrors.password }}
+      </p-message>
+      }
+    </div>
+
+    <button pButton type="submit" fluid size="large" [disabled]="isLoading()">
+      {{ 'button.signIn' | translate }}
+      <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-arrow-right'"></i>
+    </button>
+  </form>
+
+  <mh-social-sign-in label="auth.login.orContinueWith" (googleCredential)="onGoogleCredential($event)"
+    (googleFailed)="onGoogleFailed()" />
+
+  <mh-terms-notice intro="auth.login.termsIntro" />
+</div>

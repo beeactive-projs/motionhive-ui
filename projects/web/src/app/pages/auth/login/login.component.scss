@@ -1,4 +1,0 @@
-@use '../auth-shared' as auth;
-
-@include auth.auth-layout();
-@include auth.auth-social();

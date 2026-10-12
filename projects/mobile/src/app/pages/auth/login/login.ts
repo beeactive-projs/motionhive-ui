@@ -1,94 +1,106 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormField, FormRoot, form } from '@angular/forms/signals';
 import { ActivatedRoute, Params, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonContent,
+  IonHeader,
+  IonIcon,
   IonInput,
-  IonInputPasswordToggle,
   IonRouterLink,
   IonSpinner,
-  IonText,
+  IonToolbar,
   NavController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { arrowForward } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
 
-import { AuthService, LoginRequest, validationMessage } from 'core';
+import {
+  APP_HOME_URL,
+  AUTH_FIELD_ERRORS,
+  AuthService,
+  FieldErrorPipe,
+  apiErrorMessage,
+  isFieldInvalid,
+  resolveReturnUrl,
+  signInSchema,
+} from 'core';
+import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
+import { Logo } from '../../../_shared/components/logo/logo';
+import { Notice } from '../../../_shared/components/notice/notice';
+import { PasswordInput } from '../../../_shared/components/password-input/password-input';
+import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-invalid';
+import { TermsNotice } from '../_components/terms-notice/terms-notice';
 
 @Component({
   selector: 'mh-login',
   imports: [
-    ReactiveFormsModule,
+    FormField,
+    FormRoot,
     RouterLink,
     IonButton,
     IonContent,
+    IonHeader,
+    IonIcon,
     IonInput,
-    IonInputPasswordToggle,
     IonRouterLink,
     IonSpinner,
-    IonText,
+    IonToolbar,
     TranslatePipe,
+    FieldErrorPipe,
+    GuestControls,
+    Logo,
+    Notice,
+    PasswordInput,
+    TermsNotice,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class Login {
-  private readonly _formBuilder = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
   private readonly _navController = inject(NavController);
-  private readonly _route = inject(ActivatedRoute);
+  private readonly _activatedRoute = inject(ActivatedRoute);
   private readonly _translateService = inject(TranslateService);
-
-  readonly isLoading = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+  private readonly _appHomeUrl = inject(APP_HOME_URL);
 
   /** Forwarded to the sign-up link so returnUrl survives the switch. */
-  readonly queryParams: Params = this._route.snapshot.queryParams;
+  protected readonly queryParams: Params = this._activatedRoute.snapshot.queryParams;
+  protected readonly isInvalid = isFieldInvalid;
+  protected readonly fieldErrors = AUTH_FIELD_ERRORS;
 
-  loginForm: FormGroup = this._formBuilder.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+  protected readonly isLoading = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
+
+  protected readonly model = signal({ email: '', password: '' });
+  protected readonly form = form(this.model, signInSchema, {
+    submission: { action: async () => this.signIn(), onInvalid: focusFirstInvalidIonic },
   });
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
+  constructor() {
+    addIcons({ arrowForward });
+  }
 
+  private signIn(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-
-    const credentials: LoginRequest = {
-      email: this.loginForm.value.email,
-      password: this.loginForm.value.password,
-    };
-
-    this._authService.login(credentials).subscribe({
-      next: () => {
-        this.isLoading.set(false);
-        this.navigateToApp();
-      },
-      error: (error) => {
-        this.isLoading.set(false);
-        this.errorMessage.set(
-          error.error?.message || this._translateService.instant('auth.login.error'),
-        );
-      },
-    });
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.loginForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  getFieldError(fieldName: string): string {
-    return validationMessage(this.loginForm.get(fieldName)?.errors);
+    this._authService
+      .login(this.model())
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => this.navigateToApp(),
+        error: (err) =>
+          this.errorMessage.set(
+            apiErrorMessage(err, this._translateService.instant('auth.login.error')),
+          ),
+      });
   }
 
   private navigateToApp(): void {
-    const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl');
-    this._navController.navigateRoot(returnUrl || '/tabs/home');
+    void this._navController.navigateRoot(
+      resolveReturnUrl(this._activatedRoute.snapshot.queryParamMap, this._appHomeUrl),
+    );
   }
 }

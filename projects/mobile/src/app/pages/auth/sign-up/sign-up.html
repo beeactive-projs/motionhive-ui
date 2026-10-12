@@ -1,129 +1,90 @@
-<ion-header [translucent]="true">
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/auth/login" />
     </ion-buttons>
-    <ion-title>{{ 'auth.signUp.title' | translate }}</ion-title>
+    <mh-guest-controls slot="end" />
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="auth-container">
-    @if (errorMessage()) {
-      <ion-text color="danger" role="alert" class="ion-padding-horizontal">
-        <p>{{ errorMessage() }}</p>
-      </ion-text>
+<ion-content fixedSlotPlacement="before">
+  <div slot="fixed" class="honeycomb" aria-hidden="true"></div>
+
+  <div class="auth-page">
+    <div class="auth-head">
+      <h1>{{ 'auth.signUp.title' | translate }}</h1>
+      <p>
+        {{ 'auth.common.haveAccount' | translate }}
+        <ion-button fill="clear" class="mh-text-link inline" routerLink="/auth/login" [queryParams]="queryParams">
+          {{ 'button.signIn' | translate }}
+        </ion-button>
+      </p>
+    </div>
+
+    @if (errorMessage(); as message) {
+    <mh-notice tone="danger" role="alert">{{ message }}</mh-notice>
     }
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="ion-margin-horizontal">
-        <ion-input
-          fill="outline"
-          [label]="'form.label.firstName' | translate"
-          labelPlacement="stacked"
-          type="text"
-          formControlName="firstName"
-          [placeholder]="'auth.signUp.firstNamePlaceholder' | translate"
-          autocomplete="given-name"
-          enterkeyhint="next"
-          [errorText]="getFieldError('firstName')"
-          [class.ion-invalid]="isFieldInvalid('firstName')"
-          [class.ion-touched]="isFieldInvalid('firstName')"
-        />
-        <ion-input
-          class="ion-margin-top"
-          fill="outline"
-          [label]="'form.label.lastName' | translate"
-          labelPlacement="stacked"
-          type="text"
-          formControlName="lastName"
-          [placeholder]="'auth.signUp.lastNamePlaceholder' | translate"
-          autocomplete="family-name"
-          enterkeyhint="next"
-          [errorText]="getFieldError('lastName')"
-          [class.ion-invalid]="isFieldInvalid('lastName')"
-          [class.ion-touched]="isFieldInvalid('lastName')"
-        />
-        <ion-input
-          class="ion-margin-top"
-          fill="outline"
-          [label]="'auth.common.emailLabel' | translate"
-          labelPlacement="stacked"
-          type="email"
-          inputmode="email"
-          formControlName="email"
-          [placeholder]="'form.placeholder.email' | translate"
-          autocomplete="email"
-          enterkeyhint="next"
-          [errorText]="getFieldError('email')"
-          [class.ion-invalid]="isFieldInvalid('email')"
-          [class.ion-touched]="isFieldInvalid('email')"
-        />
-        <ion-input
-          class="ion-margin-top"
-          fill="outline"
-          [label]="'form.label.password' | translate"
-          labelPlacement="stacked"
-          type="password"
-          formControlName="password"
-          [placeholder]="'form.hint.passwordMinLength' | translate"
-          autocomplete="new-password"
-          enterkeyhint="next"
-          [errorText]="getFieldError('password')"
-          [class.ion-invalid]="isFieldInvalid('password')"
-          [class.ion-touched]="isFieldInvalid('password')"
-        >
-          <ion-input-password-toggle slot="end" />
-        </ion-input>
-        <ion-input
-          class="ion-margin-top"
-          fill="outline"
-          [label]="'form.label.confirmPassword' | translate"
-          labelPlacement="stacked"
-          type="password"
-          formControlName="confirmPassword"
-          [placeholder]="'form.hint.reenterPassword' | translate"
-          autocomplete="new-password"
-          enterkeyhint="done"
-          [errorText]="getConfirmPasswordError()"
-          [class.ion-invalid]="isConfirmPasswordInvalid()"
-          [class.ion-touched]="isConfirmPasswordInvalid()"
-        >
-          <ion-input-password-toggle slot="end" />
-        </ion-input>
-        <ion-checkbox
-          class="ion-margin-top"
-          formControlName="isInstructor"
-          labelPlacement="end"
-          justify="start"
-        >
-          <ion-label class="ion-text-wrap">
-            {{ 'auth.signUp.registerAsCoach' | translate }}
-            <p>{{ 'auth.signUp.registerAsCoachHint' | translate }}</p>
-          </ion-label>
-        </ion-checkbox>
-      </div>
+    <form [formRoot]="form">
+      @let firstName = form.firstName();
+      <ion-input id="firstName" fill="outline" labelPlacement="stacked" type="text" autocomplete="given-name"
+        enterkeyhint="next" [label]="'form.label.firstName' | translate"
+        [placeholder]="'auth.signUp.firstNamePlaceholder' | translate" [formField]="form.firstName" />
+      @if (isInvalid(firstName)) {
+      <p class="mh-helper over" role="alert">{{ firstName.errors() | fieldError: fieldErrors.firstName }}</p>
+      }
 
-      <ion-button
-        expand="block"
-        type="submit"
-        [disabled]="isLoading()"
-        class="ion-margin-horizontal ion-margin-top"
-      >
+      @let lastName = form.lastName();
+      <ion-input id="lastName" fill="outline" labelPlacement="stacked" type="text" autocomplete="family-name"
+        enterkeyhint="next" [label]="'form.label.lastName' | translate"
+        [placeholder]="'auth.signUp.lastNamePlaceholder' | translate" [formField]="form.lastName" />
+      @if (isInvalid(lastName)) {
+      <p class="mh-helper over" role="alert">{{ lastName.errors() | fieldError: fieldErrors.lastName }}</p>
+      }
+
+      @let email = form.email();
+      <ion-input id="email" fill="outline" labelPlacement="stacked" type="email" inputmode="email"
+        autocomplete="email" enterkeyhint="next" [label]="'auth.common.emailLabel' | translate"
+        [placeholder]="'form.placeholder.email' | translate" [formField]="form.email" />
+      @if (isInvalid(email)) {
+      <p class="mh-helper over" role="alert">{{ email.errors() | fieldError: fieldErrors.email }}</p>
+      }
+
+      @let password = form.password();
+      <mh-password-input inputId="password" showRequirements autocomplete="new-password"
+        [label]="'form.label.password' | translate" [placeholder]="'auth.signUp.passwordPlaceholder' | translate"
+        [formField]="form.password" />
+      @if (isInvalid(password)) {
+      <p class="mh-helper over" role="alert">{{ password.errors() | fieldError: fieldErrors.newPassword }}</p>
+      }
+
+      @let confirmPassword = form.confirmPassword();
+      <mh-password-input inputId="confirmPassword" autocomplete="new-password" enterkeyhint="done"
+        [label]="'form.label.confirmPassword' | translate" [placeholder]="'form.hint.reenterPassword' | translate"
+        [formField]="form.confirmPassword" />
+      @if (isInvalid(confirmPassword)) {
+      <p class="mh-helper over" role="alert">
+        {{ confirmPassword.errors() | fieldError: fieldErrors.confirmPassword }}
+      </p>
+      }
+
+      <ion-checkbox labelPlacement="end" justify="start" alignment="start" [formField]="form.isInstructor">
+        <ion-label class="ion-text-wrap">
+          {{ 'auth.signUp.registerAsCoach' | translate }}
+          <p>{{ 'auth.signUp.registerAsCoachHint' | translate }}</p>
+        </ion-label>
+      </ion-checkbox>
+
+      <ion-button expand="block" type="submit" class="auth-submit" [disabled]="isLoading()">
         @if (isLoading()) {
-          <ion-spinner name="crescent" />
+        <ion-spinner name="crescent" />
         } @else {
-          {{ 'auth.signUp.submit' | translate }}
+        {{ 'auth.signUp.submit' | translate }}
+        <ion-icon slot="end" name="person-add-outline" aria-hidden="true" />
         }
       </ion-button>
     </form>
 
-    <div class="ion-text-center ion-padding">
-      <ion-text color="medium">
-        <p class="ion-no-margin">
-          {{ 'auth.signUp.terms' | translate }}
-        </p>
-      </ion-text>
-    </div>
+    <mh-terms-notice intro="auth.signUp.termsIntro" />
   </div>
 </ion-content>

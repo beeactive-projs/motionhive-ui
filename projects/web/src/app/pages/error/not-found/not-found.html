@@ -1,0 +1,35 @@
+<div class="flex max-w-xl flex-col items-center text-center animate-fade-in">
+  <p class="font-heading text-7xl font-extrabold leading-none tracking-[-0.02em] text-surface-900 dark:text-surface-0 sm:text-8xl"
+    aria-hidden="true">
+    4<span class="text-brand">0</span>4
+  </p>
+
+  <h1 class="mt-8 font-heading text-3xl font-extrabold tracking-[-0.02em] text-surface-900 dark:text-surface-0 sm:text-4xl">
+    {{ 'errorPages.notFound.title' | translate }}
+  </h1>
+  <p class="mt-4 max-w-md text-lg leading-relaxed text-surface-600 dark:text-surface-400">
+    {{ 'errorPages.notFound.message' | translate }}
+  </p>
+
+  <div class="mt-8 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
+    @if (isSignedIn) {
+    <button pButton type="button" size="large" routerLink="/home">
+      <i class="pi pi-home"></i>
+      {{ 'errorPages.goHome' | translate }}
+    </button>
+    } @else {
+    <button pButton type="button" size="large" routerLink="/auth/login">
+      <i class="pi pi-sign-in"></i>
+      {{ 'button.signIn' | translate }}
+    </button>
+    <button pButton type="button" size="large" severity="secondary" outlined routerLink="/auth/signup">
+      <i class="pi pi-user-plus"></i>
+      {{ 'button.signUp' | translate }}
+    </button>
+    }
+    <button pButton type="button" size="large" severity="secondary" text (click)="goBack()">
+      <i class="pi pi-arrow-left"></i>
+      {{ 'errorPages.goBack' | translate }}
+    </button>
+  </div>
+</div>

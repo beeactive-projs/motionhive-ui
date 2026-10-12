@@ -1,0 +1,4 @@
+@use '../guest-surface' as surface;
+
+// Fades out towards the centre, where the page's text is.
+@include surface.honeycomb(radial-gradient(circle at center, transparent 25%, black 75%));

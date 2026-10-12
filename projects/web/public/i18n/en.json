@@ -113,27 +113,43 @@
   },
   "auth": {
     "common": {
-      "confirmPasswordRequired": "Please confirm your password",
       "createOneFree": "Create one for free",
       "emailAddress": "Email address",
       "forgotPassword": "Forgot password?",
       "googleFailed": "Google sign-in failed. Please try again.",
       "haveAccount": "Already have an account?",
-      "homeLink": "MotionHive home",
       "noAccount": "Don't have an account?",
       "privacyPolicy": "Privacy Policy",
       "rememberPassword": "Remember your password?",
       "termsOfService": "Terms of Service"
     },
+    "invite": {
+      "accept": "Accept invitation",
+      "acceptFailed": "We couldn't accept the invitation. Please try again.",
+      "goToApp": "Go to the app",
+      "invitedBy": "{coach} invited you to join as a client.",
+      "otherAddress": "This invitation was sent to {email}. Accepting it adds the coach to the account you are signed in with.",
+      "signedInAs": "You're signed in as {name} ({email}).",
+      "title": "Accept your invitation",
+      "useAnotherAccount": "Use another account"
+    },
+    "layout": {
+      "guarantees": {
+        "noCard": "No card needed",
+        "noSubscription": "No subscription",
+        "unlimitedClients": "Unlimited clients"
+      },
+      "kicker": "For coaches and the communities they build"
+    },
     "login": {
       "error": {
-        "facebookFailed": "Facebook sign-in failed. Please try again.",
         "invalidCredentials": "Invalid email or password. Please try again."
       },
       "heroHighlight": "here.",
       "heroLine1": "Your fitness journey",
       "heroLine2": "starts",
       "heroSubtitle": "Track workouts, connect with trainers, and crush your goals, all in one place built for people who move.",
+      "inviteBanner": "Sign in to accept the invitation from {coach}.",
       "orContinueWith": "or continue with",
       "passwordPlaceholder": "Enter your password",
       "termsIntro": "By signing in, you agree to our",
@@ -149,6 +165,7 @@
       "heroLine1": "Set your new",
       "heroSubtitle": "Choose a strong password to keep your account secure. You're almost back on track.",
       "newPasswordPlaceholder": "Enter new password",
+      "requestNewLink": "Request a new link",
       "submit": "Reset password",
       "subtitle": "Enter your new password below.",
       "success": "Your password has been reset successfully. Redirecting to login...",
@@ -171,7 +188,6 @@
     "signUp": {
       "coachHint": "Coaches can create and manage sessions and clients",
       "error": {
-        "facebookFailed": "Facebook sign-up failed. Please try again.",
         "invalidInvitation": "This invitation link is invalid or has expired.",
         "registrationFailed": "Registration failed. Please try again."
       },
@@ -184,6 +200,7 @@
       "invitedByStart": "You've been invited by",
       "lastNamePlaceholder": "Doe",
       "orSignUpWith": "or sign up with",
+      "passwordPlaceholder": "Create a password",
       "registerAsCoach": "Register as coach",
       "submit": "Create account",
       "termsIntro": "By signing up, you agree to our",
@@ -883,9 +900,8 @@
         "instagramHint": "Paste it in your Instagram bio, story, or DM."
       }
     },
-    "themeToggle": {
-      "switchToDark": "Switch to dark mode",
-      "switchToLight": "Switch to light mode"
+    "siteHeader": {
+      "homeLink": "MotionHive home"
     },
     "userSearch": {
       "empty": "No matching users. Try inviting by email instead.",
@@ -964,10 +980,8 @@
     }
   },
   "errorPages": {
-    "backToHomepage": "Back to homepage",
     "goBack": "Go back",
     "goHome": "Go home",
-    "homeLink": "MotionHive home",
     "notFound": {
       "message": "This page doesn't exist, but your next workout does. Let's get you back on track.",
       "title": "Off the beaten track."
@@ -3736,6 +3750,9 @@
       "joinAria": "Join {name}",
       "subtitle": "Train with people on the same path",
       "title": "Communities I run"
+    },
+    "header": {
+      "joinFree": "Join free"
     },
     "hero": {
       "acceptingClients": "Accepting clients",

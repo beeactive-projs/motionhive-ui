@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/ht
 import { PreloadAllModules, provideRouter, RouteReuseStrategy, withPreloading } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import {
+  APP_HOME_URL,
   MESSAGING_ROUTES,
   authInterceptor,
   languageInterceptor,
@@ -25,6 +26,8 @@ export const appConfig: ApplicationConfig = {
     provideIonicAngular({ mode: 'md' }),
     // Messaging lives inside a tab stack here, not at web's /messages.
     { provide: MESSAGING_ROUTES, useValue: ['/tabs/messages'] },
+    // Where core's guestGuard sends a signed-in user off the auth pages.
+    { provide: APP_HOME_URL, useValue: '/tabs/home' },
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(
       withXhr(),

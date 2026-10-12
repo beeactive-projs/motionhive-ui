@@ -19,8 +19,9 @@ import {
   AuthStore,
   LeadFormat,
   LeadGoal,
+  LanguageService,
   LeadLevel,
-  PRIVACY_POLICY_URL,
+  privacyPolicyUrl,
   type AvatarUser,
   type InstructorLeadPayload,
   validationMessage,
@@ -77,8 +78,9 @@ export class ContactInstructorDialog {
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _languageService = inject(LanguageService);
 
-  protected readonly privacyUrl = PRIVACY_POLICY_URL;
+  protected readonly privacyUrl = privacyPolicyUrl(this._languageService.current);
 
   readonly visible = model<boolean>(false);
   readonly instructorUserId = input.required<string>();

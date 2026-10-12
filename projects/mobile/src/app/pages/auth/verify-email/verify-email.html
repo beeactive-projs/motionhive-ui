@@ -1,38 +1,60 @@
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="auth-container auth-container--center ion-text-center">
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <mh-logo slot="start" [linked]="false" />
+    <mh-guest-controls slot="end" />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fixedSlotPlacement="before">
+  <div slot="fixed" class="honeycomb" aria-hidden="true"></div>
+
+  <div class="auth-page">
+    <div class="auth-head">
+      <h1>{{ 'auth.verifyEmail.title' | translate }}</h1>
+      <p>
+        @switch (state()) {
+        @case (States.Verifying) { {{ 'auth.verifyEmail.status.verifying' | translate }} }
+        @case (States.Success) { {{ 'auth.verifyEmail.status.success' | translate }} }
+        @case (States.Invalid) { {{ 'auth.verifyEmail.status.invalid' | translate }} }
+        @case (States.Missing) { {{ 'auth.verifyEmail.status.missing' | translate }} }
+        }
+      </p>
+    </div>
+
     @switch (state()) {
-      @case (VerifyStates.Verifying) {
-        <ion-spinner name="crescent" />
-        <p>{{ 'auth.verifyEmail.verifying' | translate }}</p>
-      }
-      @case (VerifyStates.Success) {
-        <ion-icon name="checkmark-circle-outline" color="success" size="large" aria-hidden="true" />
-        <h1>{{ 'auth.verifyEmail.successTitle' | translate }}</h1>
-        <ion-text role="status">
-          <p>{{ successMessage() }}</p>
-        </ion-text>
-        <ion-button expand="block" class="ion-margin-top" (click)="goToLogin()">
-          {{ 'auth.verifyEmail.continue' | translate }}
-        </ion-button>
-      }
-      @case (VerifyStates.Invalid) {
-        <ion-icon name="alert-circle-outline" color="danger" size="large" aria-hidden="true" />
-        <h1>{{ 'auth.verifyEmail.failedTitle' | translate }}</h1>
-        <ion-text color="danger" role="alert">
-          <p>{{ errorMessage() }}</p>
-        </ion-text>
-        <ion-button expand="block" class="ion-margin-top" (click)="goToLogin()">
-          {{ 'auth.verifyEmail.backToSignIn' | translate }}
-        </ion-button>
-      }
-      @case (VerifyStates.Missing) {
-        <ion-icon name="mail-unread-outline" color="medium" size="large" aria-hidden="true" />
-        <h1>{{ 'auth.verifyEmail.missingTitle' | translate }}</h1>
-        <p>{{ 'auth.verifyEmail.missingMessage' | translate }}</p>
-        <ion-button expand="block" class="ion-margin-top" (click)="goToLogin()">
-          {{ 'auth.verifyEmail.backToSignIn' | translate }}
-        </ion-button>
-      }
+    @case (States.Verifying) {
+    <div class="verifying" role="status">
+      <ion-spinner name="crescent" />
+      <p>{{ 'auth.verifyEmail.talkingToServer' | translate }}</p>
+    </div>
+    }
+
+    @case (States.Success) {
+    <mh-notice tone="success" role="status">{{ successMessage() }}</mh-notice>
+    <ion-button expand="block" class="auth-submit" (click)="goToLogin()">
+      {{ 'auth.verifyEmail.goToSignIn' | translate }}
+      <ion-icon slot="end" name="arrow-forward" aria-hidden="true" />
+    </ion-button>
+    }
+
+    @case (States.Invalid) {
+    <mh-notice tone="danger" role="alert">{{ errorMessage() }}</mh-notice>
+    <p class="auth-fine-print">
+      {{ 'auth.common.haveAccount' | translate }}
+      <ion-button fill="clear" class="mh-text-link inline" (click)="goToLogin()">
+        {{ 'button.signIn' | translate }}
+      </ion-button>
+      {{ 'auth.verifyEmail.requestNewHint' | translate }}
+    </p>
+    }
+
+    @case (States.Missing) {
+    <mh-notice tone="warning" role="alert">{{ 'auth.verifyEmail.missingDetail' | translate }}</mh-notice>
+    <ion-button expand="block" class="auth-submit" (click)="goToLogin()">
+      {{ 'auth.verifyEmail.goToSignIn' | translate }}
+      <ion-icon slot="end" name="arrow-forward" aria-hidden="true" />
+    </ion-button>
+    }
     }
   </div>
 </ion-content>

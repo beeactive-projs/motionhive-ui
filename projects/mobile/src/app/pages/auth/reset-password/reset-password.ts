@@ -1,86 +1,96 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormField, FormRoot, form } from '@angular/forms/signals';
+import { RouterLink } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonInput,
+  IonRouterLink,
   IonSpinner,
-  IonText,
-  IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { sendOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
 
-import { AuthService, validationMessage } from 'core';
+import {
+  AUTH_FIELD_ERRORS,
+  AuthService,
+  FieldErrorPipe,
+  apiErrorMessage,
+  emailSchema,
+  isFieldInvalid,
+} from 'core';
+import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
+import { Notice } from '../../../_shared/components/notice/notice';
+import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-invalid';
 
+/** Asks for a password reset link; the email leads to the new password page. */
 @Component({
   selector: 'mh-reset-password',
   imports: [
-    ReactiveFormsModule,
+    FormField,
+    FormRoot,
     IonBackButton,
     IonButton,
     IonButtons,
     IonContent,
     IonHeader,
+    IonIcon,
     IonInput,
+    IonRouterLink,
     IonSpinner,
-    IonText,
-    IonTitle,
     IonToolbar,
+    RouterLink,
     TranslatePipe,
+    FieldErrorPipe,
+    GuestControls,
+    Notice,
   ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',
 })
 export class ResetPassword {
-  private readonly _formBuilder = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
   private readonly _translateService = inject(TranslateService);
 
-  readonly isLoading = signal(false);
-  readonly errorMessage = signal<string | null>(null);
-  readonly successMessage = signal<string | null>(null);
+  protected readonly isInvalid = isFieldInvalid;
+  protected readonly fieldErrors = AUTH_FIELD_ERRORS;
 
-  forgotPasswordForm: FormGroup = this._formBuilder.group({
-    email: ['', [Validators.required, Validators.email]],
+  protected readonly isLoading = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly sent = signal(false);
+
+  protected readonly model = signal({ email: '' });
+  protected readonly form = form(this.model, emailSchema, {
+    submission: { action: async () => this.send(), onInvalid: focusFirstInvalidIonic },
   });
 
-  onSubmit(): void {
-    if (this.forgotPasswordForm.invalid) {
-      this.forgotPasswordForm.markAllAsTouched();
-      return;
-    }
+  constructor() {
+    addIcons({ sendOutline });
+  }
 
+  private send(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.successMessage.set(null);
-
-    const email = this.forgotPasswordForm.value.email;
-
-    this._authService.forgotPassword({ email }).subscribe({
-      next: () => {
-        this.isLoading.set(false);
-        this.successMessage.set(this._translateService.instant('auth.resetPassword.success'));
-        this.forgotPasswordForm.reset();
-      },
-      error: (error) => {
-        this.isLoading.set(false);
-        this.errorMessage.set(
-          error.error?.message || this._translateService.instant('auth.resetPassword.error'),
-        );
-      },
-    });
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.forgotPasswordForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  getFieldError(fieldName: string): string {
-    return validationMessage(this.forgotPasswordForm.get(fieldName)?.errors);
+    this.sent.set(false);
+    this._authService
+      .forgotPassword(this.model())
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.sent.set(true);
+          this.form().reset({ email: '' });
+        },
+        error: (err) =>
+          this.errorMessage.set(
+            apiErrorMessage(err, this._translateService.instant('auth.resetPassword.error')),
+          ),
+      });
   }
 }

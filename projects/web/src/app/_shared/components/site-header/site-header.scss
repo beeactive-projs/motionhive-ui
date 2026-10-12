@@ -1,0 +1,17 @@
+// The marketing site's header bar (see website header.component.scss). The
+// content background is the page colour in both themes.
+:host {
+  background: color-mix(in oklab, var(--p-content-background) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-color: var(--p-surface-200);
+
+  // Phones: solid, a blur over the scrolling page is too heavy for iOS Safari.
+  @media (max-width: 1023px) {
+    background: var(--p-content-background);
+    backdrop-filter: none;
+  }
+}
+
+:host-context(.dark) {
+  border-color: color-mix(in oklab, var(--p-surface-0) 10%, transparent);
+}

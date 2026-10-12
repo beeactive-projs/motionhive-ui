@@ -1,0 +1,38 @@
+<mh-site-header />
+
+<main class="auth-main relative">
+  <div class="honeycomb" aria-hidden="true"></div>
+
+  <div class="relative mx-auto grid min-h-[calc(100dvh-4.4rem)] max-w-285 items-center gap-16 px-4 py-6 sm:px-7 sm:py-16
+    lg:grid-cols-[minmax(0,1fr)_30rem]">
+    @if (hero(); as hero) {
+    <section class="hidden lg:block">
+      <span class="kicker inline-flex items-center gap-2 rounded-full px-2.5 py-2 font-mono text-[0.725rem] font-semibold uppercase">
+        <mh-hex [size]="11" orientation="pointy" bg="currentColor" />
+        {{ 'auth.layout.kicker' | translate }}
+      </span>
+      <p class="hero-title mt-4 font-heading font-extrabold">
+        {{ hero.line1 | translate }}<br>
+        @if (hero.line2) { {{ hero.line2 | translate }} }
+        <span class="text-brand">{{ hero.highlight | translate }}</span>
+      </p>
+      <p class="mt-5 max-w-[44ch] text-lg leading-relaxed text-surface-500 dark:text-surface-400">
+        {{ hero.subtitle | translate }}
+      </p>
+      <ul class="mt-7 flex flex-col gap-3 border-t border-surface-200 pt-5 dark:border-surface-700">
+        @for (guarantee of guarantees; track guarantee) {
+        <li class="flex items-start gap-3 text-[0.97rem] text-surface-600 dark:text-surface-300">
+          <mh-hex class="mt-0.5 flex-none" [size]="20" bg="var(--p-primary-500)" fg="var(--p-surface-0)"
+            orientation="pointy" icon="check" />
+          {{ guarantee | translate }}
+        </li>
+        }
+      </ul>
+    </section>
+    }
+
+    <div class="auth-card w-full justify-self-center lg:justify-self-end max-w-120 sm:rounded-2xl sm:border sm:p-8">
+      <router-outlet (activate)="onActivate()" />
+    </div>
+  </div>
+</main>

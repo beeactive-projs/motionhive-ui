@@ -12,6 +12,7 @@ import { DOCUMENT } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { Hex, Logo, SIGNUP_URL, ThemeService } from 'core';
+import { webAppLink } from '../../_shared/site.const';
 import { LanguageSwitcher } from '../../_shared/language-switcher/language-switcher';
 import { MobileMenuService } from '../../_shared/mobile-menu.service';
 import { SwipeDismissDirective } from '../../_shared/swipe-dismiss.directive';
@@ -61,7 +62,7 @@ export class PublicHeaderComponent {
 
   readonly features = FEATURES;
   readonly menuFeatures = MENU_FEATURES;
-  readonly signupUrl = SIGNUP_URL;
+  readonly signupUrl = webAppLink(SIGNUP_URL);
 
   /** Desktop overlays. */
   readonly megaOpen = signal(false);

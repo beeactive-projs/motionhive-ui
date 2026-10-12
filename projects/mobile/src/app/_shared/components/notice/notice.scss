@@ -1,0 +1,40 @@
+// The wash pairs flip with the palette, so the box reads in both themes.
+:host {
+  --notice-background: var(--ion-color-medium-wash);
+  --notice-color: var(--ion-color-medium-wash-contrast);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--notice-background);
+  color: var(--notice-color);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+}
+
+:host([data-tone='info']) {
+  --notice-background: var(--ion-color-info-wash);
+  --notice-color: var(--ion-color-info-wash-contrast);
+}
+
+:host([data-tone='success']) {
+  --notice-background: var(--ion-color-success-wash);
+  --notice-color: var(--ion-color-success-wash-contrast);
+}
+
+:host([data-tone='warning']) {
+  --notice-background: var(--ion-color-warning-wash);
+  --notice-color: var(--ion-color-warning-wash-contrast);
+}
+
+:host([data-tone='danger']) {
+  --notice-background: var(--ion-color-danger-wash);
+  --notice-color: var(--ion-color-danger-wash-contrast);
+}
+
+ion-icon {
+  flex: none;
+  margin-top: 0.125rem;
+  font-size: var(--mh-text-md);
+}

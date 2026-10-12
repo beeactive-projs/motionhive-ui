@@ -1,0 +1,21 @@
+<button pButton type="button" text severity="secondary" size="small" class="sm:hidden"
+  [disabled]="switching()" (click)="use(next)">
+  <i class="pi pi-globe"></i>
+  <span class="sr-only">{{ 'a11y.changeLanguage' | translate }}</span>
+  {{ current.toUpperCase() }}
+</button>
+
+<div class="hidden sm:flex items-center" role="group" [attr.aria-label]="'form.label.language' | translate">
+  @for (language of languages; track language) {
+  @let active = language === current;
+  <!-- The current one in honey, at the steps that pass AA (see .mh-link). -->
+  <button pButton type="button" text severity="secondary" size="small"
+    [class]="active ? 'font-bold text-primary-700 dark:text-primary-400' : ''" [attr.aria-pressed]="active" [attr.title]="'language.' + language | translate"
+    [disabled]="switching()" (click)="use(language)">
+    {{ language.toUpperCase() }}
+  </button>
+  @if (!$last) {
+  <span class="text-surface-300 dark:text-surface-600 select-none" aria-hidden="true">|</span>
+  }
+  }
+</div>

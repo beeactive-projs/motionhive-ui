@@ -1,0 +1,39 @@
+@use '../guest-surface' as surface;
+
+// Faded out towards the form, so it never sits behind text that has to be read.
+@include surface.honeycomb(linear-gradient(to right, black, transparent 70%));
+
+// The site's teal kicker (website kicker.scss, `teal`).
+.kicker {
+  color: var(--color-accent-700);
+  background: color-mix(in oklab, var(--color-accent-500) 14%, transparent);
+}
+
+:host-context(.dark) .kicker {
+  color: var(--color-accent-400);
+}
+
+// The site's hero H1 type (website home.component.scss `.hero__h1`).
+.hero-title {
+  font-size: clamp(2.35rem, 4.5vw, 3.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--p-surface-900);
+}
+
+:host-context(.dark) .hero-title {
+  color: var(--p-surface-0);
+}
+
+// The site's card (website marketing.css `.mh-card`), from `sm` up.
+@media (min-width: 40rem) {
+  .auth-card {
+    background: var(--p-surface-0);
+    border-color: var(--p-surface-200);
+  }
+
+  :host-context(.dark) .auth-card {
+    background: color-mix(in oklab, var(--p-surface-0) 5%, transparent);
+    border-color: color-mix(in oklab, var(--p-surface-0) 12%, transparent);
+  }
+}

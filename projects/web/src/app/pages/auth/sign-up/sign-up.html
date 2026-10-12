@@ -1,0 +1,127 @@
+@if (showAcceptInvite()) {
+<mh-accept-invite (signedOut)="showAcceptInvite.set(false)" />
+} @else {
+<mh-auth-header title="auth.signUp.title">
+  {{ 'auth.common.haveAccount' | translate }}
+  <a routerLink="/auth/login" [queryParams]="queryParams" class="mh-link">{{ 'button.signIn' | translate }}</a>
+</mh-auth-header>
+
+<div class="flex flex-col gap-6 animate-fade-in">
+  @if (hasInvitation) {
+  <p-message severity="info" icon="pi pi-envelope">
+    @if (invitation()) {
+    {{ 'auth.signUp.invitedByStart' | translate }}
+    <strong>{{ coachName() }}</strong>
+    {{ 'auth.signUp.invitedByEnd' | translate }}
+    } @else {
+    {{ 'auth.signUp.invited' | translate }}
+    }
+  </p-message>
+  }
+
+  @if (errorMessage(); as message) {
+  <p-message severity="error">{{ message }}</p-message>
+  }
+
+  <form [formRoot]="form" class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      @let firstName = form.firstName();
+      <div class="flex flex-col gap-1">
+        <label for="firstName" class="text-xs font-semibold text-surface-900 dark:text-surface-100">
+          {{ 'form.label.firstName' | translate }}
+        </label>
+        <input pInputText id="firstName" type="text" [formField]="form.firstName" autocomplete="given-name" fluid
+          pSize="large" [placeholder]="'auth.signUp.firstNamePlaceholder' | translate"
+          [attr.aria-invalid]="isInvalid(firstName)"
+          [attr.aria-describedby]="isInvalid(firstName) ? 'firstName-error' : null" />
+        @if (isInvalid(firstName)) {
+        <p-message id="firstName-error" severity="error" size="small" variant="simple">
+          {{ firstName.errors() | fieldError: fieldErrors.firstName }}
+        </p-message>
+        }
+      </div>
+
+      @let lastName = form.lastName();
+      <div class="flex flex-col gap-1">
+        <label for="lastName" class="text-xs font-semibold text-surface-900 dark:text-surface-100">
+          {{ 'form.label.lastName' | translate }}
+        </label>
+        <input pInputText id="lastName" type="text" [formField]="form.lastName" autocomplete="family-name" fluid
+          pSize="large" [placeholder]="'auth.signUp.lastNamePlaceholder' | translate"
+          [attr.aria-invalid]="isInvalid(lastName)"
+          [attr.aria-describedby]="isInvalid(lastName) ? 'lastName-error' : null" />
+        @if (isInvalid(lastName)) {
+        <p-message id="lastName-error" severity="error" size="small" variant="simple">
+          {{ lastName.errors() | fieldError: fieldErrors.lastName }}
+        </p-message>
+        }
+      </div>
+    </div>
+
+    @let email = form.email();
+    <div class="flex flex-col gap-1">
+      <label for="email" class="text-xs font-semibold text-surface-900 dark:text-surface-100">
+        {{ 'auth.common.emailAddress' | translate }}
+      </label>
+      <input pInputText id="email" type="email" [formField]="form.email" autocomplete="email" fluid pSize="large"
+        [placeholder]="'form.placeholder.email' | translate"
+        [attr.aria-invalid]="isInvalid(email)" [attr.aria-describedby]="isInvalid(email) ? 'email-error' : null" />
+      @if (isInvalid(email)) {
+      <p-message id="email-error" severity="error" size="small" variant="simple">
+        {{ email.errors() | fieldError: fieldErrors.email }}
+      </p-message>
+      }
+    </div>
+
+    @let password = form.password();
+    <div class="flex flex-col gap-1">
+      <label for="password" class="text-xs font-semibold text-surface-900 dark:text-surface-100">
+        {{ 'form.label.password' | translate }}
+      </label>
+      <mh-password-input inputId="password" [formField]="form.password" autocomplete="new-password"
+        errorId="password-error" showRequirements [placeholder]="'auth.signUp.passwordPlaceholder' | translate" />
+      @if (isInvalid(password)) {
+      <p-message id="password-error" severity="error" size="small" variant="simple">
+        {{ password.errors() | fieldError: fieldErrors.newPassword }}
+      </p-message>
+      }
+    </div>
+
+    @let confirmPassword = form.confirmPassword();
+    <div class="flex flex-col gap-1">
+      <label for="confirmPassword" class="text-xs font-semibold text-surface-900 dark:text-surface-100">
+        {{ 'form.label.confirmPassword' | translate }}
+      </label>
+      <mh-password-input inputId="confirmPassword" [formField]="form.confirmPassword" autocomplete="new-password"
+        errorId="confirmPassword-error" [placeholder]="'form.hint.reenterPassword' | translate" />
+      @if (isInvalid(confirmPassword)) {
+      <p-message id="confirmPassword-error" severity="error" size="small" variant="simple">
+        {{ confirmPassword.errors() | fieldError: fieldErrors.confirmPassword }}
+      </p-message>
+      }
+    </div>
+
+    @if (!hasInvitation) {
+    <div class="flex items-start gap-3 pt-1">
+      <p-checkbox inputId="isInstructor" [formField]="form.isInstructor" [binary]="true" />
+      <div class="flex flex-col gap-0.5">
+        <label for="isInstructor" class="cursor-pointer text-sm font-medium">
+          {{ 'auth.signUp.registerAsCoach' | translate }}
+        </label>
+        <span class="text-xs text-surface-600 dark:text-surface-300">{{ 'auth.signUp.coachHint' | translate }}</span>
+      </div>
+    </div>
+    }
+
+    <button pButton type="submit" fluid size="large" class="mt-2" [disabled]="isLoading()">
+      {{ 'auth.signUp.submit' | translate }}
+      <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-user-plus'"></i>
+    </button>
+  </form>
+
+  <mh-social-sign-in label="auth.signUp.orSignUpWith" (googleCredential)="onGoogleCredential($event)"
+    (googleFailed)="onGoogleFailed()" />
+
+  <mh-terms-notice intro="auth.signUp.termsIntro" />
+</div>
+}

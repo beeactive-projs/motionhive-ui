@@ -2,6 +2,7 @@
   "a11y": {
     "back": "Înapoi",
     "bottomSheet": "Panou de jos",
+    "changeLanguage": "Schimbă limba",
     "close": "Închide",
     "closePhoto": "Închide fotografia",
     "closeSearch": "Închide căutarea",
@@ -13,10 +14,15 @@
     "notificationsUnread": "Notificări, {count} necitite",
     "openMenu": "Deschide meniul",
     "openNotifications": "Deschide notificările",
+    "opensInNewTab": "(se deschide într-o filă nouă)",
     "playVideo": "Redă videoclipul",
     "previousMonth": "Luna anterioară",
     "removeItem": "Elimină {name}",
+    "requirementMet": "{label}: îndeplinit",
+    "requirementNotMet": "{label}: neîndeplinit",
     "showPassword": "Arată parola",
+    "switchToDarkMode": "Treci la modul întunecat",
+    "switchToLightMode": "Treci la modul luminos",
     "unread": "Necitită"
   },
   "button": {
@@ -444,7 +450,14 @@
   "form": {
     "hint": {
       "optional": "(opțional)",
-      "passwordMinLength": "Min. 8 caractere",
+      "passwordRule": {
+        "length": "Minim 8 caractere",
+        "lowercase": "Literă mică",
+        "number": "Cifră",
+        "symbol": "Caracter special",
+        "uppercase": "Literă mare"
+      },
+      "passwordRules": "Cerințe pentru parolă",
       "reenterPassword": "Introdu parola din nou"
     },
     "label": {
@@ -610,6 +623,19 @@
     }
   },
   "validation": {
+    "auth": {
+      "confirmPasswordRequired": "Introdu parola încă o dată, pentru confirmare.",
+      "emailInvalid": "Introdu o adresă de email validă, de exemplu nume@exemplu.ro.",
+      "emailRequired": "Introdu adresa de email.",
+      "firstNameMinLength": "Prenumele trebuie să aibă cel puțin {min, plural, one {# caracter} few {# caractere} other {# de caractere}}.",
+      "firstNameRequired": "Introdu prenumele.",
+      "lastNameMinLength": "Numele de familie trebuie să aibă cel puțin {min, plural, one {# caracter} few {# caractere} other {# de caractere}}.",
+      "lastNameRequired": "Introdu numele de familie.",
+      "newPasswordRequired": "Creează o parolă.",
+      "passwordMismatch": "Nu se potrivește cu parola de mai sus.",
+      "passwordRequired": "Introdu parola.",
+      "passwordStrength": "Parola nu îndeplinește încă toate cerințele."
+    },
     "email": "Introdu o adresă de email validă.",
     "emailTooLong": "O adresă de email nu poate avea mai mult de {max} caractere.",
     "emailWithExample": "Introdu o adresă de email validă, de exemplu client@exemplu.ro.",

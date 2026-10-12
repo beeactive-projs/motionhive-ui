@@ -199,11 +199,13 @@
   --mh-text-xl: 1.25rem;    /* 20px — page titles (h1) */
   --mh-text-2xl: 1.5rem;    /* 24px — hero numbers */
 
-  /* Leading & tracking — three leadings, one kicker tracking. */
+  /* Leading & tracking — three leadings, a kicker and a display tracking. */
   --mh-leading-none: 1;
   --mh-leading-tight: 1.4;
   --mh-leading-body: 1.55;
   --mh-tracking-kicker: 0.08em;
+  /* Display titles tighten slightly, as on web (Tailwind tracking-[-0.02em]). */
+  --mh-tracking-display: -0.02em;
 
   /* The WCAG minimum touch target (44px). */
   --mh-tap-target: 2.75rem;
@@ -220,6 +222,13 @@
    * amber the design uses for links and labels sitting on honey surfaces.
    */
   --mh-color-honey-deep: var(--mh-primary-700);
+
+  /*
+   * The danger slot (red 500) is 3.76:1 on white: enough for an outline,
+   * short of AA for text. Field errors and invalid labels use this step,
+   * 4.83:1 on white and 4.62:1 on the slate page.
+   */
+  --mh-color-danger-deep: var(--mh-danger-600);
 
   /*
    * The hairline between rows inside a card — one step lighter than
@@ -469,6 +478,8 @@
   /* On navy, the deep amber goes unread — the design's dark-surface accent is
      the light honey tint instead. */
   --mh-color-honey-deep: var(--mh-warning-300);
+  /* On navy the step goes the other way: red 400 is 6.22:1 on the page. */
+  --mh-color-danger-deep: var(--mh-danger-400);
 
   /* Slate 100 would glare on a navy card; the divider tracks the border here. */
   --mh-color-divider: var(--mh-navy-700);

@@ -5,6 +5,12 @@ export const SUPPORTED_LANGUAGES: readonly AppLanguage[] = Object.values(AppLang
 export const DEFAULT_LANGUAGE: AppLanguage = AppLanguages.English;
 
 /**
+ * Query param a link into the web app carries to hand over the language the
+ * visitor was reading in (`/auth/signup?lang=ro` from the Romanian site).
+ */
+export const LANGUAGE_URL_PARAM = 'lang';
+
+/**
  * BCP 47 locale per UI language — drives `LOCALE_ID` (DatePipe & co.) and every
  * `Intl` / `toLocale*` call. English maps to en-GB, not en-US: the app already
  * formats 24h times and day-first dates, which is what en-GB produces.

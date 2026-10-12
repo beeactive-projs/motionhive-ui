@@ -1,5 +1,6 @@
 import { Component, booleanAttribute, input } from '@angular/core';
 import { LOGIN_URL, SIGNUP_URL } from 'core';
+import { webAppLink } from '../../site.const';
 
 /**
  * "Log in" (ghost) + "Start free" (primary). Side by side, 1fr / 1.6fr, by
@@ -16,6 +17,6 @@ import { LOGIN_URL, SIGNUP_URL } from 'core';
 export class CtaPair {
   readonly stacked = input(false, { transform: booleanAttribute });
 
-  protected readonly loginUrl = LOGIN_URL;
-  protected readonly signupUrl = SIGNUP_URL;
+  protected readonly loginUrl = webAppLink(LOGIN_URL);
+  protected readonly signupUrl = webAppLink(SIGNUP_URL);
 }

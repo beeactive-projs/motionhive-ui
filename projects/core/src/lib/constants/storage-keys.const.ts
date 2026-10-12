@@ -19,4 +19,6 @@
     `motionhive_program_builder_expanded_${programId}`,
   /** Whether the workout history calendar is folded down to one week. */
   HISTORY_CALENDAR_COLLAPSED: 'motionhive_history_calendar_collapsed',
+  /** `?ref=` of a friend referral sign-up link, kept until sign up succeeds. */
+  FRIEND_REFERRER_ID: 'mh_friend_referrer_id',
 } as const;

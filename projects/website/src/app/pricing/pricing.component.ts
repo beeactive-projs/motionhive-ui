@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/c
 import { Hex, type HexTone, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
-import { isRoLocale, SITE_ORIGIN, siteUrl } from '../_shared/site.const';
+import { isRoLocale, SITE_ORIGIN, siteUrl, webAppLink } from '../_shared/site.const';
 import { Kicker } from '../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../_shared/ui/section-header/section-header';
 import { CheckList } from '../_shared/ui/check-list/check-list';
@@ -29,7 +29,7 @@ interface CompareRow {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PricingComponent {
-  readonly signupUrl = SIGNUP_URL;
+  readonly signupUrl = webAppLink(SIGNUP_URL);
 
   readonly planFeatures = [
     $localize`:@@pricing.pf1:Unlimited clients`,

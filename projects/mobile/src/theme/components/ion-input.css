@@ -10,3 +10,31 @@
 ion-input:not([shape='round']) {
   --border-radius: var(--mh-radius-control) !important;
 }
+
+/* Browser autofill paints its own fill and ink on the native input, which
+   inside an ion-input is a strip inset from the outline: a grey bar behind
+   the saved email and password instead of a filled field. The delay holds
+   the field's own surface; the fill colour keeps the text in the theme ink. */
+ion-input input:-webkit-autofill {
+  -webkit-text-fill-color: var(--ion-text-color);
+  caret-color: var(--ion-text-color);
+  transition:
+    background-color 0s 600000s,
+    color 0s 600000s;
+}
+
+/* A field whose error line is showing: Ionic's own invalid look (danger
+   outline and label, at rest and focused), like web's red field. Keyed off
+   the `.mh-helper.over` sibling rather than `ion-invalid`, which Ionic wipes
+   from the host on its next render. `!important` for the reason at the top:
+   Ionic's outline and hover rules outrank any selector we can write. */
+ion-input:has(+ .mh-helper.over),
+mh-password-input:has(+ .mh-helper.over) ion-input {
+  --border-color: var(--mh-color-danger-deep) !important;
+  --highlight-color-focused: var(--mh-color-danger-deep);
+}
+
+ion-input:has(+ .mh-helper.over) .label-text-wrapper,
+mh-password-input:has(+ .mh-helper.over) ion-input .label-text-wrapper {
+  color: var(--mh-color-danger-deep);
+}
