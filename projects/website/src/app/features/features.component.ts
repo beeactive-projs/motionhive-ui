@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Hex, type HexTone, SIGNUP_URL } from 'core';
+import { Hex, type HexTone, Kicker, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
 import { isRoLocale, SITE_ORIGIN, siteUrl, webAppLink } from '../_shared/site.const';
 import { FEATURES } from '../_data/features';
-import { Kicker } from '../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../_shared/ui/section-header/section-header';
 import { CtaBand } from '../_shared/ui/cta-band/cta-band';
 import { FeatureCard } from '../_shared/ui/feature-card/feature-card';

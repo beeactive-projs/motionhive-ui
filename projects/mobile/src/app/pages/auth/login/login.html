@@ -9,15 +9,18 @@
   <div slot="fixed" class="honeycomb" aria-hidden="true"></div>
 
   <div class="auth-page">
-    <div class="auth-head">
-      <h1>{{ 'auth.login.title' | translate }}</h1>
-      <p>
-        {{ 'auth.login.noAccount' | translate }}
-        <ion-button fill="clear" class="mh-text-link inline" routerLink="/auth/signup" [queryParams]="queryParams">
-          {{ 'auth.login.createAccount' | translate }}
-        </ion-button>
-      </p>
-    </div>
+    <mh-auth-header title="auth.login.title">
+      {{ 'auth.common.noAccount' | translate }}
+      <ion-button fill="clear" class="mh-text-link inline" routerLink="/auth/signup" [queryParams]="queryParams">
+        {{ 'auth.common.createOneFree' | translate }}
+      </ion-button>
+    </mh-auth-header>
+
+    @if (invite()) {
+    <mh-notice tone="info">{{ 'auth.login.inviteBanner' | translate: { coach: coachName() } }}</mh-notice>
+    } @else if (inviteInvalid()) {
+    <mh-notice tone="danger">{{ 'auth.signUp.error.invalidInvitation' | translate }}</mh-notice>
+    }
 
     @if (errorMessage(); as message) {
     <mh-notice tone="danger" role="alert">{{ message }}</mh-notice>
@@ -26,7 +29,7 @@
     <form [formRoot]="form">
       @let email = form.email();
       <ion-input id="email" fill="outline" labelPlacement="stacked" type="email" inputmode="email" autocomplete="email"
-        enterkeyhint="next" [label]="'auth.common.emailLabel' | translate"
+        enterkeyhint="next" [label]="'auth.common.emailAddress' | translate"
         [placeholder]="'form.placeholder.email' | translate" [formField]="form.email" />
       @if (isInvalid(email)) {
       <p class="mh-helper over" role="alert">{{ email.errors() | fieldError: fieldErrors.email }}</p>
@@ -42,7 +45,7 @@
 
       <div class="auth-forgot">
         <ion-button fill="clear" class="mh-text-link" routerLink="/auth/reset-password">
-          {{ 'auth.login.forgotPassword' | translate }}
+          {{ 'auth.common.forgotPassword' | translate }}
         </ion-button>
       </div>
 

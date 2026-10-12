@@ -17,6 +17,7 @@ import { arrowForward } from 'ionicons/icons';
 
 import { AuthService, VerifyEmailState, VerifyEmailStates, apiErrorMessage } from 'core';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
+import { AuthHeader } from '../_components/auth-header/auth-header';
 import { Logo } from '../../../_shared/components/logo/logo';
 import { Notice } from '../../../_shared/components/notice/notice';
 
@@ -36,6 +37,7 @@ import { Notice } from '../../../_shared/components/notice/notice';
     IonSpinner,
     IonToolbar,
     TranslatePipe,
+    AuthHeader,
     GuestControls,
     Logo,
     Notice,

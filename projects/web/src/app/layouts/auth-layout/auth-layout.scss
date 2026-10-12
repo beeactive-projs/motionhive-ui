@@ -3,16 +3,6 @@
 // Faded out towards the form, so it never sits behind text that has to be read.
 @include surface.honeycomb(linear-gradient(to right, black, transparent 70%));
 
-// The site's teal kicker (website kicker.scss, `teal`).
-.kicker {
-  color: var(--color-accent-700);
-  background: color-mix(in oklab, var(--color-accent-500) 14%, transparent);
-}
-
-:host-context(.dark) .kicker {
-  color: var(--color-accent-400);
-}
-
 // The site's hero H1 type (website home.component.scss `.hero__h1`).
 .hero-title {
   font-size: clamp(2.35rem, 4.5vw, 3.5rem);

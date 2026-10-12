@@ -11,15 +11,27 @@
   <div slot="fixed" class="honeycomb" aria-hidden="true"></div>
 
   <div class="auth-page">
-    <div class="auth-head">
-      <h1>{{ 'auth.signUp.title' | translate }}</h1>
-      <p>
-        {{ 'auth.common.haveAccount' | translate }}
-        <ion-button fill="clear" class="mh-text-link inline" routerLink="/auth/login" [queryParams]="queryParams">
-          {{ 'button.signIn' | translate }}
-        </ion-button>
-      </p>
-    </div>
+    @if (showAcceptInvite()) {
+    <mh-accept-invite (signedOut)="onSignedOut()" />
+    } @else {
+    <mh-auth-header title="auth.signUp.title">
+      {{ 'auth.common.haveAccount' | translate }}
+      <ion-button fill="clear" class="mh-text-link inline" routerLink="/auth/login" [queryParams]="queryParams">
+        {{ 'button.signIn' | translate }}
+      </ion-button>
+    </mh-auth-header>
+
+    @if (hasInvitation) {
+    <mh-notice tone="info">
+      @if (invitation()) {
+      {{ 'auth.signUp.invitedByStart' | translate }}
+      <strong>{{ coachName() }}</strong>
+      {{ 'auth.signUp.invitedByEnd' | translate }}
+      } @else {
+      {{ 'auth.signUp.invited' | translate }}
+      }
+    </mh-notice>
+    }
 
     @if (errorMessage(); as message) {
     <mh-notice tone="danger" role="alert">{{ message }}</mh-notice>
@@ -44,7 +56,7 @@
 
       @let email = form.email();
       <ion-input id="email" fill="outline" labelPlacement="stacked" type="email" inputmode="email"
-        autocomplete="email" enterkeyhint="next" [label]="'auth.common.emailLabel' | translate"
+        autocomplete="email" enterkeyhint="next" [label]="'auth.common.emailAddress' | translate"
         [placeholder]="'form.placeholder.email' | translate" [formField]="form.email" />
       @if (isInvalid(email)) {
       <p class="mh-helper over" role="alert">{{ email.errors() | fieldError: fieldErrors.email }}</p>
@@ -68,12 +80,14 @@
       </p>
       }
 
+      @if (!hasInvitation) {
       <ion-checkbox labelPlacement="end" justify="start" alignment="start" [formField]="form.isInstructor">
         <ion-label class="ion-text-wrap">
           {{ 'auth.signUp.registerAsCoach' | translate }}
-          <p>{{ 'auth.signUp.registerAsCoachHint' | translate }}</p>
+          <p>{{ 'auth.signUp.coachHint' | translate }}</p>
         </ion-label>
       </ion-checkbox>
+      }
 
       <ion-button expand="block" type="submit" class="auth-submit" [disabled]="isLoading()">
         @if (isLoading()) {
@@ -86,5 +100,6 @@
     </form>
 
     <mh-terms-notice intro="auth.signUp.termsIntro" />
+    }
   </div>
 </ion-content>

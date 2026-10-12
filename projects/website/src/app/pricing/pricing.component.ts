@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/core';
-import { Hex, type HexTone, SIGNUP_URL } from 'core';
+import { CheckList, Hex, type HexTone, Kicker, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
 import { isRoLocale, SITE_ORIGIN, siteUrl, webAppLink } from '../_shared/site.const';
-import { Kicker } from '../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../_shared/ui/section-header/section-header';
-import { CheckList } from '../_shared/ui/check-list/check-list';
 import { CtaBand } from '../_shared/ui/cta-band/cta-band';
 import { Faq, type FaqItem } from '../_shared/ui/faq/faq';
 

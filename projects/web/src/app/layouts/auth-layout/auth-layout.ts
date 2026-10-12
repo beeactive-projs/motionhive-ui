@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
-import { Hex } from 'core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { CheckList, Kicker } from 'core';
 import { SiteHeader } from '../../_shared/components/site-header/site-header';
 import { AuthHero } from './auth-hero.model';
 
@@ -14,19 +14,20 @@ import { AuthHero } from './auth-hero.model';
  */
 @Component({
   selector: 'mh-auth-layout',
-  imports: [RouterOutlet, TranslatePipe, Hex, SiteHeader],
+  imports: [RouterOutlet, TranslatePipe, CheckList, Kicker, SiteHeader],
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.scss',
 })
 export class AuthLayout {
   private readonly _activatedRoute = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
-  /** The site hero's guarantees, word for word. */
+  /** The site hero's guarantees, word for word (`mh-check-list` takes translated strings). */
   protected readonly guarantees = [
     'auth.layout.guarantees.unlimitedClients',
     'auth.layout.guarantees.noSubscription',
     'auth.layout.guarantees.noCard',
-  ];
+  ].map((key) => this._translateService.instant(key));
   protected readonly hero = signal<AuthHero | null>(null);
 
   protected onActivate(): void {

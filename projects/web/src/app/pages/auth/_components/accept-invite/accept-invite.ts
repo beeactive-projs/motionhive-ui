@@ -1,11 +1,11 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { Message } from 'primeng/message';
-import { AuthService, AuthStore, apiErrorMessage } from 'core';
-import { ClientInviteService } from '../../_services/client-invite.service';
+import { AuthService, AuthStore, ClientInviteService, apiErrorMessage } from 'core';
+import { INVITE_ACCEPTED_URL } from '../../auth.const';
 import { AuthHeader } from '../auth-header/auth-header';
 
 /**
@@ -24,6 +24,7 @@ export class AcceptInvite {
   private readonly _authService = inject(AuthService);
   private readonly _authStore = inject(AuthStore);
   private readonly _translateService = inject(TranslateService);
+  private readonly _router = inject(Router);
 
   protected readonly userName = this._authStore.userName;
   protected readonly userEmail = computed(() => this._authStore.user()?.email ?? '');
@@ -54,7 +55,7 @@ export class AcceptInvite {
       .accept(token)
       .pipe(finalize(() => this.isAccepting.set(false)))
       .subscribe({
-        next: () => void this._clientInviteService.openCoaches(),
+        next: () => void this._router.navigateByUrl(INVITE_ACCEPTED_URL),
         error: (err) =>
           this.errorMessage.set(
             apiErrorMessage(err, this._translateService.instant('auth.invite.acceptFailed')),

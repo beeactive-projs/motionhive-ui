@@ -9,17 +9,14 @@
   <div slot="fixed" class="honeycomb" aria-hidden="true"></div>
 
   <div class="auth-page">
-    <div class="auth-head">
-      <h1>{{ 'auth.verifyEmail.title' | translate }}</h1>
-      <p>
-        @switch (state()) {
-        @case (States.Verifying) { {{ 'auth.verifyEmail.status.verifying' | translate }} }
-        @case (States.Success) { {{ 'auth.verifyEmail.status.success' | translate }} }
-        @case (States.Invalid) { {{ 'auth.verifyEmail.status.invalid' | translate }} }
-        @case (States.Missing) { {{ 'auth.verifyEmail.status.missing' | translate }} }
-        }
-      </p>
-    </div>
+    <mh-auth-header title="auth.verifyEmail.title">
+      @switch (state()) {
+      @case (States.Verifying) { {{ 'auth.verifyEmail.status.verifying' | translate }} }
+      @case (States.Success) { {{ 'auth.verifyEmail.status.success' | translate }} }
+      @case (States.Invalid) { {{ 'auth.verifyEmail.status.invalid' | translate }} }
+      @case (States.Missing) { {{ 'auth.verifyEmail.status.missing' | translate }} }
+      }
+    </mh-auth-header>
 
     @switch (state()) {
     @case (States.Verifying) {

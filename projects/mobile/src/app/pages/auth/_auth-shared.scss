@@ -67,26 +67,6 @@ ion-content {
   padding: 1.5rem 1rem 2.5rem;
 }
 
-// Title + subtitle. With the column gap, 2rem to the form, as on web.
-.auth-head {
-  margin-bottom: 0.5rem;
-
-  h1 {
-    margin: 0 0 0.5rem;
-    font-size: var(--mh-text-2xl);
-    font-weight: 600;
-    letter-spacing: var(--mh-tracking-display);
-    line-height: var(--mh-leading-tight);
-  }
-
-  p {
-    margin: 0;
-    color: var(--ion-color-medium);
-    font-size: var(--mh-text-base);
-    line-height: var(--mh-leading-tight);
-  }
-}
-
 form {
   display: flex;
   flex-direction: column;

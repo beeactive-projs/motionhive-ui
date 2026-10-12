@@ -1,0 +1,20 @@
+// Title + subtitle. With the page's column gap, 2rem to the form, as on web.
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-display);
+  line-height: var(--mh-leading-tight);
+}
+
+p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-tight);
+}

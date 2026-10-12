@@ -65,7 +65,7 @@ import { BookingDetailStore } from './booking-detail.store';
 const CLOCK_TICK_MS = 20_000;
 
 interface StatusBand {
-  tone: 'success' | 'warn' | 'info' | 'live';
+  tone: 'success' | 'warning' | 'info' | 'live';
   icon: string | null;
   title: string;
   detail: string;
@@ -292,7 +292,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
       case DetailViews.Pending: {
         const first = this.coach()?.firstName?.trim();
         return {
-          tone: 'warn',
+          tone: 'warning',
           icon: 'hourglass-outline',
           title: this._translateService.instant('mySessions.detail.band.pending'),
           detail: first

@@ -220,7 +220,7 @@ describe('bookingChip', () => {
   it('labels the exceptions', () => {
     expect(
       bookingChip(participant({ status: SessionParticipantStatus.PendingApproval }), NOW),
-    ).toEqual({ label: 'Awaiting approval', tone: 'warn' });
+    ).toEqual({ label: 'Awaiting approval', tone: 'warning' });
     expect(
       bookingChip(participant({ status: SessionParticipantStatus.Waitlisted }), NOW),
     ).toEqual({ label: 'Waitlist', tone: 'info' });
