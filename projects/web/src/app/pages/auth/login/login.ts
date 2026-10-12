@@ -10,6 +10,7 @@ import {
   APP_HOME_URL,
   AUTH_FIELD_ERRORS,
   AuthService,
+  ClientInviteService,
   FieldErrorPipe,
   apiErrorMessage,
   focusFirstInvalid,
@@ -21,7 +22,7 @@ import { AuthHeader } from '../_components/auth-header/auth-header';
 import { SocialSignIn } from '../_components/social-sign-in/social-sign-in';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
-import { ClientInviteService } from '../_services/client-invite.service';
+import { INVITE_ACCEPTED_URL } from '../auth.const';
 
 /**
  * Sign in. Reached from a client invite's sign-up page too (`?token=` carried
@@ -108,7 +109,7 @@ export class Login {
       return;
     }
     this._clientInviteService.accept(token).subscribe({
-      next: () => void this._clientInviteService.openCoaches(),
+      next: () => void this._router.navigateByUrl(INVITE_ACCEPTED_URL),
       error: () => this.navigateIn(),
     });
   }

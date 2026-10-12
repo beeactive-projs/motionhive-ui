@@ -212,7 +212,7 @@ const ASSIGNMENT_CHIPS: Record<ProgramAssignmentStatus, { key: string; tone: Bad
   [ProgramAssignmentStatus.Active]: null,
   [ProgramAssignmentStatus.Pending]: {
     key: 'programs.assignment.notStarted',
-    tone: BadgeTones.Warn,
+    tone: BadgeTones.Warning,
   },
   [ProgramAssignmentStatus.Paused]: {
     key: 'enum.programAssignmentStatus.PAUSED',

@@ -21,19 +21,27 @@ import {
   APP_HOME_URL,
   AUTH_FIELD_ERRORS,
   AuthService,
+  ClientInviteService,
   FieldErrorPipe,
   apiErrorMessage,
+  focusFirstInvalid,
   isFieldInvalid,
   resolveReturnUrl,
   signInSchema,
 } from 'core';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
+import { AuthHeader } from '../_components/auth-header/auth-header';
 import { Logo } from '../../../_shared/components/logo/logo';
 import { Notice } from '../../../_shared/components/notice/notice';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
-import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-invalid';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
+import { InviteLandingService } from '../invite-landing.service';
 
+/**
+ * Sign in. Reached from a client invite's sign-up page too (`?token=` carried
+ * over): it then names the inviting coach and accepts the invite once signed
+ * in.
+ */
 @Component({
   selector: 'mh-login',
   imports: [
@@ -50,12 +58,14 @@ import { TermsNotice } from '../_components/terms-notice/terms-notice';
     IonToolbar,
     TranslatePipe,
     FieldErrorPipe,
+    AuthHeader,
     GuestControls,
     Logo,
     Notice,
     PasswordInput,
     TermsNotice,
   ],
+  providers: [ClientInviteService],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -65,22 +75,30 @@ export class Login {
   private readonly _activatedRoute = inject(ActivatedRoute);
   private readonly _translateService = inject(TranslateService);
   private readonly _appHomeUrl = inject(APP_HOME_URL);
+  private readonly _clientInviteService = inject(ClientInviteService);
+  private readonly _inviteLandingService = inject(InviteLandingService);
 
-  /** Forwarded to the sign-up link so returnUrl survives the switch. */
+  /** Forwarded to the sign-up link so a return URL or invite survives the switch. */
   protected readonly queryParams: Params = this._activatedRoute.snapshot.queryParams;
   protected readonly isInvalid = isFieldInvalid;
   protected readonly fieldErrors = AUTH_FIELD_ERRORS;
+
+  protected readonly invite = this._clientInviteService.details;
+  protected readonly inviteInvalid = this._clientInviteService.invalid;
+  protected readonly coachName = this._clientInviteService.coachName;
 
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly model = signal({ email: '', password: '' });
   protected readonly form = form(this.model, signInSchema, {
-    submission: { action: async () => this.signIn(), onInvalid: focusFirstInvalidIonic },
+    submission: { action: async () => this.signIn(), onInvalid: focusFirstInvalid },
   });
 
   constructor() {
     addIcons({ arrowForward });
+    const token = this._clientInviteService.token;
+    if (token) this._clientInviteService.load(token).subscribe({ error: () => undefined });
   }
 
   private signIn(): void {
@@ -90,12 +108,25 @@ export class Login {
       .login(this.model())
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: () => this.navigateToApp(),
+        next: () => this.acceptInviteAndNavigate(),
         error: (err) =>
           this.errorMessage.set(
-            apiErrorMessage(err, this._translateService.instant('auth.login.error')),
+            apiErrorMessage(err, this._translateService.instant('auth.login.error.invalidCredentials')),
           ),
       });
+  }
+
+  /** With a valid invite in the URL, accept it; else carry on into the app. */
+  private acceptInviteAndNavigate(): void {
+    const token = this._clientInviteService.token;
+    if (!token || this.inviteInvalid()) {
+      this.navigateToApp();
+      return;
+    }
+    this._clientInviteService.accept(token).subscribe({
+      next: () => void this._inviteLandingService.open(),
+      error: () => this.navigateToApp(),
+    });
   }
 
   private navigateToApp(): void {

@@ -108,7 +108,7 @@ export function bookingTone(p: SessionParticipant, now: number): MyBookingTone {
 /** Wash tone names — the badge SCSS maps each to an `--ion-color-*-wash`. */
 export interface BookingChip {
   label: string;
-  tone: 'success' | 'warn' | 'info' | 'medium';
+  tone: 'success' | 'warning' | 'info' | 'medium';
 }
 
 /**
@@ -123,7 +123,7 @@ export interface BookingChip {
 export function bookingChip(p: SessionParticipant, now: number): BookingChip | null {
   switch (p.status) {
     case SessionParticipantStatus.PendingApproval:
-      return { label: translate('mySessions.chip.awaitingApproval'), tone: 'warn' };
+      return { label: translate('mySessions.chip.awaitingApproval'), tone: 'warning' };
     case SessionParticipantStatus.Waitlisted:
       return { label: translate('mySessions.chip.waitlist'), tone: 'info' };
     // The cancelled list is the only place these rows render, muted on

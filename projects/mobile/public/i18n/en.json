@@ -48,7 +48,9 @@
       "deleteAccount": "Delete account",
       "deleteNote": "Deleting your account removes your profile, programs and messages permanently. This can't be undone.",
       "logOut": "Log out",
-      "soon": "Soon"
+      "resendVerification": "Resend verification email",
+      "soon": "Soon",
+      "unverified": "{email} isn't verified yet."
     },
     "memberSince": "Member since {date}",
     "notifications": {
@@ -111,7 +113,9 @@
     "toast": {
       "copyFailed": "Could not copy the link.",
       "timezoneFailed": "Could not update your timezone.",
-      "timezoneUpdated": "Timezone updated"
+      "timezoneUpdated": "Timezone updated",
+      "verificationFailed": "Couldn't resend. If the email is already verified or you recently asked, please try again later.",
+      "verificationSent": "Verification email sent. Check {email}."
     }
   },
   "accountSheets": {
@@ -215,68 +219,6 @@
         "copyFailed": "Could not copy the link.",
         "shareFailed": "Could not share the link."
       }
-    }
-  },
-  "auth": {
-    "common": {
-      "emailLabel": "Email address",
-      "haveAccount": "Already have an account?",
-      "privacyPolicy": "Privacy Policy",
-      "rememberPassword": "Remember your password?",
-      "termsOfService": "Terms of Service"
-    },
-    "login": {
-      "createAccount": "Create one for free",
-      "error": "Invalid email or password. Please try again.",
-      "forgotPassword": "Forgot password?",
-      "noAccount": "Don't have an account?",
-      "passwordPlaceholder": "Enter your password",
-      "termsIntro": "By signing in, you agree to our",
-      "title": "Welcome back"
-    },
-    "newPassword": {
-      "confirmPlaceholder": "Re-enter your new password",
-      "error": "Failed to reset password. The link may have expired.",
-      "missingToken": "Invalid or missing reset token. Please request a new password reset link.",
-      "newPasswordPlaceholder": "Enter new password",
-      "requestNewLink": "Request a new link",
-      "submit": "Reset password",
-      "subtitle": "Enter your new password below.",
-      "success": "Your password has been reset successfully. Redirecting to sign in…",
-      "title": "Create new password"
-    },
-    "resetPassword": {
-      "error": "Failed to send reset instructions. Please try again.",
-      "submit": "Send reset instructions",
-      "subtitle": "Enter the email address associated with your account and we'll send you a link to reset your password.",
-      "success": "If an account exists with this email, you will receive password reset instructions shortly.",
-      "title": "Forgot password?"
-    },
-    "signUp": {
-      "error": "Registration failed. Please try again.",
-      "firstNamePlaceholder": "John",
-      "lastNamePlaceholder": "Doe",
-      "passwordPlaceholder": "Create a password",
-      "registerAsCoach": "Register as coach",
-      "registerAsCoachHint": "Coaches can create and manage sessions and clients",
-      "submit": "Create account",
-      "termsIntro": "By signing up, you agree to our",
-      "title": "Create your account"
-    },
-    "verifyEmail": {
-      "goToSignIn": "Go to sign in",
-      "invalidDefault": "This verification link is no longer valid. Request a new one from your profile.",
-      "missingDetail": "We couldn't find a verification token in this link. Try opening the email link directly, or request a new one from your profile after signing in.",
-      "requestNewHint": "and request a new verification email from your profile.",
-      "status": {
-        "invalid": "This link is no longer valid.",
-        "missing": "This link is missing its token.",
-        "success": "You're all set.",
-        "verifying": "Hold on while we confirm your link."
-      },
-      "talkingToServer": "Talking to the server…",
-      "title": "Verifying your email",
-      "verified": "Your email has been verified. Redirecting you to sign in…"
     }
   },
   "clients": {

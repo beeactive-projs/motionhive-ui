@@ -1,7 +1,6 @@
 /**
- * A notice's hue, one of the wash pairs in variables.css. `warning` matches
- * the session-row spine and Ionic's colour name; ion-badge's older `warn`
- * tone is a separate vocabulary.
+ * A notice's hue, one of the wash pairs in variables.css. The names match the
+ * badge and session-row tones and Ionic's colour names (`warning`, not `warn`).
  */
 export const NoticeTones = {
   Medium: 'medium',

@@ -84,7 +84,7 @@ export const BadgeTones = {
   Honey: 'honey',
   Teal: 'teal',
   Success: 'success',
-  Warn: 'warn',
+  Warning: 'warning',
   Info: 'info',
   Danger: 'danger',
   Violet: 'violet',
@@ -197,7 +197,7 @@ export interface LevelMeta {
 
 export const LEVEL_META: Record<ExerciseLevel, LevelMeta> = withEnumLabels('exerciseLevel', {
   [ExerciseLevel.Beginner]: { tone: BadgeTones.Success },
-  [ExerciseLevel.Intermediate]: { tone: BadgeTones.Warn },
+  [ExerciseLevel.Intermediate]: { tone: BadgeTones.Warning },
   [ExerciseLevel.Advanced]: { tone: BadgeTones.Danger },
 });
 
@@ -482,12 +482,12 @@ export function tileTone(color: string): HexAvatarTone {
 /**
  * The badge wash for each Ionic palette name a tile can wear, so a tile and
  * its chips can be handed the same colour. Most names are shared with the
- * badge vocabulary; `warning`, `primary` and `secondary` are the three the
- * stylesheet calls something else. A palette name with no wash (`dark`)
- * falls to the neutral default.
+ * badge vocabulary; `primary` and `secondary` are the two the stylesheet
+ * calls something else. A palette name with no wash (`dark`) falls to the
+ * neutral default.
  */
 const PALETTE_BADGE_TONE: Readonly<Record<string, BadgeTone>> = {
-  warning: BadgeTones.Warn,
+  warning: BadgeTones.Warning,
   primary: BadgeTones.Honey,
   secondary: BadgeTones.Navy,
   coral: BadgeTones.Coral,

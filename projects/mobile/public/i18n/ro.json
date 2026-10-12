@@ -48,7 +48,9 @@
       "deleteAccount": "Șterge contul",
       "deleteNote": "Ștergerea contului îți elimină definitiv profilul, programele și mesajele. Acțiunea nu poate fi anulată.",
       "logOut": "Deconectează-te",
-      "soon": "În curând"
+      "resendVerification": "Retrimite emailul de verificare",
+      "soon": "În curând",
+      "unverified": "Adresa {email} nu este încă verificată."
     },
     "memberSince": "Membru din {date}",
     "notifications": {
@@ -111,7 +113,9 @@
     "toast": {
       "copyFailed": "Linkul nu a putut fi copiat.",
       "timezoneFailed": "Fusul orar nu a putut fi actualizat.",
-      "timezoneUpdated": "Fus orar actualizat"
+      "timezoneUpdated": "Fus orar actualizat",
+      "verificationFailed": "Nu am putut retrimite. Dacă emailul e deja verificat sau ai cerut unul recent, încearcă din nou mai târziu.",
+      "verificationSent": "Email de verificare trimis. Verifică {email}."
     }
   },
   "accountSheets": {
@@ -215,68 +219,6 @@
         "copyFailed": "Linkul nu a putut fi copiat.",
         "shareFailed": "Linkul nu a putut fi distribuit."
       }
-    }
-  },
-  "auth": {
-    "common": {
-      "emailLabel": "Adresă de email",
-      "haveAccount": "Ai deja cont?",
-      "privacyPolicy": "Politica de confidențialitate",
-      "rememberPassword": "Îți amintești parola?",
-      "termsOfService": "Termenii și condițiile"
-    },
-    "login": {
-      "createAccount": "Creează un cont gratuit",
-      "error": "Emailul sau parola nu sunt corecte. Încearcă din nou.",
-      "forgotPassword": "Ai uitat parola?",
-      "noAccount": "Nu ai cont?",
-      "passwordPlaceholder": "Introdu parola",
-      "termsIntro": "Autentificându-te, ești de acord cu",
-      "title": "Bine ai revenit"
-    },
-    "newPassword": {
-      "confirmPlaceholder": "Introdu din nou parola nouă",
-      "error": "Parola nu a putut fi resetată. Probabil linkul a expirat.",
-      "missingToken": "Codul de resetare lipsește sau nu e valid. Cere un nou link de resetare a parolei.",
-      "newPasswordPlaceholder": "Introdu parola nouă",
-      "requestNewLink": "Cere un link nou",
-      "submit": "Resetează parola",
-      "subtitle": "Introdu mai jos noua parolă.",
-      "success": "Parola a fost resetată. Te redirecționăm către autentificare…",
-      "title": "Creează o parolă nouă"
-    },
-    "resetPassword": {
-      "error": "Instrucțiunile de resetare nu au putut fi trimise. Încearcă din nou.",
-      "submit": "Trimite instrucțiunile",
-      "subtitle": "Introdu adresa de email asociată contului tău și îți trimitem un link pentru resetarea parolei.",
-      "success": "Dacă există un cont cu acest email, vei primi în curând instrucțiunile de resetare a parolei.",
-      "title": "Ai uitat parola?"
-    },
-    "signUp": {
-      "error": "Înregistrarea a eșuat. Încearcă din nou.",
-      "firstNamePlaceholder": "Ion",
-      "lastNamePlaceholder": "Popescu",
-      "passwordPlaceholder": "Creează o parolă",
-      "registerAsCoach": "Înregistrează-te ca antrenor",
-      "registerAsCoachHint": "Antrenorii pot crea și gestiona sesiuni și clienți",
-      "submit": "Creează cont",
-      "termsIntro": "Creându-ți contul, ești de acord cu",
-      "title": "Creează-ți contul"
-    },
-    "verifyEmail": {
-      "goToSignIn": "Mergi la autentificare",
-      "invalidDefault": "Acest link de verificare nu mai este valid. Cere unul nou din profilul tău.",
-      "missingDetail": "Nu am găsit un token de verificare în acest link. Încearcă să deschizi direct linkul din email sau cere unul nou din profil după ce te autentifici.",
-      "requestNewHint": "și cere un nou email de verificare din profilul tău.",
-      "status": {
-        "invalid": "Acest link nu mai este valid.",
-        "missing": "Acestui link îi lipsește tokenul.",
-        "success": "Totul e gata.",
-        "verifying": "Așteaptă puțin cât confirmăm linkul."
-      },
-      "talkingToServer": "Comunicăm cu serverul…",
-      "title": "Îți verificăm emailul",
-      "verified": "Emailul tău a fost verificat. Te redirecționăm la autentificare…"
     }
   },
   "clients": {

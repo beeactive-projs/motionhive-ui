@@ -67,7 +67,21 @@ export function isFieldInvalid(field: { invalid(): boolean; touched(): boolean }
  * A submission's `onInvalid`: focuses the first field with an error, so
  * keyboard and screen reader users land on what needs fixing.
  * `form(model, schema, { submission: { action, onInvalid: focusFirstInvalid } })`.
+ *
+ * An Ionic input's host can't take focus: Ionic moves it to the inner input
+ * with `setFocus()`, so a bound element that has one is focused that way.
+ * Everything else (native inputs, custom controls with `focus()`) goes
+ * through Signal Forms' `focusBoundControl()`.
  */
 export function focusFirstInvalid(form: FieldTree<unknown>): void {
-  form().errorSummary()[0]?.fieldTree().focusBoundControl();
+  const field = form().errorSummary()[0]?.fieldTree;
+  if (!field) return;
+  const element = field().formFieldBindings()[0]?.element as
+    | (HTMLElement & { setFocus?: () => Promise<void> })
+    | undefined;
+  if (element?.setFocus) {
+    void element.setFocus();
+  } else {
+    field().focusBoundControl();
+  }
 }

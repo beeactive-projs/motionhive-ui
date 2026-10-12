@@ -27,8 +27,7 @@
     color: var(--p-surface-600);
   }
 
-  /* The marker is now the shared <mh-hex> primitive, which draws itself.
-     Here we only handle its alignment in the row. */
+  // The marker is the shared <mh-hex>, which draws itself; this only aligns it in the row.
   .mk {
     flex: none;
     margin-top: 0.15rem;

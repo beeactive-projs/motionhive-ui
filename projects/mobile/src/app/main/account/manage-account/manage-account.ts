@@ -14,6 +14,7 @@ import {
   IonRadioGroup,
   IonSelect,
   IonSelectOption,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   NavController,
@@ -66,6 +67,7 @@ import { AccountStore } from '../account.store';
     IonRadioGroup,
     IonSelect,
     IonSelectOption,
+    IonSpinner,
     IonTitle,
     IonToolbar,
     TranslatePipe,
@@ -95,9 +97,15 @@ export class ManageAccount implements OnInit {
   readonly timezonesMounted = signal(false);
   readonly savingTimezone = signal(false);
   readonly signingOut = signal(false);
+  readonly resendingVerification = signal(false);
 
   readonly account = this.store.account;
   readonly timezone = computed(() => this.account()?.timezone ?? null);
+  /** The account's email while it is unverified, else null (no resend row). */
+  readonly unverifiedEmail = computed(() => {
+    const account = this.account();
+    return account && !account.isEmailVerified ? account.email : null;
+  });
   readonly currentLanguage = this._languageService.current;
   /** Each language named in itself — someone lost in the wrong one can still find theirs. */
   readonly languageOptions = this._languageService.languages.map((value) => ({
@@ -148,6 +156,34 @@ export class ManageAccount implements OnInit {
           void this._feedbackService.error(
             error,
             this._translateService.instant('account.toast.timezoneFailed'),
+          );
+        },
+      });
+  }
+
+  /**
+   * Re-sends the email-verification link, the one the verify-email page's
+   * "request a new one" points to. The API is rate limited and idempotent.
+   */
+  onResendVerification(): void {
+    const email = this.unverifiedEmail();
+    if (!email || this.resendingVerification()) return;
+    this.resendingVerification.set(true);
+    this._authService
+      .resendVerification(email)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.resendingVerification.set(false);
+          void this._feedbackService.success(
+            this._translateService.instant('account.toast.verificationSent', { email }),
+          );
+        },
+        error: (error: unknown) => {
+          this.resendingVerification.set(false);
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.toast.verificationFailed'),
           );
         },
       });

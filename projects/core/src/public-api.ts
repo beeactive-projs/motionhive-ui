@@ -218,6 +218,7 @@ export * from './lib/services/user/user.service';
 export * from './lib/services/profile/profile.service';
 export * from './lib/services/geo/place-search.service';
 export * from './lib/services/client/client.service';
+export * from './lib/services/client/client-invite.service';
 export * from './lib/services/group/group.service';
 export * from './lib/services/group/groups-refresh.service';
 export * from './lib/services/post/post.service';
@@ -287,6 +288,8 @@ export * from './lib/components/hex/hex';
 export * from './lib/components/segmented/segmented';
 export * from './lib/components/hex/hex.types';
 export * from './lib/components/hex/hex-icons';
+export * from './lib/components/kicker/kicker';
+export * from './lib/components/check-list/check-list';
 export * from './lib/components/dialog-shell/dialog-shell';
 // Mobile-first primitives — sheet/sticky-cta.
 export * from './lib/components/bottom-sheet/bottom-sheet';

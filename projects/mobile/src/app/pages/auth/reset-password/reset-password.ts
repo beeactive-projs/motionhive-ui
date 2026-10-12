@@ -24,11 +24,12 @@ import {
   FieldErrorPipe,
   apiErrorMessage,
   emailSchema,
+  focusFirstInvalid,
   isFieldInvalid,
 } from 'core';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
+import { AuthHeader } from '../_components/auth-header/auth-header';
 import { Notice } from '../../../_shared/components/notice/notice';
-import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-invalid';
 
 /** Asks for a password reset link; the email leads to the new password page. */
 @Component({
@@ -49,6 +50,7 @@ import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-inval
     RouterLink,
     TranslatePipe,
     FieldErrorPipe,
+    AuthHeader,
     GuestControls,
     Notice,
   ],
@@ -68,7 +70,7 @@ export class ResetPassword {
 
   protected readonly model = signal({ email: '' });
   protected readonly form = form(this.model, emailSchema, {
-    submission: { action: async () => this.send(), onInvalid: focusFirstInvalidIonic },
+    submission: { action: async () => this.send(), onInvalid: focusFirstInvalid },
   });
 
   constructor() {
@@ -89,7 +91,7 @@ export class ResetPassword {
         },
         error: (err) =>
           this.errorMessage.set(
-            apiErrorMessage(err, this._translateService.instant('auth.resetPassword.error')),
+            apiErrorMessage(err, this._translateService.instant('auth.resetPassword.error.sendFailed')),
           ),
       });
   }

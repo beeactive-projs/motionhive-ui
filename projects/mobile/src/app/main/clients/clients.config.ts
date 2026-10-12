@@ -20,12 +20,12 @@ import { InstructorClient, InstructorClientStatuses, clientEmail, translate } fr
  * default state says nothing, like a booked session — so only the exceptions
  * get a wash.
  */
-export type ClientStatusTone = 'warn' | 'medium' | null;
+export type ClientStatusTone = 'warning' | 'medium' | null;
 
 export function clientStatusTone(client: InstructorClient): ClientStatusTone {
   switch (client.status) {
     case InstructorClientStatuses.Pending:
-      return 'warn';
+      return 'warning';
     case InstructorClientStatuses.Archived:
       return 'medium';
     default:

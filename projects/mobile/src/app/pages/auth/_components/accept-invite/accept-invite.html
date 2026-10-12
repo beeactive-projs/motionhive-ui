@@ -1,0 +1,40 @@
+<mh-auth-header title="auth.invite.title">
+  {{ 'auth.invite.signedInAs' | translate: { name: userName(), email: userEmail() } }}
+</mh-auth-header>
+
+@if (invalid()) {
+<mh-notice tone="danger" role="alert">{{ 'auth.signUp.error.invalidInvitation' | translate }}</mh-notice>
+<ion-button expand="block" class="auth-submit" (click)="goToApp()">
+  {{ 'auth.invite.goToApp' | translate }}
+  <ion-icon slot="end" name="arrow-forward" aria-hidden="true" />
+</ion-button>
+} @else {
+@if (invite()) {
+<mh-notice tone="info">{{ 'auth.invite.invitedBy' | translate: { coach: coachName() } }}</mh-notice>
+}
+@if (otherAddress(); as address) {
+<mh-notice tone="warning">{{ 'auth.invite.otherAddress' | translate: { email: address } }}</mh-notice>
+}
+@if (errorMessage(); as message) {
+<mh-notice tone="danger" role="alert">{{ message }}</mh-notice>
+}
+
+<ion-button expand="block" class="auth-submit" [disabled]="!invite() || isAccepting() || isSigningOut()"
+  (click)="accept()">
+  @if (isAccepting()) {
+  <ion-spinner name="crescent" />
+  } @else {
+  {{ 'auth.invite.accept' | translate }}
+  <ion-icon slot="end" name="checkmark" aria-hidden="true" />
+  }
+</ion-button>
+<ion-button expand="block" fill="outline" color="medium" class="auth-submit"
+  [disabled]="isAccepting() || isSigningOut()" (click)="signOut()">
+  @if (isSigningOut()) {
+  <ion-spinner name="crescent" />
+  } @else {
+  <ion-icon slot="start" name="log-out-outline" aria-hidden="true" />
+  {{ 'auth.invite.useAnotherAccount' | translate }}
+  }
+</ion-button>
+}

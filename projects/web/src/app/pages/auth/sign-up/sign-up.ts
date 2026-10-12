@@ -11,6 +11,7 @@ import {
   AUTH_FIELD_ERRORS,
   AuthService,
   AuthStore,
+  ClientInviteService,
   FieldErrorPipe,
   RegisterRequest,
   STORAGE_KEYS,
@@ -24,7 +25,7 @@ import { AcceptInvite } from '../_components/accept-invite/accept-invite';
 import { AuthHeader } from '../_components/auth-header/auth-header';
 import { SocialSignIn } from '../_components/social-sign-in/social-sign-in';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
-import { ClientInviteService } from '../_services/client-invite.service';
+import { INVITE_ACCEPTED_URL } from '../auth.const';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
 
 /**
@@ -166,7 +167,7 @@ export class SignUp {
       return;
     }
     this._clientInviteService.accept(token).subscribe({
-      next: () => void this._clientInviteService.openCoaches(),
+      next: () => void this._router.navigateByUrl(INVITE_ACCEPTED_URL),
       error: () => this.navigateIn(),
     });
   }

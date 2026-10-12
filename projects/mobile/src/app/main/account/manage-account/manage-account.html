@@ -69,6 +69,19 @@
     <section class="mh-section">
       <ion-note class="mh-kicker" color="medium">{{ 'account.sections.account' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
+        @if (unverifiedEmail(); as email) {
+          <ion-item button [detail]="false" [disabled]="resendingVerification()" lines="full"
+            (click)="onResendVerification()">
+            <ion-icon slot="start" name="mail-outline" aria-hidden="true" />
+            <ion-label class="ion-text-wrap">
+              {{ 'account.manage.resendVerification' | translate }}
+              <p>{{ 'account.manage.unverified' | translate: { email } }}</p>
+            </ion-label>
+            @if (resendingVerification()) {
+              <ion-spinner slot="end" name="crescent" />
+            }
+          </ion-item>
+        }
         <ion-item button [detail]="false" [disabled]="signingOut()" lines="full" (click)="onSignOut()">
           <ion-icon slot="start" name="log-out-outline" color="danger" aria-hidden="true" />
           <ion-label color="danger">{{ 'account.manage.logOut' | translate }}</ion-label>

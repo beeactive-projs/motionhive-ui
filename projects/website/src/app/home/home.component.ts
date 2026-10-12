@@ -9,7 +9,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
-import { BlogService, Hex, type BlogPost, type HexTone, SIGNUP_URL } from 'core';
+import { BlogService, CheckList, Hex, type BlogPost, type HexTone, Kicker, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
 import {
@@ -20,9 +20,7 @@ import {
   webAppLink,
 } from '../_shared/site.const';
 import { FEATURES } from '../_data/features';
-import { Kicker } from '../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../_shared/ui/section-header/section-header';
-import { CheckList } from '../_shared/ui/check-list/check-list';
 import { CtaBand } from '../_shared/ui/cta-band/cta-band';
 import { MediaDemo } from '../_shared/ui/media-demo/media-demo';
 import { FeatureCard } from '../_shared/ui/feature-card/feature-card';

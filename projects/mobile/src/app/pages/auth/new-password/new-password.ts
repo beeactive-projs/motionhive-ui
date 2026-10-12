@@ -24,13 +24,14 @@ import {
   AuthService,
   FieldErrorPipe,
   apiErrorMessage,
+  focusFirstInvalid,
   isFieldInvalid,
   newPasswordSchema,
 } from 'core';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
+import { AuthHeader } from '../_components/auth-header/auth-header';
 import { Notice } from '../../../_shared/components/notice/notice';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
-import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-invalid';
 
 /**
  * Sets a new password from the emailed reset link. Reachable only with a
@@ -55,6 +56,7 @@ import { focusFirstInvalidIonic } from '../../../_shared/utils/focus-first-inval
     IonToolbar,
     TranslatePipe,
     FieldErrorPipe,
+    AuthHeader,
     GuestControls,
     Notice,
     PasswordInput,
@@ -80,7 +82,7 @@ export class NewPassword {
 
   protected readonly model = signal({ newPassword: '', confirmPassword: '' });
   protected readonly form = form(this.model, newPasswordSchema, {
-    submission: { action: async () => this.save(), onInvalid: focusFirstInvalidIonic },
+    submission: { action: async () => this.save(), onInvalid: focusFirstInvalid },
   });
 
   constructor() {
@@ -102,7 +104,7 @@ export class NewPassword {
         },
         error: (err) =>
           this.errorMessage.set(
-            apiErrorMessage(err, this._translateService.instant('auth.newPassword.error')),
+            apiErrorMessage(err, this._translateService.instant('auth.newPassword.error.resetFailed')),
           ),
       });
   }

@@ -2,14 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, inject 
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
-import { Hex, SIGNUP_URL } from 'core';
+import { CheckList, Hex, Kicker, SIGNUP_URL } from 'core';
 
 import { SeoService } from '../../_shared/seo.service';
 import { isRoLocale, siteUrl, webAppLink } from '../../_shared/site.const';
 import { featureBySlug, relatedFeatures } from '../../_data/features';
-import { Kicker } from '../../_shared/ui/kicker/kicker';
 import { SectionHeader } from '../../_shared/ui/section-header/section-header';
-import { CheckList } from '../../_shared/ui/check-list/check-list';
 import { CtaBand } from '../../_shared/ui/cta-band/cta-band';
 import { MediaDemo } from '../../_shared/ui/media-demo/media-demo';
 import { FeatureCard } from '../../_shared/ui/feature-card/feature-card';

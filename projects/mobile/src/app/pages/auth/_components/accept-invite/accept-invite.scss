@@ -1,0 +1,9 @@
+// Takes the auth page's button skin (`ion-button.auth-submit`).
+@use '../../auth-shared';
+
+// One block of the page's column: the heading, the notices and both buttons.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

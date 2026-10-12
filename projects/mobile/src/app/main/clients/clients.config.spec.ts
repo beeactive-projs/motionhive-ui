@@ -261,7 +261,7 @@ describe('All clients rows', () => {
   // Active is the default state and says nothing; only the exceptions wear a chip.
   it('leaves active rows chip-silent', () => {
     expect(clientStatusTone(client())).toBeNull();
-    expect(clientStatusTone(client({ status: InstructorClientStatuses.Pending }))).toBe('warn');
+    expect(clientStatusTone(client({ status: InstructorClientStatuses.Pending }))).toBe('warning');
     expect(clientStatusTone(client({ status: InstructorClientStatuses.Archived }))).toBe('medium');
   });
 

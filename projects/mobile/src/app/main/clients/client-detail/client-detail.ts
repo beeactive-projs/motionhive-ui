@@ -132,7 +132,7 @@ export class ClientDetail implements ViewWillEnter {
       case InstructorClientStatuses.Archived:
         return 'medium';
       default:
-        return 'warn';
+        return 'warning';
     }
   });
 
