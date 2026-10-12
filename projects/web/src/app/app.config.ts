@@ -1,6 +1,7 @@
 import { ApplicationConfig, isDevMode, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
+import { provideSignalFormsConfig } from '@angular/forms/signals';
 import { provideServiceWorker } from '@angular/service-worker';
 import { providePrimeNG } from 'primeng/config';
 
@@ -9,6 +10,7 @@ import {
   languageInterceptor,
   environment,
   errorInterceptor,
+  isFieldInvalid,
   loadingInterceptor,
   provideAppI18n,
 } from 'core';
@@ -30,6 +32,13 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideAppI18n(),
+    provideSignalFormsConfig({
+      classes: {
+        // PrimeNG's invalid style on Signal Forms fields, shown on blur like
+        // the field's message (inputs can't take [invalid] next to [formField]).
+        'p-invalid': ({ state }) => isFieldInvalid(state()),
+      },
+    }),
     providePrimeNG({
       theme: {
         preset: MotionHiveLara,

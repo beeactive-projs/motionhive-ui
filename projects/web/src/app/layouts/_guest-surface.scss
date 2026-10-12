@@ -1,0 +1,19 @@
+@use 'variables' as *;
+
+// The faint honeycomb behind the guest layouts. Brand surface rule: navy
+// pattern on light, honey on dark. `$mask` fades it where text has to be read.
+@mixin honeycomb($mask: none) {
+  .honeycomb {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: $honeycomb-svg-navy;
+    background-size: 56px 100px;
+    mask-image: $mask;
+    pointer-events: none;
+  }
+
+  :host-context(.dark) .honeycomb {
+    background-image: $honeycomb-svg-primary;
+  }
+}

@@ -1,0 +1,11 @@
+<ion-buttons>
+  <ion-button [disabled]="switching()" (click)="switchLanguage()">
+    <ion-icon slot="start" name="globe-outline" aria-hidden="true" />
+    <span class="mh-visually-hidden">{{ 'a11y.changeLanguage' | translate }}</span>
+    {{ current.toUpperCase() }}
+  </ion-button>
+  <ion-button [attr.aria-label]="(isDark() ? 'a11y.switchToLightMode' : 'a11y.switchToDarkMode') | translate"
+    (click)="toggleTheme()">
+    <ion-icon slot="icon-only" [name]="isDark() ? 'sunny-outline' : 'moon-outline'" aria-hidden="true" />
+  </ion-button>
+</ion-buttons>

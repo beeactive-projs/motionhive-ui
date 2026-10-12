@@ -28,7 +28,7 @@ h1 {
 /* The same line when it is reporting a problem with the field above it —
    over a length limit, out of range. Global for the same reason. */
 .mh-helper.over {
-  color: var(--ion-color-danger);
+  color: var(--mh-color-danger-deep);
   font-weight: 600;
 }
 

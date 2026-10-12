@@ -16,6 +16,7 @@ import { UserRole } from '../../models/user/role.enums';
 import { TokenService } from './token.service';
 import { AuthStore } from '../../stores/auth.store';
 import { LanguageService } from '../i18n/language.service';
+import { UserService } from '../user/user.service';
 import { appLanguage } from '../../i18n/app-language';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
@@ -29,6 +30,7 @@ export class AuthService implements OnDestroy {
   private readonly _tokenService = inject(TokenService);
   private readonly _authStore = inject(AuthStore);
   private readonly _languageService = inject(LanguageService);
+  private readonly _userService = inject(UserService);
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -76,7 +78,18 @@ export class AuthService implements OnDestroy {
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
         switchMap(() => this.fetchAndStoreProfile()),
+        tap(() => this.saveDeviceTimezone()),
       );
+  }
+
+  /**
+   * The API doesn't take a timezone on register, so a new account stores the
+   * device's right after, in the background. A failure leaves the account on
+   * the server's default; the user can set it from their profile.
+   */
+  private saveDeviceTimezone(): void {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    this._userService.updateMe({ timezone }).subscribe({ error: () => undefined });
   }
 
   /**
@@ -88,12 +101,18 @@ export class AuthService implements OnDestroy {
     return { ...body, language: appLanguage() };
   }
 
+  /**
+   * Revokes the refresh token and ends the local session. The local session
+   * ends even when the request fails (offline, token already expired): a
+   * sign-out the user asked for must not leave them signed in. It is cleared
+   * before the caller's `next` or `error` runs, so either can navigate away.
+   */
   logout(): Observable<void> {
     return this._http
       .post<void>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGOUT}`, {
         refreshToken: this._tokenService.getRefreshToken(),
       })
-      .pipe(tap(() => this.clearAuthData()));
+      .pipe(tap({ next: () => this.clearAuthData(), error: () => this.clearAuthData() }));
   }
 
   googleLogin(request: GoogleLoginRequest): Observable<User> {

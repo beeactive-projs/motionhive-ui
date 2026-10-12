@@ -113,27 +113,43 @@
   },
   "auth": {
     "common": {
-      "confirmPasswordRequired": "Confirmă-ți parola",
       "createOneFree": "Creează unul gratuit",
       "emailAddress": "Adresă de email",
       "forgotPassword": "Ai uitat parola?",
       "googleFailed": "Autentificarea cu Google a eșuat. Încearcă din nou.",
       "haveAccount": "Ai deja cont?",
-      "homeLink": "Pagina principală MotionHive",
       "noAccount": "Nu ai cont?",
       "privacyPolicy": "Politica de confidențialitate",
       "rememberPassword": "Îți amintești parola?",
       "termsOfService": "Termenii și condițiile"
     },
+    "invite": {
+      "accept": "Acceptă invitația",
+      "acceptFailed": "Nu am putut accepta invitația. Încearcă din nou.",
+      "goToApp": "Mergi în aplicație",
+      "invitedBy": "Ai primit o invitație de la {coach} să devii client.",
+      "otherAddress": "Invitația a fost trimisă pe adresa {email}. Dacă o accepți, antrenorul va fi adăugat contului cu care ești autentificat.",
+      "signedInAs": "Ești autentificat ca {name} ({email}).",
+      "title": "Acceptă invitația",
+      "useAnotherAccount": "Folosește alt cont"
+    },
+    "layout": {
+      "guarantees": {
+        "noCard": "Fără card",
+        "noSubscription": "Fără abonament",
+        "unlimitedClients": "Clienți nelimitați"
+      },
+      "kicker": "Pentru antrenori și comunitățile lor"
+    },
     "login": {
       "error": {
-        "facebookFailed": "Autentificarea cu Facebook a eșuat. Încearcă din nou.",
         "invalidCredentials": "Email sau parolă greșită. Încearcă din nou."
       },
       "heroHighlight": "aici.",
       "heroLine1": "Drumul tău în fitness",
       "heroLine2": "începe",
       "heroSubtitle": "Ține evidența antrenamentelor, conectează-te cu antrenori și atinge-ți obiectivele, totul într-un singur loc, creat pentru oamenii care se mișcă.",
+      "inviteBanner": "Autentifică-te ca să accepți invitația de la {coach}.",
       "orContinueWith": "sau continuă cu",
       "passwordPlaceholder": "Introdu parola",
       "termsIntro": "Autentificându-te, ești de acord cu",
@@ -149,6 +165,7 @@
       "heroLine1": "Alege-ți",
       "heroSubtitle": "Alege o parolă puternică pentru a-ți păstra contul în siguranță. Aproape ai revenit pe drumul cel bun.",
       "newPasswordPlaceholder": "Introdu parola nouă",
+      "requestNewLink": "Cere un link nou",
       "submit": "Resetează parola",
       "subtitle": "Introdu mai jos noua parolă.",
       "success": "Parola a fost resetată cu succes. Te redirecționăm la autentificare...",
@@ -171,7 +188,6 @@
     "signUp": {
       "coachHint": "Antrenorii pot crea și gestiona sesiuni și clienți",
       "error": {
-        "facebookFailed": "Înregistrarea cu Facebook a eșuat. Încearcă din nou.",
         "invalidInvitation": "Acest link de invitație este invalid sau a expirat.",
         "registrationFailed": "Înregistrarea a eșuat. Încearcă din nou."
       },
@@ -184,6 +200,7 @@
       "invitedByStart": "Ai fost invitat de",
       "lastNamePlaceholder": "Popescu",
       "orSignUpWith": "sau creează cont cu",
+      "passwordPlaceholder": "Creează o parolă",
       "registerAsCoach": "Înregistrează-te ca antrenor",
       "submit": "Creează cont",
       "termsIntro": "Creându-ți contul, ești de acord cu",
@@ -883,9 +900,8 @@
         "instagramHint": "Lipește-l în bio-ul de Instagram, în story sau într-un mesaj."
       }
     },
-    "themeToggle": {
-      "switchToDark": "Treci la modul întunecat",
-      "switchToLight": "Treci la modul luminos"
+    "siteHeader": {
+      "homeLink": "Pagina principală MotionHive"
     },
     "userSearch": {
       "empty": "Niciun utilizator găsit. Încearcă să-l inviți prin email.",
@@ -964,10 +980,8 @@
     }
   },
   "errorPages": {
-    "backToHomepage": "Înapoi la pagina principală",
     "goBack": "Înapoi",
     "goHome": "Acasă",
-    "homeLink": "Pagina principală MotionHive",
     "notFound": {
       "message": "Pagina asta nu există, dar următorul tău antrenament da. Hai să te readucem pe drumul cel bun.",
       "title": "Ai luat-o pe alt drum."
@@ -3736,6 +3750,9 @@
       "joinAria": "Intră în {name}",
       "subtitle": "Antrenează-te alături de oameni cu aceleași obiective",
       "title": "Comunitățile mele"
+    },
+    "header": {
+      "joinFree": "Înscrie-te gratuit"
     },
     "hero": {
       "acceptingClients": "Acceptă clienți",

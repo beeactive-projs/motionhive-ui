@@ -15,7 +15,7 @@ import { filter } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { FeedbackService, Logo, NavItem, NavMode, NavSection, Segmented } from 'core';
-import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
+import { ThemeToggle } from '../../_shared/components/theme-toggle/theme-toggle';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchModal } from '../../_shared/components/search-modal/search-modal';
@@ -29,7 +29,7 @@ import { InstallApp } from '../../_shared/components/install-app/install-app';
     RouterLinkActive,
     ButtonDirective,
     ToolbarModule,
-    ThemeToggleComponent,
+    ThemeToggle,
     Logo,
     ProfileMenu,
     NotificationBell,

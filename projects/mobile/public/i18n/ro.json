@@ -219,7 +219,11 @@
   },
   "auth": {
     "common": {
-      "emailLabel": "Adresă de email"
+      "emailLabel": "Adresă de email",
+      "haveAccount": "Ai deja cont?",
+      "privacyPolicy": "Politica de confidențialitate",
+      "rememberPassword": "Îți amintești parola?",
+      "termsOfService": "Termenii și condițiile"
     },
     "login": {
       "createAccount": "Creează un cont gratuit",
@@ -227,47 +231,52 @@
       "forgotPassword": "Ai uitat parola?",
       "noAccount": "Nu ai cont?",
       "passwordPlaceholder": "Introdu parola",
-      "subtitle": "Autentifică-te ca să-ți gestionezi clienții și cererile.",
+      "termsIntro": "Autentificându-te, ești de acord cu",
       "title": "Bine ai revenit"
     },
     "newPassword": {
       "confirmPlaceholder": "Introdu din nou parola nouă",
       "error": "Parola nu a putut fi resetată. Probabil linkul a expirat.",
       "missingToken": "Codul de resetare lipsește sau nu e valid. Cere un nou link de resetare a parolei.",
+      "newPasswordPlaceholder": "Introdu parola nouă",
       "requestNewLink": "Cere un link nou",
       "submit": "Resetează parola",
-      "subtitle": "Alege o parolă nouă pentru contul tău.",
+      "subtitle": "Introdu mai jos noua parolă.",
       "success": "Parola a fost resetată. Te redirecționăm către autentificare…",
-      "title": "Parolă nouă"
+      "title": "Creează o parolă nouă"
     },
     "resetPassword": {
       "error": "Instrucțiunile de resetare nu au putut fi trimise. Încearcă din nou.",
       "submit": "Trimite instrucțiunile",
-      "subtitle": "Introdu adresa de email asociată contului și îți trimitem instrucțiunile pentru resetarea parolei.",
+      "subtitle": "Introdu adresa de email asociată contului tău și îți trimitem un link pentru resetarea parolei.",
       "success": "Dacă există un cont cu acest email, vei primi în curând instrucțiunile de resetare a parolei.",
-      "title": "Resetează parola"
+      "title": "Ai uitat parola?"
     },
     "signUp": {
-      "confirmPasswordRequired": "Confirmă parola.",
       "error": "Înregistrarea a eșuat. Încearcă din nou.",
       "firstNamePlaceholder": "Ion",
       "lastNamePlaceholder": "Popescu",
+      "passwordPlaceholder": "Creează o parolă",
       "registerAsCoach": "Înregistrează-te ca antrenor",
       "registerAsCoachHint": "Antrenorii pot crea și gestiona sesiuni și clienți",
       "submit": "Creează cont",
-      "terms": "Prin înregistrare, ești de acord cu termenii de utilizare și cu politica de confidențialitate.",
-      "title": "Creează cont"
+      "termsIntro": "Creându-ți contul, ești de acord cu",
+      "title": "Creează-ți contul"
     },
     "verifyEmail": {
-      "backToSignIn": "Înapoi la autentificare",
-      "continue": "Continuă spre autentificare",
-      "failedMessage": "Acest link de verificare nu mai este valid. Cere unul nou și încearcă din nou.",
-      "failedTitle": "Verificarea a eșuat",
-      "missingMessage": "Acest link de verificare este incomplet. Deschide din nou linkul din email sau autentifică-te ca să ceri unul nou.",
-      "missingTitle": "Link incomplet",
-      "successMessage": "Emailul tău a fost verificat. Te redirecționăm către autentificare…",
-      "successTitle": "Email verificat",
-      "verifying": "Îți verificăm emailul…"
+      "goToSignIn": "Mergi la autentificare",
+      "invalidDefault": "Acest link de verificare nu mai este valid. Cere unul nou din profilul tău.",
+      "missingDetail": "Nu am găsit un token de verificare în acest link. Încearcă să deschizi direct linkul din email sau cere unul nou din profil după ce te autentifici.",
+      "requestNewHint": "și cere un nou email de verificare din profilul tău.",
+      "status": {
+        "invalid": "Acest link nu mai este valid.",
+        "missing": "Acestui link îi lipsește tokenul.",
+        "success": "Totul e gata.",
+        "verifying": "Așteaptă puțin cât confirmăm linkul."
+      },
+      "talkingToServer": "Comunicăm cu serverul…",
+      "title": "Îți verificăm emailul",
+      "verified": "Emailul tău a fost verificat. Te redirecționăm la autentificare…"
     }
   },
   "clients": {

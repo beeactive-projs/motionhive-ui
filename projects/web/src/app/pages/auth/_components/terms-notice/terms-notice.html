@@ -1,0 +1,10 @@
+<p class="text-xs text-center leading-relaxed text-surface-600 dark:text-surface-300">
+  {{ intro() | translate }}
+  <a [href]="termsUrl" target="_blank" rel="noopener noreferrer" class="mh-link">
+    {{ 'auth.common.termsOfService' | translate }}<span class="sr-only"> {{ 'a11y.opensInNewTab' | translate }}</span>
+  </a>
+  {{ 'common.and' | translate }}
+  <a [href]="privacyUrl" target="_blank" rel="noopener noreferrer" class="mh-link">
+    {{ 'auth.common.privacyPolicy' | translate }}<span class="sr-only"> {{ 'a11y.opensInNewTab' | translate }}</span>
+  </a>.
+</p>

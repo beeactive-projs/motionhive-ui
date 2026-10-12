@@ -1,0 +1,44 @@
+<mh-auth-header title="auth.verifyEmail.title">
+  @switch (state()) {
+  @case (States.Verifying) { {{ 'auth.verifyEmail.status.verifying' | translate }} }
+  @case (States.Success) { {{ 'auth.verifyEmail.status.success' | translate }} }
+  @case (States.Invalid) { {{ 'auth.verifyEmail.status.invalid' | translate }} }
+  @case (States.Missing) { {{ 'auth.verifyEmail.status.missing' | translate }} }
+  }
+</mh-auth-header>
+
+<div class="flex flex-col gap-6 animate-fade-in">
+  @switch (state()) {
+  @case (States.Verifying) {
+  <div class="flex flex-col items-center gap-4 py-8" role="status">
+    <p-progress-spinner class="size-12" strokeWidth="3" [ariaLabel]="'auth.verifyEmail.title' | translate" />
+    <p class="text-sm text-surface-600 dark:text-surface-300">{{ 'auth.verifyEmail.talkingToServer' | translate }}</p>
+  </div>
+  }
+
+  @case (States.Success) {
+  <p-message severity="success" icon="pi pi-check-circle">{{ 'auth.verifyEmail.verified' | translate }}</p-message>
+  <button pButton type="button" routerLink="/auth/login" fluid size="large">
+    {{ 'auth.verifyEmail.goToSignIn' | translate }}
+    <i class="pi pi-arrow-right"></i>
+  </button>
+  }
+
+  @case (States.Invalid) {
+  <p-message severity="error">{{ errorMessage() }}</p-message>
+  <p class="text-center text-xs leading-relaxed text-surface-600 dark:text-surface-300">
+    {{ 'auth.common.haveAccount' | translate }}
+    <a routerLink="/auth/login" class="mh-link">{{ 'button.signIn' | translate }}</a>
+    {{ 'auth.verifyEmail.requestNewHint' | translate }}
+  </p>
+  }
+
+  @case (States.Missing) {
+  <p-message severity="warn">{{ 'auth.verifyEmail.missingDetail' | translate }}</p-message>
+  <button pButton type="button" routerLink="/auth/login" fluid size="large">
+    {{ 'auth.verifyEmail.goToSignIn' | translate }}
+    <i class="pi pi-arrow-right"></i>
+  </button>
+  }
+  }
+</div>

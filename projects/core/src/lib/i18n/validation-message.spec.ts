@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { maxLengthError, minLengthError, requiredError } from '@angular/forms/signals';
 
 import { validationMessage } from './validation-message';
 
@@ -32,5 +33,23 @@ describe('validationMessage', () => {
 
   it('falls back to a generic message for an unknown validator', () => {
     expect(validationMessage({ notAHandle: true })).toBe('Invalid value.');
+  });
+
+  describe('Signal Forms errors', () => {
+    it('words them like their reactive counterparts, with their limits', () => {
+      expect(validationMessage([requiredError()])).toBe('This field is required.');
+      expect(validationMessage([minLengthError(2)])).toBe('Must be at least 2 characters.');
+      expect(validationMessage([maxLengthError(50)])).toBe('Must be 50 characters or fewer.');
+    });
+
+    // Overrides are keyed by the reactive name: AUTH_FIELD_ERRORS relies on this.
+    it('applies a minLength override under its reactive name', () => {
+      const overrides = { minlength: 'validation.passwordMismatch' };
+      expect(validationMessage([minLengthError(2)], overrides)).toBe('Passwords do not match.');
+    });
+
+    it('falls back to a generic message for an unknown kind', () => {
+      expect(validationMessage([{ kind: 'notAHandle' }])).toBe('Invalid value.');
+    });
   });
 });

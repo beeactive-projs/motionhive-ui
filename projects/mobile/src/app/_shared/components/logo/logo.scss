@@ -1,14 +1,36 @@
-// The mark is honey on both surfaces.
-//
-// Web and the marketing site both carry the honey logo as their identity
-// (`logo-honey-192.png`); the navy variant exists only for the social share
-// card, where it sits on a navy fill. Mobile was the one place showing navy
-// on a light surface, which read as a different product.
-//
-// Honey on white is 2.05:1 — fine for a logo, which is a graphic rather than
-// text, and the mark's own weight carries it. Text on honey still goes
-// through `--mh-color-honey-deep`.
+// Navy on light, honey on dark: the brand surface rule, and what web's
+// `mh-logo` (core) renders (`logo-navy.svg` / `logo-honey.svg`). The navy
+// slot doesn't flip in dark mode, so dark switches to primary explicitly.
 svg {
   display: block;
+  fill: var(--ion-color-secondary);
+}
+
+:host-context(.ion-palette-dark) svg {
   fill: var(--ion-color-primary);
+}
+
+// The unlinked lockup (auth pages): the web site header's mark + wordmark,
+// mark at its 2.5rem width there, wordmark in the heading face beside it.
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+
+  svg {
+    width: 2.5rem;
+    height: auto;
+  }
+}
+
+.wordmark {
+  color: var(--ion-color-secondary);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-xl);
+  font-weight: 800;
+  line-height: var(--mh-leading-none);
+}
+
+:host-context(.ion-palette-dark) .wordmark {
+  color: var(--ion-color-primary);
 }

@@ -1,3 +1,5 @@
+import type { ParamMap } from '@angular/router';
+
 /**
  * Canonicalize a URL the user pasted. Designed to be forgiving of
  * common copy-paste shapes:
@@ -73,4 +75,30 @@ export function detectMeetingProvider(
   } catch {
     return null;
   }
+}
+
+/**
+ * True for a path inside this app (`/groups/1?tab=a`), false for anything that
+ * could leave it (`https://…`, protocol-relative `//evil.com`, `javascript:`).
+ * Control characters fail too: browsers drop tabs and newlines from a URL, so
+ * `/\t/evil.com` would become `//evil.com` if it ever reached `location.href`.
+ * Use before navigating to a URL taken from a query param such as `returnUrl`.
+ */
+export function isInAppPath(value: string | null | undefined): value is string {
+  return (
+    !!value &&
+    value.startsWith('/') &&
+    !value.startsWith('//') &&
+    !value.startsWith('/\\') &&
+    !/[\u0000-\u001F\u007F]/.test(value)
+  );
+}
+
+/**
+ * Where to go after a guest page (sign in, sign up): the `returnUrl` query
+ * param when it is an in-app path, else `fallback` (usually `APP_HOME_URL`).
+ */
+export function resolveReturnUrl(params: ParamMap, fallback: string): string {
+  const returnUrl = params.get('returnUrl');
+  return isInAppPath(returnUrl) ? returnUrl : fallback;
 }

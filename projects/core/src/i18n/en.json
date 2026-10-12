@@ -2,6 +2,7 @@
   "a11y": {
     "back": "Back",
     "bottomSheet": "Bottom sheet",
+    "changeLanguage": "Change language",
     "close": "Close",
     "closePhoto": "Close photo",
     "closeSearch": "Close search",
@@ -13,10 +14,15 @@
     "notificationsUnread": "Notifications, {count} unread",
     "openMenu": "Open menu",
     "openNotifications": "Open notifications",
+    "opensInNewTab": "(opens in a new tab)",
     "playVideo": "Play video",
     "previousMonth": "Previous month",
     "removeItem": "Remove {name}",
+    "requirementMet": "{label}: met",
+    "requirementNotMet": "{label}: not met",
     "showPassword": "Show password",
+    "switchToDarkMode": "Switch to dark mode",
+    "switchToLightMode": "Switch to light mode",
     "unread": "Unread"
   },
   "button": {
@@ -444,7 +450,14 @@
   "form": {
     "hint": {
       "optional": "(optional)",
-      "passwordMinLength": "Min. 8 characters",
+      "passwordRule": {
+        "length": "8+ characters",
+        "lowercase": "Lowercase letter",
+        "number": "Number",
+        "symbol": "Special character",
+        "uppercase": "Uppercase letter"
+      },
+      "passwordRules": "Password requirements",
       "reenterPassword": "Re-enter your password"
     },
     "label": {
@@ -610,6 +623,19 @@
     }
   },
   "validation": {
+    "auth": {
+      "confirmPasswordRequired": "Enter your password again to confirm it.",
+      "emailInvalid": "Enter a valid email address, like name@example.com.",
+      "emailRequired": "Enter your email address.",
+      "firstNameMinLength": "Your first name needs at least {min, plural, one {# character} other {# characters}}.",
+      "firstNameRequired": "Enter your first name.",
+      "lastNameMinLength": "Your last name needs at least {min, plural, one {# character} other {# characters}}.",
+      "lastNameRequired": "Enter your last name.",
+      "newPasswordRequired": "Create a password.",
+      "passwordMismatch": "This doesn't match the password above.",
+      "passwordRequired": "Enter your password.",
+      "passwordStrength": "Your password doesn't meet all the requirements yet."
+    },
     "email": "Please enter a valid email address.",
     "emailTooLong": "An email address cannot be longer than {max} characters.",
     "emailWithExample": "Enter a valid email address, like client@example.com.",

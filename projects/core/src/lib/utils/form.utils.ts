@@ -26,3 +26,27 @@ export function trimmedMinLength(min: number): ValidatorFn {
       : null;
   };
 }
+
+/** One requirement of the password policy, with the translation key of its short label. */
+export interface PasswordRule {
+  labelKey: string;
+  test: (password: string) => boolean;
+}
+
+/**
+ * The password policy the API enforces on sign up and reset (its
+ * `IsStrongPassword`), one rule per requirement so a form can show each one
+ * as met or not while the user types. The `strongPassword` Signal Forms rule
+ * is built from this list, so the two can't drift apart.
+ */
+export const PASSWORD_RULES: readonly PasswordRule[] = [
+  { labelKey: 'form.hint.passwordRule.length', test: (p) => p.length >= 8 },
+  { labelKey: 'form.hint.passwordRule.uppercase', test: (p) => /[A-Z]/.test(p) },
+  { labelKey: 'form.hint.passwordRule.lowercase', test: (p) => /[a-z]/.test(p) },
+  { labelKey: 'form.hint.passwordRule.number', test: (p) => /[0-9]/.test(p) },
+  {
+    labelKey: 'form.hint.passwordRule.symbol',
+    // Exactly the API's symbol set: a backtick or `~` alone fails there.
+    test: (p) => /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?]/.test(p),
+  },
+];

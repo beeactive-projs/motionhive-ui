@@ -1,0 +1,10 @@
+<p>
+  {{ intro() | translate }}
+  <ion-button fill="clear" class="mh-text-link inline" target="_blank" rel="noopener noreferrer" [href]="termsUrl">
+    {{ 'auth.common.termsOfService' | translate }}<span class="mh-visually-hidden"> {{ 'a11y.opensInNewTab' | translate }}</span>
+  </ion-button>
+  {{ 'common.and' | translate }}
+  <ion-button fill="clear" class="mh-text-link inline" target="_blank" rel="noopener noreferrer" [href]="privacyUrl">
+    {{ 'auth.common.privacyPolicy' | translate }}<span class="mh-visually-hidden"> {{ 'a11y.opensInNewTab' | translate }}</span>
+  </ion-button>.
+</p>

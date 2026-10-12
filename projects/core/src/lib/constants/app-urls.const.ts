@@ -1,6 +1,7 @@
+import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { AppLanguage } from '../models/common/language.enums';
-import { LANGUAGE_URL_PARAM } from './languages.const';
+import { DEFAULT_LANGUAGE, LANGUAGE_URL_PARAM } from './languages.const';
 
 /**
  * Base origin of the authenticated MotionHive web app (e.g.
@@ -16,6 +17,15 @@ export const SIGNUP_URL = `${WEB_APP_URL}/auth/signup`;
 
 /** Login page on the web app. */
 export const LOGIN_URL = `${WEB_APP_URL}/auth/login`;
+
+/**
+ * The in-app path a signed-in user lands on when a guest page (sign in, sign
+ * up, `guestGuard`) sends them into the app. Web keeps the default; mobile
+ * provides its tab root (`/tabs/home`).
+ */
+export const APP_HOME_URL = new InjectionToken<string>('APP_HOME_URL', {
+  factory: () => '/home',
+});
 
 /**
  * A web app link that opens the app in `language` rather than the device's
@@ -41,11 +51,31 @@ export const MARKETING_BLOG_URL = `${MARKETING_SITE_URL}/blog`;
 /**
  * Legal pages. They live ONLY on the marketing site — the web app has no
  * `/legal/*` routes — so anything in the app (login, signup, consent copy)
- * must link out with these absolute URLs, not a `routerLink`.
+ * must link out with absolute URLs (`termsOfServiceUrl`, `privacyPolicyUrl`),
+ * not a `routerLink`.
  */
-export const TERMS_OF_SERVICE_URL = `${MARKETING_SITE_URL}/legal/terms-of-service`;
-export const PRIVACY_POLICY_URL = `${MARKETING_SITE_URL}/legal/privacy-policy`;
-export const COOKIE_POLICY_URL = `${MARKETING_SITE_URL}/legal/cookie-policy`;
+export const TERMS_OF_SERVICE_PATH = '/legal/terms-of-service';
+export const PRIVACY_POLICY_PATH = '/legal/privacy-policy';
+
+/**
+ * A marketing site page in `language`. The site serves the default language at
+ * the root and every other one under its code: `marketingSiteUrl('/', 'ro')` is
+ * `…/ro/`, `marketingSiteUrl(PRIVACY_POLICY_PATH, 'en')` is `…/legal/privacy-policy`.
+ */
+export function marketingSiteUrl(path: string, language: AppLanguage): string {
+  const prefix = language === DEFAULT_LANGUAGE ? '' : `/${language}`;
+  return `${MARKETING_SITE_URL}${prefix}${path}`;
+}
+
+/** The terms of service on the marketing site, in `language`. */
+export function termsOfServiceUrl(language: AppLanguage): string {
+  return marketingSiteUrl(TERMS_OF_SERVICE_PATH, language);
+}
+
+/** The privacy policy on the marketing site, in `language`. */
+export function privacyPolicyUrl(language: AppLanguage): string {
+  return marketingSiteUrl(PRIVACY_POLICY_PATH, language);
+}
 
 /**
  * A coach's public profile — the one URL in this product that a stranger can

@@ -123,6 +123,33 @@ ion-item ion-button[fill='clear'] {
   --color: var(--mh-color-honey-deep);
 }
 
+/* The same fix for a clear button used as a text link on a page ("Forgot
+   password?", "Create one for free"), which sits on the page surface rather
+   than in a row. */
+ion-button.mh-text-link {
+  --color: var(--mh-color-honey-deep);
+}
+
+/* …and one that sits inside a sentence ("Don't have an account? Create one
+   for free"): no button box, so the words run on the line like a link. Still
+   an ion-button, the app's rule for anything tappable; give it `href` and
+   `target` for a page outside the app. */
+ion-button.mh-text-link.inline {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  font-size: inherit;
+  font-weight: 600;
+  letter-spacing: normal;
+  /* Measured: `baseline` leaves the words 2px above the sentence (Ionic's
+     inner button has its own line box); this lands them on it. */
+  vertical-align: -0.125rem;
+}
+
 /* "Add …" as a dashed outline: reads as "make something", not as a filled
    row that already exists. An outline ion-button with the border restyled —
    Ionic exposes the style and width, so no wrapper is needed. */

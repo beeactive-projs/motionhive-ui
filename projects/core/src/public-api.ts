@@ -8,6 +8,7 @@ export * from './lib/models/auth/register.model';
 export * from './lib/models/auth/auth-response.model';
 export * from './lib/models/auth/password-reset.model';
 export * from './lib/models/auth/social-login.model';
+export * from './lib/models/auth/verify-email.enums';
 
 // Models - User — exports User, AvatarUser, UserInfo, UserSearchResult, …
 export * from './lib/models/user/user.model';
@@ -187,6 +188,8 @@ export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';
 export * from './lib/utils/exercise-tag.utils';
 export * from './lib/utils/form.utils';
+export * from './lib/utils/signal-form.utils';
+export * from './lib/utils/auth-form.schemas';
 export * from './lib/utils/messaging.utils';
 export * from './lib/utils/client.utils';
 export * from './lib/utils/email.utils';
@@ -201,6 +204,7 @@ export * from './lib/i18n/provide-app-i18n';
 export * from './lib/i18n/app-title.strategy';
 export * from './lib/i18n/merged-translate.loader';
 export * from './lib/i18n/validation-message';
+export * from './lib/i18n/auth-field-errors';
 export * from './lib/i18n/enum-label';
 export * from './lib/i18n/language-name';
 export * from './lib/i18n/message-format-translator';
@@ -307,6 +311,7 @@ export * from './lib/stores/my-bookings-index.store';
 
 // Guards
 export * from './lib/guards/auth.guard';
+export * from './lib/guards/guest.guard';
 export * from './lib/guards/role.guard';
 
 // Environment

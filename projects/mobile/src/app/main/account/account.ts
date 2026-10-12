@@ -183,15 +183,11 @@ export class Account implements OnInit, ViewWillEnter {
   onSignOut(): void {
     if (this.signingOut()) return;
     this.signingOut.set(true);
+    // logout() ends the local session even when the request fails (offline),
+    // so either way the user lands back on the login page.
     this._authService.logout().subscribe({
       next: () => this._leaveSession(),
-      // Even if the server call fails (e.g. offline), drop the local session so
-      // the user still lands back on the login page.
-      error: () => {
-        this.signingOut.set(false);
-        this.store.reset();
-        this._authService.clearAuthDataAndRedirect();
-      },
+      error: () => this._leaveSession(),
     });
   }
 

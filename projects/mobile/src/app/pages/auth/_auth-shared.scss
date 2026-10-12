@@ -1,17 +1,150 @@
 /*
- * Shared auth-page layout. Ionic has no utility for capping a form's
- * width on tablets or vertically centering a lone column — these two
- * rules are the only custom CSS the auth pages need.
+ * The web app's auth screen at phone width (its AuthLayout below `sm`), on
+ * mobile's theme tokens: a flat header with the logo, language and theme; one
+ * column with the title, a one-line subtitle, the form and its fine print; a
+ * faint honeycomb behind it. Every auth page `@use`s this file.
  */
-.auth-container {
-  width: 100%;
-  max-width: 28rem;
-  margin-inline: auto;
+
+// Header: flat with a hairline like web's site header, not Material's drop
+// shadow (the page puts `ion-no-border` on ion-header). 4.375rem is web's bar.
+ion-toolbar {
+  --min-height: 4.375rem;
+  --padding-start: 1rem;
+  --padding-end: 0.5rem;
+  --border-width: 0 0 1px;
+  --border-color: var(--ion-border-color);
 }
 
-.auth-container--center {
+// Web's guest page is white. The app's slate-50 page exists so white cards
+// read on it; the auth pages have no cards, so they take the card surface.
+// Dark keeps the app's navy page.
+ion-content {
+  --background: var(--ion-card-background);
+}
+
+:host-context(.ion-palette-dark) ion-content {
+  --background: var(--ion-background-color);
+}
+
+// The honeycomb behind the page (`<div slot="fixed" class="honeycomb">`, with
+// `fixedSlotPlacement="before"` on ion-content: Ionic's default paints the
+// fixed slot over the scrolling content, lines across the fields and button).
+// Masked rather than drawn, so its colour is a theme token: navy on light,
+// honey on dark (the brand surface rule). One tile is web's 56 × 100, at
+// web's opacity, faded out to the right as web's AuthLayout does so it
+// never sits behind the text that has to be read.
+.honeycomb {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background: var(--ion-color-secondary);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E")
+      0 0 / 3.5rem 6.25rem repeat,
+    linear-gradient(to right, black, transparent 70%);
+  mask-composite: intersect;
+  pointer-events: none;
+}
+
+:host-context(.ion-palette-dark) .honeycomb {
+  opacity: 0.05;
+  background: var(--ion-color-primary);
+}
+
+// The column: web's gutter, top/bottom padding and 1.5rem between blocks,
+// capped at the card width so a tablet doesn't stretch the form. Centred
+// vertically: at least the content's full height, with the blocks in the
+// middle; a page taller than the screen (sign-up) just scrolls.
+.auth-page {
+  position: relative;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 1.5rem;
   min-height: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+// Title + subtitle. With the column gap, 2rem to the form, as on web.
+.auth-head {
+  margin-bottom: 0.5rem;
+
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: var(--mh-text-2xl);
+    font-weight: 600;
+    letter-spacing: var(--mh-tracking-display);
+    line-height: var(--mh-leading-tight);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: var(--mh-text-base);
+    line-height: var(--mh-leading-tight);
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// An error hugs the field above it rather than taking a full form gap:
+// 0.25rem, as close as web's message sits under its input.
+form > .mh-helper {
+  margin: -0.75rem 0.25rem 0;
+}
+
+// "Forgot password?" under the password field, at the end of the line. It
+// stands alone, so unlike a link inside a sentence it keeps a full tap target:
+// the box is tap-target tall and the margins take back the space it adds, so
+// the words sit where they did without the box reaching over the field.
+.auth-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-block: -1rem -0.5rem;
+  font-size: var(--mh-text-sm);
+
+  ion-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    height: var(--mh-tap-target);
+    margin: 0;
+    font-size: inherit;
+    font-weight: 600;
+    letter-spacing: normal;
+  }
+}
+
+// "Register as coach": web's sizes, the label at body size, its hint a step down.
+ion-checkbox ion-label {
+  font-size: var(--mh-text-base);
+  font-weight: 500;
+
+  p {
+    font-size: var(--mh-text-sm);
+  }
+}
+
+// Web's primary button: flat, 2.875rem, the label at the field's size.
+ion-button.auth-submit {
+  --box-shadow: none;
+  height: 2.875rem;
+  margin: 0;
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+// The closing line ("Don't have an account? Create one for free").
+.auth-fine-print {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+  text-align: center;
 }

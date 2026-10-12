@@ -1,0 +1,36 @@
+<mh-auth-header title="auth.invite.title">
+  {{ 'auth.invite.signedInAs' | translate: { name: userName(), email: userEmail() } }}
+</mh-auth-header>
+
+<div class="flex flex-col gap-4 animate-fade-in">
+  @if (invalid()) {
+  <p-message severity="error">{{ 'auth.signUp.error.invalidInvitation' | translate }}</p-message>
+  <button pButton type="button" routerLink="/home" fluid size="large">
+    {{ 'auth.invite.goToApp' | translate }}
+    <i class="pi pi-arrow-right"></i>
+  </button>
+  } @else {
+  @if (invite()) {
+  <p-message severity="info" icon="pi pi-envelope">
+    {{ 'auth.invite.invitedBy' | translate: { coach: coachName() } }}
+  </p-message>
+  }
+  @if (otherAddress(); as address) {
+  <p-message severity="warn">{{ 'auth.invite.otherAddress' | translate: { email: address } }}</p-message>
+  }
+  @if (errorMessage(); as message) {
+  <p-message severity="error">{{ message }}</p-message>
+  }
+
+  <button pButton type="button" fluid size="large" class="mt-2"
+    [disabled]="!invite() || isAccepting() || isSigningOut()" (click)="accept()">
+    {{ 'auth.invite.accept' | translate }}
+    <i class="pi" [class]="isAccepting() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+  </button>
+  <button pButton type="button" fluid size="large" severity="secondary" outlined
+    [disabled]="isAccepting() || isSigningOut()" (click)="signOut()">
+    <i class="pi" [class]="isSigningOut() ? 'pi-spinner pi-spin' : 'pi-sign-out'"></i>
+    {{ 'auth.invite.useAnotherAccount' | translate }}
+  </button>
+  }
+</div>

@@ -1,27 +1,12 @@
-<div class="layout">
-  <p-toolbar>
-    <ng-template #start>
-      <a routerLink="/" class="brand" aria-label="MotionHive home">
-        <mh-logo styleClass="h-8 w-8" />
-      </a>
-    </ng-template>
-    <!-- <ng-template #center>
-      <nav class="primary-nav" aria-label="Public navigation">
-        <a routerLink="/auth/login">Explore coaches</a>
-        <a routerLink="/auth/login">Groups</a>
-        <a routerLink="/auth/login">For instructors</a>
-      </nav>
-    </ng-template> -->
-    <ng-template #end>
-      <div class="flex items-center gap-2">
-        <mh-theme-toggle />
-        <button pButton type="button" severity="secondary" text size="small" routerLink="/auth/login">Log in</button>
-        <button pButton type="button" size="small" routerLink="/auth/signup">Join free</button>
-      </div>
-    </ng-template>
-  </p-toolbar>
+<mh-site-header>
+  <button pButton type="button" severity="secondary" text size="small" class="hidden sm:inline-flex" routerLink="/auth/login">
+    {{ 'button.signIn' | translate }}
+  </button>
+  <button pButton type="button" size="small" routerLink="/auth/signup">
+    {{ 'publicProfile.header.joinFree' | translate }}
+  </button>
+</mh-site-header>
 
-  <main class="flex flex-col flex-1 p-4 overflow-auto relative">
-    <router-outlet />
-  </main>
-</div>
+<main class="relative flex flex-1 flex-col overflow-auto p-4">
+  <router-outlet />
+</main>

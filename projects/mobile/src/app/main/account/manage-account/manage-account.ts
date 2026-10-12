@@ -156,16 +156,16 @@ export class ManageAccount implements OnInit {
   onSignOut(): void {
     if (this.signingOut()) return;
     this.signingOut.set(true);
+    // logout() ends the local session even when the request fails (offline),
+    // so either way the user lands back on the login page.
     this._authService.logout().subscribe({
-      next: () => {
-        this.store.reset();
-        void this._navController.navigateRoot('/auth/login');
-      },
-      error: () => {
-        this.signingOut.set(false);
-        this.store.reset();
-        this._authService.clearAuthDataAndRedirect();
-      },
+      next: () => this._leaveSession(),
+      error: () => this._leaveSession(),
     });
+  }
+
+  private _leaveSession(): void {
+    this.store.reset();
+    void this._navController.navigateRoot('/auth/login');
   }
 }
