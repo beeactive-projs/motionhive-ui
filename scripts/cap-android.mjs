@@ -26,7 +26,9 @@ const MAIN_ACTIVITY = `${APP_ID}/.MainActivity`;
 const DEV_API_PORT = 3800;
 
 const isWindows = process.platform === 'win32';
-const gradlew = isWindows ? 'gradlew.bat' : './gradlew';
+// Absolute on Windows: cmd skips the current directory when resolving a bare
+// command if NoDefaultCurrentDirectoryInExePath is set.
+const gradlew = isWindows ? `"${join(ANDROID_DIR, 'gradlew.bat')}"` : './gradlew';
 
 /** Run a command, inheriting stdio, and exit on first failure. */
 function run(command, args, { cwd = ROOT, optional = false } = {}) {

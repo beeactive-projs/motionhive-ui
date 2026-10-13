@@ -119,7 +119,7 @@
     </button>
   </form>
 
-  <mh-social-sign-in label="auth.signUp.orSignUpWith" (googleCredential)="onGoogleCredential($event)"
+  <mh-social-sign-in (googleCredential)="onGoogleCredential($event)"
     (googleFailed)="onGoogleFailed()" />
 
   <mh-terms-notice intro="auth.signUp.termsIntro" />

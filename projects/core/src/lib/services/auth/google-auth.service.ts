@@ -49,7 +49,9 @@ function loadGoogleAccountsId(): Promise<GoogleAccountsId> {
 
   gsiLoad ??= new Promise<GoogleAccountsId>((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = GSI_SCRIPT_URL;
+    // Without `hl` the placeholder Google draws before its iframe loads
+    // follows the visitor's location, not the page.
+    script.src = `${GSI_SCRIPT_URL}?hl=${appLanguage()}`;
     script.async = true;
     script.onload = () => {
       const gsi = getGoogleAccountsId();
@@ -115,10 +117,14 @@ export class GoogleAuthService {
 
     gsi.renderButton(container, {
       type: 'standard',
+      // Also in dark mode: Google's dark themes put the logo on a white tile.
       theme: 'outline',
       size: 'large',
-      text: 'signin_with',
+      // Shown on both sign in and sign up.
+      text: 'continue_with',
       shape: 'rectangular',
+      // Logo beside the label, like our icon buttons, not pinned to the edge.
+      logo_alignment: 'center',
       width: container.offsetWidth,
       // Google otherwise picks its own language (browser/geo), which can
       // disagree with the page around the button.

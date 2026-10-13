@@ -1,14 +1,6 @@
-// Google's iframe must fill our button so any click on it lands on Google's.
-// Google inserts these nodes itself, so they carry no encapsulation attribute.
-.google-overlay ::ng-deep :is(div, iframe) {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-// Google's button is invisible, so show its keyboard focus on ours.
-.google:focus-within .p-button {
-  outline: var(--p-focus-ring-width) var(--p-focus-ring-style) var(--p-focus-ring-color);
-  outline-offset: var(--p-focus-ring-offset);
+// Holds the height of Google's button while its script loads.
+.google {
+  min-height: 2.75rem;
 }
 
 :host ::ng-deep .p-divider-content {
