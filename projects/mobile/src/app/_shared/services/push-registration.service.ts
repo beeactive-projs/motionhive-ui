@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { AuthStore, DevicePlatform, NotificationService, NotificationStore } from 'core';
+import { AuthStore, DevicePlatform, NotificationService, NotificationStore, environment } from 'core';
 
 import { queryParamsFor, routeFor } from '../config/notification-deep-link';
 import type { NotificationData } from 'core';
@@ -35,7 +35,11 @@ export class PushRegistrationService {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
 
-  private readonly available = Capacitor.isNativePlatform();
+  // Production builds only. On Android, register() needs Firebase, which is
+  // configured by google-services.json; that file is gitignored and only CI
+  // restores it. Without it the plugin throws natively and kills the app,
+  // which no JS try/catch can stop, so dev builds never touch the plugin.
+  private readonly available = Capacitor.isNativePlatform() && environment.production;
   private listeners: PluginListenerHandle[] = [];
   private registeredDeviceId: string | null = null;
   private started = false;
