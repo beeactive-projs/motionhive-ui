@@ -65,7 +65,6 @@
       "heroLine2": "starts",
       "heroSubtitle": "Track workouts, connect with trainers, and crush your goals, all in one place built for people who move.",
       "inviteBanner": "Sign in to accept the invitation from {coach}.",
-      "orContinueWith": "or continue with",
       "passwordPlaceholder": "Enter your password",
       "termsIntro": "By signing in, you agree to our",
       "title": "Welcome back"
@@ -114,7 +113,6 @@
       "invitedByEnd": "to join as a client. Complete the form below to accept.",
       "invitedByStart": "You've been invited by",
       "lastNamePlaceholder": "Doe",
-      "orSignUpWith": "or sign up with",
       "passwordPlaceholder": "Create a password",
       "registerAsCoach": "Register as coach",
       "submit": "Create account",

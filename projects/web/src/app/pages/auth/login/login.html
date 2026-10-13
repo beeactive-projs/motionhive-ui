@@ -53,7 +53,7 @@
     </button>
   </form>
 
-  <mh-social-sign-in label="auth.login.orContinueWith" (googleCredential)="onGoogleCredential($event)"
+  <mh-social-sign-in (googleCredential)="onGoogleCredential($event)"
     (googleFailed)="onGoogleFailed()" />
 
   <mh-terms-notice intro="auth.login.termsIntro" />

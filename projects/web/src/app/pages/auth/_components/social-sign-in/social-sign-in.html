@@ -1,13 +1,11 @@
 <p-divider align="center">
-  {{ label() | translate }}
+  {{ 'common.or' | translate }}
 </p-divider>
 
-<div class="google relative">
-  <button pButton type="button" fluid size="large" severity="secondary" outlined tabindex="-1" aria-hidden="true"
-    [disabled]="googleUnavailable()">
+<div #googleButton class="google flex justify-center" [class.hidden]="googleUnavailable()"></div>
+@if (googleUnavailable()) {
+  <button pButton type="button" fluid size="large" severity="secondary" outlined disabled>
     <i class="pi pi-google"></i>
     Google
   </button>
-  <div #googleButton class="google-overlay absolute inset-0 overflow-hidden opacity-0"
-    [class.cursor-pointer]="!googleUnavailable()"></div>
-</div>
+}
