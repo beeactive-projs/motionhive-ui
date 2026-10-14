@@ -29,6 +29,7 @@ import {
   PublicUserProfile,
   appLocale,
   countryNameFromCode,
+  publicProfileUrl,
   translate,
 } from 'core';
 
@@ -144,11 +145,19 @@ export class Person {
     return new Date(iso).toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' });
   });
 
-  /** Contact rows only exist when the viewer's tier includes them. */
-  readonly hasContactDetails = computed(() => {
+  /**
+   * Email and phone are each the person's own call: their privacy settings
+   * default both to "only me", so these rows exist only when they chose to
+   * share them with everyone or with their coaches. Kept apart from the
+   * public basics at the top, and said to be theirs to share.
+   */
+  readonly hasContact = computed(() => {
     const profile = this.profile();
-    return !!profile && (!!profile.email || !!profile.phone || !!this.location());
+    return !!profile && (!!profile.email || !!profile.phone);
   });
+
+  /** Groups you are both in — the one thing here that is about the two of you. */
+  readonly sharedGroups = computed(() => this.profile()?.sharedGroups ?? []);
 
   readonly bio = computed(() => this.coachProfile()?.bio?.trim() || null);
 
@@ -181,7 +190,9 @@ export class Person {
       this.specializations().length === 0 &&
       !this.experience() &&
       !this.rating() &&
-      !this.hasContactDetails() &&
+      !this.location() &&
+      !this.hasContact() &&
+      this.sharedGroups().length === 0 &&
       this.roles().length === 0,
   );
 
@@ -224,6 +235,16 @@ export class Person {
         next: (coach) => this.coachProfile.set(coach),
         error: () => this.coachProfile.set(null),
       });
+  }
+
+  /**
+   * A coach's shareable page on the web — the one their link and QR code
+   * open — in the browser, for the offerings and reviews this screen leaves
+   * out.
+   */
+  openPublicPage(): void {
+    const handle = this.profile()?.handle;
+    if (handle) window.open(publicProfileUrl(handle), '_blank', 'noopener');
   }
 
   message(): void {

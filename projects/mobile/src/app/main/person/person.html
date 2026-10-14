@@ -33,12 +33,30 @@
         <h1>{{ name() }}</h1>
         <ion-note class="handle">&#64;{{ person.handle }}</ion-note>
 
+        <!-- Where they are, beside who they are: public by default, and the
+             one detail most people look for first. -->
+        @if (location(); as place) {
+          <p class="place">
+            <ion-icon name="location-outline" aria-hidden="true" />
+            {{ place }}
+          </p>
+        }
+
         @if (roles().length > 0) {
           <div class="roles">
             @for (role of roles(); track role) {
               <ion-chip [outline]="true" color="medium">{{ role }}</ion-chip>
             }
           </div>
+        }
+
+        <!-- A coach's shareable page: offerings, reviews and booking live
+             there, and it is the link they hand out. -->
+        @if (person.isInstructor) {
+          <ion-button class="public-page" fill="outline" size="small" (click)="openPublicPage()">
+            {{ 'person.viewPublicPage' | translate }}
+            <ion-icon slot="end" name="open-outline" aria-hidden="true" />
+          </ion-button>
         }
       </div>
 
@@ -90,18 +108,27 @@
         </section>
       }
 
-      @if (hasContactDetails()) {
+      @if (sharedGroups().length > 0) {
         <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.details' | translate }}</div>
-          <ion-list [inset]="true" class="mh-card-list">
-            @if (location(); as place) {
-              <ion-item lines="full">
-                <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
-                <ion-label><h3>{{ place }}</h3></ion-label>
-              </ion-item>
+          <div class="mh-section-label">{{ 'person.groupsInCommon' | translate }}</div>
+          <!-- Labels, not links: a group opens in its own tab, and back from
+               there would not return here. -->
+          <div class="tags">
+            @for (group of sharedGroups(); track group.id) {
+              <ion-chip [outline]="true" color="medium">{{ group.name }}</ion-chip>
             }
+          </div>
+        </section>
+      }
+
+      @if (hasContact()) {
+        <!-- Only what they chose to share; their privacy settings hide both
+             by default. Last, under the public basics. -->
+        <section class="mh-section">
+          <div class="mh-section-label">{{ 'person.contact' | translate }}</div>
+          <ion-list [inset]="true" class="mh-card-list">
             @if (person.email; as email) {
-              <ion-item lines="full" [href]="'mailto:' + email">
+              <ion-item [lines]="person.phone ? 'full' : 'none'" [href]="'mailto:' + email">
                 <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
                 <ion-label><h3>{{ email }}</h3></ion-label>
               </ion-item>
@@ -113,6 +140,9 @@
               </ion-item>
             }
           </ion-list>
+          @if (firstName(); as first) {
+            <ion-note class="mh-footnote shared">{{ 'person.contactShared' | translate: { name: first } }}</ion-note>
+          }
         </section>
       }
 

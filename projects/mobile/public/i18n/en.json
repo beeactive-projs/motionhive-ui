@@ -265,7 +265,7 @@
       },
       "progressLink": "Progress & records",
       "sections": {
-        "notes": "Notes · private",
+        "notes": "Your private notes",
         "plans": "Plans",
         "sessions": "Sessions",
         "thisWeek": "This week",
@@ -358,7 +358,7 @@
       "searchScope": "{lens} · {filter}"
     },
     "notesSheet": {
-      "helper": "Only you can see this. It stays with this client.",
+      "helper": "Only you can see these notes. Your client never does.",
       "placeholder": "Goals, injuries, what keeps them motivated…",
       "save": "Save note",
       "title": "Notes",
@@ -511,6 +511,10 @@
       "dates": "Dates",
       "title": "Filter sessions"
     },
+    "groupsRail": {
+      "all": "All groups",
+      "title": "Groups to join"
+    },
     "hero": {
       "title": "Find your people in the hive"
     },
@@ -527,13 +531,14 @@
     },
     "search": {
       "coaches": "Coaches",
-      "empty": "No coaches or sessions match that. Try fewer words.",
+      "empty": "No coaches, groups or sessions match that. Try fewer words.",
       "error": {
         "heading": "Couldn't search",
         "message": "Check your connection and try typing again."
       },
-      "hint": "Keep typing. Search starts at two letters and looks across coaches and sessions.",
-      "placeholder": "Search coaches and sessions",
+      "groups": "Groups",
+      "hint": "Keep typing. Search starts at two letters and looks across coaches, groups and sessions.",
+      "placeholder": "Search coaches, groups and sessions",
       "sessions": "Sessions"
     }
   },
@@ -1699,8 +1704,10 @@
   "person": {
     "about": "About",
     "coaching": "Coaching",
-    "details": "Details",
+    "contact": "Contact",
+    "contactShared": "{name} chose to share these.",
     "experience": "{count, plural, one {# year of experience} other {# years of experience}}",
+    "groupsInCommon": "Groups in common",
     "memberSince": "On MotionHive since {date}.",
     "message": "Message",
     "noDetails": "{name} hasn't added any profile details yet.",
@@ -1710,7 +1717,8 @@
     "unavailable": {
       "message": "This person may have changed their handle or closed their account.",
       "title": "Profile unavailable"
-    }
+    },
+    "viewPublicPage": "View public page"
   },
   "profileView": {
     "loadFailed": "Couldn't load this profile",
@@ -1942,8 +1950,11 @@
         "duplicated": "Program duplicated",
         "published": "Program published",
         "repeatFailed": "Saved, but the weeks could not be repeated",
-        "saveFailed": "Could not save the program"
+        "saveFailed": "Could not save the program",
+        "unpublishFailed": "Could not unpublish the program",
+        "unpublished": "Moved back to draft"
       },
+      "unpublish": "Unpublish",
       "viewAssignments": "View assignments",
       "weekFewer": "One week fewer",
       "weekMore": "One week more",
@@ -2531,12 +2542,14 @@
         "title": "Delete routine"
       },
       "deleteRow": "Delete routine…",
+      "makeCopy": "Make a copy",
       "name": {
         "label": "Routine name",
         "placeholder": "Push day"
       },
       "noExercises": "No exercises yet. Add the movements in the order you do them.",
       "starterNote": "A MotionHive starter. Start it and it becomes yours to edit.",
+      "starterNoteCoach": "A MotionHive starter. Make a copy to change it for your clients.",
       "stepper": {
         "fewer": "One set fewer for {name}",
         "group": "Sets for {name}",
@@ -2555,6 +2568,8 @@
       "title": "Routine",
       "toast": {
         "alreadyIn": "{count, plural, one {That exercise is already in this routine} other {# were already in this routine}}",
+        "copied": "Copy made. It is yours to edit.",
+        "copyFailed": "Could not make a copy",
         "deleteFailed": "Could not delete the routine",
         "deleted": "Routine deleted",
         "saveFailed": "Could not save the routine",
@@ -2617,5 +2632,39 @@
       "kgShort": "kg",
       "meters": "{value} m"
     }
+  },
+  "feedback": {
+    "helper": "We read every message, and a confirmation goes to your email.",
+    "menuRow": "Send feedback",
+    "messageLabel": "Details",
+    "minLength": "Write at least {min} characters.",
+    "placeholder": {
+      "BUG": {
+        "message": "What were you doing when it happened? What did you expect, and what happened instead?",
+        "title": "e.g. A set I logged did not save"
+      },
+      "OTHER": {
+        "message": "Tell us anything. We read every message.",
+        "title": "e.g. A question about my plan"
+      },
+      "SUGGESTION": {
+        "message": "What would you like to be able to do, and how would it help you?",
+        "title": "e.g. Reorder exercises by dragging"
+      }
+    },
+    "send": "Send",
+    "subtitle": "Help us make MotionHive better",
+    "title": "Share feedback",
+    "titleLabel": "Title",
+    "toast": {
+      "sendFailed": "Could not send your feedback. Try again.",
+      "sent": "Thanks, we got your feedback."
+    },
+    "type": {
+      "BUG": "Bug report",
+      "OTHER": "Other",
+      "SUGGESTION": "Suggestion"
+    },
+    "typeLabel": "What is it about?"
   }
 }
