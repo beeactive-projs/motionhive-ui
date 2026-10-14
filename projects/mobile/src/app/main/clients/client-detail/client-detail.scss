@@ -186,3 +186,38 @@
 .verb.success {
   color: var(--ion-color-success-wash-contrast);
 }
+
+/* "View profile" under the address: a quiet text link, not a second honey
+   button competing with Message. Clear of the 44px floor so a thumb lands it. */
+.profile-link {
+  --color: var(--mh-color-honey-deep);
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* The week against the one before — the same footnote voice, its own line. */
+.week .trend {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* The fold for finished plans: reads as a disclosure, aligned with the rows. */
+.past-toggle {
+  --color: var(--ion-color-medium);
+  align-self: flex-start;
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* The segment sits above its list with the same air as a section head. */
+.session-list {
+  margin-top: 0.25rem;
+}
+
+/* The agenda's day header, minus the pin: mid-page, a sticky date would ride
+   over the sections below this one. */
+.session-list .mh-day-header {
+  position: static;
+}

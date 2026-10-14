@@ -17,6 +17,8 @@ import {
   IonLabel,
   IonList,
   IonNote,
+  IonSegment,
+  IonSegmentButton,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -26,10 +28,14 @@ import { addIcons } from 'ionicons';
 
 import {
   InstructorClientStatuses,
+  ProgramAssignment,
+  ProgramAssignmentStatus,
   SessionInstance,
   clientDisplayName,
   clientEmail,
   clientStatusLabel,
+  localDayKey,
+  sessionDayLabel,
 } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
@@ -39,18 +45,36 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { SessionRow } from '../../coach/sessions/_components/session-row/session-row';
+import {
+  AssignmentRow,
+  AssignmentRowSubjects,
+} from '../../programs/_components/assignment-row/assignment-row';
+import { AssignRequest, AssignSheet } from '../../programs/_sheets/assign-sheet/assign-sheet';
 import { ClientActionsSheet } from '../_sheets/client-actions-sheet/client-actions-sheet';
 import { ClientNotesSheet } from '../_sheets/client-notes-sheet/client-notes-sheet';
 import { ClientActionId, ClientActionIds } from '../clients.config';
 import { CLIENT_ICONS } from '../clients.icons';
+import { clientPath, coachStackOf } from '../client-paths';
 import { adherenceLabel, lastActiveLabel } from '../roster-labels';
-import { ClientDetailStore, UPCOMING_DAYS } from './client-detail.store';
+import { ClientDetailStore, PAST_DAYS, UPCOMING_DAYS } from './client-detail.store';
+
+/** Which way the Sessions section looks. */
+const SessionScopes = {
+  Upcoming: 'upcoming',
+  Past: 'past',
+} as const;
+type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
 
 /**
- * One client: who they are, how their week is going, what is coming up, and
- * the coach's private notes. Only grounded sections — the This week card and
- * the Plan row exist only when the roster has this person, Upcoming sessions
- * only when there are any — so nothing on the screen is invented.
+ * One client: who they are, how their week is going, the plans they are on,
+ * their sessions either side of today, and the coach's private notes. Only
+ * grounded sections — the This week card exists only when the roster has
+ * this person, Sessions only when there are any — so nothing on the screen
+ * is invented.
+ *
+ * Mounted under Clients and under Programs (from a plan's list of who is on
+ * it); every link out stays in whichever stack it was opened in, so back
+ * always returns here. See `client-paths.ts`.
  *
  * The URL is the source of truth: a refresh, a deep link, or a tap from any
  * list all land here with the client's user id and load from it.
@@ -58,6 +82,8 @@ import { ClientDetailStore, UPCOMING_DAYS } from './client-detail.store';
 @Component({
   selector: 'mh-client-detail',
   imports: [
+    AssignmentRow,
+    AssignSheet,
     ClientActionsSheet,
     ClientNotesSheet,
     ConfirmSheet,
@@ -77,6 +103,8 @@ import { ClientDetailStore, UPCOMING_DAYS } from './client-detail.store';
     IonLabel,
     IonList,
     IonNote,
+    IonSegment,
+    IonSegmentButton,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
@@ -97,15 +125,29 @@ export class ClientDetail implements ViewWillEnter {
   private readonly _openDirectMessage = injectOpenDirectMessage();
 
   readonly Statuses = InstructorClientStatuses;
+  readonly PlanStatuses = ProgramAssignmentStatus;
+  readonly RowSubjects = AssignmentRowSubjects;
+  readonly Scopes = SessionScopes;
   readonly skeletonRows = [1, 2, 3];
   /** The Upcoming sessions window, named beside its kicker. */
   readonly upcomingDays = UPCOMING_DAYS;
+  readonly pastDays = PAST_DAYS;
+
+  /** Clients or Programs, whichever this page was opened from. */
+  private readonly _stack = coachStackOf(this._router.url);
+  /** Back on a cold load: the list this page belongs to. */
+  readonly backHref: string = this._stack;
 
   readonly actionsOpen = signal(false);
   readonly notesOpen = signal(false);
   readonly notesSaving = signal(false);
   readonly archiveOpen = signal(false);
   readonly archiveSaving = signal(false);
+  readonly assignOpen = signal(false);
+  /** Past plans are a record; folded away until asked for. */
+  readonly pastPlansOpen = signal(false);
+  /** Null until the coach picks: the default follows what there is to show. */
+  private readonly _sessionScope = signal<SessionScope | null>(null);
 
   readonly name = computed(() => {
     const client = this.store.client();
@@ -150,6 +192,47 @@ export class ClientDetail implements ViewWillEnter {
 
   readonly canMessage = computed(() => !!this.store.client()?.client);
 
+  /** Their public handle: no account (an email invite) means no profile to open. */
+  readonly handle = computed(() => this.store.client()?.client?.handle ?? null);
+
+  /** Only an active relationship can be given work — the API says the same. */
+  readonly canAssign = computed(() => this.isActive());
+
+  /** Upcoming when anything is booked, otherwise what already happened. */
+  readonly sessionScope = computed<SessionScope>(
+    () =>
+      this._sessionScope() ??
+      (this.store.sessions().length || !this.store.pastSessions().length
+        ? SessionScopes.Upcoming
+        : SessionScopes.Past),
+  );
+
+  readonly showSessions = computed(
+    () => this.store.sessions().length > 0 || this.store.pastSessions().length > 0,
+  );
+
+  /**
+   * The scope's sessions under day headers, as every session list in the app
+   * reads. The row shows only the time — it was built for lists that already
+   * say the day — so without these five past sessions read as five "15:00"s.
+   * The order is the store's: soonest first ahead, most recent first behind.
+   */
+  readonly sessionDays = computed(() => {
+    const sessions =
+      this.sessionScope() === SessionScopes.Upcoming
+        ? this.store.sessions()
+        : this.store.pastSessions();
+    const days: { key: string; label: string; instances: SessionInstance[] }[] = [];
+    for (const instance of sessions) {
+      const start = new Date(instance.startAt);
+      const key = localDayKey(start);
+      const last = days[days.length - 1];
+      if (last?.key === key) last.instances.push(instance);
+      else days.push({ key, label: sessionDayLabel(start), instances: [instance] });
+    }
+    return days;
+  });
+
   readonly weekPercent = computed(() => {
     const roster = this.store.roster();
     return roster ? adherenceLabel(roster) : '—';
@@ -171,12 +254,22 @@ export class ClientDetail implements ViewWillEnter {
     });
   });
 
-  readonly planLabel = computed(() => {
-    const count = this.store.activePlans();
-    if (count === null || count === 0) {
-      return this._translateService.instant('clients.roster.noActivePlan');
-    }
-    return this._translateService.instant('clients.detail.plan.count', { count });
+  /**
+   * "12 points up on last week" — the week's adherence against the one
+   * before, so a coach can tell a dip from a habit. Silent when either week
+   * had nothing due: a change from nothing is not a trend.
+   */
+  readonly weekTrend = computed(() => {
+    const roster = this.store.roster();
+    const current = roster?.adherencePercent;
+    const previous = roster?.previousAdherencePercent;
+    if (current == null || previous == null) return null;
+    const delta = Math.round(current - previous);
+    if (delta === 0) return this._translateService.instant('clients.detail.week.trend.level');
+    return this._translateService.instant(
+      delta > 0 ? 'clients.detail.week.trend.up' : 'clients.detail.week.trend.down',
+      { count: Math.abs(delta) },
+    );
   });
 
   readonly archiveTitle = computed(() => {
@@ -214,6 +307,9 @@ export class ClientDetail implements ViewWillEnter {
     switch (id) {
       case ClientActionIds.Message:
         this.message();
+        return;
+      case ClientActionIds.ViewProfile:
+        this.openProfile();
         return;
       case ClientActionIds.EditNotes:
         this.openNotes();
@@ -298,12 +394,69 @@ export class ClientDetail implements ViewWillEnter {
     void this._router.navigate(['/tabs/coach/sessions', instance.id]);
   }
 
-  /** Their plan and what they have logged — pushed onto the clients stack. */
+  /** Who they are in public — the profile anyone else in the app would see. */
+  openProfile(): void {
+    const handle = this.handle();
+    if (handle) void this._router.navigate([this._stack, 'person', handle]);
+  }
+
+  /** Their plan and what they have logged — pushed onto this stack. */
   openTraining(): void {
     const clientId = this.store.client()?.clientId;
     if (clientId) {
-      void this._router.navigate(['/tabs/clients', clientId, 'training']);
+      void this._router.navigate([...clientPath(this._stack, clientId), 'training']);
     }
+  }
+
+  /** Their numbers and records; the name rides along for the header. */
+  openProgress(): void {
+    const clientId = this.store.client()?.clientId;
+    if (clientId) {
+      void this._router.navigate([...clientPath(this._stack, clientId), 'progress'], {
+        state: { clientName: this.name() },
+      });
+    }
+  }
+
+  setSessionScope(value: unknown): void {
+    if (value === SessionScopes.Upcoming || value === SessionScopes.Past) {
+      this._sessionScope.set(value);
+    }
+  }
+
+  togglePastPlans(): void {
+    this.pastPlansOpen.update((open) => !open);
+  }
+
+  openAssign(): void {
+    this.assignOpen.set(true);
+  }
+
+  onAssign(request: AssignRequest): void {
+    const programId = request.programId;
+    const clientId = this.store.client()?.clientId;
+    if (!programId || !clientId) return;
+    this.store.assignPlan({ ...request, programId, clientId }).subscribe({
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('programs.assignments.toast.assigned'),
+        ),
+      error: (error: unknown) =>
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.assignments.toast.assignFailed'),
+        ),
+    });
+  }
+
+  setPlanStatus(plan: ProgramAssignment, status: ProgramAssignmentStatus): void {
+    this.store.setPlanStatus(plan, status)?.subscribe({
+      error: (error: unknown) =>
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.assignments.toast.statusFailed'),
+        ),
+    });
   }
 
   retry(): void {

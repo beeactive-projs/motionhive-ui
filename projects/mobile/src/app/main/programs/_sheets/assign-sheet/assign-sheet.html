@@ -8,34 +8,112 @@
         </ion-label>
       </ion-item>
     </ion-list>
+  } @else if (picksProgram()) {
+    <!-- Opened from a client: the program is the choice. Picked, the list
+         folds to that one row so the dates and preview below stay in reach
+         of a thumb; "Change" opens it again. -->
+    <div class="mh-section-label">{{ 'programs.assign.program' | translate }}</div>
+    @if (chosenProgram(); as chosen) {
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item lines="none">
+          <ion-label>
+            <h2>{{ chosen.name }}</h2>
+            @if (programMeta(chosen)) {
+              <p>{{ programMeta(chosen) }}</p>
+            }
+          </ion-label>
+          <ion-button slot="end" fill="clear" size="small" (click)="changeProgram()">
+            {{ 'button.change' | translate }}
+          </ion-button>
+        </ion-item>
+      </ion-list>
+    } @else if (programsLoading()) {
+      <ion-note class="mh-note-block">{{ 'programs.assign.loadingPrograms' | translate }}</ion-note>
+    } @else if (!programs().length) {
+      <ion-note class="mh-note-block">{{ 'programs.assign.noPrograms' | translate }}</ion-note>
+    } @else {
+      @if (showProgramSearch()) {
+        <ion-searchbar
+          class="program-search"
+          [placeholder]="'programs.assign.searchPrograms' | translate"
+          [value]="programQuery()"
+          [debounce]="0"
+          (ionInput)="programQuery.set($any($event).detail.value ?? '')"
+        />
+      }
+      @if (visiblePrograms().length) {
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (row of visiblePrograms(); track row.id; let last = $last) {
+            <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="chooseProgram(row)">
+              <ion-label>
+                <h2>{{ row.name }}</h2>
+                <div class="program-tags">
+                  @if (isDraft(row)) {
+                    <ion-badge data-tone="medium">{{ 'enum.programStatus.DRAFT' | translate }}</ion-badge>
+                  }
+                  @if (row.isSingleWorkout) {
+                    <ion-badge data-tone="teal">{{ 'programs.row.routine' | translate }}</ion-badge>
+                  }
+                  @if (isStarter(row)) {
+                    <ion-badge data-tone="info">MotionHive</ion-badge>
+                  }
+                  @if (programMeta(row)) {
+                    <ion-note>{{ programMeta(row) }}</ion-note>
+                  }
+                </div>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <ion-note class="mh-note-block">{{ 'programs.assign.noProgramMatch' | translate }}</ion-note>
+      }
+    }
   }
 
-  <div class="mh-section-label">{{ 'programs.assign.client' | translate }}</div>
-  @if (loading()) {
-    <ion-note class="mh-note-block">{{ 'programs.assign.loadingClients' | translate }}</ion-note>
-  } @else if (!clients().length) {
-    <ion-note class="mh-note-block">
-      {{ 'programs.assign.noClients' | translate }}
-    </ion-note>
-  } @else {
+  @if (client(); as client) {
+    <div class="mh-section-label">{{ 'programs.assign.client' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
-      @for (row of clients(); track row.clientId; let last = $last) {
-        <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="clientId.set(row.clientId)">
-          <mh-hex-avatar
-            slot="start"
-            size="sm"
-            aria-hidden="true"
-            [name]="name(row)"
-            [imageUrl]="row.client?.avatarUrl ?? null"
-            [color]="tone(row)"
-          />
-          <ion-label>{{ name(row) }}</ion-label>
-          @if (clientId() === row.clientId) {
-            <ion-icon slot="end" name="checkmark-circle-outline" aria-hidden="true" />
-          }
-        </ion-item>
-      }
+      <ion-item lines="none">
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          aria-hidden="true"
+          [name]="name(client)"
+          [imageUrl]="client.client?.avatarUrl ?? null"
+          [color]="tone(client)"
+        />
+        <ion-label>{{ name(client) }}</ion-label>
+      </ion-item>
     </ion-list>
+  } @else {
+    <div class="mh-section-label">{{ 'programs.assign.client' | translate }}</div>
+    @if (loading()) {
+      <ion-note class="mh-note-block">{{ 'programs.assign.loadingClients' | translate }}</ion-note>
+    } @else if (!clients().length) {
+      <ion-note class="mh-note-block">
+        {{ 'programs.assign.noClients' | translate }}
+      </ion-note>
+    } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (row of clients(); track row.clientId; let last = $last) {
+          <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="clientId.set(row.clientId)">
+            <mh-hex-avatar
+              slot="start"
+              size="sm"
+              aria-hidden="true"
+              [name]="name(row)"
+              [imageUrl]="row.client?.avatarUrl ?? null"
+              [color]="tone(row)"
+            />
+            <ion-label>{{ name(row) }}</ion-label>
+            @if (clientId() === row.clientId) {
+              <ion-icon slot="end" name="checkmark-circle-outline" aria-hidden="true" />
+            }
+          </ion-item>
+        }
+      </ion-list>
+    }
   }
 
   <div class="mh-section-label">{{ 'programs.assign.starts' | translate }}</div>

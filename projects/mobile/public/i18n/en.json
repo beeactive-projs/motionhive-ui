@@ -231,6 +231,7 @@
       "notes": "Notes",
       "resent": "Resent",
       "unarchiveClient": "Unarchive client",
+      "viewProfile": "View profile",
       "withdraw": "Withdraw"
     },
     "actionsSheet": {
@@ -255,24 +256,40 @@
         "message": "Couldn't load this client.",
         "title": "Couldn't load this client"
       },
-      "plan": {
-        "count": "{count, plural, one {# active plan} other {# active plans}}",
-        "webOnly": "Plans are managed on the web for now."
+      "pastWindow": "Last {count, plural, one {# day} other {# days}}",
+      "plans": {
+        "assign": "Assign a plan",
+        "hidePast": "Hide past plans",
+        "none": "No plan assigned yet.",
+        "showPast": "{count, plural, one {Show # past plan} other {Show # past plans}}"
       },
+      "progressLink": "Progress & records",
       "sections": {
         "notes": "Notes · private",
-        "plan": "Plan",
+        "plans": "Plans",
+        "sessions": "Sessions",
         "thisWeek": "This week",
-        "training": "Training",
-        "upcoming": "Upcoming sessions"
+        "training": "Training"
+      },
+      "sessions": {
+        "nonePast": "No sessions together lately.",
+        "noneUpcoming": "Nothing booked yet.",
+        "past": "Past",
+        "upcoming": "Upcoming"
       },
       "since": "Since {date}",
       "trainingLink": "Plan & logged workouts",
       "upcomingWindow": "Next {count, plural, one {# day} other {# days}}",
+      "viewProfile": "View profile",
       "week": {
         "count": "{completed} of {due}",
         "footnote": "{completed} done · {skipped} skipped · {remaining} remaining",
-        "label": "workouts done"
+        "label": "workouts done",
+        "trend": {
+          "down": "{count, plural, one {# point down on last week} other {# points down on last week}}",
+          "level": "Level with last week",
+          "up": "{count, plural, one {# point up on last week} other {# points up on last week}}"
+        }
       }
     },
     "directory": {
@@ -1715,11 +1732,15 @@
         "unchosen": "Trains {count, plural, one {# day} other {# days}} a week. Leave these alone to count forward from the start date."
       },
       "loadingClients": "Loading your clients…",
+      "loadingPrograms": "Loading your programs…",
       "more": "+ {count} more",
       "noClients": "No active clients yet. A client has to accept before they can be given work.",
+      "noProgramMatch": "No program matches that.",
+      "noPrograms": "No programs yet. Create one in Programs first.",
       "note": "Note",
       "program": "Program",
       "schedule": "Schedule",
+      "searchPrograms": "Search programs",
       "starts": "Starts",
       "title": "Assign program",
       "trainingDays": "Training days"
@@ -2375,6 +2396,7 @@
       "stepSeconds": "{step}s"
     },
     "loadError": {
+      "clientProgress": "Couldn't load their progress",
       "exercise": "Couldn't load this exercise",
       "history": "Couldn't load your history",
       "plan": "Couldn't open this plan",
@@ -2482,7 +2504,9 @@
       "todaysWorkout": "Today's workout"
     },
     "progress": {
+      "clientPrivacyNote": "Workouts your client does outside your plans stay private unless they share them, so these numbers may not count everything they did.",
       "empty": {
+        "clientMessage": "Workouts they log from your plans will build up here.",
         "message": "Log a few workouts and your numbers will build up here.",
         "title": "Nothing to show yet"
       },

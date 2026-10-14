@@ -1,4 +1,5 @@
 import {
+  addOutline,
   alertCircleOutline,
   archiveOutline,
   arrowUndoOutline,
@@ -6,7 +7,9 @@ import {
   chatbubbleOutline,
   checkmarkCircle,
   checkmarkCircleOutline,
+  chevronDown,
   chevronForward,
+  chevronUp,
   closeCircleOutline,
   cloudOfflineOutline,
   createOutline,
@@ -16,9 +19,11 @@ import {
   mailOutline,
   peopleOutline,
   personAddOutline,
+  personCircleOutline,
   personOutline,
   searchOutline,
   shareOutline,
+  trendingUpOutline,
 } from 'ionicons/icons';
 
 /**
@@ -29,6 +34,7 @@ import {
  * direction.
  */
 export const CLIENT_ICONS = {
+  addOutline,
   alertCircleOutline,
   archiveOutline,
   arrowUndoOutline,
@@ -36,7 +42,9 @@ export const CLIENT_ICONS = {
   chatbubbleOutline,
   checkmarkCircle,
   checkmarkCircleOutline,
+  chevronDown,
   chevronForward,
+  chevronUp,
   closeCircleOutline,
   cloudOfflineOutline,
   createOutline,
@@ -46,7 +54,9 @@ export const CLIENT_ICONS = {
   mailOutline,
   peopleOutline,
   personAddOutline,
+  personCircleOutline,
   personOutline,
   searchOutline,
   shareOutline,
+  trendingUpOutline,
 };

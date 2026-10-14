@@ -54,7 +54,14 @@
           <div class="stack">
             @for (row of store.incoming(); track row.id) {
               <ion-card class="request">
-                <ion-item lines="none">
+                <!-- Tappable when they have a profile: who is asking is worth a
+                     look before Accept. -->
+                <ion-item
+                  lines="none"
+                  [button]="!!row.client?.handle"
+                  [detail]="!!row.client?.handle"
+                  (click)="openProfile(row)"
+                >
                   <!-- Decorative: the name it would announce is the very next thing. -->
                   <mh-hex-avatar
                     slot="start"

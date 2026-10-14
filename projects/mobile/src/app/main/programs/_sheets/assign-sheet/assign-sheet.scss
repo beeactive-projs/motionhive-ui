@@ -36,3 +36,22 @@ ion-item ion-icon {
 .day-hint.warn {
   color: var(--ion-color-warning-wash-contrast);
 }
+
+/* A program's badges and size under its name — the library row's tags line,
+   in miniature. */
+.program-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+
+  ion-note {
+    font-size: var(--mh-text-sm);
+  }
+}
+
+/* Flush with the inset lists above and below it. */
+.program-search {
+  padding-inline: 0;
+}

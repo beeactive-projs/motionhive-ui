@@ -12,6 +12,7 @@ import {
   programMeta,
   programTone,
   scheduledDateFor,
+  weekdayScheduleStart,
   weeksOf,
   weeksToDays,
 } from './programs.config';
@@ -143,5 +144,17 @@ describe('programs config', () => {
     // Parsed as a local calendar day, so the weekday survives a timezone
     // west of Greenwich — `new Date('2026-09-07')` would slip to the 6th.
     expect(scheduledDateFor('2026-09-07', 0, 0).getDay()).toBe(1);
+  });
+
+  // The server's rule: picked weekdays never put a session before the start.
+  it('moves a weekday schedule a week when a day would land before the start', () => {
+    // 2026-10-14 is a Wednesday; 0=Mon..6=Sun.
+    expect(weekdayScheduleStart('2026-10-14', [0])).toBe('2026-10-21');
+    expect(weekdayScheduleStart('2026-10-14', [1, 4])).toBe('2026-10-21');
+    // The start day itself and anything after it keep the start week.
+    expect(weekdayScheduleStart('2026-10-14', [2, 4])).toBe('2026-10-14');
+    expect(weekdayScheduleStart('2026-10-14', [4])).toBe('2026-10-14');
+    // A program with nothing in week 0 has nothing to land early.
+    expect(weekdayScheduleStart('2026-10-14', [])).toBe('2026-10-14');
   });
 });

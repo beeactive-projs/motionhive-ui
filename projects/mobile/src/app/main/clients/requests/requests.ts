@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonBackButton,
@@ -78,6 +79,7 @@ export class Requests implements ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _router = inject(Router);
 
   readonly skeletonRows = [1, 2, 3];
 
@@ -121,6 +123,12 @@ export class Requests implements ViewWillEnter {
 
   name(row: InstructorClient): string {
     return clientDisplayName(row);
+  }
+
+  /** Who is asking, before saying yes — their public profile, in this stack. */
+  openProfile(row: InstructorClient): void {
+    const handle = row.client?.handle;
+    if (handle) void this._router.navigate(['/tabs/clients/person', handle]);
   }
 
   email(row: InstructorClient): string {

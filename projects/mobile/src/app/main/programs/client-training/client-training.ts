@@ -31,6 +31,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { clientUrl, coachStackOf } from '../../clients/client-paths';
 import { LogRow } from '../../workouts/_components/log-row/log-row';
 import { shortDayLabel } from '../../workouts/workouts.config';
 import { PROGRAM_ICONS } from '../programs.config';
@@ -92,6 +93,12 @@ export class ClientTraining implements ViewWillEnter {
   readonly skeletonRows = [1, 2, 3];
 
   private _clientId: string | null = null;
+
+  /** Clients or Programs, whichever this was opened from — see `client-paths`. */
+  private readonly _stack = coachStackOf(this._router.url);
+
+  /** Back on a cold load: the client this training belongs to. */
+  readonly backHref = clientUrl(this._stack, this._route.snapshot.paramMap.get('clientId') ?? '');
 
   readonly activePlans = computed(() =>
     this.assignments().filter(
@@ -168,6 +175,6 @@ export class ClientTraining implements ViewWillEnter {
   }
 
   openLog(log: WorkoutLog): void {
-    void this._router.navigate(['/tabs/clients/log', log.id]);
+    void this._router.navigate([this._stack, 'log', log.id]);
   }
 }

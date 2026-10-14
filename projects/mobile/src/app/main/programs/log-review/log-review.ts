@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
@@ -29,6 +29,7 @@ import {
   workoutDuration,
   workoutTiles,
 } from '../../workouts/workouts.config';
+import { coachStackOf } from '../../clients/client-paths';
 import { PROGRAM_ICONS } from '../programs.config';
 
 /**
@@ -65,6 +66,10 @@ import { PROGRAM_ICONS } from '../programs.config';
 export class LogReview implements ViewWillEnter {
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+
+  /** Mounted under Clients and Programs; back on a cold load stays in that tab. */
+  readonly backHref = coachStackOf(this._router.url);
 
   readonly log = signal<WorkoutLog | null>(null);
   readonly loading = signal(false);

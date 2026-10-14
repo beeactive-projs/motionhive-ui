@@ -27,6 +27,15 @@
   font-weight: 600;
 }
 
+/* The asker's address ends in an ellipsis rather than breaking mid-domain:
+   the row now carries a chevron to their profile, and the name above is
+   what identifies them. */
+.request ion-label p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* What they wrote when asking — their words, quoted and set on the page
    slate so it reads as a message, not as the row's own copy. */
 .quote {

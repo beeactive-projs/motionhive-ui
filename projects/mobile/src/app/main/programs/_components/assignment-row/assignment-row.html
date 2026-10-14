@@ -1,13 +1,25 @@
-<ion-item class="mh-session-row mh-list-row" lines="none" detail="false" [attr.data-tone]="tone()">
-  <!-- Decorative: the name it would announce is the very next thing in the row. -->
-  <mh-hex-avatar
-    slot="start"
-    size="md"
-    aria-hidden="true"
-    [name]="name()"
-    [imageUrl]="assignment().client?.avatarUrl ?? null"
-    [color]="avatarTone()"
-  />
+<ion-item
+  class="mh-session-row mh-list-row"
+  lines="none"
+  detail="false"
+  [button]="tappable()"
+  [attr.data-tone]="tone()"
+  (click)="onRowClick()"
+>
+  @if (subject() === Subjects.Program) {
+    <!-- A plan, not a person: the same barbell mark the client page used for it. -->
+    <mh-hex-avatar slot="start" size="md" icon="barbell-outline" color="violet" tone="wash" aria-hidden="true" />
+  } @else {
+    <!-- Decorative: the name it would announce is the very next thing in the row. -->
+    <mh-hex-avatar
+      slot="start"
+      size="md"
+      aria-hidden="true"
+      [name]="name()"
+      [imageUrl]="assignment().client?.avatarUrl ?? null"
+      [color]="avatarTone()"
+    />
+  }
 
   <ion-label>
     <h2>{{ name() }}</h2>
@@ -21,12 +33,13 @@
     </div>
   </ion-label>
 
+  <!-- The verb stops the tap here, so pausing never also opens the row. -->
   @if (canPause()) {
-    <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="pause.emit()">
+    <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="pause.emit(); $event.stopPropagation()">
       {{ 'programs.assignment.pause' | translate }}
     </ion-button>
   } @else if (canResume()) {
-    <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="resume.emit()">
+    <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="resume.emit(); $event.stopPropagation()">
       {{ 'button.resume' | translate }}
     </ion-button>
   }

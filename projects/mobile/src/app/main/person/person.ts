@@ -83,16 +83,18 @@ export class Person {
   private readonly _router = inject(Router);
 
   /**
-   * Where back goes on a cold load. The screen is mounted under four tabs
-   * (messages, discover, and each role's sessions area), so the fallback
-   * follows whichever one the URL is in — without it a deep link renders a
-   * header with no way out.
+   * Where back goes on a cold load. The screen is mounted under six tabs
+   * (messages, discover, each role's sessions area, and the coach's clients
+   * and programs), so the fallback follows whichever one the URL is in —
+   * without it a deep link renders a header with no way out.
    */
   readonly backHref = computed(() => {
     const url = this._router.url;
     if (url.startsWith('/tabs/messages')) return '/tabs/messages';
     if (url.startsWith('/tabs/discover')) return '/tabs/discover';
     if (url.startsWith('/tabs/user')) return '/tabs/user/sessions';
+    if (url.startsWith('/tabs/clients')) return '/tabs/clients';
+    if (url.startsWith('/tabs/programs')) return '/tabs/programs';
     return '/tabs/coach/sessions';
   });
 

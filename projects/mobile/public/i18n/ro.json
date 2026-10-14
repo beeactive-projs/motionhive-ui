@@ -231,6 +231,7 @@
       "notes": "Notițe",
       "resent": "Retrimisă",
       "unarchiveClient": "Dezarhivează clientul",
+      "viewProfile": "Vezi profilul",
       "withdraw": "Retrage"
     },
     "actionsSheet": {
@@ -255,24 +256,40 @@
         "message": "Clientul nu a putut fi încărcat.",
         "title": "Clientul nu a putut fi încărcat"
       },
-      "plan": {
-        "count": "{count, plural, one {# plan activ} few {# planuri active} other {# de planuri active}}",
-        "webOnly": "Deocamdată, planurile se gestionează pe web."
+      "pastWindow": "{count, plural, one {Ultima zi} few {Ultimele # zile} other {Ultimele # de zile}}",
+      "plans": {
+        "assign": "Atribuie un plan",
+        "hidePast": "Ascunde planurile încheiate",
+        "none": "Niciun plan atribuit încă.",
+        "showPast": "{count, plural, one {Arată # plan încheiat} few {Arată # planuri încheiate} other {Arată # de planuri încheiate}}"
       },
+      "progressLink": "Progres și recorduri",
       "sections": {
         "notes": "Notițe · private",
-        "plan": "Plan",
+        "plans": "Planuri",
+        "sessions": "Sesiuni",
         "thisWeek": "Săptămâna aceasta",
-        "training": "Antrenament",
-        "upcoming": "Sesiuni viitoare"
+        "training": "Antrenament"
+      },
+      "sessions": {
+        "nonePast": "Nicio sesiune împreună în ultima vreme.",
+        "noneUpcoming": "Nimic programat încă.",
+        "past": "Trecute",
+        "upcoming": "Viitoare"
       },
       "since": "Din {date}",
       "trainingLink": "Plan și antrenamente înregistrate",
       "upcomingWindow": "Următoarele {count, plural, one {# zi} few {# zile} other {# de zile}}",
+      "viewProfile": "Vezi profilul",
       "week": {
         "count": "{completed} din {due}",
         "footnote": "{completed, plural, one {# făcut} few {# făcute} other {# făcute}} · {skipped, plural, one {# sărit} few {# sărite} other {# sărite}} · {remaining, plural, one {# rămas} few {# rămase} other {# rămase}}",
-        "label": "antrenamente făcute"
+        "label": "antrenamente făcute",
+        "trend": {
+          "down": "{count, plural, one {Cu # punct sub săptămâna trecută} few {Cu # puncte sub săptămâna trecută} other {Cu # de puncte sub săptămâna trecută}}",
+          "level": "La fel ca săptămâna trecută",
+          "up": "{count, plural, one {Cu # punct peste săptămâna trecută} few {Cu # puncte peste săptămâna trecută} other {Cu # de puncte peste săptămâna trecută}}"
+        }
       }
     },
     "directory": {
@@ -1715,11 +1732,15 @@
         "unchosen": "Se antrenează {count, plural, one {o zi} few {# zile} other {# de zile}} pe săptămână. Dacă nu alegi nimic, zilele se numără de la data de început."
       },
       "loadingClients": "Se încarcă clienții…",
+      "loadingPrograms": "Se încarcă programele…",
       "more": "+ încă {count}",
       "noClients": "Încă nu ai clienți activi. Un client trebuie să accepte înainte să-i poți atribui ceva.",
+      "noProgramMatch": "Niciun program nu se potrivește.",
+      "noPrograms": "Niciun program încă. Creează unul mai întâi în Programe.",
       "note": "Notă",
       "program": "Program",
       "schedule": "Calendar",
+      "searchPrograms": "Caută programe",
       "starts": "Data de început",
       "title": "Atribuie programul",
       "trainingDays": "Zile de antrenament"
@@ -2375,6 +2396,7 @@
       "stepSeconds": "{step}s"
     },
     "loadError": {
+      "clientProgress": "Nu am putut încărca progresul clientului",
       "exercise": "Nu am putut încărca exercițiul",
       "history": "Nu am putut încărca istoricul",
       "plan": "Nu am putut deschide planul",
@@ -2482,7 +2504,9 @@
       "todaysWorkout": "Antrenamentul de azi"
     },
     "progress": {
+      "clientPrivacyNote": "Antrenamentele pe care clientul le face în afara planurilor tale rămân private dacă nu le partajează, așa că cifrele pot să nu includă tot ce a făcut.",
       "empty": {
+        "clientMessage": "Antrenamentele pe care le face din planurile tale vor apărea aici.",
         "message": "Înregistrează câteva antrenamente și cifrele tale vor apărea aici.",
         "title": "Nimic de arătat încă"
       },

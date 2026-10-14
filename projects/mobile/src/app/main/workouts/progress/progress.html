@@ -1,9 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/workouts" />
+      <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
-    <ion-title>{{ 'workouts.common.progress' | translate }}</ion-title>
+    <ion-title>{{ title() }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,7 +11,7 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      [heading]="'workouts.loadError.progress' | translate"
+      [heading]="(clientId ? 'workouts.loadError.clientProgress' : 'workouts.loadError.progress') | translate"
       [message]="'error.checkConnection' | translate"
       [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
@@ -31,7 +31,7 @@
     <mh-empty-state
       icon="trending-up-outline"
       [heading]="'workouts.progress.empty.title' | translate"
-      [message]="'workouts.progress.empty.message' | translate"
+      [message]="(clientId ? 'workouts.progress.empty.clientMessage' : 'workouts.progress.empty.message') | translate"
     />
   } @else {
     <div class="mh-page">
@@ -63,6 +63,26 @@
             }
           </ion-list>
         </section>
+      }
+
+      @if (clientId) {
+        <!-- The boundary, stated: these numbers are what the client lets this
+             coach see, the same rule and wording as their training page. -->
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item lines="none">
+            <mh-hex-avatar
+              slot="start"
+              size="sm"
+              icon="lock-closed-outline"
+              color="medium"
+              tone="wash"
+              aria-hidden="true"
+            />
+            <ion-label class="ion-text-wrap">
+              <p>{{ 'workouts.progress.clientPrivacyNote' | translate }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
       }
     </div>
   }

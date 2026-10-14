@@ -28,6 +28,7 @@ import { ExerciseProgress as ExerciseProgressData, ProgressRange, ProgressServic
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
+import { clientUrl, coachStackOf } from '../../clients/client-paths';
 import { BadgeTones } from '../../exercises/exercises.config';
 import { TrendChart, TrendLabel } from '../_components/trend-chart/trend-chart';
 import {
@@ -95,6 +96,18 @@ export class ExerciseProgress implements ViewWillEnter {
   private readonly _translateService = inject(TranslateService);
   private readonly _activatedRoute = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+
+  /**
+   * Set when a coach reads one client's history of this exercise (mounted
+   * under Clients and Programs); null on the trainee's own screen.
+   */
+  private readonly _clientId = this._activatedRoute.snapshot.paramMap.get('clientId');
+  private readonly _stack = coachStackOf(this._router.url);
+
+  /** Back on a cold load: the progress screen this was opened from. */
+  readonly backHref = this._clientId
+    ? `${clientUrl(this._stack, this._clientId)}/progress`
+    : '/tabs/workouts/progress';
 
   readonly ranges = PROGRESS_RANGES;
   readonly Tones = BadgeTones;
@@ -241,8 +254,10 @@ export class ExerciseProgress implements ViewWillEnter {
     if (!id) return;
     this.loading.set(true);
     this.error.set(false);
-    this._progressService
-      .forExercise(id)
+    const request = this._clientId
+      ? this._progressService.forClientExercise(this._clientId, id)
+      : this._progressService.forExercise(id);
+    request
       .pipe(take(1))
       .subscribe({
         next: (progress) => {
@@ -264,7 +279,12 @@ export class ExerciseProgress implements ViewWillEnter {
     if (range) this.range.set(range);
   }
 
+  /** The trainee reopens their own summary; a coach gets the review of that log. */
   openSession(workoutLogId: string): void {
+    if (this._clientId) {
+      void this._router.navigate([this._stack, 'log', workoutLogId]);
+      return;
+    }
     void this._router.navigate(['/tabs/workouts/finish', workoutLogId]);
   }
 
