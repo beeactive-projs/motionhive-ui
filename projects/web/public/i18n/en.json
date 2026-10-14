@@ -3215,6 +3215,7 @@
       "actions": {
         "assign": "Assign to client",
         "delete": "Delete program…",
+        "duplicate": "Duplicate program",
         "edit": "Edit program"
       },
       "archivedBanner": {
@@ -3229,7 +3230,11 @@
       },
       "fallbackTitle": "Program",
       "loading": "Loading program…",
-      "setsInWeek": "{count, plural, one {# set} other {# sets}} in week {week}"
+      "setsInWeek": "{count, plural, one {# set} other {# sets}} in week {week}",
+      "starterBanner": {
+        "message": "You can assign it as it is. To change anything, duplicate it and edit your copy.",
+        "title": "This program is made by MotionHive."
+      }
     },
     "editor": {
       "addExercise": "Add exercise",

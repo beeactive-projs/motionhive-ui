@@ -127,6 +127,9 @@
               <p-tag value="MotionHive" severity="info" />
               }
               <p-tag [value]="p.status | enumLabel: 'programStatus'" [severity]="statusSeverity(p.status)" />
+              <!-- Every menu action edits the program, which a starter refuses;
+                   the card itself still opens it to assign or duplicate. -->
+              @if (!isStarter(p)) {
               <button pButton
                 type="button"
                 severity="secondary"
@@ -140,6 +143,7 @@
               >
                 <i class="pi" [class]="mutatingIds().has(p.id) ? 'pi-spinner pi-spin' : 'pi-ellipsis-v'"></i>
               </button>
+              }
             </div>
 
             @if (p.description) {

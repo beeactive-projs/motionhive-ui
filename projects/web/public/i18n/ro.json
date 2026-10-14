@@ -3215,6 +3215,7 @@
       "actions": {
         "assign": "Atribuie unui client",
         "delete": "Șterge programul…",
+        "duplicate": "Duplică programul",
         "edit": "Editează programul"
       },
       "archivedBanner": {
@@ -3229,7 +3230,11 @@
       },
       "fallbackTitle": "Program",
       "loading": "Se încarcă programul…",
-      "setsInWeek": "{count, plural, one {# serie} few {# serii} other {# de serii}} în săptămâna {week}"
+      "setsInWeek": "{count, plural, one {# serie} few {# serii} other {# de serii}} în săptămâna {week}",
+      "starterBanner": {
+        "message": "Îl poți atribui așa cum este. Ca să schimbi ceva, duplică-l și editează copia ta.",
+        "title": "Acest program este creat de MotionHive."
+      }
     },
     "editor": {
       "addExercise": "Adaugă exercițiu",

@@ -35,6 +35,8 @@ export class ExerciseRow {
   readonly count = input.required<number>();
   readonly expanded = input(false);
   readonly canMoveAcross = input(false);
+  /** Someone else's program: sets can be read and the exercise viewed, nothing changed. */
+  readonly readOnly = input(false);
 
   readonly toggle = output<void>();
   readonly moveUp = output<void>();

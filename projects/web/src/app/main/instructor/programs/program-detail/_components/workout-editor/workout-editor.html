@@ -37,6 +37,7 @@
       @if (durationEstimate(); as minutes) {
         <p-chip [label]="'programs.common.approxMinutes' | translate: { minutes: minutes }" icon="pi pi-clock" />
       }
+      @if (!readOnly()) {
       <button pButton
         type="button"
         size="small"
@@ -130,6 +131,7 @@
       >
         <i class="pi pi-trash"></i>
       </button>
+      }
     </div>
   </header>
 
@@ -143,7 +145,7 @@
         icon="pi pi-list"
         [title]="'programs.editor.empty.title' | translate"
         [message]="'programs.editor.empty.message' | translate"
-        [actionLabel]="'programs.editor.addExercise' | translate"
+        [actionLabel]="readOnly() ? undefined : ('programs.editor.addExercise' | translate)"
         actionIcon="pi pi-plus"
         actionSeverity="secondary"
         [actionOutlined]="true"
@@ -160,6 +162,7 @@
           [count]="exercises().length"
           [expanded]="isExpanded(ex.id)"
           [canMoveAcross]="canMoveExerciseAcross()"
+          [readOnly]="readOnly()"
           (toggle)="toggleExercise(ex.id)"
           (moveUp)="reorderExercise.emit({ from: i, to: i - 1 })"
           (moveDown)="reorderExercise.emit({ from: i, to: i + 1 })"
@@ -173,6 +176,7 @@
           (setsReordered)="setsReordered.emit({ exercise: ex, sets: $event })"
         />
       }
+      @if (!readOnly()) {
       <div class="p-3">
         <button pButton
           type="button"
@@ -187,6 +191,7 @@
           {{ 'programs.editor.addExercise' | translate }}
         </button>
       </div>
+      }
     </div>
   }
 </div>

@@ -40,6 +40,7 @@
     </button>
 
     <span class="mh-exrow__actions flex shrink-0 items-center">
+      @if (!readOnly()) {
       <button pButton
         type="button"
         size="small"
@@ -88,6 +89,7 @@
       >
         <i class="pi pi-arrow-right-arrow-left"></i>
       </button>
+      }
       <button pButton
         type="button"
         size="small"
@@ -103,6 +105,7 @@
       >
         <i class="pi pi-info-circle"></i>
       </button>
+      @if (!readOnly()) {
       <button pButton
         type="button"
         size="small"
@@ -117,6 +120,7 @@
       >
         <i class="pi pi-trash"></i>
       </button>
+      }
       <button pButton
         type="button"
         size="small"
@@ -156,16 +160,21 @@
           >
             <ng-template #header>
               <tr>
+                @if (!readOnly()) {
                 <th class="w-[1%]"></th>
+                }
                 <th>#</th>
                 <th>{{ 'form.label.type' | translate }}</th>
                 <th>{{ 'programs.exerciseRow.target' | translate }}</th>
                 <th>{{ 'programs.exerciseRow.rest' | translate }}</th>
+                @if (!readOnly()) {
                 <th class="w-[1%]"></th>
+                }
               </tr>
             </ng-template>
             <ng-template #body let-s let-rowIndex="rowIndex">
               <tr [pReorderableRow]="rowIndex">
+                @if (!readOnly()) {
                 <td>
                   <span
                     pReorderableRowHandle
@@ -173,6 +182,7 @@
                     [attr.aria-label]="'programs.exerciseRow.dragSet' | translate: { number: rowIndex + 1 }"
                   ></span>
                 </td>
+                }
                 <td>{{ s.orderIndex + 1 }}</td>
                 <td>
                   <p-tag [value]="s.setType | enumLabel: 'exerciseSetType'" [severity]="setTypeSeverity(s.setType)" />
@@ -185,6 +195,7 @@
                     —
                   }
                 </td>
+                @if (!readOnly()) {
                 <td class="text-right">
                   <span class="flex items-center gap-2">
                     <button pButton
@@ -231,6 +242,7 @@
                     </button>
                   </span>
                 </td>
+                }
               </tr>
             </ng-template>
           </p-table>
@@ -238,12 +250,14 @@
           <div class="text-[11px] italic text-muted-color">{{ 'programs.exerciseRow.noSets' | translate }}</div>
         }
 
+        @if (!readOnly()) {
         <div class="mt-2 flex justify-end">
           <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="addSet.emit()" class="mh-dashed-btn">
             <i class="pi pi-plus"></i>
             {{ 'programs.exerciseRow.addSet' | translate }}
           </button>
         </div>
+        }
       </div>
     }
   </div>

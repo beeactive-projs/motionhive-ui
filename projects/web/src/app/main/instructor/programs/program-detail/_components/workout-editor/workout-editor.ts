@@ -41,6 +41,8 @@ export class WorkoutEditor {
   readonly canMoveExerciseAcross = input(false);
   /** Mobile one-pane mode — show a back control to the outline. */
   readonly showBack = input(false);
+  /** Someone else's program: the workout can be read, nothing changed. */
+  readonly readOnly = input(false);
 
   readonly back = output<void>();
   readonly moveUp = output<void>();

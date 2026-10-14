@@ -30,6 +30,7 @@ import {
   PrescribedSet,
   Program,
   ProgramService,
+  ProgramSource,
   ProgramStatus,
   ProgramWorkout,
   STORAGE_KEYS,
@@ -118,6 +119,12 @@ export class ProgramDetail implements OnInit {
 
   readonly program = signal<Program | null>(null);
   readonly loading = signal(false);
+  /**
+   * MotionHive's own starter, shown in every coach's library. The API lets
+   * a coach assign or duplicate it and refuses every edit, so the builder
+   * is read-only and the header offers only those two.
+   */
+  readonly isStarter = computed(() => this.program()?.source === ProgramSource.System);
   // Read-only exercise-detail dialog wired into the workout editor rows.
   readonly viewingExerciseId = signal<string | null>(null);
   readonly viewOpen = signal(false);
@@ -127,7 +134,7 @@ export class ProgramDetail implements OnInit {
     this.viewingExerciseId.set(id);
     this.viewOpen.set(true);
   }
-  /** Mobile overflow sheet (Edit / Assign / Delete). */
+  /** Mobile overflow sheet (Edit / Duplicate / Assign / Delete). */
   readonly actionsOpen = signal(false);
   readonly assignDialogOpen = signal(false);
   readonly editDialogOpen = signal(false);
@@ -253,16 +260,18 @@ export class ProgramDetail implements OnInit {
   });
 
   /** Action-sheet rows for the mobile ⋮ menu — mirror the desktop header buttons. */
-  readonly detailActions: ActionItem[] = [
-    { id: 'edit', icon: 'pi pi-pencil', label: this._translateService.instant('programs.detail.actions.edit') },
-    { id: 'assign', icon: 'pi pi-user-plus', label: this._translateService.instant('programs.detail.actions.assign') },
-    {
-      id: 'delete',
-      icon: 'pi pi-trash',
-      label: this._translateService.instant('programs.detail.actions.delete'),
-      danger: true,
-    },
-  ];
+  readonly detailActions = computed<ActionItem[]>(() => {
+    const t = (key: string): string => this._translateService.instant(key);
+    const duplicate: ActionItem = { id: 'duplicate', icon: 'pi pi-copy', label: t('programs.detail.actions.duplicate') };
+    const assign: ActionItem = { id: 'assign', icon: 'pi pi-user-plus', label: t('programs.detail.actions.assign') };
+    if (this.isStarter()) return [duplicate, assign];
+    return [
+      { id: 'edit', icon: 'pi pi-pencil', label: t('programs.detail.actions.edit') },
+      duplicate,
+      assign,
+      { id: 'delete', icon: 'pi pi-trash', label: t('programs.detail.actions.delete'), danger: true },
+    ];
+  });
 
   /** Reveal key already handled — `id:weekIndex`, so a cross-week move re-reveals. */
   private _lastReveal: string | null = null;
@@ -1337,6 +1346,9 @@ export class ProgramDetail implements OnInit {
     switch (item.id) {
       case 'edit':
         this.openEdit();
+        break;
+      case 'duplicate':
+        this.duplicateProgram();
         break;
       case 'assign':
         this.openAssign();
