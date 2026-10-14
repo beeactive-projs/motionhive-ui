@@ -72,9 +72,9 @@ export interface PickedLocation {
   longitude: number | null;
 }
 
+/** A person in a picker. Never carries their email: that stays private. */
 export interface UserSearchResult {
   id: string;
-  email: string;
   firstName: string | null;
   lastName: string | null;
   avatarUrl: string | null;

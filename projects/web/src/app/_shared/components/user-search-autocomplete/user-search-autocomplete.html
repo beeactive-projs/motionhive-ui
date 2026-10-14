@@ -3,7 +3,7 @@
   <p-autocomplete
     class="w-full"
     [suggestions]="suggestions()"
-    optionLabel="email"
+    [optionLabel]="displayName"
     [placeholder]="placeholder() || ('components.userSearch.placeholder' | translate)"
     [appendTo]="'body'"
     [delay]="0"
@@ -18,7 +18,9 @@
         <mh-avatar [user]="user" styleClass="bg-primary-100 text-primary-700" />
         <div class="flex flex-col min-w-0">
           <span class="font-medium text-sm truncate">{{ displayName(user) }}</span>
-          <span class="text-xs text-surface-500 truncate">{{ user.email }}</span>
+          @if (user.handle) {
+          <span class="text-xs text-surface-500 truncate">&#64;{{ user.handle }}</span>
+          }
         </div>
       </div>
     </ng-template>

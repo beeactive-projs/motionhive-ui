@@ -74,7 +74,9 @@
             />
             <div class="mh-picker__result-text">
               <div class="mh-picker__result-name">{{ nameOf(user) }}</div>
-              <div class="mh-picker__result-sub">{{ user.email }}</div>
+              @if (user.handle) {
+                <div class="mh-picker__result-sub">&#64;{{ user.handle }}</div>
+              }
             </div>
           </button>
         }

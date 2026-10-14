@@ -14,6 +14,7 @@ import {
   ClientService,
   UserRoles,
   UserSearchResult,
+  displayName as personName,
   showApiError,
   validationMessage,
 } from 'core';
@@ -125,8 +126,7 @@ export class InviteClientDialog {
   }
 
   displayName(user: UserSearchResult): string {
-    const name = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
-    return name || user.email;
+    return personName(user);
   }
 
   isFieldInvalid(field: 'email'): boolean {
