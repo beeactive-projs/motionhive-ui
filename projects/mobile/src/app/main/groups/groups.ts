@@ -162,6 +162,10 @@ export class Groups implements ViewWillEnter {
   // re-fire the list for data seconds old.
   ionViewWillEnter(): void {
     this.store.reenter();
+    // "All groups" from Discover lands on Discover's lens here. Read off the
+    // live URL, not a route snapshot: this page stays alive across visits.
+    const segment = this._router.parseUrl(this._router.url).queryParamMap.get('segment');
+    if (segment) this.setSegment(segment);
   }
 
   setSegment(value: string | number | undefined): void {

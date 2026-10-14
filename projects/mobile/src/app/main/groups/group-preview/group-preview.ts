@@ -67,6 +67,14 @@ export class GroupPreview {
   readonly store = inject(GroupPreviewStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+
+  /**
+   * Mounted under Groups and under Discover (its rail and search). Back on a
+   * cold load, and the label beside the arrow, name whichever one this is.
+   */
+  private readonly _fromDiscover = this._router.url.startsWith('/tabs/discover');
+  readonly backHref = this._fromDiscover ? '/tabs/discover' : '/tabs/groups';
+  readonly backLabel = this._fromDiscover ? 'nav.discover' : 'nav.groups';
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);

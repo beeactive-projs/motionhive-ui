@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" [text]="'nav.groups' | translate" />
+      <ion-back-button [defaultHref]="backHref" [text]="backLabel | translate" />
     </ion-buttons>
     <ion-title>{{ group()?.name ?? ('groups.common.group' | translate) }}</ion-title>
   </ion-toolbar>
