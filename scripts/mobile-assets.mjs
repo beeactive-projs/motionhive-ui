@@ -17,9 +17,9 @@
 // The Android 12+ *system* splash (shown before the Capacitor one) takes its colour from
 // android/app/src/main/res/values{,-night}/colors.xml, not from these images.
 //
-// Brand rule: the honey mark on both surfaces, matching web and the marketing site.
-// The navy mark is kept for the icon's foreground, where it sits on a honey tile.
-// Backgrounds match --ion-background-color light/dark so splash → first paint is seamless.
+// Brand rule: there is one mark, honey. It sits on no background (the splash screens)
+// or on a navy tile (the app icon, matching the favicons and web's PWA icons).
+// Splash backgrounds match --ion-background-color light/dark so splash → first paint is seamless.
 
 import { execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -32,12 +32,10 @@ const svgDir = join(root, 'projects/web/public/svg');
 const outDir = join(root, 'projects/mobile/resources');
 const androidRes = join(root, 'android/app/src/main/res');
 
-const NAVY_MARK = join(svgDir, 'logo-navy.svg'); // fill #1e3a5f
 const HONEY_MARK = join(svgDir, 'logo-honey.svg'); // fill #f59e0b
 
-const HONEY = '#f59e0b'; // --mh-primary-500
 const SLATE_50 = '#f8fafc'; // light --ion-background-color
-const NAVY_900 = '#0e1b31'; // dark --ion-background-color
+const NAVY_900 = '#0e1b31'; // dark --ion-background-color, and the icon tile
 
 const MARK_ASPECT = 168 / 190; // logo-*.svg viewBox is 168×190
 
@@ -71,23 +69,21 @@ async function compose(size, background, mark, dest) {
 }
 
 async function writeSources() {
-  // iOS icon + Android legacy icon: honey tile, navy mark at the same proportions as
-  // logo-bg-honey.svg (190/230 of the tile). The OS rounds the corners.
-  await compose(ICON, HONEY, await renderMark(NAVY_MARK, Math.round(ICON * (190 / 230))), join(outDir, 'icon-only.png'));
+  // iOS icon + Android legacy icon: navy tile, honey mark at the same proportions as
+  // logo-bg-navy.svg (190/230 of the tile). The OS rounds the corners.
+  await compose(ICON, NAVY_900, await renderMark(HONEY_MARK, Math.round(ICON * (190 / 230))), join(outDir, 'icon-only.png'));
 
   // Android adaptive icon layers. @capacitor/assets insets the foreground by 16.7%, so the
   // 1024 canvas maps onto the 72dp visible area; the 66dp safe circle is ~92% of it.
   // 70% mark height keeps the hexagon well inside every launcher mask.
-  await compose(ICON, { r: 0, g: 0, b: 0, alpha: 0 }, await renderMark(NAVY_MARK, Math.round(ICON * 0.7)), join(outDir, 'icon-foreground.png'));
-  await compose(ICON, HONEY, null, join(outDir, 'icon-background.png'));
+  await compose(ICON, { r: 0, g: 0, b: 0, alpha: 0 }, await renderMark(HONEY_MARK, Math.round(ICON * 0.7)), join(outDir, 'icon-foreground.png'));
+  await compose(ICON, NAVY_900, null, join(outDir, 'icon-background.png'));
 
   // Splash: mark at 20% of the canvas width (the tool's own default for its easy mode).
   const splashMarkHeight = Math.round((SPLASH * 0.2) / MARK_ASPECT);
-  // Honey on light too, not navy: web and the marketing site both carry the
-  // honey mark as their identity, so a navy launch screen was mobile
-  // introducing a second brand. A logo is a graphic, not text, so the 2.05:1
-  // of honey on slate-50 is not a contrast failure — text on honey still
-  // goes through `--mh-color-honey-deep`.
+  // Honey on light too: there is only the honey mark. A logo is a graphic, not
+  // text, so the 2.05:1 of honey on slate-50 is not a contrast failure — text
+  // on honey still goes through `--mh-color-honey-deep`.
   await compose(SPLASH, SLATE_50, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash.png'));
   await compose(SPLASH, NAVY_900, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash-dark.png'));
 }
@@ -118,7 +114,7 @@ async function writeAndroidAdaptiveIcon() {
       .composite([{ input: mark, left: pad + nudge, top: pad + nudge }])
       .png()
       .toFile(join(dir, 'ic_launcher_foreground.png'));
-    await sharp({ create: { width: canvas, height: canvas, channels: 4, background: HONEY } })
+    await sharp({ create: { width: canvas, height: canvas, channels: 4, background: NAVY_900 } })
       .png()
       .toFile(join(dir, 'ic_launcher_background.png'));
     console.log('wrote', dir, `adaptive layers ${canvas}px (nudge ${nudge}px)`);
