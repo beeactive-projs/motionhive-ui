@@ -121,22 +121,41 @@
         </section>
       }
 
-      @if (hasContact()) {
-        <!-- Only what they chose to share; their privacy settings hide both
-             by default. Last, under the public basics. -->
+      @if (hasDetails()) {
+        <!-- Only what their privacy settings let this viewer see: email and
+             phone are theirs alone by default, language and time zone go to
+             their coaches. Last, under the public basics. -->
         <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.contact' | translate }}</div>
-          <ion-list [inset]="true" class="mh-card-list">
+          <div class="mh-section-label">{{ 'person.details' | translate }}</div>
+          <ion-list [inset]="true" class="mh-card-list details">
             @if (person.email; as email) {
-              <ion-item [lines]="person.phone ? 'full' : 'none'" [href]="'mailto:' + email">
+              <ion-item lines="full" [href]="'mailto:' + email">
                 <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
                 <ion-label><h3>{{ email }}</h3></ion-label>
               </ion-item>
             }
             @if (person.phone; as phone) {
-              <ion-item lines="none" [href]="'tel:' + phone">
+              <ion-item lines="full" [href]="'tel:' + phone">
                 <ion-icon slot="start" name="call-outline" color="medium" aria-hidden="true" />
                 <ion-label><h3>{{ phone }}</h3></ion-label>
+              </ion-item>
+            }
+            @if (language(); as spoken) {
+              <ion-item lines="full">
+                <ion-icon slot="start" name="language-outline" color="medium" aria-hidden="true" />
+                <ion-label>
+                  <h3>{{ spoken }}</h3>
+                  <p>{{ 'form.label.language' | translate }}</p>
+                </ion-label>
+              </ion-item>
+            }
+            @if (localTime(); as time) {
+              <ion-item lines="full">
+                <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+                <ion-label>
+                  <h3>{{ time }}</h3>
+                  <p>{{ 'person.localTime' | translate }}</p>
+                </ion-label>
               </ion-item>
             }
           </ion-list>

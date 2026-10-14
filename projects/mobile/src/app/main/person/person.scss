@@ -74,3 +74,9 @@
   display: block;
   padding: 0 0.375rem;
 }
+
+/* Any of the detail rows can be the last one, depending on what the person
+   shares; the card's own border closes the list, so the last hairline goes. */
+.details ion-item:last-child {
+  --border-width: 0;
+}
