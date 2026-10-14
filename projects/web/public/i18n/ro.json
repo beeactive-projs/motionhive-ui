@@ -870,7 +870,7 @@
     "goHome": "Acasă",
     "notFound": {
       "message": "Pagina asta nu există, dar următorul tău antrenament da. Hai să te readucem pe drumul cel bun.",
-      "title": "Ai luat-o pe alt drum."
+      "title": "Ups, ai luat-o pe un drum greșit."
     },
     "serverError": {
       "500": {
