@@ -23,7 +23,8 @@ export class FeedbackService {
   }
 
   submit(payload: FeedbackPayload): Observable<void> {
-    // The API writes the confirmation email in the language of this page.
-    return this._http.post<void>(this._base, { ...payload, language: this._language });
+    // The API writes the confirmation email in the language of this page,
+    // unless the caller knows better (mobile picks its language at runtime).
+    return this._http.post<void>(this._base, { language: this._language, ...payload });
   }
 }
