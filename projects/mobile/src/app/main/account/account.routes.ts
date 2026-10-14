@@ -40,8 +40,8 @@ export const accountRoutes: Routes = [
     title: 'pageTitle.coachingProfile',
   },
   {
-    path: 'manage',
-    loadComponent: () => import('./manage-account/manage-account').then((m) => m.ManageAccount),
-    title: 'pageTitle.manageAccount',
+    path: 'privacy',
+    loadComponent: () => import('./privacy/privacy').then((m) => m.AccountPrivacy),
+    title: 'pageTitle.privacy',
   },
 ];

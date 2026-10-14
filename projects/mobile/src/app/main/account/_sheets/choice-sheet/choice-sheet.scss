@@ -1,0 +1,6 @@
+/* The pinned strip already pads the searchbar to the sheet's gutter, as in
+   the exercise picker; Ionic's own toolbar padding would indent it twice. */
+ion-searchbar {
+  --box-shadow: none;
+  padding-inline: 0;
+}

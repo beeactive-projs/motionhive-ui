@@ -44,15 +44,6 @@
       "copyLink": "Copiază linkul profilului",
       "verified": "Verificat"
     },
-    "manage": {
-      "deleteAccount": "Șterge contul",
-      "deleteNote": "Ștergerea contului îți elimină definitiv profilul, programele și mesajele. Acțiunea nu poate fi anulată.",
-      "logOut": "Deconectează-te",
-      "resendVerification": "Retrimite emailul de verificare",
-      "soon": "În curând",
-      "switchingLanguage": "Se schimbă limba…",
-      "unverified": "Adresa {email} nu este încă verificată."
-    },
     "memberSince": "Membru din {date}",
     "notifications": {
       "channels": {
@@ -95,21 +86,25 @@
       "appearance": "Aspect",
       "blockedUsers": "Utilizatori blocați",
       "coachingProfile": "Profil de antrenor",
-      "manageAccount": "Gestionează contul",
-      "manageAccountHint": "Deconectare, ștergere",
       "profile": "Profil",
-      "profileHint": "Nume, fotografie, nume de utilizator"
+      "profileHint": "Nume, fotografie, nume de utilizator",
+      "privacy": "Cine îmi poate vedea detaliile",
+      "resendVerification": "Retrimite emailul de verificare",
+      "unverified": "Adresa {email} nu este încă verificată.",
+      "deleteAccount": "Șterge contul",
+      "deleteAccountHint": "Deschide pașii pe site-ul nostru"
     },
     "sections": {
       "account": "Cont",
       "preferences": "Preferințe",
-      "privacy": "Confidențialitate și cont",
+      "privacy": "Confidențialitate",
       "profile": "Profil"
     },
     "theme": {
       "dark": "Întunecat",
       "light": "Deschis",
-      "system": "Sistem"
+      "system": "Sistem",
+      "systemHint": "Urmează setarea telefonului"
     },
     "toast": {
       "copyFailed": "Linkul nu a putut fi copiat.",
@@ -117,6 +112,25 @@
       "timezoneUpdated": "Fus orar actualizat",
       "verificationFailed": "Nu am putut retrimite. Dacă emailul e deja verificat sau ai cerut unul recent, încearcă din nou mai târziu.",
       "verificationSent": "Email de verificare trimis. Verifică {email}."
+    },
+    "language": {
+      "switching": "Se schimbă limba…",
+      "restartNote": "Aplicația repornește în limba aleasă."
+    },
+    "timezone": {
+      "search": "Caută după oraș sau regiune"
+    },
+    "choice": {
+      "noMatches": "Niciun rezultat"
+    },
+    "privacy": {
+      "intro": "Numele și fotografia ta sunt mereu vizibile. Alege cine vede fiecare dintre acestea.",
+      "hint": {
+        "PUBLIC": "Oricine îți deschide profilul",
+        "COACHES_ONLY": "Doar antrenorii cu care te antrenezi",
+        "ONLY_ME": "Nimeni în afară de tine"
+      },
+      "saveFailed": "Nu am putut salva. Încearcă din nou."
     }
   },
   "accountSheets": {
@@ -1472,7 +1486,6 @@
     "groups": "Grupuri",
     "history": "Istoric",
     "invoice": "Factură",
-    "manageAccount": "Gestionează contul",
     "manageGroup": "Gestionează grupul",
     "manageSessions": "Gestionează sesiunile",
     "messages": "Mesaje",
@@ -1503,7 +1516,8 @@
     "verifyEmail": "Verifică emailul",
     "workout": "Antrenament",
     "workoutComplete": "Antrenament încheiat",
-    "workouts": "Antrenamente"
+    "workouts": "Antrenamente",
+    "privacy": "Cine îmi poate vedea detaliile"
   },
   "payments": {
     "badge": {
@@ -1704,7 +1718,6 @@
   "person": {
     "about": "Despre",
     "coaching": "Ca antrenor",
-    "contact": "Contact",
     "contactShared": "{name} a ales să le facă vizibile.",
     "experience": "{count, plural, one {# an de experiență} few {# ani de experiență} other {# de ani de experiență}}",
     "groupsInCommon": "Grupuri comune",
@@ -1718,7 +1731,9 @@
       "message": "Persoana poate și-a schimbat numele de utilizator sau și-a închis contul.",
       "title": "Profil indisponibil"
     },
-    "viewPublicPage": "Vezi pagina publică"
+    "viewPublicPage": "Vezi pagina publică",
+    "details": "Detalii",
+    "localTime": "Ora locală"
   },
   "profileView": {
     "loadFailed": "Profilul nu a putut fi încărcat",

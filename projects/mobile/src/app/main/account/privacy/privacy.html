@@ -1,0 +1,47 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/account" />
+    </ion-buttons>
+    <ion-title>{{ 'account.rows.privacy' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    <ion-note class="mh-note-block" color="medium">
+      {{ 'account.privacy.intro' | translate }}
+    </ion-note>
+
+    @if (account()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (row of rows; track row.field) {
+          <mh-settings-row
+            [label]="row.labelKey | translate"
+            [icon]="row.icon"
+            [iconColor]="row.iconColor"
+            [value]="levelLabel(row.field)"
+            [disabled]="isSaving(row.field)"
+            (select)="choose(row)"
+          />
+        }
+      </ion-list>
+    } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (row of rows; track row.field; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <ion-label><ion-skeleton-text [animated]="true" style="width: 45%" /></ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  </div>
+
+  <mh-choice-sheet
+    [(open)]="sheetOpen"
+    [title]="sheetTitle()"
+    [options]="levelOptions"
+    [selected]="sheetSelected()"
+    (picked)="onPicked($event)"
+  />
+</ion-content>

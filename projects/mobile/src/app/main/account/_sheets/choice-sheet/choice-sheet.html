@@ -1,0 +1,56 @@
+<ng-template #search>
+  <ion-searchbar
+    inputmode="search"
+    [placeholder]="searchPlaceholder()"
+    [attr.aria-label]="searchPlaceholder()"
+    [debounce]="0"
+    [value]="query()"
+    (ionInput)="onQuery($event.detail.value ?? '')"
+  />
+</ng-template>
+
+<ng-template #body>
+  @if (rows().length) {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (option of rows(); track option.value; let last = $last) {
+        <ion-item
+          button
+          [detail]="false"
+          [lines]="last ? 'none' : 'full'"
+          [attr.aria-current]="option.value === selected() ? 'true' : null"
+          (click)="pick(option.value)"
+        >
+          <ion-label class="ion-text-wrap">
+            {{ option.label }}
+            @if (option.hint) {
+              <p>{{ option.hint }}</p>
+            }
+          </ion-label>
+          @if (option.value === selected()) {
+            <ion-icon slot="end" name="checkmark" color="primary" aria-hidden="true" />
+          }
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <ion-note class="mh-note-block">{{ 'account.choice.noMatches' | translate }}</ion-note>
+  }
+
+  <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="crescent" />
+  </ion-infinite-scroll>
+
+  @if (footnote()) {
+    <p class="mh-helper">{{ footnote() }}</p>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [sticky]="searchable() ? search : null"
+  [showFooter]="false"
+  [breakpoints]="breakpoints()"
+  [initialBreakpoint]="initialBreakpoint()"
+/>

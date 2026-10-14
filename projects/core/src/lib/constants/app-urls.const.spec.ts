@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   MARKETING_SITE_URL,
+  deleteAccountUrl,
   marketingSiteUrl,
   privacyPolicyUrl,
   termsOfServiceUrl,
@@ -21,5 +22,6 @@ describe('legal page URLs', () => {
   it('follow the language', () => {
     expect(termsOfServiceUrl('en')).toBe(`${MARKETING_SITE_URL}/legal/terms-of-service`);
     expect(privacyPolicyUrl('ro')).toBe(`${MARKETING_SITE_URL}/ro/legal/privacy-policy`);
+    expect(deleteAccountUrl('ro')).toBe(`${MARKETING_SITE_URL}/ro/legal/delete-account`);
   });
 });

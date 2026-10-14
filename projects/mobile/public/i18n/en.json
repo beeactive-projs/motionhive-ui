@@ -44,15 +44,6 @@
       "copyLink": "Copy profile link",
       "verified": "Verified"
     },
-    "manage": {
-      "deleteAccount": "Delete account",
-      "deleteNote": "Deleting your account removes your profile, programs and messages permanently. This can't be undone.",
-      "logOut": "Log out",
-      "resendVerification": "Resend verification email",
-      "soon": "Soon",
-      "switchingLanguage": "Switching language…",
-      "unverified": "{email} isn't verified yet."
-    },
     "memberSince": "Member since {date}",
     "notifications": {
       "channels": {
@@ -95,21 +86,25 @@
       "appearance": "Appearance",
       "blockedUsers": "Blocked users",
       "coachingProfile": "Coaching profile",
-      "manageAccount": "Manage account",
-      "manageAccountHint": "Log out, delete",
       "profile": "Profile",
-      "profileHint": "Name, photo, handle"
+      "profileHint": "Name, photo, handle",
+      "privacy": "Who can see my details",
+      "resendVerification": "Resend verification email",
+      "unverified": "{email} isn't verified yet.",
+      "deleteAccount": "Delete account",
+      "deleteAccountHint": "Opens the steps on our website"
     },
     "sections": {
       "account": "Account",
       "preferences": "Preferences",
-      "privacy": "Privacy & account",
+      "privacy": "Privacy",
       "profile": "Profile"
     },
     "theme": {
       "dark": "Dark",
       "light": "Light",
-      "system": "System"
+      "system": "System",
+      "systemHint": "Follows your phone's setting"
     },
     "toast": {
       "copyFailed": "Could not copy the link.",
@@ -117,6 +112,25 @@
       "timezoneUpdated": "Timezone updated",
       "verificationFailed": "Couldn't resend. If the email is already verified or you recently asked, please try again later.",
       "verificationSent": "Verification email sent. Check {email}."
+    },
+    "language": {
+      "switching": "Switching language…",
+      "restartNote": "The app restarts in the language you pick."
+    },
+    "timezone": {
+      "search": "Search by city or region"
+    },
+    "choice": {
+      "noMatches": "No matches"
+    },
+    "privacy": {
+      "intro": "Your name and photo are always visible. Choose who sees each of these.",
+      "hint": {
+        "PUBLIC": "Anyone who opens your profile",
+        "COACHES_ONLY": "Only the coaches you train with",
+        "ONLY_ME": "No one but you"
+      },
+      "saveFailed": "Couldn't save that. Try again."
     }
   },
   "accountSheets": {
@@ -1472,7 +1486,6 @@
     "groups": "Groups",
     "history": "History",
     "invoice": "Invoice",
-    "manageAccount": "Manage account",
     "manageGroup": "Manage group",
     "manageSessions": "Manage sessions",
     "messages": "Messages",
@@ -1503,7 +1516,8 @@
     "verifyEmail": "Verify email",
     "workout": "Workout",
     "workoutComplete": "Workout complete",
-    "workouts": "Workouts"
+    "workouts": "Workouts",
+    "privacy": "Who can see my details"
   },
   "payments": {
     "badge": {
@@ -1704,7 +1718,6 @@
   "person": {
     "about": "About",
     "coaching": "Coaching",
-    "contact": "Contact",
     "contactShared": "{name} chose to share these.",
     "experience": "{count, plural, one {# year of experience} other {# years of experience}}",
     "groupsInCommon": "Groups in common",
@@ -1718,7 +1731,9 @@
       "message": "This person may have changed their handle or closed their account.",
       "title": "Profile unavailable"
     },
-    "viewPublicPage": "View public page"
+    "viewPublicPage": "View public page",
+    "details": "Details",
+    "localTime": "Local time"
   },
   "profileView": {
     "loadFailed": "Couldn't load this profile",
