@@ -19,8 +19,8 @@
         type="button"
         size="small"
         rounded
-        [severity]="originFilter() === tab.value ? 'primary' : 'secondary'"
-        [text]="originFilter() !== tab.value"
+        [severity]="appliedOrigin() === tab.value ? 'primary' : 'secondary'"
+        [text]="appliedOrigin() !== tab.value"
         (click)="setOrigin(tab.value)"
         class="py-0.5 min-w-10"
       >

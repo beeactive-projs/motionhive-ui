@@ -337,6 +337,38 @@ export class ProgramSettings implements ViewWillEnter {
     this.save(true);
   }
 
+  readonly unpublishing = signal(false);
+
+  /**
+   * Back to draft — a coach pulling a plan to rework it. Only the status
+   * moves: unsaved edits in the form stay as they are, and clients already
+   * on the plan keep their own copy, so nothing they see changes.
+   */
+  unpublish(): void {
+    const id = this._id;
+    if (!id || this.unpublishing()) return;
+    this.unpublishing.set(true);
+    this._programService
+      .update(id, { status: ProgramStatus.Draft })
+      .pipe(take(1))
+      .subscribe({
+        next: (saved) => {
+          this.unpublishing.set(false);
+          this.program.update((current) => (current ? { ...current, status: saved.status } : current));
+          void this._feedbackService.success(
+            this._translateService.instant('programs.settings.toast.unpublished'),
+          );
+        },
+        error: (err) => {
+          this.unpublishing.set(false);
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('programs.settings.toast.unpublishFailed'),
+          );
+        },
+      });
+  }
+
   readonly duplicating = signal(false);
 
   /**

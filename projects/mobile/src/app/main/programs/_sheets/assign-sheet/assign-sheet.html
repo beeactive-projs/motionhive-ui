@@ -32,6 +32,19 @@
     } @else if (!programs().length) {
       <ion-note class="mh-note-block">{{ 'programs.assign.noPrograms' | translate }}</ion-note>
     } @else {
+      @if (showProgramOrigins()) {
+        <div class="mh-chip-row program-origins" role="group" [attr.aria-label]="'programs.assign.program' | translate">
+          @for (pill of programOriginPills; track pill.value) {
+            <ion-chip
+              [class.selected]="programOrigin() === pill.value"
+              [attr.aria-pressed]="programOrigin() === pill.value"
+              (click)="programOrigin.set(pill.value)"
+            >
+              {{ pill.label | translate }} · {{ originCount(pill.value) }}
+            </ion-chip>
+          }
+        </div>
+      }
       @if (showProgramSearch()) {
         <ion-searchbar
           class="program-search"

@@ -55,3 +55,8 @@ ion-item ion-icon {
 .program-search {
   padding-inline: 0;
 }
+
+/* Mine / MotionHive above the list, the library's own pills. */
+.program-origins {
+  padding: 0 0.25rem 0.25rem;
+}

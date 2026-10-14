@@ -3315,7 +3315,8 @@
         "archive": "Archive…",
         "delete": "Delete…",
         "publish": "Publish",
-        "restore": "Restore to draft"
+        "restore": "Restore to draft",
+        "unpublish": "Unpublish"
       },
       "newProgram": "New program",
       "origin": {
@@ -3479,6 +3480,7 @@
         "summaryToDay": "{name} copied to {day}"
       },
       "deleteError": "Couldn't delete program",
+      "deleteWeekError": "Couldn't delete the week",
       "deleteWorkoutError": "Couldn't delete workout",
       "deleted": "Program deleted",
       "duplicateSetError": "Couldn't duplicate set",
@@ -3519,6 +3521,7 @@
       "removeExerciseError": "Couldn't remove exercise",
       "removeSetError": "Couldn't remove set",
       "reorderError": "Couldn't save the new order",
+      "repeatWeeksError": "Saved, but the weeks couldn't be repeated",
       "restored": "Program restored to draft",
       "saveProgramError": "Couldn't save program",
       "saveSetError": "Couldn't save set",
@@ -3527,11 +3530,13 @@
       "setRemoved": "Set removed",
       "setUpdated": "Set updated",
       "setsAdded": "{count, plural, one {Set added} other {# sets added}}",
+      "unpublished": "Moved back to draft",
       "updateError": "Couldn't update program",
       "weekCopied": {
         "detail": "{count, plural, one {# workout copied.} other {# workouts copied.}}",
         "summary": "Week {source} copied into week {target}"
       },
+      "weekDeleted": "Week {week} deleted",
       "weekFull": {
         "detail": "A week holds at most 7 workouts.",
         "summary": "Week is full"
@@ -3542,10 +3547,7 @@
         "detail": "{name} → week {week}, day {day}.",
         "summary": "Workout moved"
       },
-      "workoutUpdated": "Workout updated",
-      "weekDeleted": "Week {week} deleted",
-      "deleteWeekError": "Couldn't delete the week",
-      "repeatWeeksError": "Saved, but the weeks couldn't be repeated"
+      "workoutUpdated": "Workout updated"
     },
     "workoutForm": {
       "minutesSuffix": "(min)",

@@ -36,6 +36,8 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import {
+  ProgramOrigin,
+  ProgramOrigins,
   programMeta,
   scheduledDateFor,
   scheduledDateFromMonday,
@@ -129,6 +131,12 @@ export class AssignSheet {
   readonly programs = signal<Program[]>([]);
   readonly programsLoading = signal(false);
   readonly programQuery = signal('');
+  /**
+   * Your own programs first, as the library opens: a coach assigns their own
+   * work far more often than a starter, and ten starters ahead of it made the
+   * right one hard to find. MotionHive is the other pill.
+   */
+  readonly programOrigin = signal<ProgramOrigin>(ProgramOrigins.Mine);
   /** The chosen program with its days, fetched on pick for the preview. */
   readonly chosenProgram = signal<Program | null>(null);
   readonly chosenLoading = signal(false);
@@ -138,9 +146,38 @@ export class AssignSheet {
 
   readonly showProgramSearch = computed(() => this.programs().length >= SEARCH_FROM);
 
+  /** Only worth a choice when the library holds both kinds. */
+  readonly showProgramOrigins = computed(() => {
+    const rows = this.programs();
+    return rows.some((row) => this.isStarter(row)) && rows.some((row) => !this.isStarter(row));
+  });
+
+  readonly programOriginCounts = computed(() => {
+    const rows = this.programs();
+    const starters = rows.filter((row) => this.isStarter(row)).length;
+    return { mine: rows.length - starters, starters };
+  });
+
+  originCount(origin: ProgramOrigin): number {
+    const counts = this.programOriginCounts();
+    return origin === ProgramOrigins.Starters ? counts.starters : counts.mine;
+  }
+
+  readonly programOriginPills: readonly { value: ProgramOrigin; label: string }[] = [
+    { value: ProgramOrigins.Mine, label: 'programs.library.origin.mine' },
+    { value: ProgramOrigins.Starters, label: 'programs.library.origin.starters' },
+  ];
+
   readonly visiblePrograms = computed(() => {
     const query = this.programQuery().trim().toLocaleLowerCase(appLocale());
-    const rows = this.programs();
+    const origin = this.showProgramOrigins() ? this.programOrigin() : ProgramOrigins.All;
+    const rows = this.programs().filter((row) =>
+      origin === ProgramOrigins.Mine
+        ? !this.isStarter(row)
+        : origin === ProgramOrigins.Starters
+          ? this.isStarter(row)
+          : true,
+    );
     if (!query) return rows;
     return rows.filter((row) => row.name.toLocaleLowerCase(appLocale()).includes(query));
   });
@@ -392,6 +429,7 @@ export class AssignSheet {
     this.clientId.set(null);
     this.chosenProgram.set(null);
     this.programQuery.set('');
+    this.programOrigin.set(ProgramOrigins.Mine);
     this.startDate.set(todayIso());
     this.notes.set('');
   }

@@ -28,11 +28,25 @@ export class ProgramsStore {
   readonly size = signal<ProgramSize>(ProgramSizes.All);
 
   /**
-   * Whose content to show. Narrows what is already loaded rather than
-   * refetching: the list arrives in one page, and `source` travels on every
-   * row, so the answer is already here.
+   * Whose content to show — the coach's own by default. The MotionHive
+   * starters sit in every coach's library, and opening on all of them mixed
+   * in buried the coach's own work; they are one pill away. Narrows what is
+   * already loaded rather than refetching: the list arrives in one page, and
+   * `source` travels on every row, so the answer is already here.
    */
-  readonly origin = signal<ProgramOrigin>(ProgramOrigins.All);
+  readonly origin = signal<ProgramOrigin>(ProgramOrigins.Mine);
+
+  /**
+   * The origin actually applied. "Mine" with nothing of your own would open
+   * on an empty list beside a library full of starters, so it shows
+   * everything until there is something of yours to show.
+   */
+  private readonly _appliedOrigin = computed<ProgramOrigin>(() =>
+    this.origin() === ProgramOrigins.Mine &&
+    !this._all().some((p) => p.source !== ProgramSource.System)
+      ? ProgramOrigins.All
+      : this.origin(),
+  );
 
   readonly loading = this._loading.asReadonly();
 
@@ -42,7 +56,7 @@ export class ProgramsStore {
   /** The rows left after the origin pill, before the size pill narrows them. */
   private readonly _byOrigin = computed(() => {
     const rows = this._all();
-    switch (this.origin()) {
+    switch (this._appliedOrigin()) {
       case ProgramOrigins.Mine:
         return rows.filter((p) => p.source !== ProgramSource.System);
       case ProgramOrigins.Starters:

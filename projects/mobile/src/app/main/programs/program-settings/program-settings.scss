@@ -77,3 +77,11 @@
   color: var(--ion-color-danger);
   font-size: var(--mh-text-sm);
 }
+
+/* View assignments and Unpublish side by side under the published note. */
+.status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
