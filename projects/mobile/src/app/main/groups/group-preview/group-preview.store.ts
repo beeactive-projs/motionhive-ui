@@ -81,7 +81,7 @@ export class GroupPreviewStore {
     // The members-only read comes along for the ride: a 200 from it means
     // they are already in, which changes the whole screen.
     this._groupService
-      .getById(this._groupId)
+      .getById(this._groupId, { silent: true })
       .pipe(take(1), takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: () => this._alreadyMember.set(true),

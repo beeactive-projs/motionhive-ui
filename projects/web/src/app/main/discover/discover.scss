@@ -56,12 +56,21 @@
 }
 
 /* Tabs */
+// The rule under the tabs is an inset shadow, not a border: the active
+// underline used to sit on the border with a -1px margin, and that one
+// pixel of overflow put a vertical scrollbar beside the tabs. The tabs
+// still scroll sideways on a narrow screen, without a visible bar.
 .disc__tabs {
   display: flex;
   gap: 4px;
-  border-bottom: 1px solid var(--p-content-border-color);
+  box-shadow: inset 0 -1px 0 var(--p-content-border-color);
   margin-bottom: 18px;
   overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .disc__tab {
   font-family: var(--font-heading);
@@ -70,7 +79,6 @@
   color: var(--p-text-muted-color);
   padding: 11px 14px;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   white-space: nowrap;
   cursor: pointer;
   background: none;

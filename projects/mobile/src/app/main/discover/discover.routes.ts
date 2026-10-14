@@ -22,6 +22,15 @@ export const discoverRoutes: Routes = [
     title: 'pageTitle.coaches',
   },
   {
+    // A group seen from outside, pushed onto this stack so back returns to
+    // the rail or the search it was opened from. Before `:id`, which would
+    // otherwise read "group" as a session id.
+    path: 'group/:groupId',
+    loadComponent: () =>
+      import('../groups/group-preview/group-preview').then((m) => m.GroupPreview),
+    title: 'pageTitle.group',
+  },
+  {
     path: 'person/:handle',
     loadComponent: () => import('../person/person').then((m) => m.Person),
     title: 'pageTitle.profile',

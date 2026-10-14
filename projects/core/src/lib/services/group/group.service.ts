@@ -19,6 +19,7 @@ import {
   UpdateGroupPayload,
   UpdateMemberRolePayload,
 } from '../../models/group/group.model';
+import { silentRequest } from '../../interceptors/silent-request.context';
 
 @Injectable({
   providedIn: 'root',
@@ -36,8 +37,15 @@ export class GroupService {
   }
 
   /** One group, with the caller's own role in it (see `GroupWithMyRole`). */
-  getById(groupId: string): Observable<GroupWithMyRole> {
-    return this._http.get<GroupWithMyRole>(`${this.baseUrl}/${groupId}`);
+  /**
+   * The members-only view. `silent` skips the global error dialog, for a
+   * caller that expects a refusal: the group preview asks this to learn
+   * whether the reader is already in, and a 403 there is the normal answer.
+   */
+  getById(groupId: string, opts: { silent?: boolean } = {}): Observable<GroupWithMyRole> {
+    return this._http.get<GroupWithMyRole>(`${this.baseUrl}/${groupId}`, {
+      ...(opts.silent ? { context: silentRequest() } : {}),
+    });
   }
 
   /**

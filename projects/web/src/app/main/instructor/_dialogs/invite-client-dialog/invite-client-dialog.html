@@ -21,7 +21,9 @@
         <mh-hex-avatar [user]="selectedUser()" [size]="36" />
         <div class="flex flex-col min-w-0 flex-1">
           <span class="font-medium text-sm truncate">{{ displayName(selectedUser()!) }}</span>
-          <span class="text-xs text-surface-500 truncate">{{ selectedUser()!.email }}</span>
+          @if (selectedUser()!.handle; as handle) {
+          <span class="text-xs text-surface-500 truncate">&#64;{{ handle }}</span>
+          }
         </div>
         <button pButton
           type="button"

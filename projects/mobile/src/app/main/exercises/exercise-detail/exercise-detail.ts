@@ -125,7 +125,17 @@ export class ExerciseDetail implements ViewWillEnter {
 
   readonly frameIndex = signal(0);
 
-  readonly backHref = '/tabs/exercises';
+  /**
+   * Where back lands when there is no history to pop (a deep link, a
+   * restored app). The page is pushed onto the Workouts and Programs stacks
+   * as well as its own, and back returns to origin, so it follows the URL.
+   */
+  readonly backHref = computed(() => {
+    const url = this._router.url;
+    if (url.startsWith('/tabs/workouts')) return '/tabs/workouts';
+    if (url.startsWith('/tabs/programs')) return '/tabs/programs';
+    return '/tabs/exercises';
+  });
 
   /** Kind + level + a couple of traits: the card's usual height, blank. */
   readonly skeletonRows = [1, 2, 3, 4];

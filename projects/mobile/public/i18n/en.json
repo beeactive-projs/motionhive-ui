@@ -50,6 +50,7 @@
       "logOut": "Log out",
       "resendVerification": "Resend verification email",
       "soon": "Soon",
+      "switchingLanguage": "Switching language…",
       "unverified": "{email} isn't verified yet."
     },
     "memberSince": "Member since {date}",
@@ -230,6 +231,7 @@
       "notes": "Notes",
       "resent": "Resent",
       "unarchiveClient": "Unarchive client",
+      "viewProfile": "View profile",
       "withdraw": "Withdraw"
     },
     "actionsSheet": {
@@ -254,24 +256,40 @@
         "message": "Couldn't load this client.",
         "title": "Couldn't load this client"
       },
-      "plan": {
-        "count": "{count, plural, one {# active plan} other {# active plans}}",
-        "webOnly": "Plans are managed on the web for now."
+      "pastWindow": "Last {count, plural, one {# day} other {# days}}",
+      "plans": {
+        "assign": "Assign a plan",
+        "hidePast": "Hide past plans",
+        "none": "No plan assigned yet.",
+        "showPast": "{count, plural, one {Show # past plan} other {Show # past plans}}"
       },
+      "progressLink": "Progress & records",
       "sections": {
-        "notes": "Notes · private",
-        "plan": "Plan",
+        "notes": "Your private notes",
+        "plans": "Plans",
+        "sessions": "Sessions",
         "thisWeek": "This week",
-        "training": "Training",
-        "upcoming": "Upcoming sessions"
+        "training": "Training"
+      },
+      "sessions": {
+        "nonePast": "No sessions together lately.",
+        "noneUpcoming": "Nothing booked yet.",
+        "past": "Past",
+        "upcoming": "Upcoming"
       },
       "since": "Since {date}",
       "trainingLink": "Plan & logged workouts",
       "upcomingWindow": "Next {count, plural, one {# day} other {# days}}",
+      "viewProfile": "View profile",
       "week": {
         "count": "{completed} of {due}",
         "footnote": "{completed} done · {skipped} skipped · {remaining} remaining",
-        "label": "workouts done"
+        "label": "workouts done",
+        "trend": {
+          "down": "{count, plural, one {# point down on last week} other {# points down on last week}}",
+          "level": "Level with last week",
+          "up": "{count, plural, one {# point up on last week} other {# points up on last week}}"
+        }
       }
     },
     "directory": {
@@ -340,7 +358,7 @@
       "searchScope": "{lens} · {filter}"
     },
     "notesSheet": {
-      "helper": "Only you can see this. It stays with this client.",
+      "helper": "Only you can see these notes. Your client never does.",
       "placeholder": "Goals, injuries, what keeps them motivated…",
       "save": "Save note",
       "title": "Notes",
@@ -493,6 +511,10 @@
       "dates": "Dates",
       "title": "Filter sessions"
     },
+    "groupsRail": {
+      "all": "All groups",
+      "title": "Groups to join"
+    },
     "hero": {
       "title": "Find your people in the hive"
     },
@@ -509,13 +531,14 @@
     },
     "search": {
       "coaches": "Coaches",
-      "empty": "No coaches or sessions match that. Try fewer words.",
+      "empty": "No coaches, groups or sessions match that. Try fewer words.",
       "error": {
         "heading": "Couldn't search",
         "message": "Check your connection and try typing again."
       },
-      "hint": "Keep typing. Search starts at two letters and looks across coaches and sessions.",
-      "placeholder": "Search coaches and sessions",
+      "groups": "Groups",
+      "hint": "Keep typing. Search starts at two letters and looks across coaches, groups and sessions.",
+      "placeholder": "Search coaches, groups and sessions",
       "sessions": "Sessions"
     }
   },
@@ -1681,8 +1704,10 @@
   "person": {
     "about": "About",
     "coaching": "Coaching",
-    "details": "Details",
+    "contact": "Contact",
+    "contactShared": "{name} chose to share these.",
     "experience": "{count, plural, one {# year of experience} other {# years of experience}}",
+    "groupsInCommon": "Groups in common",
     "memberSince": "On MotionHive since {date}.",
     "message": "Message",
     "noDetails": "{name} hasn't added any profile details yet.",
@@ -1692,7 +1717,8 @@
     "unavailable": {
       "message": "This person may have changed their handle or closed their account.",
       "title": "Profile unavailable"
-    }
+    },
+    "viewPublicPage": "View public page"
   },
   "profileView": {
     "loadFailed": "Couldn't load this profile",
@@ -1714,11 +1740,15 @@
         "unchosen": "Trains {count, plural, one {# day} other {# days}} a week. Leave these alone to count forward from the start date."
       },
       "loadingClients": "Loading your clients…",
+      "loadingPrograms": "Loading your programs…",
       "more": "+ {count} more",
       "noClients": "No active clients yet. A client has to accept before they can be given work.",
+      "noProgramMatch": "No program matches that.",
+      "noPrograms": "No programs yet. Create one in Programs first.",
       "note": "Note",
       "program": "Program",
       "schedule": "Schedule",
+      "searchPrograms": "Search programs",
       "starts": "Starts",
       "title": "Assign program",
       "trainingDays": "Training days"
@@ -1920,8 +1950,11 @@
         "duplicated": "Program duplicated",
         "published": "Program published",
         "repeatFailed": "Saved, but the weeks could not be repeated",
-        "saveFailed": "Could not save the program"
+        "saveFailed": "Could not save the program",
+        "unpublishFailed": "Could not unpublish the program",
+        "unpublished": "Moved back to draft"
       },
+      "unpublish": "Unpublish",
       "viewAssignments": "View assignments",
       "weekFewer": "One week fewer",
       "weekMore": "One week more",
@@ -2374,6 +2407,7 @@
       "stepSeconds": "{step}s"
     },
     "loadError": {
+      "clientProgress": "Couldn't load their progress",
       "exercise": "Couldn't load this exercise",
       "history": "Couldn't load your history",
       "plan": "Couldn't open this plan",
@@ -2481,7 +2515,9 @@
       "todaysWorkout": "Today's workout"
     },
     "progress": {
+      "clientPrivacyNote": "Workouts your client does outside your plans stay private unless they share them, so these numbers may not count everything they did.",
       "empty": {
+        "clientMessage": "Workouts they log from your plans will build up here.",
         "message": "Log a few workouts and your numbers will build up here.",
         "title": "Nothing to show yet"
       },
@@ -2506,12 +2542,14 @@
         "title": "Delete routine"
       },
       "deleteRow": "Delete routine…",
+      "makeCopy": "Make a copy",
       "name": {
         "label": "Routine name",
         "placeholder": "Push day"
       },
       "noExercises": "No exercises yet. Add the movements in the order you do them.",
       "starterNote": "A MotionHive starter. Start it and it becomes yours to edit.",
+      "starterNoteCoach": "A MotionHive starter. Make a copy to change it for your clients.",
       "stepper": {
         "fewer": "One set fewer for {name}",
         "group": "Sets for {name}",
@@ -2530,6 +2568,8 @@
       "title": "Routine",
       "toast": {
         "alreadyIn": "{count, plural, one {That exercise is already in this routine} other {# were already in this routine}}",
+        "copied": "Copy made. It is yours to edit.",
+        "copyFailed": "Could not make a copy",
         "deleteFailed": "Could not delete the routine",
         "deleted": "Routine deleted",
         "saveFailed": "Could not save the routine",
@@ -2592,5 +2632,39 @@
       "kgShort": "kg",
       "meters": "{value} m"
     }
+  },
+  "feedback": {
+    "helper": "We read every message, and a confirmation goes to your email.",
+    "menuRow": "Send feedback",
+    "messageLabel": "Details",
+    "minLength": "Write at least {min} characters.",
+    "placeholder": {
+      "BUG": {
+        "message": "What were you doing when it happened? What did you expect, and what happened instead?",
+        "title": "e.g. A set I logged did not save"
+      },
+      "OTHER": {
+        "message": "Tell us anything. We read every message.",
+        "title": "e.g. A question about my plan"
+      },
+      "SUGGESTION": {
+        "message": "What would you like to be able to do, and how would it help you?",
+        "title": "e.g. Reorder exercises by dragging"
+      }
+    },
+    "send": "Send",
+    "subtitle": "Help us make MotionHive better",
+    "title": "Share feedback",
+    "titleLabel": "Title",
+    "toast": {
+      "sendFailed": "Could not send your feedback. Try again.",
+      "sent": "Thanks, we got your feedback."
+    },
+    "type": {
+      "BUG": "Bug report",
+      "OTHER": "Other",
+      "SUGGESTION": "Suggestion"
+    },
+    "typeLabel": "What is it about?"
   }
 }

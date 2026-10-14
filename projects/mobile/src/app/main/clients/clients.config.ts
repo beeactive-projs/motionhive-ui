@@ -42,6 +42,7 @@ export function clientSubline(client: InstructorClient): string {
 
 export const ClientActionIds = {
   Message: 'message',
+  ViewProfile: 'viewProfile',
   EditNotes: 'editNotes',
   Unarchive: 'unarchive',
   Archive: 'archive',
@@ -72,6 +73,12 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
     color: 'primary',
   },
   {
+    id: ClientActionIds.ViewProfile,
+    label: 'clients.actions.viewProfile',
+    icon: 'person-circle-outline',
+    color: 'medium',
+  },
+  {
     id: ClientActionIds.EditNotes,
     label: 'clients.actions.editNotes',
     icon: 'create-outline',
@@ -93,8 +100,9 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
 ];
 
 /**
- * Only the verbs that can do something for this row. Messaging needs an
- * account on the other end; notes and archiving need a settled relationship;
+ * Only the verbs that can do something for this row. Messaging and the
+ * public profile need an account on the other end; notes and archiving need
+ * a settled relationship;
  * archive and unarchive are each other's undo, so exactly one shows.
  */
 export function visibleClientActions(client: InstructorClient): ClientAction[] {
@@ -105,6 +113,8 @@ export function visibleClientActions(client: InstructorClient): ClientAction[] {
     switch (action.id) {
       case ClientActionIds.Message:
         return !!client.client;
+      case ClientActionIds.ViewProfile:
+        return !!client.client?.handle;
       case ClientActionIds.EditNotes:
         return active || archived;
       case ClientActionIds.Archive:

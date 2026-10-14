@@ -29,4 +29,16 @@ export interface PublicUserProfile {
   displayRoles: string[];
   memberSince: string;
   isInstructor: boolean;
+  /**
+   * Groups the signed-in viewer and this person are both active members of.
+   * Empty for a guest or your own profile; absent from an API older than it.
+   */
+  sharedGroups?: PublicSharedGroup[];
+}
+
+/** One group in common — enough to name it. */
+export interface PublicSharedGroup {
+  id: string;
+  name: string;
+  logoUrl: string | null;
 }

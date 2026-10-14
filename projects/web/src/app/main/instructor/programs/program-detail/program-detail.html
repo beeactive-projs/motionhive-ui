@@ -48,10 +48,12 @@
         <i class="pi pi-ellipsis-v"></i>
       </button>
       } @else {
+      @if (!isStarter()) {
       <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="openEdit()">
         <i class="pi pi-pencil"></i>
         {{ 'button.edit' | translate }}
       </button>
+      }
       <!-- A copy to build the next block from, leaving this one untouched. -->
       <button pButton
         type="button"
@@ -68,6 +70,7 @@
         <i class="pi pi-user-plus"></i>
         {{ 'programs.detail.assign' | translate }}
       </button>
+      @if (!isStarter()) {
       <button pButton
         type="button"
         text
@@ -79,6 +82,7 @@
         <i class="pi" [class]="deleting() ? 'pi-spinner pi-spin' : 'pi-trash'"></i>
         {{ 'button.delete' | translate }}
       </button>
+      }
       }
     </div>
     }
@@ -102,13 +106,25 @@
   </div>
   }
 
+  <!-- Starter banner · says why nothing here is editable and what to do instead. -->
+  @if (isStarter()) {
+  <div class="mh-pd-banner mh-pd-banner--starter mb-3 flex items-center gap-3 rounded-xl px-4 py-3 text-sm"
+    role="status">
+    <i class="pi pi-lock shrink-0 text-xl"></i>
+    <div>
+      <strong class="font-bold">{{ 'programs.detail.starterBanner.title' | translate }}</strong>
+      {{ 'programs.detail.starterBanner.message' | translate }}
+    </div>
+  </div>
+  }
+
   <!-- Two-pane body · outline rail left, one workout right.
        `has-editor` drives the mobile one-pane flip. -->
   <div class="mh-builder__body flex min-h-0 flex-1 border-t border-surface max-md:flex-col"
     [class.has-editor]="explicitWorkoutId() !== null">
     <aside class="mh-builder__rail flex min-h-0 w-full flex-col py-3 md:w-1/4 md:border-r md:border-surface md:px-3">
       <mh-builder-rail [weeks]="weeks()" [selectedWorkoutId]="activeWorkout()?.id ?? null"
-        [collapsedWeeks]="collapsedWeeks()" [totalWorkouts]="totalWorkouts()" (selectWorkout)="selectWorkout($event)"
+        [collapsedWeeks]="collapsedWeeks()" [totalWorkouts]="totalWorkouts()" [readOnly]="isStarter()" (selectWorkout)="selectWorkout($event)"
         (toggleWeek)="toggleWeekCollapsed($event)" (addWorkout)="openAddWorkout($event)"
         (copyWeek)="openCopyWeek($event)" (deleteWeek)="confirmDeleteWeek($event)"
         (workoutDropped)="onRailWorkoutDropped($event)" (weekDropped)="onRailWeekDropped($event)" />
@@ -119,7 +135,7 @@
       <mh-workout-editor [workout]="w" [weekNumber]="w.weekIndex + 1"
         [indexInWeek]="activeWorkoutPosition().indexInWeek"
         [weekWorkoutCount]="activeWorkoutPosition().weekWorkoutCount" [canMoveExerciseAcross]="totalWorkouts() >= 2"
-        [showBack]="isMobile()" (back)="closeEditor()" (moveUp)="moveActiveWorkout(-1)"
+        [showBack]="isMobile()" [readOnly]="isStarter()" (back)="closeEditor()" (moveUp)="moveActiveWorkout(-1)"
         (moveDown)="moveActiveWorkout(1)" (moveToWeek)="openMoveWorkoutDialog(w)" (copyDay)="openCopyDay(w)" (edit)="openEditWorkout(w)"
         (remove)="confirmDeleteWorkout(w)" (addExercise)="openExercisePicker(w)"
         (reorderExercise)="moveExercise(w, $event.from, $event.to)" (moveExerciseTo)="openMoveExerciseDialog(w, $event)"
@@ -132,7 +148,7 @@
       } @else if (totalWorkouts() === 0) {
       <mh-list-empty-state icon="pi pi-calendar-plus" [title]="'programs.detail.empty.title' | translate"
         [message]="'programs.detail.empty.message' | translate"
-        [actionLabel]="'programs.detail.empty.action' | translate" actionIcon="pi pi-plus" actionSeverity="secondary" [actionOutlined]="true"
+        [actionLabel]="isStarter() ? undefined : ('programs.detail.empty.action' | translate)" actionIcon="pi pi-plus" actionSeverity="secondary" [actionOutlined]="true"
         (action)="openAddWorkout(0)" />
       }
     </section>
@@ -144,7 +160,7 @@
 @if (isMobile()) {
 <mh-bottom-sheet [open]="actionsOpen()" (openChange)="actionsOpen.set($event)" size="small" [showClose]="false">
   @if (program()) {
-  <mh-action-list [items]="detailActions" (select)="onDetailAction($event)" />
+  <mh-action-list [items]="detailActions()" (select)="onDetailAction($event)" />
   }
 </mh-bottom-sheet>
 }

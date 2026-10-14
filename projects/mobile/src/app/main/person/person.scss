@@ -45,3 +45,32 @@
 .empty {
   text-align: center;
 }
+
+/* City and country under the handle, with the pin as its only decoration. */
+.place {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+
+  ion-icon {
+    font-size: var(--mh-text-base);
+  }
+}
+
+/* The coach's web page: a quiet outline, so Message stays the one honey
+   action on the screen. Tall enough for a thumb. */
+.public-page {
+  --color: var(--mh-color-honey-deep);
+  --border-color: var(--ion-border-color);
+  min-height: var(--mh-tap-target);
+  margin-top: 0.25rem;
+}
+
+/* "Shared by Elena." under the contact rows, aligned with the list text. */
+.shared {
+  display: block;
+  padding: 0 0.375rem;
+}

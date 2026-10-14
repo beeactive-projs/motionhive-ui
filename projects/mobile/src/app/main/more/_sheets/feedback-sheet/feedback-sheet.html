@@ -1,0 +1,58 @@
+<ng-template #body>
+  <div class="mh-section-label">{{ 'feedback.typeLabel' | translate }}</div>
+  <div class="mh-chip-row kinds" role="group" [attr.aria-label]="'feedback.typeLabel' | translate">
+    @for (kind of kinds; track kind.type) {
+      <ion-chip
+        [class.selected]="type() === kind.type"
+        [attr.aria-pressed]="type() === kind.type"
+        (click)="type.set(kind.type)"
+      >
+        {{ kind.label | translate }}
+      </ion-chip>
+    }
+  </div>
+
+  <ion-input
+    class="field"
+    fill="outline"
+    labelPlacement="stacked"
+    [label]="'feedback.titleLabel' | translate"
+    [placeholder]="kind().titlePlaceholder | translate"
+    [value]="title()"
+    [maxlength]="200"
+    (ionInput)="title.set($any($event).detail.value ?? '')"
+  />
+
+  <ion-textarea
+    class="field"
+    fill="outline"
+    labelPlacement="stacked"
+    [autoGrow]="true"
+    [rows]="5"
+    [maxlength]="5000"
+    [label]="'feedback.messageLabel' | translate"
+    [placeholder]="kind().messagePlaceholder | translate"
+    [value]="message()"
+    (ionInput)="message.set($any($event).detail.value ?? '')"
+  />
+
+  @if (messageTooShort()) {
+    <p class="mh-helper over">{{ 'feedback.minLength' | translate: { min: messageMin } }}</p>
+  } @else {
+    <p class="mh-helper">{{ 'feedback.helper' | translate }}</p>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'feedback.title' | translate"
+  [subtitle]="'feedback.subtitle' | translate"
+  [body]="body"
+  [saveLabel]="'feedback.send' | translate"
+  [dismissLabel]="'button.cancel' | translate"
+  [canSave]="canSend()"
+  [saving]="sending()"
+  [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9"
+  (save)="send()"
+/>

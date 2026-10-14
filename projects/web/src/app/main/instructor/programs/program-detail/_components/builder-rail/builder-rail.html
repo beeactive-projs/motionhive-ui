@@ -39,7 +39,7 @@
     cdkDropList
     [cdkDropListData]="visibleWeeks()"
     cdkDropListLockAxis="y"
-    [cdkDropListDisabled]="searchActive()"
+    [cdkDropListDisabled]="searchActive() || readOnly()"
     (cdkDropListDropped)="onWeekDrop($event)"
   >
     @for (g of visibleWeeks(); track g.week) {
@@ -61,7 +61,7 @@
         </div>
 
         <div class="flex items-center gap-0.5">
-          @if (!searchActive()) {
+          @if (!searchActive() && !readOnly()) {
             <i
               cdkDragHandle
               class="mh-rail__grip pi pi-bars inline-flex shrink-0 items-center justify-center p-1 text-xs pointer-coarse:min-h-11 pointer-coarse:min-w-11"
@@ -88,21 +88,23 @@
             <span class="text-xs font-bold uppercase tracking-wide">{{ 'programs.common.week' | translate: { week: g.week + 1 } }}</span>
             <span class="ml-auto text-xs tabular-nums">{{ g.workouts.length }}</span>
           </button>
-          <button pButton
-            type="button"
-            size="small"
-            severity="secondary"
-            [text]="true"
-            [rounded]="true"
-            [pTooltip]="'programs.rail.addWorkout' | translate"
-            tooltipPosition="right"
-            (click)="addWorkout.emit(g.week)"
-            [attr.aria-label]="'programs.rail.addWorkoutToWeek' | translate: { week: g.week + 1 }"
-            iconOnly
-          >
-            <i class="pi pi-plus"></i>
-          </button>
-          @if (!searchActive() && (g.workouts.length > 0 || weeks().length > 1)) {
+          @if (!readOnly()) {
+            <button pButton
+              type="button"
+              size="small"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              [pTooltip]="'programs.rail.addWorkout' | translate"
+              tooltipPosition="right"
+              (click)="addWorkout.emit(g.week)"
+              [attr.aria-label]="'programs.rail.addWorkoutToWeek' | translate: { week: g.week + 1 }"
+              iconOnly
+            >
+              <i class="pi pi-plus"></i>
+            </button>
+          }
+          @if (!readOnly() && !searchActive() && (g.workouts.length > 0 || weeks().length > 1)) {
             <!-- Copy and delete share one menu: the rail is too narrow for a
                  third icon without wrapping the week label. -->
             <button pButton
@@ -146,7 +148,7 @@
           [cdkDropListConnectedTo]="workoutListIds()"
           cdkDropListLockAxis="y"
           [cdkDropListEnterPredicate]="canEnterWeek"
-          [cdkDropListDisabled]="searchActive()"
+          [cdkDropListDisabled]="searchActive() || readOnly()"
           (cdkDropListDropped)="onWorkoutDrop($event)"
         >
           @if (isWeekOpen(g.week)) {
@@ -191,18 +193,20 @@
 
 <!-- Footer -->
 <div class="mt-2 flex shrink-0 flex-col gap-2">
-  <button pButton
-    type="button"
-    size="small"
-    severity="secondary"
-    [outlined]="true"
-    fluid
-    (click)="addWorkout.emit(null)"
-    class="mh-dashed-btn"
-  >
-    <i class="pi pi-plus"></i>
-    {{ (totalWorkouts() === 0 ? 'programs.rail.addWorkout' : 'programs.rail.addWorkoutAnotherWeek') | translate }}
-  </button>
+  @if (!readOnly()) {
+    <button pButton
+      type="button"
+      size="small"
+      severity="secondary"
+      [outlined]="true"
+      fluid
+      (click)="addWorkout.emit(null)"
+      class="mh-dashed-btn"
+    >
+      <i class="pi pi-plus"></i>
+      {{ (totalWorkouts() === 0 ? 'programs.rail.addWorkout' : 'programs.rail.addWorkoutAnotherWeek') | translate }}
+    </button>
+  }
   <div class="mh-rail__summary flex items-center gap-2 px-3 py-2 text-xs font-semibold">
     <i class="pi pi-calendar text-xs" aria-hidden="true"></i>
     <span>

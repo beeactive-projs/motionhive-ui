@@ -870,7 +870,7 @@
     "goHome": "Acasă",
     "notFound": {
       "message": "Pagina asta nu există, dar următorul tău antrenament da. Hai să te readucem pe drumul cel bun.",
-      "title": "Ai luat-o pe alt drum."
+      "title": "Ups, ai luat-o pe un drum greșit."
     },
     "serverError": {
       "500": {
@@ -3215,6 +3215,7 @@
       "actions": {
         "assign": "Atribuie unui client",
         "delete": "Șterge programul…",
+        "duplicate": "Duplică programul",
         "edit": "Editează programul"
       },
       "archivedBanner": {
@@ -3229,7 +3230,11 @@
       },
       "fallbackTitle": "Program",
       "loading": "Se încarcă programul…",
-      "setsInWeek": "{count, plural, one {# serie} few {# serii} other {# de serii}} în săptămâna {week}"
+      "setsInWeek": "{count, plural, one {# serie} few {# serii} other {# de serii}} în săptămâna {week}",
+      "starterBanner": {
+        "message": "Îl poți atribui așa cum este. Ca să schimbi ceva, duplică-l și editează copia ta.",
+        "title": "Acest program este creat de MotionHive."
+      }
     },
     "editor": {
       "addExercise": "Adaugă exercițiu",
@@ -3310,7 +3315,8 @@
         "archive": "Arhivează…",
         "delete": "Șterge…",
         "publish": "Publică",
-        "restore": "Readu la ciornă"
+        "restore": "Readu la ciornă",
+        "unpublish": "Anulează publicarea"
       },
       "newProgram": "Program nou",
       "origin": {
@@ -3474,6 +3480,7 @@
         "summaryToDay": "{name} a fost copiat în ziua de {day}"
       },
       "deleteError": "Programul nu s-a putut șterge",
+      "deleteWeekError": "Săptămâna nu s-a putut șterge",
       "deleteWorkoutError": "Antrenamentul nu s-a putut șterge",
       "deleted": "Program șters",
       "duplicateSetError": "Seria nu s-a putut duplica",
@@ -3514,6 +3521,7 @@
       "removeExerciseError": "Exercițiul nu s-a putut elimina",
       "removeSetError": "Seria nu s-a putut elimina",
       "reorderError": "Noua ordine nu s-a putut salva",
+      "repeatWeeksError": "Am salvat, dar săptămânile nu s-au putut repeta",
       "restored": "Programul a revenit la ciornă",
       "saveProgramError": "Programul nu s-a putut salva",
       "saveSetError": "Seria nu s-a putut salva",
@@ -3522,11 +3530,13 @@
       "setRemoved": "Serie eliminată",
       "setUpdated": "Serie actualizată",
       "setsAdded": "{count, plural, one {Serie adăugată} few {# serii adăugate} other {# de serii adăugate}}",
+      "unpublished": "Programul a revenit la ciornă",
       "updateError": "Programul nu s-a putut actualiza",
       "weekCopied": {
         "detail": "{count, plural, one {# antrenament copiat.} few {# antrenamente copiate.} other {# de antrenamente copiate.}}",
         "summary": "Săptămâna {source} a fost copiată în săptămâna {target}"
       },
+      "weekDeleted": "Săptămâna {week} a fost ștearsă",
       "weekFull": {
         "detail": "O săptămână poate avea cel mult 7 antrenamente.",
         "summary": "Săptămâna e plină"
@@ -3537,10 +3547,7 @@
         "detail": "{name} → săptămâna {week}, ziua {day}.",
         "summary": "Antrenament mutat"
       },
-      "workoutUpdated": "Antrenament actualizat",
-      "weekDeleted": "Săptămâna {week} a fost ștearsă",
-      "deleteWeekError": "Săptămâna nu s-a putut șterge",
-      "repeatWeeksError": "Am salvat, dar săptămânile nu s-au putut repeta"
+      "workoutUpdated": "Antrenament actualizat"
     },
     "workoutForm": {
       "minutesSuffix": "(min)",

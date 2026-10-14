@@ -226,7 +226,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   }
 
   openExercise(row: PrescribedExercise): void {
-    void this._router.navigate(['/tabs/workouts/exercise', row.exerciseId]);
+    void this._router.navigate(['/tabs/programs/exercise', row.exerciseId]);
   }
 
   /**

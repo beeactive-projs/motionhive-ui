@@ -105,6 +105,38 @@
       </div>
     }
 
+    <!-- Groups to join: public groups the reader is not in yet, so there is
+         somewhere to go besides a coach. Hidden while empty or failing, like
+         the coaches rail; the full list is Groups' own Discover lens. -->
+    @if (groupsStore.groups().length > 0) {
+      <div class="rail-head">
+        <span class="mh-kicker">{{ 'discover.groupsRail.title' | translate }}</span>
+        <ion-button class="rail-link" fill="clear" size="small" (click)="openAllGroups()">
+          {{ 'discover.groupsRail.all' | translate }}
+        </ion-button>
+      </div>
+      <div class="rail">
+        @for (group of groupsStore.groups(); track group.id) {
+          <button type="button" class="rail-item" (click)="openGroup(group)">
+            <mh-hex-avatar
+              size="lg"
+              [name]="group.name"
+              [imageUrl]="group.logoUrl"
+              [color]="groupTone(group)"
+            />
+            <span class="rail-name">{{ group.name }}</span>
+            @if (group.city) {
+              <span class="rail-city">{{ group.city }}</span>
+            }
+          </button>
+        }
+        <button type="button" class="rail-item" (click)="openAllGroups()">
+          <mh-hex-avatar size="lg" icon="arrow-forward" color="medium" tone="wash" />
+          <span class="rail-name muted">{{ 'discover.groupsRail.all' | translate }}</span>
+        </button>
+      </div>
+    }
+
     <!-- The feed: quick filters, then chronological buckets. -->
     <div class="feed-head">
       <span class="mh-kicker">{{ 'discover.feed.title' | translate }}</span>
@@ -208,6 +240,16 @@
             <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
           </ion-label>
         </ion-item>
+        <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item lines="none">
+            <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
         <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
         @for (_ of [1, 2]; track $index) {
           <mh-session-row-skeleton />
@@ -235,6 +277,27 @@
           @for (coach of search.coaches(); track coach.id) {
             <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
           }
+        }
+        @if (search.groups().length > 0) {
+          <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (group of search.groups(); track group.id; let last = $last) {
+              <ion-item button [detail]="true" [lines]="last ? 'none' : 'full'" (click)="openGroup(group)">
+                <mh-hex-avatar
+                  slot="start"
+                  size="md"
+                  aria-hidden="true"
+                  [name]="group.name"
+                  [imageUrl]="group.logoUrl"
+                  [color]="groupTone(group)"
+                />
+                <ion-label>
+                  <h2>{{ group.name }}</h2>
+                  <p>{{ groupMeta(group) }}</p>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
         }
         @if (search.sessions().length > 0) {
           <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>

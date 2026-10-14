@@ -4,6 +4,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
@@ -121,9 +122,10 @@ export class Programs {
 
   /**
    * Whose content to show. Narrows what is already loaded rather than
-   * refetching — `source` travels on every row, so the answer is in hand.
+   * refetching: `source` travels on every row, so the answer is in hand.
+   * Opens on the coach's own work, with MotionHive's starters one tab away.
    */
-  readonly originFilter = signal<ProgramOrigin>('all');
+  readonly originFilter = signal<ProgramOrigin>('mine');
   readonly formDialogOpen = signal(false);
   /** When set → the form dialog opens in edit mode; null → create mode. */
   readonly editTarget = signal<Program | null>(null);
@@ -140,17 +142,29 @@ export class Programs {
 
   // ── Derived ──────────────────────────────────────────────────────
 
-  readonly hasMore = computed(() => this.visibleItems().length < this.total());
+  // Counts what is loaded, not what the origin filter lets through: `total`
+  // covers both, so a narrowed view would otherwise offer pages forever.
+  readonly hasMore = computed(() => this.items().length < this.total());
 
   /** MotionHive's own starter content, which appears in every library. */
   isStarter(p: Program): boolean {
     return p.source === ProgramSource.System;
   }
 
+  /**
+   * "Mine" on an empty list beside a library full of starters would read as
+   * broken, so it shows everything until there is something of theirs.
+   */
+  readonly appliedOrigin = computed<ProgramOrigin>(() =>
+    this.originFilter() === 'mine' && !this.items().some((p) => !this.isStarter(p))
+      ? 'all'
+      : this.originFilter(),
+  );
+
   /** The rows actually rendered, after the origin filter. */
   readonly visibleItems = computed(() => {
     const rows = this.items();
-    switch (this.originFilter()) {
+    switch (this.appliedOrigin()) {
       case 'mine':
         return rows.filter((p) => p.source !== ProgramSource.System);
       case 'starters':
@@ -229,12 +243,16 @@ export class Programs {
   });
 
   constructor() {
-    // Effect-driven refetch on any filter change.
+    // Effect-driven refetch on any filter change. The fetch runs untracked:
+    // it reads `page`, so "Load more" moving to page 2 used to re-run this
+    // effect, which reset to page 1 and threw the new rows away.
     effect(() => {
       this.search();
       this.statusFilter();
-      this.page.set(1);
-      this._fetch(true);
+      untracked(() => {
+        this.page.set(1);
+        this._fetch(true);
+      });
     });
   }
 
@@ -307,6 +325,14 @@ export class Programs {
     this._setStatus(program, ProgramStatus.Published, 'programs.toast.published');
   }
 
+  /**
+   * Published → back to draft, to rework it. Non-destructive, no confirm:
+   * clients already on the plan keep their own copy.
+   */
+  unpublish(program: Program): void {
+    this._setStatus(program, ProgramStatus.Draft, 'programs.toast.unpublished');
+  }
+
   /** Archived → restore to draft. Non-destructive, no confirm. */
   restore(program: Program): void {
     this._setStatus(program, ProgramStatus.Draft, 'programs.toast.restored');
@@ -376,6 +402,11 @@ export class Programs {
         });
         break;
       case ProgramStatus.Published:
+        items.push({
+          label: t('programs.list.menu.unpublish'),
+          icon: 'pi pi-undo',
+          command: () => this.unpublish(p),
+        });
         items.push({
           label: t('programs.list.menu.archive'),
           icon: 'pi pi-inbox',

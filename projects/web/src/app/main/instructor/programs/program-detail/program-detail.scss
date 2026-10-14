@@ -52,6 +52,15 @@
       color: var(--p-text-muted-color);
     }
   }
+
+  &--starter {
+    background: color-mix(in srgb, var(--p-primary-color) 8%, transparent);
+    color: var(--p-text-color);
+    border: 1px solid color-mix(in srgb, var(--p-primary-color) 25%, transparent);
+    i {
+      color: var(--p-primary-color);
+    }
+  }
 }
 
 // Mobile: one pane at a time (matches MOBILE_QUERY in viewport.utils and

@@ -54,6 +54,8 @@
           <mh-assignment-row
             [assignment]="row"
             [busy]="store.isBusy(row.id)"
+            [tappable]="true"
+            (select)="openClient(row)"
             (pause)="setStatus(row, Statuses.Paused)"
             (resume)="setStatus(row, Statuses.Active)"
           />

@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
-import { InstructorSearchResult, ProfileService } from 'core';
+import { DiscoverGroup, GroupService, InstructorSearchResult, ProfileService } from 'core';
 
 /**
  * The coach directory behind Discover — the "Taking new clients" rail and
@@ -56,6 +56,45 @@ export class DiscoverCoachesStore {
           this._loading.set(false);
           opts.done?.();
         },
+      });
+  }
+}
+
+/** How many groups the rail shows before "See all" takes over. */
+const GROUP_RAIL_LIMIT = 8;
+
+/**
+ * Public groups for Discover's "Groups to join" rail. The endpoint already
+ * leaves out groups the reader is in, so everything here is somewhere they
+ * could go. Same load policy as the coaches rail: once per visit, forced by
+ * pull to refresh, and a failure stays silent and retries on the next entry.
+ */
+@Injectable()
+export class DiscoverGroupsStore {
+  private readonly _groupService = inject(GroupService);
+
+  private readonly _groups = signal<DiscoverGroup[]>([]);
+  private readonly _loading = signal(false);
+  private readonly _loaded = signal(false);
+
+  readonly groups = this._groups.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly loaded = this._loaded.asReadonly();
+
+  load(opts: { force?: boolean } = {}): void {
+    if (this._loading() || (this._loaded() && !opts.force)) return;
+    this._loading.set(true);
+
+    this._groupService
+      .discoverGroups({ limit: GROUP_RAIL_LIMIT })
+      .pipe(take(1))
+      .subscribe({
+        next: (page) => {
+          this._groups.set(page.items);
+          this._loaded.set(true);
+          this._loading.set(false);
+        },
+        error: () => this._loading.set(false),
       });
   }
 }

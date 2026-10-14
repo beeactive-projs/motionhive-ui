@@ -29,6 +29,7 @@ import {
   PublicUserProfile,
   appLocale,
   countryNameFromCode,
+  publicProfileUrl,
   translate,
 } from 'core';
 
@@ -83,16 +84,18 @@ export class Person {
   private readonly _router = inject(Router);
 
   /**
-   * Where back goes on a cold load. The screen is mounted under four tabs
-   * (messages, discover, and each role's sessions area), so the fallback
-   * follows whichever one the URL is in — without it a deep link renders a
-   * header with no way out.
+   * Where back goes on a cold load. The screen is mounted under six tabs
+   * (messages, discover, each role's sessions area, and the coach's clients
+   * and programs), so the fallback follows whichever one the URL is in —
+   * without it a deep link renders a header with no way out.
    */
   readonly backHref = computed(() => {
     const url = this._router.url;
     if (url.startsWith('/tabs/messages')) return '/tabs/messages';
     if (url.startsWith('/tabs/discover')) return '/tabs/discover';
     if (url.startsWith('/tabs/user')) return '/tabs/user/sessions';
+    if (url.startsWith('/tabs/clients')) return '/tabs/clients';
+    if (url.startsWith('/tabs/programs')) return '/tabs/programs';
     return '/tabs/coach/sessions';
   });
 
@@ -142,11 +145,19 @@ export class Person {
     return new Date(iso).toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' });
   });
 
-  /** Contact rows only exist when the viewer's tier includes them. */
-  readonly hasContactDetails = computed(() => {
+  /**
+   * Email and phone are each the person's own call: their privacy settings
+   * default both to "only me", so these rows exist only when they chose to
+   * share them with everyone or with their coaches. Kept apart from the
+   * public basics at the top, and said to be theirs to share.
+   */
+  readonly hasContact = computed(() => {
     const profile = this.profile();
-    return !!profile && (!!profile.email || !!profile.phone || !!this.location());
+    return !!profile && (!!profile.email || !!profile.phone);
   });
+
+  /** Groups you are both in — the one thing here that is about the two of you. */
+  readonly sharedGroups = computed(() => this.profile()?.sharedGroups ?? []);
 
   readonly bio = computed(() => this.coachProfile()?.bio?.trim() || null);
 
@@ -179,7 +190,9 @@ export class Person {
       this.specializations().length === 0 &&
       !this.experience() &&
       !this.rating() &&
-      !this.hasContactDetails() &&
+      !this.location() &&
+      !this.hasContact() &&
+      this.sharedGroups().length === 0 &&
       this.roles().length === 0,
   );
 
@@ -222,6 +235,16 @@ export class Person {
         next: (coach) => this.coachProfile.set(coach),
         error: () => this.coachProfile.set(null),
       });
+  }
+
+  /**
+   * A coach's shareable page on the web — the one their link and QR code
+   * open — in the browser, for the offerings and reviews this screen leaves
+   * out.
+   */
+  openPublicPage(): void {
+    const handle = this.profile()?.handle;
+    if (handle) window.open(publicProfileUrl(handle), '_blank', 'noopener');
   }
 
   message(): void {

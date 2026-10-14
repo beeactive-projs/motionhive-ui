@@ -5,7 +5,7 @@
         <!-- Editing a saved routine: back out to how it was, not off the page. -->
         <ion-button (click)="cancelEdit()">{{ 'button.cancel' | translate }}</ion-button>
       } @else {
-        <ion-back-button defaultHref="/tabs/workouts" />
+        <ion-back-button [defaultHref]="stackBase()" />
       }
     </ion-buttons>
     <ion-title>{{ title() }}</ion-title>
@@ -53,7 +53,7 @@
         [eyebrow]="eyebrow()"
         [title]="routine()!.name"
         [chips]="chips()"
-        [hint]="readOnly() ? ('workouts.routineBuilder.starterNote' | translate) : null"
+        [hint]="readOnly() ? starterHint() : null"
         [note]="routine()!.notes"
         [noteLabel]="noteLabel()"
         [exercises]="overviewExercises()"
@@ -186,12 +186,30 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
-        <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
-        <!-- A starter has nothing to edit: starting it is how it becomes yours. -->
-        @if (!readOnly()) {
-          <div class="mh-quiet-actions">
-            <ion-button fill="clear" size="small" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
-          </div>
+        @if (isCoachMode()) {
+          <!-- Coaching: a routine is something to shape and hand out. A
+               starter becomes yours by copying it; your own leads with Edit,
+               with a copy one quiet tap away for a variation. -->
+          @if (readOnly()) {
+            <ion-button expand="block" [disabled]="copying()" (click)="makeCopy()">
+              {{ 'workouts.routineBuilder.makeCopy' | translate }}
+            </ion-button>
+          } @else {
+            <ion-button expand="block" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
+            <div class="mh-quiet-actions">
+              <ion-button fill="clear" size="small" [disabled]="copying()" (click)="makeCopy()">
+                {{ 'workouts.routineBuilder.makeCopy' | translate }}
+              </ion-button>
+            </div>
+          }
+        } @else {
+          <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
+          <!-- A starter has nothing to edit: starting it is how it becomes yours. -->
+          @if (!readOnly()) {
+            <div class="mh-quiet-actions">
+              <ion-button fill="clear" size="small" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
+            </div>
+          }
         }
       </div>
     </ion-toolbar>

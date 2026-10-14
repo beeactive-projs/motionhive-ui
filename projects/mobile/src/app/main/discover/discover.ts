@@ -12,6 +12,7 @@ import {
   IonInfiniteScrollContent,
   IonItem,
   IonLabel,
+  IonList,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
@@ -25,12 +26,14 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
+  DiscoverGroup,
   InstructorSearchResult,
   MyBookingsIndexStore,
   PublicSessionInstance,
   SessionGroup,
   SessionsDiscoverStore,
   groupSessionsByBucket,
+  translate,
 } from 'core';
 
 import { AvatarButton } from '../../_shared/components/avatar-button/avatar-button';
@@ -56,7 +59,8 @@ import {
   compileDatePreset,
   quickFilterSelected,
 } from './discover.config';
-import { DiscoverCoachesStore } from './discover.store';
+import { GroupsSegments } from '../groups/groups.filters';
+import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
 
 /**
  * Discover — the trainee's front door to the catalogue: brand hero, one
@@ -87,6 +91,7 @@ import { DiscoverCoachesStore } from './discover.store';
     IonInfiniteScrollContent,
     IonItem,
     IonLabel,
+    IonList,
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
@@ -100,11 +105,12 @@ import { DiscoverCoachesStore } from './discover.store';
   ],
   templateUrl: './discover.html',
   styleUrl: './discover.scss',
-  providers: [SessionsDiscoverStore, DiscoverCoachesStore],
+  providers: [SessionsDiscoverStore, DiscoverCoachesStore, DiscoverGroupsStore],
 })
 export class Discover implements ViewWillEnter {
   readonly sessionsStore = inject(SessionsDiscoverStore);
   readonly coachesStore = inject(DiscoverCoachesStore);
+  readonly groupsStore = inject(DiscoverGroupsStore);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
   private readonly _clockService = inject(ClockService);
   private readonly _router = inject(Router);
@@ -128,6 +134,7 @@ export class Discover implements ViewWillEnter {
     this._clockService.bump();
     this._myBookingsIndexStore.ensureLoaded();
     this.coachesStore.load();
+    this.groupsStore.load();
     // Filters survive re-entry; stale rows refresh in place (no blank flash).
     this.sessionsStore.reload();
   }
@@ -250,7 +257,8 @@ export class Discover implements ViewWillEnter {
     this._clockService.bump();
     this._myBookingsIndexStore.ensureLoaded(true);
     this.coachesStore.load({ force: true });
-    // The spinner hangs on the feed — the rail settles on its own.
+    this.groupsStore.load({ force: true });
+    // The spinner hangs on the feed — the rails settle on their own.
     this.sessionsStore.reload(() => void event.target.complete());
   }
 
@@ -268,5 +276,27 @@ export class Discover implements ViewWillEnter {
 
   openAllCoaches(): void {
     void this._router.navigate(['/tabs/discover/coaches']);
+  }
+
+  /** A group seen from outside, pushed onto this stack so back returns here. */
+  openGroup(group: DiscoverGroup): void {
+    void this._router.navigate(['/tabs/discover/group', group.id]);
+  }
+
+  /** The full list lives in Groups' own Discover lens. */
+  openAllGroups(): void {
+    void this._router.navigate(['/tabs/groups'], {
+      queryParams: { segment: GroupsSegments.Discover },
+    });
+  }
+
+  groupTone(group: DiscoverGroup): string {
+    return avatarToneFor(group.id);
+  }
+
+  /** "12 members · Cluj-Napoca" — size first, then where. */
+  groupMeta(group: DiscoverGroup): string {
+    const members = translate('count.members', { count: group.memberCount });
+    return [members, group.city].filter(Boolean).join(' · ');
   }
 }

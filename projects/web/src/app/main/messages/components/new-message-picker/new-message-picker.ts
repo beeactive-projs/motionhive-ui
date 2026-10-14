@@ -76,14 +76,14 @@ export class NewMessagePicker {
   protected readonly recipientName = computed(() => {
     const u = this.selected();
     if (!u) return '';
-    return displayName(u, u.email);
+    return displayName(u);
   });
 
   protected readonly placeholder = computed(() => {
     const u = this.selected();
     if (!u) return this._translateService.instant('messages.composer.placeholderPick');
     return this._translateService.instant('messages.composer.placeholderNamed', {
-      name: u.firstName ?? u.email,
+      name: u.firstName ?? displayName(u),
     });
   });
 
@@ -145,11 +145,10 @@ export class NewMessagePicker {
   }
 
   protected initials(u: UserSearchResult): string {
-    const out = initialsOf(u);
-    return out !== '?' ? out : u.email.charAt(0).toUpperCase() || '?';
+    return initialsOf(u);
   }
 
   protected nameOf(u: UserSearchResult): string {
-    return displayName(u, u.email);
+    return displayName(u);
   }
 }

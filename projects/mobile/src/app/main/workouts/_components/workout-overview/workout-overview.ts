@@ -48,11 +48,22 @@ export class WorkoutOverview {
   private readonly _noteText = viewChild<ElementRef<HTMLElement>>('noteText');
 
   constructor() {
-    afterRenderEffect(() => {
+    // Measured on every size change, not once. The first render can land
+    // before the page has a layout (pushed mid transition, or in a tab not
+    // shown yet), and measuring an empty box says the note fits, which left
+    // a cut sentence with no way to read the rest.
+    afterRenderEffect((onCleanup) => {
       this.note();
       const el = this._noteText()?.nativeElement;
-      if (!el || this.noteOpen()) return;
-      this.noteOverflows.set(el.scrollHeight > el.clientHeight + 1);
+      if (!el) return;
+      const measure = (): void => {
+        if (this.noteOpen() || el.clientHeight === 0) return;
+        this.noteOverflows.set(el.scrollHeight > el.clientHeight + 1);
+      };
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(el);
+      onCleanup(() => observer.disconnect());
     });
   }
 

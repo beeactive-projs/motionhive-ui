@@ -25,6 +25,51 @@ export const programRoutes: Routes = [
     title: 'pageTitle.routine',
   },
   {
+    // The catalog page, pushed onto THIS stack so back returns to the routine
+    // or day it was opened from. On the Workouts stack, back had nothing of
+    // the coach's to pop and fell through to the exercise list.
+    path: 'exercise/:exerciseId',
+    loadComponent: () =>
+      import('../exercises/exercise-detail/exercise-detail').then((m) => m.ExerciseDetail),
+    title: 'pageTitle.exercise',
+  },
+  // A client, opened from a plan's list of who is on it — the same screens
+  // the Clients tab mounts, pushed onto THIS stack so back returns to the
+  // plan. See `clients/client-paths.ts`.
+  {
+    path: 'client/:clientId/training',
+    loadComponent: () =>
+      import('./client-training/client-training').then((m) => m.ClientTraining),
+    title: 'pageTitle.training',
+  },
+  {
+    path: 'client/:clientId/progress/:exerciseId',
+    loadComponent: () =>
+      import('../workouts/exercise-progress/exercise-progress').then((m) => m.ExerciseProgress),
+    title: 'pageTitle.exerciseProgress',
+  },
+  {
+    path: 'client/:clientId/progress',
+    loadComponent: () => import('../workouts/progress/progress').then((m) => m.Progress),
+    title: 'pageTitle.progress',
+  },
+  {
+    path: 'client/:clientId',
+    loadComponent: () =>
+      import('../clients/client-detail/client-detail').then((m) => m.ClientDetail),
+    title: 'pageTitle.client',
+  },
+  {
+    path: 'log/:id',
+    loadComponent: () => import('./log-review/log-review').then((m) => m.LogReview),
+    title: 'pageTitle.workout',
+  },
+  {
+    path: 'person/:handle',
+    loadComponent: () => import('../person/person').then((m) => m.Person),
+    title: 'pageTitle.profile',
+  },
+  {
     path: 'program/:id',
     loadComponent: () =>
       import('./program-builder/program-builder').then((m) => m.ProgramBuilder),

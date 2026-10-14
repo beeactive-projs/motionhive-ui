@@ -2,7 +2,7 @@ import { Component, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, catchError, debounceTime, of, switchMap } from 'rxjs';
-import { UserRole, UserSearchResult, UserService } from 'core';
+import { UserRole, UserSearchResult, UserService, displayName as personName } from 'core';
 import {
   AutoComplete,
   AutoCompleteCompleteEvent,
@@ -75,15 +75,6 @@ export class UserSearchAutocomplete {
     this.cleared.emit();
   }
 
-  displayName(user: UserSearchResult): string {
-    const name = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
-    return name || user.email;
-  }
-
-  initials(user: UserSearchResult): string {
-    const first = user.firstName?.charAt(0) ?? '';
-    const last = user.lastName?.charAt(0) ?? '';
-    const combined = (first + last).toUpperCase();
-    return combined || user.email.charAt(0).toUpperCase();
-  }
+  /** Also the text the input keeps once a person is picked. */
+  readonly displayName = (user: UserSearchResult): string => personName(user);
 }

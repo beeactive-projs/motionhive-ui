@@ -23,9 +23,13 @@ import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
 import {
+  AppModeStore,
+  AuthStore,
   CreateRoutineExercisePayload,
   Exercise,
   ExerciseKind,
+  NavModes,
+  ProgramService,
   Routine,
   RoutineService,
   RoutineSources,
@@ -37,6 +41,7 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { resolveMode } from '../../../_shared/config/tabs.config';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
@@ -134,9 +139,22 @@ export class RoutineBuilder implements ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _programService = inject(ProgramService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _appModeStore = inject(AppModeStore);
 
   readonly Targets = TargetFields;
   readonly skeletonRows = [1, 2, 3, 4];
+
+  /**
+   * The stack this page was pushed onto. It is mounted under the trainee's
+   * Workouts tab and the coach's Programs tab, and back returns to origin,
+   * so the back fallback and every way out of the page stay in that stack.
+   * Pushing an exercise onto the other tab left back nowhere to return to.
+   */
+  readonly stackBase = computed(() =>
+    this._router.url.startsWith('/tabs/programs') ? '/tabs/programs' : '/tabs/workouts',
+  );
 
   readonly routine = signal<Routine | null>(null);
   readonly name = signal('');
@@ -146,6 +164,7 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly error = signal(false);
   readonly saving = signal(false);
   readonly starting = signal(false);
+  readonly copying = signal(false);
   readonly pickerOpen = signal(false);
   readonly deleteOpen = signal(false);
   readonly deleting = signal(false);
@@ -183,6 +202,26 @@ export class RoutineBuilder implements ViewWillEnter {
 
   /** A starter belongs to nobody: runnable and copyable, never editable. */
   readonly readOnly = computed(() => this.routine()?.source === RoutineSources.System);
+
+  /**
+   * The role this person chose, which decides what the page offers. A coach
+   * looks at a routine to shape it and hand it out — copy and edit — while
+   * a trainee looks at one to do it, so Start leads. Someone who is not an
+   * instructor is always training.
+   */
+  readonly isCoachMode = computed(
+    () =>
+      resolveMode(this._authStore.isInstructor(), this._appModeStore.mode()) === NavModes.Coach,
+  );
+
+  /** What a starter does for this reader: become theirs by starting, or by copying. */
+  readonly starterHint = computed(() =>
+    this._translateService.instant(
+      this.isCoachMode()
+        ? 'workouts.routineBuilder.starterNoteCoach'
+        : 'workouts.routineBuilder.starterNote',
+    ),
+  );
 
   /** The read view: any saved routine, unless you are editing your own. */
   readonly showOverview = computed(
@@ -329,6 +368,41 @@ export class RoutineBuilder implements ViewWillEnter {
       });
   }
 
+  // ─── Copying ──────────────────────────────────────────────────
+
+  /**
+   * A copy of this routine, owned by the caller — how a coach makes a
+   * MotionHive starter their own to change or hand out.
+   *
+   * Lands on the copy, replacing this page, as duplicating a program does:
+   * the reason to copy is to change something, and the thing to change is
+   * the new one. Back then returns to the list, not to the original.
+   */
+  makeCopy(): void {
+    const id = this._id();
+    if (!id || id === NEW || this.copying()) return;
+    this.copying.set(true);
+    this._programService
+      .duplicate(id)
+      .pipe(take(1))
+      .subscribe({
+        next: (copy) => {
+          this.copying.set(false);
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.routineBuilder.toast.copied'),
+          );
+          void this._router.navigate([this.stackBase(), 'routine', copy.id], { replaceUrl: true });
+        },
+        error: (err) => {
+          this.copying.set(false);
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.routineBuilder.toast.copyFailed'),
+          );
+        },
+      });
+  }
+
   // ─── Editing ──────────────────────────────────────────────────
 
   edit(): void {
@@ -388,7 +462,7 @@ export class RoutineBuilder implements ViewWillEnter {
   }
 
   openExerciseById(exerciseId: string): void {
-    void this._router.navigate(['/tabs/workouts/exercise', exerciseId]);
+    void this._router.navigate([this.stackBase(), 'exercise', exerciseId]);
   }
 
   setCount(index: number, delta: number): void {
@@ -487,7 +561,7 @@ export class RoutineBuilder implements ViewWillEnter {
           this._translateService.instant('workouts.routineBuilder.toast.saved'),
         );
         if (creating) {
-          void this._router.navigate(['/tabs/workouts']);
+          void this._router.navigate([this.stackBase()]);
           return;
         }
         // An edit lands back on the read view, showing what was just saved.
@@ -520,7 +594,7 @@ export class RoutineBuilder implements ViewWillEnter {
           void this._feedbackService.success(
             this._translateService.instant('workouts.routineBuilder.toast.deleted'),
           );
-          void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
+          void this._router.navigate([this.stackBase()], { replaceUrl: true });
         },
         error: (err) => {
           this.deleting.set(false);

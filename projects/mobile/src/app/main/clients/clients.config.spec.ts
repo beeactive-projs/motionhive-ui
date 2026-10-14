@@ -374,6 +374,19 @@ describe('client actions', () => {
       ClientActionIds.Message,
     );
   });
+
+  it('offers the public profile only to someone with a handle, right after Message', () => {
+    const withHandle = client({
+      client: { id: 'user-1', firstName: 'Maria', lastName: 'Ionescu', handle: 'maria' },
+    });
+    expect(visibleClientActions(withHandle).map((a) => a.id).slice(0, 2)).toEqual([
+      ClientActionIds.Message,
+      ClientActionIds.ViewProfile,
+    ]);
+    expect(visibleClientActions(client()).map((a) => a.id)).not.toContain(
+      ClientActionIds.ViewProfile,
+    );
+  });
 });
 
 describe('requests page', () => {

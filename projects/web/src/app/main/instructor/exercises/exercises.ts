@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonDirective } from 'primeng/button';
@@ -234,8 +234,12 @@ export class Exercises {
       this.selectedLevels();
       this.selectedMuscleIds();
       this.selectedEquipmentIds();
-      this.page.set(1);
-      this.fetch(true);
+      // Untracked: the fetch reads `page`, and tracking it made "Load more"
+      // re-run this effect and fall back to page 1.
+      untracked(() => {
+        this.page.set(1);
+        this.fetch(true);
+      });
     });
   }
 

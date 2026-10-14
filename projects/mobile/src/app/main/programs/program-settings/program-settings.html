@@ -98,9 +98,16 @@
 
           @if (isPublished()) {
             <p>{{ 'programs.settings.publishedNote' | translate }}</p>
-            <ion-button fill="clear" size="small" (click)="openAssignments()">
-              {{ 'programs.settings.viewAssignments' | translate }}
-            </ion-button>
+            <div class="status-actions">
+              <ion-button fill="clear" size="small" (click)="openAssignments()">
+                {{ 'programs.settings.viewAssignments' | translate }}
+              </ion-button>
+              <!-- Back to draft, to rework it. Quiet: it undoes cleanly, and
+                   clients already on the plan keep their own copy. -->
+              <ion-button fill="clear" size="small" color="medium" [disabled]="unpublishing()" (click)="unpublish()">
+                {{ 'programs.settings.unpublish' | translate }}
+              </ion-button>
+            </div>
           } @else {
             <p>{{ dayCountLabel() }} {{ blockersLabel() }}</p>
             <ion-button expand="block" [disabled]="!canPublish() || saving()" (click)="publish()">

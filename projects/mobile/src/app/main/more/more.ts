@@ -1,6 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { addIcons } from 'ionicons';
+import { chatbubbleEllipsesOutline } from 'ionicons/icons';
 import {
   IonButtons,
   IonContent,
@@ -23,6 +25,7 @@ import { ROLES } from '../../_shared/config/roles.config';
 import { resolveMode, TAB_SETS } from '../../_shared/config/tabs.config';
 import { MoreSection, MoreTile } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
+import { FeedbackSheet } from './_sheets/feedback-sheet/feedback-sheet';
 
 /**
  * The menu page behind the Menu tab — Messenger-style: an identity card that
@@ -37,6 +40,7 @@ import { MoreBadgesService } from '../../_shared/services/more-badges.service';
 @Component({
   selector: 'mh-more',
   imports: [
+    FeedbackSheet,
     HexAvatar,
     IonButtons,
     IonContent,
@@ -93,9 +97,22 @@ export class More implements ViewWillEnter {
       .filter((section) => section.items.length > 0);
   });
 
+  /** The feedback sheet, from the row at the foot of the menu. */
+  readonly feedbackOpen = signal(false);
+
+  constructor() {
+    // The feedback row's glyph is the menu's own; the tab shell registers
+    // only the icons its configs name.
+    addIcons({ chatbubbleEllipsesOutline });
+  }
+
   /** Tab pages stay alive, so re-entering is the moment a dot can be stale. */
   ionViewWillEnter(): void {
     this._moreBadgesService.refresh();
+  }
+
+  openFeedback(): void {
+    this.feedbackOpen.set(true);
   }
 
   open(entry: MoreTile): void {

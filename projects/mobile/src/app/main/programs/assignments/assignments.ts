@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
@@ -25,6 +25,7 @@ import { ProgramAssignment, ProgramAssignmentStatus } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { CoachStacks, clientPath } from '../../clients/client-paths';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AssignmentRow } from '../_components/assignment-row/assignment-row';
 import { AssignRequest, AssignSheet } from '../_sheets/assign-sheet/assign-sheet';
@@ -67,6 +68,7 @@ import { AssignmentsStore } from './assignments.store';
 export class Assignments implements ViewWillEnter {
   readonly store = inject(AssignmentsStore);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
 
@@ -110,6 +112,14 @@ export class Assignments implements ViewWillEnter {
         );
       }
     });
+  }
+
+  /**
+   * The person on this plan, opened in THIS stack so back returns to the
+   * plan's list. Their page carries the rest: profile, training, progress.
+   */
+  openClient(row: ProgramAssignment): void {
+    void this._router.navigate(clientPath(CoachStacks.Programs, row.clientId));
   }
 
   setStatus(row: ProgramAssignment, status: ProgramAssignmentStatus): void {

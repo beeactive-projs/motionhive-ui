@@ -83,6 +83,8 @@ export class BuilderRail {
   readonly selectedWorkoutId = input<string | null>(null);
   readonly collapsedWeeks = input.required<ReadonlySet<number>>();
   readonly totalWorkouts = input.required<number>();
+  /** Someone else's program: the outline can be browsed, not rearranged or added to. */
+  readonly readOnly = input(false);
 
   readonly selectWorkout = output<string>();
   readonly toggleWeek = output<number>();

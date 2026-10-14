@@ -114,7 +114,8 @@ export class AssignmentsStore {
     const programId = this._programId;
     if (!programId) return;
     this._programAssignmentService
-      .assign({ programId, ...payload })
+      // This page's program last, so nothing in the sheet's payload can override it.
+      .assign({ ...payload, programId })
       .pipe(take(1))
       .subscribe({
         next: () => {

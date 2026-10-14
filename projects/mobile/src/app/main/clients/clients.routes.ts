@@ -23,6 +23,26 @@ export const clientsRoutes: Routes = [
     title: 'pageTitle.requests',
   },
   {
+    // Someone's public profile, from the client page or a request. Before
+    // `:clientId`, or the parameterised routes swallow "person".
+    path: 'person/:handle',
+    loadComponent: () => import('../person/person').then((m) => m.Person),
+    title: 'pageTitle.profile',
+  },
+  {
+    // The trainee's own Progress screens, read for one client. Same reason as
+    // training below for living here, and declared before `:clientId`.
+    path: ':clientId/progress/:exerciseId',
+    loadComponent: () =>
+      import('../workouts/exercise-progress/exercise-progress').then((m) => m.ExerciseProgress),
+    title: 'pageTitle.exerciseProgress',
+  },
+  {
+    path: ':clientId/progress',
+    loadComponent: () => import('../workouts/progress/progress').then((m) => m.Progress),
+    title: 'pageTitle.progress',
+  },
+  {
     // A client's training and one logged workout. Mounted here rather than
     // under programs because they are reached from the person, and switching
     // tabs mid-review would lose the client you were looking at.

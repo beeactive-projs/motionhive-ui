@@ -8,9 +8,18 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { assignmentChip, assignmentSubline, assignmentTone } from '../../programs.config';
 
+/** Who the row is about: the client (on a program) or the plan (on a client). */
+export const AssignmentRowSubjects = {
+  Client: 'client',
+  Program: 'program',
+} as const;
+export type AssignmentRowSubject =
+  (typeof AssignmentRowSubjects)[keyof typeof AssignmentRowSubjects];
+
 /**
- * One client on a program: their avatar and name, a chip for any state that
- * is not the ordinary one, and the line that says where they are in it.
+ * One assignment: on a program it names the client, on a client's page it
+ * names the plan. A chip for any state that is not the ordinary one, and the
+ * line that says where they are in it.
  *
  * The spine is keyed to the assignment's state — honey waiting, emerald
  * under way, muted paused, teal finished, red cancelled — and the one verb
@@ -28,15 +37,23 @@ export class AssignmentRow {
   readonly assignment = input.required<ProgramAssignment>();
   /** True while this row's status change is in flight. */
   readonly busy = input(false);
+  readonly subject = input<AssignmentRowSubject>(AssignmentRowSubjects.Client);
+  /** The whole row opens something; the verb at the end still only does its own job. */
+  readonly tappable = input(false);
 
   readonly pause = output<void>();
   readonly resume = output<void>();
+  readonly select = output<void>();
+
+  readonly Subjects = AssignmentRowSubjects;
 
   readonly name = computed(() =>
-    displayName(
-      this.assignment().client ?? null,
-      this._translateService.instant('programs.common.clientFallback'),
-    ),
+    this.subject() === AssignmentRowSubjects.Program
+      ? this.assignment().programNameSnapshot
+      : displayName(
+          this.assignment().client ?? null,
+          this._translateService.instant('programs.common.clientFallback'),
+        ),
   );
 
   readonly avatarTone = computed(() => avatarToneFor(this.assignment().clientId));
@@ -54,4 +71,8 @@ export class AssignmentRow {
   readonly canResume = computed(
     () => this.assignment().status === ProgramAssignmentStatus.Paused,
   );
+
+  onRowClick(): void {
+    if (this.tappable()) this.select.emit();
+  }
 }

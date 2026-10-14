@@ -2,6 +2,7 @@ import {
   addOutline,
   albumsOutline,
   alertCircleOutline,
+  barbellOutline,
   calendarOutline,
   checkmarkCircleOutline,
   chevronForward,
@@ -42,6 +43,7 @@ export const PROGRAM_ICONS = {
   addOutline,
   albumsOutline,
   alertCircleOutline,
+  barbellOutline,
   calendarOutline,
   checkmarkCircleOutline,
   chevronForward,
@@ -297,9 +299,9 @@ export function scheduledDateFor(
  * days onto chosen weekdays.
  *
  * Anchored on the Monday of the start date's week, so `dayIndex` names a
- * weekday rather than an offset — the same grid the server builds. Week 0
- * can therefore begin a few days before the start date, which is the
- * program's own shape rather than a back-fill.
+ * weekday rather than an offset — the same grid the server builds. On that
+ * grid week 0 can begin before the start date; count from
+ * `weekdayScheduleStart` instead of the start date so it never does.
  */
 export function scheduledDateFromMonday(
   startDate: string,
@@ -314,6 +316,26 @@ export function scheduledDateFromMonday(
   monday.setDate(start.getDate() - daysSinceMonday);
   monday.setDate(monday.getDate() + weekIndex * DAYS_PER_WEEK + dayIndex);
   return monday;
+}
+
+/**
+ * The date a weekday-mapped schedule counts from: the start date, or a week
+ * later when a picked weekday falls earlier in the start week than the start
+ * itself. The server's rule (`ProgramAssignmentService.scheduleStart`), so the
+ * preview shows the dates that will be saved: nothing before the start, the
+ * whole plan moved together so its days keep their order.
+ *
+ * `weekZeroDays` are week 0's sessions as weekdays after the remap, 0=Mon..6=Sun.
+ */
+export function weekdayScheduleStart(startDate: string, weekZeroDays: readonly number[]): string {
+  const [y, m, d] = startDate.split('-').map(Number);
+  const start = new Date(y, m - 1, d);
+  const startIndex = (start.getDay() + 6) % 7;
+  if (!weekZeroDays.some((day) => day < startIndex)) return startDate;
+  start.setDate(start.getDate() + DAYS_PER_WEEK);
+  const mm = String(start.getMonth() + 1).padStart(2, '0');
+  const dd = String(start.getDate()).padStart(2, '0');
+  return `${start.getFullYear()}-${mm}-${dd}`;
 }
 
 /** Local calendar day, not UTC — a start date is a day, not an instant. */
