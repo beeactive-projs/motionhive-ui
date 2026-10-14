@@ -37,15 +37,15 @@ export class App {
     // Translations have loaded by now — bootstrap waits for them.
     this._primeNg.setTranslation(primeNgTranslation(this._translateService));
 
-    const imageUrl = `${environment.appUrl}/svg/logo-navy.svg`;
+    const imageUrl = `${environment.appUrl}/png/logo-bg-navy.png`;
     this._meta.addTags([
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: environment.appUrl },
       { property: 'og:title', content: 'MotionHive' },
       { property: 'og:description', content: 'Where active communities come together' },
       { property: 'og:image', content: imageUrl },
-      { property: 'og:image:width', content: '1200' },
-      { property: 'og:image:height', content: '630' },
+      { property: 'og:image:width', content: '566' },
+      { property: 'og:image:height', content: '566' },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: 'MotionHive' },
       { name: 'twitter:description', content: 'Where active communities come together' },

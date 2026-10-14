@@ -25,7 +25,6 @@
           "/media/**",
           "/svg/**",
           "/png/**",
-          "/favicon-honey/**",
           "/favicon-navy/**",
           "/flag-icons/**"
         ]

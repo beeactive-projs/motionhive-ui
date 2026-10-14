@@ -1,12 +1,7 @@
-// Navy on light, honey on dark: the brand surface rule, and what web's
-// `mh-logo` (core) renders (`logo-navy.svg` / `logo-honey.svg`). The navy
-// slot doesn't flip in dark mode, so dark switches to primary explicitly.
+// The mark is honey on every surface, like web's `mh-logo` (core,
+// `logo-honey.svg`). The wordmark beside it is plain text colour.
 svg {
   display: block;
-  fill: var(--ion-color-secondary);
-}
-
-:host-context(.ion-palette-dark) svg {
   fill: var(--ion-color-primary);
 }
 
@@ -24,13 +19,9 @@ svg {
 }
 
 .wordmark {
-  color: var(--ion-color-secondary);
+  color: var(--ion-text-color);
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-xl);
   font-weight: 800;
   line-height: var(--mh-leading-none);
-}
-
-:host-context(.ion-palette-dark) .wordmark {
-  color: var(--ion-color-primary);
 }

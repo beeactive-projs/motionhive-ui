@@ -16,10 +16,3 @@
     height: auto;
   }
 }
-
-.title-color {
-  color: var(--color-navy-500);
-}
-:host-context(.dark) .title-color {
-  color: var(--p-primary-color);
-}
