@@ -5,7 +5,7 @@
         <!-- Editing a saved routine: back out to how it was, not off the page. -->
         <ion-button (click)="cancelEdit()">{{ 'button.cancel' | translate }}</ion-button>
       } @else {
-        <ion-back-button defaultHref="/tabs/workouts" />
+        <ion-back-button [defaultHref]="stackBase()" />
       }
     </ion-buttons>
     <ion-title>{{ title() }}</ion-title>

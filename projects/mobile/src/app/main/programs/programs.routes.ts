@@ -25,6 +25,15 @@ export const programRoutes: Routes = [
     title: 'pageTitle.routine',
   },
   {
+    // The catalog page, pushed onto THIS stack so back returns to the routine
+    // or day it was opened from. On the Workouts stack, back had nothing of
+    // the coach's to pop and fell through to the exercise list.
+    path: 'exercise/:exerciseId',
+    loadComponent: () =>
+      import('../exercises/exercise-detail/exercise-detail').then((m) => m.ExerciseDetail),
+    title: 'pageTitle.exercise',
+  },
+  {
     path: 'program/:id',
     loadComponent: () =>
       import('./program-builder/program-builder').then((m) => m.ProgramBuilder),

@@ -138,6 +138,16 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly Targets = TargetFields;
   readonly skeletonRows = [1, 2, 3, 4];
 
+  /**
+   * The stack this page was pushed onto. It is mounted under the trainee's
+   * Workouts tab and the coach's Programs tab, and back returns to origin,
+   * so the back fallback and every way out of the page stay in that stack.
+   * Pushing an exercise onto the other tab left back nowhere to return to.
+   */
+  readonly stackBase = computed(() =>
+    this._router.url.startsWith('/tabs/programs') ? '/tabs/programs' : '/tabs/workouts',
+  );
+
   readonly routine = signal<Routine | null>(null);
   readonly name = signal('');
   readonly exercises = signal<DraftExercise[]>([]);
@@ -388,7 +398,7 @@ export class RoutineBuilder implements ViewWillEnter {
   }
 
   openExerciseById(exerciseId: string): void {
-    void this._router.navigate(['/tabs/workouts/exercise', exerciseId]);
+    void this._router.navigate([this.stackBase(), 'exercise', exerciseId]);
   }
 
   setCount(index: number, delta: number): void {
@@ -487,7 +497,7 @@ export class RoutineBuilder implements ViewWillEnter {
           this._translateService.instant('workouts.routineBuilder.toast.saved'),
         );
         if (creating) {
-          void this._router.navigate(['/tabs/workouts']);
+          void this._router.navigate([this.stackBase()]);
           return;
         }
         // An edit lands back on the read view, showing what was just saved.
@@ -520,7 +530,7 @@ export class RoutineBuilder implements ViewWillEnter {
           void this._feedbackService.success(
             this._translateService.instant('workouts.routineBuilder.toast.deleted'),
           );
-          void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
+          void this._router.navigate([this.stackBase()], { replaceUrl: true });
         },
         error: (err) => {
           this.deleting.set(false);
