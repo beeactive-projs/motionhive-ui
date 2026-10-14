@@ -1,6 +1,6 @@
 import { DOCUMENT, InjectionToken, Service, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, finalize, take } from 'rxjs';
+import { filter, finalize, take, timeout } from 'rxjs';
 
 import { STORAGE_KEYS } from '../../constants/storage-keys.const';
 import { SUPPORTED_LANGUAGES, isSupportedLanguage } from '../../constants/languages.const';
@@ -15,6 +15,13 @@ import { UserService } from '../user/user.service';
  * AuthService, and must not have sign-in rewrite the account language or
  * reload the page.
  */
+/**
+ * Longest wait for the account save before switching anyway. A slow or hung
+ * request must not leave the picker looking dead; the choice stays marked
+ * pending and is saved at the next sign-in.
+ */
+export const LANGUAGE_SAVE_TIMEOUT_MS = 4000;
+
 export const LANGUAGE_SYNC_ENABLED = new InjectionToken<boolean>('LANGUAGE_SYNC_ENABLED', {
   factory: () => false,
 });
@@ -54,7 +61,10 @@ export class LanguageService {
     setPendingSync(true);
     this._userService
       .updateMyLanguage(language)
-      .pipe(finalize(() => this._reload()))
+      .pipe(
+        timeout(LANGUAGE_SAVE_TIMEOUT_MS),
+        finalize(() => this._reload()),
+      )
       .subscribe({ next: () => setPendingSync(false), error: () => undefined });
   }
 

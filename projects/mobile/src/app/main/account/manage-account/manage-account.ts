@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, afterNextRender, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton,
   IonBadge,
@@ -17,6 +17,7 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  LoadingController,
   NavController,
   SelectCustomEvent,
 } from '@ionic/angular/standalone';
@@ -83,6 +84,7 @@ export class ManageAccount implements OnInit {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _languageService = inject(LanguageService);
+  private readonly _loadingController = inject(LoadingController);
 
   readonly store = inject(AccountStore);
 
@@ -91,10 +93,12 @@ export class ManageAccount implements OnInit {
 
   /**
    * `TIMEZONE_OPTIONS` is ~400 entries and `ion-select-option`s are real
-   * elements whether the select is open or not. Mounting them on first focus
-   * keeps that cost off the page load.
+   * elements whether the select is open or not, so they mount just after the
+   * page first paints rather than with it. Not on focus: iOS opens a select on
+   * tap before it takes focus, which left the first open blank.
    */
   readonly timezonesMounted = signal(false);
+  readonly switchingLanguage = signal(false);
   readonly savingTimezone = signal(false);
   readonly signingOut = signal(false);
   readonly resendingVerification = signal(false);
@@ -107,6 +111,9 @@ export class ManageAccount implements OnInit {
     return account && !account.isEmailVerified ? account.email : null;
   });
   readonly currentLanguage = this._languageService.current;
+  readonly languageSheetOptions = {
+    header: this._translateService.instant('form.label.language'),
+  };
   /** Each language named in itself — someone lost in the wrong one can still find theirs. */
   readonly languageOptions = this._languageService.languages.map((value) => ({
     value,
@@ -115,6 +122,7 @@ export class ManageAccount implements OnInit {
 
   constructor() {
     addIcons(ACCOUNT_ICONS);
+    afterNextRender(() => setTimeout(() => this.timezonesMounted.set(true)));
   }
 
   ngOnInit(): void {
@@ -129,8 +137,19 @@ export class ManageAccount implements OnInit {
     this._themeService.setPreference(preference);
   }
 
-  onLanguageChange(event: SelectCustomEvent<AppLanguage>): void {
-    this._languageService.use(event.detail.value);
+  /**
+   * The switch saves to the account, then reloads the app. Cover that wait so
+   * the screen doesn't look like nothing happened.
+   */
+  async onLanguageChange(event: SelectCustomEvent<AppLanguage>): Promise<void> {
+    const language = event.detail.value;
+    if (language === this.currentLanguage || this.switchingLanguage()) return;
+    this.switchingLanguage.set(true);
+    const loading = await this._loadingController.create({
+      message: this._translateService.instant('account.manage.switchingLanguage'),
+    });
+    await loading.present();
+    this._languageService.use(language);
   }
 
   onTimezoneChange(event: SelectCustomEvent<string>): void {

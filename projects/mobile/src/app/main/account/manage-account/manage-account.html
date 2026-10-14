@@ -15,12 +15,16 @@
            `:last-of-type`, so mixing it with bare `ion-item`s in one list puts the
            last hairline in the wrong place. -->
       <ion-list [inset]="true" class="mh-card-list">
-        <!-- Picking reloads the app in that language (see LanguageService). -->
+        <!-- Picking reloads the app in that language (see LanguageService). An
+             action sheet: two choices, and it doesn't land on the rows below. -->
         <ion-item lines="full">
           <ion-select
             [label]="'form.label.language' | translate"
             [value]="currentLanguage"
-            interface="popover"
+            interface="action-sheet"
+            [interfaceOptions]="languageSheetOptions"
+            [cancelText]="'button.cancel' | translate"
+            [disabled]="switchingLanguage()"
             (ionChange)="onLanguageChange($event)"
           >
             @for (option of languageOptions; track option.value) {
@@ -36,7 +40,6 @@
             [disabled]="savingTimezone()"
             interface="modal"
             [placeholder]="'form.placeholder.notSet' | translate"
-            (ionFocus)="timezonesMounted.set(true)"
             (ionChange)="onTimezoneChange($event)"
           >
             @if (timezonesMounted()) {

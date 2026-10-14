@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
-import { Subject, of, throwError } from 'rxjs';
+import { NEVER, Subject, of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { STORAGE_KEYS } from '../../constants/storage-keys.const';
@@ -9,7 +9,7 @@ import { AppLanguage } from '../../models/common/language.enums';
 import { User } from '../../models/user/user.model';
 import { AuthStore } from '../../stores/auth.store';
 import { UserService } from '../user/user.service';
-import { LANGUAGE_SYNC_ENABLED, LanguageService } from './language.service';
+import { LANGUAGE_SAVE_TIMEOUT_MS, LANGUAGE_SYNC_ENABLED, LanguageService } from './language.service';
 
 describe('LanguageService', () => {
   const reload = vi.fn();
@@ -107,6 +107,21 @@ describe('LanguageService', () => {
       service.use(other(service.current));
       expect(localStorage.getItem(STORAGE_KEYS.LANGUAGE_PENDING_SYNC)).toBe('1');
       expect(reload).toHaveBeenCalledOnce();
+    });
+
+    it('switches anyway when the account save hangs, and marks it for retry', () => {
+      vi.useFakeTimers();
+      try {
+        updateMyLanguage.mockReturnValue(NEVER);
+        const service = setup();
+        service.use(other(service.current));
+        expect(reload).not.toHaveBeenCalled();
+        vi.advanceTimersByTime(LANGUAGE_SAVE_TIMEOUT_MS);
+        expect(reload).toHaveBeenCalledOnce();
+        expect(localStorage.getItem(STORAGE_KEYS.LANGUAGE_PENDING_SYNC)).toBe('1');
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('skips the account when signed out', () => {

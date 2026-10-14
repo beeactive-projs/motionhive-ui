@@ -50,6 +50,7 @@
       "logOut": "Deconectează-te",
       "resendVerification": "Retrimite emailul de verificare",
       "soon": "În curând",
+      "switchingLanguage": "Se schimbă limba…",
       "unverified": "Adresa {email} nu este încă verificată."
     },
     "memberSince": "Membru din {date}",

@@ -50,6 +50,7 @@
       "logOut": "Log out",
       "resendVerification": "Resend verification email",
       "soon": "Soon",
+      "switchingLanguage": "Switching language…",
       "unverified": "{email} isn't verified yet."
     },
     "memberSince": "Member since {date}",
