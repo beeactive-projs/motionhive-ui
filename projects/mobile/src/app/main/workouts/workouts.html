@@ -52,9 +52,15 @@
       @if (store.inProgress(); as log) {
         <ion-list [inset]="true" class="mh-card-list resume">
           <ion-item button detail="false" lines="none" (click)="resume()">
-            <span slot="start" class="live-dot" aria-hidden="true"></span>
+            @if (isPaused()) {
+              <ion-icon slot="start" name="pause-outline" class="paused-mark" aria-hidden="true" />
+            } @else {
+              <span slot="start" class="live-dot" aria-hidden="true"></span>
+            }
             <ion-label>
-              <span class="mh-kicker">{{ 'workouts.home.inProgress' | translate: { elapsed: elapsed() } }}</span>
+              <span class="mh-kicker">
+                {{ (isPaused() ? 'workouts.home.paused' : 'workouts.home.inProgress') | translate: { elapsed: elapsed() } }}
+              </span>
               <h2>{{ log.name }}</h2>
             </ion-label>
             <ion-button slot="end" size="small" shape="round" color="primary" (click)="resume()">

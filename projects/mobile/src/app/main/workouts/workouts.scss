@@ -27,6 +27,12 @@
   background: var(--ion-color-primary);
 }
 
+/* Paused: the dot's place, but a glyph that says the clock is stopped. */
+.resume .paused-mark {
+  margin-inline-end: 0.5rem;
+  font-size: var(--mh-text-md);
+}
+
 .resume h2 {
   color: inherit;
   font-weight: 600;

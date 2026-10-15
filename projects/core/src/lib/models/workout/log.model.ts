@@ -31,6 +31,10 @@ export interface WorkoutLog {
   startedAt: string;
   completedAt: string | null;
   durationSeconds: number | null;
+  /** When the current pause began; null while the clock is running. */
+  pausedAt?: string | null;
+  /** Every finished pause, summed. The clock and the duration leave it out. */
+  pausedSeconds?: number;
   feelingRating: number | null;
   notes: string | null;
   /**

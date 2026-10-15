@@ -2405,6 +2405,7 @@
       "inProgress": "In progress · {elapsed}",
       "noRoutines": "Save a workout as a routine and it will show up here, ready to repeat.",
       "openHistory": "Open history",
+      "paused": "Paused · {elapsed}",
       "percentDone": "{percent}% done",
       "startEmpty": "Start empty workout",
       "startsOn": "Starts {date}",
@@ -2467,7 +2468,14 @@
         "prev": "Prev",
         "set": "Set"
       },
-      "leave": "Leave and keep the workout going",
+      "leave": "Leave the workout",
+      "leaveSheet": {
+        "keepRunning": "Keep it running",
+        "keepRunningHint": "The clock keeps counting while you are away.",
+        "pause": "Pause workout",
+        "pauseHint": "The clock stops until you come back to it.",
+        "title": "Leaving the workout?"
+      },
       "nextField": "Next field",
       "picker": {
         "replacing": "Replacing {name}",
@@ -2484,6 +2492,7 @@
         "discardFailed": "Could not discard the workout",
         "discarded": "Workout discarded",
         "nothingToRepeat": "That workout had no exercises to repeat",
+        "pauseFailed": "Could not pause the workout",
         "removeSetFailed": "Could not remove that set",
         "removed": "Removed {name}",
         "repeatFailed": "Could not load that workout to repeat"
@@ -2544,6 +2553,7 @@
       "title": "Rest over"
     },
     "restTimer": {
+      "backToWork": "Back to work",
       "lastSet": "last set",
       "minusSeconds": "Minus {seconds} seconds",
       "nextUp": "Next up",

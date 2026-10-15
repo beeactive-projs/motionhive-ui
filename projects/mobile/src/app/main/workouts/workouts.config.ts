@@ -39,6 +39,7 @@ import {
   eyeOutline,
   flashOutline,
   lockClosedOutline,
+  pauseOutline,
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
@@ -74,6 +75,7 @@ export const WORKOUT_ICONS = {
   eyeOutline,
   flashOutline,
   lockClosedOutline,
+  pauseOutline,
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
@@ -424,9 +426,25 @@ function completedSetCount(log: WorkoutLog): number {
     .filter((set) => set.isCompleted).length;
 }
 
-/** How long the in-progress log has been open, as the resume banner says it. */
-export function elapsedLabel(startedAt: string, now: number): string {
-  const seconds = Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000));
+/**
+ * Seconds trained so far: open time minus every pause. A paused workout's
+ * clock stands still at the moment it was paused.
+ */
+export function workoutElapsedSeconds(
+  log: Pick<WorkoutLog, 'startedAt' | 'pausedAt' | 'pausedSeconds'>,
+  now: number,
+): number {
+  const end = log.pausedAt ? new Date(log.pausedAt).getTime() : now;
+  const open = Math.floor((end - new Date(log.startedAt).getTime()) / 1000);
+  return Math.max(0, open - (log.pausedSeconds ?? 0));
+}
+
+/** How long the in-progress log has been trained, as the logger and resume banner say it. */
+export function workoutClock(
+  log: Pick<WorkoutLog, 'startedAt' | 'pausedAt' | 'pausedSeconds'>,
+  now: number,
+): string {
+  const seconds = workoutElapsedSeconds(log, now);
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   const hrs = Math.floor(mins / 60);
@@ -1022,6 +1040,44 @@ export const FEELINGS: readonly { value: number; glyph: string }[] = [
   { value: 3, glyph: '😐' },
   { value: 4, glyph: '🙂' },
   { value: 5, glyph: '💪' },
+];
+
+// ─── Leaving the logger ───────────────────────────────────────────────────
+
+/** What leaving the logger does to the workout's clock. */
+export const LeaveChoices = {
+  KeepRunning: 'keepRunning',
+  Pause: 'pause',
+} as const;
+
+export type LeaveChoice = (typeof LeaveChoices)[keyof typeof LeaveChoices];
+
+export interface LeaveOption {
+  id: LeaveChoice;
+  /** Translation keys — the sheet's template translates them. */
+  label: string;
+  hint: string;
+  icon: string;
+}
+
+/**
+ * Running first: stepping out for a minute is the common case, and a pause
+ * is the decision that something longer has come up. Neither ends the
+ * workout; Finish and Discard stay the only two ways out of it.
+ */
+export const LEAVE_OPTIONS: readonly LeaveOption[] = [
+  {
+    id: LeaveChoices.KeepRunning,
+    label: 'workouts.logger.leaveSheet.keepRunning',
+    hint: 'workouts.logger.leaveSheet.keepRunningHint',
+    icon: 'play-outline',
+  },
+  {
+    id: LeaveChoices.Pause,
+    label: 'workouts.logger.leaveSheet.pause',
+    hint: 'workouts.logger.leaveSheet.pauseHint',
+    icon: 'pause-outline',
+  },
 ];
 
 // ─── Exercise verbs ───────────────────────────────────────────────────────

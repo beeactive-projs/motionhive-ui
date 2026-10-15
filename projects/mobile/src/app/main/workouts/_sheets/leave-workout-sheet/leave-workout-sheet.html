@@ -1,0 +1,30 @@
+<ng-template #body>
+  <ion-list lines="none">
+    <ion-item class="head" lines="full">
+      <ion-label class="ion-text-wrap">
+        <h3>{{ 'workouts.logger.leaveSheet.title' | translate }}</h3>
+      </ion-label>
+    </ion-item>
+
+    @for (option of options; track option.id) {
+      <ion-item button [detail]="false" (click)="choose(option.id)">
+        <ion-icon slot="start" [name]="option.icon" color="medium" aria-hidden="true" />
+        <ion-label class="ion-text-wrap">
+          <h2>{{ option.label | translate }}</h2>
+          <p>{{ option.hint | translate }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'workouts.logger.leaveSheet.title' | translate"
+  [body]="body"
+  [showHeader]="false"
+  [showFooter]="false"
+  [flushBody]="true"
+  [breakpoints]="[0, 0.4]"
+  [initialBreakpoint]="0.4"
+/>

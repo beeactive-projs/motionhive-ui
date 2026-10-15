@@ -99,3 +99,11 @@
   font-family: var(--ion-font-family);
   font-weight: 600;
 }
+
+/* Rest is over, so it becomes the one thing to do next: honey, the action colour. */
+.bar.done .actions button.skip {
+  grid-column: span 2;
+  border-color: var(--ion-color-primary);
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+}
