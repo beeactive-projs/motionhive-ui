@@ -41,7 +41,6 @@
 .count strong {
   margin-top: 0.25rem;
   color: var(--ion-color-primary);
-  font-family: var(--mh-font-mono);
   font-size: 3rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -63,7 +62,7 @@
 .next strong {
   margin-top: 0.25rem;
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .next .detail {
@@ -85,9 +84,8 @@
   border-radius: var(--mh-radius-control);
   background: var(--mh-navy-700);
   color: var(--ion-color-secondary-contrast);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 }

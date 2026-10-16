@@ -16,7 +16,8 @@
 /* Dark palette — class-driven: ThemeService toggles `ion-palette-dark` on <html> */
 @import '@ionic/angular/css/palettes/dark.class.css';
 
-/* MotionHive brand theme — tokens, text roles, layout primitives */
+/* MotionHive brand theme — fonts, tokens, text roles, layout primitives */
+@import './theme/fonts.css';
 @import './theme/variables.css';
 @import './theme/typography.css';
 @import './theme/layout.css';

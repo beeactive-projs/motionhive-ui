@@ -1,5 +1,4 @@
 import { Component, ElementRef, inject, model, viewChild } from '@angular/core';
-import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { cameraOutline, imageOutline, trashOutline } from 'ionicons/icons';
@@ -7,9 +6,32 @@ import { take } from 'rxjs';
 
 import { AVATAR_ACCEPT, AVATAR_MAX_BYTES, UserService, avatarRejectionReason } from 'core';
 
-import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { ActionSheet } from '../../../../_shared/components/action-sheet/action-sheet';
+import { SheetAction } from '../../../../_shared/components/action-sheet/action-sheet.model';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AccountStore } from '../../account.store';
+
+const PhotoActionIds = {
+  Take: 'take',
+  Choose: 'choose',
+  Remove: 'remove',
+} as const;
+
+type PhotoActionId = (typeof PhotoActionIds)[keyof typeof PhotoActionIds];
+
+/** "Remove photo" is disabled rather than absent: there is no DELETE avatar endpoint yet. */
+const PHOTO_ACTIONS: readonly SheetAction<PhotoActionId>[] = [
+  { id: PhotoActionIds.Take, label: 'accountSheets.photo.take', icon: 'camera-outline' },
+  { id: PhotoActionIds.Choose, label: 'accountSheets.photo.choose', icon: 'image-outline' },
+  {
+    id: PhotoActionIds.Remove,
+    label: 'accountSheets.photo.remove',
+    hint: 'accountSheets.photo.comingSoon',
+    icon: 'trash-outline',
+    destructive: true,
+    disabled: true,
+  },
+];
 
 /**
  * Profile picture actions.
@@ -17,13 +39,12 @@ import { AccountStore } from '../../account.store';
  * Both rows are file inputs rather than a camera plugin: `capture` on a file
  * input is enough to ask Android for the camera, and adding `@capacitor/camera`
  * for two rows would be a native dependency for something the WebView already
- * does. "Remove photo" is disabled — there is no DELETE avatar endpoint yet.
+ * does.
  */
 @Component({
   selector: 'mh-photo-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
+  imports: [ActionSheet, TranslatePipe],
   templateUrl: './photo-sheet.html',
-  styleUrl: './photo-sheet.scss',
 })
 export class PhotoSheet {
   private readonly _userService = inject(UserService);
@@ -36,17 +57,21 @@ export class PhotoSheet {
 
   readonly open = model(false);
   readonly accept = AVATAR_ACCEPT;
+  readonly actions = PHOTO_ACTIONS;
 
   constructor() {
     addIcons({ cameraOutline, imageOutline, trashOutline });
   }
 
-  takePhoto(): void {
-    this._cameraInput()?.nativeElement.click();
-  }
-
-  choosePhoto(): void {
-    this._galleryInput()?.nativeElement.click();
+  choose(id: PhotoActionId): void {
+    switch (id) {
+      case PhotoActionIds.Take:
+        this._cameraInput()?.nativeElement.click();
+        break;
+      case PhotoActionIds.Choose:
+        this._galleryInput()?.nativeElement.click();
+        break;
+    }
   }
 
   onFileSelected(event: Event): void {

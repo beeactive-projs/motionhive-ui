@@ -12,9 +12,9 @@
 .hero .name {
   margin: 0.25rem 0 0;
   font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
-  line-height: var(--mh-leading-tight);
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
 }
 
 .hero .meta {
@@ -25,7 +25,6 @@
 
 .hero .count {
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
@@ -50,7 +49,6 @@
 ion-item ion-label p {
   margin: 0 0 0.125rem;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   font-weight: 600;
   letter-spacing: var(--mh-tracking-kicker);

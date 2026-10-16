@@ -67,7 +67,7 @@ function iconNamesUsed(): string[] {
     ...SESSION_ACCESS_OPTIONS,
     ...SESSION_ACTIONS,
   ]) {
-    names.add(option.icon);
+    if (option.icon) names.add(option.icon);
   }
 
   // Ionic's own components name these; we never register them.

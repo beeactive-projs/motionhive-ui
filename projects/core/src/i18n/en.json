@@ -20,6 +20,7 @@
     "removeItem": "Remove {name}",
     "requirementMet": "{label}: met",
     "requirementNotMet": "{label}: not met",
+    "resizeSheet": "Resize sheet",
     "showPassword": "Show password",
     "switchToDarkMode": "Switch to dark mode",
     "switchToLightMode": "Switch to light mode",

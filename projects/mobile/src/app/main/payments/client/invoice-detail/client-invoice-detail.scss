@@ -4,7 +4,6 @@
 
 .total {
   margin-top: 0.2rem;
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 1.9rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -19,18 +18,16 @@
 }
 
 .badges ion-badge {
-  font-size: 0.66rem;
+  font-size: var(--mh-text-xs);
   font-weight: 600;
   text-transform: none;
 }
 
 .badges ion-note {
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 0.7rem;
 }
 
 .line-amount {
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }

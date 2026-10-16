@@ -26,8 +26,8 @@
 
 .hero-name {
   margin: 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
 }
 
 .hero-handle {
@@ -43,7 +43,6 @@
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-pill);
   background: var(--ion-background-color);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }

@@ -50,6 +50,7 @@ import {
   trendingUpOutline,
 } from 'ionicons/icons';
 
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import { SpineTone, SpineTones } from '../../_shared/models/spine-tone.model';
 import { BadgeTone, BadgeTones } from '../exercises/exercises.config';
 
@@ -1052,13 +1053,7 @@ export const LeaveChoices = {
 
 export type LeaveChoice = (typeof LeaveChoices)[keyof typeof LeaveChoices];
 
-export interface LeaveOption {
-  id: LeaveChoice;
-  /** Translation keys — the sheet's template translates them. */
-  label: string;
-  hint: string;
-  icon: string;
-}
+export type LeaveOption = SheetAction<LeaveChoice>;
 
 /**
  * Running first: stepping out for a minute is the common case, and a pause
@@ -1091,15 +1086,7 @@ export const ExerciseActionIds = {
 
 export type ExerciseActionId = (typeof ExerciseActionIds)[keyof typeof ExerciseActionIds];
 
-export interface ExerciseAction {
-  id: ExerciseActionId;
-  /** Translation key — the sheet's template translates it. */
-  label: string;
-  icon: string;
-  /** Ionic palette name for the leading glyph. */
-  color: string;
-  destructive?: boolean;
-}
+export type ExerciseAction = SheetAction<ExerciseActionId>;
 
 /**
  * Skip flips to unskip on an exercise already skipped; the other two verbs

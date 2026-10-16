@@ -6,8 +6,8 @@
 
 .hero h2 {
   margin: 0.25rem 0 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
 }
 
 .hero ion-progress-bar {
@@ -39,12 +39,11 @@
    table of contents, not a set of things to press. */
 ion-item.current ion-label {
   color: var(--mh-color-honey-deep);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Counts sit in a column; proportional digits make them wobble. */
 .count {
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-variant-numeric: tabular-nums;
 }

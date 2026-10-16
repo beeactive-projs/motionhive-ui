@@ -52,9 +52,9 @@ ion-item-option {
   background: none;
   color: var(--ion-color-medium);
   cursor: pointer;
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 /* The warm-up mark, chipped on the honey wash where the number would be. */
@@ -77,8 +77,8 @@ ion-item-option {
   width: 3.5rem;
   overflow: hidden;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
+  font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -91,7 +91,6 @@ ion-item-option {
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-medium-wash);
   color: var(--ion-text-color);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;

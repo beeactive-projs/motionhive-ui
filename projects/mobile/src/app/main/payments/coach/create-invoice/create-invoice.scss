@@ -15,7 +15,6 @@
   width: 5rem;
   border: 1px solid var(--mh-color-divider);
   border-radius: var(--mh-radius-control);
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-variant-numeric: tabular-nums;
   text-align: end;
 }
@@ -66,7 +65,6 @@
 }
 
 .total-row strong {
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 1.15rem;
   font-variant-numeric: tabular-nums;
 }

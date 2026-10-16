@@ -17,10 +17,6 @@ ion-label h2 {
   font-weight: 600;
 }
 
-:host(.mh-unread) ion-label h2 {
-  font-weight: 700;
-}
-
 :host(.mh-unread) ion-label p {
   color: var(--ion-color-dark);
   font-weight: 500;

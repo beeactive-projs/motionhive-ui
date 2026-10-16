@@ -51,8 +51,8 @@
 
 .hero-name {
   margin: 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
 }
 
 /* Account's section kicker, with room for the count badge some sections carry.
@@ -148,7 +148,6 @@ ion-badge[data-tone='danger'] {
    of the product gives to addresses — and wraps rather than stretching. */
 .url {
   overflow-wrap: anywhere;
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
 }
 
@@ -205,7 +204,7 @@ ion-badge[data-tone='danger'] {
 
 .attendance-summary strong {
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .attendance-summary span {
@@ -309,7 +308,7 @@ ion-badge[data-tone='danger'] {
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .waitlist-action {
@@ -352,7 +351,7 @@ ion-badge[data-tone='danger'] {
 
 .full-banner strong {
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .full-banner span {

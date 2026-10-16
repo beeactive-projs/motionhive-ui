@@ -1,5 +1,7 @@
 import { InstructorClient, InstructorClientStatuses, clientEmail, translate } from 'core';
 
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
+
 /**
  * What a client row looks like and what can be done to one: the status tone
  * map, the verb registry behind the ⋮ sheet, and the note field's limits.
@@ -50,15 +52,7 @@ export const ClientActionIds = {
 
 export type ClientActionId = (typeof ClientActionIds)[keyof typeof ClientActionIds];
 
-export interface ClientAction {
-  id: ClientActionId;
-  /** Translation key — the sheet's template translates it. */
-  label: string;
-  icon: string;
-  /** Ionic palette name for the leading glyph. */
-  color: string;
-  destructive?: boolean;
-}
+export type ClientAction = SheetAction<ClientActionId>;
 
 /**
  * The verbs on a client — the ⋮ on the detail screen. Message is the primary

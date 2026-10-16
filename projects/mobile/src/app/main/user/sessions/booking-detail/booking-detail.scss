@@ -54,8 +54,8 @@
 
 .hero-name {
   margin: 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
 }
 
 .hero .meta {
@@ -157,7 +157,7 @@ ion-badge[data-tone='success'] {
 
 .band strong {
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .band span {
@@ -190,7 +190,7 @@ ion-badge[data-tone='success'] {
 
 .banner strong {
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .banner span {
@@ -215,7 +215,6 @@ ion-badge[data-tone='success'] {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
 }
 

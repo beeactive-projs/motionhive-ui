@@ -20,7 +20,7 @@ ion-buttons ion-button.round {
 
 .summary b {
   color: var(--ion-text-color);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .summary .sep {
@@ -59,7 +59,7 @@ ion-buttons ion-button.round {
   background: none;
   color: var(--mh-color-honey-deep);
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
   text-align: start;
   white-space: nowrap;
 }
@@ -190,7 +190,6 @@ ion-buttons ion-button.round {
 
 .week .initial {
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   font-weight: 600;
 }
@@ -199,7 +198,7 @@ ion-buttons ion-button.round {
 .week .date {
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-lg);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--mh-leading-none);
 }
 

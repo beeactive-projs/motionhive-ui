@@ -20,7 +20,6 @@
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
   overflow-wrap: anywhere;
@@ -41,7 +40,7 @@
   margin: 0;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .hint {

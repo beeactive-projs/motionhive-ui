@@ -23,7 +23,6 @@
 
 .hero-meta .count {
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
@@ -137,7 +136,7 @@
   overflow: hidden;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -208,7 +207,6 @@
   --color: var(--ion-color-primary);
   font-weight: 600;
 }
-
 
 /* The loading twin of a post card, so nothing shifts when data lands. */
 .post-skeleton {

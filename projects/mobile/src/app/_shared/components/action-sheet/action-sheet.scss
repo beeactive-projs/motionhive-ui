@@ -1,0 +1,18 @@
+/* One card per group, a gap between them — the space is what says "these
+   verbs are a different kind" before the red does. */
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.note {
+  margin: 0 0 0.75rem;
+}
+
+/* The wash ink, not the saturated slot colour: danger-500 as text on a card
+   is 3.76:1, under the 4.5:1 body text needs. The glyph beside it keeps the
+   full hue, where 3:1 is the bar. */
+.destructive ion-label {
+  color: var(--ion-color-danger-wash-contrast);
+}

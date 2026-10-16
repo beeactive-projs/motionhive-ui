@@ -1,6 +1,5 @@
 import { Component, computed, inject, input, model, output } from '@angular/core';
-import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
@@ -11,7 +10,7 @@ import {
   sessionLifecycle,
 } from 'core';
 
-import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
+import { ActionSheet } from '../../../../../_shared/components/action-sheet/action-sheet';
 import {
   SESSION_ACTIONS,
   SESSION_ICONS,
@@ -24,13 +23,8 @@ import {
 } from '../../sessions.config';
 
 /**
- * The verbs for one occurrence — long-press on a row, or the ⋮ on its detail.
- *
- * A component rather than `ActionSheetController` for two reasons. The design's
- * header line (time, title, where, how full) is not something the controller
- * can render — it takes a plain string. And an action sheet built in TypeScript
- * hides its icon names from the config spec's template scanner, which is what
- * keeps registered and rendered icons in step.
+ * The verbs for one occurrence — long-press on a row, or the ⋮ on its detail —
+ * under its title, with when, where and how full it is below.
  *
  * The sheet only reports which verb was chosen; the page owns what each one
  * does, because the answers differ by screen (the agenda navigates to the
@@ -38,9 +32,8 @@ import {
  */
 @Component({
   selector: 'mh-session-actions-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
+  imports: [ActionSheet],
   templateUrl: './session-actions-sheet.html',
-  styleUrl: './session-actions-sheet.scss',
 })
 export class SessionActionsSheet {
   private readonly _translateService = inject(TranslateService);
@@ -65,24 +58,19 @@ export class SessionActionsSheet {
     return instance.titleOverride ?? instance.template?.title ?? fallback;
   });
 
-  readonly time = computed(() => {
-    const instance = this.instance();
-    return instance ? formatSessionTime(instance.startAt) : '';
-  });
-
   /**
-   * "TODAY · HERĂSTRĂU · 8/12" — uppercased in CSS, not here.
+   * "Today · 08:30 · Herăstrău · 8/12", the sheet's subtitle.
    *
    * Composed here rather than through `instanceMeta`, which leads with capacity
    * because that is what a dense agenda row needs first. With the session named
    * on the line above, the question this sheet answers is "which one of the two
-   * at Herăstrău?", so place comes before the count.
+   * at Herăstrău?", so when and where come before the count.
    */
   readonly meta = computed(() => {
     const instance = this.instance();
     if (!instance) return '';
     const day = sessionDayLabel(new Date(instance.startAt)).split(' · ')[0];
-    return [day, instancePlaceLabel(instance), instanceCapacityLabel(instance)]
+    return [day, formatSessionTime(instance.startAt), instancePlaceLabel(instance), instanceCapacityLabel(instance)]
       .filter(Boolean)
       .join(' · ');
   });
@@ -128,9 +116,4 @@ export class SessionActionsSheet {
       }
     });
   });
-
-  choose(id: SessionActionId): void {
-    this.open.set(false);
-    this.action.emit(id);
-  }
 }

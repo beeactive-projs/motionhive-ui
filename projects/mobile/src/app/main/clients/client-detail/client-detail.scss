@@ -14,8 +14,8 @@
 
 .hero-name {
   margin: 0.5rem 0 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
 }
 
 /* The address, in the mono the product gives to addresses. */
@@ -23,7 +23,6 @@
   margin: 0;
   overflow-wrap: anywhere;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
@@ -54,8 +53,8 @@
 
 .week-count {
   font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-2xl);
-  font-weight: 700;
+  font-size: var(--mh-text-3xl);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 

@@ -1,31 +1,23 @@
 import { Component, computed, inject, input, model, output } from '@angular/core';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { InstructorClient, clientDisplayName, clientEmail } from 'core';
 
-import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
+import { ActionSheet } from '../../../../_shared/components/action-sheet/action-sheet';
 import { ClientActionId, visibleClientActions } from '../../clients.config';
 import { CLIENT_ICONS } from '../../clients.icons';
 
 /**
- * The verbs for one client — the ⋮ on the detail screen.
- *
- * A component rather than `ActionSheetController`, for the same two reasons
- * as the session actions sheet: the head row (avatar, name, address) is not
- * something the controller can render, and an action sheet built in
- * TypeScript hides its icon names from the config spec's template scanner.
+ * The verbs for one client — the ⋮ on the detail screen — under the client's
+ * name and address.
  *
  * The sheet only reports which verb was chosen; the page owns what it does.
  */
 @Component({
   selector: 'mh-client-actions-sheet',
-  imports: [HexAvatar, IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
+  imports: [ActionSheet],
   templateUrl: './client-actions-sheet.html',
-  styleUrl: './client-actions-sheet.scss',
 })
 export class ClientActionsSheet {
   private readonly _translateService = inject(TranslateService);
@@ -51,17 +43,8 @@ export class ClientActionsSheet {
     return client ? clientEmail(client) : '';
   });
 
-  readonly avatarUrl = computed(() => this.client()?.client?.avatarUrl ?? null);
-
-  readonly avatarTone = computed(() => avatarToneFor(this.client()?.clientId));
-
   readonly visibleActions = computed(() => {
     const client = this.client();
     return client ? visibleClientActions(client) : [];
   });
-
-  choose(id: ClientActionId): void {
-    this.open.set(false);
-    this.action.emit(id);
-  }
 }

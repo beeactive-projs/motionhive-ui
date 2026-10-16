@@ -95,7 +95,7 @@ export class ChoiceSheet {
   );
   readonly rows = computed(() => this.matches().slice(0, this._shown()));
   readonly hasMore = computed(() => this.rows().length < this.matches().length);
-  readonly breakpoints = computed(() => (this.searchable() ? [0, 0.9] : [0, 0.5]));
+  readonly breakpoints = computed(() => (this.searchable() ? [0, 0.9] : [0, 0.5, 0.95]));
   readonly initialBreakpoint = computed(() => (this.searchable() ? 0.9 : 0.5));
 
   constructor() {

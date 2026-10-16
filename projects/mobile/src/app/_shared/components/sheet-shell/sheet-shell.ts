@@ -3,7 +3,9 @@ import {
   Component,
   ElementRef,
   TemplateRef,
+  computed,
   effect,
+  inject,
   input,
   model,
   output,
@@ -21,7 +23,7 @@ import {
   IonSpinner,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 
@@ -33,12 +35,34 @@ import { close } from 'ionicons/icons';
  */
 export const SHEET_PRESENTED_CLASS = 'mh-presented';
 
+/** Put on the `ion-modal` of a `fit` sheet; the auto-height rules in ion-modal.css key off it. */
+const SHEET_FIT_CLASS = 'mh-sheet-fit';
+
+/** A fit sheet has one open stop: all of it. Its height is its content's. */
+const FIT_BREAKPOINTS: readonly number[] = [0, 1];
+
 /**
- * The bottom sheet the account area edits in: grabber, centred title, close
- * button, projected body, and a Cancel / Save footer.
+ * Ionic's dismiss roles for a person closing the sheet themselves: `gesture`
+ * is the swipe down, `backdrop` covers the scrim tap, Escape and Android back.
+ * Code closing the sheet dismisses with no role.
+ */
+const USER_DISMISS_ROLES: readonly (string | undefined)[] = ['gesture', 'backdrop'];
+
+const HandleBehaviors = { Cycle: 'cycle', None: 'none' } as const;
+
+/**
+ * The bottom sheet every mobile overlay is built on: grabber, a fixed header
+ * (title, optional subtitle, close button), projected body, and a Cancel /
+ * Save footer within thumb reach.
  *
- * Nine sheets share this chrome. Each supplies only its own fields and keeps
- * its own `open` binding, so the parent stays in charge of when it shows.
+ * The header is deliberately not customisable, so every sheet reads the same.
+ * Swipe down, a scrim tap, Android back and the close button all dismiss; the
+ * close button is also the one a screen reader can reach. The scrim stays on
+ * at every snap point, so the page behind keeps its place but cannot scroll
+ * or take taps.
+ *
+ * Each sheet supplies only its own fields and keeps its own `open` binding, so
+ * the parent stays in charge of when it shows.
  *
  * The body arrives as a `TemplateRef`, not through `<ng-content>`. Ionic
  * relocates the modal element when it presents, so anything not captured in an
@@ -73,11 +97,20 @@ export class SheetShell {
   readonly open = model(false);
   readonly title = input.required<string>();
   /**
-   * One-line summary under the title — "One-off · Thu 21 May". Setting it also
-   * switches the header to the design's left-aligned form-sheet layout; empty
-   * keeps the centred single-line title the simpler sheets use.
+   * Optional line under the title, in smaller plain text: "One-off · Thu 21
+   * May", a client's email. Title, subtitle and the close button are the
+   * whole header, the same on every sheet; anything richer belongs in the body.
    */
   readonly subtitle = input('');
+  /**
+   * Size the sheet to its content instead of to snap points: Ionic's
+   * auto-height sheet. For short, fixed bodies like an action list, where a
+   * fraction of the screen is either too much (empty sheet) or too little
+   * (clipped rows) depending on the phone. The body is not an `ion-content`
+   * here, it scrolls itself past most of the screen's height, and
+   * `breakpoints` is ignored.
+   */
+  readonly fit = input(false);
   /** The sheet's fields, declared by the consumer as `<ng-template #body>`. */
   readonly body = input.required<TemplateRef<unknown>>();
   /**
@@ -91,25 +124,16 @@ export class SheetShell {
   /** Ionic palette name for the confirm button — `danger` for destructive sheets. */
   readonly saveColor = input('primary');
   /**
-   * Label on the footer's dismiss button. Override it where "Cancel" would sit
-   * next to a destructive confirm that also says cancel — the cancel-session
-   * sheet reads "Keep / Cancel session" instead of "Cancel / Cancel session".
+   * Translated label on the footer's dismiss button; empty falls back to
+   * "Cancel". Override it where "Cancel" would sit next to a destructive
+   * confirm that also says cancel — the cancel-session sheet reads
+   * "Keep / Cancel session" instead of "Cancel / Cancel session".
    */
-  /** Translated text; empty falls back to "Cancel". */
   readonly dismissLabel = input('');
   readonly canSave = input(true);
   readonly saving = input(false);
   /** Off for the sheets that are a list of actions rather than a form. */
   readonly showFooter = input(true);
-  /**
-   * Off for sheets whose body already names what they are about — a title bar
-   * repeating it costs a row of height and pushes the content down.
-   *
-   * `title` stays required either way: with the bar hidden it becomes the
-   * modal's `aria-label`, so the dialog keeps an accessible name. Dismissal
-   * falls back to the grabber and the backdrop, both of which Ionic provides.
-   */
-  readonly showHeader = input(true);
   /**
    * Paint the body on the sheet's own surface instead of the page slate.
    *
@@ -119,12 +143,23 @@ export class SheetShell {
    * white rows — one continuous surface is what those want instead.
    */
   readonly flushBody = input(false);
+  /**
+   * Snap points as fractions of the screen. Keep the `0`: it is what lets a
+   * swipe down dismiss. Two or more open stops (half-open and tall) make the
+   * grabber a button that steps between them, so resizing never needs a drag.
+   *
+   * Opening at 0.75 or lower? Add a `0.95` stop when the body holds a text
+   * field (the keyboard eats the half-open height), a list that can grow, or
+   * copy of unknown length. Short fixed action menus keep a single stop:
+   * pulling them up would only reveal empty sheet.
+   */
   readonly breakpoints = input<readonly number[]>([0, 0.6, 0.95]);
   readonly initialBreakpoint = input(0.6);
   /**
-   * Text action at the header's right edge — the filter sheet's "Reset".
-   * Setting it also moves the title to the start edge, same as `subtitle`,
-   * since a centred title would sit under the action.
+   * A second footer action that takes Cancel's place — the filter sheets'
+   * "Reset". It sits beside the confirm, in thumb reach, rather than in the
+   * header's top corner; swipe, scrim and back still close the sheet. Needs
+   * the footer: ignored when `showFooter` is off.
    */
   readonly actionLabel = input('');
   readonly actionDisabled = input(false);
@@ -145,10 +180,37 @@ export class SheetShell {
    * from one still sliding in.
    */
   readonly presented = signal(false);
-  readonly presentedClass = SHEET_PRESENTED_CLASS;
 
+  readonly snapPoints = computed(() => (this.fit() ? FIT_BREAKPOINTS : this.breakpoints()));
+  readonly startPoint = computed(() => (this.fit() ? 1 : this.initialBreakpoint()));
+  readonly modalClass = computed(() =>
+    [this.presented() ? SHEET_PRESENTED_CLASS : '', this.fit() ? SHEET_FIT_CLASS : ''].filter(Boolean).join(' '),
+  );
+
+  /**
+   * Tapping the grabber steps through the open snap points: the single
+   * pointer alternative to dragging (WCAG 2.5.7). With one open stop there is
+   * nothing to step to, so the grabber stays a drag affordance only.
+   */
+  readonly handleBehavior = computed(() =>
+    this.snapPoints().filter((stop) => stop > 0).length > 1 ? HandleBehaviors.Cycle : HandleBehaviors.None,
+  );
+
+  /**
+   * While a save is in flight the person cannot swipe, tap the scrim or press
+   * back to close — the request would finish behind a sheet they think they
+   * cancelled. Code can still close it. Outside a save this stays a plain
+   * `true`: any other value makes Ionic resist every swipe down, not just
+   * the ones it will refuse.
+   */
+  readonly canDismiss = computed(() => (this.saving() ? this._refuseUserDismiss : true));
+
+  private readonly _translateService = inject(TranslateService);
   private readonly _modal = viewChild(IonModal);
   private readonly _modalElement = viewChild(IonModal, { read: ElementRef });
+
+  private readonly _refuseUserDismiss = async (_data?: unknown, role?: string): Promise<boolean> =>
+    !USER_DISMISS_ROLES.includes(role);
 
   constructor() {
     addIcons({ close });
@@ -176,8 +238,27 @@ export class SheetShell {
    * is written onto the wrapper directly, before the sheet is announced.
    */
   syncDialogLabel(): void {
-    const host = this._modalElement()?.nativeElement as HTMLElement | undefined;
-    host?.shadowRoot?.querySelector('.modal-wrapper')?.setAttribute('aria-label', this.title());
+    this._shadowElement('.modal-wrapper')?.setAttribute('aria-label', this.title());
+  }
+
+  /**
+   * Run before the sheet is announced: the dialog's name, plus the grabber's.
+   *
+   * Ionic renders the grabber as a shadow `<button>` with a hard-coded English
+   * label, reachable by a screen reader even when it does nothing. Where it
+   * steps between snap points it gets a translated name; where it does not,
+   * it is hidden so nobody lands on a button with no action.
+   */
+  syncShadowAria(): void {
+    this.syncDialogLabel();
+    const grabber = this._shadowElement('.modal-handle');
+    if (!grabber) return;
+    if (this.handleBehavior() === HandleBehaviors.Cycle) {
+      grabber.removeAttribute('aria-hidden');
+      grabber.setAttribute('aria-label', this._translateService.instant('a11y.resizeSheet'));
+    } else {
+      grabber.setAttribute('aria-hidden', 'true');
+    }
   }
 
   dismiss(): void {
@@ -193,5 +274,10 @@ export class SheetShell {
   async close(): Promise<void> {
     this.open.set(false);
     await this._modal()?.dismiss();
+  }
+
+  private _shadowElement(selector: string): HTMLElement | null {
+    const host = this._modalElement()?.nativeElement as HTMLElement | undefined;
+    return host?.shadowRoot?.querySelector<HTMLElement>(selector) ?? null;
   }
 }

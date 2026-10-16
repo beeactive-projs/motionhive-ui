@@ -42,7 +42,6 @@ ion-buttons ion-button.cancel {
   min-width: 0;
   overflow: hidden;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
   text-overflow: ellipsis;
@@ -102,7 +101,7 @@ ion-buttons ion-button.cancel {
 .all-clear strong {
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .all-clear span {

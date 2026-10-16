@@ -77,8 +77,7 @@ ion-label h2 {
 /* The ownership chip is the exception marker, so it reads as a label rather
    than a status: mono and uppercase, the way the roster's chips do. */
 .ownership {
-  font-family: var(--mh-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--mh-text-xs);
   letter-spacing: var(--mh-tracking-kicker);
   text-transform: uppercase;
 }

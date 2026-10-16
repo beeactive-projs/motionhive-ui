@@ -1,14 +1,15 @@
-<ion-modal [isOpen]="open()" [breakpoints]="breakpoints()" [initialBreakpoint]="initialBreakpoint()" [handle]="true"
-  [expandToScroll]="false" [attr.aria-label]="title()" [class]="presented() ? presentedClass : ''"
-  (willPresent)="syncDialogLabel()" (didPresent)="presented.set(true)"
-  (didDismiss)="open.set(false); presented.set(false); dismissed.emit()">
+<!-- `canDismiss` is bound ahead of `isOpen` on purpose: a save that finishes
+     and closes in the same pass must release the guard before Ionic dismisses. -->
+<ion-modal [canDismiss]="canDismiss()" [handleBehavior]="handleBehavior()" [isOpen]="open()"
+  [breakpoints]="snapPoints()" [initialBreakpoint]="startPoint()" [handle]="true" [expandToScroll]="false"
+  [attr.aria-label]="title()" [class]="modalClass()" (willPresent)="syncShadowAria()"
+  (didPresent)="presented.set(true)" (didDismiss)="open.set(false); presented.set(false); dismissed.emit()">
   <!-- Everything the modal shows must live inside this template: Ionic moves
        the modal when it presents, and anything outside is left behind. -->
   <ng-template>
-    @if (showHeader()) {
+    <!-- One header for every sheet: title, optional subtitle, close. -->
     <ion-header class="ion-no-border">
       <ion-toolbar>
-        @if (subtitle() || actionLabel()) {
         <div class="heading">
           <span class="heading-title">{{ title() }}</span>
           @if (subtitle()) {
@@ -16,30 +17,13 @@
           }
         </div>
         <ion-buttons slot="end">
-          @if (actionLabel()) {
-          <ion-button fill="clear" class="header-action" [disabled]="actionDisabled()" (click)="action.emit()">
-            {{ actionLabel() }}
-          </ion-button>
-          }
-          @if (subtitle()) {
-          <ion-button class="close" shape="round" [attr.aria-label]="'a11y.close' | translate" (click)="dismiss()">
-            <ion-icon slot="icon-only" name="close" />
-          </ion-button>
-          }
-        </ion-buttons>
-        } @else {
-        <div class="heading">
-          <span class="heading-title">{{ title() }}</span>
-        </div>
-        <ion-buttons slot="end">
-          <ion-button class="close" shape="round" [attr.aria-label]="'a11y.close' | translate" (click)="dismiss()">
+          <ion-button class="close" shape="round" [disabled]="saving()" [attr.aria-label]="'a11y.close' | translate"
+            (click)="dismiss()">
             <ion-icon slot="icon-only" name="close" />
           </ion-button>
         </ion-buttons>
-        }
       </ion-toolbar>
     </ion-header>
-    }
 
     @if (sticky(); as pinned) {
     <div class="sticky">
@@ -47,9 +31,17 @@
     </div>
     }
 
+    @if (fit()) {
+    <!-- Not `ion-content`: it is absolutely positioned, so it has no height
+         of its own for an auto-height sheet to wrap around. -->
+    <div class="fit-body">
+      <ng-container [ngTemplateOutlet]="body()" />
+    </div>
+    } @else {
     <ion-content class="ion-padding" [class.flush]="flushBody()">
       <ng-container [ngTemplateOutlet]="body()" />
     </ion-content>
+    }
 
     @if (showFooter()) {
     <ion-footer class="ion-no-border">
@@ -57,9 +49,16 @@
         <!-- Not `ion-buttons`: that slot packs its children to one edge at
                toolbar-button size. The sheet's commit is a full-width bar. -->
         <div class="actions">
-          <ion-button fill="outline" color="medium" class="dismiss" [disabled]="saving()" (click)="dismiss()">
+          @if (actionLabel()) {
+          <ion-button fill="outline" color="medium" class="secondary" [disabled]="actionDisabled() || saving()"
+            (click)="action.emit()">
+            {{ actionLabel() }}
+          </ion-button>
+          } @else {
+          <ion-button fill="outline" color="medium" class="secondary" [disabled]="saving()" (click)="dismiss()">
             {{ dismissLabel() || ('button.cancel' | translate) }}
           </ion-button>
+          }
           <ion-button fill="solid" class="confirm" [color]="saveColor()" [disabled]="!canSave() || saving()"
             (click)="save.emit()">
             @if (saving()) {
