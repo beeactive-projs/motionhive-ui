@@ -69,10 +69,14 @@
   scroll-margin-top: calc(var(--offset-top, 0px) + 3.75rem);
 }
 
-/* The weekday at the start of each row, at a fixed width so the names align. */
+/* The weekday at the start of each row, at a fixed width so the names align.
+   The row's separator starts after it (theme/components/ion-list.css). */
 .dow {
   width: 2.5rem;
-  margin-inline-end: 0.5rem;
+}
+
+ion-item:has(> .dow) {
+  --mh-row-lead: 2.5rem;
 }
 
 /* A rest day is an invitation, quieter than a day with a name. */

@@ -12,11 +12,10 @@
 <ng-template #body>
   @if (rows().length) {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (option of rows(); track option.value; let last = $last) {
+      @for (option of rows(); track option.value) {
         <ion-item
           button
           [detail]="false"
-          [lines]="last ? 'none' : 'full'"
           [attr.aria-current]="option.value === selected() ? 'true' : null"
           (click)="pick(option.value)"
         >

@@ -14,8 +14,8 @@
   } @else if (results().length) {
     <ion-list [inset]="true" class="mh-card-list">
       @for (place of results(); track place.displayName) {
-        <ion-item button [detail]="false" lines="full" (click)="pick(place)">
-          <ion-icon slot="start" name="location-outline" aria-hidden="true" />
+        <ion-item button [detail]="false" (click)="pick(place)">
+          <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" />
           <ion-label class="ion-text-wrap">
             {{ place.city ?? place.displayName }}
             <p>{{ place.country }}</p>

@@ -2,7 +2,7 @@
   @if (program(); as program) {
     <div class="mh-section-label">{{ 'programs.assign.program' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item lines="none">
+      <ion-item>
         <ion-label>
           <h2>{{ program.name }}</h2>
         </ion-label>
@@ -15,7 +15,7 @@
     <div class="mh-section-label">{{ 'programs.assign.program' | translate }}</div>
     @if (chosenProgram(); as chosen) {
       <ion-list [inset]="true" class="mh-card-list">
-        <ion-item lines="none">
+        <ion-item>
           <ion-label>
             <h2>{{ chosen.name }}</h2>
             @if (programMeta(chosen)) {
@@ -56,8 +56,8 @@
       }
       @if (visiblePrograms().length) {
         <ion-list [inset]="true" class="mh-card-list">
-          @for (row of visiblePrograms(); track row.id; let last = $last) {
-            <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="chooseProgram(row)">
+          @for (row of visiblePrograms(); track row.id) {
+            <ion-item button [detail]="false" (click)="chooseProgram(row)">
               <ion-label>
                 <h2>{{ row.name }}</h2>
                 <div class="program-tags">
@@ -87,7 +87,7 @@
   @if (client(); as client) {
     <div class="mh-section-label">{{ 'programs.assign.client' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item lines="none">
+      <ion-item>
         <mh-hex-avatar
           slot="start"
           size="sm"
@@ -109,8 +109,8 @@
       </ion-note>
     } @else {
       <ion-list [inset]="true" class="mh-card-list">
-        @for (row of clients(); track row.clientId; let last = $last) {
-          <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="clientId.set(row.clientId)">
+        @for (row of clients(); track row.clientId) {
+          <ion-item button [detail]="false" (click)="clientId.set(row.clientId)">
             <mh-hex-avatar
               slot="start"
               size="sm"
@@ -131,7 +131,7 @@
 
   <div class="mh-section-label">{{ 'programs.assign.starts' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
-    <ion-item lines="none">
+    <ion-item>
       <ion-label>{{ 'form.label.startDate' | translate }}</ion-label>
       <ion-datetime-button slot="end" datetime="assign-start-date" />
     </ion-item>
@@ -174,15 +174,15 @@
   @if (preview().length) {
     <div class="mh-section-label">{{ 'programs.assign.schedule' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
-      @for (row of previewHead(); track row.name + row.date; let last = $last) {
-        <ion-item [lines]="last && !previewMore() ? 'none' : 'full'">
+      @for (row of previewHead(); track row.name + row.date) {
+        <ion-item>
           <ion-note slot="start" class="mh-kicker week">{{ row.week }}</ion-note>
           <ion-label>{{ row.name }}</ion-label>
           <ion-note slot="end">{{ row.date }}</ion-note>
         </ion-item>
       }
       @if (previewMore()) {
-        <ion-item lines="none">
+        <ion-item>
           <ion-note class="more">{{ 'programs.assign.more' | translate: { count: previewMore() } }}</ion-note>
         </ion-item>
       }

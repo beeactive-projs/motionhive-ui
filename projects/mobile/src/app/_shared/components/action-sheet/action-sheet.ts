@@ -1,9 +1,10 @@
 import { Component, computed, input, model, output } from '@angular/core';
-import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../sheet-shell/sheet-shell';
 import { SheetAction } from './action-sheet.model';
+import { HexAvatar } from '../hex-avatar/hex-avatar';
 
 /**
  * A list of verbs about one thing: the shell's header saying what it is
@@ -22,7 +23,7 @@ import { SheetAction } from './action-sheet.model';
  */
 @Component({
   selector: 'mh-action-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
+  imports: [HexAvatar, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './action-sheet.html',
   styleUrl: './action-sheet.scss',
 })

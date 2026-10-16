@@ -35,8 +35,8 @@
       @if (showSkeleton()) {
         <!-- Mirrors the row shape so nothing shifts when the rows land. -->
         <ion-list [inset]="true" class="mh-card-list" aria-hidden="true">
-          @for (_ of skeletonRows; track $index; let last = $last) {
-            <ion-item [lines]="last ? 'none' : 'full'">
+          @for (_ of skeletonRows; track $index) {
+            <ion-item>
               <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
               <ion-label>
                 <ion-skeleton-text [animated]="true" style="width: 55%" />

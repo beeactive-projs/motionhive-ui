@@ -88,8 +88,8 @@
       <section class="mh-section">
         <span class="mh-kicker">{{ 'workouts.plan.allWeeks' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
-          @for (week of store.weeks(); track week.index; let last = $last) {
-            <ion-item [lines]="last ? 'none' : 'full'" [class.current]="isCurrentWeek(week.index)">
+          @for (week of store.weeks(); track week.index) {
+            <ion-item [class.current]="isCurrentWeek(week.index)">
               <ion-label>{{ 'workouts.meta.week' | translate: { number: week.index + 1 } }}</ion-label>
               <ion-note slot="end" class="count">{{ week.done }} / {{ week.days.length }}</ion-note>
             </ion-item>

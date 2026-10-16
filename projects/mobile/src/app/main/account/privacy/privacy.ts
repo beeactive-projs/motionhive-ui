@@ -29,6 +29,7 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ChoiceOption, ChoiceSheet } from '../_sheets/choice-sheet/choice-sheet';
 import { ACCOUNT_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
+import { DETAIL_TILES } from '../../../_shared/config/detail-tiles.config';
 
 interface PrivacyRow {
   field: PrivacyControlledField;
@@ -42,11 +43,11 @@ interface PrivacyRow {
  * lists them. Name and photo are always public, so they are not here.
  */
 export const PRIVACY_ROWS: readonly PrivacyRow[] = [
-  { field: 'email', labelKey: 'form.label.email', icon: 'mail-outline', iconColor: 'primary' },
-  { field: 'phone', labelKey: 'form.label.phone', icon: 'call-outline', iconColor: 'success' },
-  { field: 'city', labelKey: 'form.label.location', icon: 'location-outline', iconColor: 'info' },
-  { field: 'language', labelKey: 'form.label.language', icon: 'language-outline', iconColor: 'medium' },
-  { field: 'timezone', labelKey: 'form.label.timezone', icon: 'time-outline', iconColor: 'medium' },
+  { field: 'email', labelKey: 'form.label.email', icon: DETAIL_TILES.email.icon, iconColor: DETAIL_TILES.email.color },
+  { field: 'phone', labelKey: 'form.label.phone', icon: DETAIL_TILES.phone.icon, iconColor: DETAIL_TILES.phone.color },
+  { field: 'city', labelKey: 'form.label.location', icon: DETAIL_TILES.location.icon, iconColor: DETAIL_TILES.location.color },
+  { field: 'language', labelKey: 'form.label.language', icon: DETAIL_TILES.language.icon, iconColor: DETAIL_TILES.language.color },
+  { field: 'timezone', labelKey: 'form.label.timezone', icon: DETAIL_TILES.timezone.icon, iconColor: DETAIL_TILES.timezone.color },
 ];
 
 /**

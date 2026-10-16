@@ -181,7 +181,7 @@
    * in styles.css and components use these rather than their own numbers.
    */
   --mh-radius-control: 0.75rem;
-  --mh-radius-card: 1rem;
+  --mh-radius-card: 1.25rem;
   --mh-radius-pill: 999px;
   --mh-radius-sheet: 1.25rem;
 
@@ -214,6 +214,13 @@
   --mh-tap-target: 2.75rem;
 
   /*
+   * A list row's one spacing step: its start and end padding and the gap
+   * after its leading tile. One value, so the separator inset in
+   * ion-list.css can be computed from it.
+   */
+  --mh-row-gutter: 0.875rem;
+
+  /*
    * Border widths — the only sanctioned px values besides 1px hairlines.
    * Everything else is a rem multiple of 0.125.
    */
@@ -240,6 +247,15 @@
   --mh-color-divider: var(--mh-slate-100);
 
   /*
+   * The hairline between rows of a grouped list (ion-list.css). Not the
+   * divider above: that one doubles as a soft fill (pills, composer) and is
+   * too pale to read as a line on a white card. Mixed from the ink rather
+   * than a ramp step so it sits at the same weight on any card fill, light
+   * or dark: about 1.2:1 against the card, the weight of an iOS separator.
+   */
+  --mh-color-separator: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+
+  /*
    * The fill behind a selected chip, tile or day — honey's palest step,
    * paired with honey-deep ink. Selection, not status: this is the one soft
    * honey surface the brand rules allow, and it is deliberately one step
@@ -263,8 +279,8 @@
    * design's card-based screens need the page one step darker than the
    * things sitting on it.
    */
-  --ion-background-color: var(--mh-slate-50);
-  --ion-background-color-rgb: 248, 250, 252;
+  --ion-background-color: var(--mh-slate-100);
+  --ion-background-color-rgb: 241, 245, 249;
   --ion-card-background: #ffffff;
   --ion-item-background: #ffffff;
   --ion-toolbar-background: #ffffff;

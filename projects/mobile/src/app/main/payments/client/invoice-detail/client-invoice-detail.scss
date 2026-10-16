@@ -24,11 +24,10 @@
 }
 
 .badges ion-note {
-  font-size: 0.7rem;
+  font-size: var(--mh-text-xs);
 }
 
 .line-amount {
-  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
 

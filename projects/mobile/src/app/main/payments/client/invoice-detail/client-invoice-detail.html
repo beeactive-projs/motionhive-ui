@@ -70,7 +70,7 @@
     </div>
 
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item lines="full">
+      <ion-item>
         <mh-hex-avatar
           slot="start"
           size="sm"
@@ -85,8 +85,8 @@
       </ion-item>
 
       @if (dueLabel(); as when) {
-        <ion-item [lines]="inv.invoicePdf ? 'full' : 'none'">
-          <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+        <ion-item>
+          <mh-hex-avatar slot="start" size="sm" icon="time-outline" color="coral" />
           <ion-label>
             <p>{{ (isPaid() ? 'payments.detail.paidOn' : 'payments.detail.due') | translate }}</p>
             <h3>{{ when }}</h3>
@@ -95,8 +95,8 @@
       }
 
       @if (inv.invoicePdf) {
-        <ion-item button detail="false" lines="none" (click)="openPdf()">
-          <ion-icon slot="start" name="document-text-outline" color="medium" aria-hidden="true" />
+        <ion-item button detail="false" (click)="openPdf()">
+          <mh-hex-avatar slot="start" size="sm" icon="document-text-outline" color="info" />
           <ion-label>
             <p>{{ 'payments.detail.document' | translate }}</p>
             <h3>{{ (isPaid() ? 'payments.detail.receiptPdf' : 'payments.detail.invoicePdf') | translate }}</h3>
@@ -110,7 +110,7 @@
       <div class="mh-section-label">{{ 'payments.detail.items' | translate }}</div>
       <ion-list [inset]="true" class="mh-card-list">
         @for (item of items(); track item.id) {
-          <ion-item lines="full">
+          <ion-item>
             <ion-label class="ion-text-wrap">
               <h3>{{ item.description || ('payments.fallback.item' | translate) }}</h3>
               @if (item.quantity > 1) {

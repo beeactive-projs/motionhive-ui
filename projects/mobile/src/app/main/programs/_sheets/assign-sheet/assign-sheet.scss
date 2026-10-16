@@ -9,7 +9,11 @@ ion-item ion-icon {
    the names line up under each other. */
 .week {
   width: 3.5rem;
-  margin-inline-end: 0.5rem;
+}
+
+/* The row's separator starts after the week column (theme/components/ion-list.css). */
+ion-item:has(> .week) {
+  --mh-row-lead: 3.5rem;
 }
 
 .more {

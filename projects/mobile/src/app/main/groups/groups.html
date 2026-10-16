@@ -99,8 +99,8 @@
     }
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index; let last = $last) {
-      <ion-item [lines]="last ? 'none' : 'full'">
+      @for (_ of skeletonRows; track $index) {
+      <ion-item>
         <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
         <ion-label>
           <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
@@ -188,8 +188,8 @@
       [message]="'groups.list.discover.empty.message' | translate" />
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (group of store.discover(); track group.id; let last = $last) {
-      <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'"
+      @for (group of store.discover(); track group.id) {
+      <ion-item button [detail]="false"
         (click)="openDiscovered(group.id)">
         <mh-hex-avatar slot="start" size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
         <ion-label>
@@ -227,8 +227,8 @@
     }
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (group of store.mine(); track group.id; let last = $last) {
-      <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="openGroup(group.id)">
+      @for (group of store.mine(); track group.id) {
+      <ion-item button [detail]="true" (click)="openGroup(group.id)">
         <mh-hex-avatar slot="start" size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
         <ion-label>
           <h2>{{ group.name }}</h2>
@@ -237,7 +237,6 @@
             @if (!group.isPublic) { · {{ 'groups.list.private' | translate }} }
           </p>
         </ion-label>
-        <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
       </ion-item>
       }
     </ion-list>

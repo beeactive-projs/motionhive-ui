@@ -26,6 +26,18 @@ Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 s
 - [`layout.css`](src/theme/layout.css) — the layout primitives `.mh-page` and `.mh-section` (below).
 - [`components/`](src/theme/components/) — **one file per Ionic component** that needs a global skin (`ion-card.css`, `ion-list.css`, `ion-button.css`, …), imported from `styles.css`. General custom CSS for a component goes in its file — never back into `styles.css`, never copy-pasted across page `.scss` files. Add a new file (and its `@import`) when a component first needs a global rule.
 
+### Rules for Claude (`.claude/rules/`)
+
+Topic rules live in [`.claude/rules/`](.claude/rules/) and load when Claude works on mobile files. They are binding like this file:
+
+- [`lists.md`](.claude/rules/lists.md): grouped lists (`mh-card-list`), rows, separators, leading hex tiles and their colours, trailing values.
+- [`surfaces-and-sheets.md`](.claude/rules/surfaces-and-sheets.md): no outlines on card surfaces, one-surface sheets, `close()` before navigating.
+- [`ionic-gotchas.md`](.claude/rules/ionic-gotchas.md): `ion-item` padding and stacking, field errors, searchbar focus, accessible names on Ionic buttons.
+- [`colour-and-type.md`](.claude/rules/colour-and-type.md): the Tailwind-ramp palette, honey means selection, sentence-case kickers, tokens over literals.
+- [`testing-and-tooling.md`](.claude/rules/testing-and-tooling.md): config-only specs, rebuild core before tests, no local prettier, check UI in both themes.
+
+Add to them when a decision should hold for everyone; keep this file for the structure and token reference.
+
 ### Layout rule — components are margin-free, pages place them
 
 - **Component skins carry no margins.** `ion-card`, `mh-card-list` and friends are layout-neutral (`margin: 0` in their skin); where they sit on a screen is the screen's decision. Never re-introduce a placement margin into `theme/components/` or into a shared component's own `.scss`.

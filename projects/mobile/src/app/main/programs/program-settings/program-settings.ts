@@ -41,6 +41,7 @@ import {
   weeksOf,
   weeksToDays,
 } from '../programs.config';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 
 /**
  * Metadata, and the one state change that matters.
@@ -55,6 +56,7 @@ import {
   imports: [
     ConfirmSheet,
     EmptyState,
+    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,

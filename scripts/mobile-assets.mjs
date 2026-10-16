@@ -34,7 +34,7 @@ const androidRes = join(root, 'android/app/src/main/res');
 
 const HONEY_MARK = join(svgDir, 'logo-honey.svg'); // fill #f59e0b
 
-const SLATE_50 = '#f8fafc'; // light --ion-background-color
+const SLATE_100 = '#f1f5f9'; // light --ion-background-color
 const NAVY_900 = '#0e1b31'; // dark --ion-background-color, and the icon tile
 
 const MARK_ASPECT = 168 / 190; // logo-*.svg viewBox is 168×190
@@ -84,7 +84,7 @@ async function writeSources() {
   // Honey on light too: there is only the honey mark. A logo is a graphic, not
   // text, so the 2.05:1 of honey on slate-50 is not a contrast failure — text
   // on honey still goes through `--mh-color-honey-deep`.
-  await compose(SPLASH, SLATE_50, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash.png'));
+  await compose(SPLASH, SLATE_100, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash.png'));
   await compose(SPLASH, NAVY_900, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash-dark.png'));
 }
 

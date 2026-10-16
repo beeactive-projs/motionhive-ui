@@ -44,6 +44,5 @@ ion-item.current ion-label {
 
 /* Counts sit in a column; proportional digits make them wobble. */
 .count {
-  font-size: var(--mh-text-sm);
   font-variant-numeric: tabular-nums;
 }

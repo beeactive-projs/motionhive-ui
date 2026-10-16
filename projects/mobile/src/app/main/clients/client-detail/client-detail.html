@@ -33,8 +33,8 @@
         <ion-skeleton-text [animated]="true" style="width: 40%" />
       </div>
       <ion-list [inset]="true" class="mh-card-list">
-        @for (_ of skeletonRows; track $index; let last = $last) {
-          <ion-item [lines]="last ? 'none' : 'full'">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item>
             <ion-label>
               <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
               <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
@@ -254,7 +254,7 @@
           <ion-icon name="lock-closed-outline" class="lock" aria-hidden="true" />
         </div>
         <ion-list [inset]="true" class="mh-card-list">
-          <ion-item button detail="false" lines="none" (click)="openNotes()">
+          <ion-item button detail="false" (click)="openNotes()">
             <ion-label class="ion-text-wrap">
               @if (client.notes) {
                 <p class="notes">{{ client.notes }}</p>
@@ -280,19 +280,18 @@
                  should be hard to read. The glyph keeps the saturated hue —
                  3:1 is enough for a graphic, and the pair is the same
                  treatment the attention rows use. -->
-            <ion-item button detail="false" lines="none" (click)="confirmArchive()">
-              <ion-icon slot="start" name="archive-outline" color="danger" aria-hidden="true" />
+            <ion-item button detail="false" (click)="confirmArchive()">
+              <mh-hex-avatar slot="start" size="sm" icon="archive-outline" color="danger" />
               <ion-label class="verb danger">{{ 'clients.actions.archiveClientEllipsis' | translate }}</ion-label>
             </ion-item>
           } @else {
             <ion-item
               button
               detail="false"
-              lines="none"
               [disabled]="store.saving()"
               (click)="unarchive()"
             >
-              <ion-icon slot="start" name="arrow-undo-outline" color="success" aria-hidden="true" />
+              <mh-hex-avatar slot="start" size="sm" icon="arrow-undo-outline" color="success" />
               <ion-label class="verb success">{{ 'clients.actions.unarchiveClient' | translate }}</ion-label>
             </ion-item>
           }

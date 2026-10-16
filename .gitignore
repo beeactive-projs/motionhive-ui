@@ -41,6 +41,10 @@ __screenshots__/
 test-results/
 playwright-report/
 .claude/
+# ...except the mobile app's shared Claude rules, committed for everyone.
+!projects/mobile/.claude/
+projects/mobile/.claude/*
+!projects/mobile/.claude/rules/
 
 # Capacitor native shells (templates ship their own .gitignore; extras below)
 /android/app/release

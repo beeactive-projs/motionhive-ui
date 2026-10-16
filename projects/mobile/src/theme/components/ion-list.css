@@ -1,8 +1,10 @@
-/* The grouped settings card: a card that happens to be a list. `ion-list`
-   publishes no CSS variables for border, radius or background, so these are
-   literal rules — the one thing Ionic's API cannot express here. `[inset]`
-   earns its place anyway: it is what supplies `overflow: hidden`, which clips
-   the first and last rows' backgrounds to the corner radius.
+/* The grouped list: a card that happens to be a list, drawn the iOS
+   inset-grouped way — no outline, a large radius, the card lifted off the
+   page by its fill alone. `ion-list` publishes no CSS variables for radius or
+   background, so these are literal rules — the one thing Ionic's API cannot
+   express here. `[inset]` earns its place anyway: it is what supplies
+   `overflow: hidden`, which clips the first and last rows' backgrounds to the
+   corner radius.
 
    Skin only — `margin: 0` makes the list layout-neutral; the page's layout
    container places it. Specificity: `[inset]` reflects to a `.list-inset`
@@ -13,30 +15,120 @@
 ion-list.list-inset.mh-card-list {
   margin: 0;
   padding: 0;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
 }
 
 /* One spacing standard for every list row. Ionic's own numbers differ mode to
    mode (md pads 1rem with no vertical air at all) and the row components had
-   each started restating their own — these four variables are the single
-   source now. `.mh-list-row` opts in the standalone card rows that render
-   outside any `ion-list` (the sessions agenda row and its skeleton twin). A
-   row with a real reason to differ (the chat transcript's zeroed bubbles, a
-   sheet's field rows) sets its own values in its component scope, which
-   outranks these plain selectors. */
+   each started restating their own — these variables are the single source
+   now. `.mh-list-row` opts in the standalone card rows that render outside
+   any `ion-list` (the sessions agenda row and its skeleton twin). A row with
+   a real reason to differ (the chat transcript's zeroed bubbles, a sheet's
+   field rows) sets its own values in its component scope, which outranks
+   these plain selectors. */
 ion-list ion-item,
 ion-item.mh-list-row {
-  --padding-start: 0.875rem;
-  --inner-padding-end: 0.875rem;
+  --padding-start: var(--mh-row-gutter);
+  --inner-padding-end: var(--mh-row-gutter);
   --padding-top: 0.5rem;
   --padding-bottom: 0.5rem;
 }
 
-/* md opens 32px between a slot="start" icon and the label — wide enough to
-   read as two columns at phone width. Same 1rem gap the avatar rows use. */
-ion-list ion-item ion-icon[slot='start'],
-ion-item.mh-list-row ion-icon[slot='start'] {
-  margin-inline-end: 0.875rem;
+/* One gap between a leading tile (or icon, avatar, checkbox) and the label.
+   md opens 32px after a slot="start" icon — wide enough to read as two
+   columns at phone width. The separator inset below assumes this gap. */
+ion-list ion-item > [slot='start'],
+ion-item.mh-list-row > [slot='start'] {
+  margin-inline-end: var(--mh-row-gutter);
+}
+
+/* ─── Rows of a grouped list ───────────────────────────────────────────
+   Rows are 3rem at least. Ionic hands `--min-height` on to the inner row,
+   which sits inside the vertical padding, so 2rem + 2 × 0.5rem is the 3rem
+   row. The chevron is the muted ink at full strength: Ionic dims it to 25%,
+   below the 3:1 a control needs. */
+ion-list.mh-card-list ion-item {
+  --min-height: 2rem;
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+  /* Where the label starts, so the separator can start there too. A row with
+     nothing leading starts at the gutter; the rules below add the leading
+     item's width and its gap. */
+  --mh-row-inset: var(--mh-row-gutter);
+}
+
+/* The trailing value or count is the label's size in the muted ink, the iOS
+   way: secondary by colour, not by shrinking. */
+ion-list.mh-card-list ion-item > ion-note[slot='end'] {
+  font-size: var(--mh-text-base);
+}
+
+/* A note in either slot sits on the row's centre line like the tile and the
+   label. Ionic tops it instead (`align-self: flex-start` plus 18px/10px of
+   padding, a metadata-corner layout), which leaves a weekday kicker or a
+   value riding high or low against the label beside it. */
+ion-list.mh-card-list ion-item > ion-note[slot] {
+  align-self: center;
+  padding-block: 0;
+}
+
+/* The separator. Ionic's own `lines` are switched off for every row in a
+   grouped list — an outer-tree declaration beats the item's shadow
+   `:host(.item-lines-*)` rules, so a `lines` attribute here is inert — and
+   one hairline is drawn instead, the way iOS does it: from the label's start
+   to a gutter short of the trailing edge.
+
+   Ionic could not draw this. `lines="inset"` runs to the very edge, and its
+   inset-list stylesheet zeroes the border on `ion-item:only-child`, which
+   every row wrapped in a component host is. The host is `position: relative`
+   (Ionic's own), which anchors the pseudo-element; the row's shadow
+   `.item-native` paints at `z-index: 1` with its own background, so the
+   line sits one above it. */
+ion-list.mh-card-list ion-item {
+  --border-width: 0;
+  --inner-border-width: 0;
+}
+
+ion-list.mh-card-list ion-item::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset-block-end: 0;
+  inset-inline-start: var(--mh-row-inset);
+  inset-inline-end: var(--mh-row-gutter);
+  height: 1px;
+  background: var(--mh-color-separator);
+  pointer-events: none;
+}
+
+/* The last row closes the card with its corner, not a line. The second
+   selector reaches rows wrapped in a host (`mh-settings-row`,
+   `ion-item-sliding`, the row components); Angular's control-flow comments
+   are not elements, so `:last-child` still finds the last row. */
+ion-list.mh-card-list > ion-item:last-child::after,
+ion-list.mh-card-list > :last-child ion-item::after {
+  display: none;
+}
+
+/* The label's start, per leading item: gutter + the item's width + gap.
+   `--mh-row-lead` is that width. Hex tiles reflect their size on
+   `data-size` (`sm` the settings-row tile, `md` a person or an entity, `lg`
+   the conversation avatar); a bare icon is md's 1.5rem glyph box. A page
+   with its own leading item (a weekday kicker) sets `--mh-row-lead` on its
+   rows. */
+ion-list.mh-card-list ion-item:has(> [slot='start']) {
+  --mh-row-inset: calc(var(--mh-row-gutter) * 2 + var(--mh-row-lead, 1.5rem));
+}
+
+ion-list.mh-card-list ion-item:has(> mh-hex-avatar[slot='start'][data-size='sm']) {
+  --mh-row-lead: 1.875rem;
+}
+
+ion-list.mh-card-list ion-item:has(> mh-hex-avatar[slot='start'][data-size='md']) {
+  --mh-row-lead: 2.5rem;
+}
+
+ion-list.mh-card-list ion-item:has(> mh-hex-avatar[slot='start'][data-size='lg']) {
+  --mh-row-lead: 3.25rem;
 }

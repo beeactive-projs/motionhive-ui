@@ -31,7 +31,7 @@
       </div>
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
-          <ion-item lines="full">
+          <ion-item>
             <ion-label>
               <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
               <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
@@ -83,7 +83,7 @@
 
       @if (lifecycle() !== 'past') {
         <ion-list [inset]="true" class="mh-card-list">
-          <ion-item lines="full">
+          <ion-item>
             <mh-hex-avatar slot="start" size="sm" icon="calendar-outline" color="info" tone="shade" aria-hidden="true" />
             <ion-label>
               <h3>{{ startLine() }}</h3>
@@ -94,8 +94,8 @@
           </ion-item>
 
           @if (isOnline()) {
-            <ion-item lines="none">
-              <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="primary" aria-hidden="true" />
+            <ion-item>
+              <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="teal" aria-hidden="true" />
               <ion-label>
                 @if (meetingUrl(); as url) {
                   <!-- The link itself is the row: the CTA below joins, and what
@@ -114,7 +114,7 @@
               }
             </ion-item>
           } @else {
-            <ion-item lines="none">
+            <ion-item>
               <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" aria-hidden="true" />
               <ion-label>
                 <h3>{{ locationLabel() }}</h3>
@@ -142,8 +142,8 @@
           {{ 'sessions.detail.details' | translate }}
         </ion-note>
         <ion-list [inset]="true" class="mh-card-list">
-          @for (row of detailRows(); track $index; let last = $last) {
-            <ion-item [lines]="last ? 'none' : 'full'">
+          @for (row of detailRows(); track $index) {
+            <ion-item>
               <mh-hex-avatar
                 slot="start"
                 size="sm"
@@ -169,13 +169,13 @@
             {{ 'sessions.detail.reminders' | translate }}
           </ion-note>
           <ion-list [inset]="true" class="mh-card-list">
-            @for (reminder of reminders(); track reminder.label; let last = $last) {
-              <ion-item [lines]="last ? 'none' : 'full'">
+            @for (reminder of reminders(); track reminder.label) {
+              <ion-item>
                 <mh-hex-avatar
                   slot="start"
                   size="sm"
                   icon="notifications-outline"
-                  color="primary"
+                  color="danger"
                   aria-hidden="true"
                 />
                 <ion-label>
@@ -243,9 +243,8 @@
           <ion-note class="mh-note-block">{{ 'sessions.detail.noSignups' | translate }}</ion-note>
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
-            @for (participant of visibleAttendees(); track participant.id; let last = $last) {
+            @for (participant of visibleAttendees(); track participant.id) {
               <ion-item
-                [lines]="last && hiddenAttendees() === 0 ? 'none' : 'full'"
                 [button]="hasProfile(participant)"
                 [detail]="hasProfile(participant) && !editingAttendance()"
                 (click)="openProfile(participant)"
@@ -334,7 +333,7 @@
             }
 
             @if (hiddenAttendees() > 0) {
-              <ion-item button detail="false" lines="none" (click)="attendeesExpanded.set(true)">
+              <ion-item button detail="false" (click)="attendeesExpanded.set(true)">
                 <ion-label class="show-all">
                   {{ 'sessions.detail.showAll' | translate: { count: attendees().length } }}
                 </ion-label>
@@ -352,8 +351,8 @@
           </ion-note>
 
           <ion-list [inset]="true" class="mh-card-list">
-            @for (participant of waitlist(); track participant.id; let i = $index; let last = $last) {
-              <ion-item [lines]="last ? 'none' : 'full'">
+            @for (participant of waitlist(); track participant.id; let i = $index) {
+              <ion-item>
                 <span slot="start" class="queue">{{ i + 1 }}</span>
                 <ion-label>
                   <h3>{{ nameOf(participant) }}</h3>
@@ -398,7 +397,7 @@
             {{ 'form.label.description' | translate }}
           </ion-note>
           <ion-list [inset]="true" class="mh-card-list">
-            <ion-item lines="none">
+            <ion-item>
               <ion-label class="description">{{ text }}</ion-label>
             </ion-item>
           </ion-list>

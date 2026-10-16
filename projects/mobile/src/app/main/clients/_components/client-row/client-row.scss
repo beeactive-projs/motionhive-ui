@@ -1,27 +1,7 @@
-/* The divider Ionic will not draw for us: its inset-list stylesheet zeroes
-   the border on `ion-item-sliding:last-of-type ion-item`, and the sliding
-   inside this host is always the last of its type — so `lines="full"` on the
-   item would vanish on every row. Keep the list homogeneous (rows only) so
-   `:last-of-type` lands on the last row — same trick as notification-row. */
+/* Separator, chevron and the tile's gap come from the grouped-list skin
+   (theme/components/ion-list.css). */
 :host {
   display: block;
-  border-block-end: 1px solid var(--mh-color-divider);
-}
-
-:host(:last-of-type) {
-  border-block-end: 0;
-}
-
-ion-item {
-  --background: var(--ion-card-background);
-  --inner-border-width: 0;
-  /* Ionic dims the chevron to 25% by default, below the 3:1 a control needs. */
-  --detail-icon-color: var(--ion-color-medium);
-  --detail-icon-opacity: 1;
-}
-
-mh-hex-avatar {
-  margin-inline-end: 0.875rem;
 }
 
 /* The name owns its line now — it is the widest thing on the row and had

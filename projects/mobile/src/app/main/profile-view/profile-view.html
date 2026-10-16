@@ -25,8 +25,8 @@
       <ion-skeleton-text [animated]="true" style="width: 30%; height: 0.75rem" />
     </div>
     <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index; let last = $last) {
-      <ion-item [lines]="last ? 'none' : 'full'">
+      @for (_ of skeletonRows; track $index) {
+      <ion-item>
         <ion-label>
           <p><ion-skeleton-text [animated]="true" style="width: 25%" /></p>
           <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
@@ -62,8 +62,8 @@
          absent value means "not shared with you", not "empty". -->
     <ion-list [inset]="true" class="mh-card-list">
       @if (location(); as where) {
-      <ion-item lines="full">
-        <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.location.icon" [color]="Tiles.location.color" />
         <ion-label>
           <p>{{ 'form.label.location' | translate }}</p>
           <h2>{{ where }}</h2>
@@ -72,8 +72,8 @@
       }
 
       @if (profile.email) {
-      <ion-item lines="full">
-        <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.email.icon" [color]="Tiles.email.color" />
         <ion-label>
           <p>{{ 'form.label.email' | translate }}</p>
           <h2>{{ profile.email }}</h2>
@@ -82,8 +82,8 @@
       }
 
       @if (profile.phone) {
-      <ion-item lines="full">
-        <ion-icon slot="start" name="call-outline" color="medium" aria-hidden="true" />
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.phone.icon" [color]="Tiles.phone.color" />
         <ion-label>
           <p>{{ 'form.label.phone' | translate }}</p>
           <h2>{{ profile.phone }}</h2>
@@ -92,8 +92,8 @@
       }
 
       @if (profile.language) {
-      <ion-item lines="full">
-        <ion-icon slot="start" name="language-outline" color="medium" aria-hidden="true" />
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.language.icon" [color]="Tiles.language.color" />
         <ion-label>
           <p>{{ 'form.label.language' | translate }}</p>
           <h2>{{ profile.language | languageName }}</h2>
@@ -102,8 +102,8 @@
       }
 
       @if (profile.timezone) {
-      <ion-item lines="full">
-        <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.timezone.icon" [color]="Tiles.timezone.color" />
         <ion-label>
           <p>{{ 'form.label.timezone' | translate }}</p>
           <h2>{{ profile.timezone }}</h2>
@@ -113,8 +113,8 @@
 
       <!-- Always present: `memberSince` is public for everyone, so this row
            guarantees the card is never empty. -->
-      <ion-item lines="none">
-        <ion-icon slot="start" name="calendar-outline" color="medium" aria-hidden="true" />
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.memberSince.icon" [color]="Tiles.memberSince.color" />
         <ion-label>
           <p>{{ 'form.label.memberSince' | translate }}</p>
           <h2>{{ memberSince() }}</h2>

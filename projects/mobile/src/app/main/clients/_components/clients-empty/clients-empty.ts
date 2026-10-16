@@ -1,6 +1,6 @@
 import { Component, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IonButton, IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonButton, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
@@ -16,7 +16,7 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
  */
 @Component({
   selector: 'mh-clients-empty',
-  imports: [HexAvatar, IonButton, IonIcon, IonItem, IonLabel, IonList, TranslatePipe],
+  imports: [HexAvatar, IonButton, IonItem, IonLabel, IonList, TranslatePipe],
   templateUrl: './clients-empty.html',
   styleUrl: './clients-empty.scss',
 })

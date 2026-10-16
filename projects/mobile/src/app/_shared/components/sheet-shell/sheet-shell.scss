@@ -1,15 +1,14 @@
-// Both are documented `ion-modal` variables; the sheet sits on the card surface
-// rather than the page slate so its rows read as raised.
+// One surface for the whole sheet — header, body and footer all on the page
+// slate, the iOS grouped-sheet way — so its cards read as raised and nothing
+// splits the sheet into bands. Both are documented `ion-modal` variables;
+// `ion-content` paints the slate itself.
 ion-modal {
   --border-radius: var(--mh-radius-sheet) var(--mh-radius-sheet) 0 0;
-  --background: var(--ion-card-background);
+  --background: var(--ion-background-color);
 }
 
-// `ion-content` paints `--ion-background-color` — the page slate — so a sheet
-// made only of rows shows it as a gutter around them. `flushBody` hands those
-// sheets the same surface the modal itself uses.
-ion-content.flush {
-  --background: var(--ion-card-background);
+ion-header ion-toolbar {
+  --background: var(--ion-background-color);
 }
 
 // The sheet header: title over its optional subtitle, start-aligned.
@@ -61,7 +60,7 @@ ion-content.flush {
 // and the row gets its own padding because the buttons are the bar now rather
 // than toolbar-sized text.
 ion-footer ion-toolbar {
-  --background: var(--ion-card-background);
+  --background: var(--ion-background-color);
   --border-width: 1px 0 0;
   --border-color: var(--ion-border-color);
   --padding-start: 1rem;
@@ -110,16 +109,6 @@ ion-footer ion-toolbar {
   flex: none;
   padding: 0 1.25rem 0.5rem;
   background: var(--ion-background-color);
-}
-
-// A fit sheet is a grouped list: it sits on the page slate so its cards read
-// as raised, the way a settings screen does. The header shares the surface.
-ion-modal.mh-sheet-fit {
-  --background: var(--ion-background-color);
-}
-
-ion-modal.mh-sheet-fit ion-header ion-toolbar {
-  --background: var(--ion-background-color);
 }
 
 // Scrolls itself once the content passes most of the screen; until then the

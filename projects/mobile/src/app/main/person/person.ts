@@ -40,6 +40,7 @@ import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { PERSON_ICONS, roleLabel } from './person.config';
+import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 
 /**
  * Someone else's profile, reached from anywhere a person is named.
@@ -78,6 +79,8 @@ import { PERSON_ICONS, roleLabel } from './person.config';
   styleUrl: './person.scss',
 })
 export class Person {
+  readonly Tiles = DETAIL_TILES;
+
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _profileService = inject(ProfileService);

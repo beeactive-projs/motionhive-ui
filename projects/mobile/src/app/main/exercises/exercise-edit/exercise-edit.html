@@ -25,13 +25,13 @@
         <ion-note>{{ form.nameCount() }} / {{ maxNameLength }}</ion-note>
       </div>
       <ion-list [inset]="true" class="mh-card-list">
-        <ion-item lines="full">
+        <ion-item>
           <ion-input [attr.aria-label]="'form.label.name' | translate" autocapitalize="sentences" [maxlength]="maxNameLength"
             [value]="form.draft().name" (ionInput)="form.patch({ name: $event.detail.value ?? '' })" />
         </ion-item>
         <!-- Kind is a select here, not the create form's grid: the tracking
              promise has already been made, and changing it is a correction. -->
-        <ion-item lines="none">
+        <ion-item>
           <ion-select [label]="'exercises.fields.kind' | translate" labelPlacement="start" interface="action-sheet"
             [value]="form.draft().kind" (ionChange)="form.patch({ kind: $event.detail.value })">
             @for (kind of kinds; track kind) {
@@ -56,8 +56,8 @@
     <!-- Last and red, with nothing after it: the only thing on this page that
          cannot be undone by editing again. -->
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item button detail="false" lines="none" class="danger" (click)="confirmDelete()">
-        <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+      <ion-item button detail="false" class="danger" (click)="confirmDelete()">
+        <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
         <ion-label>
           <h3>{{ 'exercises.edit.deleteAction' | translate }}</h3>
           <p>{{ 'exercises.edit.deleteHint' | translate }}</p>

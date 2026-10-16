@@ -135,15 +135,6 @@ export class SheetShell {
   /** Off for the sheets that are a list of actions rather than a form. */
   readonly showFooter = input(true);
   /**
-   * Paint the body on the sheet's own surface instead of the page slate.
-   *
-   * `ion-content` defaults to `--ion-background-color`, which is why a form
-   * sheet's fields read as cards floating on a page. A sheet that is nothing
-   * but rows has no cards to float, so the slate turns into a gutter framing
-   * white rows — one continuous surface is what those want instead.
-   */
-  readonly flushBody = input(false);
-  /**
    * Snap points as fractions of the screen. Keep the `0`: it is what lets a
    * swipe down dismiss. Two or more open stops (half-open and tall) make the
    * grabber a button that steps between them, so resizing never needs a drag.

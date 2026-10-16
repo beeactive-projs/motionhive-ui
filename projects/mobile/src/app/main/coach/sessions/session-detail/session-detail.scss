@@ -1,12 +1,11 @@
-/* The hero card, same recipe as the account page's: bordered, centred, on the
-   card surface. It carries the badges and the session name. */
+/* The hero card, same recipe as the account page's: centred, on the card
+   surface. It carries the badges and the session name. */
 .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.625rem;
   padding: 1.375rem 1.25rem 1.125rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   text-align: center;
@@ -14,28 +13,18 @@
 
 /* The session's type tone from core's SESSION_TYPES — honey group, navy
    1-on-1, teal open — as a wash surface, so the screen says what this is
-   before a word is read. The border takes the same hue at hairline strength;
-   the badges step back onto the card surface, because a wash chip sitting on
-   a wash of the same hue would melt into it. */
+   before a word is read. The badges step back onto the card surface, because
+   a wash chip sitting on a wash of the same hue would melt into it. */
 .hero[data-tone='honey'] {
-  --hero-rgb: var(--ion-color-primary-rgb);
   background: var(--ion-color-primary-wash);
 }
 
 .hero[data-tone='teal'] {
-  --hero-rgb: var(--ion-color-teal-rgb);
   background: var(--ion-color-teal-wash);
 }
 
 .hero[data-tone='navy'] {
-  --hero-rgb: var(--ion-color-info-rgb);
   background: var(--ion-color-info-wash);
-}
-
-.hero[data-tone] {
-  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
-     slash syntax cannot take. */
-  border-color: rgba(var(--hero-rgb), 0.25);
 }
 
 .hero[data-tone] ion-badge[data-tone] {

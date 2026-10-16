@@ -27,15 +27,8 @@
 }
 
 /* Skeleton rows mirror the real row's tile placement and head line. */
-.skeleton ion-item {
-  --border-color: var(--mh-color-divider);
-}
-
 .skeleton ion-skeleton-text[slot='start'] {
   flex: none;
-  margin-inline-end: 0.75rem;
-  margin-top: 0.125rem;
-  align-self: flex-start;
 }
 
 .skeleton .head {

@@ -48,12 +48,12 @@ const MESSAGES: TabItem = {
 };
 
 // Groups sits in web's shared nav block, so both modes carry the same row.
-// Slate wash on purpose: honey is reserved for actions/selection, and the
-// coloured hues are taken by this row's coach-mode neighbours.
+// Navy: honey is reserved for actions/selection, and the brighter hues are
+// taken by this row's coach-mode neighbours.
 const GROUPS: MoreTile = {
   label: 'nav.groups',
   icon: 'people-circle-outline',
-  iconColor: 'medium',
+  iconColor: 'secondary',
   route: '/tabs/groups',
 };
 
