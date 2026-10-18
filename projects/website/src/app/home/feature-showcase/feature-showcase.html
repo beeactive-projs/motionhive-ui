@@ -1,19 +1,5 @@
-<!-- The arrows sit with the tabs, which are the thing that scrolls. Over the
-     clip they read as video controls, which these are not. -->
-<div class="fs__rail">
-  <button
-    type="button"
-    class="fs__arrow fs__arrow--prev"
-    [disabled]="!canPrev()"
-    (click)="step(-1)"
-    aria-label="Previous feature"
-    i18n-aria-label="@@home.fs.prev"
-  >
-    <i class="pi pi-chevron-left" aria-hidden="true"></i>
-  </button>
-
-  <!-- Bleeds to the screen edge so the row reads as scrollable without a hint. -->
-  <div class="fs__tabs" #tabs role="tablist" aria-label="Features" i18n-aria-label="@@home.fs.tabs">
+<!-- Bleeds to the screen edge so the row reads as scrollable without a hint. -->
+<div class="fs__tabs" #tabs role="tablist" aria-label="Features" i18n-aria-label="@@home.fs.tabs">
   @for (f of features(); track f.slug; let i = $index) {
     <button
       type="button"
@@ -25,21 +11,9 @@
       (click)="select(i)"
     >
       <span class="fs__tab-ic" aria-hidden="true">{{ f.icon }}</span>
-        <span class="fs__tab-name">{{ f.name }}</span>
-      </button>
-    }
-  </div>
-
-  <button
-    type="button"
-    class="fs__arrow fs__arrow--next"
-    [disabled]="!canNext()"
-    (click)="step(1)"
-    aria-label="Next feature"
-    i18n-aria-label="@@home.fs.next"
-  >
-    <i class="pi pi-chevron-right" aria-hidden="true"></i>
-  </button>
+      <span class="fs__tab-name">{{ f.name }}</span>
+    </button>
+  }
 </div>
 
 @if (current(); as f) {

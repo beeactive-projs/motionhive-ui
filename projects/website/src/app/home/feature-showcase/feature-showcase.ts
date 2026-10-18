@@ -42,7 +42,6 @@ export class FeatureShowcase {
   private readonly _elementRef = inject(ElementRef<HTMLElement>);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _video = viewChild<ElementRef<HTMLVideoElement>>('vid');
-  private readonly _tabs = viewChild<ElementRef<HTMLElement>>('tabs');
 
   /** Index of the open feature. Starts on the first, never empty. */
   readonly active = signal(0);
@@ -54,9 +53,6 @@ export class FeatureShowcase {
 
   /** "1 / 8" over the clip, so the row reads as a set rather than a scroll. */
   readonly position = computed(() => `${this.active() + 1} / ${this.features().length}`);
-
-  readonly canPrev = computed(() => this.active() > 0);
-  readonly canNext = computed(() => this.active() < this.features().length - 1);
 
   constructor() {
     // Nothing about the clip is fetched until the section is close. Matches
@@ -109,20 +105,7 @@ export class FeatureShowcase {
   }
 
   select(index: number): void {
-    const last = this.features().length - 1;
-    this.active.set(Math.min(Math.max(index, 0), last));
-    this._scrollTabIntoView();
-  }
-
-  step(delta: number): void {
-    this.select(this.active() + delta);
-  }
-
-  /** Keeps the chosen tab visible when the arrows move past the fold. */
-  private _scrollTabIntoView(): void {
-    const row = this._tabs()?.nativeElement;
-    const tab = row?.children.item(this.active());
-    tab?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    this.active.set(index);
   }
 
   /** Still shown behind the clip, and alone where a feature has no video. */

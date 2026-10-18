@@ -6372,7 +6372,7 @@
       </trans-unit>
       <trans-unit id="pricing.sub" datatype="html">
         <source> No tiers, no trial timer, no per-client pricing. One plan, and it costs nothing. </source>
-        <target state="translated">Fără planuri plătite, fără perioadă de probă, fără preț per client. Iar planul nu costă nimic.</target>
+        <target state="translated">Fără planuri plătite, fără perioadă de probă, fără preț per client.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">12,14</context>
@@ -8107,6 +8107,14 @@
         <target state="translated">Unu la unu cu clienții tăi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.blog.all" datatype="html">
+        <source>See all articles</source>
+        <target state="translated">Vezi toate articolele</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>

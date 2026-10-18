@@ -19,9 +19,11 @@
         <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.hero.cta1">Create your free
           account</a>
         <a class="mh-btn mh-btn--ghost mh-btn--lg u-desk" routerLink="/features" i18n="@@home.hero.cta2">How it works</a>
-        <a class="hero__textlink u-mob" routerLink="/features">
+        <!-- Points down because it scrolls to the next section rather than
+             leaving the page, which an arrow would promise. -->
+        <a class="hero__textlink u-mob" href="#how">
           <span i18n="@@home.hero.cta2">How it works</span>
-          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+          <i class="pi pi-chevron-down" aria-hidden="true"></i>
         </a>
       </div>
       <mh-check-list class="hero__guar" [items]="guarantees" tone="amber" />
@@ -84,7 +86,7 @@
 </section>
 
 <!-- ===== Two paths ===== -->
-<section class="mh-band s-paths">
+<section class="mh-band s-paths" id="how">
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.paths.kicker">Built for coaches. Loved by their people.</mh-kicker>
@@ -203,16 +205,23 @@
       }
     </div>
 
-    <!-- Phones only: the row swipes, but the arrows say so. -->
+    <!-- Phones only: the row swipes, but the arrows say so. The link sits
+         opposite them, so the row ends somewhere rather than just stopping. -->
     <div class="bnav u-mob">
-      <button type="button" class="bnav__btn" (click)="scrollBlog(-1)"
-        aria-label="Previous articles" i18n-aria-label="@@home.blog.prev">
-        <i class="pi pi-chevron-left" aria-hidden="true"></i>
-      </button>
-      <button type="button" class="bnav__btn" (click)="scrollBlog(1)"
-        aria-label="Next articles" i18n-aria-label="@@home.blog.next">
-        <i class="pi pi-chevron-right" aria-hidden="true"></i>
-      </button>
+      <div class="bnav__arrows">
+        <button type="button" class="bnav__btn" (click)="scrollBlog(-1)"
+          aria-label="Previous articles" i18n-aria-label="@@home.blog.prev">
+          <i class="pi pi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="bnav__btn" (click)="scrollBlog(1)"
+          aria-label="Next articles" i18n-aria-label="@@home.blog.next">
+          <i class="pi pi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+      <a class="bnav__all" routerLink="/blog">
+        <span i18n="@@home.blog.all">See all articles</span>
+        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </a>
     </div>
   </div>
 </section>

@@ -613,15 +613,46 @@ $mh-phone: 47.5rem; // 760px
     }
   }
 
+  /* Centred under the full-width button, which is the only thing it relates
+     to. Left-aligned it looked like a stray third item in the column. */
   .hero__textlink {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.375rem;
     margin-top: 0.875rem;
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 700;
-    color: var(--mh-color-honey-deep, var(--p-primary-600));
+    color: var(--p-surface-900);
     text-decoration: none;
+
+    i {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* The three guarantees read as one line of proof, not a checklist: they are
+     the same length as the button they sit under and belong to it. */
+  .hero__guar {
+    margin-top: 1.125rem;
+
+    ::ng-deep ul {
+      display: flex;
+      /* The component stacks these in a column; the row is what makes them
+         share a line, and without it `wrap` has nothing to wrap. */
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.375rem 0.875rem;
+    }
+
+    /* The component lays each row out as a full-width flex line, so they
+       have to be told to shrink to their text before they share a line. */
+    ::ng-deep li {
+      flex: 0 0 auto;
+      width: auto;
+      font-size: 0.9375rem;
+    }
   }
 
   /* The free band lands third, before the feature tour. */
@@ -668,8 +699,29 @@ $mh-phone: 47.5rem; // 760px
   /* The blog row's arrows, under the cards where they do not cover one. */
   .bnav {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
     margin-top: 0.875rem;
+  }
+
+  .bnav__arrows {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .bnav__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--mh-color-honey-deep, var(--p-primary-600));
+    text-decoration: none;
+
+    i {
+      font-size: 0.75rem;
+    }
   }
 
   .bnav__btn {
