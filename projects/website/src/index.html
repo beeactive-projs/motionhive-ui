@@ -48,8 +48,10 @@
   <!-- Icons are PrimeIcons (bundled). Do not add the Material Symbols font back:
        it is a ~4 MB download on every page for a handful of glyphs. -->
 
-  <!-- Umami Analytics — replace placeholders after Railway deployment -->
-  <!-- <script defer src="https://<YOUR_UMAMI_DOMAIN>/metrics.js" data-website-id="<YOUR_WEBSITE_ID>"></script> -->
+  <!-- Umami Cloud: cookieless visit counts, described in the Privacy and Cookie policies.
+       data-domains keeps localhost and Vercel previews out of the stats. -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="4c5a3e73-36f4-4ddc-81ff-32bf52e1f84d"
+    data-domains="www.motionhive.fit,motionhive.fit"></script>
 </head>
 
 <body>
