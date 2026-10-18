@@ -81,6 +81,14 @@
         experience.
       </p>
 
+      <h3 class="legal-subheading mt-4" i18n="@@cookie.types.analytics.h3">Analytics</h3>
+      <p class="legal-body" i18n="@@cookie.types.analytics.p">
+        We count visits to the Website with Umami, an analytics service that works without cookies. It does not store
+        anything on your device, so it does not appear in the table below. It shows us, in aggregate, which pages are
+        read and how visitors found us. Our <a routerLink="/legal/privacy-policy" class="text-brand hover:underline">Privacy
+          Policy</a> explains what it collects.
+      </p>
+
       <div class="cookie-table-wrap mt-4">
         <table class="cookie-table">
           <thead>
@@ -102,6 +110,13 @@
               <td i18n="@@cookie.table.auth.exp">Until sign-out</td>
             </tr>
             <tr>
+              <td><code>cc_cookie</code></td>
+              <td i18n="@@cookie.table.consent.desc">Remembers your cookie preferences so we do not ask again.</td>
+              <td i18n="@@cookie.table.consent.cat">Strictly necessary</td>
+              <td i18n="@@cookie.table.type.cookie">Cookie</td>
+              <td i18n="@@cookie.table.consent.exp">6 months</td>
+            </tr>
+            <tr>
               <td><code>mh-active-theme</code></td>
               <td i18n="@@cookie.table.theme.desc">Remembers your light or dark theme preference.</td>
               <td i18n="@@cookie.table.theme.cat">Functional</td>
@@ -109,11 +124,12 @@
               <td i18n="@@cookie.table.theme.exp">Persistent</td>
             </tr>
             <tr>
-              <td i18n="@@cookie.table.lang.name">Language preference</td>
-              <td i18n="@@cookie.table.lang.desc">Remembers the language you selected for the Website.</td>
+              <td><code>mh_lang</code></td>
+              <td i18n="@@cookie.table.lang.desc">Remembers the language you chose, or the one we picked from your
+                country on your first visit, so we do not switch it again.</td>
               <td i18n="@@cookie.table.lang.cat">Functional</td>
-              <td i18n="@@cookie.table.type.localstorage">Local storage</td>
-              <td i18n="@@cookie.table.lang.exp">Persistent</td>
+              <td i18n="@@cookie.table.type.cookie">Cookie</td>
+              <td i18n="@@cookie.table.lang.exp">1 year</td>
             </tr>
             <tr>
               <td><code>mh-calorie-calculator</code></td>
