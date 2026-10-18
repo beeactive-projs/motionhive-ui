@@ -8118,6 +8118,22 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="home.free.s3v" datatype="html">
+        <source>$0</source>
+        <target state="translated">0 lei</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.plan.amt" datatype="html">
+        <source>$0</source>
+        <target state="translated">0 lei</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

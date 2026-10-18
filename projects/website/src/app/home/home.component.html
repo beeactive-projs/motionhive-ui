@@ -161,7 +161,10 @@
       <div class="free__stats">
         <mh-stat value="∞" label="clients" [onDark]="true" i18n-label="@@home.free.s1" />
         <mh-stat value="0" label="subscriptions" [onDark]="true" i18n-label="@@home.free.s2" />
-        <mh-stat value="0 lei" label="to use" [onDark]="true" i18n-label="@@home.free.s3" />
+        <!-- Translatable: "lei" means nothing outside Romania, and this was
+             hardcoded, so both languages showed the same thing. -->
+        <mh-stat value="$0" label="to use" [onDark]="true" i18n-value="@@home.free.s3v"
+          i18n-label="@@home.free.s3" />
       </div>
       <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.free.cta">Create your free
         account</a>
