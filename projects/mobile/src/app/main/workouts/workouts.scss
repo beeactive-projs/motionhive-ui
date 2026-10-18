@@ -1,7 +1,7 @@
 /* The History shortcut sits beside the bell and matches its glyph size, which
    the bell sets in its own skin. */
 .history ion-icon {
-  font-size: var(--mh-text-2xl);
+  font-size: var(--mh-icon-lg);
 }
 
 /* ─── Resume ──────────────────────────────────────────────────────
@@ -25,6 +25,12 @@
   margin-inline-end: 0.75rem;
   border-radius: var(--mh-radius-pill);
   background: var(--ion-color-primary);
+}
+
+/* Paused: the dot's place, but a glyph that says the clock is stopped. */
+.resume .paused-mark {
+  margin-inline-end: 0.5rem;
+  font-size: var(--mh-text-md);
 }
 
 .resume h2 {
@@ -58,7 +64,7 @@
   color: var(--ion-text-color);
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .cold-start p {

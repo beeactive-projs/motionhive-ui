@@ -1,82 +1,66 @@
-// Both are documented `ion-modal` variables; the sheet sits on the card surface
-// rather than the page slate so its rows read as raised.
+// One surface for the whole sheet — header, body and footer all on the page
+// slate, the iOS grouped-sheet way — so its cards read as raised and nothing
+// splits the sheet into bands. Both are documented `ion-modal` variables;
+// `ion-content` paints the slate itself.
 ion-modal {
   --border-radius: var(--mh-radius-sheet) var(--mh-radius-sheet) 0 0;
-  --background: var(--ion-card-background);
+  --background: var(--ion-background-color);
 }
 
-// `ion-content` paints `--ion-background-color` — the page slate — so a sheet
-// made only of rows shows it as a gutter around them. `flushBody` hands those
-// sheets the same surface the modal itself uses.
-ion-content.flush {
-  --background: var(--ion-card-background);
+ion-header ion-toolbar {
+  --background: var(--ion-background-color);
 }
 
-// The design centres the sheet title. `ion-title` centres itself on iOS but is
-// start-aligned on md, and exposes no alignment input.
-ion-title {
-  padding-inline: 3rem;
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-md);
-  font-weight: 700;
-  text-align: center;
-}
-
-// The form-sheet header: title over its summary line, start-aligned, with the
-// close circle keeping the right edge. Only rendered when `subtitle` is set.
+// The sheet header: title over its optional subtitle, start-aligned.
+// `min-width: 0` lets a long subtitle ellipsize instead of pushing the close
+// button out of the toolbar.
 .heading {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
   padding: 1rem;
 }
 
 .heading-title {
   font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
-}
-
-.heading-subtitle {
-  color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
-  font-size: var(--mh-text-xs);
+  font-size: var(--mh-text-lg);
   font-weight: 600;
-  letter-spacing: var(--mh-tracking-kicker);
-  text-transform: uppercase;
 }
 
-// The header's text action — honey ink so it reads as a link, not a button.
-// Ionic's disabled state supplies the faded look on its own.
-.header-action {
-  --color: var(--mh-color-honey-deep);
-  margin-inline-end: 0.375rem;
-  font-size: var(--mh-text-base);
-  font-weight: 700;
-  letter-spacing: normal;
-  text-transform: none;
+// Plain text in its own case, only smaller and quieter than the title: it
+// carries summaries, places and email addresses, which capitals would mangle.
+.heading-subtitle {
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-// A quiet grey circle, per the design — not a bare toolbar glyph. `shape=round`
-// also keeps it clear of the global control-radius pin in styles.css.
+// Just the X: no fill, in the text colour. It stays Ionic's toolbar `clear`
+// button, which supplies the press ripple. `shape=round` keeps that ripple a
+// circle, clear of the global control-radius pin. The hit area is still a
+// full tap target: it sits in the hardest corner to reach, so it must not be
+// small too.
 .close {
-  --color: var(--ion-color-medium);
+  --color: var(--ion-text-color);
   --padding-start: 0;
   --padding-end: 0;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
   margin-inline-end: 0.375rem;
 }
 
 .close ion-icon {
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-lg);
 }
 
 // The action bar. A hairline holds it apart from the body scrolling under it,
 // and the row gets its own padding because the buttons are the bar now rather
 // than toolbar-sized text.
 ion-footer ion-toolbar {
-  --background: var(--ion-card-background);
+  --background: var(--ion-background-color);
   --border-width: 1px 0 0;
   --border-color: var(--ion-border-color);
   --padding-start: 1rem;
@@ -103,9 +87,10 @@ ion-footer ion-toolbar {
   letter-spacing: normal;
 }
 
-// Ink label on the card hairline rather than the medium palette's own grey:
-// the outline stays quiet next to the filled confirm, and the label still reads.
-.actions .dismiss {
+// Cancel, or the sheet's own action (Reset) in its place. Ink label on the
+// card hairline rather than the medium palette's own grey: the outline stays
+// quiet next to the filled confirm, and the label still reads.
+.actions .secondary {
   --border-width: 1px;
   --border-color: var(--ion-border-color);
   --color: var(--ion-text-color);
@@ -114,7 +99,7 @@ ion-footer ion-toolbar {
 // The confirm takes the rest of the row — one obvious target per sheet.
 .actions .confirm {
   flex: 1;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* The pinned strip between header and body. Sits outside ion-content so it
@@ -124,4 +109,15 @@ ion-footer ion-toolbar {
   flex: none;
   padding: 0 1.25rem 0.5rem;
   background: var(--ion-background-color);
+}
+
+// Scrolls itself once the content passes most of the screen; until then the
+// sheet is exactly as tall as what it holds. The bottom inset clears the home
+// indicator, which `ion-content` would otherwise have handled.
+.fit-body {
+  max-height: 80dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--ion-padding, 16px)
+    calc(var(--ion-padding, 16px) + var(--ion-safe-area-bottom, 0rem));
 }

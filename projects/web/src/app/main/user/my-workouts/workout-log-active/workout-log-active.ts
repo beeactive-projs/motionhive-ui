@@ -838,6 +838,8 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         this.log.set(log);
         this.loading.set(false);
         this._startElapsed();
+        // Paused on the phone: opening it again is back to work.
+        if (log.pausedAt) this._resumeClock(log.id);
         // Auto-load last-time for the current exercise.
         const cur = (log.exercises ?? []).find(
           (e) =>
@@ -905,14 +907,31 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     );
   }
 
+  private _resumeClock(id: string): void {
+    this._service.resume(id).subscribe({
+      next: (saved) =>
+        this.log.update((cur) =>
+          cur
+            ? { ...cur, pausedAt: saved.pausedAt ?? null, pausedSeconds: saved.pausedSeconds ?? 0 }
+            : cur,
+        ),
+      // The clock stays held where it was paused; the sets still save.
+      error: () => undefined,
+    });
+  }
+
+  /** Time trained: open time minus every pause, held still while paused. */
   private _startElapsed(): void {
     const startedAt = this.log()?.startedAt;
     if (!startedAt) return;
     const start = new Date(startedAt).getTime();
-    const tick = (): void =>
+    const tick = (): void => {
+      const log = this.log();
+      const end = log?.pausedAt ? new Date(log.pausedAt).getTime() : Date.now();
       this.elapsedSeconds.set(
-        Math.max(0, Math.floor((Date.now() - start) / 1000)),
+        Math.max(0, Math.floor((end - start) / 1000) - (log?.pausedSeconds ?? 0)),
       );
+    };
     tick();
     if (this._elapsedHandle) clearInterval(this._elapsedHandle);
     this._elapsedHandle = setInterval(tick, 1000);

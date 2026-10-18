@@ -18,3 +18,18 @@ ion-modal.mh-picker-modal ion-datetime {
   /* Without this the picker stretches to the modal and clips its own footer. */
   height: auto;
 }
+
+/* Sheets sized to their content — sheet-shell's `fit`. Ionic's documented
+   auto-height sheet: the modal takes its content's height, and the page
+   wrapper Ionic puts around inline content stops being an absolutely
+   positioned full-height box. Global because that wrapper is rendered by
+   Ionic's own Angular component, outside the shell's style scope. */
+ion-modal.mh-sheet-fit {
+  --height: auto;
+}
+
+ion-modal.mh-sheet-fit .ion-page {
+  position: relative;
+  display: block;
+  contain: none;
+}

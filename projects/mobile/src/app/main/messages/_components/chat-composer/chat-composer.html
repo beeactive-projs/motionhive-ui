@@ -7,7 +7,7 @@
       [attr.aria-label]="'button.dismiss' | translate"
       (click)="dismissError()"
     >
-      <ion-icon slot="icon-only" name="close" />
+      <ion-icon slot="icon-only" name="close-outline" />
     </ion-button>
   </div>
 }
@@ -41,7 +41,7 @@
     @if (isRateLimited()) {
       {{ limitedSeconds() }}
     } @else {
-      <ion-icon slot="icon-only" name="send" />
+      <ion-icon slot="icon-only" name="send-outline" />
     }
   </ion-button>
 </div>

@@ -6,11 +6,11 @@ ion-card {
 // The design's figure: 16px heading face, not Ionic's 20px card title.
 ion-card-title {
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 ion-card-subtitle {
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   letter-spacing: var(--mh-tracking-kicker);
 }

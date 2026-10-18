@@ -9,36 +9,25 @@
   align-items: center;
   gap: 0.625rem;
   padding: 1.375rem 1.25rem 1.125rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   text-align: center;
 }
 
 .hero[data-tone='honey'] {
-  --hero-rgb: var(--ion-color-primary-rgb);
   background: var(--ion-color-primary-wash);
 }
 
 .hero[data-tone='teal'] {
-  --hero-rgb: var(--ion-color-teal-rgb);
   background: var(--ion-color-teal-wash);
 }
 
 .hero[data-tone='navy'] {
-  --hero-rgb: var(--ion-color-info-rgb);
   background: var(--ion-color-info-wash);
 }
 
 .hero[data-tone='violet'] {
-  --hero-rgb: var(--ion-color-violet-rgb);
   background: var(--ion-color-violet-wash);
-}
-
-.hero[data-tone] {
-  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
-     slash syntax cannot take. */
-  border-color: rgba(var(--hero-rgb), 0.25);
 }
 
 .hero[data-tone] ion-badge[data-tone] {
@@ -54,8 +43,8 @@
 
 .hero-name {
   margin: 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
 }
 
 .hero .meta {
@@ -135,7 +124,7 @@ ion-badge[data-tone='success'] {
 .band ion-icon {
   flex: none;
   margin-top: 0.125rem;
-  font-size: var(--mh-text-md);
+  font-size: var(--mh-icon-sm);
 }
 
 /* The one element on this screen that says "right now" without words. */
@@ -157,7 +146,7 @@ ion-badge[data-tone='success'] {
 
 .band strong {
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .band span {
@@ -178,7 +167,7 @@ ion-badge[data-tone='success'] {
 .banner ion-icon {
   flex: none;
   margin-top: 0.125rem;
-  font-size: var(--mh-text-md);
+  font-size: var(--mh-icon-sm);
 }
 
 .banner div {
@@ -190,7 +179,7 @@ ion-badge[data-tone='success'] {
 
 .banner strong {
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .banner span {
@@ -215,7 +204,6 @@ ion-badge[data-tone='success'] {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
 }
 

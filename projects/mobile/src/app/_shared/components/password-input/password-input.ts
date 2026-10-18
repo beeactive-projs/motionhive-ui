@@ -3,7 +3,7 @@ import { FormValueControl } from '@angular/forms/signals';
 import { IonBadge, IonButton, IonIcon, IonInput } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle, close, eye, eyeOff } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { PASSWORD_RULES } from 'core';
 
 /**
@@ -62,7 +62,7 @@ export class PasswordInput implements FormValueControl<string> {
   });
 
   constructor() {
-    addIcons({ checkmarkCircle, close, eye, eyeOff });
+    addIcons({ checkmarkCircle, ellipseOutline, eyeOutline, eyeOffOutline });
   }
 
   protected toggleRevealed(): void {

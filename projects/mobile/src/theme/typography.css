@@ -2,18 +2,28 @@
    every screen shares. Skin and type rhythm only; where a block of text sits
    on a page is the page layout's job. */
 
+/* Poppins is shipped at 600 only (plus 800 for the wordmark, see fonts.css),
+   so every heading asks for 600: Ionic's own 500 would otherwise compute one
+   weight and draw another. */
 h1,
 h2,
 h3 {
   font-family: var(--mh-font-heading);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
+}
+
+/* ion-label resets its slotted headings to `normal` from a class-scoped rule;
+   `[class]` lifts this one just past it. Component rules still win. */
+ion-label[class] :is(h1, h2, h3) {
+  font-weight: 600;
 }
 
 /* Page title — tight to the kicker above it. Ionic's default h1 is a 1.5rem
    heading with 1rem of margin on both sides of it. */
 h1 {
   margin: 0.125rem 0 0;
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
+  font-size: var(--mh-text-2xl);
 }
 
 /* Explanatory line under a field. Global because every edit sheet ends with
@@ -54,7 +64,6 @@ h1 {
 .mh-section-label {
   padding: 1rem 0.375rem 0.375rem;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
@@ -129,7 +138,6 @@ h1 {
   border-radius: var(--mh-radius-pill);
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   font-weight: 600;
   letter-spacing: var(--mh-tracking-kicker);

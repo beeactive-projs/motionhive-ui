@@ -29,16 +29,14 @@
   border-radius: var(--mh-radius-pill);
   background: var(--ion-color-primary-wash);
   color: var(--ion-color-primary-wash-contrast);
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .membership {
   padding: 0.875rem 1rem;
   margin-bottom: 0.625rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
 }
@@ -51,12 +49,12 @@
 }
 
 .membership .name {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.92rem;
 }
 
 .membership .status {
-  font-size: 0.68rem;
+  font-size: var(--mh-text-xs);
 }
 
 .membership .status.warn {
@@ -66,9 +64,8 @@
 
 .membership .price {
   margin-top: 0.25rem;
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 

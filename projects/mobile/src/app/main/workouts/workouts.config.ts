@@ -30,15 +30,16 @@ import {
   checkmarkCircle,
   checkmarkCircleOutline,
   checkmarkOutline,
-  chevronBack,
+  chevronBackOutline,
   chevronDownOutline,
-  chevronForward,
+  chevronForwardOutline,
   chevronUpOutline,
-  ellipsisHorizontal,
-  ellipsisVertical,
+  ellipsisHorizontalOutline,
+  ellipsisVerticalOutline,
   eyeOutline,
   flashOutline,
   lockClosedOutline,
+  pauseOutline,
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
@@ -49,6 +50,7 @@ import {
   trendingUpOutline,
 } from 'ionicons/icons';
 
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import { SpineTone, SpineTones } from '../../_shared/models/spine-tone.model';
 import { BadgeTone, BadgeTones } from '../exercises/exercises.config';
 
@@ -65,15 +67,16 @@ export const WORKOUT_ICONS = {
   checkmarkCircle,
   checkmarkCircleOutline,
   checkmarkOutline,
-  chevronBack,
+  chevronBackOutline,
   chevronDownOutline,
-  chevronForward,
+  chevronForwardOutline,
   chevronUpOutline,
-  ellipsisHorizontal,
-  ellipsisVertical,
+  ellipsisHorizontalOutline,
+  ellipsisVerticalOutline,
   eyeOutline,
   flashOutline,
   lockClosedOutline,
+  pauseOutline,
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
@@ -424,9 +427,25 @@ function completedSetCount(log: WorkoutLog): number {
     .filter((set) => set.isCompleted).length;
 }
 
-/** How long the in-progress log has been open, as the resume banner says it. */
-export function elapsedLabel(startedAt: string, now: number): string {
-  const seconds = Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000));
+/**
+ * Seconds trained so far: open time minus every pause. A paused workout's
+ * clock stands still at the moment it was paused.
+ */
+export function workoutElapsedSeconds(
+  log: Pick<WorkoutLog, 'startedAt' | 'pausedAt' | 'pausedSeconds'>,
+  now: number,
+): number {
+  const end = log.pausedAt ? new Date(log.pausedAt).getTime() : now;
+  const open = Math.floor((end - new Date(log.startedAt).getTime()) / 1000);
+  return Math.max(0, open - (log.pausedSeconds ?? 0));
+}
+
+/** How long the in-progress log has been trained, as the logger and resume banner say it. */
+export function workoutClock(
+  log: Pick<WorkoutLog, 'startedAt' | 'pausedAt' | 'pausedSeconds'>,
+  now: number,
+): string {
+  const seconds = workoutElapsedSeconds(log, now);
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   const hrs = Math.floor(mins / 60);
@@ -1024,6 +1043,38 @@ export const FEELINGS: readonly { value: number; glyph: string }[] = [
   { value: 5, glyph: '💪' },
 ];
 
+// ─── Leaving the logger ───────────────────────────────────────────────────
+
+/** What leaving the logger does to the workout's clock. */
+export const LeaveChoices = {
+  KeepRunning: 'keepRunning',
+  Pause: 'pause',
+} as const;
+
+export type LeaveChoice = (typeof LeaveChoices)[keyof typeof LeaveChoices];
+
+export type LeaveOption = SheetAction<LeaveChoice>;
+
+/**
+ * Running first: stepping out for a minute is the common case, and a pause
+ * is the decision that something longer has come up. Neither ends the
+ * workout; Finish and Discard stay the only two ways out of it.
+ */
+export const LEAVE_OPTIONS: readonly LeaveOption[] = [
+  {
+    id: LeaveChoices.KeepRunning,
+    label: 'workouts.logger.leaveSheet.keepRunning',
+    hint: 'workouts.logger.leaveSheet.keepRunningHint',
+    icon: 'play-outline',
+  },
+  {
+    id: LeaveChoices.Pause,
+    label: 'workouts.logger.leaveSheet.pause',
+    hint: 'workouts.logger.leaveSheet.pauseHint',
+    icon: 'pause-outline',
+  },
+];
+
 // ─── Exercise verbs ───────────────────────────────────────────────────────
 
 /** The verbs for one exercise mid-workout, in priority order, destructive last. */
@@ -1035,15 +1086,7 @@ export const ExerciseActionIds = {
 
 export type ExerciseActionId = (typeof ExerciseActionIds)[keyof typeof ExerciseActionIds];
 
-export interface ExerciseAction {
-  id: ExerciseActionId;
-  /** Translation key — the sheet's template translates it. */
-  label: string;
-  icon: string;
-  /** Ionic palette name for the leading glyph. */
-  color: string;
-  destructive?: boolean;
-}
+export type ExerciseAction = SheetAction<ExerciseActionId>;
 
 /**
  * Skip flips to unskip on an exercise already skipped; the other two verbs

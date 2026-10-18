@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <!-- Down, not back: the workout keeps running and waits on the Workouts
-         tab. Leaving is neither finishing nor discarding. -->
+    <!-- Down, not back: the workout waits on the Workouts tab, running or
+         paused. Leaving is neither finishing nor discarding. -->
     <ion-buttons slot="start">
       <ion-button [attr.aria-label]="'workouts.logger.leave' | translate" (click)="leave()">
         <ion-icon slot="icon-only" name="chevron-down-outline" aria-hidden="true" />
@@ -188,6 +188,8 @@
     />
   }
 </ion-footer>
+
+<mh-leave-workout-sheet [(open)]="leaveOpen" (choice)="onLeaveChoice($event)" />
 
 <mh-exercise-actions-sheet
   [(open)]="actionsOpen"

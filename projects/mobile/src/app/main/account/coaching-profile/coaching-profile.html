@@ -79,7 +79,7 @@
         @if (loadingProducts()) {
           <ion-list [inset]="true" class="mh-card-list">
             @for (_ of [1, 2]; track $index) {
-              <ion-item lines="full">
+              <ion-item>
                 <ion-label>
                   <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
                   <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
@@ -94,7 +94,7 @@
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
             @for (product of products(); track product.id) {
-              <ion-item lines="full">
+              <ion-item>
                 <ion-label class="ion-text-wrap">
                   <h3>{{ product.name }}</h3>
                   <p>
@@ -115,7 +115,7 @@
         <mh-section-header [title]="'account.coachingProfile.venues.title' | translate" />
         @if (loadingVenues()) {
           <ion-list [inset]="true" class="mh-card-list">
-            <ion-item lines="none">
+            <ion-item>
               <ion-label>
                 <h3><ion-skeleton-text [animated]="true" style="width: 40%" /></h3>
               </ion-label>
@@ -128,13 +128,13 @@
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
             @for (venue of venues(); track venue.id) {
-              <ion-item lines="full">
+              <ion-item>
                 <mh-hex-avatar
                   slot="start"
                   size="sm"
                   [name]="venue.name"
                   icon="location-outline"
-                  color="primary"
+                  color="teal"
                 />
                 <ion-label class="ion-text-wrap">
                   <h3>{{ venue.name }}</h3>

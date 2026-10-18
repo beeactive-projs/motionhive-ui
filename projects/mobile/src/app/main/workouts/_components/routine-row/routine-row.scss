@@ -1,17 +1,7 @@
-// The divider Ionic will not draw for us — see the class comment.
+// Separator and chevron come from the grouped-list skin
+// (theme/components/ion-list.css).
 :host {
   display: block;
-  border-block-end: 1px solid var(--mh-color-divider);
-}
-
-:host(:last-of-type) {
-  border-block-end: 0;
-}
-
-ion-item {
-  --background: var(--ion-card-background);
-  --detail-icon-color: var(--ion-color-medium);
-  --detail-icon-opacity: 1;
 }
 
 h2 {

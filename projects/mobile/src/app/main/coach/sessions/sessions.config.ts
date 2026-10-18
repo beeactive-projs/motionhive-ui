@@ -23,19 +23,18 @@ import {
 
 import {
   addOutline,
-  alertCircle,
   alertCircleOutline,
   arrowForwardCircleOutline,
   calendarOutline,
   cashOutline,
   checkmarkCircleOutline,
-  chevronBack,
-  chevronDown,
-  chevronForward,
+  chevronBackOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
   closeCircleOutline,
   copyOutline,
   createOutline,
-  ellipsisVertical,
+  ellipsisVerticalOutline,
   funnelOutline,
   globeOutline,
   heartOutline,
@@ -53,6 +52,8 @@ import {
   videocamOutline,
 } from 'ionicons/icons';
 
+import { SheetAction } from '../../../_shared/components/action-sheet/action-sheet.model';
+
 /**
  * Every icon the sessions screens render. Each page calls
  * `addIcons(SESSION_ICONS)` once, so a name in a template can never reference
@@ -60,19 +61,18 @@ import {
  */
 export const SESSION_ICONS = {
   addOutline,
-  alertCircle,
   alertCircleOutline,
   arrowForwardCircleOutline,
   calendarOutline,
   cashOutline,
   checkmarkCircleOutline,
-  chevronBack,
-  chevronDown,
-  chevronForward,
+  chevronBackOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
   closeCircleOutline,
   copyOutline,
   createOutline,
-  ellipsisVertical,
+  ellipsisVerticalOutline,
   funnelOutline,
   globeOutline,
   heartOutline,
@@ -310,15 +310,7 @@ export type SessionActionId =
  * green, sending is sky), the plumbing verbs stay neutral, and destructive is
  * red. None of these encode a *state*, which is the line honey must not cross.
  */
-export const SESSION_ACTIONS: readonly {
-  id: SessionActionId;
-  /** Translation key — the sheet's template translates it. */
-  label: string;
-  icon: string;
-  /** Ionic palette name for the leading glyph. */
-  color: string;
-  destructive?: boolean;
-}[] = [
+export const SESSION_ACTIONS: readonly SheetAction<SessionActionId>[] = [
   {
     id: SessionActionIds.Open,
     label: 'sessions.actions.open',

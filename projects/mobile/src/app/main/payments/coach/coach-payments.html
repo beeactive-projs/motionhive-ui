@@ -28,9 +28,13 @@
     <!-- 4f: the gate replaces the hub. An empty list with a locked button
          would imply the feature is here and merely idle. -->
     <div class="gate" [class.amber]="needsMore()">
-      <span class="tile" aria-hidden="true">
-        <ion-icon [name]="needsMore() ? 'alert-circle-outline' : 'lock-closed-outline'" />
-      </span>
+      <mh-hex-avatar
+        class="tile"
+        size="lg"
+        tone="wash"
+        [color]="needsMore() ? 'warning' : 'medium'"
+        [icon]="needsMore() ? 'alert-circle-outline' : 'lock-closed-outline'"
+      />
       <h2>{{ (needsMore() ? 'payments.gate.needsMore.title' : 'payments.gate.connect.title') | translate }}</h2>
       <p>
         @if (needsMore()) {

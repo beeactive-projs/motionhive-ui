@@ -73,6 +73,22 @@ export class WorkoutLogService {
     );
   }
 
+  /** Stop the workout's clock while the person is away from it. */
+  pause(id: string): Observable<WorkoutLog> {
+    return this._http.post<WorkoutLog>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.PAUSE(id)}`,
+      {},
+    );
+  }
+
+  /** Start the clock again. Does nothing on a workout that is running. */
+  resume(id: string): Observable<WorkoutLog> {
+    return this._http.post<WorkoutLog>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.RESUME(id)}`,
+      {},
+    );
+  }
+
   complete(
     id: string,
     payload: CompleteWorkoutPayload = {},

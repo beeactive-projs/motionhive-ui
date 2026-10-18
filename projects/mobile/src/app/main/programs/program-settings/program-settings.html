@@ -75,10 +75,10 @@
                 [value]="newWeeksChoice()"
                 (ionChange)="chooseNewWeeks($event.detail.value)"
               >
-                <ion-item lines="full">
+                <ion-item>
                   <ion-radio value="repeat" justify="start" labelPlacement="end">{{ repeatLabel() }}</ion-radio>
                 </ion-item>
-                <ion-item lines="none">
+                <ion-item>
                   <ion-radio value="empty" justify="start" labelPlacement="end">{{ leaveEmptyLabel() }}</ion-radio>
                 </ion-item>
               </ion-radio-group>
@@ -120,12 +120,12 @@
       <!-- A copy to build the next block from, without touching this one.
            Above the danger row so the two are never mistaken for each other. -->
       <ion-list [inset]="true" class="mh-card-list">
-        <ion-item button detail="false" lines="none" [disabled]="duplicating()"
+        <ion-item button detail="false" [disabled]="duplicating()"
           (click)="duplicate()">
           @if (duplicating()) {
             <ion-spinner slot="start" name="crescent" />
           } @else {
-            <ion-icon slot="start" name="copy-outline" color="medium" aria-hidden="true" />
+            <mh-hex-avatar slot="start" size="sm" icon="copy-outline" color="info" />
           }
           <ion-label>{{ 'programs.settings.duplicate' | translate }}</ion-label>
         </ion-item>
@@ -133,8 +133,8 @@
 
       <!-- Last, and the one row in red: the only thing here worth a second thought. -->
       <ion-list [inset]="true" class="mh-card-list">
-        <ion-item button detail="false" lines="none" (click)="deleteOpen.set(true)">
-          <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+        <ion-item button detail="false" (click)="deleteOpen.set(true)">
+          <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
           <ion-label color="danger">{{ 'programs.settings.delete.row' | translate }}</ion-label>
         </ion-item>
       </ion-list>

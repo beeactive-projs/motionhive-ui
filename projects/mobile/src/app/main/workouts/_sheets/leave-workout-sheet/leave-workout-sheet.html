@@ -1,0 +1,6 @@
+<mh-action-sheet
+  [(open)]="open"
+  [title]="'workouts.logger.leaveSheet.title' | translate"
+  [actions]="options"
+  (chosen)="choice.emit($event)"
+/>

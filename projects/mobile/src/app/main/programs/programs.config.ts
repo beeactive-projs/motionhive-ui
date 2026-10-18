@@ -5,11 +5,11 @@ import {
   barbellOutline,
   calendarOutline,
   checkmarkCircleOutline,
-  chevronForward,
+  chevronForwardOutline,
   closeOutline,
   funnelOutline,
   copyOutline,
-  ellipsisHorizontal,
+  ellipsisHorizontalOutline,
   flashOutline,
   lockClosedOutline,
   peopleOutline,
@@ -30,6 +30,7 @@ import {
   weekdayNames,
 } from 'core';
 
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import { SpineTone, SpineTones } from '../../_shared/models/spine-tone.model';
 import { BadgeTone, BadgeTones } from '../exercises/exercises.config';
 import { shortDayLabel } from '../workouts/workouts.config';
@@ -46,11 +47,11 @@ export const PROGRAM_ICONS = {
   barbellOutline,
   calendarOutline,
   checkmarkCircleOutline,
-  chevronForward,
+  chevronForwardOutline,
   closeOutline,
   funnelOutline,
   copyOutline,
-  ellipsisHorizontal,
+  ellipsisHorizontalOutline,
   flashOutline,
   lockClosedOutline,
   peopleOutline,
@@ -175,12 +176,7 @@ export const CreateChoices = {
 export type CreateChoice = (typeof CreateChoices)[keyof typeof CreateChoices];
 
 /** `label` and `hint` are translation keys; the sheet's template translates them. */
-export const CREATE_OPTIONS: readonly {
-  id: CreateChoice;
-  label: string;
-  hint: string;
-  icon: string;
-}[] = [
+export const CREATE_OPTIONS: readonly SheetAction<CreateChoice>[] = [
   {
     id: CreateChoices.Program,
     label: 'programs.create.newProgram',

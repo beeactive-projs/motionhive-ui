@@ -17,8 +17,8 @@
   </div>
   <div class="mh-page">
     <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index; let last = $last) {
-      <ion-item [lines]="last ? 'none' : 'full'">
+      @for (_ of skeletonRows; track $index) {
+      <ion-item>
         <ion-label>
           <h3><ion-skeleton-text [animated]="true" style="width: 30%" /></h3>
           <p><ion-skeleton-text [animated]="true" style="width: 55%" /></p>
@@ -77,8 +77,8 @@
     <section class="mh-section">
       <span class="mh-kicker">{{ 'exercises.detail.sections.details' | translate }}</span>
       <ion-list [inset]="true" class="mh-card-list">
-        @for (row of detailRows(); track row.label; let last = $last) {
-        <ion-item [lines]="last && !description() ? 'none' : 'full'">
+        @for (row of detailRows(); track row.label) {
+        <ion-item>
           <mh-hex-avatar slot="start" size="sm" [icon]="row.icon" [color]="row.color" [tone]="row.tone"
             aria-hidden="true" />
           <ion-label class="ion-text-wrap">
@@ -102,8 +102,8 @@
 
         @if (description(); as text) {
         <!-- The author's words, after the facts: chips scan, prose reads. -->
-        <ion-item lines="none">
-          <mh-hex-avatar slot="start" size="sm" icon="information-circle-outline" color="medium" aria-hidden="true" />
+        <ion-item>
+          <mh-hex-avatar slot="start" size="sm" icon="information-circle-outline" color="info" aria-hidden="true" />
           <ion-label class="ion-text-wrap">
             <h3>{{ 'exercises.detail.about' | translate }}</h3>
             <p class="prose">{{ text }}</p>
@@ -122,8 +122,8 @@
       <ion-list [inset]="true" class="mh-card-list">
         <!-- Red, orange, light blue: the muscle chart's convention, most work
              first. The row names the role, so the colours need no legend. -->
-        @for (row of muscleEquipmentRows(); track row.label; let last = $last) {
-        <ion-item [lines]="last ? 'none' : 'full'">
+        @for (row of muscleEquipmentRows(); track row.label) {
+        <ion-item>
           <mh-hex-avatar slot="start" size="sm" [icon]="row.icon" [color]="row.color" [tone]="row.tone"
             aria-hidden="true" />
           <ion-label class="ion-text-wrap">
@@ -161,8 +161,8 @@
     @if (canEdit() || canFork()) {
     <ion-list [inset]="true" class="mh-card-list">
       @if (canEdit()) {
-      <ion-item button detail lines="none" (click)="edit()">
-        <ion-icon slot="start" name="create-outline" color="medium" aria-hidden="true" />
+      <ion-item button detail (click)="edit()">
+        <mh-hex-avatar slot="start" size="sm" icon="create-outline" color="primary" />
         <ion-label>
           <h3>{{ 'exercises.detail.editAction' | translate }}</h3>
           <p>{{ 'exercises.detail.editHint' | translate }}</p>
@@ -172,8 +172,8 @@
       @if (canFork()) {
       <!-- Quiet, not honey: copying someone else's work is an option on this
            page, not the thing the page is for. -->
-      <ion-item button detail lines="none" (click)="confirmFork()">
-        <ion-icon slot="start" name="git-network-outline" color="medium" aria-hidden="true" />
+      <ion-item button detail (click)="confirmFork()">
+        <mh-hex-avatar slot="start" size="sm" icon="git-network-outline" color="violet" />
         <ion-label>
           <h3>{{ 'exercises.detail.forkAction' | translate }}</h3>
           <p>{{ 'exercises.detail.forkHint' | translate }}</p>

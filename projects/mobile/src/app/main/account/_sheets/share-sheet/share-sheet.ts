@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, model } from '@angular/core';
-import { IonButton, IonIcon, IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
+import { IonButton, IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { copyOutline, openOutline, shareSocialOutline } from 'ionicons/icons';
@@ -10,6 +10,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../../_shared/utils/share';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 /**
  * Share the public profile link.
@@ -25,8 +26,8 @@ import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../../_shared
   selector: 'mh-share-sheet',
   imports: [
     EmptyState,
+    HexAvatar,
     IonButton,
-    IonIcon,
     IonItem,
     IonLabel,
     IonList,

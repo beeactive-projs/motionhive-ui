@@ -11,9 +11,9 @@
 .hero .value {
   color: var(--ion-text-color);
   font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-2xl);
-  font-weight: 700;
-  line-height: var(--mh-leading-tight);
+  font-size: var(--mh-text-3xl);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
 }
 
 .hero .delta {
@@ -41,7 +41,6 @@
    is (see the records on Progress). */
 .line {
   color: var(--ion-text-color);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-variant-numeric: tabular-nums;
 }

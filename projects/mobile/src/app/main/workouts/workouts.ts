@@ -46,9 +46,9 @@ import { RoutineRow } from './_components/routine-row/routine-row';
 import { TodayHero } from './_components/today-hero/today-hero';
 import {
   WORKOUT_ICONS,
-  elapsedLabel,
   planWeekLabel,
   routineTileColor,
+  workoutClock,
 } from './workouts.config';
 import { WorkoutsStore } from './workouts.store';
 
@@ -130,17 +130,20 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
 
   private readonly _todayKey = computed(() => localDayKey(new Date(this._clockService.now())));
 
-  /** How long the abandoned session has been open, for the resume banner. */
+  /** How long the open session has been trained, for the resume banner. */
   readonly elapsed = computed(() => {
     const log = this.store.inProgress();
-    return log ? elapsedLabel(log.startedAt, this._now()) : '';
+    return log ? workoutClock(log, this._now()) : '';
   });
+
+  /** A paused session's clock stands still, so the banner says why. */
+  readonly isPaused = computed(() => !!this.store.inProgress()?.pausedAt);
 
   constructor() {
     addIcons(WORKOUT_ICONS);
 
     effect((onCleanup) => {
-      if (!this._visible() || !this.store.inProgress()) return;
+      if (!this._visible() || !this.store.inProgress() || this.isPaused()) return;
       this._now.set(Date.now());
       const handle = setInterval(() => this._now.set(Date.now()), 1000);
       onCleanup(() => clearInterval(handle));

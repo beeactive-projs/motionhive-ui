@@ -2,7 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { chevronForward, ellipsisVertical } from 'ionicons/icons';
+import { chevronForwardOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 
 import { ExerciseKind } from 'core';
 
@@ -55,7 +55,7 @@ export class ExerciseCard {
   constructor() {
     // The card is hosted by three features; none of them should have to
     // know which glyphs it draws.
-    addIcons({ chevronForward, ellipsisVertical });
+    addIcons({ chevronForwardOutline, ellipsisVerticalOutline });
   }
 
   onActions(event: Event): void {

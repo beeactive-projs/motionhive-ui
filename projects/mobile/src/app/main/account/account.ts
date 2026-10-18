@@ -50,6 +50,7 @@ import { AccountStore } from './account.store';
 import { ChoiceOption, ChoiceSheet } from './_sheets/choice-sheet/choice-sheet';
 import { PhotoSheet } from './_sheets/photo-sheet/photo-sheet';
 import { ShareSheet } from './_sheets/share-sheet/share-sheet';
+import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 
 /** Translation keys for the appearance row's value and its sheet. */
 export const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
@@ -93,6 +94,8 @@ export const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
   styleUrl: './account.scss',
 })
 export class Account implements OnInit, ViewWillEnter {
+  readonly Tiles = DETAIL_TILES;
+
   private readonly _router = inject(Router);
   private readonly _navController = inject(NavController);
   private readonly _loadingController = inject(LoadingController);

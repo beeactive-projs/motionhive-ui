@@ -26,6 +26,19 @@ Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 s
 - [`layout.css`](src/theme/layout.css) — the layout primitives `.mh-page` and `.mh-section` (below).
 - [`components/`](src/theme/components/) — **one file per Ionic component** that needs a global skin (`ion-card.css`, `ion-list.css`, `ion-button.css`, …), imported from `styles.css`. General custom CSS for a component goes in its file — never back into `styles.css`, never copy-pasted across page `.scss` files. Add a new file (and its `@import`) when a component first needs a global rule.
 
+### Rules for Claude (`.claude/rules/`)
+
+Topic rules live in [`.claude/rules/`](.claude/rules/) and load when Claude works on mobile files. They are binding like this file:
+
+- [`lists.md`](.claude/rules/lists.md): grouped lists (`mh-card-list`), rows, separators, leading hex tiles and their colours, trailing values.
+- [`surfaces-and-sheets.md`](.claude/rules/surfaces-and-sheets.md): no outlines on card surfaces, one-surface sheets, `close()` before navigating.
+- [`ionic-gotchas.md`](.claude/rules/ionic-gotchas.md): `ion-item` padding and stacking, field errors, searchbar focus, accessible names on Ionic buttons.
+- [`colour-and-type.md`](.claude/rules/colour-and-type.md): the Tailwind-ramp palette, honey means selection, sentence-case kickers, tokens over literals.
+- [`icons.md`](.claude/rules/icons.md): outline only (and its state-pair exceptions), one stroke weight, the `--mh-icon-*` size scale, hex tile glyphs, optical sizing.
+- [`testing-and-tooling.md`](.claude/rules/testing-and-tooling.md): config-only specs, rebuild core before tests, no local prettier, check UI in both themes.
+
+Add to them when a decision should hold for everyone; keep this file for the structure and token reference.
+
 ### Layout rule — components are margin-free, pages place them
 
 - **Component skins carry no margins.** `ion-card`, `mh-card-list` and friends are layout-neutral (`margin: 0` in their skin); where they sit on a screen is the screen's decision. Never re-introduce a placement margin into `theme/components/` or into a shared component's own `.scss`.
@@ -38,7 +51,7 @@ Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 s
 2. **Ionic colour slots, extended.** Every hue goes through `--ion-color-<name>` (custom hues — info, violet, teal, coral — join the system with the full slot set plus a `.ion-color-<name>` class block; never a standalone one-off variable). Soft fills for chips/badges/tiles use the **wash extension**: `background: var(--ion-color-<name>-wash); color: var(--ion-color-<name>-wash-contrast);` — the mobile equivalent of web's `bg-sky-100 text-sky-700` tag idiom, and it flips automatically in dark mode. To parameterize a hue from the template, set a per-instance custom prop that resolves to wash tokens (see the category chips in `notifications.html`).
 3. **Ramps** — `--mh-<scale>-<step>` (primary, warning, success, info, danger, violet, navy, slate, teal, coral), mirrored from `theme-colors.ts`. Ramps are absolute (no dark-mode flip) and exist **only for `variables.css` to derive tokens from**. Component SCSS must never read a ramp step directly — needing one is the signal to mint a role token. Variants come from adjacent ramp steps: shade/tint = 600/400; wash = 100 fill + 700 ink in light, 900 fill + 200 ink in dark (honey uses 800 / 950+300 — see the file header).
 4. **Brand colour means selection.** A control that is *on* — a selected filter chip, the segment underline, the active tab — takes `--ion-color-primary` (honey) with `--ion-color-primary-contrast` (black, 9.78:1) for its text. Navy (`--ion-color-secondary`) is a surface colour for things like the workouts resume banner, never a selected state; mixing the two put a blue chip next to a honey segment in the same toolbar. The logo mark is honey on both light and dark, matching web and the marketing site; on a tile (the app icon) it sits on navy, never on honey.
-5. **Role tokens** — `--mh-*`, only for what Ionic has no slot for: `--mh-font-heading`/`--mh-font-mono`, the type scale `--mh-text-*`, leadings/tracking, `--mh-radius-control|card|pill|sheet` (Ionic has no global radius token), `--mh-tap-target`, `--mh-ring-width`/`--mh-spine-width`, `--mh-color-divider`, `--mh-color-honey-deep` (accent ink on honey surfaces), `--mh-color-selected-background` (selection fill — selection, never status). Each is defined once in `variables.css` with its dark override; components consume, never define.
+5. **Role tokens** — `--mh-*`, only for what Ionic has no slot for: `--mh-font-heading`, the type scale `--mh-text-*`, leadings/tracking, `--mh-radius-control|card|pill|sheet` (Ionic has no global radius token), `--mh-tap-target`, `--mh-ring-width`/`--mh-spine-width`, `--mh-color-divider`, `--mh-color-honey-deep` (accent ink on honey surfaces), `--mh-color-selected-background` (selection fill — selection, never status). Each is defined once in `variables.css` with its dark override; components consume, never define.
 
 ### Dimensions & typography — the 0.125rem grid
 
@@ -46,19 +59,20 @@ Every dimension in this project sits on a **0.125rem grid** (1rem = 16px, so the
 
 **px is banned except for border widths**: `1px` hairlines as a literal, and the two tokens `--mh-ring-width` (2px — focus/danger ring, avatar cutout) and `--mh-spine-width` (3px — left accent spine). `--mh-radius-pill: 999px` is a sentinel, not a dimension. Everything else — spacing, sizes, radii, even `ion-skeleton-text` inline styles in templates — is rem on the grid. (`var(--ion-padding, 16px)` fallbacks mirroring Ionic's own default are tolerated.)
 
-**Never write a `font-size` literal** — always a `--mh-text-*` token (defined in `variables.css`, mirroring web's Tailwind ladder):
+**Never write a `font-size` literal** — always a `--mh-text-*` token (defined in `variables.css`). An icon's `font-size` is its glyph box, so it takes a `--mh-icon-*` token instead (16 / 20 / 24 / 32 / 40 / 48, see `.claude/rules/icons.md`). The scale is sized against iOS and Material, not a 2px grid: 11px is the floor for any text, 15px is body.
 
 | Token | Value | Role |
 |---|---|---|
-| `--mh-text-xs` | 0.625rem (10px) | kickers, badges, timestamps, footnotes |
+| `--mh-text-xs` | 0.6875rem (11px) | kickers, badges, timestamps, footnotes |
 | `--mh-text-sm` | 0.75rem (12px) | meta, helper, secondary text |
-| `--mh-text-base` | 0.875rem (14px) | body, controls |
+| `--mh-text-base` | 0.9375rem (15px) | body, controls |
 | `--mh-text-md` | 1rem (16px) | emphasized body, inputs, card titles |
 | `--mh-text-lg` | 1.125rem (18px) | section titles |
-| `--mh-text-xl` | 1.25rem (20px) | page titles (`h1`) |
-| `--mh-text-2xl` | 1.5rem (24px) | hero numbers |
+| `--mh-text-xl` | 1.25rem (20px) | empty states, in-card heroes |
+| `--mh-text-2xl` | 1.5rem (24px) | page titles (`h1`), detail-screen titles |
+| `--mh-text-3xl` | 1.75rem (28px) | hero numbers, display titles |
 
-Display/glyph sizes above the ladder (avatar initials at `1.75`/`2.25`/`2.75rem`) may stay on-grid literals. `line-height` comes from `--mh-leading-none|tight|body` (1 / 1.4 / 1.55; a bare `line-height: 0` layout hack is not typography and stays). `letter-spacing` for mono kickers is `--mh-tracking-kicker` (0.08em) — never a per-component tracking value. Font families only via `--ion-font-family` / `--mh-font-heading` / `--mh-font-mono`.
+Display/glyph sizes above the ladder (avatar initials at `1.75`/`2.25`/`2.75rem`) may stay on-grid literals. `line-height` comes from `--mh-leading-none|heading|tight|body` (1 / 1.2 / 1.4 / 1.55; headings take `heading`, never `tight`; a bare `line-height: 0` layout hack is not typography and stays). `letter-spacing` for kickers is `--mh-tracking-kicker` (0.08em) — never a per-component tracking value. Font families only via `--ion-font-family` / `--mh-font-heading`. Weights: Inter 400 / 500 / 600, with 700 only for display figures (rest timer, invoice totals); Poppins 600 only, 800 for the wordmark. Poppins ships just those two faces (`theme/fonts.css`), so any other weight silently draws as the nearest one.
 
 Other dimension roles: `--mh-tap-target` (2.75rem, the WCAG 44px minimum — use it for anything sized as a touch target) and `--mh-radius-sheet` (1.25rem sheet top corners). **No `vh` for keyboard-adjacent UI** — use `dvh` so the WebView's dynamic chrome/keyboard is accounted for.
 

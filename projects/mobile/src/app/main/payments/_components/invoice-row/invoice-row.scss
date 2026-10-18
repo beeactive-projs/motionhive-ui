@@ -11,7 +11,6 @@ ion-item {
   --inner-padding-end: 0.75rem;
   --padding-top: 0.5rem;
   --padding-bottom: 0.5rem;
-  border: 1px solid var(--ion-border-color);
   border-left: 3px solid var(--spine);
   border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
 }
@@ -43,7 +42,7 @@ ion-label h2 {
 }
 
 .tags ion-badge {
-  font-size: 0.62rem;
+  font-size: var(--mh-text-xs);
   font-weight: 600;
   text-transform: none;
 }
@@ -52,7 +51,7 @@ ion-label h2 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.68rem;
+  font-size: var(--mh-text-xs);
 }
 
 /* Money is mono and tabular so columns of amounts line up and cannot be
@@ -65,9 +64,8 @@ ion-label h2 {
 }
 
 .value {
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -75,6 +73,6 @@ ion-label h2 {
 .due {
   margin-top: 0.1rem;
   color: var(--ion-color-medium);
-  font-size: 0.64rem;
+  font-size: var(--mh-text-xs);
   white-space: nowrap;
 }

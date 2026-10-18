@@ -1,5 +1,7 @@
 <ng-template #search>
   <ion-searchbar
+    searchIcon="search-outline"
+    clearIcon="close-outline"
     inputmode="search"
     [placeholder]="searchPlaceholder()"
     [attr.aria-label]="searchPlaceholder()"
@@ -12,11 +14,10 @@
 <ng-template #body>
   @if (rows().length) {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (option of rows(); track option.value; let last = $last) {
+      @for (option of rows(); track option.value) {
         <ion-item
           button
           [detail]="false"
-          [lines]="last ? 'none' : 'full'"
           [attr.aria-current]="option.value === selected() ? 'true' : null"
           (click)="pick(option.value)"
         >
@@ -27,7 +28,7 @@
             }
           </ion-label>
           @if (option.value === selected()) {
-            <ion-icon slot="end" name="checkmark" color="primary" aria-hidden="true" />
+            <ion-icon slot="end" name="checkmark-outline" color="primary" aria-hidden="true" />
           }
         </ion-item>
       }

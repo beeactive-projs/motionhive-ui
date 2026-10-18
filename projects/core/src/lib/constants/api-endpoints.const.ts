@@ -253,6 +253,8 @@ export const API_ENDPOINTS = {
     BASE: '/workout-logs',
     BY_ID: (id: string) => `/workout-logs/${id}`,
     COMPLETE: (id: string) => `/workout-logs/${id}/complete`,
+    PAUSE: (id: string) => `/workout-logs/${id}/pause`,
+    RESUME: (id: string) => `/workout-logs/${id}/resume`,
     LOG_SET: (id: string, setId: string) =>
       `/workout-logs/${id}/sets/${setId}`,
     ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,

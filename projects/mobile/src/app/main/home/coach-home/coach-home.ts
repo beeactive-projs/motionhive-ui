@@ -13,7 +13,7 @@ import {
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
+import { addOutline } from 'ionicons/icons';
 
 import { formatMinorUnits } from 'core';
 
@@ -48,7 +48,7 @@ export class CoachHome implements OnInit, ViewWillEnter {
   readonly today = signal(new Date());
 
   constructor() {
-    addIcons({ add });
+    addIcons({ addOutline });
   }
 
   ngOnInit(): void {

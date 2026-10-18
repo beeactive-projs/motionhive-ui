@@ -16,7 +16,7 @@
     @if (loading()) {
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of [1, 2, 3]; track $index) {
-          <ion-item lines="full">
+          <ion-item>
             <ion-skeleton-text slot="start" [animated]="true" style="width: 2.5rem; height: 2.25rem" />
             <ion-label>
               <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
@@ -42,7 +42,7 @@
     } @else {
       <ion-list [inset]="true" class="mh-card-list">
         @for (block of blocks(); track block.id) {
-          <ion-item lines="full">
+          <ion-item>
             <mh-hex-avatar
               slot="start"
               [name]="nameOf(block)"

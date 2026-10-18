@@ -168,12 +168,11 @@
 
   /*
    * ── Tier 4: role tokens ─────────────────────────────────────────────────
-   * Type — the same three families as web: Inter for UI, Poppins for
-   * headings, JetBrains Mono for the uppercase kickers. Loaded in index.html.
+   * Type — Inter for UI, Poppins for headings, the same families as web.
+   * Bundled with the app, see fonts.css.
    */
   --ion-font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mh-font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
-  --mh-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
 
   /*
    * Corner radius, three steps and a pill. Ionic has no global radius token —
@@ -182,25 +181,42 @@
    * in styles.css and components use these rather than their own numbers.
    */
   --mh-radius-control: 0.75rem;
-  --mh-radius-card: 1rem;
+  --mh-radius-card: 1.25rem;
   --mh-radius-pill: 999px;
   --mh-radius-sheet: 1.25rem;
 
   /*
-   * Type scale — strict 0.125rem grid (1rem = 16px), mirroring web's dominant
-   * Tailwind ladder (text-xs/sm/base/…). Component SCSS never writes a
-   * font-size literal; it picks the nearest role here.
+   * Type scale (1rem = 16px), sized against the platforms' own: 11px is the
+   * smallest text iOS and Material set, and 15px body sits between Material's
+   * 14 and iOS's 17. Odd sizes are deliberate; the old 2px grid put the floor
+   * at 10px. Component SCSS never writes a font-size literal; it picks the
+   * nearest role here. Every step is rem, so system text size scales it.
    */
-  --mh-text-xs: 0.625rem;   /* 10px — kickers, badges, timestamps, footnotes */
+  --mh-text-xs: 0.6875rem;  /* 11px — kickers, badges, timestamps, footnotes */
   --mh-text-sm: 0.75rem;    /* 12px — meta, helper, secondary text */
-  --mh-text-base: 0.875rem; /* 14px — body, controls */
+  --mh-text-base: 0.9375rem; /* 15px — body, controls */
   --mh-text-md: 1rem;       /* 16px — emphasized body, inputs, card titles */
   --mh-text-lg: 1.125rem;   /* 18px — section titles */
-  --mh-text-xl: 1.25rem;    /* 20px — page titles (h1) */
-  --mh-text-2xl: 1.5rem;    /* 24px — hero numbers */
+  --mh-text-xl: 1.25rem;    /* 20px — empty states, in-card heroes */
+  --mh-text-2xl: 1.5rem;    /* 24px — page titles (h1), detail-screen titles */
+  --mh-text-3xl: 1.75rem;   /* 28px — hero numbers, display titles */
 
-  /* Leading & tracking — three leadings, a kicker and a display tracking. */
+  /*
+   * Icon sizes — an icon's font-size is its glyph box, so it takes one of
+   * these, never a --mh-text-* step. 24 is the base grid and 16 the dense
+   * one; 20 sits an icon inline with 15–16px body text. Above 24 the steps
+   * are display glyphs (empty states, hero tiles). See .claude/rules/icons.md.
+   */
+  --mh-icon-sm: 1rem;       /* 16px — dense: tags, chips, inline meta */
+  --mh-icon-md: 1.25rem;    /* 20px — inline with body text, inside buttons */
+  --mh-icon-lg: 1.5rem;     /* 24px — toolbars, tab bar, standalone actions */
+  --mh-icon-xl: 2rem;       /* 32px — empty states, in-card heroes */
+  --mh-icon-2xl: 2.5rem;    /* 40px — xl hex tile glyph */
+  --mh-icon-3xl: 3rem;      /* 48px — 2xl hex tile glyph */
+
+  /* Leading & tracking — four leadings, a kicker and a display tracking. */
   --mh-leading-none: 1;
+  --mh-leading-heading: 1.2;
   --mh-leading-tight: 1.4;
   --mh-leading-body: 1.55;
   --mh-tracking-kicker: 0.08em;
@@ -209,6 +225,13 @@
 
   /* The WCAG minimum touch target (44px). */
   --mh-tap-target: 2.75rem;
+
+  /*
+   * A list row's one spacing step: its start and end padding and the gap
+   * after its leading tile. One value, so the separator inset in
+   * ion-list.css can be computed from it.
+   */
+  --mh-row-gutter: 0.875rem;
 
   /*
    * Border widths — the only sanctioned px values besides 1px hairlines.
@@ -237,6 +260,15 @@
   --mh-color-divider: var(--mh-slate-100);
 
   /*
+   * The hairline between rows of a grouped list (ion-list.css). Not the
+   * divider above: that one doubles as a soft fill (pills, composer) and is
+   * too pale to read as a line on a white card. Mixed from the ink rather
+   * than a ramp step so it sits at the same weight on any card fill, light
+   * or dark: about 1.2:1 against the card, the weight of an iOS separator.
+   */
+  --mh-color-separator: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+
+  /*
    * The fill behind a selected chip, tile or day — honey's palest step,
    * paired with honey-deep ink. Selection, not status: this is the one soft
    * honey surface the brand rules allow, and it is deliberately one step
@@ -260,8 +292,8 @@
    * design's card-based screens need the page one step darker than the
    * things sitting on it.
    */
-  --ion-background-color: var(--mh-slate-50);
-  --ion-background-color-rgb: 248, 250, 252;
+  --ion-background-color: var(--mh-slate-100);
+  --ion-background-color-rgb: 241, 245, 249;
   --ion-card-background: #ffffff;
   --ion-item-background: #ffffff;
   --ion-toolbar-background: #ffffff;

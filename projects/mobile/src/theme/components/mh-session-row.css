@@ -14,7 +14,6 @@
 ion-item.mh-session-row {
   --background: var(--ion-card-background);
   --border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
-  border: 1px solid var(--ion-border-color);
   border-left: var(--mh-spine-width) solid var(--spine);
   border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
 }
@@ -104,7 +103,7 @@ ion-item.mh-session-row .tags {
 ion-item.mh-session-row .tags .online {
   flex: none;
   color: var(--ion-color-teal);
-  font-size: var(--mh-text-sm);
+  font-size: var(--mh-icon-sm);
 }
 
 ion-item.mh-session-row .tags ion-note {

@@ -649,7 +649,8 @@ export class SessionDetail implements ViewWillEnter {
 
     rows.push({
       icon: 'hourglass-outline',
-      color: 'medium',
+      // Slate only while it is off: the unavailable state.
+      color: template.waitlistEnabled ? 'info' : 'medium',
       tone: HexAvatarTones.Base,
       title: template.waitlistEnabled
         ? t('sessions.detail.rows.waitlistOn')
@@ -677,7 +678,7 @@ export class SessionDetail implements ViewWillEnter {
 
     rows.push({
       icon: 'globe-outline',
-      color: 'dark',
+      color: 'teal',
       tone: HexAvatarTones.Base,
       title: template.timezone,
       detail: t('form.label.timezone'),

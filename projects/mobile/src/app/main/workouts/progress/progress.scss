@@ -1,7 +1,6 @@
 /* A record's weight — mono and tabular, the way every number in a column is. */
 .value {
   color: var(--ion-text-color);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;

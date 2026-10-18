@@ -13,15 +13,14 @@
 .hero .name {
   margin: 0.25rem 0 0;
   font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-xl);
-  font-weight: 700;
-  line-height: var(--mh-leading-tight);
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
 }
 
 .hero .handle {
   margin: 0;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
 }
 
@@ -50,7 +49,6 @@ ion-item ion-label p {
   margin: 0 0 0.125rem;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
-  font-family: var(--mh-font-mono);
   font-weight: 600;
   letter-spacing: var(--mh-tracking-kicker);
   text-transform: uppercase;
@@ -71,7 +69,6 @@ ion-item ion-label h2 {
   gap: 0.625rem;
   margin-top: 0.75rem;
   padding: 0.75rem 0.875rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
@@ -81,5 +78,5 @@ ion-item ion-label h2 {
 
 .private ion-icon {
   flex: none;
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }

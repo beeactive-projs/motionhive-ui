@@ -16,10 +16,6 @@ import { lastDoneLabel } from '../../workouts.config';
  * The row opens the routine; it does not start it. Starting lives on the
  * routine's own page, next to the exercise list — a second tap target on the
  * row itself only made it unclear which half you had pressed.
- *
- * Draws its own divider for the same reason `mh-settings-row` does — Ionic's
- * inset list zeroes the border on `ion-item:only-child`, and every item here
- * is the only child of its host. Keep a list of these homogeneous.
  */
 @Component({
   selector: 'mh-routine-row',

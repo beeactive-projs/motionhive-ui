@@ -1,5 +1,5 @@
 <ng-template #sticky>
-  <ion-searchbar [placeholder]="'groups.addMembers.search' | translate"
+  <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" [placeholder]="'groups.addMembers.search' | translate"
     [attr.aria-label]="'groups.addMembers.search' | translate"
     inputmode="search" [value]="query()" (ionInput)="onQuery($event.detail.value ?? '')" />
 </ng-template>
@@ -7,8 +7,8 @@
 <ng-template #body>
   @if (loading()) {
   <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
-    @for (_ of [1, 2, 3, 4]; track $index; let last = $last) {
-    <ion-item [lines]="last ? 'none' : 'full'">
+    @for (_ of [1, 2, 3, 4]; track $index) {
+    <ion-item>
       <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
       <ion-label>
         <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
@@ -25,8 +25,8 @@
     [message]="'groups.addMembers.noMatch' | translate" />
   } @else {
   <ion-list [inset]="true" class="mh-card-list">
-    @for (client of visible(); track client.clientId; let last = $last) {
-    <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="toggle(client)">
+    @for (client of visible(); track client.clientId) {
+    <ion-item button [detail]="false" (click)="toggle(client)">
       <mh-hex-avatar slot="start" size="md" [name]="name(client)"
         [imageUrl]="client.client?.avatarUrl ?? null" />
       <ion-label>

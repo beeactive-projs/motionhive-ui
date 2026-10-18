@@ -2405,6 +2405,7 @@
       "inProgress": "În desfășurare · {elapsed}",
       "noRoutines": "Salvează un antrenament ca rutină și va apărea aici, gata de repetat.",
       "openHistory": "Deschide istoricul",
+      "paused": "Pe pauză · {elapsed}",
       "percentDone": "{percent}% gata",
       "startEmpty": "Începe un antrenament nou",
       "startsOn": "Începe {date}",
@@ -2467,7 +2468,14 @@
         "prev": "Anterior",
         "set": "Serie"
       },
-      "leave": "Ieși și lasă antrenamentul în desfășurare",
+      "leave": "Ieși din antrenament",
+      "leaveSheet": {
+        "keepRunning": "Lasă-l să meargă",
+        "keepRunningHint": "Cronometrul continuă cât timp lipsești.",
+        "pause": "Pune pe pauză",
+        "pauseHint": "Cronometrul se oprește până revii la antrenament.",
+        "title": "Ieși din antrenament?"
+      },
       "nextField": "Câmpul următor",
       "picker": {
         "replacing": "Înlocuiești {name}",
@@ -2484,6 +2492,7 @@
         "discardFailed": "Nu am putut renunța la antrenament",
         "discarded": "Ai renunțat la antrenament",
         "nothingToRepeat": "Antrenamentul acela nu avea exerciții de repetat",
+        "pauseFailed": "Nu am putut pune antrenamentul pe pauză",
         "removeSetFailed": "Nu am putut elimina seria",
         "removed": "Am eliminat {name}",
         "repeatFailed": "Nu am putut încărca antrenamentul de repetat"
@@ -2544,6 +2553,7 @@
       "title": "Pauza s-a terminat"
     },
     "restTimer": {
+      "backToWork": "Înapoi la treabă",
       "lastSet": "ultima serie",
       "minusSeconds": "Minus {seconds} secunde",
       "nextUp": "Urmează",

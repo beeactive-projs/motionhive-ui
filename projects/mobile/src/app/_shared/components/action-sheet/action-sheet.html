@@ -1,0 +1,29 @@
+<ng-template #body>
+  @if (note()) {
+  <p class="mh-helper note">{{ note() }}</p>
+  }
+
+  <div class="groups">
+    @for (group of groups(); track $index) {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (action of group; track action.id) {
+      <ion-item button [detail]="false" [disabled]="action.disabled ?? false"
+        [class.destructive]="action.destructive" (click)="choose(action.id)">
+        @if (action.icon) {
+        <mh-hex-avatar slot="start" size="sm" [icon]="action.icon" [color]="action.destructive ? 'danger' : (action.color ?? 'medium')" />
+        }
+        <ion-label class="ion-text-wrap">
+          {{ action.label | translate }}
+          @if (action.hint) {
+          <p>{{ action.hint | translate }}</p>
+          }
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell [(open)]="open" [title]="title()" [subtitle]="subtitle()" [body]="body"
+  [showFooter]="false" [fit]="true" (dismissed)="onDismissed()" />

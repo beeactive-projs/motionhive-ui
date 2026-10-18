@@ -8,7 +8,6 @@ import {
   IonContent,
   IonFooter,
   IonHeader,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -35,6 +34,7 @@ import { LevelSegment } from '../_components/level-segment/level-segment';
 import { MuscleEquipmentFields } from '../_components/muscle-equipment-fields/muscle-equipment-fields';
 import { ExerciseDraftForm, MAX_NAME_LENGTH } from '../exercise-draft';
 import { EXERCISE_ICONS, KIND_ORDER, kindLabel } from '../exercises.config';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 
 /**
  * Editing an exercise you own — one page, no steps.
@@ -56,13 +56,13 @@ import { EXERCISE_ICONS, KIND_ORDER, kindLabel } from '../exercises.config';
     ConfirmSheet,
     EmptyState,
     ExerciseDetailsFields,
+    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,
     IonContent,
     IonFooter,
     IonHeader,
-    IonIcon,
     IonInput,
     IonItem,
     IonLabel,
