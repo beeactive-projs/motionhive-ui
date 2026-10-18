@@ -4419,9 +4419,9 @@
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p5" datatype="html">
-        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Payment data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> We may collect data necessary to process your payment if you choose to make purchases. All payment data is handled and stored by Stripe. You may find their privacy notice link(s) here: <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://stripe.com/privacy&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Payment data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> We may collect data necessary to process your payment if you choose to make purchases. Your card details are handled and stored by Stripe, and we never see them. We keep a record of each payment, invoice and subscription (amounts, dates and status) to run your account and to meet accounting and tax law. You may find Stripe's privacy notice here: <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://stripe.com/privacy&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;
           class=&quot;text-brand hover:underline&quot;>"/>https://stripe.com/privacy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</source>
-        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Date de plată.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem colecta datele necesare pentru a-ți procesa plata dacă alegi să faci achiziții. Toate datele de plată sunt gestionate și stocate de Stripe. Poți consulta nota lor de confidențialitate aici: <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://stripe.com/privacy&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Date de plată.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem colecta datele necesare pentru a-ți procesa plata dacă alegi să faci achiziții. Datele cardului sunt gestionate și stocate de Stripe, iar noi nu le vedem niciodată. Păstrăm o evidență a fiecărei plăți, a fiecărei facturi și a fiecărui abonament (sume, date și stare) pentru a-ți administra contul și pentru a respecta legislația contabilă și fiscală. Poți consulta nota de confidențialitate Stripe aici: <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://stripe.com/privacy&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;
           class=&quot;text-brand hover:underline&quot;>"/>https://stripe.com/privacy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
@@ -4433,7 +4433,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Date de autentificare prin rețele sociale.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Îți putem oferi opțiunea de a te înregistra folosind datele contului tău de pe o rețea socială, precum Facebook sau Google. Dacă alegi această metodă, vom colecta anumite informații de profil de la furnizorul rețelei sociale, așa cum este descris în secțiunea „Cum gestionăm autentificările prin rețele sociale?" de mai jos.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p7" datatype="html">
@@ -4441,7 +4441,7 @@
         <target state="translated">Toate datele pe care ni le furnizezi trebuie să fie adevărate, complete și exacte, iar tu trebuie să ne anunți cu privire la orice modificare a acestora.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">156</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.sub2" datatype="html">
@@ -4449,7 +4449,7 @@
         <target state="translated">Informații colectate automat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">159</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p8" datatype="html">
@@ -4457,7 +4457,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>O parte din informații, precum adresa ta IP și/sau caracteristicile browserului și dispozitivului, sunt colectate automat când vizitezi Serviciile.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">160</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p9" datatype="html">
@@ -4465,7 +4465,7 @@
         <target state="translated">Colectăm automat anumite informații când vizitezi, folosești sau navighezi în Servicii. Aceste informații nu îți dezvăluie identitatea specifică (precum numele sau datele de contact), dar pot include informații despre dispozitiv și utilizare, cum ar fi adresa IP, caracteristicile browserului și dispozitivului, sistemul de operare, preferințele de limbă, URL-urile de referință, numele dispozitivului, țara, locația și informații despre cum și când folosești Serviciile. Aceste informații sunt necesare în principal pentru menținerea securității și funcționării Serviciilor și în scopuri interne de analiză și raportare.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">163</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p10" datatype="html">
@@ -4475,7 +4475,7 @@
           class=&quot;text-brand hover:underline&quot;>"/>Politica de cookie-uri<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p11" datatype="html">
@@ -4483,7 +4483,7 @@
         <target state="translated">Informațiile pe care le colectăm includ:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.li12" datatype="html">
@@ -4491,7 +4491,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Date de jurnal și utilizare.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Informații de serviciu, de diagnosticare, de utilizare și de performanță pe care serverele noastre le colectează automat și le înregistrează în fișiere de jurnal. Acestea pot include adresa IP, informații despre dispozitiv, tipul de browser și setările, activitatea ta în Servicii (data/ora, paginile și fișierele vizualizate, căutările și alte acțiuni) și informații despre evenimentele dispozitivului (activitatea sistemului și rapoartele de eroare).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">175</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.li13" datatype="html">
@@ -4499,7 +4499,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Date despre dispozitiv.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Informații despre computerul, telefonul, tableta sau alt dispozitiv folosit, precum adresa IP, numerele de identificare ale dispozitivului și aplicației, tipul de browser, modelul hardware, furnizorul de internet și/sau operatorul mobil și sistemul de operare.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">180</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.li14" datatype="html">
@@ -4507,7 +4507,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Date de locație.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Informații despre locația dispozitivului tău, care pot fi exacte sau aproximative. Poți renunța la colectarea lor refuzând accesul sau dezactivând setarea de Locație de pe dispozitiv.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p12" datatype="html">
@@ -4517,7 +4517,7 @@
           target=&quot;_blank&quot; rel=&quot;noopener&quot; class=&quot;text-brand hover:underline&quot;>"/>Politica Google privind datele utilizatorilor serviciilor API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>, inclusiv cerințele privind utilizarea limitată.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">188</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.h2" datatype="html">
@@ -4525,7 +4525,7 @@
         <target state="translated">2. Cum prelucrăm informațiile tale?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">195</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.p1" datatype="html">
@@ -4533,7 +4533,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Prelucrăm informațiile tale pentru a furniza, îmbunătăți și administra Serviciile, pentru a comunica cu tine, pentru securitate și prevenirea fraudei și pentru a respecta legea. Le putem prelucra în alte scopuri doar cu consimțământul tău explicit prealabil.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.p2" datatype="html">
@@ -4541,7 +4541,7 @@
         <target state="translated">Prelucrăm datele tale din diverse motive, în funcție de modul în care interacționezi cu Serviciile, inclusiv:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li1" datatype="html">
@@ -4549,7 +4549,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a facilita crearea contului și autentificarea<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> și pentru a gestiona conturile utilizatorilor.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li2" datatype="html">
@@ -4557,7 +4557,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a furniza și facilita livrarea serviciilor<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> către utilizator.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li3" datatype="html">
@@ -4565,7 +4565,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a răspunde la solicitările utilizatorilor<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> și a oferi suport.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">206</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li4" datatype="html">
@@ -4573,7 +4573,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a-ți trimite informații administrative<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> despre produsele și serviciile noastre, modificări ale termenilor și politicilor și alte informații similare.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">207</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li5" datatype="html">
@@ -4581,7 +4581,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a onora și gestiona comenzile,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> plățile, returnările și schimburile efectuate prin Servicii.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li6" datatype="html">
@@ -4589,7 +4589,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a permite comunicarea între utilizatori.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">211</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li7" datatype="html">
@@ -4597,7 +4597,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a solicita feedback<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> și a te contacta cu privire la utilizarea Serviciilor.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">212</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li8" datatype="html">
@@ -4605,7 +4605,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a proteja Serviciile,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> inclusiv monitorizarea și prevenirea fraudei.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">214</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li9" datatype="html">
@@ -4613,7 +4613,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a identifica tendințele de utilizare,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> astfel încât să ne putem îmbunătăți Serviciile.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">216</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li10" datatype="html">
@@ -4621,7 +4621,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Pentru a salva sau proteja interesul vital al unei persoane,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> de exemplu pentru a preveni un prejudiciu.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">216</context>
+          <context context-type="linenumber">217</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.h2" datatype="html">
@@ -4629,7 +4629,7 @@
         <target state="translated">3. Pe ce temeiuri legale ne bazăm pentru a prelucra informațiile tale?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">223</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.p1" datatype="html">
@@ -4637,7 +4637,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Prelucrăm datele tale doar atunci când considerăm că este necesar și avem un temei legal valabil, precum consimțământul tău, respectarea legii, furnizarea Serviciilor sau îndeplinirea obligațiilor contractuale, protejarea drepturilor tale sau urmărirea intereselor noastre legitime.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">225</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.sub1" datatype="html">
@@ -4645,7 +4645,7 @@
         <target state="translated">Dacă te afli în UE sau în Regatul Unit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">230</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.p2" datatype="html">
@@ -4653,7 +4653,7 @@
         <target state="translated">Regulamentul General privind Protecția Datelor (GDPR) și GDPR-ul din Regatul Unit ne cer să explicăm temeiurile legale valabile pe care ne bazăm. Astfel, ne putem baza pe următoarele:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">231</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li1" datatype="html">
@@ -4661,7 +4661,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Consimțământ.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem prelucra informațiile tale dacă ne-ai dat permisiunea (consimțământul) de a le folosi într-un scop specific. Îți poți retrage consimțământul oricând.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">234</context>
+          <context context-type="linenumber">235</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li2" datatype="html">
@@ -4669,7 +4669,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Executarea unui contract.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem prelucra datele atunci când este necesar pentru a ne îndeplini obligațiile contractuale față de tine, inclusiv pentru a furniza Serviciile.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">238</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li3" datatype="html">
@@ -4677,7 +4677,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Interese legitime.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem prelucra informațiile atunci când este necesar în mod rezonabil pentru a ne atinge interesele legitime, iar acestea nu prevalează asupra drepturilor și libertăților tale fundamentale. De exemplu, pentru a analiza modul de utilizare a Serviciilor ca să le îmbunătățim, pentru a diagnostica probleme și preveni frauda și pentru a înțelege cum folosesc utilizatorii produsele noastre.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">241</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li4" datatype="html">
@@ -4685,7 +4685,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Obligații legale.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem prelucra informațiile când este necesar pentru respectarea obligațiilor noastre legale.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">246</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li5" datatype="html">
@@ -4693,7 +4693,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Interese vitale.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem prelucra informațiile când este necesar pentru a proteja interesele vitale ale tale sau ale unei alte persoane.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">247</context>
+          <context context-type="linenumber">248</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.sub2" datatype="html">
@@ -4701,7 +4701,7 @@
         <target state="translated">Dacă te afli în Canada</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">251</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.p3" datatype="html">
@@ -4709,7 +4709,7 @@
         <target state="translated">Putem prelucra informațiile tale dacă ne-ai dat permisiunea explicită de a le folosi într-un scop specific sau în situații în care permisiunea ta poate fi dedusă (consimțământ implicit). Îți poți retrage consimțământul oricând. În unele cazuri excepționale, putem fi autorizați legal să prelucrăm informațiile fără consimțământul tău, de exemplu pentru investigații și prevenirea fraudei sau atunci când divulgarea este necesară pentru a respecta o citație, un mandat sau o hotărâre judecătorească.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">252</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.h2" datatype="html">
@@ -4717,7 +4717,7 @@
         <target state="translated">4. Când și cu cine partajăm datele tale?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">261</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p1" datatype="html">
@@ -4725,7 +4725,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Putem partaja informații în situațiile specifice descrise aici și/sau cu următoarele categorii de terți.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">262</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p2" datatype="html">
@@ -4733,7 +4733,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Furnizori, consultanți și alți furnizori de servicii terți.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem partaja datele tale cu furnizori terți, prestatori de servicii, contractori sau agenți („terți") care prestează servicii pentru noi sau în numele nostru și au nevoie de acces pentru a-și desfășura activitatea. Avem contracte încheiate cu acești terți, menite să contribuie la protejarea datelor tale.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">264</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p3" datatype="html">
@@ -4741,7 +4741,7 @@
         <target state="translated">Categoriile de terți cu care putem partaja datele sunt:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">269</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li1" datatype="html">
@@ -4749,7 +4749,7 @@
         <target state="translated">Procesatori de plăți</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">272</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li2" datatype="html">
@@ -4757,7 +4757,7 @@
         <target state="translated">Servicii de înregistrare și autentificare a conturilor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">273</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li3" datatype="html">
@@ -4765,7 +4765,7 @@
         <target state="translated">Servicii de cloud computing</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">273</context>
+          <context context-type="linenumber">274</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li4" datatype="html">
@@ -4773,7 +4773,7 @@
         <target state="translated">Furnizori de găzduire a site-ului</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">275</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li5" datatype="html">
@@ -4781,7 +4781,7 @@
         <target state="translated">Furnizori de servicii de stocare a datelor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">276</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li6" datatype="html">
@@ -4789,7 +4789,7 @@
         <target state="translated">Servicii de analiză a datelor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">277</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li7" datatype="html">
@@ -4797,7 +4797,7 @@
         <target state="translated">Instrumente de comunicare și colaborare</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">277</context>
+          <context context-type="linenumber">278</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li8" datatype="html">
@@ -4805,7 +4805,7 @@
         <target state="translated">Furnizor de servicii de email (email tranzacțional/de notificare)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">278</context>
+          <context context-type="linenumber">279</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p4" datatype="html">
@@ -4813,7 +4813,7 @@
         <target state="translated">De asemenea, este posibil să fie nevoie să partajăm datele tale în următoarele situații:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">281</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li9" datatype="html">
@@ -4821,7 +4821,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Transferuri de afaceri.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Putem partaja sau transfera informațiile tale în legătură cu, sau în timpul negocierilor pentru, orice fuziune, vânzare de active, finanțare sau achiziție a întregii afaceri sau a unei părți din aceasta.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">284</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li10" datatype="html">
@@ -4829,7 +4829,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Alți utilizatori.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Când partajezi date sau interacționezi cu zonele publice ale Serviciilor, aceste date pot fi vizualizate de toți utilizatorii și pot deveni public disponibile în afara Serviciilor pe termen nelimitat. Alți utilizatori vor putea vedea descrieri ale activității tale, comunica cu tine și vizualiza profilul tău.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">286</context>
+          <context context-type="linenumber">287</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.h2" datatype="html">
@@ -4837,7 +4837,7 @@
         <target state="translated">5. Folosim cookie-uri și alte tehnologii de urmărire?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">294</context>
+          <context context-type="linenumber">295</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p1" datatype="html">
@@ -4845,7 +4845,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Folosim cookie-uri și tehnologii similare ca Serviciile să funcționeze și să îți reținem preferințele, iar vizitele pe site le numărăm fără cookie-uri. Nu folosim instrumente de urmărire pentru publicitate.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">296</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p2" datatype="html">
@@ -4853,7 +4853,7 @@
         <target state="translated">Folosim cookie-uri și tehnologii similare, precum stocarea locală a browserului, atunci când interacționezi cu Serviciile. Ele îți păstrează sesiunea activă, ne ajută să protejăm Serviciile și contul tău și îți rețin preferințele, precum tema și limba.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">298</context>
+          <context context-type="linenumber">299</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p3" datatype="html">
@@ -4861,7 +4861,7 @@
         <target state="translated">Nu permitem terților să plaseze pe Serviciile noastre tehnologii de publicitate sau de urmărire între site-uri și nu vindem și nu partajăm informațiile tale personale pentru publicitate direcționată.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">301</context>
+          <context context-type="linenumber">302</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p4" datatype="html">
@@ -4869,7 +4869,7 @@
         <target state="translated">Cookie-urile și tehnologiile similare pe care le folosim, precum și felul în care le poți refuza, sunt descrise în <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/cookie-policy&quot; class=&quot;text-brand hover:underline&quot;>"/>Politica de cookie-uri<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">305</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.analytics.h3" datatype="html">
@@ -4877,7 +4877,7 @@
         <target state="translated">Statistici despre vizitele pe site</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">307,308</context>
+          <context context-type="linenumber">308</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.analytics.p1" datatype="html">
@@ -4885,7 +4885,7 @@
         <target state="translated">Folosim Umami (umami.is), un serviciu de statistici, ca să înțelegem câte persoane ne vizitează site-ul, ce pagini citesc și cum au ajuns la noi. Umami nu folosește cookie-uri sau stocarea locală, nu îți păstrează adresa IP și nu te urmărește pe alte site-uri.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">308,311</context>
+          <context context-type="linenumber">309</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.analytics.p2" datatype="html">
@@ -4893,7 +4893,7 @@
         <target state="translated">Pentru fiecare vizită, înregistrează pagina, site-ul de pe care ai venit, eventualele etichete de campanie din link (precum utm_source=instagram), locația ta aproximativă (țara, regiunea și orașul, deduse din adresa IP), precum și browserul, sistemul de operare, tipul dispozitivului, dimensiunea ecranului și limba. Noi vedem aceste date doar ca statistici agregate. Ne bazăm pe interesul nostru legitim de a înțelege și îmbunătăți site-ul, iar Umami prelucrează datele în numele nostru, pe servere din Uniunea Europeană sau din Statele Unite.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">311,316</context>
+          <context context-type="linenumber">312</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.h2" datatype="html">
@@ -4901,7 +4901,7 @@
         <target state="translated">6. Cum gestionăm autentificările prin rețele sociale?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">321</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.p1" datatype="html">
@@ -4909,7 +4909,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Dacă alegi să te înregistrezi sau să te autentifici folosind un cont de rețea socială, este posibil să avem acces la anumite informații despre tine.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">321</context>
+          <context context-type="linenumber">322</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.p2" datatype="html">
@@ -4917,7 +4917,7 @@
         <target state="translated">Serviciile noastre îți oferă posibilitatea de a te înregistra și autentifica folosind datele contului tău de pe o rețea socială terță (precum Facebook sau Google). Când alegi această opțiune, vom primi anumite informații de profil de la furnizorul rețelei sociale: de obicei numele, adresa de email și fotografia de profil, precum și alte informații pe care alegi să le faci publice pe acea platformă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">325</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.p3" datatype="html">
@@ -4925,7 +4925,7 @@
         <target state="translated">Vom folosi informațiile primite doar în scopurile descrise în această Notă de confidențialitate sau care ți-au fost comunicate clar. Reține că nu controlăm și nu suntem responsabili pentru alte utilizări ale datelor tale de către furnizorul rețelei sociale terțe.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">330</context>
+          <context context-type="linenumber">331</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.h2" datatype="html">
@@ -4933,7 +4933,7 @@
         <target state="translated">7. Datele tale sunt transferate internațional?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">338</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p1" datatype="html">
@@ -4941,7 +4941,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Putem transfera, stoca și prelucra informațiile tale în alte țări decât a ta.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">338</context>
+          <context context-type="linenumber">339</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p2" datatype="html">
@@ -4949,7 +4949,7 @@
         <target state="translated">Serverele noastre sunt situate în Țările de Jos. Indiferent de locul în care te afli, te rugăm să reții că informațiile tale pot fi transferate, stocate și prelucrate de noi în sediile noastre și în sediile terților cu care putem partaja datele tale, inclusiv în sedii din Statele Unite și alte țări.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">340</context>
+          <context context-type="linenumber">341</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p3" datatype="html">
@@ -4957,7 +4957,7 @@
         <target state="translated">Dacă ești rezident în Spațiul Economic European (SEE), Regatul Unit (UK) sau Elveția, aceste țări s-ar putea să nu aibă legi privind protecția datelor la fel de cuprinzătoare ca cele din țara ta. Totuși, vom lua toate măsurile necesare pentru a-ți proteja datele în conformitate cu această Notă și cu legislația aplicabilă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">345</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p4" datatype="html">
@@ -4965,7 +4965,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Clauzele contractuale standard ale Comisiei Europene.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Am implementat măsuri pentru protejarea datelor tale, inclusiv prin utilizarea Clauzelor contractuale standard ale Comisiei Europene pentru transferurile de date cu caracter personal între noi și furnizorii noștri terți. Aceste clauze cer tuturor destinatarilor să protejeze datele provenite din SEE sau din UK în conformitate cu legislația europeană. Clauzele pot fi furnizate la cerere.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">349</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.h2" datatype="html">
@@ -4973,7 +4973,7 @@
         <target state="translated">8. Cât timp păstrăm informațiile tale?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">358</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.p1" datatype="html">
@@ -4981,15 +4981,15 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Păstrăm informațiile tale atât timp cât este necesar pentru scopurile descrise în această Notă, cu excepția cazului în care legea prevede altfel.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">359</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.p2" datatype="html">
-        <source>We will only keep your personal information for as long as it is necessary for the purposes set out in this Privacy Notice, unless a longer retention period is required or permitted by law (such as tax, accounting, or other legal requirements). No purpose in this notice will require us keeping your personal information for longer than three (3) months past the termination of the user's account.</source>
-        <target state="translated">Vom păstra datele tale doar atât timp cât este necesar pentru scopurile stabilite în această Notă, cu excepția cazului în care o perioadă mai lungă de păstrare este cerută sau permisă de lege (precum obligațiile fiscale, contabile sau alte cerințe legale). Niciun scop din această notă nu ne va cere să păstrăm datele tale mai mult de trei (3) luni după închiderea contului utilizatorului.</target>
+        <source>We keep your personal information while you have an account. When you delete your account, we erase it within 30 days. We keep only the records the law or a dispute requires: invoices and payment records for 5 years after the end of the financial year, as Romanian accounting and tax law requires, a record that your account was deleted, and when, for 3 years, and anything tied to an open dispute, chargeback or legal claim until it is resolved. Each is deleted when its period ends. Our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/delete-account&quot; class=&quot;text-brand hover:underline&quot;>"/>Delete your account<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> page explains what is erased and what is kept.</source>
+        <target state="translated">Păstrăm datele tale personale cât timp ai un cont. Când îți ștergi contul, le ștergem în cel mult 30 de zile. Păstrăm doar evidențele cerute de lege sau de un litigiu: facturile și evidența plăților timp de 5 ani de la încheierea exercițiului financiar, așa cum cere legislația contabilă și fiscală din România, o înregistrare a faptului că ți-ai șters contul și când, timp de 3 ani, și documentele legate de un litigiu, o contestație de plată sau o acțiune în instanță în curs, până la soluționare. Le ștergem pe fiecare când i se încheie perioada. Pagina <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/delete-account&quot; class=&quot;text-brand hover:underline&quot;>"/>Ștergerea contului<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> explică ce ștergem și ce păstrăm.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">362</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.p3" datatype="html">
@@ -4997,7 +4997,7 @@
         <target state="translated">Când nu mai avem o nevoie legitimă de a prelucra datele tale, le vom șterge sau anonimiza, sau, dacă acest lucru nu este posibil (de exemplu pentru că au fost stocate în arhive de rezervă), le vom stoca în siguranță și le vom izola de orice prelucrare ulterioară până când ștergerea devine posibilă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">366</context>
+          <context context-type="linenumber">369</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s9.h2" datatype="html">
@@ -5005,7 +5005,7 @@
         <target state="translated">9. Cum îți menținem informațiile în siguranță?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">376</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s9.p1" datatype="html">
@@ -5013,7 +5013,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Ne propunem să îți protejăm datele printr-un sistem de măsuri de securitate organizatorice și tehnice.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">374</context>
+          <context context-type="linenumber">377</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s9.p2" datatype="html">
@@ -5021,7 +5021,7 @@
         <target state="translated">Am implementat măsuri de securitate tehnice și organizatorice adecvate și rezonabile, concepute pentru a proteja securitatea datelor pe care le prelucrăm. Totuși, în ciuda eforturilor noastre, nicio transmisie prin internet și nicio tehnologie de stocare nu pot fi garantate ca fiind 100% sigure, așa că nu putem garanta că infractorii cibernetici sau alți terți neautorizați nu vor putea învinge măsurile noastre de securitate. Deși vom face tot posibilul să îți protejăm datele, transmiterea acestora către și dinspre Servicii se face pe propriul tău risc. Ar trebui să accesezi Serviciile doar într-un mediu securizat.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">376</context>
+          <context context-type="linenumber">379</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s10.h2" datatype="html">
@@ -5029,7 +5029,7 @@
         <target state="translated">10. Colectăm informații de la minori?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">390</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s10.p1" datatype="html">
@@ -5037,7 +5037,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Nu colectăm cu bună știință date de la copii sub 18 ani și nu le adresăm materiale de marketing.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">391</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s10.p2" datatype="html">
@@ -5047,7 +5047,7 @@
           class=&quot;text-brand hover:underline&quot;>"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">391</context>
+          <context context-type="linenumber">394</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.h2" datatype="html">
@@ -5055,7 +5055,7 @@
         <target state="translated">11. Care sunt drepturile tale de confidențialitate?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">403</context>
+          <context context-type="linenumber">406</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p1" datatype="html">
@@ -5063,7 +5063,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>În funcție de statul tău de reședință din SUA sau de regiuni precum SEE, UK, Elveția și Canada, ai drepturi care îți oferă un acces mai mare și un control mai bun asupra datelor tale. Îți poți consulta, modifica sau închide contul oricând.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">404</context>
+          <context context-type="linenumber">407</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p2" datatype="html">
@@ -5071,7 +5071,7 @@
         <target state="translated">În unele regiuni (precum SEE, UK, Elveția și Canada), ai anumite drepturi conform legislației aplicabile: dreptul (i) de a solicita accesul și a obține o copie a datelor tale, (ii) de a solicita rectificarea sau ștergerea, (iii) de a restricționa prelucrarea, (iv) dacă este cazul, la portabilitatea datelor și (v) de a nu face obiectul unei decizii automate. În anumite circumstanțe, poți avea și dreptul de a te opune prelucrării datelor tale. Poți face o astfel de solicitare contactându-ne folosind datele din secțiunea „Cum ne poți contacta cu privire la această notă?" de mai jos.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">409</context>
+          <context context-type="linenumber">412</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p3" datatype="html">
@@ -5079,7 +5079,7 @@
         <target state="translated">Dacă te afli în SEE sau UK și consideri că prelucrăm ilegal datele tale, ai și dreptul de a depune o plângere la autoritatea de supraveghere din statul tău membru. În România, autoritatea competentă este ANSPDCP (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal). Dacă te afli în Elveția, poți contacta Comisarul Federal pentru Protecția Datelor și Informațiilor.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">419</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p4" datatype="html">
@@ -5087,15 +5087,15 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Retragerea consimțământului:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Dacă ne bazăm pe consimțământul tău pentru a prelucra datele, ai dreptul să îl retragi oricând, contactându-ne folosind datele de mai jos. Totuși, acest lucru nu va afecta legalitatea prelucrării de dinainte de retragere și nici prelucrarea realizată pe alte temeiuri legale decât consimțământul.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">423</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p5" datatype="html">
-        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Account information:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> If you would at any time like to review or change the information in your account or terminate your account, you can contact us using the contact information provided. Upon your request to terminate your account, we will deactivate or delete your account and information from our active databases. However, we may retain some information in our files to prevent fraud, troubleshoot problems, assist with any investigations, enforce our legal terms and/or comply with applicable legal requirements.</source>
-        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Informațiile contului:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Dacă dorești oricând să consulți sau să modifici informațiile din contul tău ori să îl închizi, ne poți contacta folosind datele de contact furnizate. La cererea ta de închidere a contului, vom dezactiva sau șterge contul și informațiile din bazele noastre de date active. Totuși, putem păstra anumite informații pentru a preveni frauda, a rezolva probleme, a sprijini investigații, a ne aplica termenii legali și/sau a respecta cerințele legale aplicabile.</target>
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Account information:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> If you would at any time like to review or change the information in your account or terminate your account, you can contact us using the contact information provided. You can also delete your account yourself in the MotionHive mobile app. When you do, we deactivate your account at once and erase your information within 30 days, keeping only the records described in section 8.</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Informațiile contului:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Dacă dorești oricând să consulți sau să modifici informațiile din contul tău ori să îl închizi, ne poți contacta folosind datele de contact furnizate. Îți poți șterge contul și singur, în aplicația mobilă MotionHive. Când faci asta, îți dezactivăm contul imediat și îți ștergem informațiile în cel mult 30 de zile, păstrând doar evidențele descrise în secțiunea 8.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">426</context>
+          <context context-type="linenumber">429</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p6" datatype="html">
@@ -5105,7 +5105,7 @@
           class=&quot;text-brand hover:underline&quot;>"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">432</context>
+          <context context-type="linenumber">434</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s12.h2" datatype="html">
@@ -5113,7 +5113,7 @@
         <target state="translated">12. Controale pentru funcțiile „Do-Not-Track"</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">438</context>
+          <context context-type="linenumber">440</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s12.p1" datatype="html">
@@ -5121,7 +5121,7 @@
         <target state="translated">Majoritatea browserelor web și unele sisteme de operare și aplicații mobile includ o funcție sau setare „Do-Not-Track" („DNT") pe care o poți activa pentru a semnala preferința ta de a nu-ți fi monitorizate și colectate datele despre activitatea de navigare online. În acest stadiu, nu a fost finalizat niciun standard tehnologic uniform pentru recunoașterea și implementarea semnalelor DNT. Prin urmare, nu răspundem în prezent la semnalele DNT ale browserului sau la orice alt mecanism care comunică automat alegerea ta de a nu fi urmărit online. Dacă va fi adoptat un standard pe care va trebui să îl respectăm în viitor, te vom informa despre această practică într-o versiune revizuită a acestei Note.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">439</context>
+          <context context-type="linenumber">441</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.h2" datatype="html">
@@ -5129,7 +5129,7 @@
         <target state="translated">13. Rezidenții din Statele Unite au drepturi specifice de confidențialitate?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">449</context>
+          <context context-type="linenumber">451</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p1" datatype="html">
@@ -5137,7 +5137,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Dacă ești rezident în California, Colorado, Connecticut, Delaware, Florida, Indiana, Iowa, Kentucky, Maryland, Minnesota, Montana, Nebraska, New Hampshire, New Jersey, Oregon, Rhode Island, Tennessee, Texas, Utah sau Virginia, poți avea dreptul de a solicita accesul la datele pe care le deținem despre tine, de a corecta inexactitățile, de a obține o copie sau de a-ți șterge datele.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">451</context>
+          <context context-type="linenumber">453</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.sub1" datatype="html">
@@ -5145,7 +5145,7 @@
         <target state="translated">Categoriile de date cu caracter personal pe care le colectăm</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">456</context>
+          <context context-type="linenumber">458</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p2" datatype="html">
@@ -5153,7 +5153,7 @@
         <target state="translated">Am colectat următoarele categorii de date în ultimele douăsprezece (12) luni:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">457</context>
+          <context context-type="linenumber">459</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li1" datatype="html">
@@ -5161,7 +5161,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>A. Identificatori<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (date de contact, adresă IP, email, nume de cont). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">460</context>
+          <context context-type="linenumber">462</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li2" datatype="html">
@@ -5169,7 +5169,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>B. Informații personale conform statutului privind evidențele clienților din California<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (nume, date de contact, informații financiare). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">462</context>
+          <context context-type="linenumber">464</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li3" datatype="html">
@@ -5177,7 +5177,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>C. Caracteristici de clasificare protejată<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (gen, vârstă, date demografice). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">464</context>
+          <context context-type="linenumber">466</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li4" datatype="html">
@@ -5185,7 +5185,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>D. Informații comerciale<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (tranzacții, istoricul achizițiilor, informații de plată). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">466</context>
+          <context context-type="linenumber">468</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li5" datatype="html">
@@ -5193,7 +5193,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>E. Informații biometrice<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>. Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Nu<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">468</context>
+          <context context-type="linenumber">470</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li6" datatype="html">
@@ -5201,7 +5201,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>F. Activitate în internet sau rețea similară<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (istoric de navigare, utilizare). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">469</context>
+          <context context-type="linenumber">471</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li7" datatype="html">
@@ -5209,7 +5209,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>G. Date de geolocalizare<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (locația dispozitivului). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">471</context>
+          <context context-type="linenumber">473</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li8" datatype="html">
@@ -5217,7 +5217,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>H. Informații audio, electronice, senzoriale sau similare<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (imagini). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">473</context>
+          <context context-type="linenumber">475</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li9" datatype="html">
@@ -5225,7 +5225,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>I. Informații profesionale sau legate de ocupare<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>. Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">475</context>
+          <context context-type="linenumber">477</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li10" datatype="html">
@@ -5233,7 +5233,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>J. Informații despre educație<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>. Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">477</context>
+          <context context-type="linenumber">479</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li11" datatype="html">
@@ -5241,7 +5241,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>K. Concluzii deduse pentru a crea un profil<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>. Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Nu<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">478</context>
+          <context context-type="linenumber">480</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li12" datatype="html">
@@ -5249,15 +5249,15 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>L. Date cu caracter personal sensibile<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> (date de autentificare și date privind sănătatea). Colectăm: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Da<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">480</context>
+          <context context-type="linenumber">482</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p3" datatype="html">
-        <source>We only collect sensitive personal information, as defined by applicable privacy laws, for the purposes allowed by law or with your consent. We do not collect or process sensitive personal information for the purpose of inferring characteristics about you. We retain each category of collected personal information for as long as the user has an account with us.</source>
-        <target state="translated">Colectăm date sensibile, așa cum sunt definite de legislația aplicabilă, doar în scopurile permise de lege sau cu consimțământul tău. Nu colectăm și nu prelucrăm date sensibile în scopul deducerii unor caracteristici despre tine. Păstrăm fiecare categorie de date colectate atât timp cât utilizatorul are un cont la noi.</target>
+        <source>We only collect sensitive personal information, as defined by applicable privacy laws, for the purposes allowed by law or with your consent. We do not collect or process sensitive personal information for the purpose of inferring characteristics about you. We retain each category of collected personal information for as long as the user has an account with us, except the records described in section 8, which the law requires us to keep for longer.</source>
+        <target state="translated">Colectăm date sensibile, așa cum sunt definite de legislația aplicabilă, doar în scopurile permise de lege sau cu consimțământul tău. Nu colectăm și nu prelucrăm date sensibile în scopul deducerii unor caracteristici despre tine. Păstrăm fiecare categorie de date colectate atât timp cât utilizatorul are un cont la noi, cu excepția evidențelor descrise în secțiunea 8, pe care legea ne obligă să le păstrăm mai mult.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">483</context>
+          <context context-type="linenumber">485</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.sub2" datatype="html">
@@ -5265,7 +5265,7 @@
         <target state="translated">Drepturile tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">487</context>
+          <context context-type="linenumber">490</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p4" datatype="html">
@@ -5273,7 +5273,7 @@
         <target state="translated">Ai drepturi conform anumitor legi privind protecția datelor din statele SUA. Acestea includ:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">488</context>
+          <context context-type="linenumber">491</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li13" datatype="html">
@@ -5281,7 +5281,7 @@
         <target state="translated">Dreptul de a ști dacă prelucrăm sau nu datele tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">491</context>
+          <context context-type="linenumber">494</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li14" datatype="html">
@@ -5289,7 +5289,7 @@
         <target state="translated">Dreptul de acces la datele tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">492</context>
+          <context context-type="linenumber">495</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li15" datatype="html">
@@ -5297,7 +5297,7 @@
         <target state="translated">Dreptul de a corecta inexactitățile din datele tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">493</context>
+          <context context-type="linenumber">496</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li16" datatype="html">
@@ -5305,7 +5305,7 @@
         <target state="translated">Dreptul de a solicita ștergerea datelor tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">494</context>
+          <context context-type="linenumber">497</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li17" datatype="html">
@@ -5313,7 +5313,7 @@
         <target state="translated">Dreptul de a obține o copie a datelor pe care ni le-ai furnizat anterior</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">495</context>
+          <context context-type="linenumber">498</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li18" datatype="html">
@@ -5321,7 +5321,7 @@
         <target state="translated">Dreptul la nediscriminare pentru exercitarea drepturilor tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">496</context>
+          <context context-type="linenumber">499</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li19" datatype="html">
@@ -5329,7 +5329,7 @@
         <target state="translated">Dreptul de a renunța la prelucrarea datelor tale dacă este folosită pentru publicitate direcționată, vânzarea datelor sau profilare în vederea unor decizii cu efecte juridice sau similar semnificative</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">497</context>
+          <context context-type="linenumber">500</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.sub3" datatype="html">
@@ -5337,7 +5337,7 @@
         <target state="translated">Cum îți exerciți drepturile</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">501</context>
+          <context context-type="linenumber">504</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p5" datatype="html">
@@ -5347,7 +5347,7 @@
           href=&quot;mailto:privacy@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;>"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> sau folosind datele de contact de la finalul acestui document. Poți renunța la vânzarea datelor tale, la publicitatea direcționată sau la profilare dezactivând cookie-urile în setările de preferințe pentru cookie-uri.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">502</context>
+          <context context-type="linenumber">505</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p6" datatype="html">
@@ -5357,7 +5357,7 @@
           href=&quot;mailto:privacy@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;>"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>. Dacă contestația îți este respinsă, poți depune o plângere la procurorul general al statului tău.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">506</context>
+          <context context-type="linenumber">509</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p7" datatype="html">
@@ -5365,7 +5365,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Legea „Shine the Light" din California.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Secțiunea 1798.83 din Codul civil al Californiei le permite utilizatorilor rezidenți în California să solicite și să obțină de la noi, o dată pe an și gratuit, informații despre categoriile de date pe care le-am divulgat terților în scopuri de marketing direct. Dacă ești rezident în California, transmite-ne solicitarea în scris folosind datele de contact de mai jos.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">510</context>
+          <context context-type="linenumber">513</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s14.h2" datatype="html">
@@ -5373,7 +5373,7 @@
         <target state="translated">14. Actualizăm această notă?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">518</context>
+          <context context-type="linenumber">521</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s14.p1" datatype="html">
@@ -5381,7 +5381,7 @@
         <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Pe scurt:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em>"/>Da, vom actualiza această notă ori de câte ori este necesar pentru a respecta legile relevante.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">519</context>
+          <context context-type="linenumber">522</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s14.p2" datatype="html">
@@ -5389,7 +5389,7 @@
         <target state="translated">Putem actualiza această Notă de confidențialitate periodic. Versiunea actualizată va fi indicată printr-o dată „Revizuit" actualizată în partea de sus a Notei. Dacă vom face modificări semnificative, te putem notifica fie prin afișarea vizibilă a unui anunț, fie printr-o notificare directă. Te încurajăm să consulți frecvent această Notă pentru a fi informat despre modul în care îți protejăm datele.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">521</context>
+          <context context-type="linenumber">524</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.h2" datatype="html">
@@ -5397,7 +5397,7 @@
         <target state="translated">15. Cum ne poți contacta cu privire la această notă?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">529</context>
+          <context context-type="linenumber">532</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.p1" datatype="html">
@@ -5405,7 +5405,7 @@
         <target state="translated">Dacă ai întrebări sau comentarii despre această notă, ne poți scrie prin email sau prin poștă la:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">530</context>
+          <context context-type="linenumber">533</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.email.label" datatype="html">
@@ -5413,7 +5413,7 @@
         <target state="translated">Email:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">536</context>
+          <context context-type="linenumber">539</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.address.label" datatype="html">
@@ -5421,7 +5421,7 @@
         <target state="translated">Adresă:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">544</context>
+          <context context-type="linenumber">547</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.address.value" datatype="html">
@@ -5429,7 +5429,7 @@
         <target state="translated">HIVECRAFT S.R.L., Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58, Cluj-Napoca, Cluj 400482, România</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">545</context>
+          <context context-type="linenumber">548</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s16.h2" datatype="html">
@@ -5437,7 +5437,7 @@
         <target state="translated">16. Cum poți consulta, actualiza sau șterge datele pe care le colectăm despre tine?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">553</context>
+          <context context-type="linenumber">556</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s16.p1" datatype="html">
@@ -5447,7 +5447,7 @@
           class=&quot;text-brand hover:underline&quot;>"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">555</context>
+          <context context-type="linenumber">558</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.footer.also" datatype="html">
@@ -5455,7 +5455,7 @@
         <target state="translated"> Citește și <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/terms-of-service&quot; class=&quot;text-brand hover:underline font-medium&quot;>"/>Termenii și condițiile<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> noastre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">572</context>
+          <context context-type="linenumber">575</context>
         </context-group>
       </trans-unit>
       <trans-unit id="legal.footer.goToHome" datatype="html">
@@ -5467,11 +5467,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">578</context>
+          <context context-type="linenumber">581</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
@@ -5487,11 +5487,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">223</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">582</context>
+          <context context-type="linenumber">585</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
@@ -7650,13 +7650,22 @@
           <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="deleteAccount.s1.p1" datatype="html">
-        <source> Send an email to <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot;
-          class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> from the address you use to sign in, with the subject "Delete my account". </source>
-        <target state="translated">Trimite un email la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot; class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> de pe adresa cu care te autentifici, cu subiectul „Ștergeți contul meu”.</target>
+      <trans-unit id="deleteAccount.s1.app" datatype="html">
+        <source> In the MotionHive mobile app, go to your account and choose Delete account at the bottom. We email you a code to confirm the request is yours, and you confirm it in the app. </source>
+        <target state="translated">În aplicația mobilă MotionHive, intră în contul tău și alege Șterge contul, în partea de jos. Îți trimitem pe email un cod care confirmă că cererea vine de la tine, iar tu o confirmi în aplicație.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">37,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s1.p1" datatype="html">
+        <source> You can also send an email to <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot;
+          class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> from the address you use to sign in, with the subject "Delete my account". </source>
+        <target state="translated">Poți trimite și un email la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot;
+          class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> de pe adresa cu care te autentifici, cu subiectul „Ștergeți contul meu”.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s1.p2" datatype="html">
@@ -7664,7 +7673,7 @@
         <target state="translated">Faptul că scrii de pe propria adresă de autentificare este modul în care confirmăm că cererea este într-adevăr a ta. Dacă te-ai înregistrat cu Google sau Facebook, folosește adresa de email asociată acelui cont. Dacă nu mai ai acces la acea căsuță, scrie-ne oricum și îți vom cere altă modalitate de a dovedi că este contul tău.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s1.p3" datatype="html">
@@ -7672,7 +7681,7 @@
         <target state="translated">Confirmăm prin email când primim cererea și încă o dată după ce ștergerea este făcută. Nu trebuie să dai niciun motiv și nu vom încerca să te convingem să rămâi.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s2.h2" datatype="html">
@@ -7680,15 +7689,23 @@
         <target state="translated">2. Cât durează</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s2.p1" datatype="html">
-        <source> We deactivate your account within 72 hours of confirming your request, so you stop appearing to other people straight away. We then permanently erase your personal information within 30 days. </source>
-        <target state="translated">Dezactivăm contul în 72 de ore de la confirmarea cererii, așa că nu mai apari imediat pentru ceilalți. Apoi ștergem definitiv informațiile tale personale în 30 de zile.</target>
+        <source> If you delete your account in the app, we deactivate it as soon as you confirm. If you write to us, we deactivate it within 72 hours of confirming your request. Either way you stop appearing to other people straight away, and we permanently erase your personal information within 30 days. </source>
+        <target state="translated">Dacă îți ștergi contul din aplicație, îl dezactivăm imediat ce confirmi. Dacă ne scrii, îl dezactivăm în 72 de ore de la confirmarea cererii. În ambele cazuri nu mai apari imediat pentru ceilalți, iar informațiile tale personale sunt șterse definitiv în cel mult 30 de zile.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s2.keep" datatype="html">
+        <source> Until then, you can sign in and keep your account. Subscriptions, bookings and groups that ended when you asked to delete it stay ended. </source>
+        <target state="translated">Până atunci, te poți autentifica și îți poți păstra contul. Abonamentele, rezervările și grupurile încheiate când ai cerut ștergerea rămân încheiate.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">71,75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s2.p2" datatype="html">
@@ -7696,7 +7713,7 @@
         <target state="translated">Copiile de siguranță se păstrează pe un ciclu continuu și sunt suprascrise în 90 de zile. Până când o copie este suprascrisă, informațiile tale pot exista încă în interiorul ei, izolate și nefolosite pentru nimic.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.h2" datatype="html">
@@ -7704,7 +7721,7 @@
         <target state="translated">3. Ce se șterge</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.p1" datatype="html">
@@ -7712,7 +7729,7 @@
         <target state="translated">Tot ce urmează este șters definitiv:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li1" datatype="html">
@@ -7720,7 +7737,7 @@
         <target state="translated">Contul tău: nume, adresă de email, parolă, număr de telefon, oraș și țară, fotografie de profil și numele tău de utilizator.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li2" datatype="html">
@@ -7728,7 +7745,7 @@
         <target state="translated">Orice autentificare Google, Facebook sau Apple asociată contului.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">92</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li3" datatype="html">
@@ -7736,7 +7753,7 @@
         <target state="translated">Profilul tău de antrenor, dacă ai unul: descriere, specializări, experiență, linkuri sociale și locații.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li4" datatype="html">
@@ -7744,7 +7761,7 @@
         <target state="translated">Istoricul tău de antrenamente: antrenamente înregistrate, serii, recorduri personale și orice notițe ai scris.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li5" datatype="html">
@@ -7752,15 +7769,15 @@
         <target state="translated">Programele și rutinele pe care le-ai creat, precum și programele atribuite ție.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li6" datatype="html">
-        <source>Your group memberships, posts and comments, and your session bookings.</source>
-        <target state="translated">Apartenența la grupuri, postările și comentariile tale, și rezervările la sesiuni.</target>
+        <source>Your group memberships.</source>
+        <target state="translated">Apartenența ta la grupuri.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li7" datatype="html">
@@ -7768,7 +7785,7 @@
         <target state="translated">Mesajele tale și relațiile cu antrenori sau clienți.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li8" datatype="html">
@@ -7776,7 +7793,7 @@
         <target state="translated">Datele tale de plată salvate. Acestea sunt păstrate de Stripe, nu de noi, și cerem și companiei Stripe să le șteargă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">89</context>
+          <context context-type="linenumber">100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.h2" datatype="html">
@@ -7784,7 +7801,7 @@
         <target state="translated">4. Ce suntem obligați să păstrăm și pentru cât timp</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.p1" datatype="html">
@@ -7792,7 +7809,7 @@
         <target state="translated">Legea română ne obligă să păstrăm anumite documente chiar și după ce pleci. Păstrăm doar acestea, nu le folosim pentru nimic altceva și sunt șterse la finalul perioadei de mai jos.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.th1" datatype="html">
@@ -7800,7 +7817,7 @@
         <target state="translated">Ce anume</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.th2" datatype="html">
@@ -7808,7 +7825,7 @@
         <target state="translated">Cât timp</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.th3" datatype="html">
@@ -7816,7 +7833,7 @@
         <target state="translated">De ce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r1c1" datatype="html">
@@ -7824,15 +7841,15 @@
         <target state="translated">Facturi și documente de plată, inclusiv numele și suma de pe ele</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r1c2" datatype="html">
-        <source>5 years</source>
-        <target state="translated">5 ani</target>
+        <source>5 years after the end of the financial year</source>
+        <target state="translated">5 ani de la încheierea exercițiului financiar</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r1c3" datatype="html">
@@ -7840,7 +7857,7 @@
         <target state="translated">Legislația contabilă și fiscală din România</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r2c1" datatype="html">
@@ -7848,7 +7865,7 @@
         <target state="translated">O înregistrare a faptului că ți-ai șters contul și când</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r2c2" datatype="html">
@@ -7856,7 +7873,7 @@
         <target state="translated">3 ani</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r2c3" datatype="html">
@@ -7864,7 +7881,7 @@
         <target state="translated">Dovada că ți-am respectat cererea</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r3c1" datatype="html">
@@ -7872,7 +7889,7 @@
         <target state="translated">Documente legate de un litigiu, o contestație de plată sau o acțiune în instanță în curs</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r3c2" datatype="html">
@@ -7880,7 +7897,7 @@
         <target state="translated">Până la soluționare</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r3c3" datatype="html">
@@ -7888,15 +7905,15 @@
         <target state="translated">Susținerea sau soluționarea cauzei</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.p2" datatype="html">
-        <source> Content you posted in a group stays visible to that group, but it is anonymised: your name and photo are removed, so it is no longer linked to you. If you want a specific post or comment removed as well, say so in your email and we will delete it. </source>
-        <target state="translated">Conținutul pe care l-ai publicat într-un grup rămâne vizibil pentru acel grup, însă este anonimizat: numele și fotografia ta sunt eliminate, așa că nu mai este legat de tine. Dacă vrei ca o anumită postare sau un anumit comentariu să fie șterse, spune-ne în email și le ștergem.</target>
+        <source> Content you posted in a group stays visible to that group, but it is anonymised: your name and photo are removed, so it is no longer linked to you. Sessions you booked stay in the coach's records the same way, as a place with no name on it, and the ones still to come are cancelled. If you want a specific post or comment removed as well, tell us and we will delete it. </source>
+        <target state="translated">Conținutul pe care l-ai publicat într-un grup rămâne vizibil pentru acel grup, însă este anonimizat: numele și fotografia ta sunt eliminate, așa că nu mai este legat de tine. Sesiunile pe care le-ai rezervat rămân la fel în evidența antrenorului, ca un loc fără nume, iar cele care urmează sunt anulate. Dacă vrei ca o anumită postare sau un anumit comentariu să fie șterse, spune-ne și le ștergem.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">145</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.h2" datatype="html">
@@ -7904,7 +7921,7 @@
         <target state="translated">5. Ștergerea unei părți din date, păstrând contul</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">153</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.p1" datatype="html">
@@ -7913,7 +7930,7 @@
         <target state="translated">Nu trebuie să îți ștergi tot contul ca să elimini informații. Scrie la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20some%20of%20my%20data&quot; class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> și spune-ne ce vrei să eliminăm. Se aplică același termen de 30 de zile.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">156</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.p2" datatype="html">
@@ -7921,7 +7938,7 @@
         <target state="translated">Cel mai des ni se cere ștergerea istoricului de antrenamente, a postărilor și comentariilor, a mesajelor, a profilului de antrenor păstrând contul, sau a fotografiei de profil. Orice altceva poți numi, ne uităm.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">163</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.p3" datatype="html">
@@ -7929,7 +7946,7 @@
         <target state="translated">Poți de asemenea să modifici sau să elimini singur cea mai mare parte din acestea direct în aplicație, în secțiunea de profil, fără să ne scrii.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s6.h2" datatype="html">
@@ -7937,15 +7954,23 @@
         <target state="translated">6. Cere o copie înainte să pleci</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">175</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s6.p1" datatype="html">
-        <source> Deletion cannot be undone, and we cannot bring your training history back afterwards. If you want to keep it, ask us for a copy of your data in the same email and we will send it to you before anything is deleted. </source>
-        <target state="translated">Ștergerea nu poate fi anulată și nu îți putem recupera istoricul de antrenamente după aceea. Dacă vrei să îl păstrezi, cere-ne o copie a datelor tale în același email și ți-o trimitem înainte să ștergem ceva.</target>
+        <source> Deletion cannot be undone, and we cannot bring your training history back afterwards. If you want to keep it, ask us for a copy of your data before you delete your account, and we will send it to you. </source>
+        <target state="translated">Ștergerea nu poate fi anulată și nu îți putem recupera istoricul de antrenamente după aceea. Dacă vrei să îl păstrezi, cere-ne o copie a datelor tale înainte să îți ștergi contul și ți-o trimitem.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s6.coach" datatype="html">
+        <source> If you coach, download the invoices you need for your accounts first. You have to keep them, and you can no longer open them in MotionHive once your account is erased. You can still ask us for copies. </source>
+        <target state="translated">Dacă ești antrenor, descarcă întâi facturile de care ai nevoie pentru contabilitate. Ești obligat să le păstrezi, iar după ce contul este șters nu le mai poți deschide în MotionHive. Ne poți cere în continuare copii.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">183,186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s7.h2" datatype="html">
@@ -7953,7 +7978,7 @@
         <target state="translated">7. Dacă ceva nu merge bine</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">190</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s7.p1" datatype="html">
@@ -7962,7 +7987,7 @@
         <target state="translated">Dacă nu ți-am răspuns în 30 de zile sau nu ești mulțumit de felul în care ți-am tratat cererea, poți depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal, ANSPDCP, la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://www.dataprotection.ro&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot; class=&quot;text-brand hover:underline&quot;>"/>dataprotection.ro<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s7.p2" datatype="html">
@@ -7970,7 +7995,7 @@
         <target state="translated">Datele noastre de contact: HIVECRAFT S.R.L., Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58, Cluj-Napoca, Cluj 400482, România. Email <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;>"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.footer.also" datatype="html">
@@ -7978,7 +8003,7 @@
         <target state="translated">Citește și <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/privacy-policy&quot; class=&quot;text-brand hover:underline font-medium&quot;>"/>Politica de confidențialitate<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4397178425705775032" datatype="html">

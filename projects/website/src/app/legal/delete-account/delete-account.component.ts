@@ -11,7 +11,7 @@ import { ButtonDirective } from 'primeng/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeleteAccountComponent {
-  readonly lastUpdated = signal(new Date(2026, 9, 6));
+  readonly lastUpdated = signal(new Date(2026, 9, 18));
 
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
