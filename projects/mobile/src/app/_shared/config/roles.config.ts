@@ -1,5 +1,5 @@
 import { NavMode, NavModes, translate } from 'core';
-import { barbellOutline, businessOutline, chevronDown, peopleOutline } from 'ionicons/icons';
+import { barbellOutline, businessOutline, chevronDownOutline, peopleOutline } from 'ionicons/icons';
 
 /** One switchable role, as the pill and the switch-role page render it. */
 export interface RoleOption {
@@ -23,7 +23,7 @@ export interface UpcomingRole {
  * Icons the role surfaces render, in one place so `addIcons()` and the kebab
  * name strings below cannot drift apart — same contract as `TAB_ICONS`.
  */
-export const ROLE_ICONS = { barbellOutline, businessOutline, chevronDown, peopleOutline };
+export const ROLE_ICONS = { barbellOutline, businessOutline, chevronDownOutline, peopleOutline };
 
 /**
  * `NavMode` is the persisted workspace mode; this is how that mode is *named*

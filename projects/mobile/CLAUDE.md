@@ -34,6 +34,7 @@ Topic rules live in [`.claude/rules/`](.claude/rules/) and load when Claude work
 - [`surfaces-and-sheets.md`](.claude/rules/surfaces-and-sheets.md): no outlines on card surfaces, one-surface sheets, `close()` before navigating.
 - [`ionic-gotchas.md`](.claude/rules/ionic-gotchas.md): `ion-item` padding and stacking, field errors, searchbar focus, accessible names on Ionic buttons.
 - [`colour-and-type.md`](.claude/rules/colour-and-type.md): the Tailwind-ramp palette, honey means selection, sentence-case kickers, tokens over literals.
+- [`icons.md`](.claude/rules/icons.md): outline only (and its state-pair exceptions), one stroke weight, the `--mh-icon-*` size scale, hex tile glyphs, optical sizing.
 - [`testing-and-tooling.md`](.claude/rules/testing-and-tooling.md): config-only specs, rebuild core before tests, no local prettier, check UI in both themes.
 
 Add to them when a decision should hold for everyone; keep this file for the structure and token reference.
@@ -58,7 +59,7 @@ Every dimension in this project sits on a **0.125rem grid** (1rem = 16px, so the
 
 **px is banned except for border widths**: `1px` hairlines as a literal, and the two tokens `--mh-ring-width` (2px — focus/danger ring, avatar cutout) and `--mh-spine-width` (3px — left accent spine). `--mh-radius-pill: 999px` is a sentinel, not a dimension. Everything else — spacing, sizes, radii, even `ion-skeleton-text` inline styles in templates — is rem on the grid. (`var(--ion-padding, 16px)` fallbacks mirroring Ionic's own default are tolerated.)
 
-**Never write a `font-size` literal** — always a `--mh-text-*` token (defined in `variables.css`). The scale is sized against iOS and Material, not a 2px grid: 11px is the floor for any text, 15px is body.
+**Never write a `font-size` literal** — always a `--mh-text-*` token (defined in `variables.css`). An icon's `font-size` is its glyph box, so it takes a `--mh-icon-*` token instead (16 / 20 / 24 / 32 / 40 / 48, see `.claude/rules/icons.md`). The scale is sized against iOS and Material, not a 2px grid: 11px is the floor for any text, 15px is body.
 
 | Token | Value | Role |
 |---|---|---|

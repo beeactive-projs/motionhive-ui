@@ -3,7 +3,7 @@
   <ion-note class="mh-note-block">{{ 'exercises.detailsFields.classificationHint' | translate }}</ion-note>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item>
-      <ion-select [label]="'exercises.detailsFields.pattern' | translate" labelPlacement="start"
+      <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.detailsFields.pattern' | translate" labelPlacement="start"
         interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().movementPattern"
         (ionChange)="form().patch({ movementPattern: $event.detail.value })">
         @for (option of patternOptions; track option.value) {
@@ -12,7 +12,7 @@
       </ion-select>
     </ion-item>
     <ion-item>
-      <ion-select [label]="'exercises.detailsFields.mechanic' | translate" labelPlacement="start"
+      <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.detailsFields.mechanic' | translate" labelPlacement="start"
         interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().mechanic"
         (ionChange)="form().patch({ mechanic: $event.detail.value })">
         @for (option of mechanicOptions; track option.value) {
@@ -21,7 +21,7 @@
       </ion-select>
     </ion-item>
     <ion-item>
-      <ion-select [label]="'exercises.detailsFields.force' | translate" labelPlacement="start"
+      <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.detailsFields.force' | translate" labelPlacement="start"
         interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().force"
         (ionChange)="form().patch({ force: $event.detail.value })">
         @for (option of forceOptions; track option.value) {

@@ -9,3 +9,8 @@
 ion-tab-bar {
   --color-selected: var(--mh-color-honey-deep);
 }
+
+/* Material's tab glyph is 22px, off the icon grid. */
+ion-tab-button ion-icon {
+  font-size: var(--mh-icon-lg);
+}

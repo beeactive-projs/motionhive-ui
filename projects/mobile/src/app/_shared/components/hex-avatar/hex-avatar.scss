@@ -60,24 +60,30 @@
   line-height: var(--mh-leading-none);
 }
 
+// The glyph holds about half the tile's width at every size, so a row of
+// tiles reads as one set. Each step is an icon token; xs is the one
+// exception, its 1.5rem tile is too small for the 16px dense glyph.
 ion-icon {
-  font-size: var(--mh-text-xl);
+  font-size: var(--mh-icon-md);
 }
 
-// The glyph tracks the hexagon rather than sitting lost inside a large tile.
 :host([data-size='xs']) ion-icon {
-  font-size: var(--mh-text-sm);
+  font-size: 0.75rem;
 }
 
 :host([data-size='sm']) ion-icon {
-  font-size: var(--mh-text-md);
+  font-size: var(--mh-icon-sm);
+}
+
+:host([data-size='lg']) ion-icon {
+  font-size: var(--mh-icon-lg);
 }
 
 :host([data-size='xl']) ion-icon {
-  font-size: 2.25rem;
+  font-size: var(--mh-icon-2xl);
 }
 
 :host([data-size='2xl']) ion-icon {
-  font-size: 2.75rem;
+  font-size: var(--mh-icon-3xl);
 }
 

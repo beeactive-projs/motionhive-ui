@@ -23,7 +23,7 @@ describe('roles configuration', () => {
     const used = [
       ...ROLE_LIST.map((role) => role.icon),
       ...UPCOMING_ROLES.map((role) => role.icon),
-      'chevron-down',
+      'chevron-down-outline',
     ];
 
     for (const icon of used) {

@@ -12,7 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { checkmark } from 'ionicons/icons';
+import { checkmarkOutline } from 'ionicons/icons';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 
@@ -99,7 +99,7 @@ export class ChoiceSheet {
   readonly initialBreakpoint = computed(() => (this.searchable() ? 0.9 : 0.5));
 
   constructor() {
-    addIcons({ checkmark });
+    addIcons({ checkmarkOutline });
 
     // Every opening starts at the top with an empty search.
     effect(() => {

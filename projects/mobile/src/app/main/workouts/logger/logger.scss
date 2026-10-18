@@ -62,7 +62,7 @@ ion-toolbar.progress {
 .folded .done-mark {
   margin-inline-end: 0.875rem;
   color: var(--ion-color-success-shade);
-  font-size: 2rem;
+  font-size: var(--mh-icon-xl);
 }
 
 .folded h2 {

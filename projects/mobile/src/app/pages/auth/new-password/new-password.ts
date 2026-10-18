@@ -15,7 +15,7 @@ import {
   NavController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmark, sendOutline } from 'ionicons/icons';
+import { checkmarkOutline, sendOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize, timer } from 'rxjs';
 
@@ -86,7 +86,7 @@ export class NewPassword {
   });
 
   constructor() {
-    addIcons({ checkmark, sendOutline });
+    addIcons({ checkmarkOutline, sendOutline });
   }
 
   private save(): void {

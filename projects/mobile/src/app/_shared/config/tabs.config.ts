@@ -9,7 +9,6 @@ import {
   flashOutline,
   homeOutline,
   menuOutline,
-  peopleCircleOutline,
   peopleOutline,
   personAddOutline,
   swapHorizontalOutline,
@@ -31,7 +30,6 @@ export const TAB_ICONS = {
   flashOutline,
   homeOutline,
   menuOutline,
-  peopleCircleOutline,
   peopleOutline,
   personAddOutline,
   swapHorizontalOutline,
@@ -52,7 +50,7 @@ const MESSAGES: TabItem = {
 // taken by this row's coach-mode neighbours.
 const GROUPS: MoreTile = {
   label: 'nav.groups',
-  icon: 'people-circle-outline',
+  icon: 'people-outline',
   iconColor: 'secondary',
   route: '/tabs/groups',
 };

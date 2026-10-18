@@ -32,7 +32,7 @@
         <!-- Kind is a select here, not the create form's grid: the tracking
              promise has already been made, and changing it is a correction. -->
         <ion-item>
-          <ion-select [label]="'exercises.fields.kind' | translate" labelPlacement="start" interface="action-sheet"
+          <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.fields.kind' | translate" labelPlacement="start" interface="action-sheet"
             [value]="form.draft().kind" (ionChange)="form.patch({ kind: $event.detail.value })">
             @for (kind of kinds; track kind) {
             <ion-select-option [value]="kind">{{ kindLabel(kind) }}</ion-select-option>

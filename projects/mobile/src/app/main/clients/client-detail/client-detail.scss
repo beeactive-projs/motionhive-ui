@@ -112,7 +112,7 @@
 .lock {
   align-self: center;
   color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
+  font-size: var(--mh-icon-sm);
 }
 
 /* The note keeps its line breaks, but stops at six of them: a full-length one
@@ -154,7 +154,7 @@
 
 .training ion-icon {
   color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 .training .t-label {
@@ -165,7 +165,7 @@
 
 .training .t-chev {
   color: var(--ion-color-medium);
-  font-size: var(--mh-text-base);
+  font-size: var(--mh-icon-sm);
 }
 
 /* The two relationship verbs at the foot of the page. Semantic hue as ink is

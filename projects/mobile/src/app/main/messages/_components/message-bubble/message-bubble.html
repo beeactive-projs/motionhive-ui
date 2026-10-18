@@ -33,7 +33,7 @@
         <span>{{ timeLabel() }}</span>
         @if (showReceipt() && !isDeleted() && !isPending()) {
           <ion-icon
-            name="checkmark-done"
+            name="checkmark-done-outline"
             [class.read]="isRead()"
             [attr.aria-label]="(isRead() ? 'messages.bubble.read' : 'messages.bubble.sent') | translate"
           />

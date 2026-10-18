@@ -60,7 +60,7 @@ ion-buttons ion-button.cancel {
 
 .stale-bar ion-icon {
   flex: none;
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 .stale-bar span {
@@ -166,7 +166,7 @@ ion-buttons ion-button.cancel {
 }
 
 .post-meta ion-icon {
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 /* Liked: the brand amber, matching web's `severity="primary"` reaction

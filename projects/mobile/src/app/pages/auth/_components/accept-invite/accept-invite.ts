@@ -1,7 +1,7 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { IonButton, IonIcon, IonSpinner, NavController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowForward, checkmark, logOutOutline } from 'ionicons/icons';
+import { arrowForwardOutline, checkmarkOutline, logOutOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 
@@ -52,7 +52,7 @@ export class AcceptInvite {
   protected readonly errorMessage = signal<string | null>(null);
 
   constructor() {
-    addIcons({ arrowForward, checkmark, logOutOutline });
+    addIcons({ arrowForwardOutline, checkmarkOutline, logOutOutline });
   }
 
   protected accept(): void {

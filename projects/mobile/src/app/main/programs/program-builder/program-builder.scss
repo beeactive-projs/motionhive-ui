@@ -102,7 +102,7 @@ ion-item.rest p {
 
 .chevron {
   margin-inline-end: 0.25rem;
-  font-size: 0.875rem;
+  font-size: var(--mh-icon-sm);
   transition: transform 150ms ease;
 }
 

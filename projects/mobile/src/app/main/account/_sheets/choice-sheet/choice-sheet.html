@@ -1,5 +1,7 @@
 <ng-template #search>
   <ion-searchbar
+    searchIcon="search-outline"
+    clearIcon="close-outline"
     inputmode="search"
     [placeholder]="searchPlaceholder()"
     [attr.aria-label]="searchPlaceholder()"
@@ -26,7 +28,7 @@
             }
           </ion-label>
           @if (option.value === selected()) {
-            <ion-icon slot="end" name="checkmark" color="primary" aria-hidden="true" />
+            <ion-icon slot="end" name="checkmark-outline" color="primary" aria-hidden="true" />
           }
         </ion-item>
       }

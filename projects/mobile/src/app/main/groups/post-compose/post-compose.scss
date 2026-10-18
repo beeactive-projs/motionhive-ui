@@ -28,7 +28,7 @@
 
 .review-note ion-icon {
   flex: none;
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 /* The writing surface carries no card chrome: the page is the composer, and
@@ -85,7 +85,7 @@
 }
 
 .drop ion-icon {
-  font-size: var(--mh-text-base);
+  font-size: var(--mh-icon-sm);
 }
 
 .drop:focus-visible {

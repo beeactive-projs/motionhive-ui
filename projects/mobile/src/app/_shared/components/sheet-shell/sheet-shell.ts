@@ -25,7 +25,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { close } from 'ionicons/icons';
+import { closeOutline } from 'ionicons/icons';
 
 /**
  * Put on the `ion-modal` once its enter animation has finished, and taken off
@@ -204,7 +204,7 @@ export class SheetShell {
     !USER_DISMISS_ROLES.includes(role);
 
   constructor() {
-    addIcons({ close });
+    addIcons({ closeOutline });
     // A title that resolves after the sheet is already in the DOM — every
     // `computed()` one here does — has to be pushed onto the dialog by hand.
     effect(() => {

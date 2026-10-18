@@ -1,7 +1,7 @@
 import {
   alertCircleOutline,
   checkmarkDoneOutline,
-  chevronForward,
+  chevronForwardOutline,
   funnelOutline,
   trashOutline,
 } from 'ionicons/icons';
@@ -24,7 +24,7 @@ export const NOTIFICATION_ICONS = {
   ...CATEGORY_ICONS,
   alertCircleOutline,
   checkmarkDoneOutline,
-  chevronForward,
+  chevronForwardOutline,
   funnelOutline,
   trashOutline,
 };

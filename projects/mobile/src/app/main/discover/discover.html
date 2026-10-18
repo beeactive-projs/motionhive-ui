@@ -4,6 +4,8 @@
   <ion-header [translucent]="true">
     <ion-toolbar>
       <ion-searchbar
+        searchIcon="search-outline"
+        clearIcon="close-outline"
         mhAutofocus
         [placeholder]="'discover.search.placeholder' | translate"
         inputmode="search"
@@ -99,7 +101,7 @@
           </button>
         }
         <button type="button" class="rail-item" (click)="openAllCoaches()">
-          <mh-hex-avatar size="lg" icon="arrow-forward" color="medium" tone="wash" />
+          <mh-hex-avatar size="lg" icon="arrow-forward-outline" color="medium" tone="wash" />
           <span class="rail-name muted">{{ 'discover.rail.allCoaches' | translate }}</span>
         </button>
       </div>
@@ -131,7 +133,7 @@
           </button>
         }
         <button type="button" class="rail-item" (click)="openAllGroups()">
-          <mh-hex-avatar size="lg" icon="arrow-forward" color="medium" tone="wash" />
+          <mh-hex-avatar size="lg" icon="arrow-forward-outline" color="medium" tone="wash" />
           <span class="rail-name muted">{{ 'discover.groupsRail.all' | translate }}</span>
         </button>
       </div>

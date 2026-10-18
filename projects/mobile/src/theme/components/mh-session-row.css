@@ -103,7 +103,7 @@ ion-item.mh-session-row .tags {
 ion-item.mh-session-row .tags .online {
   flex: none;
   color: var(--ion-color-teal);
-  font-size: var(--mh-text-sm);
+  font-size: var(--mh-icon-sm);
 }
 
 ion-item.mh-session-row .tags ion-note {

@@ -3,7 +3,7 @@
        rows do not fit above the fold on a phone. Same as the inbox. -->
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-searchbar mhAutofocus [placeholder]="'sessions.agenda.search' | translate" inputmode="search" [debounce]="0"
+    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'sessions.agenda.search' | translate" inputmode="search" [debounce]="0"
       [value]="query()" (ionInput)="query.set($event.detail.value ?? '')" />
     <ion-buttons slot="end">
       <ion-button (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
@@ -36,7 +36,7 @@
 
     <!-- <div class="controls">
       <ion-button aria-label="Back to agenda" (click)="showAgenda()">
-        <ion-icon slot="icon-only" name="chevron-back" />
+        <ion-icon slot="icon-only" name="chevron-back-outline" />
       </ion-button>
       <ion-title size="small">{{ selectedDayLabel() }}</ion-title>
       <ion-segment class="view" [value]="view()" (ionChange)="setView($event.detail.value)">
@@ -47,7 +47,7 @@
 
     <ion-buttons slot="start">
       <ion-button [attr.aria-label]="'sessions.agenda.backToAgenda' | translate" (click)="showAgenda()">
-        <ion-icon slot="icon-only" name="chevron-back" />
+        <ion-icon slot="icon-only" name="chevron-back-outline" />
       </ion-button>
     </ion-buttons>
     <ion-title size="small">{{ selectedDayLabel() }}</ion-title>
@@ -88,7 +88,7 @@
     <div class="controls">
       <button type="button" class="month" (click)="openMonth()">
         {{ monthLabel() }}
-        <ion-icon name="chevron-down" aria-hidden="true" />
+        <ion-icon name="chevron-down-outline" aria-hidden="true" />
       </button>
       <button type="button" class="today" (click)="goToday()">{{ 'time.today' | translate }}</button>
       <ion-segment class="view" [value]="view()" (ionChange)="setView($event.detail.value)">

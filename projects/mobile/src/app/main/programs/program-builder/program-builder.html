@@ -6,7 +6,7 @@
     <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="end">
       <ion-button [attr.aria-label]="'programs.settings.title' | translate" (click)="openSettings()">
-        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+        <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -84,7 +84,7 @@
             >
               <ion-icon
                 slot="start"
-                name="chevron-forward"
+                name="chevron-forward-outline"
                 class="chevron"
                 [class.open]="isWeekOpen(week.index)"
                 aria-hidden="true"

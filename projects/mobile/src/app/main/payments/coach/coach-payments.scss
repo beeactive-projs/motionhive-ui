@@ -79,24 +79,7 @@
 }
 
 .gate .tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.25rem;
-  height: 3.65rem;
   margin-bottom: 1rem;
-  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-  background: var(--ion-color-medium-wash);
-  color: var(--ion-color-medium-wash-contrast);
-}
-
-.gate.amber .tile {
-  background: var(--ion-color-warning-wash);
-  color: var(--ion-color-warning-wash-contrast);
-}
-
-.gate .tile ion-icon {
-  font-size: 1.5rem;
 }
 
 .gate h2 {

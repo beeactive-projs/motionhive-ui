@@ -69,7 +69,7 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
   {
     id: ClientActionIds.ViewProfile,
     label: 'clients.actions.viewProfile',
-    icon: 'person-circle-outline',
+    icon: 'person-outline',
     color: 'medium',
   },
   {

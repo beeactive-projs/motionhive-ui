@@ -7,7 +7,7 @@
          box is a request per term now, not a filter over loaded rows.
          Named, because a searchbar with only a placeholder announces itself
          as Ionic's default "search text". -->
-    <ion-searchbar mhAutofocus [placeholder]="'clients.list.search' | translate"
+    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'clients.list.search' | translate"
       [attr.aria-label]="'clients.list.search' | translate"
       inputmode="search" [debounce]="300" [value]="store.query()"
       (ionInput)="onQuery($event.detail.value ?? '')" />

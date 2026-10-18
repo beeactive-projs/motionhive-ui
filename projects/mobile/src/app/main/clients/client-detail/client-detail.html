@@ -9,7 +9,7 @@
     @if (store.client()) {
       <ion-buttons slot="end">
         <ion-button [attr.aria-label]="'clients.actionsSheet.title' | translate" (click)="openActions()">
-          <ion-icon slot="icon-only" name="ellipsis-vertical" />
+          <ion-icon slot="icon-only" name="ellipsis-vertical-outline" />
         </ion-button>
       </ion-buttons>
     }
@@ -62,7 +62,7 @@
                same profile a group member or a chat partner would open. -->
           <ion-button class="profile-link" fill="clear" size="small" (click)="openProfile()">
             {{ 'clients.detail.viewProfile' | translate }}
-            <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
+            <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
           </ion-button>
         }
         <div class="hero-badges">
@@ -158,7 +158,7 @@
                 (pastPlansOpen() ? 'clients.detail.plans.hidePast' : 'clients.detail.plans.showPast')
                   | translate: { count: store.pastPlans().length }
               }}
-              <ion-icon slot="end" [name]="pastPlansOpen() ? 'chevron-up' : 'chevron-down'" aria-hidden="true" />
+              <ion-icon slot="end" [name]="pastPlansOpen() ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true" />
             </ion-button>
             @if (pastPlansOpen()) {
               @for (plan of store.pastPlans(); track plan.id) {
@@ -237,14 +237,14 @@
         <button class="training" type="button" (click)="openTraining()">
           <ion-icon name="barbell-outline" aria-hidden="true" />
           <span class="t-label">{{ 'clients.detail.trainingLink' | translate }}</span>
-          <ion-icon class="t-chev" name="chevron-forward" aria-hidden="true" />
+          <ion-icon class="t-chev" name="chevron-forward-outline" aria-hidden="true" />
         </button>
         <!-- Their numbers and records over twelve weeks: the trainee's own
              Progress screen, read from what they let this coach see. -->
         <button class="training" type="button" (click)="openProgress()">
           <ion-icon name="trending-up-outline" aria-hidden="true" />
           <span class="t-label">{{ 'clients.detail.progressLink' | translate }}</span>
-          <ion-icon class="t-chev" name="chevron-forward" aria-hidden="true" />
+          <ion-icon class="t-chev" name="chevron-forward-outline" aria-hidden="true" />
         </button>
       </section>
 

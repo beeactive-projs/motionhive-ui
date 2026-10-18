@@ -76,7 +76,7 @@
   </ion-modal>
 
   <ion-item lines="none" class="field">
-    <ion-select [label]="'form.label.timezone' | translate" interface="modal"
+    <ion-select toggleIcon="chevron-down-outline" [label]="'form.label.timezone' | translate" interface="modal"
       [attr.aria-label]="'form.label.timezone' | translate" [value]="timezone()"
       (ionChange)="timezone.set($event.detail.value)">
       @for (option of timezones; track option.value) {
@@ -174,7 +174,7 @@
   <p class="mh-helper">{{ 'sessions.form.meetingLinkHint' | translate }}</p>
   } @else if (venues().length > 0) {
   <ion-item lines="none" class="field">
-    <ion-select [label]="'sessions.form.venue' | translate" interface="action-sheet"
+    <ion-select toggleIcon="chevron-down-outline" [label]="'sessions.form.venue' | translate" interface="action-sheet"
       [placeholder]="'sessions.form.noVenue' | translate" [value]="venueId()"
       (ionChange)="venueId.set($event.detail.value)">
       <ion-select-option [value]="null">{{ 'sessions.form.noVenue' | translate }}</ion-select-option>
@@ -200,7 +200,7 @@
   @if (needsGroup()) {
   @if (groups().length > 0) {
   <ion-item lines="none" class="field">
-    <ion-select [label]="'sessions.form.group' | translate" interface="action-sheet"
+    <ion-select toggleIcon="chevron-down-outline" [label]="'sessions.form.group' | translate" interface="action-sheet"
       [placeholder]="'sessions.form.groupPlaceholder' | translate" [value]="groupId()"
       (ionChange)="groupId.set($event.detail.value)">
       @for (group of groups(); track group.id) {
@@ -239,7 +239,7 @@
       <ion-input fill="outline" type="number" inputmode="decimal" placeholder="0"
         [attr.aria-label]="'form.label.price' | translate" [value]="priceAmount()"
         (ionInput)="priceAmount.set(toNumber($event.detail.value))">
-        <ion-select slot="end" class="currency" interface="action-sheet"
+        <ion-select toggleIcon="chevron-down-outline" slot="end" class="currency" interface="action-sheet"
           [attr.aria-label]="'form.label.currency' | translate" [value]="priceCurrency()"
           (ionChange)="priceCurrency.set($event.detail.value)">
           @for (currency of currencies; track currency) {

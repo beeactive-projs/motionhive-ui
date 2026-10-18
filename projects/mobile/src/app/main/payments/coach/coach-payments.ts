@@ -43,6 +43,7 @@ import {
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { InvoiceRow } from '../_components/invoice-row/invoice-row';
 import {
@@ -73,6 +74,7 @@ const PAGE_SIZE = 20;
   imports: [
     CurrencyRonPipe,
     EmptyState,
+    HexAvatar,
     InvoiceRow,
     IonBackButton,
     IonButton,

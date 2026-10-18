@@ -47,6 +47,8 @@
       }
       @if (showProgramSearch()) {
         <ion-searchbar
+          searchIcon="search-outline"
+          clearIcon="close-outline"
           class="program-search"
           [placeholder]="'programs.assign.searchPrograms' | translate"
           [value]="programQuery()"

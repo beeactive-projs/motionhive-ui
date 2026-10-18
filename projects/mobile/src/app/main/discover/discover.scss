@@ -60,7 +60,7 @@
 
 .search-entry ion-icon {
   margin-inline-end: 0.5rem;
-  font-size: var(--mh-text-md);
+  font-size: var(--mh-icon-sm);
 }
 
 /* ── "Taking new clients" rail ──────────────────────────────────────── */
@@ -165,7 +165,7 @@
 
 .search-hint ion-icon {
   color: var(--ion-color-medium);
-  font-size: 1.875rem;
+  font-size: var(--mh-icon-xl);
 }
 
 .search-hint p {

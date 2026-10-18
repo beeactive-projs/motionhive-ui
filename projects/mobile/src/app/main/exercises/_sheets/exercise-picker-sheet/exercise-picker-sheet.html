@@ -1,5 +1,5 @@
 <ng-template #sticky>
-  <ion-searchbar mhAutofocus [placeholder]="'exercises.library.search' | translate" inputmode="search"
+  <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'exercises.library.search' | translate" inputmode="search"
     [debounce]="0"
     [value]="query()" (ionInput)="onQuery($any($event).detail.value ?? '')" />
 </ng-template>
