@@ -8086,6 +8086,30 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="feat.profile.menuBlurb" datatype="html">
+        <source>Your bookable coaching page</source>
+        <target state="translated">Pagina ta publică, cu rezervări</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.exercises.menuBlurb" datatype="html">
+        <source>Your library, with clips</source>
+        <target state="translated">Biblioteca ta, cu clipuri</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.messaging.menuBlurb" datatype="html">
+        <source>One-to-one with your clients</source>
+        <target state="translated">Unu la unu cu clienții tăi</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>
