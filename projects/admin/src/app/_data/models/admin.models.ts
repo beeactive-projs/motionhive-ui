@@ -48,6 +48,13 @@ export interface AdminUserDetail extends AdminUserListItem {
     deviceInfo: string | null;
     ipAddress: string | null;
   } | null;
+  /** An account deletion under way or done, so nobody acts on a request twice. */
+  deletion: {
+    status: 'SCHEDULED' | 'ERASED';
+    requestedAt: string | null;
+    scheduledFor: string | null;
+    erasedAt: string | null;
+  } | null;
 }
 
 export interface AdminUserActivity {

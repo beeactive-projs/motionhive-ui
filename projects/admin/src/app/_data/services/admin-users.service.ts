@@ -61,6 +61,13 @@ export class AdminUsersService {
     return this._http.post<AdminUserDetail>(`${this._baseUrl}/${id}/restore`, {});
   }
 
+  /** Act on a deletion request emailed from the account's sign-in address. */
+  scheduleDeletion(id: string, requestEmail: string): Observable<AdminUserDetail> {
+    return this._http.post<AdminUserDetail>(`${this._baseUrl}/${id}/deletion`, {
+      requestEmail,
+    });
+  }
+
   resendVerification(id: string): Observable<{ sent: boolean }> {
     return this._http.post<{ sent: boolean }>(
       `${this._baseUrl}/${id}/resend-verification`,

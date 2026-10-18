@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -14,7 +15,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
-import { AuthStore, WEB_APP_URL, showApiError } from 'core';
+import {
+  AuthStore,
+  WEB_APP_URL,
+  countryFlagEmoji,
+  countryNameFromCode,
+  showApiError,
+} from 'core';
 import { AdminUsersService } from '../../_data/services/admin-users.service';
 import { AdminImpersonationService } from '../../_data/services/admin-impersonation.service';
 import {
@@ -49,6 +56,9 @@ export class Users {
   private readonly _messages = inject(MessageService);
 
   readonly isSuperAdmin = this._authStore.isSuperAdmin;
+  readonly canDeleteAccounts = computed(
+    () => this._authStore.isAdmin() || this._authStore.isSuperAdmin(),
+  );
   readonly roleOptions = ALL_ROLES.map((r) => ({ label: r, value: r }));
   readonly assignableRoles = ALL_ROLES;
 
@@ -72,6 +82,16 @@ export class Users {
   readonly activity = signal<AdminUserActivity | null>(null);
   impersonateReason = '';
   roleToAssign: string | null = null;
+  deletionEmail = '';
+
+  /** "Cluj-Napoca, Romania", or whichever half the person gave. */
+  location(u: AdminUserListItem): string {
+    return [u.city, countryNameFromCode(u.countryCode)].filter(Boolean).join(', ');
+  }
+
+  flag(u: AdminUserListItem): string {
+    return countryFlagEmoji(u.countryCode);
+  }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
     const first = event.first ?? 0;
@@ -115,6 +135,7 @@ export class Users {
     this.activity.set(null);
     this.impersonateReason = '';
     this.roleToAssign = null;
+    this.deletionEmail = '';
     this.detailLoading.set(true);
     this._users.get(id).subscribe({
       next: (d) => {
@@ -169,6 +190,21 @@ export class Users {
       next: () => this.toast('Verification email sent', `Sent to ${d.email}.`),
       error: (err) =>
         showApiError(this._messages, 'Resend', 'Failed to resend verification', err),
+    });
+  }
+
+  scheduleDeletion(): void {
+    const d = this.detail();
+    const requestEmail = this.deletionEmail.trim();
+    if (!d || !requestEmail) return;
+    this._users.scheduleDeletion(d.id, requestEmail).subscribe({
+      next: (updated) => {
+        this.detail.set(updated);
+        this.syncRow(updated);
+        this.deletionEmail = '';
+        this.toast('Deletion scheduled', `${updated.email} is deactivated and will be erased within 30 days.`);
+      },
+      error: (err) => showApiError(this._messages, 'Delete account', 'Failed to delete account', err),
     });
   }
 
