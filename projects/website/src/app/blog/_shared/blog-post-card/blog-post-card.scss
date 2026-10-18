@@ -119,3 +119,24 @@
     color: var(--p-surface-50);
   }
 }
+
+/* No cover: a branded navy tile with the category, rather than a grey gap. */
+.post-card__media--none {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      var(--mh-color-navy, #1e3a5f),
+      color-mix(in oklab, var(--mh-color-navy, #1e3a5f) 80%, black)
+    );
+}
+
+.post-card__fallback {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--p-primary-400, #fbbf24) 90%, white);
+}

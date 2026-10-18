@@ -1,0 +1,170 @@
+:host {
+  display: block;
+}
+
+/* The row bleeds past the page margins so a half-cut tab at the edge says
+   "this scrolls" without needing an arrow or a hint. */
+.fs__tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  margin: 0 -1.25rem;
+  padding: 0.25rem 1.25rem 0.75rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.fs__tab {
+  flex: 0 0 4.75rem;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.25rem;
+  border: 1px solid color-mix(in oklab, var(--p-surface-900) 12%, transparent);
+  border-radius: 0.875rem;
+  background: var(--p-surface-0, #fff);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &.is-active {
+    border-color: var(--p-primary-500);
+    background: color-mix(in oklab, var(--p-primary-500) 10%, transparent);
+  }
+}
+
+.fs__tab-ic {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.fs__tab-name {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--p-surface-700);
+
+  .fs__tab.is-active & {
+    color: var(--p-surface-900);
+  }
+}
+
+.fs__panel {
+  margin-top: 0.25rem;
+}
+
+/* 16:10 keeps the crop tall enough to show a list but short enough that the
+   copy under it stays above the fold on a small phone. */
+.fs__clip {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--p-surface-100);
+  border: 1px solid color-mix(in oklab, var(--p-surface-900) 10%, transparent);
+}
+
+.fs__shot {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  animation: fs-fade 0.15s ease;
+}
+
+@keyframes fs-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs__shot {
+    animation: none;
+  }
+}
+
+.fs__count {
+  position: absolute;
+  right: 0.625rem;
+  bottom: 0.625rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--p-surface-950, #0f172a) 72%, transparent);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.fs__name {
+  margin: 0.875rem 0 0.25rem;
+  font-family: var(--font-heading, inherit);
+  font-size: 1.1875rem;
+  font-weight: 800;
+  color: var(--p-surface-900);
+}
+
+.fs__line {
+  margin: 0 0 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--p-surface-600);
+}
+
+.fs__link,
+.fs__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--mh-color-honey-deep, var(--p-primary-600));
+  text-decoration: none;
+
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+.fs__all {
+  margin-top: 1.25rem;
+}
+
+:host-context(.dark) {
+  .fs__tab {
+    background: color-mix(in oklab, white 4%, transparent);
+    border-color: color-mix(in oklab, white 14%, transparent);
+  }
+
+  .fs__tab-name {
+    color: var(--p-surface-300);
+  }
+
+  .fs__tab.is-active .fs__tab-name,
+  .fs__name {
+    color: var(--p-surface-50);
+  }
+
+  .fs__clip {
+    background: color-mix(in oklab, white 6%, transparent);
+    border-color: color-mix(in oklab, white 14%, transparent);
+  }
+
+  .fs__line {
+    color: var(--p-surface-400);
+  }
+}

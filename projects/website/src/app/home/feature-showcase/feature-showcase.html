@@ -1,0 +1,42 @@
+<!-- Bleeds to the screen edge so the row reads as scrollable without a hint. -->
+<div class="fs__tabs" role="tablist" aria-label="Features" i18n-aria-label="@@home.fs.tabs">
+  @for (f of features(); track f.slug; let i = $index) {
+    <button
+      type="button"
+      role="tab"
+      class="fs__tab"
+      [class.is-active]="active() === i"
+      [attr.aria-selected]="active() === i"
+      [attr.aria-controls]="'fs-panel'"
+      (click)="select(i)"
+    >
+      <span class="fs__tab-ic" aria-hidden="true">{{ f.icon }}</span>
+      <span class="fs__tab-name">{{ f.name }}</span>
+    </button>
+  }
+</div>
+
+@if (current(); as f) {
+  <div class="fs__panel" id="fs-panel" role="tabpanel">
+    <div class="fs__clip">
+      <!-- Keyed on the slug so swapping features restarts the fade and the
+           browser treats it as a new image rather than a src change. -->
+      @for (shot of [f.slug]; track shot) {
+        <img class="fs__shot" [src]="shotFor(f.slug)" [alt]="f.name" loading="lazy" decoding="async" />
+      }
+      <span class="fs__count">{{ position() }}</span>
+    </div>
+
+    <h3 class="fs__name">{{ f.name }}</h3>
+    <p class="fs__line">{{ f.oneLiner }}</p>
+    <a class="fs__link" [routerLink]="['/features', f.slug]">
+      <span i18n="@@home.fs.how">See how it works</span>
+      <i class="pi pi-arrow-right" aria-hidden="true"></i>
+    </a>
+  </div>
+}
+
+<a class="fs__all" routerLink="/features">
+  <span i18n="@@home.fs.all">See all features</span>
+  <i class="pi pi-arrow-right" aria-hidden="true"></i>
+</a>

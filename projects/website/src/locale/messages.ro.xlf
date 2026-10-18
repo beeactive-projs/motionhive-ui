@@ -8014,6 +8014,46 @@
           <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="home.hero.h1m" datatype="html">
+        <source>All your coaching in one app. <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>Free.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+        <target state="translated">Tot coaching-ul tău într-o singură aplicație. <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>Gratuit.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.fs.how" datatype="html">
+        <source>See how it works</source>
+        <target state="translated">Vezi cum funcționează</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/feature-showcase/feature-showcase.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.fs.all" datatype="html">
+        <source>See all features</source>
+        <target state="translated">Vezi toate funcționalitățile</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/feature-showcase/feature-showcase.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.fs.tabs" datatype="html">
+        <source>Features</source>
+        <target state="translated">Funcționalități</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/feature-showcase/feature-showcase.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.pt.who" datatype="html">
+        <source>Who you are</source>
+        <target state="translated">Cine ești</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/path-toggle/path-toggle.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

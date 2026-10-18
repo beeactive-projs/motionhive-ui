@@ -27,6 +27,8 @@ import { FeatureCard } from '../_shared/ui/feature-card/feature-card';
 import { Stat } from '../_shared/ui/stat/stat';
 import { BlogPostCard } from '../blog/_shared/blog-post-card/blog-post-card';
 import { StickyCta } from '../_shared/sticky-cta/sticky-cta';
+import { FeatureShowcase } from './feature-showcase/feature-showcase';
+import { PathToggle } from './path-toggle/path-toggle';
 
 /**
  * Hero cluster hex — the pre-redesign diamond of 4 (top / two middle /
@@ -68,6 +70,8 @@ interface CommunityCard {
     Stat,
     BlogPostCard,
     StickyCta,
+    FeatureShowcase,
+    PathToggle,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',

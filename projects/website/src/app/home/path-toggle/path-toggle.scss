@@ -1,0 +1,79 @@
+:host {
+  display: block;
+}
+
+.pt__seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--p-surface-900) 6%, transparent);
+}
+
+.pt__seg-btn {
+  min-height: 2.875rem;
+  border: 0;
+  border-radius: 0.6875rem;
+  background: transparent;
+  font-family: var(--font-heading, inherit);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--p-surface-600);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &.is-active {
+    background: var(--p-surface-0, #fff);
+    color: var(--p-surface-900);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+  }
+}
+
+.pt__panel {
+  /* One row ≈ 2.25rem of list plus the hex head and its margin. */
+  min-height: calc(var(--pt-rows, 4) * 2.25rem + 4.5rem);
+  margin-top: 1rem;
+  animation: pt-fade 0.15s ease;
+}
+
+.pt__head {
+  margin-bottom: 0.875rem;
+}
+
+.pt__ic {
+  font-size: 1.125rem;
+}
+
+@keyframes pt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt__panel {
+    animation: none;
+  }
+}
+
+:host-context(.dark) {
+  .pt__seg {
+    background: color-mix(in oklab, white 7%, transparent);
+  }
+
+  .pt__seg-btn {
+    color: var(--p-surface-400);
+
+    &.is-active {
+      background: color-mix(in oklab, white 12%, transparent);
+      color: var(--p-surface-50);
+    }
+  }
+}

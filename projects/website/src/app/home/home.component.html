@@ -3,8 +3,13 @@
   <div class="mh-wrap hero__grid">
     <div class="hero__copy">
       <mh-kicker tone="teal" i18n="@@home.hero.kicker">For coaches and the communities they build</mh-kicker>
-      <h1 class="hero__h1" i18n="@@home.hero.h1">
+      <h1 class="hero__h1 u-desk" i18n="@@home.hero.h1">
         Where coaches build <span class="text-brand">communities.</span>
+      </h1>
+      <!-- Phones get the plainer promise: what it is and that it costs
+           nothing, before anything else competes for the first screen. -->
+      <h1 class="hero__h1 u-mob" i18n="@@home.hero.h1m">
+        All your coaching in one app. <span class="text-brand">Free.</span>
       </h1>
       <p class="hero__sub" i18n="@@home.hero.sub">
         Run your whole coaching business in one place: a bookable profile, sessions, programs,
@@ -13,7 +18,8 @@
       <div class="hero__cta">
         <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.hero.cta1">Create your free
           account</a>
-        <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/features" i18n="@@home.hero.cta2">How it works</a>
+        <a class="mh-btn mh-btn--ghost mh-btn--lg u-desk" routerLink="/features" i18n="@@home.hero.cta2">How it works</a>
+        <a class="hero__textlink u-mob" routerLink="/features" i18n="@@home.hero.cta2">How it works</a>
       </div>
       <mh-check-list class="hero__guar" [items]="guarantees" tone="amber" />
     </div>
@@ -28,7 +34,7 @@
         </clipPath>
       </defs>
     </svg>
-    <div class="hero__art" aria-hidden="true">
+    <div class="hero__art u-desk" aria-hidden="true">
       @for (h of heroHexes; track h.label) {
       <div [class]="'hero-hex hero-hex-' + h.pos" [style.--hh]="h.color">
         <div class="hero-hex-inner">
@@ -62,7 +68,7 @@
 </section>
 
 <!-- ===== Proof strip ===== -->
-<section class="proof">
+<section class="proof u-desk">
   <div class="mh-wrap proof__row">
     @for (f of features; track f.slug) {
     <span class="chip">
@@ -75,7 +81,7 @@
 </section>
 
 <!-- ===== Two paths ===== -->
-<section class="mh-band">
+<section class="mh-band s-paths">
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.paths.kicker">Built for coaches. Loved by their people.</mh-kicker>
@@ -84,7 +90,10 @@
         in one place.</ng-container>
     </mh-section-header>
 
-    <div class="paths">
+    <!-- Phones pick a side; desktop has room for both at once. -->
+    <mh-path-toggle class="u-mob" [paths]="paths" />
+
+    <div class="paths u-desk">
       @for (p of paths; track p.title) {
       <div class="mh-card path">
         <div class="path__head">
@@ -99,19 +108,23 @@
 </section>
 
 <!-- ===== See it work ===== -->
-<section class="mh-band seeit">
+<section class="mh-band seeit s-features">
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.see.kicker">See it work</mh-kicker>
       <ng-container heading i18n="@@home.see.h">All your coaching, together.</ng-container>
     </mh-section-header>
 
-    <div class="seeit__demo">
+    <!-- Phones: one swipeable row of all eight, tap to open. Replaces the
+         shrunk desktop clip and the nine stacked cards under it. -->
+    <mh-feature-showcase class="u-mob" [features]="features" />
+
+    <div class="seeit__demo u-desk">
       <mh-media-demo src="/videos/home.en.mp4" poster="/videos/home.en.jpg" caption="A day in MotionHive"
         i18n-caption="@@home.see.cap" />
     </div>
 
-    <div class="fgrid">
+    <div class="fgrid u-desk">
       @for (f of features; track f.slug) {
       <mh-feature-card [feature]="f" />
       }
@@ -131,7 +144,8 @@
 </section>
 
 <!-- ===== Free story (dark band) ===== -->
-<section class="mh-band">
+<!-- Third on phones: the strongest argument lands before the feature tour. -->
+<section class="mh-band s-free">
   <div class="mh-wrap">
     <div class="free dark">
       <mh-kicker tone="amber" i18n="@@home.free.kicker">Building in the open</mh-kicker>
@@ -142,7 +156,7 @@
       <div class="free__stats">
         <mh-stat value="∞" label="clients" [onDark]="true" i18n-label="@@home.free.s1" />
         <mh-stat value="0" label="subscriptions" [onDark]="true" i18n-label="@@home.free.s2" />
-        <mh-stat value="$0" label="to start" [onDark]="true" i18n-label="@@home.free.s3" />
+        <mh-stat value="0 lei" label="to start" [onDark]="true" i18n-label="@@home.free.s3" />
       </div>
       <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.free.cta">Create your free
         account</a>
@@ -151,14 +165,14 @@
 </section>
 
 <!-- ===== Community ===== -->
-<section class="mh-band">
+<section class="mh-band s-community">
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker tone="teal" i18n="@@home.comm.kicker">Community</mh-kicker>
       <ng-container heading i18n="@@home.comm.h">Your people, in one room.</ng-container>
     </mh-section-header>
 
-    <div class="cgrid">
+    <div class="cgrid cgrid--rows">
       @for (c of community; track c.title) {
       <div class="mh-card ccard">
         <div class="ccard__head">
@@ -174,13 +188,13 @@
 
 <!-- ===== Blog teaser ===== -->
 @if (latestPosts().length) {
-<section class="mh-band">
+<section class="mh-band s-blog">
   <div class="mh-wrap">
     <mh-section-header>
       <mh-kicker kicker i18n="@@home.blog.kicker">From the blog</mh-kicker>
       <ng-container heading i18n="@@home.blog.h">Stories from the hive.</ng-container>
     </mh-section-header>
-    <div class="bgrid">
+    <div class="bgrid bgrid--snap">
       @for (p of latestPosts(); track p.id) {
       <mh-blog-post-card [post]="p" variant="grid" />
       }

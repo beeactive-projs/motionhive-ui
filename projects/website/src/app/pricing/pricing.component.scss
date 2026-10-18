@@ -224,3 +224,41 @@
     color: var(--p-primary-400);
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Phones: the plan banner follows the homepage spec — left aligned, one
+   full-width button, tighter rhythm. Centred text under a left-aligned page
+   read as a different page, and the eight-row checklist pushed the CTA off
+   the first screen.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 47.5rem) {
+  .plan {
+    text-align: left;
+    padding: 1.25rem 1.125rem 1.375rem;
+  }
+
+  .plan__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .plan__amt {
+    font-size: 2.75rem;
+    line-height: 1;
+  }
+
+  .plan__per {
+    font-size: 0.9375rem;
+  }
+
+  .plan .mh-btn {
+    width: 100%;
+    min-height: 3.125rem;
+  }
+
+  .plan__note {
+    text-align: left;
+  }
+}
