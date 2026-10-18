@@ -8054,6 +8054,38 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="home.fs.prev" datatype="html">
+        <source>Previous feature</source>
+        <target state="translated">Funcționalitatea anterioară</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/feature-showcase/feature-showcase.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.fs.next" datatype="html">
+        <source>Next feature</source>
+        <target state="translated">Funcționalitatea următoare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/feature-showcase/feature-showcase.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.blog.prev" datatype="html">
+        <source>Previous articles</source>
+        <target state="translated">Articolele anterioare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.blog.next" datatype="html">
+        <source>Next articles</source>
+        <target state="translated">Articolele următoare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>
