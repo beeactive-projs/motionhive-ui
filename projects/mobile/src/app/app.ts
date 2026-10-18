@@ -3,6 +3,8 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { App as CapacitorApp } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { AuthService } from 'core';
+import { addIcons } from 'ionicons';
+import { arrowBackOutline, chevronDownOutline, closeOutline, searchOutline } from 'ionicons/icons';
 
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { ThemeService } from './_shared/services/theme.service';
@@ -38,6 +40,11 @@ export class App {
   private readonly _pushRegistration = inject(PushRegistrationService);
 
   constructor() {
+    // The outline replacements for Ionic's built-in sharp glyphs, named by
+    // string in app.config.ts (back button) and on every ion-searchbar and
+    // ion-select (searchIcon, clearIcon, toggleIcon), so no page owns them.
+    addIcons({ arrowBackOutline, chevronDownOutline, closeOutline, searchOutline });
+
     // launchAutoHide is off in capacitor.config.ts — hide once the UI has rendered.
     afterNextRender(() => void SplashScreen.hide());
 

@@ -92,6 +92,18 @@ export class MessagingService {
     );
   }
 
+  /**
+   * "Mark as unread": a flag on the caller's side, cleared by the next
+   * markRead. The read position (and so the other side's read receipt)
+   * stays where it is.
+   */
+  markUnread(conversationId: string): Observable<{ markedUnread: true }> {
+    return this._http.patch<{ markedUnread: true }>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.CONVERSATION_UNREAD(conversationId),
+      {},
+    );
+  }
+
   muteConversation(
     conversationId: string,
     untilIso: string | null,

@@ -22,12 +22,16 @@
   </div>
 
   <div class="actions">
-    <button type="button" [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: nudgeSeconds }" (click)="subtract()">
-      −{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
-    </button>
+    <!-- Nothing left to take off once the count is out. -->
+    @if (!done()) {
+      <button type="button" [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: nudgeSeconds }" (click)="subtract()">
+        −{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
+      </button>
+    }
     <button type="button" [attr.aria-label]="'workouts.restTimer.plusSeconds' | translate: { seconds: nudgeSeconds }" (click)="add()">
       +{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
     </button>
-    <button type="button" class="skip" (click)="skip.emit()">{{ 'button.skip' | translate }}</button>
+    <!-- Nothing left to skip once the count is out: the same key closes the bar. -->
+    <button type="button" class="skip" (click)="skip.emit()">{{ (done() ? 'workouts.restTimer.backToWork' : 'button.skip') | translate }}</button>
   </div>
 </div>

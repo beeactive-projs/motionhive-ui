@@ -29,7 +29,9 @@ import {
   PublicUserProfile,
   appLocale,
   countryNameFromCode,
+  languageName,
   publicProfileUrl,
+  timezonePlace,
   translate,
 } from 'core';
 
@@ -38,6 +40,7 @@ import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { PERSON_ICONS, roleLabel } from './person.config';
+import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 
 /**
  * Someone else's profile, reached from anywhere a person is named.
@@ -76,6 +79,8 @@ import { PERSON_ICONS, roleLabel } from './person.config';
   styleUrl: './person.scss',
 })
 export class Person {
+  readonly Tiles = DETAIL_TILES;
+
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _profileService = inject(ProfileService);
@@ -151,9 +156,38 @@ export class Person {
    * share them with everyone or with their coaches. Kept apart from the
    * public basics at the top, and said to be theirs to share.
    */
-  readonly hasContact = computed(() => {
+  /** Their language, named in the reader's: shown only when their settings allow it. */
+  readonly language = computed(() => languageName(this.profile()?.language) || null);
+
+  /**
+   * Their time zone as the place and the time it is there now ("Bucharest ·
+   * 14:32"): what a coach wants before messaging someone. Read when the page
+   * renders; it does not tick.
+   */
+  readonly localTime = computed(() => {
+    const timezone = this.profile()?.timezone;
+    if (!timezone) return null;
+    const place = timezonePlace(timezone);
+    try {
+      const now = new Intl.DateTimeFormat(appLocale(), {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: timezone,
+      }).format(new Date());
+      return `${place} · ${now}`;
+    } catch {
+      // An unknown zone name: the place alone still says where they are.
+      return place;
+    }
+  });
+
+  /** Everything here depends on their privacy settings; the server nulls the rest. */
+  readonly hasDetails = computed(() => {
     const profile = this.profile();
-    return !!profile && (!!profile.email || !!profile.phone);
+    return (
+      !!profile &&
+      (!!profile.email || !!profile.phone || !!this.language() || !!this.localTime())
+    );
   });
 
   /** Groups you are both in — the one thing here that is about the two of you. */
@@ -191,7 +225,7 @@ export class Person {
       !this.experience() &&
       !this.rating() &&
       !this.location() &&
-      !this.hasContact() &&
+      !this.hasDetails() &&
       this.sharedGroups().length === 0 &&
       this.roles().length === 0,
   );

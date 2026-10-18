@@ -23,7 +23,6 @@ ion-buttons ion-button.cancel {
   min-width: 0;
   overflow: hidden;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
   text-overflow: ellipsis;
@@ -61,7 +60,7 @@ ion-buttons ion-button.cancel {
 
 .stale-bar ion-icon {
   flex: none;
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 .stale-bar span {
@@ -86,7 +85,6 @@ ion-buttons ion-button.cancel {
   width: 100%;
   margin-bottom: 0.75rem;
   padding: 0.875rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   text-align: start;
@@ -105,7 +103,6 @@ ion-buttons ion-button.cancel {
 .in-group {
   margin: 0 0 0.5rem;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
@@ -128,7 +125,7 @@ ion-buttons ion-button.cancel {
   overflow: hidden;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -169,7 +166,7 @@ ion-buttons ion-button.cancel {
 }
 
 .post-meta ion-icon {
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 /* Liked: the brand amber, matching web's `severity="primary"` reaction
@@ -184,7 +181,6 @@ ion-buttons ion-button.cancel {
   display: block;
   margin-bottom: 0.75rem;
   padding: 0.875rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
 }

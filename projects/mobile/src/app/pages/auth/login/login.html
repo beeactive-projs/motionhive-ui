@@ -54,7 +54,7 @@
         <ion-spinner name="crescent" />
         } @else {
         {{ 'button.signIn' | translate }}
-        <ion-icon slot="end" name="arrow-forward" aria-hidden="true" />
+        <ion-icon slot="end" name="arrow-forward-outline" aria-hidden="true" />
         }
       </ion-button>
     </form>
@@ -62,3 +62,13 @@
     <mh-terms-notice intro="auth.login.termsIntro" />
   </div>
 </ion-content>
+
+<mh-confirm-sheet
+  [(open)]="keepOpen"
+  [title]="'auth.keepAccount.title' | translate"
+  [body]="'auth.keepAccount.body' | translate: { date: keepDate() }"
+  [confirmLabel]="'auth.keepAccount.confirm' | translate"
+  [cancelLabel]="'auth.keepAccount.cancel' | translate"
+  [saving]="keeping()"
+  (confirm)="keepAccount()"
+/>

@@ -20,6 +20,7 @@
     "removeItem": "Remove {name}",
     "requirementMet": "{label}: met",
     "requirementNotMet": "{label}: not met",
+    "resizeSheet": "Resize sheet",
     "showPassword": "Show password",
     "switchToDarkMode": "Switch to dark mode",
     "switchToLightMode": "Switch to light mode",
@@ -136,6 +137,20 @@
       "talkingToServer": "Talking to the server…",
       "title": "Verifying your email",
       "verified": "Your email has been verified. Redirecting you to sign in…"
+    },
+    "accountClosed": {
+      "title": "Your account is closed",
+      "body": "We will erase your data on {date}. Changed your mind? Sign in before then and you can keep your account.",
+      "bodyNoDate": "We will erase your data within 30 days. Changed your mind? Sign in before then and you can keep your account.",
+      "email": "We also emailed you the details.",
+      "back": "Back to sign in"
+    },
+    "keepAccount": {
+      "title": "Keep your account?",
+      "body": "Your account is scheduled for deletion on {date}. Keep it and sign in? Whatever ended when you asked to delete it stays ended.",
+      "confirm": "Keep my account",
+      "cancel": "Not now",
+      "expired": "That took too long. Sign in again to keep your account."
     }
   },
   "button": {

@@ -10,7 +10,7 @@
 <ion-content [fullscreen]="true">
   <div class="mh-section-label">{{ 'payments.create.sections.who' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
-    <ion-item button detail="true" lines="none" (click)="pickerOpen.set(true)">
+    <ion-item button detail="true" (click)="pickerOpen.set(true)">
       @if (selectedClient(); as client) {
         <mh-hex-avatar
           slot="start"
@@ -24,7 +24,7 @@
           <h3>{{ selectedName() }}</h3>
         </ion-label>
       } @else {
-        <ion-icon slot="start" name="person-outline" color="medium" aria-hidden="true" />
+        <mh-hex-avatar slot="start" size="sm" icon="person-outline" color="info" />
         <ion-label>
           <h3>{{ 'payments.create.chooseClient' | translate }}</h3>
         </ion-label>
@@ -35,7 +35,7 @@
   <div class="mh-section-label">{{ 'payments.create.sections.whatFor' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
     @for (item of items(); track $index) {
-      <ion-item lines="full" class="line">
+      <ion-item class="line">
         <ion-label position="stacked">{{ 'form.label.description' | translate }}</ion-label>
         <ion-input
           [placeholder]="'payments.create.descriptionPlaceholder' | translate"
@@ -66,15 +66,15 @@
         </div>
       </ion-item>
     }
-    <ion-item button detail="false" lines="none" (click)="addItem()">
-      <ion-icon slot="start" name="add-outline" color="primary" aria-hidden="true" />
+    <ion-item button detail="false" (click)="addItem()">
+      <mh-hex-avatar slot="start" size="sm" icon="add-outline" color="primary" />
       <ion-label color="primary"><h3>{{ 'payments.create.addLine' | translate }}</h3></ion-label>
     </ion-item>
   </ion-list>
 
   <div class="mh-section-label">{{ 'payments.create.sections.due' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
-    <ion-item lines="none">
+    <ion-item>
       <ion-label position="stacked">{{ 'payments.create.dueDate' | translate }}</ion-label>
       <ion-input
         type="date"
@@ -139,6 +139,6 @@
   [title]="'payments.create.chooseClient' | translate"
   [body]="picker"
   [showFooter]="false"
-  [breakpoints]="[0, 0.75]"
+  [breakpoints]="[0, 0.75, 0.95]"
   [initialBreakpoint]="0.75"
 />

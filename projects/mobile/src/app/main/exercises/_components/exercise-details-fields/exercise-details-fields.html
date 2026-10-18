@@ -2,8 +2,8 @@
   <span class="mh-kicker">{{ 'exercises.fields.classification' | translate }}</span>
   <ion-note class="mh-note-block">{{ 'exercises.detailsFields.classificationHint' | translate }}</ion-note>
   <ion-list [inset]="true" class="mh-card-list">
-    <ion-item lines="full">
-      <ion-select [label]="'exercises.detailsFields.pattern' | translate" labelPlacement="start"
+    <ion-item>
+      <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.detailsFields.pattern' | translate" labelPlacement="start"
         interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().movementPattern"
         (ionChange)="form().patch({ movementPattern: $event.detail.value })">
         @for (option of patternOptions; track option.value) {
@@ -11,8 +11,8 @@
         }
       </ion-select>
     </ion-item>
-    <ion-item lines="full">
-      <ion-select [label]="'exercises.detailsFields.mechanic' | translate" labelPlacement="start"
+    <ion-item>
+      <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.detailsFields.mechanic' | translate" labelPlacement="start"
         interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().mechanic"
         (ionChange)="form().patch({ mechanic: $event.detail.value })">
         @for (option of mechanicOptions; track option.value) {
@@ -20,8 +20,8 @@
         }
       </ion-select>
     </ion-item>
-    <ion-item lines="full">
-      <ion-select [label]="'exercises.detailsFields.force' | translate" labelPlacement="start"
+    <ion-item>
+      <ion-select toggleIcon="chevron-down-outline" [label]="'exercises.detailsFields.force' | translate" labelPlacement="start"
         interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().force"
         (ionChange)="form().patch({ force: $event.detail.value })">
         @for (option of forceOptions; track option.value) {
@@ -29,7 +29,7 @@
         }
       </ion-select>
     </ion-item>
-    <ion-item lines="none">
+    <ion-item>
       <ion-label class="ion-text-wrap">
         <h3>{{ 'exercises.detailsFields.unilateral' | translate }}</h3>
         <p>{{ 'exercises.detailsFields.unilateralHint' | translate }}</p>
@@ -44,18 +44,18 @@
 <section class="mh-section">
   <span class="mh-kicker">{{ 'exercises.detailsFields.demo' | translate }}</span>
   <ion-list [inset]="true" class="mh-card-list">
-    <ion-item lines="full">
+    <ion-item>
       <ion-input [label]="'exercises.detailsFields.youtube' | translate" labelPlacement="stacked" inputmode="url"
         placeholder="https://youtube.com/watch?v=…" [value]="form().draft().youtubeUrl"
         (ionInput)="form().patch({ youtubeUrl: $event.detail.value ?? '' })" />
     </ion-item>
-    <ion-item lines="full">
+    <ion-item>
       <ion-textarea [label]="'form.label.description' | translate" labelPlacement="stacked" [autoGrow]="true" [rows]="2"
         [placeholder]="'exercises.detailsFields.descriptionPlaceholder' | translate"
         [value]="form().draft().description"
         (ionInput)="form().patch({ description: $event.detail.value ?? '' })" />
     </ion-item>
-    <ion-item lines="none">
+    <ion-item>
       <ion-textarea [label]="'exercises.fields.instructions' | translate" labelPlacement="stacked" [autoGrow]="true" [rows]="3"
         [placeholder]="'exercises.detailsFields.instructionsPlaceholder' | translate" [value]="form().draft().instructions"
         (ionInput)="form().patch({ instructions: $event.detail.value ?? '' })" />
@@ -75,8 +75,8 @@
 <section class="mh-section">
   <span class="mh-kicker">{{ 'exercises.fields.visibility' | translate }}</span>
   <ion-list [inset]="true" class="mh-card-list">
-    <ion-item lines="none">
-      <ion-icon slot="start" name="lock-closed-outline" color="medium" aria-hidden="true" />
+    <ion-item>
+      <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="violet" />
       <ion-label class="ion-text-wrap">
         <h3>{{ 'exercises.fields.private' | translate }}</h3>
         <p>{{ 'exercises.detailsFields.privateHint' | translate }}</p>

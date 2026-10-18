@@ -36,7 +36,7 @@
 }
 
 .tile ion-icon {
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 /* The Where and access tiles are pills — icon beside label, per the design. */
@@ -191,7 +191,7 @@
 .repeat ion-icon[slot='start'] {
   margin-inline: 0 0.875rem;
   color: var(--ion-color-medium);
-  font-size: var(--mh-text-xl);
+  font-size: var(--mh-icon-md);
 }
 
 .repeat.on {

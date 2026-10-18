@@ -47,13 +47,15 @@ import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
 import { RestTimerBar } from '../_components/rest-timer-bar/rest-timer-bar';
 import { SetRow } from '../_components/set-row/set-row';
 import { ExerciseActionsSheet } from '../_sheets/exercise-actions-sheet/exercise-actions-sheet';
+import { LeaveWorkoutSheet } from '../_sheets/leave-workout-sheet/leave-workout-sheet';
 import {
   ExerciseActionId,
   ExerciseActionIds,
   KeypadField,
   KeypadFields,
+  LeaveChoice,
+  LeaveChoices,
   WORKOUT_ICONS,
-  elapsedLabel,
   formatMeasure,
   secondsToClock,
   setPlaceholder,
@@ -61,6 +63,7 @@ import {
   exerciseSetSummary,
   isExerciseDone,
   lastTimeSummary,
+  workoutClock,
 } from '../workouts.config';
 import { LoggerStore } from './logger.store';
 
@@ -106,9 +109,10 @@ const COLUMN_LABELS: Record<SetField, string> = {
  * is being edited, the rest timer while resting, and nothing otherwise. Both
  * dock rather than overlay so the set grid stays readable.
  *
- * Leaving is not ending. The chevron takes you back to the Workouts tab with
- * the session still open, where the resume banner waits; Finish and Discard
- * are the two ways a session actually ends.
+ * Leaving is not ending. The chevron asks whether the clock keeps running or
+ * pauses, then takes you back to the Workouts tab with the session still
+ * open, where the resume banner waits; Finish and Discard are the two ways a
+ * session actually ends.
  */
 @Component({
   selector: 'mh-logger',
@@ -132,6 +136,7 @@ const COLUMN_LABELS: Record<SetField, string> = {
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    LeaveWorkoutSheet,
     NumericKeypad,
     RestTimerBar,
     SetRow,
@@ -206,6 +211,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly discardConfirmOpen = signal(false);
   readonly finishConfirmOpen = signal(false);
   readonly discarding = signal(false);
+  /** Asked on the way out: keep the clock running, or pause it. */
+  readonly leaveOpen = signal(false);
 
   /**
    * Finish and discard both navigate once confirmed, so those two sheets are
@@ -250,7 +257,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   readonly elapsed = computed(() => {
     const log = this.store.log();
-    return log ? elapsedLabel(log.startedAt, this._now()) : '';
+    return log ? workoutClock(log, this._now()) : '';
   });
 
   readonly progressRatio = computed(() => {
@@ -359,7 +366,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!id) return;
 
     if (id === 'new') this._startFreestyle();
-    else this.store.load(id, () => this._loadLastTimes());
+    else
+      this.store.load(id, () => {
+        // Back at the workout is back to work: a paused clock starts again.
+        this.store.resumeClock();
+        this._loadLastTimes();
+      });
   }
 
   ionViewWillLeave(): void {
@@ -369,8 +381,33 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.editing.set(null);
   }
 
-  /** Back to the Workouts tab with the session still running. */
+  /** Asks whether the clock keeps running while away, then goes. */
   leave(): void {
+    if (!this.store.log()) {
+      this._goBack();
+      return;
+    }
+    this._keepTyped();
+    this.editing.set(null);
+    this.leaveOpen.set(true);
+  }
+
+  onLeaveChoice(choice: LeaveChoice): void {
+    if (choice === LeaveChoices.KeepRunning) {
+      this._goBack();
+      return;
+    }
+    this.store.pause(
+      () => this._goBack(),
+      () =>
+        void this._feedbackService.error(
+          null,
+          this._translateService.instant('workouts.logger.toast.pauseFailed'),
+        ),
+    );
+  }
+
+  private _goBack(): void {
     void this._navController.navigateBack('/tabs/workouts');
   }
 

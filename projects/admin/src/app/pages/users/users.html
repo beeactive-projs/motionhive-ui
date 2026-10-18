@@ -56,6 +56,7 @@
     <tr>
       <th>Name</th>
       <th>Email</th>
+      <th>Location</th>
       <th>Roles</th>
       <th>Status</th>
       <th>Created</th>
@@ -66,6 +67,13 @@
     <tr>
       <td>{{ u.firstName }} {{ u.lastName }}</td>
       <td>{{ u.email }}</td>
+      <td>
+        @if (location(u); as place) {
+          {{ flag(u) }} {{ place }}
+        } @else {
+          <span class="text-[var(--p-text-muted-color)]">Not set</span>
+        }
+      </td>
       <td>
         @for (r of u.roles; track r) {
           <p-tag [value]="r" severity="secondary" class="mr-1" />
@@ -94,7 +102,7 @@
   </ng-template>
   <ng-template #emptymessage>
     <tr>
-      <td colspan="6" class="py-6 text-center text-[var(--p-text-muted-color)]">No users found.</td>
+      <td colspan="7" class="py-6 text-center text-[var(--p-text-muted-color)]">No users found.</td>
     </tr>
   </ng-template>
 </p-table>
@@ -130,6 +138,8 @@
         <p-tag [value]="d.isEmailVerified ? 'Verified' : 'Unverified'" [severity]="d.isEmailVerified ? 'success' : 'info'" />
         @if (d.locked) { <p-tag value="Locked" severity="warn" /> }
         @if (d.deletedAt) { <p-tag value="Deleted" severity="danger" /> }
+        @if (d.deletion?.status === 'SCHEDULED') { <p-tag value="Deletion scheduled" severity="danger" /> }
+        @if (d.deletion?.status === 'ERASED') { <p-tag value="Erased" severity="danger" /> }
       </div>
 
       <!-- Counts -->
@@ -186,55 +196,58 @@
         </div>
       }
 
-      <!-- Status actions -->
-      <div class="flex flex-col gap-2">
-        <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Status</div>
-        <div class="flex flex-wrap gap-2">
-          <button pButton type="button" [severity]="d.isActive ? 'warn' : 'success'" size="small" (click)="toggleActive()">
-            {{ d.isActive ? 'Deactivate' : 'Activate' }}
-          </button>
-          @if (d.locked) {
-            <button pButton type="button" severity="secondary" size="small" (click)="unlock()">Unlock</button>
-          }
-          @if (!d.isEmailVerified) {
-            <button pButton type="button" severity="secondary" size="small" (click)="forceVerify()">Force verify</button>
-            <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="resendVerification()">
-              Resend email
-            </button>
-          }
-          @if (d.deletedAt && isSuperAdmin()) {
-            <button pButton type="button" severity="success" size="small" (click)="restore()">Restore</button>
-          }
-        </div>
-      </div>
-
-      <!-- Roles (SUPER_ADMIN) -->
-      @if (isSuperAdmin()) {
+      <!-- Nothing to act on once an account is erased: it is an empty husk. -->
+      @if (d.deletion?.status !== 'ERASED') {
+        <!-- Status actions -->
         <div class="flex flex-col gap-2">
-          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Roles</div>
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Status</div>
           <div class="flex flex-wrap gap-2">
-            @for (r of d.roles; track r) {
-              <p-tag [value]="r" severity="secondary" />
-              <button
-                type="button"
-                class="text-xs text-[var(--p-red-500)] hover:underline"
-                (click)="revokeRole(r)"
-              >
-                remove
+            <button pButton type="button" [severity]="d.isActive ? 'warn' : 'success'" size="small" (click)="toggleActive()">
+              {{ d.isActive ? 'Deactivate' : 'Activate' }}
+            </button>
+            @if (d.locked) {
+              <button pButton type="button" severity="secondary" size="small" (click)="unlock()">Unlock</button>
+            }
+            @if (!d.isEmailVerified) {
+              <button pButton type="button" severity="secondary" size="small" (click)="forceVerify()">Force verify</button>
+              <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="resendVerification()">
+                Resend email
               </button>
             }
-          </div>
-          <div class="flex items-center gap-2">
-            <p-select
-              [(ngModel)]="roleToAssign"
-              [options]="assignableRoles"
-              placeholder="Add role"
-              appendTo="body"
-              styleClass="w-40"
-            />
-            <button pButton type="button" size="small" [disabled]="!roleToAssign" (click)="assignRole()">Add</button>
+            @if (d.deletedAt && isSuperAdmin()) {
+              <button pButton type="button" severity="success" size="small" (click)="restore()">Restore</button>
+            }
           </div>
         </div>
+
+        <!-- Roles (SUPER_ADMIN) -->
+        @if (isSuperAdmin()) {
+          <div class="flex flex-col gap-2">
+            <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Roles</div>
+            <div class="flex flex-wrap gap-2">
+              @for (r of d.roles; track r) {
+                <p-tag [value]="r" severity="secondary" />
+                <button
+                  type="button"
+                  class="text-xs text-[var(--p-red-500)] hover:underline"
+                  (click)="revokeRole(r)"
+                >
+                  remove
+                </button>
+              }
+            </div>
+            <div class="flex items-center gap-2">
+              <p-select
+                [(ngModel)]="roleToAssign"
+                [options]="assignableRoles"
+                placeholder="Add role"
+                appendTo="body"
+                styleClass="w-40"
+              />
+              <button pButton type="button" size="small" [disabled]="!roleToAssign" (click)="assignRole()">Add</button>
+            </div>
+          </div>
+        }
       }
 
       <!-- Impersonation (SUPER_ADMIN) -->
@@ -256,6 +269,45 @@
           <span class="text-xs text-[var(--p-text-muted-color)]">
             Opens the app in a new tab with a 30-minute token. Every impersonation is logged.
           </span>
+        </div>
+      }
+
+      <!-- Account deletion: acting on an emailed request (ADMIN+) -->
+      @if (d.deletion; as del) {
+        <div class="flex flex-col gap-1 rounded-lg border border-[var(--p-content-border-color)] p-3 text-sm">
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Account deletion</div>
+          @if (del.status === 'SCHEDULED') {
+            <div>Requested {{ del.requestedAt | date: 'medium' }}.</div>
+            <div>Erased on {{ del.scheduledFor | date: 'medium' }}, unless they sign in and keep the account.</div>
+          } @else {
+            <div>Erased {{ del.erasedAt | date: 'medium' }}.</div>
+          }
+        </div>
+      } @else if (canDeleteAccounts() && !d.deletedAt) {
+        <div class="flex flex-col gap-2 rounded-lg border border-[var(--p-content-border-color)] p-3">
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Delete account</div>
+          <span class="text-xs text-[var(--p-text-muted-color)]">
+            Only for a deletion request emailed to us. Type the address it came from: it must be this account's
+            sign-in email. The account is deactivated now, wound down the same way as deleting in the app, and erased
+            within 30 days. They get the same emails, and can still keep the account by signing in before then.
+          </span>
+          <input
+            pInputText
+            [(ngModel)]="deletionEmail"
+            placeholder="Address the request came from"
+            class="w-full"
+          />
+          <button
+            pButton
+            type="button"
+            severity="danger"
+            size="small"
+            [disabled]="!deletionEmail.trim()"
+            (click)="scheduleDeletion()"
+          >
+            <i class="pi pi-trash"></i>
+            Delete this account
+          </button>
         </div>
       }
 

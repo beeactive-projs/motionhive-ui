@@ -11,17 +11,9 @@ import { HexAvatar, HexAvatarTone, HexAvatarTones } from '../hex-avatar/hex-avat
  * a component each one is a nine-line `ion-item` with the same six CSS
  * variables re-declared, which is exactly the CSS dumping this project bans.
  *
- * The row draws its own divider instead of letting the list do it. Ionic's
- * inset-list stylesheet zeroes the border on `ion-item:only-child`
- * (`list.ios.css` / `list.md.css`), and every item here IS an only child —
- * of this component's host — so the built-in dividers all disappear. An
- * outer-tree declaration also outranks the item's own shadow `:host` rule, so
- * `lines="full"` cannot win it back. Hence `lines="none"` plus a border here.
- *
- * The consequence: **keep a grouped list homogeneous.** The last row drops its
- * hairline via `:host(:last-of-type)`, which counts only sibling
- * `mh-settings-row`s — mix these with bare `ion-item`s and the hairline lands
- * in the wrong place. Use one or the other per list.
+ * Separator, height and chevron belong to the grouped-list skin
+ * (theme/components/ion-list.css), like every other row in a card list, so
+ * these mix freely with bare `ion-item`s in the same list.
  */
 @Component({
   selector: 'mh-settings-row',

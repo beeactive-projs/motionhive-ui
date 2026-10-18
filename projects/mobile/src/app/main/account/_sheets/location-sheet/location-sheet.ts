@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, model, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
@@ -19,6 +18,7 @@ import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-she
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AccountStore } from '../../account.store';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 const SEARCH_DEBOUNCE_MS = 400;
 
@@ -32,7 +32,7 @@ const SEARCH_DEBOUNCE_MS = 400;
 @Component({
   selector: 'mh-location-sheet',
   imports: [
-    IonIcon,
+    HexAvatar,
     IonItem,
     IonLabel,
     IonList,

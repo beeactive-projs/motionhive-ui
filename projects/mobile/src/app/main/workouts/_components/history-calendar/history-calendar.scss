@@ -32,7 +32,6 @@
 
 .weekday {
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   font-weight: 600;
   text-align: center;
@@ -99,7 +98,7 @@ ion-skeleton-text.cell {
   border-color: transparent;
   background: var(--ion-color-primary);
   color: var(--ion-color-primary-contrast);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .error {

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { MESSAGING_ICONS } from './messages.config';
+import { ConversationActions, MESSAGING_ICONS, conversationActions } from './messages.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
 const templates = import.meta.glob('./**/*.html', {
@@ -63,6 +63,49 @@ describe('MESSAGING_ICONS', () => {
 
     for (const key of registered) {
       expect(used, `${key} is registered but unused`).toContain(key);
+    }
+  });
+});
+
+describe('conversationActions', () => {
+  it('offers profile, mute, then block for a person with a handle', () => {
+    expect(conversationActions(false, true).map((a) => a.id)).toEqual([
+      ConversationActions.Profile,
+      ConversationActions.Mute,
+      ConversationActions.Block,
+    ]);
+  });
+
+  it('leaves out the profile row when there is no handle to open', () => {
+    expect(conversationActions(false, false).map((a) => a.id)).toEqual([
+      ConversationActions.Mute,
+      ConversationActions.Block,
+    ]);
+  });
+
+  it('flips the notification row with the mute state', () => {
+    const mute = (muted: boolean) =>
+      conversationActions(muted, true).find((a) => a.id === ConversationActions.Mute);
+
+    expect(mute(false)).toMatchObject({
+      label: 'messages.actions.mute',
+      icon: 'notifications-off-outline',
+    });
+    expect(mute(true)).toMatchObject({
+      label: 'messages.actions.unmute',
+      icon: 'notifications-outline',
+    });
+  });
+
+  it('keeps block alone in the destructive card', () => {
+    const destructive = conversationActions(false, true).filter((a) => a.destructive);
+    expect(destructive.map((a) => a.id)).toEqual([ConversationActions.Block]);
+  });
+
+  // The sheet renders these through `mh-hex-avatar`, which needs them registered.
+  it('only uses registered icons', () => {
+    for (const action of [...conversationActions(false, true), ...conversationActions(true, true)]) {
+      expect(registered).toContain(toCamelCase(action.icon ?? ''));
     }
   });
 });

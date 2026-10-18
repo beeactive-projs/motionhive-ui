@@ -3707,11 +3707,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">203,205</context>
+          <context context-type="linenumber">219,221</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">578,580</context>
+          <context context-type="linenumber">581,583</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
@@ -3726,11 +3726,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">207,210</context>
+          <context context-type="linenumber">223,226</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">582,585</context>
+          <context context-type="linenumber">585,588</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
@@ -3772,229 +3772,243 @@
           <context context-type="linenumber">34,36</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="deleteAccount.s1.p1" datatype="html">
-        <source> Send an email to <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot;
-          class=&quot;text-brand hover:underline&quot;&gt;"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> from the address you use to sign in, with the subject &quot;Delete my account&quot;. </source>
+      <trans-unit id="deleteAccount.s1.app" datatype="html">
+        <source> In the MotionHive mobile app, go to your account and choose Delete account at the bottom. We email you a code to confirm the request is yours, and you confirm it in the app. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
           <context context-type="linenumber">37,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s1.p1" datatype="html">
+        <source> You can also send an email to <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit?subject=Delete%20my%20account&quot;
+          class=&quot;text-brand hover:underline&quot;&gt;"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> from the address you use to sign in, with the subject &quot;Delete my account&quot;. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">42,46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s1.p2" datatype="html">
         <source> Writing from your own sign-in address is how we confirm the request is really yours. If you signed up with Google or Facebook, use the email address attached to that account. If you can no longer access that mailbox, write to us anyway and we will ask you for another way to prove the account is yours. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">44,47</context>
+          <context context-type="linenumber">49,52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s1.p3" datatype="html">
         <source> We confirm by email when we receive your request, and again once the deletion is done. You do not need to give a reason, and we will not try to talk you out of it. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">50,53</context>
+          <context context-type="linenumber">55,58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s2.h2" datatype="html">
         <source>2. How long it takes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">57,59</context>
+          <context context-type="linenumber">62,64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s2.p1" datatype="html">
-        <source> We deactivate your account within 72 hours of confirming your request, so you stop appearing to other people straight away. We then permanently erase your personal information within 30 days. </source>
+        <source> If you delete your account in the app, we deactivate it as soon as you confirm. If you write to us, we deactivate it within 72 hours of confirming your request. Either way you stop appearing to other people straight away, and we permanently erase your personal information within 30 days. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">60,64</context>
+          <context context-type="linenumber">65,68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s2.keep" datatype="html">
+        <source> Until then, you can sign in and keep your account. Subscriptions, bookings and groups that ended when you asked to delete it stay ended. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">71,75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s2.p2" datatype="html">
         <source> Backups are kept on a rolling schedule and are overwritten within 90 days. Until a backup rolls over, your information may still exist inside it, isolated and not used for anything. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">65,68</context>
+          <context context-type="linenumber">76,79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.h2" datatype="html">
         <source>3. What gets deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">72,74</context>
+          <context context-type="linenumber">83,85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.p1" datatype="html">
         <source> Everything below is permanently erased: </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">75,78</context>
+          <context context-type="linenumber">86,89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li1" datatype="html">
         <source>Your account: name, email address, password, phone number, city and country, profile photo and profile handle.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">79,81</context>
+          <context context-type="linenumber">90,92</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li2" datatype="html">
         <source>Any Google, Facebook or Apple sign-in linked to your account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">81,82</context>
+          <context context-type="linenumber">92,93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li3" datatype="html">
         <source>Your coach profile, if you have one: biography, specialisations, experience, social links and venues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">82,84</context>
+          <context context-type="linenumber">93,95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li4" datatype="html">
         <source>Your workout history: logged workouts, sets, personal records and any notes you wrote.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">84,86</context>
+          <context context-type="linenumber">95,97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li5" datatype="html">
         <source>Training programs and routines you created, and programs assigned to you.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">86,87</context>
+          <context context-type="linenumber">97,98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li6" datatype="html">
-        <source>Your group memberships, posts and comments, and your session bookings.</source>
+        <source>Your group memberships.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">87,88</context>
+          <context context-type="linenumber">98,99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li7" datatype="html">
         <source>Your messages, and your relationships with coaches or clients.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">88,89</context>
+          <context context-type="linenumber">99,100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s3.li8" datatype="html">
         <source>Your saved payment details. These are held by Stripe, not by us, and we ask Stripe to delete them too.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">89,92</context>
+          <context context-type="linenumber">100,103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.h2" datatype="html">
         <source>4. What we have to keep, and for how long</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">96,98</context>
+          <context context-type="linenumber">107,109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.p1" datatype="html">
         <source> Romanian law requires us to keep some records even after you leave. We keep only these, we do not use them for anything else, and they are deleted when the period below ends. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">99,103</context>
+          <context context-type="linenumber">110,114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.th1" datatype="html">
         <source>What</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">107,108</context>
+          <context context-type="linenumber">118,119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.th2" datatype="html">
         <source>How long</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">108,109</context>
+          <context context-type="linenumber">119,120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.th3" datatype="html">
         <source>Why</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">110,111</context>
+          <context context-type="linenumber">121,122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r1c1" datatype="html">
         <source>Invoices and payment records, including the name and amount on them </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">114,116</context>
+          <context context-type="linenumber">125,127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r1c2" datatype="html">
-        <source>5 years</source>
+        <source>5 years after the end of the financial year</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">116,117</context>
+          <context context-type="linenumber">127,128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r1c3" datatype="html">
         <source>Romanian accounting and tax law</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">117,119</context>
+          <context context-type="linenumber">128,130</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r2c1" datatype="html">
         <source>A record that your account was deleted, and when</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">120,121</context>
+          <context context-type="linenumber">131,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r2c2" datatype="html">
         <source>3 years</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">121,122</context>
+          <context context-type="linenumber">132,133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r2c3" datatype="html">
         <source>Proof that we honoured your request</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">122,124</context>
+          <context context-type="linenumber">133,135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r3c1" datatype="html">
         <source>Records tied to an open dispute, chargeback or legal claim</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">125,126</context>
+          <context context-type="linenumber">136,137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r3c2" datatype="html">
         <source>Until it is resolved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">126,127</context>
+          <context context-type="linenumber">137,138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.r3c3" datatype="html">
         <source>Defending or settling the claim</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">127,129</context>
+          <context context-type="linenumber">138,140</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s4.p2" datatype="html">
-        <source> Content you posted in a group stays visible to that group, but it is anonymised: your name and photo are removed, so it is no longer linked to you. If you want a specific post or comment removed as well, say so in your email and we will delete it. </source>
+        <source> Content you posted in a group stays visible to that group, but it is anonymised: your name and photo are removed, so it is no longer linked to you. Sessions you booked stay in the coach&apos;s records the same way, as a place with no name on it, and the ones still to come are cancelled. If you want a specific post or comment removed as well, tell us and we will delete it. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">134,137</context>
+          <context context-type="linenumber">145,148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.h2" datatype="html">
         <source>5. Delete some of your data, keep your account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">142,144</context>
+          <context context-type="linenumber">153,155</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.p1" datatype="html">
@@ -4002,42 +4016,49 @@
           class=&quot;text-brand hover:underline&quot;&gt;"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> and tell us what you want removed. The same 30-day timeline applies. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">145,149</context>
+          <context context-type="linenumber">156,160</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.p2" datatype="html">
         <source> People most often ask us to delete their workout history, their posts and comments, their messages, their coach profile while keeping the account, or their profile photo. Anything else you can name, we will look at. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">152,156</context>
+          <context context-type="linenumber">163,167</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s5.p3" datatype="html">
         <source> You can also edit or remove most of this yourself inside the app, under your profile, without writing to us at all. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">157,160</context>
+          <context context-type="linenumber">168,171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s6.h2" datatype="html">
         <source>6. Get a copy before you go</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">164,166</context>
+          <context context-type="linenumber">175,177</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s6.p1" datatype="html">
-        <source> Deletion cannot be undone, and we cannot bring your training history back afterwards. If you want to keep it, ask us for a copy of your data in the same email and we will send it to you before anything is deleted. </source>
+        <source> Deletion cannot be undone, and we cannot bring your training history back afterwards. If you want to keep it, ask us for a copy of your data before you delete your account, and we will send it to you. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">167,170</context>
+          <context context-type="linenumber">178,182</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="deleteAccount.s6.coach" datatype="html">
+        <source> If you coach, download the invoices you need for your accounts first. You have to keep them, and you can no longer open them in MotionHive once your account is erased. You can still ask us for copies. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
+          <context context-type="linenumber">183,186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s7.h2" datatype="html">
         <source>7. If something goes wrong</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">174,176</context>
+          <context context-type="linenumber">190,192</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s7.p1" datatype="html">
@@ -4045,21 +4066,21 @@
           class=&quot;text-brand hover:underline&quot;&gt;"/>dataprotection.ro<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">177,183</context>
+          <context context-type="linenumber">193,199</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.s7.p2" datatype="html">
         <source> Our contact details: HIVECRAFT S.R.L., Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58, Cluj-Napoca, Cluj 400482, Romania. Email <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;mailto:contact@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>contact@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">184,188</context>
+          <context context-type="linenumber">200,204</context>
         </context-group>
       </trans-unit>
       <trans-unit id="deleteAccount.footer.also" datatype="html">
         <source> Also read our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/privacy-policy&quot; class=&quot;text-brand hover:underline font-medium&quot;&gt;"/>Privacy Policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/delete-account/delete-account.component.html</context>
-          <context context-type="linenumber">197,200</context>
+          <context context-type="linenumber">213,216</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.pill" datatype="html">
@@ -4427,46 +4448,46 @@
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p5" datatype="html">
-        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Payment data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may collect data necessary to process your payment if you choose to make purchases. All payment data is handled and stored by Stripe. You may find their privacy notice link(s) here: <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://stripe.com/privacy&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Payment data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may collect data necessary to process your payment if you choose to make purchases. Your card details are handled and stored by Stripe, and we never see them. We keep a record of each payment, invoice and subscription (amounts, dates and status) to run your account and to meet accounting and tax law. You may find Stripe&apos;s privacy notice here: <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://stripe.com/privacy&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;
           class=&quot;text-brand hover:underline&quot;&gt;"/>https://stripe.com/privacy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">146,150</context>
+          <context context-type="linenumber">146,151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p6" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Social media login data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may provide you with the option to register with us using your existing social media account details, like your Facebook, Google, or other social media account. If you choose to register in this way, we will collect certain profile information about you from the social media provider, as described in the section called &quot;How do we handle your social logins?&quot; below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">150,154</context>
+          <context context-type="linenumber">151,155</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p7" datatype="html">
         <source>All personal information that you provide to us must be true, complete, and accurate, and you must notify us of any changes to such personal information.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">155,158</context>
+          <context context-type="linenumber">156,159</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.sub2" datatype="html">
         <source>Information automatically collected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">158,159</context>
+          <context context-type="linenumber">159,160</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p8" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Some information, such as your Internet Protocol (IP) address and/or browser and device characteristics, is collected automatically when you visit our Services.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">159,162</context>
+          <context context-type="linenumber">160,163</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p9" datatype="html">
         <source>We automatically collect certain information when you visit, use, or navigate the Services. This information does not reveal your specific identity (like your name or contact information) but may include device and usage information, such as your IP address, browser and device characteristics, operating system, language preferences, referring URLs, device name, country, location, information about how and when you use our Services, and other technical information. This information is primarily needed to maintain the security and operation of our Services, and for our internal analytics and reporting purposes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">162,168</context>
+          <context context-type="linenumber">163,169</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p10" datatype="html">
@@ -4474,35 +4495,35 @@
           class=&quot;text-brand hover:underline&quot;&gt;"/>Cookie Policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">169,172</context>
+          <context context-type="linenumber">170,173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p11" datatype="html">
         <source>The information we collect includes:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">172,173</context>
+          <context context-type="linenumber">173,174</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.li12" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Log and usage data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Service-related, diagnostic, usage, and performance information our servers automatically collect when you access or use our Services and which we record in log files. This may include your IP address, device information, browser type and settings, and information about your activity in the Services (such as date/time stamps, pages and files viewed, searches, and other actions you take), and device event information (such as system activity and error reports).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">174,178</context>
+          <context context-type="linenumber">175,179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.li13" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Device data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Information about your computer, phone, tablet, or other device you use to access the Services, such as IP address, device and application identification numbers, browser type, hardware model, internet service provider and/or mobile carrier, operating system, and system configuration information.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">179,182</context>
+          <context context-type="linenumber">180,183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.li14" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Location data.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Information about your device&apos;s location, which can be either precise or imprecise. You can opt out of allowing us to collect this information either by refusing access or by disabling your Location setting on your device.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">183,185</context>
+          <context context-type="linenumber">184,186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s1.p12" datatype="html">
@@ -4510,462 +4531,462 @@
           target=&quot;_blank&quot; rel=&quot;noopener&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>Google API Services User Data Policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, including the Limited Use requirements.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">187,191</context>
+          <context context-type="linenumber">188,192</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.h2" datatype="html">
         <source>2. How do we process your information?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">194,195</context>
+          <context context-type="linenumber">195,196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We process your information to provide, improve, and administer our Services, communicate with you, for security and fraud prevention, and to comply with law. We may also process your information for other purposes only with your prior explicit consent.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">195,199</context>
+          <context context-type="linenumber">196,200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.p2" datatype="html">
         <source>We process your personal information for a variety of reasons, depending on how you interact with our Services, including:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">199,201</context>
+          <context context-type="linenumber">200,202</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To facilitate account creation and authentication and otherwise manage user accounts.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">202,204</context>
+          <context context-type="linenumber">203,205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li2" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To deliver and facilitate delivery of services to the user.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">204,205</context>
+          <context context-type="linenumber">205,206</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li3" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To respond to user inquiries/offer support to users.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">205,206</context>
+          <context context-type="linenumber">206,207</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li4" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To send administrative information to you<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> about our products and services, changes to our terms and policies, and other similar information.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">206,208</context>
+          <context context-type="linenumber">207,209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li5" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To fulfill and manage your orders,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> payments, returns, and exchanges made through the Services.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">208,210</context>
+          <context context-type="linenumber">209,211</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li6" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To enable user-to-user communications.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">210,211</context>
+          <context context-type="linenumber">211,212</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li7" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To request feedback<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> and to contact you about your use of our Services.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">211,213</context>
+          <context context-type="linenumber">212,214</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li8" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To protect our Services,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> including fraud monitoring and prevention. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">213,215</context>
+          <context context-type="linenumber">214,216</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li9" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To identify usage trends<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> so we can improve our Services.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">215,216</context>
+          <context context-type="linenumber">216,217</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s2.li10" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>To save or protect an individual&apos;s vital interest,<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> such as to prevent harm.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">216,218</context>
+          <context context-type="linenumber">217,219</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.h2" datatype="html">
         <source>3. What legal bases do we rely on to process your information? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">222,224</context>
+          <context context-type="linenumber">223,225</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We only process your personal information when we believe it is necessary and we have a valid legal reason (i.e., legal basis) to do so under applicable law, like with your consent, to comply with laws, to provide you with services to enter into or fulfill our contractual obligations, to protect your rights, or to fulfill our legitimate business interests.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">224,229</context>
+          <context context-type="linenumber">225,230</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.sub1" datatype="html">
         <source>If you are located in the EU or UK</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">229,230</context>
+          <context context-type="linenumber">230,231</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.p2" datatype="html">
         <source>The General Data Protection Regulation (GDPR) and UK GDPR require us to explain the valid legal bases we rely on in order to process your personal information. As such, we may rely on the following legal bases:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">230,233</context>
+          <context context-type="linenumber">231,234</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Consent.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may process your information if you have given us permission (i.e., consent) to use your personal information for a specific purpose. You can withdraw your consent at any time.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">234,236</context>
+          <context context-type="linenumber">235,237</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li2" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Performance of a contract.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may process your personal information when we believe it is necessary to fulfill our contractual obligations to you, including providing our Services or at your request prior to entering into a contract with you.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">237,239</context>
+          <context context-type="linenumber">238,240</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li3" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Legitimate interests.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may process your information when we believe it is reasonably necessary to achieve our legitimate business interests and those interests do not outweigh your interests and fundamental rights and freedoms. For example, to analyze how our Services are used so we can improve them, to diagnose problems and/or prevent fraudulent activities, and to understand how our users use our products and services so we can improve user experience.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">240,244</context>
+          <context context-type="linenumber">241,245</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li4" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Legal obligations.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may process your information where we believe it is necessary for compliance with our legal obligations.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">245,247</context>
+          <context context-type="linenumber">246,248</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.li5" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Vital interests.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may process your information where we believe it is necessary to protect your vital interests or the vital interests of a third party.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">247,249</context>
+          <context context-type="linenumber">248,250</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.sub2" datatype="html">
         <source>If you are located in Canada</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">250,251</context>
+          <context context-type="linenumber">251,252</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s3.p3" datatype="html">
         <source>We may process your information if you have given us specific permission (i.e., express consent) to use your personal information for a specific purpose, or in situations where your permission can be inferred (i.e., implied consent). You can withdraw your consent at any time. In some exceptional cases, we may be legally permitted under applicable law to process your information without your consent, such as for investigations and fraud detection and prevention, business transactions, or where disclosure is required to comply with a subpoena, warrant, or court order.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">251,256</context>
+          <context context-type="linenumber">252,257</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.h2" datatype="html">
         <source>4. When and with whom do we share your personal information?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">260,261</context>
+          <context context-type="linenumber">261,262</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We may share information in specific situations described in this section and/or with the following categories of third parties.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">261,263</context>
+          <context context-type="linenumber">262,264</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p2" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Vendors, consultants, and other third-party service providers.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may share your data with third-party vendors, service providers, contractors, or agents (&quot;third parties&quot;) who perform services for us or on our behalf and require access to such information to do that work. We have contracts in place with our third parties, which are designed to help safeguard your personal information.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">263,267</context>
+          <context context-type="linenumber">264,268</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p3" datatype="html">
         <source>The categories of third parties we may share personal information with are as follows:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">268,270</context>
+          <context context-type="linenumber">269,271</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li1" datatype="html">
         <source>Payment processors</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">271,272</context>
+          <context context-type="linenumber">272,273</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li2" datatype="html">
         <source>User account registration &amp; authentication services</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">272,273</context>
+          <context context-type="linenumber">273,274</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li3" datatype="html">
         <source>Cloud computing services</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">273,274</context>
+          <context context-type="linenumber">274,275</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li4" datatype="html">
         <source>Website hosting service providers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">274,275</context>
+          <context context-type="linenumber">275,276</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li5" datatype="html">
         <source>Data storage service providers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">275,276</context>
+          <context context-type="linenumber">276,277</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li6" datatype="html">
         <source>Data analytics services</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">276,277</context>
+          <context context-type="linenumber">277,278</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li7" datatype="html">
         <source>Communication &amp; collaboration tools</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">277,278</context>
+          <context context-type="linenumber">278,279</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li8" datatype="html">
         <source>Email service provider (transactional/notification email)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">278,280</context>
+          <context context-type="linenumber">279,281</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.p4" datatype="html">
         <source>We also may need to share your personal information in the following situations:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">280,282</context>
+          <context context-type="linenumber">281,283</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li9" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Business transfers.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We may share or transfer your information in connection with, or during negotiations of, any merger, sale of company assets, financing, or acquisition of all or a portion of our business to another company.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">283,285</context>
+          <context context-type="linenumber">284,286</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s4.li10" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Other users.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> When you share personal information or otherwise interact with public areas of the Services, such personal information may be viewed by all users and may be publicly made available outside the Services in perpetuity. Other users will be able to view descriptions of your activity, communicate with you within our Services, and view your profile.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">286,289</context>
+          <context context-type="linenumber">287,290</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.h2" datatype="html">
         <source>5. Do we use cookies and other tracking technologies?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">294,295</context>
+          <context context-type="linenumber">295,296</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We use cookies and similar technologies to run the Services and remember your preferences, and we count visits to our website without cookies. We do not use advertising trackers.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">295,298</context>
+          <context context-type="linenumber">296,299</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p2" datatype="html">
         <source>We use cookies and similar technologies, such as your browser&apos;s local storage, when you interact with our Services. They keep you signed in, help us protect the Services and your account, and remember your preferences, such as your theme and language.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">298,301</context>
+          <context context-type="linenumber">299,302</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p3" datatype="html">
         <source>We do not allow third parties to place advertising or cross-site tracking technologies on our Services, and we do not sell or share your personal information for targeted advertising.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">301,304</context>
+          <context context-type="linenumber">302,305</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.p4" datatype="html">
         <source>The cookies and similar technologies we use, and how you can refuse them, are described in our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/cookie-policy&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>Cookie Policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">304,307</context>
+          <context context-type="linenumber">305,308</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.analytics.h3" datatype="html">
         <source>Website analytics</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">307,308</context>
+          <context context-type="linenumber">308,309</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.analytics.p1" datatype="html">
         <source>We use Umami (umami.is), an analytics service, to understand how many people visit our website, which pages they read, and how they found us. Umami does not use cookies or local storage, does not keep your IP address, and does not follow you across other websites.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">308,311</context>
+          <context context-type="linenumber">309,312</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s5.analytics.p2" datatype="html">
         <source>For each visit it records the page, the referring website, any campaign tags in the link (such as utm_source=instagram), your approximate location (country, region, and city, worked out from your IP address), and your browser, operating system, device type, screen size, and language. We only see this as aggregated statistics. We rely on our legitimate interest in understanding and improving our website, and Umami processes the data on our behalf, on servers in the European Union or the United States.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">311,316</context>
+          <context context-type="linenumber">312,317</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.h2" datatype="html">
         <source>6. How do we handle your social logins?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">320,321</context>
+          <context context-type="linenumber">321,322</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>If you choose to register or log in to our Services using a social media account, we may have access to certain information about you.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">321,324</context>
+          <context context-type="linenumber">322,325</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.p2" datatype="html">
         <source>Our Services offer you the ability to register and log in using your third-party social media account details (like your Facebook or Google logins). Where you choose to do this, we will receive certain profile information about you from your social media provider. The profile information we receive may vary depending on the social media provider concerned, but will often include your name, email address, and profile picture, as well as other information you choose to make public on such a social media platform.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">324,329</context>
+          <context context-type="linenumber">325,330</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s6.p3" datatype="html">
         <source>We will use the information we receive only for the purposes that are described in this Privacy Notice or that are otherwise made clear to you on the relevant Services. Please note that we do not control, and are not responsible for, other uses of your personal information by your third-party social media provider.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">330,333</context>
+          <context context-type="linenumber">331,334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.h2" datatype="html">
         <source>7. Is your information transferred internationally?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">337,338</context>
+          <context context-type="linenumber">338,339</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We may transfer, store, and process your information in countries other than your own.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">338,340</context>
+          <context context-type="linenumber">339,341</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p2" datatype="html">
         <source>Our servers are located in the Netherlands. Regardless of your location, please be aware that your information may be transferred to, stored by, and processed by us in our facilities and in the facilities of the third parties with whom we may share your personal information, including facilities in the United States and other countries.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">340,343</context>
+          <context context-type="linenumber">341,344</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p3" datatype="html">
         <source>If you are a resident in the European Economic Area (EEA), United Kingdom (UK), or Switzerland, then these countries may not necessarily have data protection laws or other similar laws as comprehensive as those in your country. However, we will take all necessary measures to protect your personal information in accordance with this Privacy Notice and applicable law.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">344,347</context>
+          <context context-type="linenumber">345,348</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s7.p4" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>European Commission&apos;s Standard Contractual Clauses.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> We have implemented measures to protect your personal information, including by using the European Commission&apos;s Standard Contractual Clauses for transfers of personal information between us and our third-party providers. These clauses require all recipients to protect all personal information that they process originating from the EEA or UK in accordance with European data protection laws and regulations. Our Standard Contractual Clauses can be provided upon request.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">348,353</context>
+          <context context-type="linenumber">349,354</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.h2" datatype="html">
         <source>8. How long do we keep your information?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">357,358</context>
+          <context context-type="linenumber">358,359</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We keep your information for as long as necessary to fulfill the purposes outlined in this Privacy Notice unless otherwise required by law.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">358,361</context>
+          <context context-type="linenumber">359,362</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.p2" datatype="html">
-        <source>We will only keep your personal information for as long as it is necessary for the purposes set out in this Privacy Notice, unless a longer retention period is required or permitted by law (such as tax, accounting, or other legal requirements). No purpose in this notice will require us keeping your personal information for longer than three (3) months past the termination of the user&apos;s account.</source>
+        <source>We keep your personal information while you have an account. When you delete your account, we erase it within 30 days. We keep only the records the law or a dispute requires: invoices and payment records for 5 years after the end of the financial year, as Romanian accounting and tax law requires, a record that your account was deleted, and when, for 3 years, and anything tied to an open dispute, chargeback or legal claim until it is resolved. Each is deleted when its period ends. Our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/delete-account&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>Delete your account<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> page explains what is erased and what is kept.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">361,365</context>
+          <context context-type="linenumber">362,369</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s8.p3" datatype="html">
         <source>When we have no ongoing legitimate business need to process your personal information, we will either delete or anonymize such information, or, if this is not possible (for example, because your personal information has been stored in backup archives), then we will securely store your personal information and isolate it from any further processing until deletion is possible.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">366,369</context>
+          <context context-type="linenumber">369,372</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s9.h2" datatype="html">
         <source>9. How do we keep your information safe?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">373,374</context>
+          <context context-type="linenumber">376,377</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s9.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We aim to protect your personal information through a system of organizational and technical security measures.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">374,376</context>
+          <context context-type="linenumber">377,379</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s9.p2" datatype="html">
         <source>We have implemented appropriate and reasonable technical and organizational security measures designed to protect the security of any personal information we process. However, despite our safeguards and efforts to secure your information, no electronic transmission over the internet or information storage technology can be guaranteed to be 100% secure, so we cannot promise or guarantee that hackers, cybercriminals, or other unauthorized third parties will not be able to defeat our security and improperly collect, access, steal, or modify your information. Although we will do our best to protect your personal information, transmission of personal information to and from our Services is at your own risk. You should only access the Services within a secure environment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">376,383</context>
+          <context context-type="linenumber">379,386</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s10.h2" datatype="html">
         <source>10. Do we collect information from minors?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">387,388</context>
+          <context context-type="linenumber">390,391</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s10.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>We do not knowingly collect data from or market to children under 18 years of age or the equivalent age as specified by law in your jurisdiction.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">388,391</context>
+          <context context-type="linenumber">391,394</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s10.p2" datatype="html">
@@ -4973,49 +4994,49 @@
           class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">391,400</context>
+          <context context-type="linenumber">394,403</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.h2" datatype="html">
         <source>11. What are your privacy rights?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">403,404</context>
+          <context context-type="linenumber">406,407</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Depending on your state of residence in the US or in some regions, such as the European Economic Area (EEA), United Kingdom (UK), Switzerland, and Canada, you have rights that allow you greater access to and control over your personal information. You may review, change, or terminate your account at any time, depending on your country, province, or state of residence.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">404,409</context>
+          <context context-type="linenumber">407,412</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p2" datatype="html">
         <source>In some regions (like the EEA, UK, Switzerland, and Canada), you have certain rights under applicable data protection laws. These may include the right (i) to request access and obtain a copy of your personal information, (ii) to request rectification or erasure; (iii) to restrict the processing of your personal information; (iv) if applicable, to data portability; and (v) not to be subject to automated decision-making. In certain circumstances, you may also have the right to object to the processing of your personal information. You can make such a request by contacting us using the contact details provided in the section &quot;How can you contact us about this notice?&quot; below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">409,415</context>
+          <context context-type="linenumber">412,418</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p3" datatype="html">
         <source>If you are located in the EEA or UK and you believe we are unlawfully processing your personal information, you also have the right to complain to your Member State data protection authority. In Romania, the competent authority is ANSPDCP. If you are located in Switzerland, you may contact the Federal Data Protection and Information Commissioner.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">416,420</context>
+          <context context-type="linenumber">419,423</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p4" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Withdrawing your consent:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> If we are relying on your consent to process your personal information, you have the right to withdraw your consent at any time by contacting us using the contact details provided below. However, please note that this will not affect the lawfulness of the processing before its withdrawal nor, when applicable law allows, will it affect the processing of your personal information conducted in reliance on lawful processing grounds other than consent. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">420,424</context>
+          <context context-type="linenumber">423,427</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p5" datatype="html">
-        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Account information:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> If you would at any time like to review or change the information in your account or terminate your account, you can contact us using the contact information provided. Upon your request to terminate your account, we will deactivate or delete your account and information from our active databases. However, we may retain some information in our files to prevent fraud, troubleshoot problems, assist with any investigations, enforce our legal terms and/or comply with applicable legal requirements.</source>
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Account information:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> If you would at any time like to review or change the information in your account or terminate your account, you can contact us using the contact information provided. You can also delete your account yourself in the MotionHive mobile app. When you do, we deactivate your account at once and erase your information within 30 days, keeping only the records described in section 8.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">426,431</context>
+          <context context-type="linenumber">429,433</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s11.p6" datatype="html">
@@ -5023,210 +5044,210 @@
           class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">432,435</context>
+          <context context-type="linenumber">434,437</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s12.h2" datatype="html">
         <source>12. Controls for do-not-track features</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">438,439</context>
+          <context context-type="linenumber">440,441</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s12.p1" datatype="html">
         <source>Most web browsers and some mobile operating systems and mobile applications include a Do-Not-Track (&quot;DNT&quot;) feature or setting you can activate to signal your privacy preference not to have data about your online browsing activities monitored and collected. At this stage, no uniform technology standard for recognizing and implementing DNT signals has been finalized. As such, we do not currently respond to DNT browser signals or any other mechanism that automatically communicates your choice not to be tracked online. If a standard for online tracking is adopted that we must follow in the future, we will inform you about that practice in a revised version of this Privacy Notice.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">439,445</context>
+          <context context-type="linenumber">441,447</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.h2" datatype="html">
         <source>13. Do United States residents have specific privacy rights? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">449,451</context>
+          <context context-type="linenumber">451,453</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>If you are a resident of California, Colorado, Connecticut, Delaware, Florida, Indiana, Iowa, Kentucky, Maryland, Minnesota, Montana, Nebraska, New Hampshire, New Jersey, Oregon, Rhode Island, Tennessee, Texas, Utah, or Virginia, you may have the right to request access to and receive details about the personal information we maintain about you and how we have processed it, correct inaccuracies, get a copy of, or delete your personal information.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">451,456</context>
+          <context context-type="linenumber">453,458</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.sub1" datatype="html">
         <source>Categories of personal information we collect</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">456,457</context>
+          <context context-type="linenumber">458,459</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p2" datatype="html">
         <source>We have collected the following categories of personal information in the past twelve (12) months:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">457,459</context>
+          <context context-type="linenumber">459,461</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>A. Identifiers<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (contact details, IP address, email, account name). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">460,462</context>
+          <context context-type="linenumber">462,464</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li2" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>B. Personal information as defined in the California Customer Records statute<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (name, contact information, financial information). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">462,464</context>
+          <context context-type="linenumber">464,466</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li3" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>C. Protected classification characteristics<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (gender, age, demographic data). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">464,466</context>
+          <context context-type="linenumber">466,468</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li4" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>D. Commercial information<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (transaction information, purchase history, payment information). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">466,468</context>
+          <context context-type="linenumber">468,470</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li5" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>E. Biometric information<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>. Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>No<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">468,469</context>
+          <context context-type="linenumber">470,471</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li6" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>F. Internet or other similar network activity<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (browsing history, usage). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">469,471</context>
+          <context context-type="linenumber">471,473</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li7" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>G. Geolocation data<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (device location). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">471,473</context>
+          <context context-type="linenumber">473,475</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li8" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>H. Audio, electronic, sensory, or similar information<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (images). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">473,475</context>
+          <context context-type="linenumber">475,477</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li9" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>I. Professional or employment-related information<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>. Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">475,477</context>
+          <context context-type="linenumber">477,479</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li10" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>J. Education information<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>. Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">477,478</context>
+          <context context-type="linenumber">479,480</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li11" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>K. Inferences drawn to create a profile<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>. Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>No<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">478,480</context>
+          <context context-type="linenumber">480,482</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li12" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>L. Sensitive personal information<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> (account login information and health data). Collected: <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Yes<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">480,483</context>
+          <context context-type="linenumber">482,485</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p3" datatype="html">
-        <source>We only collect sensitive personal information, as defined by applicable privacy laws, for the purposes allowed by law or with your consent. We do not collect or process sensitive personal information for the purpose of inferring characteristics about you. We retain each category of collected personal information for as long as the user has an account with us.</source>
+        <source>We only collect sensitive personal information, as defined by applicable privacy laws, for the purposes allowed by law or with your consent. We do not collect or process sensitive personal information for the purpose of inferring characteristics about you. We retain each category of collected personal information for as long as the user has an account with us, except the records described in section 8, which the law requires us to keep for longer.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">483,487</context>
+          <context context-type="linenumber">485,489</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.sub2" datatype="html">
         <source>Your rights</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">487,488</context>
+          <context context-type="linenumber">490,491</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p4" datatype="html">
         <source>You have rights under certain US state data protection laws. These rights include:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">488,490</context>
+          <context context-type="linenumber">491,493</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li13" datatype="html">
         <source>Right to know whether or not we are processing your personal data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">491,492</context>
+          <context context-type="linenumber">494,495</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li14" datatype="html">
         <source>Right to access your personal data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">492,493</context>
+          <context context-type="linenumber">495,496</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li15" datatype="html">
         <source>Right to correct inaccuracies in your personal data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">493,494</context>
+          <context context-type="linenumber">496,497</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li16" datatype="html">
         <source>Right to request the deletion of your personal data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">494,495</context>
+          <context context-type="linenumber">497,498</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li17" datatype="html">
         <source>Right to obtain a copy of the personal data you previously shared with us</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">495,496</context>
+          <context context-type="linenumber">498,499</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li18" datatype="html">
         <source>Right to non-discrimination for exercising your rights</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">496,497</context>
+          <context context-type="linenumber">499,500</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.li19" datatype="html">
         <source>Right to opt out of the processing of your personal data if it is used for targeted advertising, the sale of personal data, or profiling in furtherance of decisions that produce legal or similarly significant effects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">497,500</context>
+          <context context-type="linenumber">500,503</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.sub3" datatype="html">
         <source>How to exercise your rights</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">501,502</context>
+          <context context-type="linenumber">504,505</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p5" datatype="html">
@@ -5234,7 +5255,7 @@
           href=&quot;mailto:privacy@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, or by referring to the contact details at the bottom of this document. You can opt out from the selling of your personal information, targeted advertising, or profiling by disabling cookies in cookie preference settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">502,505</context>
+          <context context-type="linenumber">505,508</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p6" datatype="html">
@@ -5242,77 +5263,77 @@
           href=&quot;mailto:privacy@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>. If your appeal is denied, you may submit a complaint to your state attorney general.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">506,510</context>
+          <context context-type="linenumber">509,513</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p7" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>California &quot;Shine the Light&quot; law.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> California Civil Code Section 1798.83 permits our users who are California residents to request and obtain from us, once a year and free of charge, information about categories of personal information (if any) we disclosed to third parties for direct marketing purposes. If you are a California resident and would like to make such a request, please submit your request in writing to us using the contact details provided below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">510,514</context>
+          <context context-type="linenumber">513,517</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s14.h2" datatype="html">
         <source>14. Do we make updates to this notice?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">518,519</context>
+          <context context-type="linenumber">521,522</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s14.p1" datatype="html">
         <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>In short:<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Yes, we will update this notice as necessary to stay compliant with relevant laws.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">519,521</context>
+          <context context-type="linenumber">522,524</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s14.p2" datatype="html">
         <source>We may update this Privacy Notice from time to time. The updated version will be indicated by an updated &quot;Revised&quot; date at the top of this Privacy Notice. If we make material changes to this Privacy Notice, we may notify you either by prominently posting a notice of such changes or by directly sending you a notification. We encourage you to review this Privacy Notice frequently to be informed of how we are protecting your information.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">521,525</context>
+          <context context-type="linenumber">524,528</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.h2" datatype="html">
         <source>15. How can you contact us about this notice?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">529,530</context>
+          <context context-type="linenumber">532,533</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.p1" datatype="html">
         <source>If you have questions or comments about this notice, you may email us or contact us by post at:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">530,532</context>
+          <context context-type="linenumber">533,535</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.email.label" datatype="html">
         <source>Email:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">536,537</context>
+          <context context-type="linenumber">539,540</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.address.label" datatype="html">
         <source>Address:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">544,545</context>
+          <context context-type="linenumber">547,548</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s15.address.value" datatype="html">
         <source>HIVECRAFT S.R.L., Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58, Cluj-Napoca, Cluj 400482, Romania</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">545,548</context>
+          <context context-type="linenumber">548,551</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s16.h2" datatype="html">
         <source>16. How can you review, update, or delete the data we collect from you?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">553,555</context>
+          <context context-type="linenumber">556,558</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s16.p1" datatype="html">
@@ -5320,14 +5341,14 @@
           class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">555,562</context>
+          <context context-type="linenumber">558,565</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.footer.also" datatype="html">
         <source> Also read our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/terms-of-service&quot; class=&quot;text-brand hover:underline font-medium&quot;&gt;"/>Terms of Service<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">572,575</context>
+          <context context-type="linenumber">575,578</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.pill" datatype="html">

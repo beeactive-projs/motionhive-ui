@@ -1,22 +1,10 @@
-// The divider Ionic will not draw for us — see the class comment for why the
-// inset list's own borders cannot be used here.
+// Separator, row height and chevron come from the grouped-list skin
+// (theme/components/ion-list.css); this row only lays out its own parts.
 :host {
   display: block;
-  border-block-end: 1px solid var(--mh-color-divider);
-}
-
-:host(:last-of-type) {
-  border-block-end: 0;
 }
 
 ion-item {
-  --background: var(--ion-card-background);
-  --min-height: 0;
-  // Ionic dims the chevron to 25% by default, which drops it below the
-  // design's weight and below the 3:1 a control needs.
-  --detail-icon-color: var(--ion-color-medium);
-  --detail-icon-opacity: 1;
-
   font-size: var(--mh-text-base);
 }
 
@@ -28,7 +16,6 @@ ion-item {
 ion-note {
   max-width: 55%;
   overflow: hidden;
-  font-size: var(--mh-text-sm);
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: 0;
@@ -51,7 +38,6 @@ ion-badge {
 }
 
 .value-mono {
-  font-family: var(--mh-font-mono);
 }
 
 .value-empty {

@@ -56,6 +56,8 @@ export const MARKETING_BLOG_URL = `${MARKETING_SITE_URL}/blog`;
  */
 export const TERMS_OF_SERVICE_PATH = '/legal/terms-of-service';
 export const PRIVACY_POLICY_PATH = '/legal/privacy-policy';
+/** How to delete an account, and what happens to the data. The store listings link here too. */
+export const DELETE_ACCOUNT_PATH = '/legal/delete-account';
 
 /**
  * A marketing site page in `language`. The site serves the default language at
@@ -75,6 +77,11 @@ export function termsOfServiceUrl(language: AppLanguage): string {
 /** The privacy policy on the marketing site, in `language`. */
 export function privacyPolicyUrl(language: AppLanguage): string {
   return marketingSiteUrl(PRIVACY_POLICY_PATH, language);
+}
+
+/** The delete-account page on the marketing site, in `language`. */
+export function deleteAccountUrl(language: AppLanguage): string {
+  return marketingSiteUrl(DELETE_ACCOUNT_PATH, language);
 }
 
 /**

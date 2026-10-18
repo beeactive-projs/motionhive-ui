@@ -37,7 +37,6 @@
   border-radius: var(--mh-radius-pill);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
   cursor: pointer;
@@ -70,10 +69,14 @@
   scroll-margin-top: calc(var(--offset-top, 0px) + 3.75rem);
 }
 
-/* The weekday at the start of each row, at a fixed width so the names align. */
+/* The weekday at the start of each row, at a fixed width so the names align.
+   The row's separator starts after it (theme/components/ion-list.css). */
 .dow {
   width: 2.5rem;
-  margin-inline-end: 0.5rem;
+}
+
+ion-item:has(> .dow) {
+  --mh-row-lead: 2.5rem;
 }
 
 /* A rest day is an invitation, quieter than a day with a name. */
@@ -99,7 +102,7 @@ ion-item.rest p {
 
 .chevron {
   margin-inline-end: 0.25rem;
-  font-size: 0.875rem;
+  font-size: var(--mh-icon-sm);
   transition: transform 150ms ease;
 }
 
@@ -125,7 +128,6 @@ ion-item.rest p {
 .week-summary .entry-dow {
   margin-inline-end: 0.25rem;
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   font-weight: 600;
 }

@@ -17,6 +17,10 @@
   @if (errorMessage(); as message) {
   <p-message severity="error">{{ message }}</p-message>
   }
+  @if (keepOffer(); as offer) {
+  <mh-keep-account-offer [offer]="offer" (kept)="onKept()" (dismissed)="keepOffer.set(null)"
+    (expired)="onKeepExpired()" />
+  }
 
   <form [formRoot]="form" class="flex flex-col gap-5">
     @let email = form.email();

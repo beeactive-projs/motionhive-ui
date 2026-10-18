@@ -1,5 +1,20 @@
 <ion-item-sliding #sliding>
-  <ion-item button detail="false" lines="full" (click)="select.emit()">
+  <!-- Swipe right: WhatsApp's Read / Unread toggle. -->
+  <ion-item-options side="start">
+    <ion-item-option
+      color="primary"
+      (click)="emitAndClose(sliding, isUnread() ? markRead : markUnread)"
+    >
+      <ion-icon
+        slot="top"
+        aria-hidden="true"
+        [name]="isUnread() ? 'checkmark-done-outline' : 'chatbubble-outline'"
+      />
+      {{ (isUnread() ? 'messages.row.markRead' : 'messages.row.markUnread') | translate }}
+    </ion-item-option>
+  </ion-item-options>
+
+  <ion-item button detail="false" (click)="select.emit()">
     <!--
       Decorative here: the name it would announce is the very next thing in the
       row, so without this a screen reader reads it twice. `name` still feeds the
@@ -14,43 +29,58 @@
       [color]="tone()"
     />
 
+    <!-- WhatsApp's two lines: the name with its time, then the preview with
+         the muted bell and the unread count. -->
     <ion-label>
-      <h2>{{ title() }}</h2>
-      <p>{{ preview() }}</p>
+      <div class="mh-feed-line">
+        <h2>{{ title() }}</h2>
+        <ion-note class="time">{{ time() }}</ion-note>
+      </div>
+      <div class="mh-feed-line">
+        <p>{{ preview() }}</p>
+        @if (isMuted()) {
+          <ion-icon
+            class="muted"
+            name="notifications-off-outline"
+            role="img"
+            [attr.aria-label]="'messages.row.mutedAria' | translate"
+          />
+        }
+        <!-- Honey whether muted or not; the bell says it is muted. -->
+        @if (unreadLabel(); as count) {
+          <ion-badge
+            color="primary"
+            [attr.aria-label]="'messages.row.unreadAria' | translate: { count }"
+          >
+            {{ count }}
+          </ion-badge>
+        } @else if (isMarkedUnread()) {
+          <ion-badge
+            class="dot"
+            role="img"
+            color="primary"
+            [attr.aria-label]="'messages.row.markedUnreadAria' | translate"
+          />
+        }
+      </div>
     </ion-label>
-
-    <div class="meta" slot="end">
-      <ion-note>{{ time() }}</ion-note>
-      @if (isUnread()) {
-        <ion-badge
-          color="danger"
-          [attr.aria-label]="'messages.row.unreadAria' | translate: { count: unreadLabel() }"
-        >
-          {{ unreadLabel() }}
-        </ion-badge>
-      }
-    </div>
   </ion-item>
 
+  <!-- Swipe left: WhatsApp's More + Archive, with mute where archive sits. -->
   <ion-item-options side="end">
-    @if (isUnread()) {
-      <ion-item-option color="primary" (click)="emitAndClose(sliding, markRead)">
-        <ion-icon
-          slot="icon-only"
-          name="checkmark-done"
-          [attr.aria-label]="'messages.row.markRead' | translate"
-        />
-      </ion-item-option>
-    }
-    <ion-item-option
-      [color]="isMuted() ? 'medium' : 'secondary'"
-      (click)="emitAndClose(sliding, toggleMute)"
-    >
+    <ion-item-option color="medium" (click)="emitAndClose(sliding, more)">
+      <ion-icon slot="top" name="ellipsis-horizontal-outline" aria-hidden="true" />
+      {{ 'messages.row.more' | translate }}
+    </ion-item-option>
+    <!-- Navy in both states, so it never matches More beside it; the icon
+         and the label carry the state. -->
+    <ion-item-option color="secondary" (click)="emitAndClose(sliding, toggleMute)">
       <ion-icon
-        slot="icon-only"
+        slot="top"
+        aria-hidden="true"
         [name]="isMuted() ? 'notifications-outline' : 'notifications-off-outline'"
-        [attr.aria-label]="(isMuted() ? 'messages.row.unmute' : 'messages.row.mute') | translate"
       />
+      {{ (isMuted() ? 'messages.row.unmute' : 'messages.row.mute') | translate }}
     </ion-item-option>
   </ion-item-options>
 </ion-item-sliding>

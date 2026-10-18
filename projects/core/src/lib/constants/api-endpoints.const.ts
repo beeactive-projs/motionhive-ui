@@ -10,6 +10,12 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: '/auth/reset-password',
     RESEND_VERIFICATION: '/auth/resend-verification',
     VERIFY_EMAIL: '/auth/verify-email',
+    RESTORE_ACCOUNT: '/auth/restore-account',
+  },
+  ACCOUNT_DELETION: {
+    PREVIEW: '/users/me/deletion/preview',
+    CODE: '/users/me/deletion/code',
+    CONFIRM: '/users/me/deletion/confirm',
   },
   USERS: {
     BASE: '/users',
@@ -253,6 +259,8 @@ export const API_ENDPOINTS = {
     BASE: '/workout-logs',
     BY_ID: (id: string) => `/workout-logs/${id}`,
     COMPLETE: (id: string) => `/workout-logs/${id}/complete`,
+    PAUSE: (id: string) => `/workout-logs/${id}/pause`,
+    RESUME: (id: string) => `/workout-logs/${id}/resume`,
     LOG_SET: (id: string, setId: string) =>
       `/workout-logs/${id}/sets/${setId}`,
     ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,
@@ -291,6 +299,7 @@ export const API_ENDPOINTS = {
     CONVERSATION_MESSAGES: (id: string) =>
       `/messaging/conversations/${id}/messages`,
     CONVERSATION_READ: (id: string) => `/messaging/conversations/${id}/read`,
+    CONVERSATION_UNREAD: (id: string) => `/messaging/conversations/${id}/unread`,
     CONVERSATION_MUTE: (id: string) => `/messaging/conversations/${id}/mute`,
     CONVERSATION_LEAVE: (id: string) => `/messaging/conversations/${id}/leave`,
     MESSAGES: '/messaging/messages',

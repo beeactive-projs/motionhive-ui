@@ -20,6 +20,7 @@
     "removeItem": "Elimină {name}",
     "requirementMet": "{label}: îndeplinit",
     "requirementNotMet": "{label}: neîndeplinit",
+    "resizeSheet": "Redimensionează panoul",
     "showPassword": "Arată parola",
     "switchToDarkMode": "Treci la modul întunecat",
     "switchToLightMode": "Treci la modul luminos",
@@ -136,6 +137,20 @@
       "talkingToServer": "Comunicăm cu serverul…",
       "title": "Îți verificăm emailul",
       "verified": "Emailul tău a fost verificat. Te redirecționăm la autentificare…"
+    },
+    "accountClosed": {
+      "title": "Contul tău este închis",
+      "body": "Îți vom șterge datele pe {date}. Te-ai răzgândit? Autentifică-te până atunci și îți poți păstra contul.",
+      "bodyNoDate": "Îți vom șterge datele în cel mult 30 de zile. Te-ai răzgândit? Autentifică-te până atunci și îți poți păstra contul.",
+      "email": "Ți-am trimis detaliile și pe email.",
+      "back": "Înapoi la autentificare"
+    },
+    "keepAccount": {
+      "title": "Îți păstrezi contul?",
+      "body": "Contul tău este programat pentru ștergere pe {date}. Îl păstrezi și te autentifici? Ce s-a încheiat când ai cerut ștergerea rămâne încheiat.",
+      "confirm": "Păstrează-mi contul",
+      "cancel": "Nu acum",
+      "expired": "A durat prea mult. Autentifică-te din nou ca să îți păstrezi contul."
     }
   },
   "button": {

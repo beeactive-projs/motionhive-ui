@@ -88,6 +88,51 @@ export class LoggerStore {
     this._error.set(false);
   }
 
+  // ─── Clock ────────────────────────────────────────────────────
+
+  /** Stop the clock on the way out. The caller leaves only once it held. */
+  pause(onDone: () => void, onError: () => void): void {
+    const log = this._log();
+    if (!log) return;
+    this._workoutLogService
+      .pause(log.id)
+      .pipe(take(1))
+      .subscribe({
+        next: (saved) => {
+          this._patchClock(saved);
+          onDone();
+        },
+        error: onError,
+      });
+  }
+
+  /**
+   * Coming back to a paused workout starts its clock again. Optimistic: the
+   * pause is folded in here at once so the clock moves on from where it
+   * stopped, and the server's sum replaces it when it answers.
+   */
+  resumeClock(): void {
+    const log = this._log();
+    if (!log?.pausedAt) return;
+    const open = Math.max(0, Math.round((Date.now() - new Date(log.pausedAt).getTime()) / 1000));
+    this._patchClock({ pausedAt: null, pausedSeconds: (log.pausedSeconds ?? 0) + open });
+    this._workoutLogService
+      .resume(log.id)
+      .pipe(
+        take(1),
+        catchError(() => of(null)),
+      )
+      .subscribe((saved) => {
+        if (saved) this._patchClock(saved);
+      });
+  }
+
+  private _patchClock(clock: Pick<WorkoutLog, 'pausedAt' | 'pausedSeconds'>): void {
+    this._log.update((log) =>
+      log ? { ...log, pausedAt: clock.pausedAt ?? null, pausedSeconds: clock.pausedSeconds ?? 0 } : log,
+    );
+  }
+
   // ─── Sets ─────────────────────────────────────────────────────
 
   logSet(exerciseId: string, setId: string, payload: LogSetPayload): void {

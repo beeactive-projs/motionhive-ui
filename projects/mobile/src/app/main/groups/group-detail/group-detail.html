@@ -74,8 +74,8 @@
   } @else if (store.showGroupSkeleton()) {
   <div class="mh-page" aria-busy="true">
     <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index; let last = $last) {
-      <ion-item [lines]="last ? 'none' : 'full'">
+      @for (_ of skeletonRows; track $index) {
+      <ion-item>
         <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
         <ion-label>
           <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
@@ -176,8 +176,8 @@
       (action)="retry()" />
     } @else if (store.showSkeleton()) {
     <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
-      @for (_ of skeletonRows; track $index; let last = $last) {
-      <ion-item [lines]="last ? 'none' : 'full'">
+      @for (_ of skeletonRows; track $index) {
+      <ion-item>
         <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
         <ion-label>
           <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
@@ -193,7 +193,7 @@
     </ion-button>
     }
 
-    <ion-searchbar [placeholder]="'groups.detail.members.search' | translate"
+    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" [placeholder]="'groups.detail.members.search' | translate"
       [attr.aria-label]="'groups.detail.members.search' | translate" inputmode="search"
       [value]="store.memberQuery()" (ionInput)="onMemberQuery($event.detail.value ?? '')" />
 
@@ -212,10 +212,10 @@
       [message]="'groups.detail.members.empty.message' | translate" />
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (member of store.visibleMembers(); track member.id; let last = $last) {
+      @for (member of store.visibleMembers(); track member.id) {
       <!-- Tappable only when the account has a handle: a profile is addressed
            by handle, so without one there is nowhere to go. -->
-      <ion-item [lines]="last ? 'none' : 'full'" [button]="hasProfile(member)"
+      <ion-item [button]="hasProfile(member)"
         [detail]="false" (click)="openMember(member)">
         <mh-hex-avatar slot="start" size="md" [name]="memberName(member)"
           [imageUrl]="member.user?.avatarUrl ?? null" />
@@ -243,20 +243,20 @@
     }
 
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item lines="full">
+      <ion-item>
         <ion-label>
           <h2>{{ 'groups.common.members' | translate }}</h2>
           <p>{{ memberCountLabel() }}</p>
         </ion-label>
       </ion-item>
-      <ion-item [lines]="group.city ? 'full' : 'none'">
+      <ion-item>
         <ion-label>
           <h2>{{ 'groups.common.joining' | translate }}</h2>
           <p>{{ policyLabel() }}</p>
         </ion-label>
       </ion-item>
       @if (group.city) {
-      <ion-item lines="none">
+      <ion-item>
         <ion-label>
           <h2>{{ 'groups.common.where' | translate }}</h2>
           <p>{{ group.city }}@if (group.country) {, {{ group.country }}}</p>
@@ -278,8 +278,8 @@
          client, so it sits with the group's own settings rather than under
          the member list. -->
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item button [detail]="true" lines="none" (click)="openJoinLink()">
-        <ion-icon slot="start" name="link-outline" color="medium" aria-hidden="true" />
+      <ion-item button [detail]="true" (click)="openJoinLink()">
+        <mh-hex-avatar slot="start" size="sm" icon="link-outline" color="info" />
         <ion-label>
           <h2>{{ 'groups.joinLink.title' | translate }}</h2>
           <p>{{ (group.joinToken ? 'groups.detail.inviteLink.active' : 'groups.detail.inviteLink.none') | translate }}</p>

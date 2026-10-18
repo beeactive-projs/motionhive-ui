@@ -24,7 +24,7 @@
       </div>
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
-          <ion-item lines="full">
+          <ion-item>
             <ion-label>
               <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
               <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
@@ -71,7 +71,7 @@
 
       <ion-list [inset]="true" class="mh-card-list">
         @if (coach(); as coach) {
-          <ion-item lines="full" [button]="!!coach.handle" detail="false" (click)="openCoach()">
+          <ion-item [button]="!!coach.handle" detail="false" (click)="openCoach()">
             <mh-hex-avatar
               slot="start"
               size="sm"
@@ -92,7 +92,7 @@
         }
 
         @if (blockedInstance()) {
-          <ion-item lines="none">
+          <ion-item>
             <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="violet" tone="wash" aria-hidden="true" />
             <ion-label>
               <h3>{{ 'mySessions.detail.blocked.title' | translate }}</h3>
@@ -101,7 +101,7 @@
           </ion-item>
         } @else {
           @if (view() === Views.OnlineLive) {
-            <ion-item lines="full">
+            <ion-item>
               <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="teal" tone="wash" aria-hidden="true" />
               <ion-label>
                 <h3>{{ providerLabel() }}</h3>
@@ -117,7 +117,7 @@
             </ion-item>
           } @else if (view() === Views.OnlinePre) {
             <!-- The withheld link is a designed state, not an error. -->
-            <ion-item lines="full">
+            <ion-item>
               <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="medium" tone="wash" aria-hidden="true" />
               <ion-label>
                 <h3>{{ 'mySessions.detail.link.locked' | translate }}</h3>
@@ -125,7 +125,7 @@
               </ion-label>
             </ion-item>
           } @else if (isOnlineSession()) {
-            <ion-item lines="full">
+            <ion-item>
               <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="medium" tone="wash" aria-hidden="true" />
               <ion-label>
                 <h3>{{ providerLabel() }}</h3>
@@ -135,7 +135,7 @@
               </ion-label>
             </ion-item>
           } @else {
-            <ion-item lines="full">
+            <ion-item>
               <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" aria-hidden="true" />
               <ion-label>
                 <p class="row-label">{{ 'mySessions.detail.where' | translate }}</p>
@@ -147,7 +147,7 @@
             </ion-item>
           }
 
-          <ion-item lines="none">
+          <ion-item>
             <mh-hex-avatar slot="start" size="sm" icon="calendar-outline" color="info" tone="shade" aria-hidden="true" />
             <ion-label>
               <p class="row-label">{{ 'mySessions.detail.when' | translate }}</p>
@@ -164,7 +164,7 @@
 
       @if (!blockedInstance()) {
         <ion-list [inset]="true" class="mh-card-list">
-          <ion-item [lines]="capacity() !== null ? 'full' : 'none'">
+          <ion-item>
             <mh-hex-avatar slot="start" size="sm" icon="pricetag-outline" color="success" tone="shade" aria-hidden="true" />
             <ion-label>
               <p class="row-label">{{ 'mySessions.detail.price' | translate }}</p>
@@ -176,7 +176,7 @@
           </ion-item>
 
           @if (capacity() !== null) {
-            <ion-item lines="none">
+            <ion-item>
               <mh-hex-avatar slot="start" size="sm" icon="people-outline" color="medium" tone="wash" aria-hidden="true" />
               <ion-label>
                 <p class="row-label">{{ 'mySessions.detail.spots' | translate }}</p>

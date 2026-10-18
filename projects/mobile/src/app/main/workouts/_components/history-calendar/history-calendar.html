@@ -3,7 +3,7 @@
     <div class="nav">
       <span class="label">{{ monthLabel() }}</span>
       <ion-button fill="clear" [attr.aria-label]="'a11y.previousMonth' | translate" (click)="step(-1)">
-        <ion-icon slot="icon-only" name="chevron-back" aria-hidden="true" />
+        <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
       </ion-button>
       <ion-button
         fill="clear"
@@ -11,7 +11,7 @@
         [attr.aria-label]="'a11y.nextMonth' | translate"
         (click)="step(1)"
       >
-        <ion-icon slot="icon-only" name="chevron-forward" aria-hidden="true" />
+        <ion-icon slot="icon-only" name="chevron-forward-outline" aria-hidden="true" />
       </ion-button>
       <ion-button
         fill="clear"

@@ -133,6 +133,29 @@ export class AuthService implements OnDestroy {
       );
   }
 
+  /**
+   * Keep an account during its deletion cooling-off, with the ticket a
+   * sign-in answered with (see `scheduledDeletionFrom`). Signs the person in,
+   * like a login.
+   */
+  restoreAccount(ticket: string): Observable<User> {
+    return this._http
+      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.RESTORE_ACCOUNT}`, { ticket })
+      .pipe(
+        tap((response) => this.handleAuthResponse(response)),
+        switchMap(() => this.fetchAndStoreProfile()),
+      );
+  }
+
+  /**
+   * End the session on this device without asking the API: for when the API
+   * already revoked it, as confirming an account deletion does. A logout
+   * request there would only fail and try a refresh first.
+   */
+  endLocalSession(): void {
+    this.clearAuthData();
+  }
+
   refreshToken(): Observable<{ accessToken: string }> {
     const refreshToken = this._tokenService.getRefreshToken();
     return this._http

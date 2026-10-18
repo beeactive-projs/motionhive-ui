@@ -34,8 +34,8 @@
         <ion-skeleton-text [animated]="true" style="width: 35%; height: 1.75rem" />
       </div>
       <ion-list [inset]="true" class="mh-card-list">
-        @for (_ of skeletonRows; track $index; let last = $last) {
-          <ion-item [lines]="last ? 'none' : 'full'">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item>
             <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
             <ion-label>
               <h2><ion-skeleton-text [animated]="true" style="width: 50%" /></h2>
@@ -160,8 +160,8 @@
       @if (!isNew()) {
         <!-- Last, and the one row in red: the only thing here worth a second thought. -->
         <ion-list [inset]="true" class="mh-card-list">
-          <ion-item button detail="false" lines="none" (click)="deleteOpen.set(true)">
-            <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+          <ion-item button detail="false" (click)="deleteOpen.set(true)">
+            <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
             <ion-label color="danger">{{ 'workouts.routineBuilder.deleteRow' | translate }}</ion-label>
           </ion-item>
         </ion-list>

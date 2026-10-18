@@ -354,6 +354,16 @@
                 "glob": "*.json",
                 "input": "projects/core/src/i18n",
                 "output": "/i18n/shared/"
+              },
+              {
+                "glob": "inter-latin{,-ext}-wght-normal.woff2",
+                "input": "node_modules/@fontsource-variable/inter/files",
+                "output": "/fonts/"
+              },
+              {
+                "glob": "poppins-latin{,-ext}-{600,800}-normal.woff2",
+                "input": "node_modules/@fontsource/poppins/files",
+                "output": "/fonts/"
               }
             ],
             "styles": ["projects/mobile/src/styles.css"]

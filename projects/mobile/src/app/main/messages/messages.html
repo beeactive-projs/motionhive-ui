@@ -1,65 +1,82 @@
-@if (searchOpen()) {
-  <!-- Search owns the toolbar: a title, two actions, a field and a filter row
-       do not fit above the fold on a phone. -->
-  <ion-header [translucent]="true">
-    <ion-toolbar>
-      <ion-searchbar
-        mhAutofocus
-        inputmode="search"
-        [placeholder]="'messages.inbox.searchPlaceholder' | translate"
-        [debounce]="0"
-        [value]="people.query()"
-        (ionInput)="onQueryChange($event.detail.value ?? '')"
-      />
-      <ion-buttons slot="end">
-        <ion-button (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-} @else {
-  <ion-header [translucent]="true">
+<!-- WhatsApp's chat list: title and actions, a search field that is always
+     there, then the filter pills. Searching folds the title and the pills
+     away and keeps the same field, so the caret the tap put there stays. -->
+<ion-header class="mh-feed-header" [translucent]="true">
+  @if (!searchOpen()) {
     <ion-toolbar>
       <ion-title>{{ 'nav.messages' | translate }}</ion-title>
       <ion-buttons slot="end">
         <mh-notification-bell />
-        <ion-button [attr.aria-label]="'messages.inbox.searchAria' | translate" (click)="openSearch()">
-          <ion-icon slot="icon-only" name="search-outline" />
-        </ion-button>
-        <ion-button [attr.aria-label]="'messages.newMessage' | translate" (click)="openCompose()">
-          <ion-icon slot="icon-only" name="create-outline" />
+        <!-- The one filled control in the header: starting a conversation is
+             the page's primary action, and honey is what those are painted. -->
+        <ion-button
+          class="round"
+          shape="round"
+          fill="solid"
+          color="primary"
+          [attr.aria-label]="'messages.newMessage' | translate"
+          (click)="openCompose()"
+        >
+          <ion-icon slot="icon-only" name="add-outline" />
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
+  }
 
-    @if (!isEmpty()) {
-      <ion-toolbar>
-        <ion-segment [value]="store.filter()" (ionChange)="onFilterChange($event)">
-          @for (option of filters; track option.value) {
-            <ion-segment-button [value]="option.value">
-              <ion-label>
-                {{ option.label | translate }}
-                @if (store.filterCounts()[option.value]; as count) {
-                  <span class="count">{{ count }}</span>
-                }
-              </ion-label>
-            </ion-segment-button>
-          }
-        </ion-segment>
-      </ion-toolbar>
+  <ion-toolbar>
+    <!-- WhatsApp's search header: a back arrow beside the field. -->
+    @if (searchOpen()) {
+      <ion-buttons slot="start">
+        <ion-button [attr.aria-label]="'a11y.closeSearch' | translate" (click)="closeSearch()">
+          <ion-icon slot="icon-only" name="arrow-back-outline" />
+        </ion-button>
+      </ion-buttons>
     }
-  </ion-header>
-}
+    <!-- No `mhAutofocus`: this field is on screen from the start, and focusing
+         it is what opens search. -->
+    <ion-searchbar
+      class="mh-search-pill"
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      inputmode="search"
+      [placeholder]="'messages.inbox.searchPlaceholder' | translate"
+      [debounce]="0"
+      [value]="people.query()"
+      (ionFocus)="openSearch()"
+      (ionInput)="onQueryChange($event.detail.value ?? '')"
+    />
+  </ion-toolbar>
 
-<!-- The list runs edge to edge on white; search results and the empty states
-     are cards and centred art, which need the slate page behind them. -->
-<ion-content [fullscreen]="true" [class.flat-list]="showFlatList()">
+  @if (!searchOpen() && !isEmpty()) {
+    <ion-toolbar>
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'messages.inbox.filterBar' | translate">
+        @for (option of filters; track option.value) {
+          <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
+               reader reads it as text and never says which one is on. -->
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="store.filter() === option.value"
+            [attr.aria-pressed]="store.filter() === option.value"
+            (click)="setFilter(option.value)"
+          >
+            {{ option.label | translate }}
+            @if (option.value !== Filters.All && store.filterCounts()[option.value]; as count) {
+              <span class="count">{{ count }}</span>
+            }
+          </ion-button>
+        }
+      </div>
+    </ion-toolbar>
+  }
+</ion-header>
+
+<!-- A feed: the rows run edge to edge on white. The empty states are centred
+     art, which needs the slate page behind it. -->
+<ion-content [fullscreen]="true" [class.mh-feed-page]="showFeed()">
   @if (!searchOpen()) {
-    <ion-header collapse="condense">
-      <ion-toolbar>
-        <ion-title size="large">{{ 'nav.messages' | translate }}</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
     <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
       <ion-refresher-content />
     </ion-refresher>
@@ -78,13 +95,13 @@
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
-    <ion-list>
+    <ion-list class="mh-feed-list">
       @for (_ of skeletonRows; track $index) {
-        <ion-item lines="full">
+        <ion-item>
           <ion-skeleton-text
             slot="start"
             [animated]="true"
-            style="width: 2.875rem; height: 3.25rem"
+            style="width: 3.25rem; height: 3.25rem"
           />
           <ion-label>
             <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
@@ -104,21 +121,21 @@
 
     @if (people.results().length > 0) {
       <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
-      <ion-list>
+      <ion-list class="mh-feed-list">
         @for (person of people.results(); track person.id) {
-          <ion-item button detail="true" lines="full" (click)="openPerson(person)">
+          <ion-item button detail="false" (click)="openPerson(person)">
             <mh-hex-avatar
               slot="start"
-              size="md"
+              size="lg"
               aria-hidden="true"
               [name]="nameOf(person)"
               [imageUrl]="person.avatarUrl"
               [color]="toneFor(person.id)"
             />
             <ion-label>
-              <h3>{{ nameOf(person) }}</h3>
+              <h2>{{ nameOf(person) }}</h2>
               @if (person.handle; as tag) {
-                <p class="handle">&#64;{{ tag }}</p>
+                <p>&#64;{{ tag }}</p>
               }
             </ion-label>
           </ion-item>
@@ -128,13 +145,15 @@
 
     @if (store.visibleConversations().length > 0) {
       <div class="mh-section-label">{{ 'nav.messages' | translate }}</div>
-      <ion-list>
+      <ion-list class="mh-feed-list">
         @for (conversation of store.visibleConversations(); track conversation.id) {
           <mh-conversation-row
             [conversation]="conversation"
             (select)="openConversation(conversation.id)"
             (markRead)="markRead(conversation.id)"
+            (markUnread)="markUnread(conversation.id)"
             (toggleMute)="toggleMute(conversation.id)"
+            (more)="openActions(conversation)"
           />
         }
       </ion-list>
@@ -154,13 +173,15 @@
       [message]="'messages.inbox.caughtUp.message' | translate"
     />
   } @else {
-    <ion-list>
+    <ion-list class="mh-feed-list">
       @for (conversation of store.visibleConversations(); track conversation.id) {
         <mh-conversation-row
           [conversation]="conversation"
           (select)="openConversation(conversation.id)"
           (markRead)="markRead(conversation.id)"
+          (markUnread)="markUnread(conversation.id)"
           (toggleMute)="toggleMute(conversation.id)"
+          (more)="openActions(conversation)"
         />
       }
     </ion-list>
@@ -172,3 +193,15 @@
 </ion-content>
 
 <mh-new-message-sheet />
+
+<!-- One More sheet and one block sheet for the whole list, aimed at whichever
+     row's More was tapped. -->
+<mh-action-sheet
+  [(open)]="actionsOpen"
+  [title]="actionTitle()"
+  [subtitle]="actionSubtitle()"
+  [actions]="actions()"
+  (chosen)="onAction($event)"
+/>
+
+<mh-block-user-sheet [(open)]="blockOpen" [name]="actionTitle()" (confirm)="block($event)" />

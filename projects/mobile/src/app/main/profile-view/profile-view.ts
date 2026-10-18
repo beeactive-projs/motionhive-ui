@@ -40,6 +40,7 @@ import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { roleLabel } from '../person/person.config';
 import { ProfileViewStore } from './profile-view.store';
+import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 
 /**
  * Someone else's profile, reached by tapping a name.
@@ -76,6 +77,8 @@ import { ProfileViewStore } from './profile-view.store';
   providers: [ProfileViewStore],
 })
 export class ProfileView implements ViewWillEnter {
+  readonly Tiles = DETAIL_TILES;
+
   readonly store = inject(ProfileViewStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);

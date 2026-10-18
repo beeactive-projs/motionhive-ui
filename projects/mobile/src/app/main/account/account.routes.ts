@@ -40,8 +40,16 @@ export const accountRoutes: Routes = [
     title: 'pageTitle.coachingProfile',
   },
   {
-    path: 'manage',
-    loadComponent: () => import('./manage-account/manage-account').then((m) => m.ManageAccount),
-    title: 'pageTitle.manageAccount',
+    // Behind a row at the end of Account, past an explanation, a code and a
+    // word to type: findable, never one tap away.
+    path: 'delete',
+    loadComponent: () =>
+      import('./delete-account/delete-account').then((m) => m.DeleteAccount),
+    title: 'pageTitle.deleteAccount',
+  },
+  {
+    path: 'privacy',
+    loadComponent: () => import('./privacy/privacy').then((m) => m.AccountPrivacy),
+    title: 'pageTitle.privacy',
   },
 ];

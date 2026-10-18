@@ -11,7 +11,8 @@
         <ion-label>{{ tab.label | translate }}</ion-label>
         @if (tab.badge; as unread) {
           @if (unread() > 0) {
-            <ion-badge color="danger">{{ unread() }}</ion-badge>
+            <!-- Honey, like the unread badge and time on the inbox rows. -->
+            <ion-badge color="primary">{{ unread() }}</ion-badge>
           }
         }
       </ion-tab-button>

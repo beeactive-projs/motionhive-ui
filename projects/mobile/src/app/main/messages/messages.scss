@@ -1,19 +1,12 @@
-/* An inbox is a wall of rows, not cards on a page. Without this the list stops
-   at the last row and the slate page shows through, reading as a cut-off list. */
-.flat-list {
-  --background: var(--ion-card-background);
+/* The skeleton's block stands in for the avatar, so the separator starts
+   where the real rows' text does. */
+ion-item:has(> ion-skeleton-text[slot='start']) {
+  --mh-row-lead: 3.25rem;
 }
 
-/* The count riding inside a segment button's label. */
+/* The count riding inside the Unread pill, as WhatsApp does. Full ink: a
+   faded count fell under 4.5:1 on the idle pill's wash. */
 .count {
-  margin-left: 0.25rem;
-  opacity: 0.55;
-  font-weight: 700;
-}
-
-/* Handle under a search result. */
-.handle {
-  font-family: var(--mh-font-mono);
-  font-size: var(--mh-text-xs);
+  margin-inline-start: 0.25rem;
   font-weight: 600;
 }

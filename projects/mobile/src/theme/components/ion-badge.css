@@ -1,3 +1,9 @@
+/* Ionic draws badge text bold; 600 is the top of the Inter scale below the
+   display figures. */
+ion-badge {
+  font-weight: 600;
+}
+
 /* A bare dot: something is waiting inside, no number implied. Ionic sizes
    badges for text, so an empty one needs its own dimensions — and its own
    `display`: Ionic hides an empty badge outright (`:host(:empty)`), and only

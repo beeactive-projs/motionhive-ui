@@ -6,7 +6,7 @@
 <mh-notice tone="danger" role="alert">{{ 'auth.signUp.error.invalidInvitation' | translate }}</mh-notice>
 <ion-button expand="block" class="auth-submit" (click)="goToApp()">
   {{ 'auth.invite.goToApp' | translate }}
-  <ion-icon slot="end" name="arrow-forward" aria-hidden="true" />
+  <ion-icon slot="end" name="arrow-forward-outline" aria-hidden="true" />
 </ion-button>
 } @else {
 @if (invite()) {
@@ -25,7 +25,7 @@
   <ion-spinner name="crescent" />
   } @else {
   {{ 'auth.invite.accept' | translate }}
-  <ion-icon slot="end" name="checkmark" aria-hidden="true" />
+  <ion-icon slot="end" name="checkmark-outline" aria-hidden="true" />
   }
 </ion-button>
 <ion-button expand="block" fill="outline" color="medium" class="auth-submit"

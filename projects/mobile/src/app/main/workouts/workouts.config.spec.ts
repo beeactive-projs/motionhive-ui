@@ -19,7 +19,6 @@ import {
   compactPrescription,
   dateRail,
   heroState,
-  elapsedLabel,
   exerciseSessionLine,
   exerciseDoneSummary,
   exerciseSetSummary,
@@ -42,6 +41,7 @@ import {
   routineTileColor,
   secondsToClock,
   trendGeometry,
+  workoutClock,
   workoutDuration,
   workoutMetaLine,
   workoutTiles,
@@ -516,12 +516,26 @@ describe('workouts config', () => {
 
   it('reads elapsed time off the start instant, never a tick count', () => {
     const started = new Date('2026-09-12T10:00:00Z');
-    const now = started.getTime() + 74_000;
-    expect(elapsedLabel(started.toISOString(), now)).toBe('1:14');
+    const log = { startedAt: started.toISOString() };
+    expect(workoutClock(log, started.getTime() + 74_000)).toBe('1:14');
     // An hour in, the seconds stay: "1:05" would read as minutes and look frozen.
-    expect(elapsedLabel(started.toISOString(), started.getTime() + 3_912_000)).toBe('1:05:12');
+    expect(workoutClock(log, started.getTime() + 3_912_000)).toBe('1:05:12');
     // A clock that has not moved is 0:00, never negative.
-    expect(elapsedLabel(started.toISOString(), started.getTime() - 5_000)).toBe('0:00');
+    expect(workoutClock(log, started.getTime() - 5_000)).toBe('0:00');
+  });
+
+  // Time away was not training: past pauses come off, and an open pause
+  // holds the clock where it stopped.
+  it('leaves paused time off the clock', () => {
+    const started = new Date('2026-09-12T10:00:00Z').getTime();
+    const resumed = { startedAt: new Date(started).toISOString(), pausedSeconds: 600 };
+    expect(workoutClock(resumed, started + 900_000)).toBe('5:00');
+
+    const paused = {
+      ...resumed,
+      pausedAt: new Date(started + 900_000).toISOString(),
+    };
+    expect(workoutClock(paused, started + 3_600_000)).toBe('5:00');
   });
 
   // Only what the session actually contained — never one composite number.

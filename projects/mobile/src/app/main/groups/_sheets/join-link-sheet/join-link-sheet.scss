@@ -16,11 +16,9 @@
 .url {
   margin: 0;
   padding: 0.75rem 0.875rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
   overflow-wrap: anywhere;
@@ -33,7 +31,7 @@
 }
 
 .glyph {
-  font-size: var(--mh-text-2xl);
+  font-size: var(--mh-icon-lg);
   color: var(--ion-color-medium);
 }
 
@@ -41,7 +39,7 @@
   margin: 0;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .hint {

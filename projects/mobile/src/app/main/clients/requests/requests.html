@@ -24,8 +24,8 @@
     <!-- Mirrors the row shape so nothing shifts when data lands. -->
     <div class="mh-page">
       <ion-list [inset]="true" class="mh-card-list">
-        @for (_ of skeletonRows; track $index; let last = $last) {
-          <ion-item [lines]="last ? 'none' : 'full'">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item>
             <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
             <ion-label>
               <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
@@ -111,8 +111,8 @@
             <ion-note>· {{ store.sent().length }}</ion-note>
           </div>
           <ion-list [inset]="true" class="mh-card-list">
-            @for (row of store.sent(); track row.id; let last = $last) {
-              <ion-item [lines]="last ? 'none' : 'full'" class="invite">
+            @for (row of store.sent(); track row.id) {
+              <ion-item class="invite">
                 @if (row.client) {
                   <mh-hex-avatar
                     slot="start"

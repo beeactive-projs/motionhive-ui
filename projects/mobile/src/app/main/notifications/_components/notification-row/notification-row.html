@@ -11,7 +11,7 @@
     </ion-item-option>
   </ion-item-options>
 
-  <ion-item button detail="false" lines="none" (click)="select.emit()">
+  <ion-item button detail="false" (click)="select.emit()">
     <mh-hex-avatar
       slot="start"
       size="sm"
@@ -33,7 +33,7 @@
     </ion-label>
 
     @if (hasTarget()) {
-    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+    <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
     }
   </ion-item>
 

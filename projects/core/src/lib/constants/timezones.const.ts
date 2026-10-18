@@ -28,3 +28,8 @@ export const TIMEZONE_OPTIONS: TimezoneOption[] = Intl.supportedValuesOf('timeZo
   })
   .sort((a, b) => a.off - b.off || a.label.localeCompare(b.label))
   .map(({ label, value }) => ({ label, value }));
+
+/** "America/Argentina/Buenos_Aires" to "Buenos Aires": the place, without the region path. */
+export function timezonePlace(timezone: string): string {
+  return (timezone.split('/').pop() ?? timezone).replace(/_/g, ' ');
+}

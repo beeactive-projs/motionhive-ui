@@ -1,23 +1,7 @@
-<ng-template #body>
-  <p class="mh-helper">
-    {{ 'messages.blockSheet.body' | translate }}
-  </p>
-
-  <ion-list lines="none">
-    @for (reason of reasons; track reason.value) {
-      <ion-item button [detail]="false" (click)="choose(reason.value)">
-        <ion-label>{{ reason.label }}</ion-label>
-      </ion-item>
-    }
-  </ion-list>
-</ng-template>
-
-<mh-sheet-shell
+<mh-action-sheet
   [(open)]="open"
   [title]="title()"
-  [body]="body"
-  [showFooter]="false"
-  [flushBody]="true"
-  [breakpoints]="[0, 0.5]"
-  [initialBreakpoint]="0.5"
+  [note]="'messages.blockSheet.body' | translate"
+  [actions]="reasons"
+  (chosen)="confirm.emit($event)"
 />

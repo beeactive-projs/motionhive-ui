@@ -18,7 +18,7 @@
 
 .stale-bar ion-icon {
   flex: none;
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-icon-md);
 }
 
 .stale-bar span {
@@ -36,7 +36,6 @@
 .post {
   display: block;
   padding: 0.875rem;
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
 }
@@ -124,7 +123,7 @@
   overflow: hidden;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-md);
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -214,7 +213,7 @@
   overflow: hidden;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-base);
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

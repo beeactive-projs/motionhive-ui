@@ -7,7 +7,6 @@
       [icon]="tile().icon"
       [color]="tile().color"
     />
-    <h2>{{ heading() }}</h2>
     <p class="copy">{{ copy() }}</p>
     @if (isWaitlisted()) {
       <ion-note class="footnote">{{ 'mySessions.outcome.waitlisted.footnote' | translate }}</ion-note>
@@ -49,8 +48,7 @@
   [(open)]="open"
   [title]="heading()"
   [body]="body"
-  [showHeader]="false"
   [showFooter]="false"
-  [breakpoints]="[0, 0.75]"
+  [breakpoints]="[0, 0.75, 0.95]"
   [initialBreakpoint]="0.75"
 />

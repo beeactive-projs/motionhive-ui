@@ -59,7 +59,7 @@
     @if (store.cancelledCount() > 0) {
       <ion-button class="ghost" fill="clear" color="medium" expand="block" (click)="openCancelled()">
         {{ 'mySessions.list.cancelledLink' | translate: { count: store.cancelledCount() } }}
-        <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
+        <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
       </ion-button>
     }
   } @else {
@@ -93,7 +93,7 @@
       @if (store.cancelledCount() > 0) {
         <ion-button class="ghost" fill="clear" color="medium" expand="block" (click)="openCancelled()">
           {{ 'mySessions.list.cancelledLink' | translate: { count: store.cancelledCount() } }}
-          <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
+          <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
         </ion-button>
       }
     </div>

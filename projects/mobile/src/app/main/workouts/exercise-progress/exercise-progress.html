@@ -88,11 +88,10 @@
         <section class="mh-section">
           <span class="mh-kicker">{{ 'workouts.exerciseProgress.sessions' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
-            @for (row of sessionRows(); track row.id; let last = $last) {
+            @for (row of sessionRows(); track row.id) {
               <ion-item
                 button
                 [detail]="true"
-                [lines]="last ? 'none' : 'full'"
                 (click)="openSession(row.id)"
               >
                 <ion-label>

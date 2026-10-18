@@ -1,6 +1,5 @@
 import { Component, input } from '@angular/core';
 import {
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -21,6 +20,7 @@ import {
   MECHANIC_OPTIONS,
   PATTERN_OPTIONS,
 } from '../../exercises.config';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 /**
  * Everything about an exercise that is optional: classification, the demo
@@ -34,7 +34,7 @@ import {
 @Component({
   selector: 'mh-exercise-details-fields',
   imports: [
-    IonIcon,
+    HexAvatar,
     IonInput,
     IonItem,
     IonLabel,

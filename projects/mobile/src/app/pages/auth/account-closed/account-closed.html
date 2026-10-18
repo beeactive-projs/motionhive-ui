@@ -1,0 +1,27 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <mh-logo slot="start" [linked]="false" />
+    <mh-guest-controls slot="end" />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fixedSlotPlacement="before">
+  <div slot="fixed" class="honeycomb" aria-hidden="true"></div>
+
+  <div class="auth-page">
+    <mh-auth-header title="auth.accountClosed.title">
+      @if (date(); as day) {
+        {{ 'auth.accountClosed.body' | translate: { date: day } }}
+      } @else {
+        {{ 'auth.accountClosed.bodyNoDate' | translate }}
+      }
+    </mh-auth-header>
+
+    <p class="auth-fine-print">{{ 'auth.accountClosed.email' | translate }}</p>
+
+    <ion-button expand="block" class="auth-submit" (click)="goToLogin()">
+      {{ 'auth.accountClosed.back' | translate }}
+      <ion-icon slot="end" name="arrow-forward-outline" aria-hidden="true" />
+    </ion-button>
+  </div>
+</ion-content>

@@ -93,14 +93,14 @@
           <div class="mh-section-label">{{ 'person.coaching' | translate }}</div>
           <ion-list [inset]="true" class="mh-card-list">
             @if (experience(); as years) {
-              <ion-item [lines]="rating() ? 'full' : 'none'">
-                <ion-icon slot="start" name="ribbon-outline" color="medium" aria-hidden="true" />
+              <ion-item>
+                <mh-hex-avatar slot="start" size="sm" icon="ribbon-outline" color="info" />
                 <ion-label><h3>{{ years }}</h3></ion-label>
               </ion-item>
             }
             @if (rating(); as score) {
-              <ion-item lines="none">
-                <ion-icon slot="start" name="star-outline" color="primary" aria-hidden="true" />
+              <ion-item>
+                <mh-hex-avatar slot="start" size="sm" icon="star-outline" color="primary" />
                 <ion-label><h3>{{ score }}</h3></ion-label>
               </ion-item>
             }
@@ -121,22 +121,41 @@
         </section>
       }
 
-      @if (hasContact()) {
-        <!-- Only what they chose to share; their privacy settings hide both
-             by default. Last, under the public basics. -->
+      @if (hasDetails()) {
+        <!-- Only what their privacy settings let this viewer see: email and
+             phone are theirs alone by default, language and time zone go to
+             their coaches. Last, under the public basics. -->
         <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.contact' | translate }}</div>
-          <ion-list [inset]="true" class="mh-card-list">
+          <div class="mh-section-label">{{ 'person.details' | translate }}</div>
+          <ion-list [inset]="true" class="mh-card-list details">
             @if (person.email; as email) {
-              <ion-item [lines]="person.phone ? 'full' : 'none'" [href]="'mailto:' + email">
-                <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
+              <ion-item [href]="'mailto:' + email">
+                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.email.icon" [color]="Tiles.email.color" />
                 <ion-label><h3>{{ email }}</h3></ion-label>
               </ion-item>
             }
             @if (person.phone; as phone) {
-              <ion-item lines="none" [href]="'tel:' + phone">
-                <ion-icon slot="start" name="call-outline" color="medium" aria-hidden="true" />
+              <ion-item [href]="'tel:' + phone">
+                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.phone.icon" [color]="Tiles.phone.color" />
                 <ion-label><h3>{{ phone }}</h3></ion-label>
+              </ion-item>
+            }
+            @if (language(); as spoken) {
+              <ion-item>
+                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.language.icon" [color]="Tiles.language.color" />
+                <ion-label>
+                  <h3>{{ spoken }}</h3>
+                  <p>{{ 'form.label.language' | translate }}</p>
+                </ion-label>
+              </ion-item>
+            }
+            @if (localTime(); as time) {
+              <ion-item>
+                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.timezone.icon" [color]="Tiles.timezone.color" />
+                <ion-label>
+                  <h3>{{ time }}</h3>
+                  <p>{{ 'person.localTime' | translate }}</p>
+                </ion-label>
               </ion-item>
             }
           </ion-list>

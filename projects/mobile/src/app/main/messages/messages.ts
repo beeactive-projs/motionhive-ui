@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonButton,
@@ -15,31 +15,41 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
   InfiniteScrollCustomEvent,
   RefresherCustomEvent,
-  SegmentCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { InboxFilter, MessagingStore, UserSearchResult, displayName } from 'core';
+import {
+  ConversationListItem,
+  InboxFilter,
+  MessagingStore,
+  UserBlockReason,
+  UserSearchResult,
+  displayName,
+} from 'core';
 
+import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
-import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { AvatarTone, avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
+import { BlockUserSheet } from './_sheets/block-user-sheet/block-user-sheet';
 import { NewMessageSheet } from './_sheets/new-message-sheet/new-message-sheet';
-import { MESSAGING_ICONS } from './messages.config';
+import {
+  ConversationAction,
+  ConversationActions,
+  MESSAGING_ICONS,
+  conversationActions,
+} from './messages.config';
 
 /**
  * The inbox: conversations, filters, search, and the way into a new one.
@@ -56,6 +66,8 @@ import { MESSAGING_ICONS } from './messages.config';
 @Component({
   selector: 'mh-messages',
   imports: [
+    ActionSheet,
+    BlockUserSheet,
     ConversationRow,
     EmptyState,
     HexAvatar,
@@ -73,14 +85,11 @@ import { MESSAGING_ICONS } from './messages.config';
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonSegment,
-    IonSegmentButton,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
     NewMessageSheet,
     NotificationBell,
-    SearchbarAutofocusDirective,
     TranslatePipe,
   ],
   templateUrl: './messages.html',
@@ -94,21 +103,48 @@ export class Messages implements ViewWillEnter {
 
   readonly people = injectPeopleSearch();
 
+  private readonly _searchbar = viewChild(IonSearchbar);
+
   /**
    * The subset of `InboxFilter` this app offers — the store also knows
    * 'groups' and 'coaches', which have no screen behind them yet. Narrower
    * than `InboxFilter` on purpose: these are the keys `filterCounts` returns.
-   * Labels are translation keys; the template translates them.
    */
+  readonly Filters = {
+    All: 'all',
+    Unread: 'unread',
+  } as const satisfies Record<string, InboxFilter>;
+
+  /** The pills. Labels are translation keys; the template translates them. */
   readonly filters = [
-    { value: 'all', label: 'common.all' },
-    { value: 'unread', label: 'messages.inbox.filterUnread' },
-  ] as const satisfies readonly { value: InboxFilter; label: string }[];
+    { value: this.Filters.All, label: 'common.all' },
+    { value: this.Filters.Unread, label: 'messages.inbox.filterUnread' },
+  ] as const;
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
 
-  /** Search takes over the toolbar rather than stacking under it. */
+  /** Focusing the search field folds the title and the pills away. */
   readonly searchOpen = signal(false);
+
+  /** The row whose More was tapped; the More and block sheets act on it. */
+  private readonly _actionTarget = signal<ConversationListItem | null>(null);
+  readonly actionsOpen = signal(false);
+  readonly blockOpen = signal(false);
+
+  readonly actionTitle = computed(() => {
+    const target = this._actionTarget();
+    return target?.otherUser ? displayName(target.otherUser) : (target?.name ?? '');
+  });
+
+  readonly actionSubtitle = computed(() => {
+    const handle = this._actionTarget()?.otherUser?.handle;
+    return handle ? `@${handle}` : '';
+  });
+
+  readonly actions = computed(() => {
+    const target = this._actionTarget();
+    return conversationActions(target?.muted ?? false, !!target?.otherUser?.handle);
+  });
 
   readonly isSearchEmpty = computed(
     () =>
@@ -139,14 +175,16 @@ export class Messages implements ViewWillEnter {
       this.store.visibleConversations().length === 0,
   );
 
-  /** The plain conversation list — the one state that gets a white surface. */
-  readonly showFlatList = computed(
+  /**
+   * Rows on screen (the inbox, its skeleton or search results): the page
+   * takes the feed's white. Empty and error states keep the slate.
+   */
+  readonly showFeed = computed(
     () =>
       this.showSkeleton() ||
-      (!this.people.isActive() &&
-        !this.showLoadError() &&
-        !this.isEmpty() &&
-        !this.isFilteredEmpty()),
+      (this.people.isActive()
+        ? !this.isSearchEmpty()
+        : !this.showLoadError() && !this.isEmpty() && !this.isFilteredEmpty()),
   );
 
   constructor() {
@@ -159,9 +197,8 @@ export class Messages implements ViewWillEnter {
     this.store.loadConversations();
   }
 
-  onFilterChange(event: SegmentCustomEvent): void {
-    const value = event.detail.value;
-    if (typeof value === 'string') this.store.setFilter(value as InboxFilter);
+  setFilter(value: InboxFilter): void {
+    this.store.setFilter(value);
   }
 
   openSearch(): void {
@@ -172,6 +209,11 @@ export class Messages implements ViewWillEnter {
     this.searchOpen.set(false);
     this.people.clear();
     this.store.setSearchQuery('');
+    // Otherwise the field keeps focus, the keyboard stays up, and the next
+    // tap on it fires no focus event to open search again.
+    void this._searchbar()
+      ?.getInputElement()
+      .then((input) => input.blur());
   }
 
   onQueryChange(value: string): void {
@@ -210,6 +252,62 @@ export class Messages implements ViewWillEnter {
 
   markRead(id: string): void {
     this.store.markReadOnEntry(id);
+  }
+
+  async markUnread(id: string): Promise<void> {
+    const ok = await this.store.markUnread(id);
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.markUnreadFailed'),
+      );
+    }
+  }
+
+  openActions(conversation: ConversationListItem): void {
+    this._actionTarget.set(conversation);
+    this.actionsOpen.set(true);
+  }
+
+  /** The action sheet reports the choice once it has closed, so routing is safe. */
+  onAction(action: ConversationAction): void {
+    const target = this._actionTarget();
+    if (!target) return;
+
+    switch (action) {
+      case ConversationActions.Profile: {
+        const handle = target.otherUser?.handle;
+        if (handle) void this._router.navigate(['/tabs/messages/person', handle]);
+        break;
+      }
+      case ConversationActions.Mute:
+        void this.toggleMute(target.id);
+        break;
+      case ConversationActions.Block:
+        this.blockOpen.set(true);
+        break;
+    }
+  }
+
+  /** Same block as chat details; the store drops the row from the inbox itself. */
+  async block(reason: UserBlockReason): Promise<void> {
+    const target = this._actionTarget();
+    const blockedId = target?.otherUser?.id;
+    if (!target || !blockedId) return;
+
+    const name = this.actionTitle();
+    const ok = await this.store.blockUser({ blockedId, reason, conversationId: target.id });
+
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.blockFailed'),
+      );
+      return;
+    }
+    void this._feedbackService.success(
+      this._translateService.instant('messages.toast.blocked', { name }),
+    );
   }
 
   async toggleMute(id: string): Promise<void> {

@@ -22,7 +22,7 @@
       <section class="mh-section">
         <span class="mh-kicker">{{ 'programs.clientTraining.plan' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
-          <ion-item lines="none">
+          <ion-item>
             <ion-label>
               <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
               <p><ion-skeleton-text [animated]="true" style="width: 40%" /></p>
@@ -51,8 +51,8 @@
         <section class="mh-section">
           <span class="mh-kicker">{{ 'programs.clientTraining.plan' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
-            @for (plan of activePlans(); track plan.id; let last = $last) {
-              <ion-item [lines]="last ? 'none' : 'full'">
+            @for (plan of activePlans(); track plan.id) {
+              <ion-item>
                 <ion-label>
                   <h2>{{ plan.programNameSnapshot }}</h2>
                   <p>{{ planSubline(plan) }}</p>
@@ -81,7 +81,7 @@
            a gap that looks like a bug. A short list otherwise reads as a lazy
            client rather than as work they chose to keep to themselves. -->
       <ion-list [inset]="true" class="mh-card-list">
-        <ion-item lines="none">
+        <ion-item>
           <mh-hex-avatar
             slot="start"
             size="sm"

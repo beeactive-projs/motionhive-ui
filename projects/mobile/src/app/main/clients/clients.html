@@ -7,7 +7,7 @@
          box is a request per term now, not a filter over loaded rows.
          Named, because a searchbar with only a placeholder announces itself
          as Ionic's default "search text". -->
-    <ion-searchbar mhAutofocus [placeholder]="'clients.list.search' | translate"
+    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'clients.list.search' | translate"
       [attr.aria-label]="'clients.list.search' | translate"
       inputmode="search" [debounce]="300" [value]="store.query()"
       (ionInput)="onQuery($event.detail.value ?? '')" />
@@ -143,8 +143,8 @@
     }
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index; let last = $last) {
-      <ion-item [lines]="last ? 'none' : 'full'">
+      @for (_ of skeletonRows; track $index) {
+      <ion-item>
         <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
         <ion-label>
           <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>

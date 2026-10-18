@@ -16,7 +16,7 @@
 
 .hero h1 {
   max-width: 15rem;
-  line-height: var(--mh-leading-tight);
+  line-height: var(--mh-leading-heading);
 }
 
 /* The decorative hex cluster — offsets stagger the three marks the way the
@@ -60,7 +60,7 @@
 
 .search-entry ion-icon {
   margin-inline-end: 0.5rem;
-  font-size: var(--mh-text-md);
+  font-size: var(--mh-icon-sm);
 }
 
 /* ── "Taking new clients" rail ──────────────────────────────────────── */
@@ -165,7 +165,7 @@
 
 .search-hint ion-icon {
   color: var(--ion-color-medium);
-  font-size: 1.875rem;
+  font-size: var(--mh-icon-xl);
 }
 
 .search-hint p {
@@ -184,6 +184,5 @@
   margin-bottom: 0.5rem;
   --background: var(--ion-card-background);
   --border-radius: var(--mh-radius-card);
-  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
 }

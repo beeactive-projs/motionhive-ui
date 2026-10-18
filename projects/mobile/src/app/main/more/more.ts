@@ -56,7 +56,6 @@ import { FeedbackSheet } from './_sheets/feedback-sheet/feedback-sheet';
     TranslatePipe,
   ],
   templateUrl: './more.html',
-  styleUrl: './more.scss',
 })
 export class More implements ViewWillEnter {
   private readonly _router = inject(Router);

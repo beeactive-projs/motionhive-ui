@@ -70,7 +70,7 @@
   @if (groups().length > 0) {
   <div class="mh-section-label">{{ 'sessions.filterSheet.group' | translate }}</div>
   <ion-item lines="none" class="field">
-    <ion-select labelPlacement="stacked" interface="action-sheet" [placeholder]="'sessions.filterSheet.anyGroup' | translate"
+    <ion-select toggleIcon="chevron-down-outline" labelPlacement="stacked" interface="action-sheet" [placeholder]="'sessions.filterSheet.anyGroup' | translate"
       [attr.aria-label]="'sessions.filterSheet.group' | translate" [value]="draft().groupId"
       (ionChange)="setGroup($event.detail.value)">
       <ion-select-option [value]="null">{{ 'sessions.filterSheet.anyGroup' | translate }}</ion-select-option>

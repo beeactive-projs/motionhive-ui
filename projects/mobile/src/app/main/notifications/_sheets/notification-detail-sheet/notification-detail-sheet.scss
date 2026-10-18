@@ -10,7 +10,7 @@
   margin: 0;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-lg);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .head .body {
@@ -31,9 +31,8 @@
   display: block;
   margin-top: 1rem;
   padding: 0.625rem 0.875rem;
-  border: 1px solid var(--mh-color-divider);
   border-radius: var(--mh-radius-control);
-  background: var(--ion-background-color);
+  background: var(--ion-card-background);
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
 }
