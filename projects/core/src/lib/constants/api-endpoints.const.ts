@@ -299,6 +299,7 @@ export const API_ENDPOINTS = {
     CONVERSATION_MESSAGES: (id: string) =>
       `/messaging/conversations/${id}/messages`,
     CONVERSATION_READ: (id: string) => `/messaging/conversations/${id}/read`,
+    CONVERSATION_UNREAD: (id: string) => `/messaging/conversations/${id}/unread`,
     CONVERSATION_MUTE: (id: string) => `/messaging/conversations/${id}/mute`,
     CONVERSATION_LEAVE: (id: string) => `/messaging/conversations/${id}/leave`,
     MESSAGES: '/messaging/messages',

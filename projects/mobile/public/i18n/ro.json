@@ -1221,6 +1221,11 @@
     }
   },
   "messages": {
+    "actions": {
+      "block": "Blochează",
+      "mute": "Dezactivează notificările",
+      "unmute": "Activează notificările"
+    },
     "blockSheet": {
       "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație.",
       "title": "Vrei să blochezi utilizatorul {name}?"
@@ -1262,11 +1267,11 @@
         "heading": "Niciun mesaj încă",
         "message": "Conversațiile cu antrenorii și clienții tăi vor apărea aici."
       },
+      "filterBar": "Filtrează conversațiile",
       "filterUnread": "Necitite",
       "loadError": "Mesajele nu au putut fi încărcate",
       "noResultsMessage": "Nimic nu se potrivește. Încearcă alt nume sau alt cuvânt.",
       "reconnecting": "Se reconectează…",
-      "searchAria": "Caută în mesaje",
       "searchPlaceholder": "Caută mesaje și persoane",
       "sectionPeople": "Persoane"
     },
@@ -1278,15 +1283,20 @@
       "searchPlaceholder": "Caută persoane"
     },
     "row": {
-      "markRead": "Marchează ca citită",
-      "mute": "Fără notificări",
+      "markRead": "Citită",
+      "markUnread": "Necitită",
+      "markedUnreadAria": "Marcată ca necitită",
+      "more": "Mai multe",
+      "mute": "Silențios",
+      "mutedAria": "Notificări dezactivate",
       "noPreview": "Niciun mesaj încă",
-      "unmute": "Activează notificările",
+      "unmute": "Cu sunet",
       "unreadAria": "{count} necitite"
     },
     "toast": {
       "blockFailed": "Nu am putut bloca persoana.",
       "blocked": "Blocat: {name}",
+      "markUnreadFailed": "Nu am putut marca conversația ca necitită.",
       "muteFailed": "Notificările nu au putut fi actualizate.",
       "muted": "Notificări dezactivate",
       "notificationsMuted": "Notificări dezactivate",

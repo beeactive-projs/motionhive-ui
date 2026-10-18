@@ -11,7 +11,12 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { ConversationListItem, displayName, formatRelativeShort } from 'core';
+import {
+  ConversationListItem,
+  displayName,
+  formatRelativeShort,
+  isConversationUnread,
+} from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
@@ -21,8 +26,9 @@ import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
  * element, so a read and an unread row occupy identical space and nothing
  * shifts when one is opened.
  *
- * Swiping reveals mark-read and mute. The row only emits — the page owns the
- * store calls, so this stays a presentational component.
+ * Swipes follow WhatsApp: right toggles read / unread, left reveals More
+ * and mute. The row only emits — the page owns the store calls and the
+ * More sheet, so this stays a presentational component.
  */
 @Component({
   selector: 'mh-conversation-row',
@@ -42,6 +48,7 @@ import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
   styleUrl: './conversation-row.scss',
   host: {
     '[class.mh-unread]': 'isUnread()',
+    '[class.mh-muted]': 'isMuted()',
   },
 })
 export class ConversationRow {
@@ -51,9 +58,17 @@ export class ConversationRow {
 
   readonly select = output<void>();
   readonly markRead = output<void>();
+  readonly markUnread = output<void>();
   readonly toggleMute = output<void>();
+  readonly more = output<void>();
 
-  readonly isUnread = computed(() => this.conversation().unreadCount > 0);
+  /** Unread messages, or marked unread by the reader. */
+  readonly isUnread = computed(() => isConversationUnread(this.conversation()));
+
+  /** Marked unread with nothing actually unread: a dot, no number. */
+  readonly isMarkedUnread = computed(
+    () => !!this.conversation().markedUnread && this.conversation().unreadCount === 0,
+  );
 
   readonly isMuted = computed(() => this.conversation().muted);
 
@@ -74,9 +89,13 @@ export class ConversationRow {
     return iso ? formatRelativeShort(iso) : '';
   });
 
-  /** Two digits is what the pill fits; 300 unread would stretch the row. */
+  /**
+   * Two digits is what the pill fits; 300 unread would stretch the row.
+   * Empty when nothing is unread, so the template can test it.
+   */
   readonly unreadLabel = computed(() => {
     const count = this.conversation().unreadCount;
+    if (count <= 0) return '';
     return count > 99 ? '99+' : String(count);
   });
 

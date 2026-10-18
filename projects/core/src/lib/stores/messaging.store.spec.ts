@@ -303,3 +303,124 @@ describe('MessagingStore — first-message (pending) thread', () => {
     expect(store.pendingMessagesFor(RECIPIENT).items).toEqual([]);
   });
 });
+
+describe('MessagingStore — mark as unread', () => {
+  const READ_CONV = 'conv-read';
+  const UNREAD_CONV = 'conv-unread';
+
+  let store: MessagingStore;
+  let events$: Subject<unknown>;
+  let api: {
+    listConversations: ReturnType<typeof vi.fn>;
+    markRead: ReturnType<typeof vi.fn>;
+    markUnread: ReturnType<typeof vi.fn>;
+    ackStreamEvent: ReturnType<typeof vi.fn>;
+  };
+
+  function row(id: string, unreadCount: number) {
+    return { ...sendResult().conversation, id, unreadCount };
+  }
+
+  beforeEach(() => {
+    events$ = new Subject();
+    api = {
+      listConversations: vi.fn(() =>
+        of({ items: [row(READ_CONV, 0), row(UNREAD_CONV, 3)], total: 2 }),
+      ),
+      markRead: vi.fn(() => of({ lastReadAt: '2026-05-11T10:00:00Z' })),
+      markUnread: vi.fn(() => of({ markedUnread: true })),
+      ackStreamEvent: vi.fn(() => of(undefined)),
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        MessagingStore,
+        { provide: MessagingService, useValue: api },
+        {
+          provide: MessagingRealtimeService,
+          useValue: {
+            events$,
+            status: signal('open').asReadonly(),
+            lastEventId: signal<string | null>(null),
+            connect: vi.fn(),
+            disconnect: vi.fn(),
+            reconnect: vi.fn(),
+          },
+        },
+        {
+          provide: AuthStore,
+          useValue: {
+            user: signal({ id: ME }).asReadonly(),
+            // Signed out, so the auth effect doesn't load on its own.
+            isAuthenticated: signal(false).asReadonly(),
+          },
+        },
+        { provide: Router, useValue: { navigate: vi.fn(() => Promise.resolve(true)) } },
+      ],
+    });
+    store = TestBed.inject(MessagingStore);
+    store.loadConversations({ force: true });
+  });
+
+  it('counts a marked row as unread without inventing messages', async () => {
+    expect(await store.markUnread(READ_CONV)).toBe(true);
+
+    expect(api.markUnread).toHaveBeenCalledWith(READ_CONV);
+    expect(store.filterCounts().unread).toBe(2);
+    // 3 real unread messages + 1 for the marked thread, like the BE badge.
+    expect(store.unreadTotal()).toBe(4);
+
+    store.setFilter('unread');
+    expect(store.visibleConversations().map((c) => c.id)).toEqual([READ_CONV, UNREAD_CONV]);
+  });
+
+  it('takes the mark back when the server refuses it', async () => {
+    api.markUnread.mockReturnValue(
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+    );
+
+    expect(await store.markUnread(READ_CONV)).toBe(false);
+    expect(store.filterCounts().unread).toBe(1);
+  });
+
+  it('opening the thread clears the mark', async () => {
+    await store.markUnread(READ_CONV);
+
+    store.markReadOnEntry(READ_CONV);
+
+    expect(store.filterCounts().unread).toBe(1);
+    expect(store.conversations().find((c) => c.id === READ_CONV)?.markedUnread).toBe(false);
+  });
+
+  it('follows a mark set or cleared on another device', () => {
+    events$.next({
+      id: 'evt-1',
+      event: {
+        type: 'conversation.unread',
+        payload: { conversationId: READ_CONV, userId: ME, markedUnread: true },
+      },
+    });
+    expect(store.filterCounts().unread).toBe(2);
+
+    events$.next({
+      id: 'evt-2',
+      event: {
+        type: 'conversation.unread',
+        payload: { conversationId: READ_CONV, userId: ME, markedUnread: false },
+      },
+    });
+    expect(store.filterCounts().unread).toBe(1);
+  });
+
+  it("ignores someone else's mark", () => {
+    events$.next({
+      id: 'evt-1',
+      event: {
+        type: 'conversation.unread',
+        payload: { conversationId: READ_CONV, userId: 'someone-else', markedUnread: true },
+      },
+    });
+    expect(store.filterCounts().unread).toBe(1);
+  });
+});

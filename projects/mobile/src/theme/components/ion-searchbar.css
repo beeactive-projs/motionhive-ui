@@ -31,6 +31,21 @@ ion-searchbar .searchbar-input-container {
   min-height: 3.5rem;
 }
 
+/* `.mh-search-pill`: the inbox's WhatsApp-style field — a thin pill on a
+   soft fill, always on screen above the list rather than opened on a tap.
+   No ring, idle or focused: focusing it switches the header into search
+   mode (back arrow, title and pills gone), which is the focus state. */
+ion-searchbar.mh-search-pill,
+ion-searchbar.mh-search-pill.searchbar-has-focus {
+  --border-radius: var(--mh-radius-pill) !important;
+  --background: var(--mh-color-divider) !important;
+  --box-shadow: none !important;
+}
+
+ion-searchbar.mh-search-pill .searchbar-input-container {
+  min-height: 2.5rem;
+}
+
 /* md pins the glyph 11px from the top of the bar it expects; in the taller
    field it has to ride centre. `!important` for the same scoped-CSS reason
    as the radius rule above. */

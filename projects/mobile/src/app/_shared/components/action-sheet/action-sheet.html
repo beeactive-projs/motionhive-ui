@@ -10,7 +10,8 @@
       <ion-item button [detail]="false" [disabled]="action.disabled ?? false"
         [class.destructive]="action.destructive" (click)="choose(action.id)">
         @if (action.icon) {
-        <mh-hex-avatar slot="start" size="sm" [icon]="action.icon" [color]="action.destructive ? 'danger' : (action.color ?? 'medium')" />
+        <mh-hex-avatar slot="start" size="sm" [icon]="action.icon" [color]="action.destructive ? 'danger' : (action.color ?? 'medium')"
+          [tone]="action.destructive ? 'base' : (action.tone ?? 'base')" />
         }
         <ion-label class="ion-text-wrap">
           {{ action.label | translate }}

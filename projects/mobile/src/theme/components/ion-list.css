@@ -85,12 +85,12 @@ ion-list.mh-card-list ion-item > ion-note[slot] {
    (Ionic's own), which anchors the pseudo-element; the row's shadow
    `.item-native` paints at `z-index: 1` with its own background, so the
    line sits one above it. */
-ion-list.mh-card-list ion-item {
+ion-list:is(.mh-card-list, .mh-feed-list) ion-item {
   --border-width: 0;
   --inner-border-width: 0;
 }
 
-ion-list.mh-card-list ion-item::after {
+ion-list:is(.mh-card-list, .mh-feed-list) ion-item::after {
   content: '';
   position: absolute;
   z-index: 2;
@@ -106,8 +106,8 @@ ion-list.mh-card-list ion-item::after {
    selector reaches rows wrapped in a host (`mh-settings-row`,
    `ion-item-sliding`, the row components); Angular's control-flow comments
    are not elements, so `:last-child` still finds the last row. */
-ion-list.mh-card-list > ion-item:last-child::after,
-ion-list.mh-card-list > :last-child ion-item::after {
+ion-list:is(.mh-card-list, .mh-feed-list) > ion-item:last-child::after,
+ion-list:is(.mh-card-list, .mh-feed-list) > :last-child ion-item::after {
   display: none;
 }
 
@@ -117,18 +117,125 @@ ion-list.mh-card-list > :last-child ion-item::after {
    the conversation avatar); a bare icon is md's 1.5rem glyph box. A page
    with its own leading item (a weekday kicker) sets `--mh-row-lead` on its
    rows. */
-ion-list.mh-card-list ion-item:has(> [slot='start']) {
+ion-list:is(.mh-card-list, .mh-feed-list) ion-item:has(> [slot='start']) {
   --mh-row-inset: calc(var(--mh-row-gutter) * 2 + var(--mh-row-lead, 1.5rem));
 }
 
-ion-list.mh-card-list ion-item:has(> mh-hex-avatar[slot='start'][data-size='sm']) {
+ion-list:is(.mh-card-list, .mh-feed-list) ion-item:has(> mh-hex-avatar[slot='start'][data-size='sm']) {
   --mh-row-lead: 1.875rem;
 }
 
-ion-list.mh-card-list ion-item:has(> mh-hex-avatar[slot='start'][data-size='md']) {
+ion-list:is(.mh-card-list, .mh-feed-list) ion-item:has(> mh-hex-avatar[slot='start'][data-size='md']) {
   --mh-row-lead: 2.5rem;
 }
 
-ion-list.mh-card-list ion-item:has(> mh-hex-avatar[slot='start'][data-size='lg']) {
+ion-list:is(.mh-card-list, .mh-feed-list) ion-item:has(> mh-hex-avatar[slot='start'][data-size='lg']) {
   --mh-row-lead: 3.25rem;
+}
+
+/* ─── The feed list ────────────────────────────────────────────────────
+   WhatsApp's chat list: a wall of rows on white, edge to edge, no card.
+   Each row is an avatar and two lines, a title with its time on the first
+   and a preview with its badges on the second. It shares the separator
+   above: it starts where the text starts, so it never cuts under the
+   avatar, and stops at the gutter, under the end of the time. Specificity: Ionic's `.list-md` (0,1,0) paints its own background
+   and an 8px band; this (0,1,1) replaces both. */
+ion-list.mh-feed-list {
+  margin: 0;
+  padding: 0;
+  background: var(--ion-card-background);
+}
+
+/* 0.75rem around a 3.25rem avatar is WhatsApp's 76px row. The label's own
+   md margins (10px top and bottom) would stack on that padding, so the
+   padding alone sets the rhythm. */
+ion-list.mh-feed-list ion-item {
+  --background: var(--ion-card-background);
+  --padding-top: 0.75rem;
+  --padding-bottom: 0.75rem;
+  --mh-row-inset: var(--mh-row-gutter);
+}
+
+/* The feed's top edge: the first row carries a hairline above it too, the
+   same inset as the separators, so the list reads as starting there rather
+   than running on from the header. The second selector reaches rows inside
+   a host (`ion-item-sliding`, the row components). */
+ion-list.mh-feed-list > ion-item:first-child::before,
+ion-list.mh-feed-list > :first-child ion-item::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 0;
+  inset-inline-start: var(--mh-row-inset);
+  inset-inline-end: var(--mh-row-gutter);
+  height: 1px;
+  background: var(--mh-color-separator);
+  pointer-events: none;
+}
+
+ion-list.mh-feed-list ion-item > ion-label {
+  margin-block: 0;
+}
+
+/* Each line of a feed row is a whole 1.5rem box, so a row is exactly
+   0.75 + 1.5 + 1.5 + 0.75 = 4.5rem. Left to the type's own leading (16px
+   and 15px at 1.55) a row came out 72.047px; the fraction piled up row on
+   row, every separator landed on a different sub-pixel, and the ones that
+   straddled two device pixels drew visibly thicker. The text keeps its
+   leading; `.mh-feed-line` already centres it, and a bare h2 or p stays a
+   block so its ellipsis still works. */
+ion-list.mh-feed-list ion-label > :is(.mh-feed-line, h2, h3, p) {
+  block-size: 1.5rem;
+}
+
+/* The title is Inter, not the heading face the global h2 rule puts on it:
+   a feed has dozens of these and Poppins at body size reads as shouting. */
+ion-list.mh-feed-list ion-label :is(h2, h3) {
+  margin: 0;
+  font-family: var(--ion-font-family);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  line-height: var(--mh-leading-body);
+}
+
+/* Ionic greys only a `p` that is the label's direct child; inside a
+   `.mh-feed-line` it would fall back to the body ink. */
+ion-list.mh-feed-list ion-label p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+}
+
+/* One line of a feed row: the text first, taking what is left and
+   ellipsing, then whatever trails it (the time on the title line, the
+   badges on the preview line), kept whole. Trailing items sit in the line,
+   not in `slot="end"`, so the time shares the title's line and the badge
+   the preview's, as WhatsApp lays them out. */
+.mh-feed-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mh-feed-line > :first-child {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mh-feed-line > :not(:first-child) {
+  flex: none;
+}
+
+.mh-feed-line > ion-note {
+  font-size: var(--mh-text-sm);
+}
+
+/* A label over a feed (search's "People" and "Messages") lines up with the
+   rows' gutter, not the card-list inset it has inside `.mh-page`. */
+.mh-section-label:has(+ ion-list.mh-feed-list) {
+  padding-inline: var(--mh-row-gutter);
 }

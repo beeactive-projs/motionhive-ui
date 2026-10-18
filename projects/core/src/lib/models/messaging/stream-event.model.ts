@@ -34,11 +34,19 @@ export interface ConversationMutedPayload {
   mutedUntil: string | null;
 }
 
+/** The reader's own "mark as unread" flag, set or cleared on another device. */
+export interface ConversationUnreadPayload {
+  conversationId: string;
+  userId: string;
+  markedUnread: boolean;
+}
+
 export type MessagingStreamEvent =
   | { type: 'message.created'; payload: MessageCreatedPayload }
   | { type: 'message.deleted'; payload: MessageDeletedPayload }
   | { type: 'conversation.read'; payload: ConversationReadPayload }
   | { type: 'conversation.muted'; payload: ConversationMutedPayload }
+  | { type: 'conversation.unread'; payload: ConversationUnreadPayload }
   | { type: 'heartbeat'; payload: { ts: number } };
 
 /** Wrapped at the EventSource level — `id` comes from SSE's id: line. */
