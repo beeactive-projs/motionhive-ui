@@ -97,6 +97,16 @@
   font-size: var(--mh-text-sm);
 }
 
+/* A screen that is a feed (`mh-feed-list`, WhatsApp's chat list): the rows
+   run edge to edge, so the list sits straight in `ion-content`, outside
+   `.mh-page`, and the page takes the rows' white. Without it a short feed
+   stops at its last row and the slate shows through, reading as cut off.
+   Bind it only while the feed is on screen; empty states and cards need the
+   slate page behind them. */
+ion-content.mh-feed-page {
+  --background: var(--ion-card-background);
+}
+
 /* ─── Recurring blocks ─────────────────────────────────────────────
    Shared by the workouts and programs screens, where each of these had been
    written out per file. One definition, so a change to the gutter or the

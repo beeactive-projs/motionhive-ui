@@ -75,6 +75,16 @@ export function pendingThreadKey(recipientId: string): string {
 export function isPendingThreadKey(id: string | null | undefined): boolean {
   return !!id && id.startsWith(PENDING_THREAD_PREFIX);
 }
+
+/**
+ * A row counts as unread when it has unread messages or the reader marked
+ * it unread. The Unread filter, its count and the inbox rows all use this.
+ */
+export function isConversationUnread(
+  c: Pick<ConversationListItem, 'unreadCount' | 'markedUnread'>,
+): boolean {
+  return c.unreadCount > 0 || !!c.markedUnread;
+}
 import { MessagingService } from '../services/messaging/messaging.service';
 import { MessagingRealtimeService } from '../services/messaging/messaging-realtime.service';
 import { AuthStore } from './auth.store';
@@ -280,8 +290,16 @@ export class MessagingStore {
   readonly filter = this._filter.asReadonly();
   readonly searchQuery = this._searchQuery.asReadonly();
 
+  /**
+   * Unread messages across the inbox, plus one for each thread marked
+   * unread with nothing actually unread in it — the same sum the BE's
+   * `/messaging/unread-count` badge returns.
+   */
   readonly unreadTotal = computed(() =>
-    this._conversations().reduce((sum, c) => sum + c.unreadCount, 0),
+    this._conversations().reduce(
+      (sum, c) => sum + (c.unreadCount > 0 ? c.unreadCount : c.markedUnread ? 1 : 0),
+      0,
+    ),
   );
   readonly hasUnread = computed(() => this.unreadTotal() > 0);
 
@@ -290,7 +308,7 @@ export class MessagingStore {
     const all = this._conversations();
     return {
       all: all.length,
-      unread: all.filter((c) => c.unreadCount > 0).length,
+      unread: all.filter(isConversationUnread).length,
     };
   });
 
@@ -305,7 +323,7 @@ export class MessagingStore {
     const query = this._searchQuery().trim().toLowerCase();
 
     return this._conversations().filter((c) => {
-      if (filter === 'unread' && c.unreadCount === 0) return false;
+      if (filter === 'unread' && !isConversationUnread(c)) return false;
       if (filter === 'groups' && c.type !== 'GROUP') return false;
       // 'coaches' is disabled in the UI for v1; defensive no-op here.
       if (filter === 'coaches') return false;
@@ -532,7 +550,8 @@ export class MessagingStore {
     // Optimistic unread clear on the inbox row. No-op when the row
     // hasn't loaded yet — that's fine, the next list refresh will
     // come back with the BE's authoritative `unreadCount: 0`.
-    this.patchConversation(id, { unreadCount: 0 });
+    // Reading also answers a "mark as unread"; the BE clears it the same way.
+    this.patchConversation(id, { unreadCount: 0, markedUnread: false });
     // Cancel any pending debounced markRead for this id — the entry
     // call subsumes it (we're about to PATCH `now`, so a 1.5s-later
     // PATCH would be wasted).
@@ -653,6 +672,32 @@ export class MessagingStore {
           catchError((err: unknown) => {
             // Roll back on failure.
             this.patchConversation(conversationId, { muted: !willMute });
+            resolve(false);
+            return throwError(() => err);
+          }),
+        )
+        .subscribe({ error: () => resolve(false) });
+    });
+  }
+
+  /**
+   * "Mark as unread": the row counts as unread until the thread is next
+   * opened (`markReadOnEntry` clears it). Optimistic, rolled back on
+   * failure; the SSE `conversation.unread` event syncs other devices.
+   */
+  markUnread(conversationId: string): Promise<boolean> {
+    const conv = this._conversations().find((c) => c.id === conversationId);
+    if (!conv) return Promise.resolve(false);
+
+    this.patchConversation(conversationId, { markedUnread: true });
+
+    return new Promise((resolve) => {
+      this._api
+        .markUnread(conversationId)
+        .pipe(
+          tap(() => resolve(true)),
+          catchError((err: unknown) => {
+            this.patchConversation(conversationId, { markedUnread: false });
             resolve(false);
             return throwError(() => err);
           }),
@@ -1186,6 +1231,9 @@ export class MessagingStore {
       case 'conversation.muted':
         this.applyConversationMuted(event);
         break;
+      case 'conversation.unread':
+        this.applyConversationUnread(event);
+        break;
       case 'heartbeat':
         // No-op. The realtime service already tracks lastEventId.
         return;
@@ -1391,6 +1439,20 @@ export class MessagingStore {
     this._conversations.update((list) =>
       list.map((c) => (c.id === conversationId ? { ...c, muted } : c)),
     );
+  }
+
+  /**
+   * Apply a `conversation.unread` event: the reader marked the thread
+   * unread on another device, or reading it there cleared the mark.
+   */
+  private applyConversationUnread(
+    event: Extract<MessagingStreamEvent, { type: 'conversation.unread' }>,
+  ): void {
+    const { conversationId, userId, markedUnread } = event.payload;
+    const myId = this._auth.user()?.id ?? null;
+    if (userId !== myId) return;
+
+    this.patchConversation(conversationId, { markedUnread });
   }
 
   // ─── Internal ─────────────────────────────────────────────────

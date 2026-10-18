@@ -14,3 +14,21 @@ ion-tab-bar {
 ion-tab-button ion-icon {
   font-size: var(--mh-icon-lg);
 }
+
+/* The unread count on a tab, a size up from Material's 17px chip: a round
+   1.25rem badge with 12px figures, like WhatsApp's tab count. Light-DOM
+   rules outrank the tab button's `::slotted(ion-badge)` sizing. The dot
+   (`.dot`, ion-badge.css) keeps its own size. */
+ion-tab-button ion-badge:not(.dot) {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0.375rem;
+  --padding-end: 0.375rem;
+  top: 0.25rem;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: var(--mh-radius-pill);
+  font-size: var(--mh-text-sm);
+  line-height: 1.25rem;
+}

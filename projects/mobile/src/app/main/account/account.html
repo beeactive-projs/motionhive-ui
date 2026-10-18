@@ -79,8 +79,8 @@
     <section class="mh-section">
       <ion-note class="mh-kicker" color="medium">{{ 'account.sections.preferences' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
-        <mh-settings-row [label]="'nav.notifications' | translate" icon="notifications-outline" iconColor="danger"
-          (select)="go('notifications')" />
+        <mh-settings-row [label]="'nav.notifications' | translate" icon="notifications-outline" iconColor="info"
+          iconTone="shade" (select)="go('notifications')" />
         <mh-settings-row [label]="'account.rows.appearance' | translate" icon="color-palette-outline" iconColor="primary"
           [value]="themeLabel()" (select)="appearanceOpen.set(true)" />
         <mh-settings-row [label]="'form.label.language' | translate" [icon]="Tiles.language.icon" [iconColor]="Tiles.language.color"

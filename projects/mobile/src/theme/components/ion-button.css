@@ -38,6 +38,17 @@ ion-buttons ion-button.glyph {
   margin: 0;
 }
 
+/* Round header buttons — the filled honey "+" on Sessions, Clients and
+   Messages. Ionic gives `shape="round"` the radius but sizes the button from
+   its content, so an icon-only one comes out an oval; these are circles the
+   same size as the bell beside them. */
+ion-buttons ion-button.round {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
 /* Toolbar icons sit on the 24px icon grid. Material sizes them 1.8em of the
    button's 14px (25.2px); the host class outranks its scoped
    `.sc-ion-buttons-md-s ion-icon[slot=icon-only]` rule. */

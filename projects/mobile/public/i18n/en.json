@@ -1180,6 +1180,11 @@
     }
   },
   "messages": {
+    "actions": {
+      "block": "Block",
+      "mute": "Mute notifications",
+      "unmute": "Unmute notifications"
+    },
     "blockSheet": {
       "body": "They will not be able to message you, and you will not see this conversation.",
       "title": "Block {name}?"
@@ -1221,11 +1226,11 @@
         "heading": "No messages yet",
         "message": "Conversations with your coaches and clients will show up here."
       },
+      "filterBar": "Filter conversations",
       "filterUnread": "Unread",
       "loadError": "Couldn't load your messages",
       "noResultsMessage": "Nothing matched that. Try a different name or word.",
       "reconnecting": "Reconnecting…",
-      "searchAria": "Search messages",
       "searchPlaceholder": "Search messages & people",
       "sectionPeople": "People"
     },
@@ -1237,8 +1242,12 @@
       "searchPlaceholder": "Search people"
     },
     "row": {
-      "markRead": "Mark read",
+      "markRead": "Read",
+      "markUnread": "Unread",
+      "markedUnreadAria": "Marked as unread",
+      "more": "More",
       "mute": "Mute",
+      "mutedAria": "Notifications off",
       "noPreview": "No messages yet",
       "unmute": "Unmute",
       "unreadAria": "{count} unread"
@@ -1246,6 +1255,7 @@
     "toast": {
       "blockFailed": "Could not block them.",
       "blocked": "{name} blocked",
+      "markUnreadFailed": "Couldn't mark it as unread.",
       "muteFailed": "Could not update notifications.",
       "muted": "Muted",
       "notificationsMuted": "Notifications muted",

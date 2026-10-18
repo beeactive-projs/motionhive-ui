@@ -1,0 +1,52 @@
+/* The feed header: the title bar, search field and filter pills over a
+   feed list (`mh-feed-list`), as WhatsApp stacks them. Every part sits on
+   the list's own gutter, `--mh-row-gutter`, so the title, the field, the
+   first pill and the avatars share one left edge, and the end buttons, the
+   field and the row times share one right edge.
+
+   Ionic gives each part its own inset (md: the title 20px, the searchbar
+   8px around the field, the toolbar 4px before its buttons), and the pill
+   strip's global padding is sized for card pages. The toolbars are zeroed
+   and each part is placed on the gutter instead. */
+/* No drop shadow: the header and the feed are one white surface, as in
+   WhatsApp, and the first row's hairline (ion-list.css) is the only seam.
+   The same effect as Ionic's `ion-no-border` class, kept in the skin so a
+   feed header needs one class. (0,1,1) beats md's `.header-md` (0,1,0). */
+ion-header.mh-feed-header {
+  box-shadow: none;
+}
+
+ion-header.mh-feed-header ion-toolbar {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+ion-header.mh-feed-header ion-title {
+  padding-inline: var(--mh-row-gutter);
+}
+
+/* Less the 2px margin Ionic puts around each toolbar button, so the last
+   button's edge, not its margin, lands on the gutter. */
+ion-header.mh-feed-header ion-buttons[slot='end'] {
+  margin-inline-end: calc(var(--mh-row-gutter) - 0.125rem);
+}
+
+/* The back arrow in search mode: its glyph, not its tap area, starts on the
+   gutter. An md toolbar button pads its glyph by 0.75rem. */
+ion-header.mh-feed-header ion-buttons[slot='start'] {
+  margin-inline-start: calc(var(--mh-row-gutter) - 0.75rem);
+}
+
+ion-header.mh-feed-header ion-searchbar {
+  padding-inline: var(--mh-row-gutter);
+}
+
+/* Beside the back arrow the field starts after the button, not on the
+   gutter. */
+ion-header.mh-feed-header ion-buttons[slot='start'] + ion-searchbar {
+  padding-inline-start: 0;
+}
+
+ion-header.mh-feed-header .mh-chip-row {
+  padding-inline: var(--mh-row-gutter);
+}

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonBackButton,
+  ViewWillEnter,
   ViewWillLeave,
   IonButton,
   IonButtons,
@@ -65,7 +66,7 @@ const FOLLOW_THRESHOLD_PX = 120;
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
 })
-export class Chat implements ViewWillLeave {
+export class Chat implements ViewWillEnter, ViewWillLeave {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
@@ -277,13 +278,26 @@ export class Chat implements ViewWillLeave {
   }
 
   /**
+   * Back on screen — returning from details or the person page. Leaving
+   * cleared the active conversation, and the route params don't fire again
+   * for a page Ionic kept alive, so without this the header loses its name.
+   */
+  ionViewWillEnter(): void {
+    this.store.setActiveId(this.conversationId());
+  }
+
+  /**
    * The store treats the active conversation as "on screen": it holds back the
    * unread count and marks incoming messages read. Leaving has to clear that,
    * or messages that arrive after you walk away are read on your behalf and
    * never badge.
+   *
+   * Only if it is still ours. The first send leaves the draft page for the new
+   * thread's page, which has already claimed the active id by the time this
+   * runs; clearing it then blanked the new thread's header.
    */
   ionViewWillLeave(): void {
-    this.store.setActiveId(null);
+    if (this.store.activeId() === this.conversationId()) this.store.setActiveId(null);
   }
 
   dayLabel(dayKey: string): string {

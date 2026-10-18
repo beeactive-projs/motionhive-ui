@@ -30,6 +30,12 @@ export interface ConversationListItem {
   lastMessagePreview: string | null;
   unreadCount: number;
   muted: boolean;
+  /**
+   * The reader marked the thread unread ("come back to this"). Independent
+   * of `unreadCount`, which only counts real unread messages. Optional so a
+   * response from an API without the field reads as not marked.
+   */
+  markedUnread?: boolean;
   /** DIRECT only — the other participant. Null for groups. */
   otherUser: ParticipantSnapshot | null;
   /**

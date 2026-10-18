@@ -1,13 +1,3 @@
-/* Round header buttons. Ionic gives `shape="round"` the radius but sizes the
-   button from its content, so an icon-only one comes out an oval; these two are
-   circles the same 2.25rem as the bell beside them. */
-ion-buttons ion-button.round {
-  --padding-start: 0;
-  --padding-end: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
 /* Summary line above the week strip. */
 .summary {
   display: flex;
