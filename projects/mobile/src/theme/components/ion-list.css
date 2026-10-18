@@ -177,6 +177,17 @@ ion-list.mh-feed-list ion-item > ion-label {
   margin-block: 0;
 }
 
+/* Each line of a feed row is a whole 1.5rem box, so a row is exactly
+   0.75 + 1.5 + 1.5 + 0.75 = 4.5rem. Left to the type's own leading (16px
+   and 15px at 1.55) a row came out 72.047px; the fraction piled up row on
+   row, every separator landed on a different sub-pixel, and the ones that
+   straddled two device pixels drew visibly thicker. The text keeps its
+   leading; `.mh-feed-line` already centres it, and a bare h2 or p stays a
+   block so its ellipsis still works. */
+ion-list.mh-feed-list ion-label > :is(.mh-feed-line, h2, h3, p) {
+  block-size: 1.5rem;
+}
+
 /* The title is Inter, not the heading face the global h2 rule puts on it:
    a feed has dozens of these and Poppins at body size reads as shouting. */
 ion-list.mh-feed-list ion-label :is(h2, h3) {
