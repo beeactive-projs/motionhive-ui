@@ -443,7 +443,9 @@ $hex-gap: 0.25rem;
 .free {
   position: relative;
   overflow: hidden;
-  background: var(--p-surface-800);
+  /* Same navy as the pricing page's plan card: the two make the same promise
+     and sat on different darks, which read as two different components. */
+  background: var(--color-navy-900);
   border-radius: 1.6rem;
   padding: clamp(2rem, 5vw, 3.75rem);
   text-align: center;
