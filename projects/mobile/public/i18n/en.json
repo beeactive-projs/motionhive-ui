@@ -91,8 +91,7 @@
       "privacy": "Who can see my details",
       "resendVerification": "Resend verification email",
       "unverified": "{email} isn't verified yet.",
-      "deleteAccount": "Delete account",
-      "deleteAccountHint": "Opens the steps on our website"
+      "deleteAccount": "Delete account"
     },
     "sections": {
       "account": "Account",
@@ -131,6 +130,48 @@
         "ONLY_ME": "No one but you"
       },
       "saveFailed": "Couldn't save that. Try again."
+    },
+    "delete": {
+      "title": "Delete account",
+      "lead": "Before you go",
+      "intro": "We deactivate your account as soon as you confirm, and erase it on {date}. Until then, you can sign in and keep it.",
+      "dispute": "You have a payment dispute that needs your answer. Respond to it in Payments before you delete your account.",
+      "endsNow": "What ends now",
+      "coach": {
+        "clients": "{count, plural, one {Your client is told you left} other {Your # clients are told you left}}",
+        "clientsHint": "The plans you gave them stay with them.",
+        "subscriptions": "{count, plural, one {# client subscription stops at the end of the period they paid for} other {# client subscriptions stop at the end of the period they paid for}}",
+        "sessions": "{count, plural, one {# upcoming session is cancelled} other {# upcoming sessions are cancelled}}",
+        "sessionsHint": "{count, plural, =0 {Nobody has booked yet.} one {The person who booked is told.} other {The # people who booked are told.}}",
+        "groups": "{count, plural, one {# group you run closes} other {# groups you run close}}",
+        "groupsHint": "{count, plural, =0 {Nobody else is in them.} one {Its member is told.} other {Their # members are told.}}"
+      },
+      "member": {
+        "subscriptions": "{count, plural, one {# subscription stops renewing} other {# subscriptions stop renewing}}",
+        "bookings": "{count, plural, one {# upcoming booking is cancelled} other {# upcoming bookings are cancelled}}",
+        "coaches": "{count, plural, one {You stop training with your coach} other {You stop training with your # coaches}}",
+        "groups": "{count, plural, one {You leave # group} other {You leave # groups}}"
+      },
+      "nothingEnds": "Nothing else depends on your account.",
+      "erased": "What gets erased",
+      "erasedBody": "Your profile and photo, your workouts and records, the programs you made, your messages and everything else you added.",
+      "kept": "What we keep",
+      "keptBody": "Invoices and payment records, for 5 years, because the law requires it. Your posts in groups stay, without your name or photo.",
+      "policy": "Read the full policy",
+      "continue": "Continue",
+      "confirmLead": "Confirm it is you",
+      "codeSent": "We sent a 6-digit code to {email}. It works for 15 minutes.",
+      "codeLabel": "Code from the email",
+      "resend": "Send a new code",
+      "resendIn": "Send a new code in {seconds} s",
+      "confirmWord": "DELETE",
+      "confirmLabel": "Type {word} to confirm",
+      "submit": "Delete my account",
+      "afterSubmit": "You will be signed out. Sign in before {date} if you change your mind.",
+      "loadFailed": "We couldn't load this",
+      "codeFailed": "We couldn't send the code. Try again.",
+      "failed": "We couldn't delete your account. Try again.",
+      "coachInvoices": "As a coach, download the invoices you need for your accounts first, in Payments. You can still ask us for copies later."
     }
   },
   "accountSheets": {
@@ -1517,7 +1558,9 @@
     "workout": "Workout",
     "workoutComplete": "Workout complete",
     "workouts": "Workouts",
-    "privacy": "Who can see my details"
+    "privacy": "Who can see my details",
+    "deleteAccount": "Delete account",
+    "accountClosed": "Account closed"
   },
   "payments": {
     "badge": {

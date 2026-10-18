@@ -10,6 +10,12 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: '/auth/reset-password',
     RESEND_VERIFICATION: '/auth/resend-verification',
     VERIFY_EMAIL: '/auth/verify-email',
+    RESTORE_ACCOUNT: '/auth/restore-account',
+  },
+  ACCOUNT_DELETION: {
+    PREVIEW: '/users/me/deletion/preview',
+    CODE: '/users/me/deletion/code',
+    CONFIRM: '/users/me/deletion/confirm',
   },
   USERS: {
     BASE: '/users',

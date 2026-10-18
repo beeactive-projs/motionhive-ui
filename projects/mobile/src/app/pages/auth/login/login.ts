@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormField, FormRoot, form } from '@angular/forms/signals';
 import { ActivatedRoute, Params, RouterLink } from '@angular/router';
 import {
@@ -23,12 +23,16 @@ import {
   AuthService,
   ClientInviteService,
   FieldErrorPipe,
+  ScheduledDeletion,
   apiErrorMessage,
+  appLocale,
   focusFirstInvalid,
   isFieldInvalid,
   resolveReturnUrl,
+  scheduledDeletionFrom,
   signInSchema,
 } from 'core';
+import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
 import { AuthHeader } from '../_components/auth-header/auth-header';
 import { Logo } from '../../../_shared/components/logo/logo';
@@ -59,6 +63,7 @@ import { InviteLandingService } from '../invite-landing.service';
     TranslatePipe,
     FieldErrorPipe,
     AuthHeader,
+    ConfirmSheet,
     GuestControls,
     Logo,
     Notice,
@@ -90,6 +95,24 @@ export class Login {
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
+  /**
+   * The account is in its deletion cooling-off: the password was right, and
+   * the API offers to keep it instead of signing in.
+   */
+  protected readonly keepOffer = signal<ScheduledDeletion | null>(null);
+  protected readonly keepOpen = signal(false);
+  protected readonly keeping = signal(false);
+  protected readonly keepDate = computed(() => {
+    const offer = this.keepOffer();
+    return offer
+      ? new Date(offer.scheduledFor).toLocaleDateString(appLocale(), {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : '';
+  });
+
   protected readonly model = signal({ email: '', password: '' });
   protected readonly form = form(this.model, signInSchema, {
     submission: { action: async () => this.signIn(), onInvalid: focusFirstInvalid },
@@ -109,10 +132,39 @@ export class Login {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => this.acceptInviteAndNavigate(),
-        error: (err) =>
+        error: (err: unknown) => {
+          const offer = scheduledDeletionFrom(err);
+          if (offer) {
+            this.keepOffer.set(offer);
+            this.keepOpen.set(true);
+            return;
+          }
           this.errorMessage.set(
             apiErrorMessage(err, this._translateService.instant('auth.login.error.invalidCredentials')),
-          ),
+          );
+        },
+      });
+  }
+
+  /** Keep the account: the deletion is cancelled and they are signed in. */
+  protected keepAccount(): void {
+    const offer = this.keepOffer();
+    if (!offer || this.keeping()) return;
+    this.keeping.set(true);
+    this._authService
+      .restoreAccount(offer.restoreTicket)
+      .pipe(finalize(() => this.keeping.set(false)))
+      .subscribe({
+        next: () => {
+          this.keepOpen.set(false);
+          this.acceptInviteAndNavigate();
+        },
+        error: () => {
+          // The ticket lasts 15 minutes; signing in again issues a new one.
+          this.keepOpen.set(false);
+          this.keepOffer.set(null);
+          this.errorMessage.set(this._translateService.instant('auth.keepAccount.expired'));
+        },
       });
   }
 

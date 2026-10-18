@@ -12,13 +12,16 @@ import {
   AuthService,
   ClientInviteService,
   FieldErrorPipe,
+  ScheduledDeletion,
   apiErrorMessage,
   focusFirstInvalid,
   isFieldInvalid,
   resolveReturnUrl,
+  scheduledDeletionFrom,
   signInSchema,
 } from 'core';
 import { AuthHeader } from '../_components/auth-header/auth-header';
+import { KeepAccountOffer } from '../_components/keep-account-offer/keep-account-offer';
 import { SocialSignIn } from '../_components/social-sign-in/social-sign-in';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
@@ -43,6 +46,7 @@ import { INVITE_ACCEPTED_URL } from '../auth.const';
     PasswordInput,
     FieldErrorPipe,
     AuthHeader,
+    KeepAccountOffer,
     SocialSignIn,
     TermsNotice,
   ],
@@ -68,6 +72,8 @@ export class Login {
 
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  /** The account is in its deletion cooling-off: offer to keep it. */
+  protected readonly keepOffer = signal<ScheduledDeletion | null>(null);
 
   protected readonly model = signal({ email: '', password: '' });
   protected readonly form = form(this.model, signInSchema, {
@@ -94,14 +100,31 @@ export class Login {
   private signIn(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.keepOffer.set(null);
     request.pipe(finalize(() => this.isLoading.set(false))).subscribe({
       next: () => this.acceptInviteAndNavigate(),
-      error: (err) =>
-        this.errorMessage.set(apiErrorMessage(err, this._translateService.instant(fallbackKey))),
+      error: (err: unknown) => {
+        const offer = scheduledDeletionFrom(err);
+        if (offer) {
+          this.keepOffer.set(offer);
+          return;
+        }
+        this.errorMessage.set(apiErrorMessage(err, this._translateService.instant(fallbackKey)));
+      },
     });
   }
 
   /** With a valid invite in the URL, accept it and show the new coach; else carry on. */
+  protected onKept(): void {
+    this.keepOffer.set(null);
+    this.acceptInviteAndNavigate();
+  }
+
+  protected onKeepExpired(): void {
+    this.keepOffer.set(null);
+    this.errorMessage.set(this._translateService.instant('auth.keepAccount.expired'));
+  }
+
   private acceptInviteAndNavigate(): void {
     const token = this._clientInviteService.token;
     if (!token || this.inviteInvalid()) {

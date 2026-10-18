@@ -30,6 +30,13 @@ export const authRoutes: Routes = [
         title: 'pageTitle.newPassword',
       },
       {
+        // After confirming an account deletion: signed out, with the date.
+        path: 'account-closed',
+        loadComponent: () =>
+          import('./account-closed/account-closed').then((m) => m.AccountClosed),
+        title: 'pageTitle.accountClosed',
+      },
+      {
         path: 'verify-email',
         loadComponent: () => import('./verify-email/verify-email').then((m) => m.VerifyEmail),
         title: 'pageTitle.verifyEmail',

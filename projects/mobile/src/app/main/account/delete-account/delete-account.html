@@ -1,0 +1,139 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/account" />
+    </ion-buttons>
+    <ion-title>{{ 'account.delete.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    @if (loading()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of [1, 2, 3]; track $index) {
+          <ion-item>
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 60%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 40%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (loadFailed()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'account.delete.loadFailed' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="load()"
+      />
+    } @else if (step() === Steps.Explain) {
+      <section class="lead">
+        <h2>{{ 'account.delete.lead' | translate }}</h2>
+        <p>{{ 'account.delete.intro' | translate: { date: erasureDate() } }}</p>
+      </section>
+
+      @if (blocked()) {
+        <mh-notice tone="warning" role="alert">{{ 'account.delete.dispute' | translate }}</mh-notice>
+      }
+
+      <section class="mh-section">
+        <ion-note class="mh-kicker" color="medium">{{ 'account.delete.endsNow' | translate }}</ion-note>
+        @if (endsNow().length > 0) {
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (line of endsNow(); track line.text) {
+              <ion-item>
+                <ion-icon slot="start" [name]="line.icon" color="medium" aria-hidden="true" />
+                <ion-label class="ion-text-wrap">
+                  {{ line.text }}
+                  @if (line.hint) {
+                    <p>{{ line.hint }}</p>
+                  }
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        } @else {
+          <ion-note class="mh-note-block" color="medium">{{ 'account.delete.nothingEnds' | translate }}</ion-note>
+        }
+      </section>
+
+      <section class="mh-section">
+        <ion-note class="mh-kicker" color="medium">{{ 'account.delete.erased' | translate }}</ion-note>
+        <ion-note class="mh-note-block" color="medium">{{ 'account.delete.erasedBody' | translate }}</ion-note>
+      </section>
+
+      <section class="mh-section">
+        <ion-note class="mh-kicker" color="medium">{{ 'account.delete.kept' | translate }}</ion-note>
+        <ion-note class="mh-note-block" color="medium">{{ 'account.delete.keptBody' | translate }}</ion-note>
+        @if (isCoach()) {
+          <!-- A coach must keep their own invoices for years; after the
+               erasure they can no longer open them here. -->
+          <ion-note class="mh-note-block" color="medium">{{ 'account.delete.coachInvoices' | translate }}</ion-note>
+        }
+        <ion-button fill="clear" size="small" class="policy" (click)="openPolicy()">
+          {{ 'account.delete.policy' | translate }}
+          <ion-icon slot="end" name="open-outline" aria-hidden="true" />
+        </ion-button>
+      </section>
+
+      <ion-button expand="block" fill="outline" color="danger" class="primary" [disabled]="blocked()"
+        (click)="goToConfirm()">
+        {{ 'account.delete.continue' | translate }}
+      </ion-button>
+    } @else {
+      <section class="lead">
+        <h2>{{ 'account.delete.confirmLead' | translate }}</h2>
+        <p>{{ 'account.delete.codeSent' | translate: { email: preview()?.email } }}</p>
+      </section>
+
+      <ion-input
+        class="field"
+        fill="outline"
+        labelPlacement="stacked"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        [maxlength]="6"
+        [label]="'account.delete.codeLabel' | translate"
+        [value]="code()"
+        (ionInput)="code.set($event.detail.value ?? '')"
+      />
+      <div class="resend">
+        <ion-button fill="clear" size="small" [disabled]="sending() || resendIn() > 0" (click)="sendCode()">
+          @if (sending()) {
+            <ion-spinner name="crescent" />
+          } @else if (resendIn() > 0) {
+            {{ 'account.delete.resendIn' | translate: { seconds: resendIn() } }}
+          } @else {
+            {{ 'account.delete.resend' | translate }}
+          }
+        </ion-button>
+      </div>
+
+      <ion-input
+        class="field"
+        fill="outline"
+        labelPlacement="stacked"
+        autocapitalize="characters"
+        autocorrect="off"
+        [label]="'account.delete.confirmLabel' | translate: { word: confirmWord }"
+        [value]="word()"
+        (ionInput)="word.set($event.detail.value ?? '')"
+      />
+
+      @if (error(); as message) {
+        <p class="mh-helper over" role="alert">{{ message }}</p>
+      }
+
+      <ion-button expand="block" color="danger" class="primary" [disabled]="!canDelete()" (click)="deleteAccount()">
+        @if (deleting()) {
+          <ion-spinner name="crescent" />
+        } @else {
+          {{ 'account.delete.submit' | translate }}
+        }
+      </ion-button>
+      <p class="mh-footnote after">{{ 'account.delete.afterSubmit' | translate: { date: erasureDate() } }}</p>
+    }
+  </div>
+</ion-content>

@@ -9,6 +9,7 @@ export * from './lib/models/auth/auth-response.model';
 export * from './lib/models/auth/password-reset.model';
 export * from './lib/models/auth/social-login.model';
 export * from './lib/models/auth/verify-email.enums';
+export * from './lib/models/account/account-deletion.model';
 
 // Models - User — exports User, AvatarUser, UserInfo, UserSearchResult, …
 export * from './lib/models/user/user.model';
@@ -214,6 +215,7 @@ export * from './lib/services/auth/auth.service';
 export * from './lib/services/auth/token.service';
 export * from './lib/services/auth/google-auth.service';
 export * from './lib/services/auth/facebook-auth.service';
+export * from './lib/services/account-deletion/account-deletion.service';
 export * from './lib/services/user/user.service';
 export * from './lib/services/profile/profile.service';
 export * from './lib/services/geo/place-search.service';

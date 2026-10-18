@@ -32,7 +32,6 @@ import {
   TIMEZONE_OPTIONS,
   WEB_APP_URL,
   appLocale,
-  deleteAccountUrl,
   languageName,
   timezonePlace,
 } from 'core';
@@ -279,11 +278,6 @@ export class Account implements OnInit, ViewWillEnter {
           );
         },
       });
-  }
-
-  /** The website's steps, in the reader's language: the page the store listings link to. */
-  openDeleteAccount(): void {
-    window.open(deleteAccountUrl(this.currentLanguage), '_blank', 'noopener');
   }
 
   async copyHandle(): Promise<void> {

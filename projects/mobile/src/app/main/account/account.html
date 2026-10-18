@@ -110,10 +110,10 @@
           [note]="'account.rows.unverified' | translate: { email }" [detail]="false"
           [disabled]="resendingVerification()" (select)="onResendVerification()" />
         }
-        <!-- The steps live on the website, the page the store listings link
-             to as well; the app opens it rather than half-deleting here. -->
-        <mh-settings-row [label]="'account.rows.deleteAccount' | translate" icon="trash-outline" iconColor="danger"
-          [note]="'account.rows.deleteAccountHint' | translate" (select)="openDeleteAccount()" />
+        <!-- Quiet on purpose: last, grey, and it opens a page that explains
+             before anything happens. Findable, as Apple requires. -->
+        <mh-settings-row [label]="'account.rows.deleteAccount' | translate" icon="trash-outline" iconColor="medium"
+          (select)="go('delete')" />
       </ion-list>
     </section>
 

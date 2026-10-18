@@ -15,14 +15,17 @@ import {
   FieldErrorPipe,
   RegisterRequest,
   STORAGE_KEYS,
+  ScheduledDeletion,
   apiErrorMessage,
   focusFirstInvalid,
   isFieldInvalid,
   resolveReturnUrl,
+  scheduledDeletionFrom,
   signUpSchema,
 } from 'core';
 import { AcceptInvite } from '../_components/accept-invite/accept-invite';
 import { AuthHeader } from '../_components/auth-header/auth-header';
+import { KeepAccountOffer } from '../_components/keep-account-offer/keep-account-offer';
 import { SocialSignIn } from '../_components/social-sign-in/social-sign-in';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
 import { INVITE_ACCEPTED_URL } from '../auth.const';
@@ -53,6 +56,7 @@ import { PasswordInput } from '../../../_shared/components/password-input/passwo
     FieldErrorPipe,
     AcceptInvite,
     AuthHeader,
+    KeepAccountOffer,
     SocialSignIn,
     TermsNotice,
   ],
@@ -86,6 +90,8 @@ export class SignUp {
 
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  /** The account is in its deletion cooling-off: offer to keep it. */
+  protected readonly keepOffer = signal<ScheduledDeletion | null>(null);
 
   protected readonly model = signal({
     firstName: '',
@@ -151,11 +157,28 @@ export class SignUp {
   private signUp(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.keepOffer.set(null);
     request.pipe(finalize(() => this.isLoading.set(false))).subscribe({
       next: () => this.acceptInvitationAndNavigate(),
-      error: (err) =>
-        this.errorMessage.set(apiErrorMessage(err, this._translateService.instant(fallbackKey))),
+      error: (err: unknown) => {
+        const offer = scheduledDeletionFrom(err);
+        if (offer) {
+          this.keepOffer.set(offer);
+          return;
+        }
+        this.errorMessage.set(apiErrorMessage(err, this._translateService.instant(fallbackKey)));
+      },
     });
+  }
+
+  protected onKept(): void {
+    this.keepOffer.set(null);
+    this.acceptInvitationAndNavigate();
+  }
+
+  protected onKeepExpired(): void {
+    this.keepOffer.set(null);
+    this.errorMessage.set(this._translateService.instant('auth.keepAccount.expired'));
   }
 
   private acceptInvitationAndNavigate(): void {

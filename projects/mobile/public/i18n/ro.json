@@ -91,8 +91,7 @@
       "privacy": "Cine îmi poate vedea detaliile",
       "resendVerification": "Retrimite emailul de verificare",
       "unverified": "Adresa {email} nu este încă verificată.",
-      "deleteAccount": "Șterge contul",
-      "deleteAccountHint": "Deschide pașii pe site-ul nostru"
+      "deleteAccount": "Șterge contul"
     },
     "sections": {
       "account": "Cont",
@@ -131,6 +130,48 @@
         "ONLY_ME": "Nimeni în afară de tine"
       },
       "saveFailed": "Nu am putut salva. Încearcă din nou."
+    },
+    "delete": {
+      "title": "Șterge contul",
+      "lead": "Înainte să pleci",
+      "intro": "Îți dezactivăm contul imediat ce confirmi și îl ștergem pe {date}. Până atunci, te poți autentifica și îl poți păstra.",
+      "dispute": "Ai o contestație de plată la care trebuie să răspunzi. Răspunde-i din Plăți înainte să îți ștergi contul.",
+      "endsNow": "Ce se încheie acum",
+      "coach": {
+        "clients": "{count, plural, one {Clientul tău află că ai plecat} few {Cei # clienți ai tăi află că ai plecat} other {Cei # de clienți ai tăi află că ai plecat}}",
+        "clientsHint": "Planurile pe care li le-ai dat rămân la ei.",
+        "subscriptions": "{count, plural, one {# abonament al clienților se oprește la finalul perioadei plătite} few {# abonamente ale clienților se opresc la finalul perioadei plătite} other {# de abonamente ale clienților se opresc la finalul perioadei plătite}}",
+        "sessions": "{count, plural, one {# sesiune viitoare se anulează} few {# sesiuni viitoare se anulează} other {# de sesiuni viitoare se anulează}}",
+        "sessionsHint": "{count, plural, =0 {Nu a rezervat nimeni încă.} one {Persoana care a rezervat este anunțată.} few {Cele # persoane care au rezervat sunt anunțate.} other {Cele # de persoane care au rezervat sunt anunțate.}}",
+        "groups": "{count, plural, one {# grup pe care îl conduci se închide} few {# grupuri pe care le conduci se închid} other {# de grupuri pe care le conduci se închid}}",
+        "groupsHint": "{count, plural, =0 {Nu mai e nimeni altcineva în ele.} one {Membrul este anunțat.} few {Cei # membri sunt anunțați.} other {Cei # de membri sunt anunțați.}}"
+      },
+      "member": {
+        "subscriptions": "{count, plural, one {# abonament nu se mai reînnoiește} few {# abonamente nu se mai reînnoiesc} other {# de abonamente nu se mai reînnoiesc}}",
+        "bookings": "{count, plural, one {# rezervare viitoare se anulează} few {# rezervări viitoare se anulează} other {# de rezervări viitoare se anulează}}",
+        "coaches": "{count, plural, one {Nu te mai antrenezi cu antrenorul tău} few {Nu te mai antrenezi cu cei # antrenori ai tăi} other {Nu te mai antrenezi cu cei # de antrenori ai tăi}}",
+        "groups": "{count, plural, one {Ieși din # grup} few {Ieși din # grupuri} other {Ieși din # de grupuri}}"
+      },
+      "nothingEnds": "Nimic altceva nu depinde de contul tău.",
+      "erased": "Ce se șterge",
+      "erasedBody": "Profilul și fotografia, antrenamentele și recordurile, programele create de tine, mesajele și tot ce ai mai adăugat.",
+      "kept": "Ce păstrăm",
+      "keptBody": "Facturile și evidența plăților, timp de 5 ani, pentru că așa cere legea. Postările tale din grupuri rămân, fără numele și fotografia ta.",
+      "policy": "Citește politica completă",
+      "continue": "Continuă",
+      "confirmLead": "Confirmă că ești tu",
+      "codeSent": "Ți-am trimis un cod de 6 cifre la {email}. Este valabil 15 minute.",
+      "codeLabel": "Codul din email",
+      "resend": "Trimite un cod nou",
+      "resendIn": "Trimite un cod nou peste {seconds} s",
+      "confirmWord": "ȘTERGE",
+      "confirmLabel": "Scrie {word} ca să confirmi",
+      "submit": "Șterge-mi contul",
+      "afterSubmit": "Vei fi deconectat. Autentifică-te înainte de {date} dacă te răzgândești.",
+      "loadFailed": "Nu am putut încărca pagina",
+      "codeFailed": "Nu am putut trimite codul. Încearcă din nou.",
+      "failed": "Nu am putut șterge contul. Încearcă din nou.",
+      "coachInvoices": "Ca antrenor, descarcă întâi din Plăți facturile de care ai nevoie pentru contabilitate. Ne poți cere copii și mai târziu."
     }
   },
   "accountSheets": {
@@ -1517,7 +1558,9 @@
     "workout": "Antrenament",
     "workoutComplete": "Antrenament încheiat",
     "workouts": "Antrenamente",
-    "privacy": "Cine îmi poate vedea detaliile"
+    "privacy": "Cine îmi poate vedea detaliile",
+    "deleteAccount": "Șterge contul",
+    "accountClosed": "Cont închis"
   },
   "payments": {
     "badge": {

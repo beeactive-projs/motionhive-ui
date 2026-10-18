@@ -1,0 +1,41 @@
+// What the screen is about, above its sections: a heading and one paragraph.
+.lead {
+  padding: 0.25rem 0.5rem 0;
+
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: var(--mh-text-xl);
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: var(--mh-text-base);
+    line-height: var(--mh-leading-body);
+  }
+}
+
+.policy {
+  align-self: flex-start;
+  margin-inline-start: 0.25rem;
+}
+
+.field {
+  margin-top: 1rem;
+}
+
+.resend {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primary {
+  margin-top: 1.5rem;
+}
+
+.after {
+  margin-top: 0.75rem;
+  padding-inline: 0.5rem;
+  text-align: center;
+}
