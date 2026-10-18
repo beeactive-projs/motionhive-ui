@@ -1947,8 +1947,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="about.cta.sub" datatype="html">
-        <source> Set up your profile, add your first session, and share one link. Free to start, no subscription. </source>
-        <target>Îți faci profilul, adaugi prima sesiune și dai mai departe un singur link. Începi gratuit, fără abonament.</target>
+        <source> Set up your profile, add your first session, and share one link. Free, with no subscription. </source>
+        <target>Îți faci profilul, adaugi prima sesiune și trimiți un singur link. Gratuit, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">128</context>
@@ -2195,8 +2195,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.kicker" datatype="html">
-        <source>Free to start</source>
-        <target state="translated">Gratuit de la început</target>
+        <source>Free, no subscription</source>
+        <target state="translated">Gratuit, fără abonament</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
           <context context-type="linenumber">85</context>
@@ -2331,8 +2331,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.cta.kicker" datatype="html">
-        <source>Free to start</source>
-        <target state="translated">Gratuit de la început</target>
+        <source>Free, no subscription</source>
+        <target state="translated">Gratuit, fără abonament</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
           <context context-type="linenumber">93</context>
@@ -2647,8 +2647,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hero.sub" datatype="html">
-        <source> Run your whole coaching business in one place: a bookable profile, sessions, programs, payments and community. Free to start, no subscription. </source>
-        <target state="translated">Tot ce ține de coaching, într-un singur loc: profil cu rezervări, sesiuni, programe, plăți și comunitate. Începi gratuit, fără abonament.</target>
+        <source> Run your whole coaching business in one place: a bookable profile, sessions, programs, payments and community. Free, with no subscription. </source>
+        <target state="translated">Tot ce ține de coaching, într-un singur loc: profil cu rezervări, sesiuni, programe, plăți și comunitate. Gratuit, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">10,13</context>
@@ -2807,8 +2807,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s3" datatype="html">
-        <source>to start</source>
-        <target state="translated">ca să începi</target>
+        <source>to use</source>
+        <target state="translated">ca să îl folosești</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">145</context>
@@ -2871,8 +2871,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.sub" datatype="html">
-        <source>Free to start. Set up your profile in minutes.</source>
-        <target state="translated">Începi gratuit. Îți faci profilul în câteva minute.</target>
+        <source>Free, no subscription. Set up your profile in minutes.</source>
+        <target state="translated">Totul gratuit, fără abonament. Îți faci profilul în câteva minute.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">197</context>
