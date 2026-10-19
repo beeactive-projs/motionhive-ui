@@ -1,7 +1,15 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ConversationActions, MESSAGING_ICONS, conversationActions } from './messages.config';
+import { ConversationListItem } from 'core';
+
+import {
+  ConversationActions,
+  MESSAGING_ICONS,
+  conversationActions,
+  recentFromPerson,
+  suggestedPeople,
+} from './messages.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
 const templates = import.meta.glob('./**/*.html', {
@@ -107,5 +115,42 @@ describe('conversationActions', () => {
     for (const action of [...conversationActions(false, true), ...conversationActions(true, true)]) {
       expect(registered).toContain(toCamelCase(action.icon ?? ''));
     }
+  });
+});
+
+/** A conversation row with the fields the suggestion strip reads. */
+function conversation(
+  id: string,
+  otherUser: ConversationListItem['otherUser'],
+): ConversationListItem {
+  return { id, type: otherUser ? 'DIRECT' : 'GROUP', otherUser } as ConversationListItem;
+}
+
+function person(id: string, firstName: string, handle: string | null = null) {
+  return { id, firstName, lastName: 'Pop', avatarUrl: null, handle };
+}
+
+describe('search start', () => {
+  it('remembers a person with their handle under the name', () => {
+    expect(recentFromPerson(person('u1', 'Ana', 'ana'))).toEqual({
+      id: 'u1',
+      name: 'Ana Pop',
+      avatarUrl: null,
+      subline: '@ana',
+    });
+    expect(recentFromPerson(person('u1', 'Ana')).subline).toBeNull();
+  });
+
+  it('suggests the people from the latest conversations, once each, minus the recents', () => {
+    const inbox = [
+      conversation('c1', person('u1', 'Ana')),
+      conversation('c2', null),
+      conversation('c3', person('u2', 'Bogdan')),
+      conversation('c4', person('u1', 'Ana')),
+      conversation('c5', person('u3', 'Corina')),
+      conversation('c6', person('u4', 'Dan')),
+    ];
+
+    expect(suggestedPeople(inbox, ['u2'], 2).map((entry) => entry.id)).toEqual(['u1', 'u3']);
   });
 });

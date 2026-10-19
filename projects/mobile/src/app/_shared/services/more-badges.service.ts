@@ -7,7 +7,6 @@ import {
   ClientPaymentService,
   ClientService,
   NavModes,
-  translate,
 } from 'core';
 
 import { resolveMode } from '../config/tabs.config';
@@ -20,11 +19,9 @@ import { resolveMode } from '../config/tabs.config';
 const PENDING_FRESH_MS = 5000;
 
 /**
- * The attention state behind the Menu tab, shared between the tab bar's dot
- * and the menu page's per-row dots so the two can never disagree.
- *
- * Holds counts, exposes booleans: a dot only has to say "something is in
- * here", and a number would overstate it.
+ * The attention state behind the tab bar: the bill dot on the Menu tab
+ * (shared with the menu page's row, so the two can never disagree) and the
+ * request count on the Clients tab.
  */
 @Service()
 export class MoreBadgesService {
@@ -64,27 +61,13 @@ export class MoreBadgesService {
   );
 
   /**
-   * Whether the coach has client requests waiting — the one thing in the menu
-   * that is someone else waiting on them.
+   * How many client requests are waiting on the coach's answer — the badge on
+   * the Clients tab, where they are answered. Incoming only: an invitation
+   * the coach sent is waiting on someone else, and counting it lit the badge
+   * for nothing to do. Zero outside coach mode.
    */
-  readonly hasPendingRequests = computed(
-    () => this._mode() === NavModes.Coach && this._pendingRequests() > 0,
-  );
-
-  /**
-   * The raw count, for the one screen that names it out loud: the Clients
-   * tab's hourglass reads "Requests, 3 pending". It is mode-blind on purpose
-   * — only a coach's screen asks for it, and the gate belongs on the dot.
-   *
-   * Exposed so the Clients tab can read this count rather than fetch its own.
-   * Two owners meant two `/clients/requests/pending/count` calls on every
-   * load of that tab, and two numbers that could disagree mid-flight.
-   */
-  readonly pendingRequests = this._pendingRequests.asReadonly();
-
-  /** Something is in the menu — which thing decides what the dot announces. */
-  readonly moreDotLabel = computed(() =>
-    translate(this.hasBillDue() ? 'shell.menuDot.billDue' : 'shell.menuDot.requestsWaiting'),
+  readonly pendingRequests = computed(() =>
+    this._mode() === NavModes.Coach ? this._pendingRequests() : 0,
   );
 
   refresh(): void {
@@ -114,7 +97,7 @@ export class MoreBadgesService {
       .pipe(take(1))
       .subscribe({
         next: (response) => {
-          this._pendingRequests.set(response.count);
+          this._pendingRequests.set(response.incoming);
           this._pendingFetchedAt = Date.now();
           this._pendingInFlight = false;
         },

@@ -1,4 +1,5 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, TemplateRef, computed, input, model, output } from '@angular/core';
 import { IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -23,7 +24,7 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
  */
 @Component({
   selector: 'mh-action-sheet',
-  imports: [HexAvatar, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
+  imports: [HexAvatar, IonItem, IonLabel, IonList, NgTemplateOutlet, SheetShell, TranslatePipe],
   templateUrl: './action-sheet.html',
   styleUrl: './action-sheet.scss',
 })
@@ -35,6 +36,12 @@ export class ActionSheet<T extends string> {
   readonly subtitle = input('');
   /** Translated text above the verbs, for a choice that needs explaining. */
   readonly note = input('');
+  /**
+   * Optional content between the note and the verbs, for what the verbs are
+   * about when a line of text cannot hold it (a request's own message). It
+   * binds against the consumer, like the shell's body.
+   */
+  readonly details = input<TemplateRef<unknown> | null>(null);
   readonly actions = input.required<readonly SheetAction<T>[]>();
   /**
    * Off to report the choice straight away and leave the sheet open, for a

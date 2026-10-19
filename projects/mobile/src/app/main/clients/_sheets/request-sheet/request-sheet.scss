@@ -1,0 +1,12 @@
+/* What they wrote when asking: a white box on the sheet, set apart from the
+   sheet's own copy by its italics. */
+.quote {
+  margin: 0 0 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  font-style: italic;
+  line-height: var(--mh-leading-body);
+}

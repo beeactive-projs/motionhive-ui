@@ -23,7 +23,7 @@ import {
   TAB_SETS,
 } from '../../_shared/config/tabs.config';
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
-import { TabIds } from '../../_shared/models/tab.model';
+import { TabIds, TabItem } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
 
 /**
@@ -78,8 +78,6 @@ export class Tabs {
 
   /** The dot on the Menu tab, shared with the menu page's rows. */
   readonly hasBillDue = this._moreBadgesService.hasBillDue;
-  readonly hasPendingRequests = this._moreBadgesService.hasPendingRequests;
-  readonly moreDotLabel = this._moreBadgesService.moreDotLabel;
 
   /**
    * The active stack id — the first URL segment after `/tabs`. Derived from
@@ -109,11 +107,24 @@ export class Tabs {
 
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
 
-  /** Live counters can't live in a plain const, so they are spliced in here. */
+  /**
+   * Live counters can't live in a plain const, so they are spliced in here.
+   * Unread messages are honey, after WhatsApp; requests waiting on the coach
+   * are red, a count of people to answer on the tab where they are answered.
+   */
   readonly tabs = computed(() =>
-    this._tabSet().tabs.map((tab) =>
-      tab.id === TabIds.Messages ? { ...tab, badge: this._messagingStore.unreadTotal } : tab,
-    ),
+    this._tabSet().tabs.map((tab): TabItem => {
+      if (tab.id === TabIds.Messages) return { ...tab, badge: this._messagingStore.unreadTotal };
+      if (tab.id === TabIds.Clients) {
+        return {
+          ...tab,
+          badge: this._moreBadgesService.pendingRequests,
+          badgeColor: 'danger',
+          badgeLabel: 'shell.tabBadge.requestsWaiting',
+        };
+      }
+      return tab;
+    }),
   );
 
   constructor() {

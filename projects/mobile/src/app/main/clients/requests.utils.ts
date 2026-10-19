@@ -1,21 +1,6 @@
-import { InstructorClient, isIncomingRequest, isSentInvite, startOfDay, translate } from 'core';
+import { InstructorClient, startOfDay, translate } from 'core';
 
-/** The Requests page's own helpers: who is waiting on whom, and since when. */
-
-/**
- * The pending rows, split by who is waiting on whom. The API returns both
- * directions in one list; the page shows them as two sections because they
- * ask different things of the coach — a decision, or patience.
- */
-export function splitPendingRows(rows: readonly InstructorClient[]): {
-  incoming: InstructorClient[];
-  sent: InstructorClient[];
-} {
-  return {
-    incoming: rows.filter(isIncomingRequest),
-    sent: rows.filter(isSentInvite),
-  };
-}
+/** The request sheet's own helpers: since when a request has been waiting. */
 
 /** Whole local days from `iso` up to `now` — negative when `iso` is ahead. */
 export function daysBetween(iso: string, now: number): number {

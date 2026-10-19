@@ -1,100 +1,85 @@
-@if (searchOpen()) {
-<!-- Search owns the toolbar: a title, three actions, a segment and a chip
-       row do not fit above the fold on a phone. Same as the inbox. -->
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <!-- Debounced, unlike the other searchbars: the directory half of this
-         box is a request per term now, not a filter over loaded rows.
-         Named, because a searchbar with only a placeholder announces itself
-         as Ionic's default "search text". -->
-    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'clients.list.search' | translate"
-      [attr.aria-label]="'clients.list.search' | translate"
-      inputmode="search" [debounce]="300" [value]="store.query()"
-      (ionInput)="onQuery($event.detail.value ?? '')" />
-    <ion-buttons slot="end">
-      <ion-button class="cancel" (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<!-- The Messages header: title and actions, a search field that is always
+     there, then the status pills. Searching folds the title and the pills
+     away and keeps the same field, so the caret the tap put there stays.
+     They fold rather than vanish, so the field glides up to its place. -->
+<ion-header class="mh-flat-header" [translucent]="true">
+  @if (!searchOpen()) {
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
+      <ion-title>{{ 'nav.clients' | translate }}</ion-title>
+      <ion-buttons slot="end">
+        <mh-notification-bell />
+        <!-- The one filled control in the header: inviting is the page's
+             primary action, and honey is what those are painted. -->
+        <ion-button
+          class="round"
+          shape="round"
+          fill="solid"
+          color="primary"
+          [attr.aria-label]="'clients.inviteClient' | translate"
+          (click)="openInvite()"
+        >
+          <ion-icon slot="icon-only" name="add-outline" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  }
 
-  <!-- What is actually being searched. The box took the segment and the chips
-       with it, and a search run with "Archived" on looks exactly like the
-       whole client list. -->
-  <ion-toolbar class="scope-bar">
-    <div class="scope">
-      <span class="where">{{ searchScope() }}</span>
-      @if (store.filter() !== Filters.All) {
-      <ion-button fill="clear" size="small" (click)="setFilter(Filters.All)">
-        {{ 'button.clearFilter' | translate }}
-      </ion-button>
-      }
-    </div>
-    @if (showSearchHint()) {
-    <p class="hint">{{ 'clients.list.searchHint' | translate: { count: minSearchLength } }}</p>
+  <ion-toolbar>
+    @if (searchOpen()) {
+      <ion-buttons
+        slot="start"
+        (animate.enter)="fold.backIn($event)"
+        (animate.leave)="fold.backOut($event)"
+      >
+        <ion-button [attr.aria-label]="'a11y.closeSearch' | translate" (click)="closeSearch()">
+          <ion-icon slot="icon-only" name="chevron-back-outline" />
+        </ion-button>
+      </ion-buttons>
     }
+    <!-- No `mhAutofocus`: this field is on screen from the start, and focusing
+         it is what opens search. Debounced, unlike the inbox's: every term is
+         a request. Named, because a searchbar with only a placeholder
+         announces itself as Ionic's default "search text". -->
+    <ion-searchbar
+      class="mh-search-pill"
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      inputmode="search"
+      [placeholder]="'clients.list.search' | translate"
+      [attr.aria-label]="'clients.list.search' | translate"
+      [debounce]="300"
+      [value]="store.query()"
+      (ionFocus)="openSearch()"
+      (ionInput)="onQuery($event.detail.value ?? '')"
+    />
   </ion-toolbar>
-</ion-header>
-} @else {
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>{{ 'nav.clients' | translate }}</ion-title>
-    <ion-buttons slot="end">
-      <mh-notification-bell class="round" />
-      <ion-button shape="round" [attr.aria-label]="'clients.list.search' | translate" (click)="openSearch()">
-        <ion-icon slot="icon-only" name="search-outline" />
-      </ion-button>
-      <!-- A dot, not a count: it only has to say "something is waiting". -->
-      <ion-button shape="round" routerLink="/tabs/clients/requests" [attr.aria-label]="requestsLabel()">
-        <ion-icon slot="icon-only" name="hourglass-outline" />
-        @if (store.hasPendingRequests()) {
-        <ion-badge color="danger" class="dot" aria-hidden="true"></ion-badge>
+
+  @if (!searchOpen() && !store.isEmpty()) {
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'clients.list.filterByStatus' | translate">
+        @for (option of filters; track option.id) {
+          <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
+               reader reads it as text and never says which one is on. -->
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="store.filter() === option.id"
+            [attr.aria-pressed]="store.filter() === option.id"
+            (click)="setFilter(option.id)"
+          >
+            {{ option.label | translate }}
+          </ion-button>
         }
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  @if (store.showChrome()) {
-  <ion-toolbar>
-    <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
-      <ion-segment-button [value]="Segments.Attention">
-        <ion-label>
-          {{ 'clients.segments.attention' | translate }}
-          <!-- The wash pairing, not the solid fill: white on danger-500 is
-               3.76:1, and badge-sized text needs 4.5:1 (see the wash note in
-               variables.css). It still reads unmistakably as red. -->
-          @if (store.attentionCount() > 0) {
-          <ion-badge data-tone="danger" class="count">{{ store.attentionCount() }}</ion-badge>
-          }
-        </ion-label>
-      </ion-segment-button>
-      <ion-segment-button [value]="Segments.All">
-        <ion-label>{{ store.allCountLabel() }}</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
-
-  @if (!isAttention()) {
-  <ion-toolbar>
-    <!-- Scrolls sideways rather than wrapping: a second chip row would
-               push the first client below the fold. -->
-    <div class="mh-chip-row" role="group" [attr.aria-label]="'clients.list.filterByStatus' | translate">
-      @for (option of filters; track option.id) {
-      <!-- `ion-button`, not `ion-chip`: the chip renders a non-interactive
-                 element, so it never takes focus and its `aria-pressed` named a
-                 state nothing could reach. -->
-      <ion-button class="chip" fill="clear" shape="round" size="small"
-        [class.selected]="store.filter() === option.id"
-        [attr.aria-pressed]="store.filter() === option.id" (click)="setFilter(option.id)">
-        {{ option.label | translate }}
-      </ion-button>
-      }
-    </div>
-  </ion-toolbar>
-  }
+      </div>
+    </ion-toolbar>
   }
 </ion-header>
-}
 
-<ion-content [fullscreen]="true">
+<!-- A flat list: the rows run edge to edge on white. The empty states are
+     centred art, which needs the slate page behind it. -->
+<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
   <!-- The toolbar shows the page's name but `ion-title` is not a heading, so
        a screen reader had nothing to land on and the outline began at h2. -->
   <h1 class="mh-visually-hidden">{{ 'nav.clients' | translate }}</h1>
@@ -103,13 +88,22 @@
        shorter. Polite, and only once the result is the final one. -->
   <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
 
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
-    <ion-refresher-content />
-  </ion-refresher>
+  @if (!searchOpen()) {
+    <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher-content />
+    </ion-refresher>
+  }
+
+  <!-- Why a one-character term is not searching everyone; the invite sheet
+       says the same under its own people search. -->
+  @if (searchOpen() && store.queryTooShort()) {
+    <ion-note class="mh-note-block">
+      {{ 'clients.list.searchHint' | translate: { count: minSearchLength } }}
+    </ion-note>
+  }
 
   @if (store.isStale()) {
-    <!-- A status, so neutral-semantic rather than honey. It sits above both
-         lenses because either one can be the stale one. -->
+    <!-- A status, so neutral-semantic rather than honey. -->
     <div class="stale" role="status">
       <div class="stale-bar">
         <ion-icon name="cloud-offline-outline" aria-hidden="true" />
@@ -120,157 +114,113 @@
   }
 
   @if (store.showLoadError()) {
-  <mh-empty-state icon="alert-circle-outline" [heading]="'clients.list.loadError' | translate"
-    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
-    (action)="retry()" />
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'clients.list.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (showSearchStart()) {
+    <mh-search-start
+      [recents]="recents.entries()"
+      [strips]="strips()"
+      (select)="openRecent($event)"
+      (remove)="removeRecent($event)"
+      (clearAll)="clearRecents()"
+    />
   } @else if (store.showSkeleton()) {
-  <!-- Mirrors the row shape so nothing shifts when data lands. -->
-  <div class="mh-page" aria-busy="true">
-    @if (isAttention()) {
-    <div class="mh-section-head">
-      <span class="mh-kicker">
-        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
-      </span>
-    </div>
-    @for (_ of skeletonRows; track $index) {
-    <ion-item lines="none" class="row-skeleton mh-list-row">
-      <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-      <ion-label>
-        <h3><ion-skeleton-text [animated]="true" style="width: 40%" /></h3>
-        <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-      </ion-label>
-    </ion-item>
-    }
-    } @else {
-    <ion-list [inset]="true" class="mh-card-list">
+    <!-- The real rows' geometry, so nothing shifts when data lands. -->
+    <ion-list class="mh-flat-list" aria-busy="true">
       @for (_ of skeletonRows; track $index) {
-      <ion-item>
-        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-        </ion-label>
-      </ion-item>
+        <ion-item>
+          <ion-skeleton-text slot="start" [animated]="true" style="width: 3.25rem; height: 3.25rem" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+          </ion-label>
+        </ion-item>
       }
     </ion-list>
-    }
-  </div>
   } @else if (store.isEmpty()) {
-  <mh-clients-empty (invite)="openInvite()" />
-  } @else if (isAttention()) {
-  <div class="mh-page">
-    @if (store.triageEmpty()) {
-    <mh-empty-state icon="people-outline" [heading]="'clients.triage.empty.title' | translate"
-      [message]="'clients.triage.empty.message' | translate"
-      [actionLabel]="'clients.triage.empty.action' | translate"
-      actionFill="outline" (action)="showAll()" />
-    } @else if (store.isRosterFilteredEmpty()) {
-    <!-- The roster is this week's active clients only, so a name that is on
-         the directory but not here is a match the coach should go find. -->
-    <mh-empty-state icon="people-outline" [heading]="'empty.nothingMatches' | translate"
-      [message]="'clients.triage.noMatch.message' | translate"
-      [actionLabel]="'clients.triage.noMatch.action' | translate"
-      actionFill="outline" (action)="showAll()" />
+    <mh-clients-empty (invite)="openInvite()" />
+  } @else if (store.isFilteredEmpty()) {
+    @if (store.query()) {
+      <!-- The API searches every client, so there is nothing left to scroll
+           for and the copy does not say there is. -->
+      <mh-empty-state
+        icon="people-outline"
+        [heading]="'empty.nothingMatches' | translate"
+        [message]="'clients.directory.noMatch.message' | translate"
+        [actionLabel]="'button.clear' | translate"
+        actionFill="outline"
+        (action)="clearFilters()"
+      />
     } @else {
-    @if (store.allClear() && !store.query()) {
-    <!-- A status, so the success wash — never honey. The on-track
-               list stays below so the screen never feels dead. -->
-    <div class="all-clear">
-      <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
-      <div>
-        <strong>{{ 'clients.triage.allClear.title' | translate }}</strong>
-        <span>{{ 'clients.triage.allClear.message' | translate }}</span>
-      </div>
-    </div>
-    } @else if (store.visibleAttentionClients().length > 0) {
-    <section class="mh-section">
-      <div class="mh-section-head warm">
-        <!-- A heading, not a span: the outline ran straight from the page
-             title into the client names, with nothing between the two lists
-             to navigate by. The rows below drop to h3 to sit under it. -->
-        <h2 class="mh-kicker">{{ 'clients.triage.thisWeek' | translate }}</h2>
-        @if (triageNote(); as note) {
-        <ion-note>{{ note }}</ion-note>
-        }
-      </div>
-      <div>
-        @for (client of store.visibleAttentionClients(); track client.clientId) {
-        <mh-attention-row [client]="client" (select)="openRoster(client)" />
-        }
-      </div>
-    </section>
+      <mh-empty-state
+        icon="people-outline"
+        [heading]="'clients.directory.noStatus.title' | translate"
+        [message]="'clients.directory.noStatus.message' | translate"
+        [actionLabel]="'clients.directory.noStatus.action' | translate"
+        actionFill="outline"
+        (action)="clearFilters()"
+      />
     }
-
-    @if (store.visibleOnTrackClients().length > 0) {
-    <section class="mh-section">
-      <div class="mh-section-head">
-        <h2 class="mh-kicker">{{ 'clients.triage.onTrack' | translate }}</h2>
-        <ion-note>{{ onTrackNote() }}</ion-note>
-      </div>
-      <ion-list [inset]="true" class="mh-card-list">
-        @for (client of store.visibleOnTrackClients(); track client.clientId) {
-        <mh-on-track-row [client]="client" (select)="openRoster(client)" />
-        }
-      </ion-list>
-    </section>
-    }
-    }
-  </div>
   } @else {
-  @if (store.isFilteredEmpty()) {
-  @if (store.query()) {
-  <!-- The API searches the whole directory now, so there is nothing left
-       to scroll for and the copy no longer says there is. -->
-  <mh-empty-state icon="people-outline" [heading]="'empty.nothingMatches' | translate"
-    [message]="'clients.directory.noMatch.message' | translate"
-    [actionLabel]="'button.clear' | translate" actionFill="outline"
-    (action)="clearFilters()" />
-  } @else {
-  <mh-empty-state icon="people-outline" [heading]="'clients.directory.noStatus.title' | translate"
-    [message]="'clients.directory.noStatus.message' | translate"
-    [actionLabel]="'clients.directory.noStatus.action' | translate" actionFill="outline"
-    (action)="clearFilters()" />
-  }
-  } @else {
-  <div class="mh-page">
-    <ion-list [inset]="true" class="mh-card-list">
+    <ion-list class="mh-flat-list">
       @for (client of store.visibleClients(); track client.id) {
-      <mh-client-row [client]="client" (select)="open(client)" (message)="message(client)" (notes)="openNotes(client)"
-        (archive)="confirmArchive(client)" (unarchive)="unarchive(client)" (withdraw)="confirmWithdraw(client)" />
+        <mh-client-row
+          [client]="client"
+          (select)="open(client)"
+          (message)="message(client)"
+          (notes)="openNotes(client)"
+          (archive)="confirmArchive(client)"
+          (unarchive)="unarchive(client)"
+          (withdraw)="confirmWithdraw(client)"
+        />
       }
     </ion-list>
-  </div>
 
-  <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
-    <ion-infinite-scroll-content />
-  </ion-infinite-scroll>
-  }
-  }
-
-  <!-- On the root whatever the segment: inviting is the one action every
-       state of this screen leads to — except the onboarding one, which is a
-       full-width "Invite your first client" button and needs no second copy
-       of itself floating over it. -->
-  @if (!store.isEmpty()) {
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button [attr.aria-label]="'clients.inviteClient' | translate" (click)="openInvite()">
-      <ion-icon name="person-add-outline" />
-    </ion-fab-button>
-  </ion-fab>
+    <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
   }
 </ion-content>
 
 <mh-invite-client-sheet [(open)]="inviteOpen" (sent)="store.onInviteSent()" />
 
-<mh-client-notes-sheet [(open)]="notesOpen" [client]="notesClient()" [saving]="notesSaving()"
-  (save)="saveNotes($event)" />
+<mh-request-sheet
+  [(open)]="requestOpen"
+  [request]="requestClient()"
+  [resent]="requestResent()"
+  (action)="onRequestAction($event)"
+/>
 
-<mh-confirm-sheet [(open)]="archiveOpen" [title]="archiveTitle()"
+<mh-client-notes-sheet
+  [(open)]="notesOpen"
+  [client]="notesClient()"
+  [saving]="notesSaving()"
+  (save)="saveNotes($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="archiveOpen"
+  [title]="archiveTitle()"
   [body]="'clients.confirm.archive.body' | translate"
-  [confirmLabel]="'clients.actions.archiveClient' | translate" [cancelLabel]="'button.keep' | translate"
-  tone="danger" [saving]="archiveSaving()" (confirm)="archive()" />
+  [confirmLabel]="'clients.actions.archiveClient' | translate"
+  [cancelLabel]="'button.keep' | translate"
+  tone="danger"
+  [saving]="archiveSaving()"
+  (confirm)="archive()"
+/>
 
-<mh-confirm-sheet [(open)]="withdrawOpen" [title]="'clients.confirm.withdraw.title' | translate"
-  [body]="withdrawBody()" [confirmLabel]="'clients.actions.withdraw' | translate"
-  [cancelLabel]="'button.keepIt' | translate" tone="danger" [saving]="withdrawSaving()"
-  (confirm)="withdraw()" />
+<mh-confirm-sheet
+  [(open)]="withdrawOpen"
+  [title]="'clients.confirm.withdraw.title' | translate"
+  [body]="withdrawBody()"
+  [confirmLabel]="'clients.actions.withdraw' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  tone="danger"
+  [saving]="withdrawSaving()"
+  (confirm)="withdraw()"
+/>

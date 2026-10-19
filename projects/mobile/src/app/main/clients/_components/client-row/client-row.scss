@@ -1,64 +1,12 @@
-/* Separator, chevron and the tile's gap come from the grouped-list skin
-   (theme/components/ion-list.css). */
+/* Layout, type and the swipe options come from the flat-list skin
+   (`theme/components/ion-list.css`); this file only carries the archived
+   state. */
 :host {
   display: block;
 }
 
-/* The name owns its line now — it is the widest thing on the row and had
-   been sharing the width with a badge. */
-ion-label h2 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--ion-font-family);
-  font-weight: 600;
-}
-
-/* Except on an email-only invitation, where the address IS the identity and
-   there is no name behind it to fall back on. Two lines of address beat one
-   line of `radu.testclient@motion…`, so it wraps — anywhere, since an
-   address has no spaces to break at. */
-ion-label.ion-text-wrap h2 {
-  overflow: visible;
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-/* Address and status on one line under it; the address yields, the badge
-   never wraps. */
-.meta-line {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-width: 0;
-}
-
-/* Ionic colours a slotted `p` but not one nested inside a wrapper, so the
-   subline states its own ink rather than losing it to the row's. */
-.meta-line p {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  margin: 0;
-  color: var(--ion-color-medium);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.meta-line ion-badge {
-  flex: none;
-}
-
-/* Icon over label, so a named option stays about as narrow as the icon-only
-   one it replaces. */
-ion-item-option {
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  text-transform: none;
-}
-
 /* Archived reads as settled: dimmed name, faded tile — still legible, never
-   mistaken for the live roster. */
+   mistaken for a live client. */
 .archived {
   --color: var(--ion-color-medium);
 }

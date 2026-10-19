@@ -25,20 +25,21 @@ import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { clientStatusTone, clientSubline } from '../../clients.config';
 
 /**
- * One row of the All clients list: hex avatar, name, email, and a status chip
- * only where the status is worth saying. Active is the default state and stays
- * chip-silent, like a booked session; pending and archived wear a wash.
+ * One row of the client list, a flat-list row (`mh-flat-list`): hex avatar,
+ * name, email, and a status chip only where the status is worth saying.
+ * Active is the default state and stays chip-silent, like a booked session;
+ * pending and archived wear a wash.
  *
  * Swiping reveals the verbs the row can take — Message on the leading edge,
  * Notes and Archive (or Unarchive, or Withdraw for an invitation) on the
  * trailing one. An incoming request has none: its verbs are a decision, and
- * those live on the Requests page. The row only emits; the page owns the
- * store calls and the confirmations.
+ * those live in the request sheet a tap opens. The row only emits; the page
+ * owns the store calls and the confirmations.
  *
  * An email-only invite has no account behind it — no avatar to show and
  * nobody to message — so it gets a mail tile. It is still pressable: there is
- * no profile to open, but the invitation itself can be managed on the
- * Requests page, which is where the page sends the tap.
+ * no profile to open, but the invitation itself can be resent or withdrawn
+ * from the request sheet, which is where the page sends the tap.
  */
 @Component({
   selector: 'mh-client-row',
@@ -80,8 +81,8 @@ export class ClientRow {
   readonly isIncoming = computed(() => isIncomingRequest(this.client()));
 
   /**
-   * Openable, or pending in either direction — both of which the page routes
-   * to Requests, where an invitation can be resent or withdrawn.
+   * Openable, or pending in either direction — both of which the page opens
+   * in the request sheet.
    */
   readonly pressable = computed(
     () => this.openable() || this.isIncoming() || this.isInvite(),

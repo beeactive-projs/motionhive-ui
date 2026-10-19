@@ -17,7 +17,10 @@ import {
   sendOutline,
 } from 'ionicons/icons';
 
+import { ConversationListItem, UserSearchResult, displayName } from 'core';
+
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
+import { RecentPerson, SUGGESTION_LIMIT } from '../../_shared/config/recent-searches.config';
 
 /**
  * Every icon the messages screens render. Each page calls
@@ -88,4 +91,39 @@ export function conversationActions(
       destructive: true,
     },
   ];
+}
+
+// ── Search start ────────────────────────────────────────────────────────────
+
+/** A person as the inbox's recent searches keep them. */
+export function recentFromPerson(person: UserSearchResult): RecentPerson {
+  return {
+    id: person.id,
+    name: displayName(person),
+    avatarUrl: person.avatarUrl,
+    subline: person.handle ? `@${person.handle}` : null,
+  };
+}
+
+/**
+ * The strip under the recents: the people from the latest conversations,
+ * in inbox order (newest message first). Groups have no one person to show,
+ * and someone already in the recents is not offered twice.
+ */
+export function suggestedPeople(
+  conversations: readonly ConversationListItem[],
+  excludeIds: readonly string[],
+  limit = SUGGESTION_LIMIT,
+): RecentPerson[] {
+  const seen = new Set(excludeIds);
+  const people: RecentPerson[] = [];
+
+  for (const conversation of conversations) {
+    const person = conversation.otherUser;
+    if (!person || seen.has(person.id)) continue;
+    seen.add(person.id);
+    people.push(recentFromPerson(person));
+    if (people.length === limit) break;
+  }
+  return people;
 }

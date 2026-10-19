@@ -30,16 +30,16 @@ describe('activeTabIdFromUrl', () => {
   });
 
   it('keeps a nested page on its parent tab', () => {
-    // The whole reason the account area and Requests are nested rather than
+    // The whole reason the account area and a client page are nested rather than
     // siblings. The three-segment case is what keeps the Home tab lit across
     // every screen under /tabs/home/account.
-    expect(activeTabIdFromUrl('/tabs/clients/requests')).toBe(TabIds.Clients);
+    expect(activeTabIdFromUrl('/tabs/clients/user-1')).toBe(TabIds.Clients);
     expect(activeTabIdFromUrl('/tabs/home/account')).toBe(TabIds.Home);
     expect(activeTabIdFromUrl('/tabs/home/account/profile')).toBe(TabIds.Home);
   });
 
   it('ignores query strings and fragments', () => {
-    expect(activeTabIdFromUrl('/tabs/clients/requests?requestId=abc')).toBe(TabIds.Clients);
+    expect(activeTabIdFromUrl('/tabs/clients?filter=requests')).toBe(TabIds.Clients);
     expect(activeTabIdFromUrl('/tabs/home#top')).toBe(TabIds.Home);
   });
 
@@ -110,13 +110,10 @@ describe('tab set configuration', () => {
     }
   });
 
-  it('marks every coach-only More tile as requiring the instructor role', () => {
-    const coachOnly = COACH_TAB_SET.more
-      .flatMap((section) => section.items)
-      .filter((tile) => tile.route.startsWith('/tabs/clients'));
-    expect(coachOnly.length).toBeGreaterThan(0);
-    for (const tile of coachOnly) {
-      expect(tile.requiresInstructor).toBe(true);
-    }
+  // Requests are the Clients tab's chip, answered from a sheet there; a menu
+  // row pointing into that tab would be a second way in to the same list.
+  it('gives requests no menu row of their own', () => {
+    const tiles = COACH_TAB_SET.more.flatMap((section) => section.items);
+    expect(tiles.some((tile) => tile.route.startsWith('/tabs/clients'))).toBe(false);
   });
 });
