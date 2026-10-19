@@ -45,9 +45,4 @@ export class FeatureShowcase {
   select(index: number): void {
     this.active.set(index);
   }
-
-  /** The poster under each clip, and what shows where no clip exists yet. */
-  shotFor(slug: string): string {
-    return `/images/home-features/${slug}.png`;
-  }
 }

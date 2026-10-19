@@ -22,12 +22,14 @@
        rather than a picture with loose text under it. -->
   <article class="fs__panel" id="fs-panel" role="tabpanel">
     <div class="fs__clip">
-      <mh-media-demo
-        bare
-        [src]="f.preview"
-        [poster]="shotFor(f.slug)"
-        [caption]="''"
-      />
+      <!-- One demo at a time, rebuilt when the feature changes. Reusing a
+           single instance and swapping src left the new clip paused: the
+           play-on-screen effect binds to the element it was created with.
+           `track slug` makes the rebuild deliberate rather than Angular
+           guessing at identity, and only one video is ever in the DOM. -->
+      @for (slug of [f.slug]; track slug) {
+        <mh-media-demo bare [src]="f.preview" [caption]="''" />
+      }
       <span class="fs__count" aria-hidden="true">{{ position() }}</span>
     </div>
 
