@@ -9,7 +9,7 @@
 
 .foot {
   display: grid;
-  grid-template-columns: 1.7fr 1fr 1fr 1fr;
+  grid-template-columns: 1.7fr 1fr 1fr;
   gap: 2.5rem;
   padding-block: 3.5rem 2.5rem;
 
@@ -32,12 +32,8 @@
   }
 }
 
-/* Logo left, social right, one row. */
-.foot__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+.foot__brand .foot__social {
+  margin-top: 0.25rem;
 }
 
 .foot__tag {
@@ -108,28 +104,38 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* The copyright, then the line about who it is for, under it. Side by side
-   they read as two unrelated notes pushed to opposite corners. */
 .foot__bar {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding-block: 1.4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+  padding-block: 1.25rem;
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Language: a setting, so it sits on its own row with a label rather than
-   pretending to be a nav column. */
-.foot__lang {
+.foot__copy {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.4rem;
+  margin: 0;
+}
 
-  /* On a wide footer it is the fourth column's content, so it sits at the
-     top with the links rather than floating mid-column behind a rule. */
-  align-self: start;
-  justify-content: flex-start;
+.foot__meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Language: a setting, so it sits on its own row with a label rather than
+   pretending to be a nav column. */
+/* Desktop has the switch in the header, where it is in reach from any
+   scroll position. A second one down here is the same control twice. */
+.foot__lang {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .foot__lang-label {
@@ -178,23 +184,60 @@
     padding-block: 2rem 1.25rem;
   }
 
-  .foot__lang,
-  .foot__legal {
-    grid-column: 1 / -1;
-  }
-
-  .foot__lang {
+  /* No room to stack the brand block here, so the social row lifts up
+     beside the logo. A wrapped flex row keeps it one element. */
+  .foot__brand {
+    flex-flow: row wrap;
+    align-items: center;
     justify-content: space-between;
-    padding-top: 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .foot__legal {
-    padding-top: 0.25rem;
+  .foot__brand .foot__logo {
+    order: 1;
   }
 
+  .foot__brand .foot__social {
+    order: 2;
+    margin-top: 0;
+  }
+
+  .foot__brand .foot__tag {
+    order: 3;
+    flex: 1 0 100%;
+  }
+
+  /* The bar unwinds into rows: language, then legal, then the copyright. */
   .foot__bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.875rem;
     /* The sticky sign-up bar sits over the bottom of the page. */
     padding-block: 1.1rem 7rem;
+  }
+
+  .foot__meta {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.875rem;
+  }
+
+  /* The phone header keeps its switch in the drawer, so this is the one a
+     reader at the bottom of the page can actually reach. */
+  .foot__lang {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Stacked here: side by side they wrapped mid-sentence. */
+  .foot__copy {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .foot__sep {
+    display: none;
   }
 }
