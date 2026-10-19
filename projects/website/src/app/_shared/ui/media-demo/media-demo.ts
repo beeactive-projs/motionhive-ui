@@ -27,11 +27,13 @@ import {
 @Component({
   selector: 'mh-media-demo',
   template: `
-    <div class="device">
-      <div class="bar" aria-hidden="true">
-        <i></i><i></i><i></i>
-        <span class="u">{{ url() }}</span>
-      </div>
+    <div class="device" [class.device--bare]="bare()">
+      @if (!bare()) {
+        <div class="bar" aria-hidden="true">
+          <i></i><i></i><i></i>
+          <span class="u">{{ url() }}</span>
+        </div>
+      }
       <div class="screen">
         @if (src(); as s) {
           <!-- The poster is an <img> under the video, added once the demo is
@@ -85,6 +87,11 @@ export class MediaDemo {
   readonly enlargeable = input(true, { transform: booleanAttribute });
   /** Poster in the prerendered page, for a demo in the first screen (a hero). */
   readonly eagerPoster = input(false, { transform: booleanAttribute });
+  /**
+   * Drops the browser chrome and the frame's own shadow. For a clip already
+   * inside a card, where a second frame around it only steals height.
+   */
+  readonly bare = input(false, { transform: booleanAttribute });
 
   /** Lightbox open state. Renders nothing until opened (browser-only). */
   readonly expanded = signal(false);
