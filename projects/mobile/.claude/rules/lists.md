@@ -130,8 +130,20 @@ The bell's list is a grouped flat list, after Apple Mail's inbox: one label per 
 - The body is one line with an ellipsis. The full text is in the screen the row opens, or in the detail sheet.
 - Unread is a red dot centred in the gutter before the tile (absolutely placed, so the row's geometry does not move), plus full ink on the body and time. Not honey: that stays the Messages inbox's exception.
 
-### Next adopters (planned)
+### Clients
 
-Clients moves to the flat list next. It still uses `mh-card-list` today. Use the Messages inbox as the template for the list, header (`mh-flat-header`, search, `.mh-chip-row`), `mh-flat-page`, rows, swipes and skeletons. Settle these adjustments when the screen is done, then record them here:
+The coach's Clients tab is one flat list off `/clients`, laid out like the Messages inbox: title, bell and the honey "+" (invite) in the `mh-flat-header`, the search field always there under them, then the All / Active / Requests / Archived chips. There are no segments and no "Needs attention" lens: the roster (`/coach/roster`) is not read here (user decision, 2026-10-19). Requests are the Requests chip (PENDING); there is no header button, menu row or page for them (user decision, 2026-10-19). A pending row opens the request sheet ([`request-sheet`](../../src/app/main/clients/_sheets/request-sheet/request-sheet.html), an `mh-action-sheet`): who, how long it has waited, their message, then Accept / Decline for an incoming request or Resend / Withdraw for a sent invitation. Home's banner and a request notification open the tab on the chip with `?filter=requests`, and the Clients tab carries a red count of the requests waiting on the coach (`incoming` from `/clients/requests/pending/count`, never `count`, which includes the invitations the coach sent).
 
-- **Clients**: the triage groups become a grouped flat list (above). The existing swipes switch to the WhatsApp option style. The searchbar and status chips move into the `mh-flat-header`. The requests and invite entry points stay as they are, and you decide whether they sit above the list or in the header.
+- Inviting is the header's honey "+", not a floating button.
+- Opening search resets the chip to All: the pills fold away with the title, so a chip left on would narrow the results with nothing on screen saying so. A term under the API's floor gets a note under the header.
+- Rows ([`client-row`](../../src/app/main/clients/_components/client-row/client-row.html)) are flat-list rows: `lg` avatar (a mail tile for an email-only invite), the name on the first line, the address and the status badge on the second. An email-only invite's address ellipses like any title; lines never wrap.
+
+### Search start
+
+What an open search shows before anything is typed, after Messenger: [`mh-search-start`](../../src/app/_shared/components/search-start/search-start.html). Messages and Clients use it.
+
+- **Recent** is the last three people a search ended on: a person, never the typed text. Newest first, one row each, a remove X per row and "Clear all" beside the label. Kept on the device per screen and per account (`injectRecentSearches(scope)`, `mh.recentSearches.v1.<scope>.<userId>`), so nothing needs clearing on sign out. A person stops being a shortcut when they stop making sense: Messages drops someone you block.
+- **Suggestions** come from data the screen already loaded, never a new request. Each is a labelled sideways strip of `lg` avatars over first names (`strips` input, in order, empty ones left out); each button's accessible name is the full name. Messages has one, "Suggested": the people from the latest conversations. Clients has two: "Pending requests" (sent invitations and incoming requests; a tap opens the request sheet, an email-only invite shows the mail tile, and the status is said with the name) above "Newest clients" (active only; a tap opens the profile). Pending people are never remembered as recents.
+- The remove X sits beside its row, not inside it (a button in a button is one control to a screen reader); the label stops a tap target short of it.
+- With no recents and no suggestions the screen keeps its list. Typing replaces the view with results.
+- The header folds as search opens and closes (`SearchHeaderFold` in `_shared/utils/fold.ts` on `(animate.enter)` / `(animate.leave)`): title and pills fold their height, the back chevron its width, so the field glides rather than jumps. Reduced motion skips it.

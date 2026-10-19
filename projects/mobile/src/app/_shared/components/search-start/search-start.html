@@ -1,0 +1,78 @@
+@if (recents().length > 0) {
+  <div class="mh-section-label head">
+    <span>{{ 'search.recent' | translate }}</span>
+    <ion-button class="clear-all" fill="clear" color="medium" size="small" (click)="clearAll.emit()">
+      {{ 'search.clearAll' | translate }}
+    </ion-button>
+  </div>
+  <ion-list class="mh-flat-list">
+    @for (person of recents(); track person.id) {
+      <!-- The remove button sits beside the row, not inside it: a button in a
+           button is one control to a screen reader, and the inner one is lost. -->
+      <div class="recent">
+        <ion-item button detail="false" (click)="select.emit(person)">
+          <mh-hex-avatar
+            slot="start"
+            size="lg"
+            aria-hidden="true"
+            [name]="person.name"
+            [imageUrl]="person.avatarUrl"
+            [color]="toneFor(person.id)"
+          />
+          <ion-label>
+            <h2>{{ person.name }}</h2>
+            @if (person.subline; as subline) {
+              <p>{{ subline }}</p>
+            }
+          </ion-label>
+        </ion-item>
+        <ion-button
+          class="remove"
+          fill="clear"
+          color="medium"
+          shape="round"
+          [attr.aria-label]="'search.remove' | translate: { name: person.name }"
+          (click)="remove.emit(person)"
+        >
+          <ion-icon slot="icon-only" name="close-outline" />
+        </ion-button>
+      </div>
+    }
+  </ion-list>
+}
+
+@for (strip of strips(); track strip.label) {
+  @if (strip.people.length > 0) {
+    <div class="mh-section-label strip-label">{{ strip.label }}</div>
+    <div class="strip" role="group" [attr.aria-label]="strip.label">
+      @for (person of strip.people; track person.id) {
+        <ion-button
+          class="person"
+          fill="clear"
+          [attr.aria-label]="
+            person.pendingLabel
+              ? ('search.personWithStatus' | translate: { name: person.name, status: person.pendingLabel })
+              : person.name
+          "
+          (click)="select.emit(person)"
+        >
+          <span class="person-inner">
+            @if (person.icon; as icon) {
+              <!-- No account yet (an email-only invite): the mail tile, as on its list row. -->
+              <mh-hex-avatar size="lg" color="medium" tone="wash" aria-hidden="true" [icon]="icon" />
+            } @else {
+              <mh-hex-avatar
+                size="lg"
+                aria-hidden="true"
+                [name]="person.name"
+                [imageUrl]="person.avatarUrl"
+                [color]="toneFor(person.id)"
+              />
+            }
+            <span class="person-name">{{ shortName(person.name) }}</span>
+          </span>
+        </ion-button>
+      }
+    </div>
+  }
+}

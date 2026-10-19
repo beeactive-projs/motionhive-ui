@@ -13,6 +13,7 @@ import {
   CreateClientInvitation,
   InstructorClient,
   InvitationDetails,
+  PendingRequestsCount,
   UpdateClientPayload,
 } from '../../models/client/client.model';
 import { InstructorListResponse } from '../../models/client/instructor.model';
@@ -98,8 +99,8 @@ export class ClientService {
    * it: it rides along with every entry into the coach's tabs, and a failed
    * count is not worth a modal over whatever the screen did manage to load.
    */
-  getPendingRequestsCount(): Observable<{ count: number }> {
-    return this._http.get<{ count: number }>(
+  getPendingRequestsCount(): Observable<PendingRequestsCount> {
+    return this._http.get<PendingRequestsCount>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.PENDING_REQUESTS_COUNT}`,
       { context: silentRequest() },
     );

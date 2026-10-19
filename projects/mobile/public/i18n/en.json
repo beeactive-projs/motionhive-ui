@@ -279,15 +279,19 @@
   },
   "clients": {
     "actions": {
+      "acceptRequest": "Accept request",
       "archiveClient": "Archive client",
       "archiveClientEllipsis": "Archive client…",
+      "declineRequest": "Decline request",
       "editNotes": "Edit notes",
       "message": "Message",
       "notes": "Notes",
-      "resent": "Resent",
+      "resendInvitation": "Resend invitation",
+      "resent": "Invitation resent",
       "unarchiveClient": "Unarchive client",
       "viewProfile": "View profile",
-      "withdraw": "Withdraw"
+      "withdraw": "Withdraw",
+      "withdrawInvitationEllipsis": "Withdraw invitation…"
     },
     "actionsSheet": {
       "title": "Client actions"
@@ -403,14 +407,14 @@
     "list": {
       "filterByStatus": "Filter clients by status",
       "loadError": "Couldn't load your clients",
-      "requestsPending": "Requests, {count} pending",
+      "newest": "Newest clients",
+      "pendingStrip": "Pending requests",
       "results": {
         "count": "{count, plural, one {# client} other {# clients}}.",
         "none": "No clients match that."
       },
       "search": "Search clients",
-      "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search every client.",
-      "searchScope": "{lens} · {filter}"
+      "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search every client."
     },
     "notesSheet": {
       "helper": "Only you can see these notes. Your client never does.",
@@ -420,18 +424,11 @@
       "titleWithName": "Notes · {name}"
     },
     "requests": {
-      "empty": {
-        "message": "Invitations you send and incoming client requests will show up here.",
-        "title": "No pending requests"
-      },
       "expires": {
         "inDays": "expires in {count, plural, one {# day} other {# days}}",
         "today": "expires today",
         "tomorrow": "expires tomorrow"
       },
-      "incoming": "Incoming",
-      "invitationsSent": "Invitations sent",
-      "loadError": "Couldn't load your requests",
       "quote": "“{message}”",
       "received": {
         "daysAgo": "Received {count, plural, one {# day ago} other {# days ago}}",
@@ -446,47 +443,14 @@
       "sentMeta": "{sent} · {expires}"
     },
     "roster": {
-      "attention": {
-        "behind": "Behind plan",
-        "dropped": "Dropping off",
-        "inactive": "Inactive for {count, plural, one {# day} other {# days}}",
-        "neverStarted": "Has not started",
-        "noPlan": "No plan assigned"
-      },
-      "detail": {
-        "behind": "{completed} of {due} workouts done.",
-        "dropped": "Down from {previous}% to {current}% against the previous window.",
-        "neverStarted": "Assigned a plan but has never logged a workout.",
-        "noPlan": "Nothing is assigned, so there is nothing for them to follow.",
-        "silent": "{completed} of {due} workouts done in this window.",
-        "silentNone": "No workouts logged recently."
-      },
       "lastActive": {
         "daysAgo": "Last active {count, plural, one {# day ago} other {# days ago}}",
         "today": "Trained today",
         "yesterday": "Last active yesterday"
-      },
-      "lastActiveShort": {
-        "daysAgo": "{count}d ago",
-        "today": "today"
-      },
-      "noActivePlan": "No active plan",
-      "nothingScheduled": "Nothing scheduled in this window",
-      "progress": "{completed} of {due} workouts",
-      "stat": {
-        "adherence": "adherence",
-        "days": "{count}d",
-        "lastActive": "last active",
-        "noPlan": "no plan"
       }
     },
     "row": {
       "notOnPlatform": "Not on MotionHive yet"
-    },
-    "segments": {
-      "all": "All clients",
-      "allWithCount": "All clients · {count}",
-      "attention": "Needs attention"
     },
     "thisPerson": "this person",
     "toast": {
@@ -506,24 +470,6 @@
       "unarchiveFailed": "Could not unarchive this client.",
       "unarchived": "Client unarchived",
       "withdrawFailed": "Could not withdraw the invitation."
-    },
-    "triage": {
-      "allClear": {
-        "message": "No one needs a nudge this week.",
-        "title": "Everyone is on track"
-      },
-      "empty": {
-        "action": "See all clients",
-        "message": "Once someone accepts your invitation, their week shows up here.",
-        "title": "No active clients yet"
-      },
-      "noMatch": {
-        "action": "Search all clients",
-        "message": "Nobody on this week's roster matches that. Try All clients."
-      },
-      "note": "{needs} of {total, plural, one {# active client} other {# active clients}} {needs, plural, one {needs} other {need}} a look",
-      "onTrack": "On track",
-      "thisWeek": "This week"
     }
   },
   "discover": {
@@ -1558,7 +1504,6 @@
     "programSettings": "Program settings",
     "programs": "Programs",
     "progress": "Progress",
-    "requests": "Requests",
     "resetPassword": "Reset password",
     "routine": "Routine",
     "session": "Session",
@@ -2041,6 +1986,13 @@
       "label": "Trainee"
     }
   },
+  "search": {
+    "clearAll": "Clear all",
+    "personWithStatus": "{name}, {status}",
+    "recent": "Recent",
+    "remove": "Remove {name} from recent searches",
+    "suggested": "Suggested"
+  },
   "sessions": {
     "actions": {
       "cancel": "Cancel session…",
@@ -2350,9 +2302,11 @@
     "avatarButton": {
       "label": "Your profile"
     },
-    "menuDot": {
-      "billDue": "You have a bill due",
-      "requestsWaiting": "You have client requests waiting"
+    "tabBadge": {
+      "requestsWaiting": "{count, plural, one {# client request waiting} other {# client requests waiting}}"
+    },
+    "tabDot": {
+      "billDue": "You have a bill due"
     }
   },
   "workouts": {

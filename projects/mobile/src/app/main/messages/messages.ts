@@ -39,8 +39,16 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { SearchStart } from '../../_shared/components/search-start/search-start';
+import {
+  RecentPerson,
+  RecentSearchScopes,
+  SuggestionStrip,
+} from '../../_shared/config/recent-searches.config';
 import { AvatarTone, avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
+import { SearchHeaderFold } from '../../_shared/utils/fold';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
+import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
 import { BlockUserSheet } from './_sheets/block-user-sheet/block-user-sheet';
 import { NewMessageSheet } from './_sheets/new-message-sheet/new-message-sheet';
@@ -49,6 +57,8 @@ import {
   ConversationActions,
   MESSAGING_ICONS,
   conversationActions,
+  recentFromPerson,
+  suggestedPeople,
 } from './messages.config';
 
 /**
@@ -90,6 +100,7 @@ import {
     IonToolbar,
     NewMessageSheet,
     NotificationBell,
+    SearchStart,
     TranslatePipe,
   ],
   templateUrl: './messages.html',
@@ -102,6 +113,10 @@ export class Messages implements ViewWillEnter {
   private readonly _translateService = inject(TranslateService);
 
   readonly people = injectPeopleSearch();
+  readonly recents = injectRecentSearches(RecentSearchScopes.Messages);
+
+  /** Folds the title, the pills and the back chevron as search opens and closes. */
+  readonly fold = new SearchHeaderFold();
 
   private readonly _searchbar = viewChild(IonSearchbar);
 
@@ -146,6 +161,29 @@ export class Messages implements ViewWillEnter {
     return conversationActions(target?.muted ?? false, !!target?.otherUser?.handle);
   });
 
+  /** One strip: the people from the latest conversations. */
+  readonly strips = computed<SuggestionStrip[]>(() => [
+    {
+      label: this._translateService.instant('search.suggested'),
+      people: suggestedPeople(
+        this.store.conversations(),
+        this.recents.entries().map((person) => person.id),
+      ),
+    },
+  ]);
+
+  /**
+   * Search is open and nothing is typed yet: the recents and the strip, as
+   * Messenger opens its search. With neither (a new account) the inbox stays,
+   * which is still something to search through.
+   */
+  readonly showSearchStart = computed(
+    () =>
+      this.searchOpen() &&
+      !this.people.query().trim() &&
+      (this.recents.entries().length > 0 || this.strips()[0].people.length > 0),
+  );
+
   readonly isSearchEmpty = computed(
     () =>
       this.people.isActive() &&
@@ -182,6 +220,7 @@ export class Messages implements ViewWillEnter {
   readonly showList = computed(
     () =>
       this.showSkeleton() ||
+      this.showSearchStart() ||
       (this.people.isActive()
         ? !this.isSearchEmpty()
         : !this.showLoadError() && !this.isEmpty() && !this.isFilteredEmpty()),
@@ -202,10 +241,12 @@ export class Messages implements ViewWillEnter {
   }
 
   openSearch(): void {
+    this.fold.arm();
     this.searchOpen.set(true);
   }
 
   closeSearch(): void {
+    this.fold.arm();
     this.searchOpen.set(false);
     this.people.clear();
     this.store.setSearchQuery('');
@@ -227,8 +268,26 @@ export class Messages implements ViewWillEnter {
     this.store.openConversation(id);
   }
 
-  /** Reopen an existing thread with this person rather than a blank draft. */
+  /** A person from the search results. */
   openPerson(person: UserSearchResult): void {
+    this.openRecent(recentFromPerson(person));
+  }
+
+  /**
+   * A conversation from the search results. Only a direct one is remembered:
+   * a recent is a person, and a group has no one person to show.
+   */
+  openSearchedConversation(conversation: ConversationListItem): void {
+    if (conversation.otherUser) this.recents.push(recentFromPerson(conversation.otherUser));
+    this.openConversation(conversation.id);
+  }
+
+  /**
+   * A recent, a suggestion or a searched person: remembered, then the thread
+   * with them reopened rather than a blank draft.
+   */
+  openRecent(person: RecentPerson): void {
+    this.recents.push(person);
     this.closeSearch();
     const existing = this.store.findDirectWith(person.id);
 
@@ -238,8 +297,16 @@ export class Messages implements ViewWillEnter {
     }
 
     void this._router.navigate(['/tabs/messages/new'], {
-      queryParams: { to: person.id, name: this.nameOf(person) },
+      queryParams: { to: person.id, name: person.name },
     });
+  }
+
+  removeRecent(person: RecentPerson): void {
+    this.recents.remove(person.id);
+  }
+
+  clearRecents(): void {
+    this.recents.clear();
   }
 
   openCompose(): void {
@@ -305,6 +372,8 @@ export class Messages implements ViewWillEnter {
       );
       return;
     }
+    // Someone you blocked is not a shortcut back to them.
+    this.recents.remove(blockedId);
     void this._feedbackService.success(
       this._translateService.instant('messages.toast.blocked', { name }),
     );

@@ -63,7 +63,10 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
       params(d),
     ),
   'coaching/clients': (d) => link(['/tabs/clients'], params(d)),
-  'coaching/pending-requests': (d) => link(['/tabs/clients/requests'], params(d)),
+  // No page of their own: the Clients tab on its Requests chip, where a tap
+  // on the row opens the request. `filter` is `CLIENT_FILTER_PARAM`.
+  'coaching/pending-requests': (d) =>
+    link(['/tabs/clients'], { ...params(d), filter: 'requests' }),
   // Payments, both sides. The coach's screens are guarded; the client's are
   // not, which matches who each alert goes to.
   'coaching/invoices': (d) =>

@@ -10,7 +10,6 @@ import {
   homeOutline,
   menuOutline,
   peopleOutline,
-  personAddOutline,
   swapHorizontalOutline,
 } from 'ionicons/icons';
 
@@ -31,7 +30,6 @@ export const TAB_ICONS = {
   homeOutline,
   menuOutline,
   peopleOutline,
-  personAddOutline,
   swapHorizontalOutline,
 };
 
@@ -73,13 +71,8 @@ export const COACH_TAB_SET: TabSet = {
     {
       label: 'nav.coaching',
       items: [
-        {
-          label: 'nav.requests',
-          icon: 'person-add-outline',
-          iconColor: 'info',
-          route: '/tabs/clients/requests',
-          requiresInstructor: true,
-        },
+        // Requests have no row: they are the Clients tab's Requests chip, and
+        // the dot for them sits on that tab.
         { label: 'nav.programs', icon: 'albums-outline', iconColor: 'violet', route: '/tabs/programs' },
         { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
         {
@@ -159,7 +152,7 @@ export function resolveMode(canSwitchMode: boolean, storedMode: NavMode): NavMod
 /**
  * The active tab id — Ionic keys a page's navigation stack on the first URL
  * segment after `/tabs`, so that segment is what the tab bar must highlight.
- * Nested pages (`/tabs/clients/requests`) therefore keep their parent tab lit.
+ * Nested pages (`/tabs/clients/:clientId`) therefore keep their parent tab lit.
  */
 export function activeTabIdFromUrl(url: string): TabId | undefined {
   const path = url.split('?')[0]?.split('#')[0] ?? '';

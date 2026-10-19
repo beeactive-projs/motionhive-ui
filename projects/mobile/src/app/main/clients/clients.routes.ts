@@ -6,21 +6,16 @@ import { Routes } from '@angular/router';
  * Every path keeps `clients` as the first segment after `/tabs` so the tab
  * stays lit on the pushed screens — same rule as sessions and messages.
  *
- * Invite, notes and archive are sheets driven from a page, not routes: each
- * is modal over the screen that opened it and needs that screen's context
- * when it closes.
+ * Invite, notes, archive and a pending request are sheets driven from a
+ * page, not routes: each is modal over the screen that opened it and needs
+ * that screen's context when it closes. Requests have no page of their own;
+ * they are the list's Requests chip (`?filter=requests`).
  */
 export const clientsRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./clients').then((m) => m.Clients),
     title: 'pageTitle.clients',
-  },
-  {
-    // Before `:clientId`, or the parameterised route swallows the word.
-    path: 'requests',
-    loadComponent: () => import('./requests/requests').then((m) => m.Requests),
-    title: 'pageTitle.requests',
   },
   {
     // Someone's public profile, from the client page or a request. Before

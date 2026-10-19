@@ -39,6 +39,13 @@ export interface TabItem {
    * config — a plain const cannot inject a store, so the shell splices it in.
    */
   readonly badge?: Signal<number>;
+  /** Ionic palette name for the badge; honey (`primary`) when left out. */
+  readonly badgeColor?: string;
+  /**
+   * What the badge announces, as an ICU key taking `{count}`. Left out, a
+   * screen reader hears the bare number.
+   */
+  readonly badgeLabel?: string;
 }
 
 /** A row of the menu page behind the Menu tab — reachable, but not worth a tab slot. */
@@ -50,8 +57,6 @@ export interface MoreTile {
   readonly iconColor: string;
   /** Absolute route; may point outside the tab set. */
   readonly route: string;
-  /** Hidden from users without the INSTRUCTOR role. */
-  readonly requiresInstructor?: boolean;
   /**
    * Marks the row and the Menu tab button with a dot when true. A count would
    * overstate it — the point is only that something is waiting. Spliced in at

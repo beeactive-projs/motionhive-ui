@@ -279,15 +279,19 @@
   },
   "clients": {
     "actions": {
+      "acceptRequest": "Acceptă cererea",
       "archiveClient": "Arhivează clientul",
       "archiveClientEllipsis": "Arhivează clientul…",
+      "declineRequest": "Refuză cererea",
       "editNotes": "Editează notițele",
       "message": "Trimite mesaj",
       "notes": "Notițe",
-      "resent": "Retrimisă",
+      "resendInvitation": "Retrimite invitația",
+      "resent": "Invitație retrimisă",
       "unarchiveClient": "Dezarhivează clientul",
       "viewProfile": "Vezi profilul",
-      "withdraw": "Retrage"
+      "withdraw": "Retrage",
+      "withdrawInvitationEllipsis": "Retrage invitația…"
     },
     "actionsSheet": {
       "title": "Acțiuni client"
@@ -403,14 +407,14 @@
     "list": {
       "filterByStatus": "Filtrează clienții după status",
       "loadError": "Clienții nu au putut fi încărcați",
-      "requestsPending": "Cereri, {count} în așteptare",
+      "newest": "Cei mai noi clienți",
+      "pendingStrip": "Cereri în așteptare",
       "results": {
         "count": "{count, plural, one {# client} few {# clienți} other {# de clienți}}.",
         "none": "Niciun client nu se potrivește."
       },
       "search": "Caută clienți",
-      "searchHint": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}} ca să cauți printre toți clienții.",
-      "searchScope": "{lens} · {filter}"
+      "searchHint": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}} ca să cauți printre toți clienții."
     },
     "notesSheet": {
       "helper": "Doar tu vezi aceste notițe. Clientul nu le vede niciodată.",
@@ -420,18 +424,11 @@
       "titleWithName": "Notițe · {name}"
     },
     "requests": {
-      "empty": {
-        "message": "Invitațiile pe care le trimiți și cererile primite de la clienți apar aici.",
-        "title": "Nicio cerere în așteptare"
-      },
       "expires": {
         "inDays": "expiră în {count, plural, one {# zi} few {# zile} other {# de zile}}",
         "today": "expiră azi",
         "tomorrow": "expiră mâine"
       },
-      "incoming": "Primite",
-      "invitationsSent": "Invitații trimise",
-      "loadError": "Cererile nu au putut fi încărcate",
       "quote": "„{message}”",
       "received": {
         "daysAgo": "Primită acum {count, plural, one {# zi} few {# zile} other {# de zile}}",
@@ -446,47 +443,14 @@
       "sentMeta": "{sent} · {expires}"
     },
     "roster": {
-      "attention": {
-        "behind": "Rămas în urmă cu planul",
-        "dropped": "În scădere",
-        "inactive": "Inactiv de {count, plural, one {# zi} few {# zile} other {# de zile}}",
-        "neverStarted": "Nu a început",
-        "noPlan": "Niciun plan atribuit"
-      },
-      "detail": {
-        "behind": "{completed} din {due, plural, one {# antrenament făcut} few {# antrenamente făcute} other {# de antrenamente făcute}}.",
-        "dropped": "A scăzut de la {previous}% la {current}% față de perioada anterioară.",
-        "neverStarted": "Are un plan, dar n-a înregistrat niciun antrenament.",
-        "noPlan": "Nu are nimic atribuit, deci nu are ce să urmeze.",
-        "silent": "{completed} din {due, plural, one {# antrenament făcut} few {# antrenamente făcute} other {# de antrenamente făcute}} în această perioadă.",
-        "silentNone": "Niciun antrenament înregistrat recent."
-      },
       "lastActive": {
         "daysAgo": "Activ acum {count, plural, one {# zi} few {# zile} other {# de zile}}",
         "today": "S-a antrenat azi",
         "yesterday": "Activ ieri"
-      },
-      "lastActiveShort": {
-        "daysAgo": "acum {count} zile",
-        "today": "azi"
-      },
-      "noActivePlan": "Niciun plan activ",
-      "nothingScheduled": "Nimic programat în această perioadă",
-      "progress": "{completed} din {due, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}",
-      "stat": {
-        "adherence": "consecvență",
-        "days": "{count} z",
-        "lastActive": "ultima activitate",
-        "noPlan": "fără plan"
       }
     },
     "row": {
       "notOnPlatform": "Încă nu e pe MotionHive"
-    },
-    "segments": {
-      "all": "Toți clienții",
-      "allWithCount": "Toți clienții · {count}",
-      "attention": "Necesită atenție"
     },
     "thisPerson": "această persoană",
     "toast": {
@@ -506,24 +470,6 @@
       "unarchiveFailed": "Clientul nu a putut fi dezarhivat.",
       "unarchived": "Client dezarhivat",
       "withdrawFailed": "Invitația nu a putut fi retrasă."
-    },
-    "triage": {
-      "allClear": {
-        "message": "Nimeni nu are nevoie de un imbold săptămâna asta.",
-        "title": "Toți sunt pe drumul cel bun"
-      },
-      "empty": {
-        "action": "Vezi toți clienții",
-        "message": "Când cineva îți acceptă invitația, săptămâna lui apare aici.",
-        "title": "Niciun client activ încă"
-      },
-      "noMatch": {
-        "action": "Caută în toți clienții",
-        "message": "Nimeni din lista acestei săptămâni nu se potrivește. Încearcă Toți clienții."
-      },
-      "note": "{needs} din {total, plural, one {# client activ} few {# clienți activi} other {# de clienți activi}} necesită atenție",
-      "onTrack": "Pe drumul cel bun",
-      "thisWeek": "Săptămâna aceasta"
     }
   },
   "discover": {
@@ -1558,7 +1504,6 @@
     "programSettings": "Setări program",
     "programs": "Programe",
     "progress": "Progres",
-    "requests": "Cereri",
     "resetPassword": "Resetează parola",
     "routine": "Rutină",
     "session": "Sesiune",
@@ -2041,6 +1986,13 @@
       "label": "Sportiv"
     }
   },
+  "search": {
+    "clearAll": "Șterge tot",
+    "personWithStatus": "{name}, {status}",
+    "recent": "Recente",
+    "remove": "Elimină pe {name} din căutările recente",
+    "suggested": "Sugestii"
+  },
   "sessions": {
     "actions": {
       "cancel": "Anulează sesiunea…",
@@ -2350,9 +2302,11 @@
     "avatarButton": {
       "label": "Profilul tău"
     },
-    "menuDot": {
-      "billDue": "Ai o factură de plătit",
-      "requestsWaiting": "Ai cereri de la clienți în așteptare"
+    "tabBadge": {
+      "requestsWaiting": "{count, plural, one {# cerere de la clienți în așteptare} few {# cereri de la clienți în așteptare} other {# de cereri de la clienți în așteptare}}"
+    },
+    "tabDot": {
+      "billDue": "Ai o factură de plătit"
     }
   },
   "workouts": {

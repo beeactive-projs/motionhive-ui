@@ -54,6 +54,17 @@ export interface ClientRequest {
   toUser?: User;
 }
 
+/**
+ * `GET /clients/requests/pending/count`. `count` is both directions;
+ * `incoming` is the requests waiting on the coach's answer, `outgoing` the
+ * invitations they sent. Anything that says "waiting for you" reads `incoming`.
+ */
+export interface PendingRequestsCount {
+  count: number;
+  incoming: number;
+  outgoing: number;
+}
+
 export type CreateClientInvitation =
   | { userId: string; email?: never; message?: string }
   | { email: string; userId?: never; message?: string };
