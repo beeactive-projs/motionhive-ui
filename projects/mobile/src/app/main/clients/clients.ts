@@ -1,14 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   InfiniteScrollCustomEvent,
-  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonHeader,
   IonIcon,
   IonInfiniteScroll,
@@ -20,8 +18,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -32,7 +28,6 @@ import { addIcons } from 'ionicons';
 
 import {
   InstructorClient,
-  RosterClient,
   clientDisplayName,
   isIncomingRequest,
   isOpenableClient,
@@ -41,52 +36,59 @@ import {
 
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
-import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
+import { SearchStart } from '../../_shared/components/search-start/search-start';
+import {
+  RecentPerson,
+  RecentSearchScopes,
+  SuggestedPerson,
+  SuggestionStrip,
+} from '../../_shared/config/recent-searches.config';
+import { ClockService } from '../../_shared/services/clock.service';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
-import { AttentionRow } from './_components/attention-row/attention-row';
+import { SearchHeaderFold } from '../../_shared/utils/fold';
+import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { ClientRow } from './_components/client-row/client-row';
 import { ClientsEmpty } from './_components/clients-empty/clients-empty';
-import { OnTrackRow } from './_components/on-track-row/on-track-row';
 import { ClientNotesSheet } from './_sheets/client-notes-sheet/client-notes-sheet';
 import { InviteClientSheet } from './_sheets/invite-client-sheet/invite-client-sheet';
+import { RequestSheet } from './_sheets/request-sheet/request-sheet';
+import {
+  RequestActionId,
+  RequestActionIds,
+  newestClients,
+  pendingClients,
+  recentFromClient,
+} from './clients.config';
 import {
   CLIENT_FILTERS,
   ClientFilterId,
   ClientFilterIds,
-  ClientsSegments,
   MIN_SEARCH_LENGTH,
+  filterFromUrl,
 } from './clients.filters';
 import { CLIENT_ICONS } from './clients.icons';
 import { ClientsStore } from './clients.store';
-import { triageNote } from './roster-labels';
 
 /**
- * The coach's Clients tab: triage first, everyone second.
- *
- * Needs attention is the landing lens — who slipped this week and why, read
- * off the roster. All clients is the directory: every relationship and
- * request, chip-filtered by status and searchable by name. Both load on
- * entry so the segment switch never waits; see `ClientsStore`.
+ * The coach's Clients tab: one flat list (`mh-flat-list`) of every
+ * relationship and request, chip-filtered by status and searchable by name,
+ * laid out like the Messages inbox. Requests are the Requests chip; a
+ * pending row opens the request sheet, where it is answered, resent or
+ * withdrawn. See `ClientsStore`.
  */
 @Component({
   selector: 'mh-clients',
   imports: [
-    AttentionRow,
     ClientNotesSheet,
     ClientRow,
     ClientsEmpty,
     ConfirmSheet,
     EmptyState,
-    HexAvatar,
-    IonBadge,
     IonButton,
     IonButtons,
     IonContent,
-    IonFab,
-    IonFabButton,
     IonHeader,
     IonIcon,
     IonInfiniteScroll,
@@ -98,16 +100,13 @@ import { triageNote } from './roster-labels';
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonSegment,
-    IonSegmentButton,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
     InviteClientSheet,
     NotificationBell,
-    OnTrackRow,
-    RouterLink,
-    SearchbarAutofocusDirective,
+    RequestSheet,
+    SearchStart,
     TranslatePipe,
   ],
   templateUrl: './clients.html',
@@ -118,24 +117,56 @@ export class Clients implements ViewWillEnter {
   readonly store = inject(ClientsStore);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _clockService = inject(ClockService);
   private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
+  private readonly _searchbar = viewChild(IonSearchbar);
 
-  readonly Segments = ClientsSegments;
-  readonly Filters = ClientFilterIds;
-  readonly filters = CLIENT_FILTERS;
-  readonly minSearchLength = MIN_SEARCH_LENGTH;
-  readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly recents = injectRecentSearches(RecentSearchScopes.Clients);
+
+  /** Folds the title, the pills and the back chevron as search opens and closes. */
+  readonly fold = new SearchHeaderFold();
 
   /**
-   * Search owns the whole toolbar while it is open — a title, three actions,
-   * a segment and a chip row do not fit above the fold on a phone. Same
-   * treatment as the inbox and the agenda.
-   *
-   * It narrows both lenses. The box sits above the segment, so scoping it to
-   * the directory made it dead on the landing segment: it opened, took what
-   * you typed, and changed nothing.
+   * Pending requests, then the newest active clients, both from the
+   * unfiltered list already on screen. Read only while nothing is typed, when
+   * that list is the whole first page, newest first.
    */
+  readonly strips = computed<SuggestionStrip[]>(() => {
+    const clients = this.store.visibleClients();
+    return [
+      {
+        label: this._translateService.instant('clients.list.pendingStrip'),
+        people: pendingClients(clients),
+      },
+      {
+        label: this._translateService.instant('clients.list.newest'),
+        people: newestClients(
+          clients,
+          this.recents.entries().map((person) => person.id),
+        ),
+      },
+    ];
+  });
+
+  /**
+   * Search is open and nothing is typed yet: recents, pending requests and
+   * the newest clients, as Messenger opens its search. With none of them the
+   * list stays, which is still something to search through.
+   */
+  readonly showSearchStart = computed(
+    () =>
+      this.searchOpen() &&
+      !this.store.query().trim() &&
+      (this.recents.entries().length > 0 ||
+        this.strips().some((strip) => strip.people.length > 0)),
+  );
+
+  readonly filters = CLIENT_FILTERS;
+  readonly minSearchLength = MIN_SEARCH_LENGTH;
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  /** Focusing the search field folds the title and the pills away. */
   readonly searchOpen = signal(false);
 
   readonly inviteOpen = signal(false);
@@ -149,6 +180,22 @@ export class Clients implements ViewWillEnter {
   readonly archiveOpen = signal(false);
   readonly archiving = signal<InstructorClient | null>(null);
   readonly archiveSaving = signal(false);
+
+  readonly requestOpen = signal(false);
+  readonly requestClient = signal<InstructorClient | null>(null);
+
+  /**
+   * Invitations resent during this visit. The BE refuses a third resend in a
+   * row with a 429, but the sheet should never offer it: once is plenty, and
+   * the verb says so rather than going quiet. Cleared on entry, so coming
+   * back to the tab allows another.
+   */
+  private readonly _resent = signal<ReadonlySet<string>>(new Set());
+
+  readonly requestResent = computed(() => {
+    const client = this.requestClient();
+    return !!client && this._resent().has(client.id);
+  });
 
   readonly withdrawOpen = signal(false);
   readonly withdrawing = signal<InstructorClient | null>(null);
@@ -170,63 +217,16 @@ export class Clients implements ViewWillEnter {
     return this._translateService.instant('clients.confirm.withdraw.body', { name: who });
   });
 
-  readonly isAttention = computed(() => this.store.segment() === ClientsSegments.Attention);
-
   /**
-   * "3 of 8 clients need a look" — beside the This week kicker, and only
-   * when the whole roster is on screen. It counts the roster, not the rows
-   * below it, so leaving it up during a search would describe a set the
-   * coach can no longer see.
+   * Rows on screen (the list or its skeleton): the page takes the list's
+   * white. Empty and error states keep the slate.
    */
-  readonly triageNote = computed(() =>
-    this.store.query()
-      ? ''
-      : triageNote(this.store.attentionCount(), this.store.rosterTotal()),
+  readonly showList = computed(
+    () =>
+      this.store.showSkeleton() ||
+      this.showSearchStart() ||
+      (!this.store.showLoadError() && !this.store.isEmpty() && !this.store.isFilteredEmpty()),
   );
-
-  /** Counts what is under it, so it still adds up while a search narrows. */
-  readonly onTrackNote = computed(() =>
-    this._translateService.instant('count.clients', {
-      count: this.store.visibleOnTrackClients().length,
-    }),
-  );
-
-  /** The count lives in the label only — the dot itself says "some", never how many. */
-  readonly requestsLabel = computed(() => {
-    const count = this.store.pendingCount();
-    return count > 0
-      ? this._translateService.instant('clients.list.requestsPending', { count })
-      : this._translateService.instant('nav.requests');
-  });
-
-  /**
-   * What the open search is actually searching.
-   *
-   * The box takes the whole toolbar while it is open, so the segment and the
-   * chip row go with it — and with them any way to see, or change, whether
-   * you are searching the triage or the directory and with which status on. A
-   * search run with "Archived" selected looks exactly like your whole client
-   * list. This line keeps the scope on screen, and the chip clearable.
-   */
-  readonly searchScope = computed(() => {
-    const lens = this._translateService.instant(
-      this.isAttention() ? 'clients.segments.attention' : 'clients.segments.all',
-    );
-    const chip = this.filters.find((filter) => filter.id === this.store.filter());
-    return chip && chip.id !== ClientFilterIds.All
-      ? this._translateService.instant('clients.list.searchScope', {
-          lens,
-          filter: this._translateService.instant(chip.label),
-        })
-      : lens;
-  });
-
-  /**
-   * The floor is only worth saying where it bites. On the triage it does not:
-   * the roster is one unpaged response, so a single character narrows it
-   * completely and correctly. Same shape as the invite sheet's people search.
-   */
-  readonly showSearchHint = computed(() => this.store.queryTooShort() && !this.isAttention());
 
   /**
    * What a screen reader is told once a search or a filter settles. Nothing
@@ -240,40 +240,59 @@ export class Clients implements ViewWillEnter {
     const narrowing = !!this.store.query().trim() || this.store.filter() !== ClientFilterIds.All;
     if (!narrowing || !this.store.searchSettled() || this.store.showSkeleton()) return '';
 
-    const count = this.store.visibleCount();
+    const count = this.store.visibleClients().length;
     if (count === 0) return this._translateService.instant('clients.list.results.none');
     return this._translateService.instant('clients.list.results.count', { count });
   });
 
   constructor() {
     addIcons(CLIENT_ICONS);
+
+    // Home's requests banner and a request notification open this tab on a
+    // chip through `?filter=`. Read on every arrival rather than once, since
+    // the page stays alive in the stack, but not on a back navigation: that
+    // returns to the URL that once carried it, and would undo a chip the
+    // coach has changed since.
+    let popstate = false;
+    this._router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event instanceof NavigationStart) popstate = event.navigationTrigger === 'popstate';
+      if (event instanceof NavigationEnd && !popstate) this._applyUrlFilter(event.urlAfterRedirects);
+    });
   }
 
   // Not ngOnInit: Ionic keeps the page alive in the tab stack. An invite, an
   // accepted request or an archive elsewhere changes this list, so entering
   // refetches — quietly, since rows already on screen stay put. `reenter`
   // holds that back for a few seconds, so stepping into a client and straight
-  // back out does not re-fire both lenses and the count for data seconds old.
+  // back out does not re-fire the list and the count for data seconds old.
   ionViewWillEnter(): void {
+    this._resent.set(new Set());
     this.store.reenter();
-  }
-
-  setSegment(value: string | number | undefined): void {
-    if (value !== ClientsSegments.Attention && value !== ClientsSegments.All) return;
-    this.store.setSegment(value);
   }
 
   setFilter(id: ClientFilterId): void {
     this.store.setFilter(id);
   }
 
+  /**
+   * Search covers every client: the pills fold away with the title, so a
+   * chip left on would narrow the results with nothing on screen saying so.
+   */
   openSearch(): void {
+    this.fold.arm();
     this.searchOpen.set(true);
+    this.store.setFilter(ClientFilterIds.All);
   }
 
   closeSearch(): void {
+    this.fold.arm();
     this.searchOpen.set(false);
     this.store.setQuery('');
+    // Otherwise the field keeps focus, the keyboard stays up, and the next
+    // tap on it fires no focus event to open search again.
+    void this._searchbar()
+      ?.getInputElement()
+      .then((input) => input.blur());
   }
 
   onQuery(value: string): void {
@@ -281,38 +300,63 @@ export class Clients implements ViewWillEnter {
   }
 
   /**
-   * Drops the chip and the search together. Closes the box directly
-   * rather than via `closeSearch`, so clearing both does not fire one
-   * request for the emptied term and a second for the reset chip.
+   * Drops the chip and the search together. Closes search directly rather
+   * than via `closeSearch`, so clearing both does not fire one request for
+   * the emptied term and a second for the reset chip.
    */
   clearFilters(): void {
+    this.fold.arm();
     this.searchOpen.set(false);
     this.store.clearFilters();
   }
 
-  showAll(): void {
-    this.store.setSegment(ClientsSegments.All);
-  }
-
-  openRoster(client: RosterClient): void {
-    void this._router.navigate(['/tabs/clients', client.clientId]);
-  }
-
   /**
    * A relationship row opens the profile. A pending one has no profile yet,
-   * in either direction — an incoming request needs a decision and a sent
-   * invitation can be resent or withdrawn, and both of those live on the
-   * Requests page, so that is where the tap goes. A row that did nothing at
-   * all on tap just read as broken.
+   * in either direction (an incoming request needs a decision, a sent
+   * invitation can be resent or withdrawn), so it opens the request sheet.
+   * A row that did nothing at all on tap just read as broken.
    */
   open(client: InstructorClient): void {
     if (isOpenableClient(client)) {
+      // A profile opened from search is where that search ended.
+      const recent = this.searchOpen() ? recentFromClient(client) : null;
+      if (recent) this.recents.push(recent);
       void this._router.navigate(['/tabs/clients', client.clientId]);
       return;
     }
     if (isIncomingRequest(client) || isSentInvite(client)) {
-      void this._router.navigateByUrl('/tabs/clients/requests');
+      this.openRequest(client);
     }
+  }
+
+  openRequest(client: InstructorClient): void {
+    this._clockService.bump();
+    this.requestClient.set(client);
+    this.requestOpen.set(true);
+  }
+
+  /**
+   * A recent or a suggestion: remembered, then the profile. A waiting
+   * invitation has no profile yet, so it opens the request sheet and is not
+   * remembered. The strip was built from the rows on screen, so its row is
+   * still there to open.
+   */
+  openRecent(person: SuggestedPerson): void {
+    if (person.pendingLabel) {
+      const client = this.store.visibleClients().find((row) => row.id === person.id);
+      if (client) this.openRequest(client);
+      return;
+    }
+    this.recents.push(person);
+    void this._router.navigate(['/tabs/clients', person.id]);
+  }
+
+  removeRecent(person: RecentPerson): void {
+    this.recents.remove(person.id);
+  }
+
+  clearRecents(): void {
+    this.recents.clear();
   }
 
   openInvite(): void {
@@ -398,6 +442,78 @@ export class Clients implements ViewWillEnter {
     });
   }
 
+  /** The sheet has gone by now, so a verb that navigates or opens a sheet is safe. */
+  onRequestAction(id: RequestActionId): void {
+    const client = this.requestClient();
+    if (!client) return;
+
+    switch (id) {
+      case RequestActionIds.Accept:
+        this.accept(client);
+        break;
+      case RequestActionIds.Decline:
+        this.decline(client);
+        break;
+      case RequestActionIds.Resend:
+        this.resend(client);
+        break;
+      case RequestActionIds.Withdraw:
+        this.confirmWithdraw(client);
+        break;
+      case RequestActionIds.ViewProfile: {
+        // Who is asking, before saying yes: their public profile, in this stack.
+        const handle = client.client?.handle;
+        if (handle) void this._router.navigate(['/tabs/clients/person', handle]);
+        break;
+      }
+    }
+  }
+
+  accept(client: InstructorClient): void {
+    this.store.accept(client).subscribe({
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.requestAccepted'),
+        ),
+      error: (error: unknown) =>
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.requestFailed'),
+        ),
+    });
+  }
+
+  decline(client: InstructorClient): void {
+    this.store.decline(client).subscribe({
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.requestDeclined'),
+        ),
+      error: (error: unknown) =>
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.requestFailed'),
+        ),
+    });
+  }
+
+  resend(client: InstructorClient): void {
+    if (this._resent().has(client.id)) return;
+    this.store.resend(client).subscribe({
+      next: () => {
+        this._resent.update((ids) => new Set(ids).add(client.id));
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.invitationResent'),
+        );
+      },
+      error: (error: unknown) =>
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.resendFailed'),
+        ),
+    });
+  }
+
   confirmWithdraw(client: InstructorClient): void {
     this.withdrawing.set(client);
     this.withdrawOpen.set(true);
@@ -431,8 +547,7 @@ export class Clients implements ViewWillEnter {
    * right — but silently, they read as fresh. The stale bar above the list
    * says so and offers the retry, and it stays put until a load succeeds.
    *
-   * No toast on top of it. A pull with no connection fails the roster, the
-   * list and the request count at once, which is how one gesture produced a
+   * No toast on top of it. A pull with no connection used to produce a
    * blocking alert, a toast and the bar — the same news three times, two of
    * them transient. The loads are `silentRequest()` now (the alert), and the
    * bar is the one that survives long enough to be acted on (the toast).
@@ -448,5 +563,17 @@ export class Clients implements ViewWillEnter {
 
   retry(): void {
     this.store.refresh();
+  }
+
+  /**
+   * Search covers every client and hides the chips, so a chip asked for by
+   * the URL closes it first; otherwise the chip would narrow the results with
+   * nothing on screen saying so.
+   */
+  private _applyUrlFilter(url: string): void {
+    const id = filterFromUrl(url);
+    if (!id) return;
+    if (this.searchOpen()) this.closeSearch();
+    this.store.setFilter(id);
   }
 }

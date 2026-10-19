@@ -81,17 +81,11 @@ export class More implements ViewWillEnter {
     return TAB_SETS[this._mode()].more
       .map((section) => ({
         ...section,
-        items: section.items
-          .filter((entry) => !entry.requiresInstructor || this._authStore.isInstructor())
-          .map((entry) => {
-            if (entry.route === '/tabs/home/billing') {
-              return { ...entry, dot: this._moreBadgesService.hasBillDue };
-            }
-            if (entry.route === '/tabs/clients/requests') {
-              return { ...entry, dot: this._moreBadgesService.hasPendingRequests };
-            }
-            return entry;
-          }),
+        items: section.items.map((entry) =>
+          entry.route === '/tabs/home/billing'
+            ? { ...entry, dot: this._moreBadgesService.hasBillDue }
+            : entry,
+        ),
       }))
       .filter((section) => section.items.length > 0);
   });

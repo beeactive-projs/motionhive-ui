@@ -1,0 +1,17 @@
+<!-- Their words, quoted in the language's own marks, before the verbs that
+     answer them. -->
+<ng-template #details>
+  @if (message(); as text) {
+    <p class="quote">{{ 'clients.requests.quote' | translate: { message: text } }}</p>
+  }
+</ng-template>
+
+<mh-action-sheet
+  [(open)]="open"
+  [title]="name()"
+  [subtitle]="subline()"
+  [note]="when()"
+  [details]="message() ? details : null"
+  [actions]="actions()"
+  (chosen)="action.emit($event)"
+/>

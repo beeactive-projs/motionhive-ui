@@ -10,21 +10,19 @@
     </ion-item-options>
   }
 
-  <!-- The chevron follows the tap, not the destination. Showing it only on
-       rows that open a profile left pending and invitation rows — which do go
-       somewhere, the Requests page — reading as inert. Where the tap lands is
-       said by the status badge beside the name. -->
+  <!-- No chevron, as in every flat list: the whole row is the tap. Pending
+       and invitation rows open the request sheet; the status badge on the
+       second line says which kind they are. -->
   <ion-item
-    lines="none"
+    detail="false"
     [button]="pressable()"
-    [detail]="pressable()"
     [class.archived]="isArchived()"
     (click)="onSelect()"
   >
     @if (isEmailOnly()) {
       <mh-hex-avatar
         slot="start"
-        size="md"
+        size="lg"
         icon="mail-outline"
         color="medium"
         tone="wash"
@@ -34,7 +32,7 @@
       <!-- Decorative: the name it would announce is the very next thing in the row. -->
       <mh-hex-avatar
         slot="start"
-        size="md"
+        size="lg"
         aria-hidden="true"
         [name]="name()"
         [imageUrl]="client().client?.avatarUrl ?? null"
@@ -42,13 +40,11 @@
       />
     }
 
-    <!-- The badge sits on the subline, not beside the name. Sharing the top
-         line with it cost an email-only invitation the end of its address —
-         `radu.testclient@motion…` — and for a row with no account behind it
-         the address IS the identity. -->
-    <ion-label [class.ion-text-wrap]="isEmailOnly()">
+    <!-- The name owns the first line; the address and the status share the
+         second, the address yielding and the badge kept whole. -->
+    <ion-label>
       <h2>{{ name() }}</h2>
-      <div class="meta-line">
+      <div class="mh-row-line">
         <p>{{ subline() }}</p>
         @if (statusTone(); as tone) {
           <ion-badge [attr.data-tone]="tone">{{ statusLabel() }}</ion-badge>

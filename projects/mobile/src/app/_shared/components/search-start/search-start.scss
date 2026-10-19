@@ -1,0 +1,106 @@
+/* Comes in under the folding header rather than popping: a short rise and
+   fade, the same ease-out as the header's fold. */
+:host {
+  display: block;
+  animation: mh-search-start-in 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes mh-search-start-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}
+
+/* "Recent" with its "Clear all" at the far end, on the row times' edge. The
+   button keeps a full tap target without making the label taller. */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clear-all {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  min-height: var(--mh-tap-target);
+  margin-block: calc((1.25rem - var(--mh-tap-target)) / 2);
+  margin-inline-end: -0.5rem;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* The remove button floats over the row's end; the label stops short of it
+   so a long name ellipses before the X rather than under it. */
+.recent {
+  position: relative;
+}
+
+.recent ion-label {
+  margin-inline-end: var(--mh-tap-target);
+}
+
+.remove {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 50%;
+  inset-inline-end: calc(var(--mh-row-gutter) - 0.75rem);
+  margin: 0;
+  translate: 0 -50%;
+}
+
+/* The strip label sits on the gutter like a flat list's does. */
+.strip-label {
+  padding-inline: var(--mh-row-gutter);
+}
+
+/* A row of people that scrolls sideways, Messenger's suggestions. Each one
+   is an avatar over a first name; the buttons' own padding is the gap. */
+.strip {
+  display: flex;
+  overflow-x: auto;
+  padding: 0.25rem calc(var(--mh-row-gutter) - 0.5rem) 0.75rem;
+  background: var(--ion-card-background);
+  scrollbar-width: none;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.person {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  --padding-top: 0.375rem;
+  --padding-bottom: 0.375rem;
+  --color: var(--ion-text-color);
+  flex: none;
+  height: auto;
+  margin: 0;
+  text-transform: none;
+}
+
+.person-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  inline-size: 4rem;
+}
+
+.person-name {
+  overflow: hidden;
+  max-inline-size: 100%;
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
+  line-height: var(--mh-leading-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

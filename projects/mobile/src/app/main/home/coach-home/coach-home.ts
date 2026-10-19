@@ -18,6 +18,7 @@ import { addOutline } from 'ionicons/icons';
 import { formatMinorUnits } from 'core';
 
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
+import { CLIENT_REQUESTS_URL } from '../../clients/clients.filters';
 import { CoachHomeStore } from './coach-home.store';
 
 @Component({
@@ -85,8 +86,9 @@ export class CoachHome implements OnInit, ViewWillEnter {
     });
   }
 
+  /** The Clients tab on its Requests chip, where each one opens in a sheet. */
   openRequests(): void {
-    void this._router.navigateByUrl('/tabs/clients/requests');
+    void this._router.navigateByUrl(CLIENT_REQUESTS_URL);
   }
 
   openSessions(): void {

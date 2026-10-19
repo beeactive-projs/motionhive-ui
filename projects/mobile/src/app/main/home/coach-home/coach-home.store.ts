@@ -91,6 +91,8 @@ export class CoachHomeStore {
   private _loadPendingRequests(): void {
     this.requestsLoading.set(true);
     // Purpose-built count endpoint — cheaper than fetching the request list.
+    // `incoming` only: the banner says they are waiting for the coach's
+    // approval, which the invitations the coach sent are not.
     this._clientService
       .getPendingRequestsCount()
       .pipe(
@@ -99,7 +101,7 @@ export class CoachHomeStore {
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((response) => {
-        this._pendingRequests.set(response?.count ?? 0);
+        this._pendingRequests.set(response?.incoming ?? 0);
         this.requestsLoading.set(false);
       });
   }

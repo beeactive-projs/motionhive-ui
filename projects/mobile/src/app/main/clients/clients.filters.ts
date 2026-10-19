@@ -2,23 +2,14 @@ import {
   InstructorClient,
   InstructorClientStatus,
   InstructorClientStatuses,
-  RosterClient,
   clientDisplayName,
   clientEmail,
 } from 'core';
 
 /**
- * What the Clients tab is looking at: which lens, narrowed by which chip, and
- * narrowed again by the search box above both.
+ * What the Clients tab is looking at: the one `/clients` list, narrowed by a
+ * status chip or by the search field above it.
  */
-
-/** The two lenses on the same people: who needs a nudge, and everyone. */
-export const ClientsSegments = {
-  Attention: 'attention',
-  All: 'all',
-} as const;
-
-export type ClientsSegment = (typeof ClientsSegments)[keyof typeof ClientsSegments];
 
 export const ClientFilterIds = {
   All: 'all',
@@ -38,7 +29,7 @@ export interface ClientFilter {
 }
 
 /**
- * The quick-filter chips over the All clients list. "Requests" is the PENDING
+ * The quick-filter chips over the client list. "Requests" is the PENDING
  * status: the API folds invitations and incoming requests into one bucket.
  */
 export const CLIENT_FILTERS: readonly ClientFilter[] = [
@@ -65,6 +56,29 @@ export function filterStatus(id: ClientFilterId): InstructorClientStatus | undef
 }
 
 /**
+ * The query param that opens the tab on a chip: Home's requests banner and a
+ * request notification both land on `/tabs/clients?filter=requests`. The
+ * notification map in `_shared` spells the same value out, since it may not
+ * import from here.
+ */
+export const CLIENT_FILTER_PARAM = 'filter';
+
+/** The Clients tab, opened on the Requests chip. */
+export const CLIENT_REQUESTS_URL = `/tabs/clients?${CLIENT_FILTER_PARAM}=${ClientFilterIds.Requests}`;
+
+/**
+ * The chip a Clients tab URL asks for, or null when it asks for none (or for
+ * one that does not exist). Only the tab's own root counts: a client page
+ * under it carries no chip.
+ */
+export function filterFromUrl(url: string): ClientFilterId | null {
+  const [path, query = ''] = url.split('#')[0].split('?');
+  if (path !== '/tabs/clients') return null;
+  const value = new URLSearchParams(query).get(CLIENT_FILTER_PARAM);
+  return CLIENT_FILTERS.find((filter) => filter.id === value)?.id ?? null;
+}
+
+/**
  * The shortest term the API will actually search on — anything below this it
  * ignores, answering with the unfiltered page.
  *
@@ -82,20 +96,5 @@ export function matchesClientQuery(client: InstructorClient, query: string): boo
   return (
     clientDisplayName(client).toLowerCase().includes(term) ||
     clientEmail(client).toLowerCase().includes(term)
-  );
-}
-
-/**
- * The same search over a roster row. The roster is a different shape from a
- * relationship — a name and a handle, no email — so it needs its own
- * predicate, but the search box above the two segments is one box and has to
- * narrow whichever list is under it.
- */
-export function matchesRosterQuery(client: RosterClient, query: string): boolean {
-  const term = query.trim().toLowerCase();
-  if (!term) return true;
-  return (
-    client.name.toLowerCase().includes(term) ||
-    (client.handle?.toLowerCase().includes(term) ?? false)
   );
 }

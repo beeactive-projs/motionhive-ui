@@ -1,9 +1,10 @@
 <!-- WhatsApp's chat list: title and actions, a search field that is always
      there, then the filter pills. Searching folds the title and the pills
-     away and keeps the same field, so the caret the tap put there stays. -->
+     away and keeps the same field, so the caret the tap put there stays.
+     They fold rather than vanish, so the field glides up to its place. -->
 <ion-header class="mh-flat-header" [translucent]="true">
   @if (!searchOpen()) {
-    <ion-toolbar>
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
       <ion-title>{{ 'nav.messages' | translate }}</ion-title>
       <ion-buttons slot="end">
         <mh-notification-bell />
@@ -26,7 +27,11 @@
   <ion-toolbar>
     <!-- WhatsApp's search header: a back chevron beside the field. -->
     @if (searchOpen()) {
-      <ion-buttons slot="start">
+      <ion-buttons
+        slot="start"
+        (animate.enter)="fold.backIn($event)"
+        (animate.leave)="fold.backOut($event)"
+      >
         <ion-button [attr.aria-label]="'a11y.closeSearch' | translate" (click)="closeSearch()">
           <ion-icon slot="icon-only" name="chevron-back-outline" />
         </ion-button>
@@ -48,7 +53,7 @@
   </ion-toolbar>
 
   @if (!searchOpen() && !isEmpty()) {
-    <ion-toolbar>
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
       <div class="mh-chip-row" role="group" [attr.aria-label]="'messages.inbox.filterBar' | translate">
         @for (option of filters; track option.value) {
           <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
@@ -110,6 +115,14 @@
         </ion-item>
       }
     </ion-list>
+  } @else if (showSearchStart()) {
+    <mh-search-start
+      [recents]="recents.entries()"
+      [strips]="strips()"
+      (select)="openRecent($event)"
+      (remove)="removeRecent($event)"
+      (clearAll)="clearRecents()"
+    />
   } @else if (people.isActive()) {
     @if (isSearchEmpty()) {
       <mh-empty-state
@@ -149,7 +162,7 @@
         @for (conversation of store.visibleConversations(); track conversation.id) {
           <mh-conversation-row
             [conversation]="conversation"
-            (select)="openConversation(conversation.id)"
+            (select)="openSearchedConversation(conversation)"
             (markRead)="markRead(conversation.id)"
             (markUnread)="markUnread(conversation.id)"
             (toggleMute)="toggleMute(conversation.id)"

@@ -14,32 +14,29 @@ import {
   ClientActionIds,
   NOTES_COUNTER_FROM,
   NOTES_MAX_LENGTH,
+  REQUEST_ACTIONS,
+  RequestActionIds,
   clientStatusTone,
   clientSubline,
+  newestClients,
+  pendingClients,
+  recentFromClient,
   visibleClientActions,
+  visibleRequestActions,
 } from './clients.config';
 import {
   CLIENT_FILTERS,
+  CLIENT_REQUESTS_URL,
   ClientFilterIds,
   MIN_SEARCH_LENGTH,
+  filterFromUrl,
   filterStatus,
   matchesClientQuery,
-  matchesRosterQuery,
 } from './clients.filters';
 import { CLIENT_ICONS } from './clients.icons';
 import { inviteLink } from './invite.utils';
-import { daysBetween, receivedLabel, sentMetaLabel, splitPendingRows } from './requests.utils';
-import {
-  adherenceLabel,
-  attentionLabel,
-  attentionStat,
-  attentionTone,
-  lastActiveLabel,
-  lastActiveShort,
-  onTrackStat,
-  subtitleFor,
-  triageNote,
-} from './roster-labels';
+import { daysBetween, receivedLabel, sentMetaLabel } from './requests.utils';
+import { adherenceLabel, lastActiveLabel } from './roster-labels';
 
 /** Every template in this feature, inlined at build time by Vite. */
 const templates = import.meta.glob('./**/*.html', {
@@ -162,40 +159,86 @@ describe('filters', () => {
     expect(filterStatus(ClientFilterIds.Archived)).toBe('ARCHIVED');
     expect(CLIENT_FILTERS.map((f) => f.id)).toEqual(['all', 'active', 'requests', 'archived']);
   });
+
+  // Home's banner and a request notification open the tab on the Requests
+  // chip through the URL; nothing else may pick a chip that way.
+  it('reads a chip from the tab root URL only', () => {
+    expect(filterFromUrl(CLIENT_REQUESTS_URL)).toBe(ClientFilterIds.Requests);
+    expect(filterFromUrl('/tabs/clients?requestId=r-1&filter=requests')).toBe(
+      ClientFilterIds.Requests,
+    );
+    expect(filterFromUrl('/tabs/clients?filter=archived#top')).toBe(ClientFilterIds.Archived);
+    expect(filterFromUrl('/tabs/clients')).toBeNull();
+    expect(filterFromUrl('/tabs/clients?filter=nope')).toBeNull();
+    expect(filterFromUrl('/tabs/clients/user-1?filter=requests')).toBeNull();
+  });
 });
 
-describe('attention', () => {
-  // Honey is the action colour, so no reason may map to it — a flagged client
-  // is a state to read, not a button to press.
-  it('keys each reason to a semantic spine, never honey', () => {
-    expect(attentionTone('BEHIND')).toBe('danger');
-    expect(attentionTone('DROPPED')).toBe('danger');
-    expect(attentionTone('NEVER_STARTED')).toBe('warning');
-    expect(attentionTone('SILENT')).toBe('info');
-    expect(attentionTone(null)).toBeNull();
+describe('search start', () => {
+  it('remembers a client by the person, with their address under the name', () => {
+    expect(recentFromClient(client())).toEqual({
+      id: 'user-1',
+      name: 'Maria Ionescu',
+      avatarUrl: null,
+      subline: 'maria@example.com',
+    });
   });
 
-  it('says why in plain words', () => {
-    expect(attentionLabel(roster({ attention: 'BEHIND' }))).toBe('Behind plan');
-    expect(attentionLabel(roster({ attention: 'DROPPED' }))).toBe('Dropping off');
-    expect(attentionLabel(roster({ attention: 'NEVER_STARTED' }))).toBe('Has not started');
-    expect(attentionLabel(roster({ attention: 'SILENT', daysSinceLastWorkout: 21 }))).toBe(
-      'Inactive for 21 days',
-    );
-    expect(attentionLabel(roster())).toBe('');
+  // A request or an invitation has no profile, so a search never ends there.
+  it('remembers nothing without a profile to open', () => {
+    expect(
+      recentFromClient(
+        client({
+          status: InstructorClientStatuses.Pending,
+          requestType: ClientRequestTypes.ClientToInstructor,
+        }),
+      ),
+    ).toBeNull();
+    expect(recentFromClient(client({ clientId: null, client: null }))).toBeNull();
   });
 
-  // A silent client's number is how long they have been gone; everyone
-  // else's is adherence.
-  it('puts the right number on the right of the row', () => {
-    expect(attentionStat(roster({ attention: 'SILENT', daysSinceLastWorkout: 21 }))).toEqual({
-      value: '21d',
-      sub: 'last active',
+  it('suggests active clients in list order, minus the recents, capped', () => {
+    const rows = [
+      client({ id: 'r1', clientId: 'u1', client: { id: 'u1', firstName: 'Ana' } }),
+      client({
+        id: 'r2',
+        clientId: 'u2',
+        status: InstructorClientStatuses.Archived,
+        client: { id: 'u2', firstName: 'Bogdan' },
+      }),
+      client({ id: 'r3', clientId: 'u3', client: { id: 'u3', firstName: 'Corina' } }),
+      client({ id: 'r4', clientId: 'u4', client: { id: 'u4', firstName: 'Dan' } }),
+      client({ id: 'r5', clientId: 'u5', client: { id: 'u5', firstName: 'Elena' } }),
+    ];
+
+    expect(newestClients(rows, ['u3'], 2).map((person) => person.name)).toEqual(['Ana', 'Dan']);
+  });
+
+  // Waiting invitations get their own strip, and stay out of the newest
+  // clients. They carry their status, said with the name, which also tells
+  // the page to open the request sheet on a tap.
+  it('lists waiting invitations and requests apart, keyed by the request, with their status', () => {
+    const rows = [
+      client({
+        id: 'req-1',
+        clientId: null,
+        client: null,
+        invitedEmail: 'new@example.com',
+        status: InstructorClientStatuses.Pending,
+        requestType: ClientRequestTypes.InstructorToClient,
+      }),
+      client(),
+    ];
+
+    const [invite, ...rest] = pendingClients(rows);
+    expect(invite).toMatchObject({
+      id: 'req-1',
+      name: 'new@example.com',
+      pendingLabel: 'Email sent',
+      icon: 'mail-outline',
     });
-    expect(attentionStat(roster({ attention: 'BEHIND', adherencePercent: 42 }))).toEqual({
-      value: '42%',
-      sub: 'adherence',
-    });
+    expect(rest).toEqual([]);
+    expect(newestClients(rows, []).map((person) => person.id)).toEqual(['user-1']);
   });
 });
 
@@ -206,58 +249,15 @@ describe('roster numbers', () => {
     expect(adherenceLabel(roster({ adherencePercent: 0 }))).toBe('0%');
   });
 
-  it('describes the plan, not the person, when nothing is scheduled', () => {
-    expect(subtitleFor(roster({ due: 0, activePlans: 0 }))).toBe('No active plan');
-    expect(subtitleFor(roster({ due: 0, activePlans: 1 }))).toBe(
-      'Nothing scheduled in this window',
-    );
-    expect(subtitleFor(roster({ due: 5, completed: 4 }))).toBe('4 of 5 workouts');
-  });
-
-  it('formats last active for a row and for a card', () => {
-    expect(lastActiveShort(roster({ daysSinceLastWorkout: 0 }))).toBe('today');
-    expect(lastActiveShort(roster({ daysSinceLastWorkout: 3 }))).toBe('3d ago');
-    expect(lastActiveShort(roster({ daysSinceLastWorkout: null }))).toBeNull();
-
+  it('formats last active for the detail card', () => {
     expect(lastActiveLabel(roster({ daysSinceLastWorkout: 0 }))).toBe('Trained today');
     expect(lastActiveLabel(roster({ daysSinceLastWorkout: 1 }))).toBe('Last active yesterday');
     expect(lastActiveLabel(roster({ daysSinceLastWorkout: 3 }))).toBe('Last active 3 days ago');
     expect(lastActiveLabel(roster({ daysSinceLastWorkout: null }))).toBeNull();
   });
-
-  it('falls back to naming the number when last-active is unknown', () => {
-    expect(onTrackStat(roster({ daysSinceLastWorkout: null }))).toEqual({
-      value: '80%',
-      sub: 'adherence',
-    });
-    expect(onTrackStat(roster({ daysSinceLastWorkout: 2 }))).toEqual({
-      value: '80%',
-      sub: '2d ago',
-    });
-  });
-
-  // The search box sits above both segments, so it has to narrow the roster
-  // too. Scoped to the directory, it opened on the landing segment, took
-  // what you typed and changed nothing.
-  it('searches a roster row by name and handle', () => {
-    expect(matchesRosterQuery(roster(), '  IONES ')).toBe(true);
-    expect(matchesRosterQuery(roster(), 'maria')).toBe(true);
-    expect(matchesRosterQuery(roster(), 'radu')).toBe(false);
-    expect(matchesRosterQuery(roster(), '   ')).toBe(true);
-    expect(matchesRosterQuery(roster({ handle: 'mio' }), 'MIO')).toBe(true);
-    expect(matchesRosterQuery(roster({ handle: null }), 'mio')).toBe(false);
-  });
-
-  it('agrees the triage note with its numbers', () => {
-    // "active" qualifies the denominator: the segment above counts pending
-    // invitations too, so the bare noun made the two numbers look wrong.
-    expect(triageNote(3, 8)).toBe('3 of 8 active clients need a look');
-    expect(triageNote(1, 8)).toBe('1 of 8 active clients needs a look');
-    expect(triageNote(1, 1)).toBe('1 of 1 active client needs a look');
-  });
 });
 
-describe('All clients rows', () => {
+describe('client rows', () => {
   // Active is the default state and says nothing; only the exceptions wear a chip.
   it('leaves active rows chip-silent', () => {
     expect(clientStatusTone(client())).toBeNull();
@@ -389,27 +389,79 @@ describe('client actions', () => {
   });
 });
 
-describe('requests page', () => {
-  // Local noon, so a timezone offset cannot tip the day either way.
-  const NOW = new Date('2026-08-30T12:00:00').getTime();
-
-  it('splits pending rows by direction and drops anything settled', () => {
-    const incoming = client({
-      id: 'r-1',
+describe('request actions', () => {
+  const incoming = (overrides: Record<string, unknown> = {}) =>
+    client({
       status: InstructorClientStatuses.Pending,
       requestType: ClientRequestTypes.ClientToInstructor,
+      ...overrides,
     });
-    const sent = client({
-      id: 'r-2',
+  const sent = (overrides: Record<string, unknown> = {}) =>
+    client({
       status: InstructorClientStatuses.Pending,
       requestType: ClientRequestTypes.InstructorToClient,
+      ...overrides,
     });
-    const active = client({ id: 'r-3' });
+  const ids = (row: InstructorClient, resent = false) =>
+    visibleRequestActions(row, resent).map((a) => a.id);
 
-    const split = splitPendingRows([active, sent, incoming]);
-    expect(split.incoming.map((r) => r.id)).toEqual(['r-1']);
-    expect(split.sent.map((r) => r.id)).toEqual(['r-2']);
+  it('tints every verb with a palette colour Ionic knows', () => {
+    const palette = ['primary', 'success', 'info', 'medium', 'danger'];
+    for (const action of REQUEST_ACTIONS) {
+      expect(palette).toContain(action.color);
+    }
   });
+
+  // The verb that ends the request is red and sorted into its own card; the
+  // one that moves it forward is honey.
+  it('marks only decline and withdraw destructive', () => {
+    const destructive = REQUEST_ACTIONS.filter((action) => action.destructive);
+    expect(destructive.map((action) => action.id)).toEqual([
+      RequestActionIds.Decline,
+      RequestActionIds.Withdraw,
+    ]);
+    for (const action of destructive) expect(action.color).toBe('danger');
+  });
+
+  it('offers a decision on an incoming request and patience on a sent one', () => {
+    expect(ids(incoming())).toEqual([RequestActionIds.Accept, RequestActionIds.Decline]);
+    expect(ids(sent())).toEqual([RequestActionIds.Resend, RequestActionIds.Withdraw]);
+    expect(ids(sent({ client: null, clientId: null, invitedEmail: 'radu@x.com' }))).toEqual([
+      RequestActionIds.Resend,
+      RequestActionIds.Withdraw,
+    ]);
+  });
+
+  it('offers the public profile only to someone with a handle', () => {
+    const user = { id: 'user-1', firstName: 'Maria', lastName: 'Ionescu', handle: 'maria' };
+    expect(ids(incoming({ client: user }))).toEqual([
+      RequestActionIds.Accept,
+      RequestActionIds.ViewProfile,
+      RequestActionIds.Decline,
+    ]);
+    expect(ids(sent({ client: user }))).toContain(RequestActionIds.ViewProfile);
+  });
+
+  it('offers nothing on a row that is not a request', () => {
+    expect(ids(client())).toEqual([]);
+    expect(ids(client({ status: InstructorClientStatuses.Archived }))).toEqual([]);
+  });
+
+  // Once per visit is plenty: the verb stays, disabled and saying so.
+  it('keeps a resent invitation verb in place but disabled', () => {
+    const resend = visibleRequestActions(sent(), true).find(
+      (a) => a.id === RequestActionIds.Resend,
+    );
+    expect(resend).toMatchObject({ label: 'clients.actions.resent', disabled: true });
+    expect(
+      visibleRequestActions(sent()).find((a) => a.id === RequestActionIds.Resend)?.disabled,
+    ).toBeUndefined();
+  });
+});
+
+describe('request sheet', () => {
+  // Local noon, so a timezone offset cannot tip the day either way.
+  const NOW = new Date('2026-08-30T12:00:00').getTime();
 
   it('counts whole local days, not elapsed hours', () => {
     expect(daysBetween('2026-08-30T01:00:00', NOW)).toBe(0);

@@ -97,6 +97,13 @@ describe('deep links', () => {
     ).toEqual({ foo: 'bar' });
   });
 
+  // Requests have no page of their own: the Clients tab opens on its chip.
+  it('lands a request alert on the Clients tab, on the Requests chip', () => {
+    const data = { screen: 'coaching/pending-requests', queryParams: { requestId: 'r-1' } };
+    expect(routeFor(data)).toEqual(['/tabs/clients']);
+    expect(queryParamsFor(data)).toEqual({ requestId: 'r-1', filter: 'requests' });
+  });
+
   it('forwards the params it does not consume', () => {
     expect(queryParamsFor({ screen: 'profile', queryParams: { tab: 'invoices' } })).toEqual({
       tab: 'invoices',
@@ -156,7 +163,7 @@ describe('isOnTarget', () => {
 
   it('is true on the exact screen and anywhere under it', () => {
     expect(isOnTarget('/tabs/clients', clients)).toBe(true);
-    expect(isOnTarget('/tabs/clients/requests', clients)).toBe(true);
+    expect(isOnTarget('/tabs/clients/user-1', clients)).toBe(true);
     expect(isOnTarget('/tabs/clients?open=1', clients)).toBe(true);
   });
 

@@ -222,12 +222,17 @@ export class Clients implements OnInit {
     this.loadMobilePage(false);
   }
 
+  /**
+   * Requests waiting on the coach's answer. `incoming`, not `count`: the total
+   * also holds the invitations the coach sent, which lit the badge with
+   * nothing to answer.
+   */
   loadPendingCount(): void {
     this._clientService
       .getPendingRequestsCount()
       .pipe(take(1))
       .subscribe({
-        next: ({ count }) => this.incomingRequestsCount.set(count),
+        next: ({ incoming }) => this.incomingRequestsCount.set(incoming),
         error: () => this.incomingRequestsCount.set(0),
       });
   }
