@@ -677,10 +677,7 @@ $mh-phone: 47.5rem; // 760px
   }
 
   /* Community: one bordered card, rows divided by hairlines. */
-  /* One card, three rows. Each row is a two-column grid: the hexagon holds
-     the first column and the title and body share the second, so the text
-     starts on one line down the card instead of the body running back out
-     to the edge under the icon. */
+  /* One card, three rows, each laid out like a feature-page benefit card. */
   .cgrid--rows {
     display: block;
     border: 1px solid color-mix(in oklab, var(--p-surface-900) 12%, transparent);
@@ -688,42 +685,32 @@ $mh-phone: 47.5rem; // 760px
     overflow: hidden;
     background: var(--p-surface-0, #fff);
 
+    /* Icon beside the title, body on its own line underneath: the pairing
+       the feature pages use for the same kind of card. */
     .ccard {
-      display: grid;
-      grid-template-columns: 2.25rem 1fr;
-      column-gap: 0.75rem;
-      align-items: start;
       border: 0;
       border-radius: 0;
       box-shadow: none;
       background: transparent;
-      padding: 1rem 1.125rem;
+      padding: 1.125rem;
     }
 
     .ccard__head {
-      display: contents;
-    }
-
-    .ccard__head mh-hex {
-      grid-column: 1;
-      grid-row: 1 / span 2;
-      align-self: start;
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      margin-bottom: 0.625rem;
     }
 
     .ccard__t {
-      grid-column: 2;
-      grid-row: 1;
-      margin: 0 0 0.25rem;
+      margin: 0;
       font-size: 1.0625rem;
-      align-self: center;
     }
 
     .ccard__b {
-      grid-column: 2;
-      grid-row: 2;
       margin: 0;
       font-size: 0.9375rem;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .ccard + .ccard {
