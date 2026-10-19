@@ -1,13 +1,17 @@
-<ion-header [translucent]="true">
+<!-- The flat header (as Messages, without the search field): back, title and
+     the ⋯ menu, then the filter strip, every part on the rows' gutter. -->
+<ion-header class="mh-flat-header" [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" />
     </ion-buttons>
     <ion-title>{{ 'nav.notifications' | translate }}</ion-title>
+    <!-- List-wide verbs (Mark all read, settings) behind one ⋯ button, so the title
+         keeps its room and the bar holds the same shape read or unread. -->
     <ion-buttons slot="end">
-      @if (store.hasUnread()) {
-        <ion-button (click)="markAllRead()">{{ 'notifications.markAllRead' | translate }}</ion-button>
-      }
+      <ion-button aria-haspopup="dialog" [attr.aria-label]="'a11y.moreActions' | translate" (click)="openListActions()">
+        <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 
@@ -19,7 +23,7 @@
     list says what.
   -->
   @if (!isEmpty() || hasFilter()) {
-    <ion-toolbar class="filter-bar">
+    <ion-toolbar>
       <div class="mh-chip-row" role="group" [attr.aria-label]="'notifications.filterBar' | translate">
         <ion-button
           class="filters"
@@ -38,15 +42,25 @@
           }
         </ion-button>
 
-        <ion-chip
+        <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
+             reader reads it as text and never says which one is on. -->
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
           [class.selected]="!store.unreadOnly()"
           [attr.aria-pressed]="!store.unreadOnly()"
           (click)="setUnreadOnly(false)"
         >
           {{ 'common.all' | translate }}
-        </ion-chip>
+        </ion-button>
 
-        <ion-chip
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
           [class.selected]="store.unreadOnly()"
           [attr.aria-pressed]="store.unreadOnly()"
           (click)="setUnreadOnly(true)"
@@ -55,13 +69,16 @@
           @if (store.unreadCount(); as count) {
             <span class="count">{{ count }}</span>
           }
-        </ion-chip>
+        </ion-button>
       </div>
     </ion-toolbar>
   }
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<!-- A flat list: the rows run edge to edge on white, grouped under day labels as
+     Mail groups its inbox. The empty and error states are centred art, which
+     needs the slate page behind it. -->
+<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
@@ -75,29 +92,22 @@
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
-    <!-- One day card's worth of rows in the real geometry — pill, tile, title,
-         time stub, body — so content lands without shifting anything. -->
-    <div class="mh-page skeleton">
-      <section class="mh-section">
-        <div class="mh-day-pill">
-          <span><ion-skeleton-text [animated]="true" style="width: 3.5rem; height: 0.625rem" /></span>
-        </div>
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (_ of skeletonRows; track $index) {
-            <ion-item>
-              <ion-skeleton-text slot="start" [animated]="true" style="width: 1.875rem; height: 1.625rem" />
-              <ion-label>
-                <div class="head">
-                  <ion-skeleton-text [animated]="true" style="width: 55%; height: 0.875rem" />
-                  <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.75rem" />
-                </div>
-                <p><ion-skeleton-text [animated]="true" style="width: 85%" /></p>
-              </ion-label>
-            </ion-item>
-          }
-        </ion-list>
-      </section>
+    <!-- One day's worth of rows in the real geometry — label, tile, title,
+         body — so content lands without shifting anything. -->
+    <div class="mh-section-label">
+      <ion-skeleton-text [animated]="true" style="width: 3.5rem; height: 0.75rem" />
     </div>
+    <ion-list class="mh-flat-list">
+      @for (_ of skeletonRows; track $index) {
+        <ion-item>
+          <ion-skeleton-text slot="start" [animated]="true" style="width: 3.25rem; height: 3.25rem" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 85%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
   } @else if (isEmpty()) {
     <mh-notifications-empty
       [filtered]="hasFilter()"
@@ -105,30 +115,11 @@
       (action)="onEmptyAction()"
     />
   } @else {
-    <div class="mh-page">
-      @if (days().length > 0) {
-        @for (day of days(); track day.key) {
-          <section class="mh-section">
-            <div class="mh-day-pill"><span>{{ day.label }}</span></div>
-            <ion-list [inset]="true" class="mh-card-list">
-              @for (item of day.items; track item.id) {
-                <mh-notification-row
-                  [notification]="item"
-                  (select)="open(item)"
-                  (toggleRead)="toggleRead(item)"
-                  (dismiss)="dismiss(item)"
-                  (remove)="remove(item)"
-                />
-              }
-            </ion-list>
-          </section>
-        }
-      } @else {
-        <!-- A category filter drops the day dividers (see `days`), so the
-             whole list is one card and the line under it says how much of
-             the categories this is. -->
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (item of store.notifications(); track item.id) {
+    @if (days().length > 0) {
+      @for (day of days(); track day.key) {
+        <div class="mh-section-label">{{ day.label }}</div>
+        <ion-list class="mh-flat-list">
+          @for (item of day.items; track item.id) {
             <mh-notification-row
               [notification]="item"
               (select)="open(item)"
@@ -138,22 +129,37 @@
             />
           }
         </ion-list>
-
-        @if (filterSummary(); as summary) {
-          <div class="filter-summary">
-            <span>{{ summary }}</span>
-            <span aria-hidden="true">·</span>
-            <ion-button fill="clear" size="small" (click)="clearCategories()">
-              {{ 'button.clearFilter' | translate }}
-            </ion-button>
-          </div>
-        }
       }
+    } @else {
+      <!-- A category filter drops the day labels (see `days`), so the whole
+           list is one run and the line under it says how much of the
+           categories this is. -->
+      <ion-list class="mh-flat-list">
+        @for (item of store.notifications(); track item.id) {
+          <mh-notification-row
+            [notification]="item"
+            (select)="open(item)"
+            (toggleRead)="toggleRead(item)"
+            (dismiss)="dismiss(item)"
+            (remove)="remove(item)"
+          />
+        }
+      </ion-list>
 
-      <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
-        <ion-infinite-scroll-content />
-      </ion-infinite-scroll>
-    </div>
+      @if (filterSummary(); as summary) {
+        <div class="filter-summary">
+          <span>{{ summary }}</span>
+          <span aria-hidden="true">·</span>
+          <ion-button fill="clear" size="small" (click)="clearCategories()">
+            {{ 'button.clearFilter' | translate }}
+          </ion-button>
+        </div>
+      }
+    }
+
+    <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
   }
 </ion-content>
 
@@ -162,6 +168,13 @@
   [notification]="detail()"
   (toggleRead)="toggleReadFromDetail()"
   (remove)="removeFromDetail()"
+/>
+
+<mh-action-sheet
+  [(open)]="listActionsOpen"
+  [title]="'nav.notifications' | translate"
+  [actions]="listActions()"
+  (chosen)="onListAction($event)"
 />
 
 <mh-notification-filter-sheet [(open)]="filterOpen" [filters]="filters()" (applied)="onFiltersApplied($event)" />

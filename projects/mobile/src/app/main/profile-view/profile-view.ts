@@ -20,10 +20,10 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
-  arrowBackOutline,
-  callOutline,
   calendarOutline,
+  callOutline,
   chatbubbleOutline,
+  chevronBackOutline,
   globeOutline,
   languageOutline,
   locationOutline,
@@ -122,10 +122,10 @@ export class ProfileView implements ViewWillEnter {
 
   constructor() {
     addIcons({
-      arrowBackOutline,
-      callOutline,
       calendarOutline,
+      callOutline,
       chatbubbleOutline,
+      chevronBackOutline,
       globeOutline,
       languageOutline,
       locationOutline,

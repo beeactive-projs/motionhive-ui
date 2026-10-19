@@ -8,14 +8,14 @@ paths:
 
 There are two kinds of list, and every `ion-list` is one of them. [`theme/components/ion-list.css`](../../src/theme/components/ion-list.css) is the single source of both skins; rows only lay out their own parts.
 
-| | Grouped list (`mh-card-list`) | Feed list (`mh-feed-list`) |
+| | Grouped list (`mh-card-list`) | Flat list (`mh-flat-list`) |
 |---|---|---|
 | Looks like | iOS Mail "Mailboxes", WhatsApp settings and sheets | WhatsApp's chat list |
 | For | settings, details, options, verbs, short fixed sets | the content of a screen: conversations, people, search results, notifications, activity |
 | Shape | white cards with rounded corners on the slate page, inside `.mh-page` | white rows edge to edge, straight in `ion-content` |
 | Rows | one line, a small tile, a value or chevron | a large avatar and two lines, a title with its time and a preview with its badges |
 
-Grouped lists are described first; the feed list has its own section at the end. Both share the separator.
+Grouped lists are described first; the flat list has its own section at the end. Both share the separator.
 
 ## The card
 
@@ -79,47 +79,59 @@ Grouped lists are described first; the feed list has its own section at the end.
 - Use `mh-settings-row` for a settings or account row (tile, label, value or badge, chevron) instead of rebuilding it from `ion-item`.
 - Values come translated; an empty value shows `valuePlaceholder` ("Not provided"), never a blank.
 
-## Feed lists
+## Flat lists
 
 The WhatsApp chat list. First use: the Messages inbox ([`messages.html`](../../src/app/main/messages/messages.html), [`conversation-row`](../../src/app/main/messages/_components/conversation-row/conversation-row.html)). Use it for any screen whose content is a long run of people or items, not for settings or details.
 
 ### The list and its page
 
-- A feed list is `<ion-list class="mh-feed-list">`, without `[inset]`. It sits straight in `ion-content`, outside `.mh-page`; the rows run edge to edge.
-- While the feed is on screen, bind `[class.mh-feed-page]` on `ion-content` (from `layout.css`) so the page takes the rows' white. Drop it for empty and error states, which need the slate page.
-- A label over a feed (search's "People", "Messages") is a `.mh-section-label` directly before the list. The skin moves it onto the row gutter.
-- The header over a feed carries `class="mh-feed-header"` on `ion-header` ([`ion-header.css`](../../src/theme/components/ion-header.css)). It puts the title, the end buttons, the search field, the back arrow and the `.mh-chip-row` pills on `--mh-row-gutter`, so they line up with the avatars on the left and with the row times on the right. Don't pad these parts per page. It also drops Ionic's md header shadow: header and feed are one white surface.
-- The first row of a feed has a hairline above it as well (drawn by the skin, same inset as the separators). That line, not a shadow or a border on the header, is the seam between header and list.
+- A flat list is `<ion-list class="mh-flat-list">`, without `[inset]`. It sits straight in `ion-content`, outside `.mh-page`; the rows run edge to edge.
+- While the list is on screen, bind `[class.mh-flat-page]` on `ion-content` (from `layout.css`) so the page takes the rows' white. Drop it for empty and error states, which need the slate page.
+- A label over a flat list (search's "People", "Messages") is a `.mh-section-label` directly before the list. The skin moves it onto the row gutter.
+- The header over a flat list carries `class="mh-flat-header"` on `ion-header` ([`ion-header.css`](../../src/theme/components/ion-header.css)). It puts the title, the end buttons, the search field, the back chevron and the `.mh-chip-row` pills on `--mh-row-gutter`, so they line up with the avatars on the left and with the row times on the right. Don't pad these parts per page. It also drops Ionic's md header shadow: header and list are one white surface.
+- The first row of a flat list has a hairline above it as well (drawn by the skin, same inset as the separators). That line, not a shadow or a border on the header, is the seam between header and list.
 
 ### Rows
 
 - A row is one `ion-item` (bare, or in `ion-item-sliding`, or in a row component). It never sets `lines`, `--border-*`, `--padding-*` or `--min-height`; the skin gives every row 0.75rem above and below.
 - No chevron: `detail="false"`. The whole row is the tap target, as in WhatsApp.
-- The leading item is an `mh-hex-avatar` at `size="lg"` (3.25rem), centred on the row. A skeleton's block is 3.25rem too and sets `--mh-row-lead: 3.25rem` on its row, so its separator starts where the real rows' text does.
+- The leading item is an `mh-hex-avatar` at `size="lg"` (3.25rem), centred on the row. A skeleton's `ion-skeleton-text slot="start"` block is 3.25rem too; the skin gives its row `--mh-row-lead: 3.25rem`, so its separator starts where the real rows' text does. Don't restate that in the page.
+- A count inside a filter chip is `<span class="count">` in the `.chip` button; the skin (`ion-button.css`) spaces it.
 - The label holds the two lines. Trailing items go **in** the line they belong to, never in `slot="end"`:
 
   ```html
   <ion-label>
-    <div class="mh-feed-line">
+    <div class="mh-row-line">
       <h2>{{ name }}</h2>
       <ion-note>{{ time }}</ion-note>
     </div>
-    <div class="mh-feed-line">
+    <div class="mh-row-line">
       <p>{{ preview }}</p>
       <ion-badge color="primary">{{ count }}</ion-badge>
     </div>
   </ion-label>
   ```
 
-  `.mh-feed-line` lets the first child take the space and ellipsis on one line, and keeps whatever follows it whole. A row with no time or badge can use a bare `<h2>` and `<p>`.
+  `.mh-row-line` lets the first child take the space and ellipsis on one line, and keeps whatever follows it whole. A row with no time or badge can use a bare `<h2>` and `<p>`.
 - Type comes from the skin: the title is Inter 600 at `--mh-text-md`, the second line `--mh-text-base` in `--ion-color-medium`, a note in a line `--mh-text-sm`. Don't restate them in the row. A row adds only its own states (an unread row lifts the preview to `--ion-text-color` and the time to `--mh-color-honey-deep`).
-- Each line is a 1.5rem box (set by the skin), so a feed row is exactly 4.5rem. Don't put anything taller than 1.5rem in a line, and don't change a line's height or leading in a row. A row a fraction of a pixel off (the text's own 1.55 leading gave 72.047px) moves every separator below it off the pixel grid, and the ones that straddle two pixels draw thicker.
+- Each line is a 1.5rem box (set by the skin), so a flat-list row is exactly 4.5rem. Don't put anything taller than 1.5rem in a line, and don't change a line's height or leading in a row. A row a fraction of a pixel off (the text's own 1.55 leading gave 72.047px) moves every separator below it off the pixel grid, and the ones that straddle two pixels draw thicker.
 - Full ink in a row is `--ion-text-color`. `--ion-color-dark` is a dim slate in the dark palette.
 - Swipe actions follow WhatsApp: `ion-item-option`s with the icon over the label (`slot="top"`), and the row closes after a tap.
 
+### Grouped flat lists
+
+A flat list split into labelled groups (the notification days, search's People and Messages) is a run of `.mh-section-label` + `ion-list.mh-flat-list` pairs, straight in `ion-content`. Under a label the label is the seam: the skin drops the first row's top hairline there. Reference: [`notifications.html`](../../src/app/main/notifications/notifications.html).
+
+### Notifications
+
+The bell's list is a grouped flat list, after Apple Mail's inbox: one label per day (`dayDividerLabel`), no search field, the Filters / All / Unread strip in the `mh-flat-header`. A category filter drops the day labels and shows one run.
+
+- The leading item is the category's `mh-hex-avatar` at `size="lg"`, `tone="wash"`, since a notification has no person behind it.
+- The body is one line with an ellipsis. The full text is in the screen the row opens, or in the detail sheet.
+- Unread is a red dot centred in the gutter before the tile (absolutely placed, so the row's geometry does not move), plus full ink on the body and time. Not honey: that stays the Messages inbox's exception.
+
 ### Next adopters (planned)
 
-Notifications and Clients move to the feed list next. Both still use `mh-card-list` today. Use the Messages inbox as the template for the list, header (`mh-feed-header`, search, `.mh-chip-row`), `mh-feed-page`, rows, swipes and skeletons. Settle these adjustments when each screen is done, then record them here:
+Clients moves to the flat list next. It still uses `mh-card-list` today. Use the Messages inbox as the template for the list, header (`mh-flat-header`, search, `.mh-chip-row`), `mh-flat-page`, rows, swipes and skeletons. Settle these adjustments when the screen is done, then record them here:
 
-- **Notifications**: most rows have no person behind them, so decide what the leading item is (a hex tile at the avatar's 3.25rem, `tone="wash"`, or the actor's avatar when there is one). Decide how the day groups (Today, Earlier) map onto `.mh-section-label` over separate feed lists. Read state uses the inbox's unread treatment.
-- **Clients**: the triage groups become `.mh-section-label` + one feed list each. The existing swipes switch to the WhatsApp option style. The searchbar and status chips move into the `mh-feed-header`. The requests and invite entry points stay as they are, and you decide whether they sit above the feed or in the header.
+- **Clients**: the triage groups become a grouped flat list (above). The existing swipes switch to the WhatsApp option style. The searchbar and status chips move into the `mh-flat-header`. The requests and invite entry points stay as they are, and you decide whether they sit above the list or in the header.

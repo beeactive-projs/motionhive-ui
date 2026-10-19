@@ -13,7 +13,7 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { timer } from 'rxjs';
 import { addIcons } from 'ionicons';
-import { arrowForwardOutline } from 'ionicons/icons';
+import { chevronForwardOutline } from 'ionicons/icons';
 
 import { AuthService, VerifyEmailState, VerifyEmailStates, apiErrorMessage } from 'core';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
@@ -60,7 +60,7 @@ export class VerifyEmail implements OnInit {
   );
 
   constructor() {
-    addIcons({ arrowForwardOutline });
+    addIcons({ chevronForwardOutline });
   }
 
   ngOnInit(): void {

@@ -9,12 +9,13 @@ Ionicons is the only icon set. These rules keep it reading as one set: one weigh
 - Brand logos (`logo-*`) exist only filled. They are the one other exception.
 - `people-circle-outline` and `person-circle-outline` are filled glyphs despite their names. Don't use them.
 - Dismiss is `close-outline`. `close-circle-outline` is a cancel or decline verb.
-- Ionic's Material built-ins are the sharp set, so they are overridden: `backButtonIcon` in `app.config.ts` (it also covers the searchbar's cancel arrow), `searchIcon="search-outline" clearIcon="close-outline"` on every `ion-searchbar`, and `toggleIcon="chevron-down-outline"` on every `ion-select`. A new searchbar or select carries the same attributes. Those names are registered once in `app.ts`.
+- Ionic's Material built-ins are the sharp set, so they are overridden: `backButtonIcon` in `app.config.ts` (`chevron-back-outline`; it also covers the searchbar's cancel button), `searchIcon="search-outline" clearIcon="close-outline"` on every `ion-searchbar`, and `toggleIcon="chevron-down-outline"` on every `ion-select`. A new searchbar or select carries the same attributes. Those names are registered once in `app.ts`.
 
 ## One stroke weight
 
 - The stroke is set once, as `--ionicon-stroke-width` in `ion-icon.css`. Never override it in a component.
-- The chevrons and the forward/back arrows hardcode a 48-unit stroke, and `card-outline` and `link-outline` carry their own. They don't follow the variable.
+- Direction is always a chevron, never an arrow: back is `chevron-back-outline` (the toolbar back button, a search back button), forward is `chevron-forward-outline`, a circled "open" is `chevron-forward-circle-outline`. `arrow-undo-outline` stays: it means undo or restore, not a direction.
+- The chevrons hardcode a 48-unit stroke, and `card-outline` and `link-outline` carry their own. They don't follow the variable.
 
 ## Sizes
 

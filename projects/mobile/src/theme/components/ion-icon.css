@@ -1,9 +1,10 @@
 /* Icons — one weight, one optical size. Rules: .claude/rules/icons.md.
 
    Stroke. Ionicons' outline glyphs read `--ionicon-stroke-width` (default 32
-   on the 512 viewBox, 1.5px at 24px), but the chevrons and the forward/back
-   arrows hardcode 48. Two weights side by side read as two icon sets, and the
-   hardcoded nine can't be lowered, so every other stroked glyph is raised to
+   on the 512 viewBox, 1.5px at 24px), but the chevrons hardcode 48 (so do
+   the arrows, which is one reason direction is always a chevron here). Two
+   weights side by side read as two icon sets, and the hardcoded ones can't be
+   lowered, so every other stroked glyph is raised to
    meet them: 2.25px at 24, 1.5px at 16. The value is SVG user units on the
    512 box, not a CSS dimension. The property inherits into the shadow root.
 

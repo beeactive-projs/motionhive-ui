@@ -10,7 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { arrowForwardOutline } from 'ionicons/icons';
+import { chevronForwardOutline } from 'ionicons/icons';
 
 import { appLocale } from 'core';
 import { GuestControls } from '../../../_shared/components/guest-controls/guest-controls';
@@ -54,7 +54,7 @@ export class AccountClosed {
   });
 
   constructor() {
-    addIcons({ arrowForwardOutline });
+    addIcons({ chevronForwardOutline });
   }
 
   protected goToLogin(): void {

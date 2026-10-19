@@ -5,7 +5,6 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -27,6 +26,7 @@ import { addIcons } from 'ionicons';
 
 import { BellNotification, NotificationStore, dayDividerLabel, localDayKey } from 'core';
 
+import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { queryParamsFor, routeFor } from '../../_shared/config/notification-deep-link';
 import { FeedbackService } from '../../_shared/services/feedback.service';
@@ -38,8 +38,11 @@ import {
   NO_FILTERS,
   NOTIFICATION_ICONS,
   NotificationFilters,
+  NotificationListAction,
+  NotificationListActions,
   activeFilterCount,
   categoryListLabel,
+  notificationListActions,
   sameFilters,
 } from './notifications.config';
 
@@ -53,7 +56,8 @@ interface NotificationDay {
 /**
  * The notification centre.
  *
- * Flat and chronological, newest first, one card per day under a date pill.
+ * A flat list (`mh-flat-list`), flat and chronological, newest first, the
+ * rows grouped under a label per day, the way Mail groups its inbox.
  * Grouping by category was considered and dropped: the category filter already
  * answers "show me only payments" without reordering time, and a feed that
  * reorders itself is a feed you cannot scan.
@@ -65,11 +69,11 @@ interface NotificationDay {
 @Component({
   selector: 'mh-notifications',
   imports: [
+    ActionSheet,
     EmptyState,
     IonBackButton,
     IonButton,
     IonButtons,
-    IonChip,
     IonContent,
     IonHeader,
     IonIcon,
@@ -107,6 +111,10 @@ export class Notifications implements ViewWillEnter {
 
   /** The filter sheet, opened from the Filters button. */
   readonly filterOpen = signal(false);
+
+  /** The header's ⋯ sheet of list-wide verbs. */
+  readonly listActionsOpen = signal(false);
+  readonly listActions = computed(() => notificationListActions(this.store.hasUnread()));
 
   /** What the list is narrowed to, as the sheet edits it. The store owns it. */
   readonly filters = computed<NotificationFilters>(() => ({
@@ -161,6 +169,11 @@ export class Notifications implements ViewWillEnter {
 
   readonly isEmpty = computed(
     () => this.store.hasLoadedList() && this.store.notifications().length === 0,
+  );
+
+  /** The rows are on screen, so the page takes their white (`mh-flat-page`). */
+  readonly showList = computed(
+    () => this.showSkeleton() || (this.store.hasLoadedList() && !this.isEmpty()),
   );
 
   constructor() {
@@ -240,6 +253,21 @@ export class Notifications implements ViewWillEnter {
   remove(item: BellNotification): void {
     this.store.remove(item.id);
     void this._feedbackService.success(this._translateService.instant('notifications.toast.deleted'));
+  }
+
+  openListActions(): void {
+    this.listActionsOpen.set(true);
+  }
+
+  onListAction(action: NotificationListAction): void {
+    switch (action) {
+      case NotificationListActions.MarkAllRead:
+        this.markAllRead();
+        break;
+      case NotificationListActions.Settings:
+        this.openSettings();
+        break;
+    }
   }
 
   markAllRead(): void {

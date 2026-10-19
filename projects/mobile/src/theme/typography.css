@@ -125,7 +125,7 @@ h1 {
 }
 
 /* The centred date pill over a day's group of rows — the chat transcript's
-   divider promoted to a role so the notification feed reads the same.
+   divider promoted to a role so the notification list reads the same.
    Margin-free: the page (or an `.mh-section` gap) places it. Sentence case:
    `dayDividerLabel` output renders as-is — never pair it with a transform. */
 .mh-day-pill {

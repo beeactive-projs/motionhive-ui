@@ -41,7 +41,12 @@ __screenshots__/
 test-results/
 playwright-report/
 .claude/
-# ...except the mobile app's shared Claude rules, committed for everyone.
+# ...except the repo's shared Claude skills (/audit), committed for everyone;
+# settings.local.json stays private.
+!/.claude/
+/.claude/*
+!/.claude/skills/
+# ...and the mobile app's shared Claude rules.
 !projects/mobile/.claude/
 projects/mobile/.claude/*
 !projects/mobile/.claude/rules/
