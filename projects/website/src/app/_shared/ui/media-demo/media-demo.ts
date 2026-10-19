@@ -44,7 +44,7 @@ import {
           @if ((eagerPoster() || posterNear()) && poster(); as p) {
             <img class="poster" [src]="p" alt="" decoding="async" />
           }
-          <video #vid [src]="s" muted loop playsinline preload="none"></video>
+          <video #vid [src]="s" muted [loop]="!reducedMotion()" playsinline preload="none"></video>
           @if (enlargeable()) {
             <button type="button" class="expand" (click)="open()" aria-label="Enlarge video">
               <i class="pi pi-window-maximize" aria-hidden="true"></i>
@@ -93,6 +93,15 @@ export class MediaDemo {
    */
   readonly bare = input(false, { transform: booleanAttribute });
 
+  /**
+   * Reduce Motion plays the clip once and leaves it on its last frame rather
+   * than blocking it outright. A muted product demo is not the repeating
+   * motion that setting exists to stop, but an endless loop is, so the loop
+   * is what goes. Blocking it entirely left the panel a still that only a
+   * tap on enlarge could get past.
+   */
+  protected readonly reducedMotion = signal(false);
+
   /** Lightbox open state. Renders nothing until opened (browser-only). */
   readonly expanded = signal(false);
   /** The demo is within about a screen of the viewport (browser-only). */
@@ -105,6 +114,8 @@ export class MediaDemo {
 
   constructor() {
     afterNextRender(() => {
+      this.reducedMotion.set(matchMedia('(prefers-reduced-motion: reduce)').matches);
+
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (!entry.isIntersecting) return;
@@ -126,11 +137,13 @@ export class MediaDemo {
       const el = this._video()?.nativeElement;
       if (!el) return;
       el.muted = true;
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
       let visible = false;
       const play = (): void => {
-        if (visible) void el.play().catch(() => undefined);
+        // Once it has run to the end under reduced motion, leave it there:
+        // replaying on every scroll-by would be the loop by another name.
+        if (!visible || el.ended) return;
+        void el.play().catch(() => undefined);
       };
       const observer = new IntersectionObserver(
         ([entry]) => {
