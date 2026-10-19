@@ -8134,6 +8134,46 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="footer.termsShort" datatype="html">
+        <source>Terms</source>
+        <target state="translated">Termeni</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.privacyShort" datatype="html">
+        <source>Privacy</source>
+        <target state="translated">Confidențialitate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.deleteShort" datatype="html">
+        <source>Delete account</source>
+        <target state="translated">Ștergerea contului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.language" datatype="html">
+        <source>Language</source>
+        <target state="translated">Limba</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.cookiesShort" datatype="html">
+        <source>Cookies</source>
+        <target state="translated">Cookie-uri</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

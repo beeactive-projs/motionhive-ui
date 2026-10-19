@@ -2,10 +2,14 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FeedbackService, Logo } from 'core';
 import { CookieConsentService } from '../../_shared/cookie-consent/cookie-consent.service';
+import { LanguageSwitcher } from '../../_shared/language-switcher/language-switcher';
+import { LineIcon } from '../../_shared/ui/line-icon/line-icon';
 
 interface FooterLink {
   label: string;
   path: string;
+  /** Used where the links run as one wrapping line and space is tight. */
+  shortLabel?: string;
 }
 
 /**
@@ -16,7 +20,7 @@ interface FooterLink {
  */
 @Component({
   selector: 'mh-public-footer',
-  imports: [RouterLink, Logo],
+  imports: [RouterLink, Logo, LanguageSwitcher, LineIcon],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,9 +41,21 @@ export class PublicFooterComponent {
   readonly company: FooterLink[] = [{ label: $localize`About`, path: '/about' }];
 
   readonly support: FooterLink[] = [
-    { label: $localize`Terms of Service`, path: '/legal/terms-of-service' },
-    { label: $localize`Privacy Policy`, path: '/legal/privacy-policy' },
-    { label: $localize`Delete Your Account`, path: '/legal/delete-account' },
+    {
+      label: $localize`Terms of Service`,
+      shortLabel: $localize`:@@footer.termsShort:Terms`,
+      path: '/legal/terms-of-service',
+    },
+    {
+      label: $localize`Privacy Policy`,
+      shortLabel: $localize`:@@footer.privacyShort:Privacy`,
+      path: '/legal/privacy-policy',
+    },
+    {
+      label: $localize`Delete Your Account`,
+      shortLabel: $localize`:@@footer.deleteShort:Delete account`,
+      path: '/legal/delete-account',
+    },
   ];
 
   readonly social = [

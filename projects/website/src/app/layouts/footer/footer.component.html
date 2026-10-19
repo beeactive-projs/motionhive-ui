@@ -1,17 +1,21 @@
 <footer class="site-footer dark">
   <div class="mh-wrap foot">
     <div class="foot__brand">
-      <a routerLink="/" class="foot__logo" aria-label="MotionHive home" i18n-aria-label="@@footer.ariaHome">
-        <mh-logo />
-      </a>
-      <p class="foot__tag" i18n="@@footer.tagline">The free home for coaches and the communities they build.</p>
-      <div class="foot__social">
-        @for (s of social; track s.label) {
-          <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label">
-            <i class="pi {{ s.icon }}" aria-hidden="true"></i>
-          </a>
-        }
+      <!-- Logo and social on one row: on a phone they were two blocks saying
+           the same "this is us" twice over. -->
+      <div class="foot__top">
+        <a routerLink="/" class="foot__logo" aria-label="MotionHive home" i18n-aria-label="@@footer.ariaHome">
+          <mh-logo />
+        </a>
+        <div class="foot__social">
+          @for (s of social; track s.label) {
+            <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label">
+              <i class="pi {{ s.icon }}" aria-hidden="true"></i>
+            </a>
+          }
+        </div>
       </div>
+      <p class="foot__tag" i18n="@@footer.tagline">The free home for coaches and the communities they build.</p>
     </div>
 
     <nav class="foot__col" aria-label="Product" i18n-aria-label="@@footer.product">
@@ -29,19 +33,30 @@
       <button type="button" (click)="openFeedback()" i18n="@@footer.feedback">Send feedback</button>
     </nav>
 
-    <nav class="foot__col" aria-label="Legal" i18n-aria-label="@@footer.legal">
-      <span class="foot__h" i18n="@@footer.legal">Legal</span>
+    <!-- Language sits with the legal block rather than in a column of its
+         own: it is a setting, not a destination. -->
+    <div class="foot__lang">
+      <span class="foot__lang-label">
+        <mh-line-icon name="globe" />
+        <span i18n="@@footer.language">Language</span>
+      </span>
+      <mh-language-switcher variant="segmented" />
+    </div>
+
+    <!-- Legal as one wrapping line, not a fourth column: these are the links
+         people look for once, and a column gave them equal billing with the
+         pages we want read. -->
+    <nav class="foot__legal" aria-label="Legal" i18n-aria-label="@@footer.legal">
       @for (l of support; track l.path) {
-        <a [routerLink]="l.path">{{ l.label }}</a>
+        <a [routerLink]="l.path">{{ l.shortLabel ?? l.label }}</a>
       }
-      <button type="button" (click)="openCookiePreferences()" i18n="@@footer.cookies">Cookie preferences</button>
+      <button type="button" (click)="openCookiePreferences()" i18n="@@footer.cookiesShort">Cookies</button>
     </nav>
   </div>
 
   <div class="foot__barwrap">
     <div class="mh-wrap foot__bar">
-      <span>© {{ currentYear }} MotionHive</span>
-      <span i18n="@@footer.made">Made for people who move together.</span>
+      <span>© {{ currentYear }} MotionHive · <ng-container i18n="@@footer.made">Made for people who move together.</ng-container></span>
     </div>
   </div>
 </footer>
