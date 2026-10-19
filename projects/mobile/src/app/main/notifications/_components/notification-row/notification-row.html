@@ -1,20 +1,25 @@
 <ion-item-sliding #sliding>
-  <!-- A full swipe commits: read is reversible, so it may. -->
+  <!-- Swipe right: Read / Unread. A full swipe commits: read is reversible, so it may. -->
   <ion-item-options side="start" (ionSwipe)="emitAndClose(sliding, toggleRead)">
-    <ion-item-option
-      color="primary"
-      [expandable]="true"
-      [attr.aria-label]="(isUnread() ? 'notifications.markRead' : 'notifications.markUnread') | translate"
-      (click)="emitAndClose(sliding, toggleRead)"
-    >
-      <ion-icon slot="icon-only" name="checkmark-done-outline" />
+    <ion-item-option color="primary" [expandable]="true" (click)="emitAndClose(sliding, toggleRead)">
+      <ion-icon
+        slot="top"
+        aria-hidden="true"
+        [name]="isUnread() ? 'checkmark-done-outline' : 'mail-unread-outline'"
+      />
+      {{ (isUnread() ? 'notifications.markRead' : 'notifications.markUnread') | translate }}
     </ion-item-option>
   </ion-item-options>
 
   <ion-item button detail="false" (click)="select.emit()">
+    <!-- The unread dot rides in the gutter left of the tile, as in Mail. It is
+         absolutely placed (see the scss), so it takes no room in the row. -->
+    @if (isUnread()) {
+      <span slot="start" class="unread-dot" role="img" [attr.aria-label]="'a11y.unread' | translate"></span>
+    }
     <mh-hex-avatar
       slot="start"
-      size="sm"
+      size="lg"
       tone="wash"
       aria-hidden="true"
       [icon]="style().icon"
@@ -22,19 +27,12 @@
     />
 
     <ion-label>
-      <div class="head">
-        @if (isUnread()) {
-        <span class="dot" [attr.aria-label]="'a11y.unread' | translate"></span>
-        }
-        <span class="title">{{ notification().title }}</span>
-        <ion-note>{{ time() }}</ion-note>
+      <div class="mh-row-line">
+        <h2>{{ notification().title }}</h2>
+        <ion-note class="time">{{ time() }}</ion-note>
       </div>
-      <p class="body">{{ notification().body }}</p>
+      <p>{{ notification().body }}</p>
     </ion-label>
-
-    @if (hasTarget()) {
-    <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
-    }
   </ion-item>
 
   <!-- Dismiss sits at the screen edge and is the one a full swipe commits.
@@ -42,10 +40,12 @@
        it lives there in the DOM too and never jumps. Delete is never
        expandable: a full swipe must not reach an action you cannot undo. -->
   <ion-item-options side="end" (ionSwipe)="emitAndClose(sliding, dismiss)">
-    <ion-item-option color="danger" [attr.aria-label]="'button.delete' | translate" (click)="emitAndClose(sliding, remove)">
-      <ion-icon slot="icon-only" name="trash-outline" />
+    <ion-item-option color="danger" (click)="emitAndClose(sliding, remove)">
+      <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
+      {{ 'button.delete' | translate }}
     </ion-item-option>
     <ion-item-option color="medium" [expandable]="true" (click)="emitAndClose(sliding, dismiss)">
+      <ion-icon slot="top" name="eye-off-outline" aria-hidden="true" />
       {{ 'button.dismiss' | translate }}
     </ion-item-option>
   </ion-item-options>

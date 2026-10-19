@@ -1,4 +1,4 @@
-/* Layout and type come from the feed skin (`theme/components/ion-list.css`);
+/* Layout and type come from the flat-list skin (`theme/components/ion-list.css`);
    this file only carries the unread state and the row's own badges. */
 
 /* Unread lifts the preview to full ink. The skin greys it, so the state
@@ -32,17 +32,4 @@ ion-badge {
 ion-badge.dot {
   width: 1.25rem;
   height: 1.25rem;
-}
-
-/* Icon over label, like WhatsApp's swipe actions; wide enough that the
-   longest label (RO "Mai multe") stays on one line. */
-ion-item-option {
-  min-width: 5rem;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  text-transform: none;
-}
-
-ion-item-option ion-icon {
-  font-size: var(--mh-icon-lg);
 }

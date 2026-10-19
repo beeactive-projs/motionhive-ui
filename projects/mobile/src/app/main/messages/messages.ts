@@ -177,9 +177,9 @@ export class Messages implements ViewWillEnter {
 
   /**
    * Rows on screen (the inbox, its skeleton or search results): the page
-   * takes the feed's white. Empty and error states keep the slate.
+   * takes the list's white. Empty and error states keep the slate.
    */
-  readonly showFeed = computed(
+  readonly showList = computed(
     () =>
       this.showSkeleton() ||
       (this.people.isActive()

@@ -14,14 +14,14 @@ import { BellNotification, formatCalendarShort } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { categoryStyle } from '../../../../_shared/config/notification-categories.config';
-import { routeFor } from '../../../../_shared/config/notification-deep-link';
 
 /**
- * One row of the notification centre.
+ * One row of the notification centre, a flat-list row (`mh-flat-list`): the
+ * category tile, the title with its time, the body on one line.
  *
- * Unread is a red dot plus a heavier title; read drops both. The chevron
- * appears only when the notification has somewhere to go on mobile — a row
- * without one still opens, into the detail sheet.
+ * Unread is a red dot in the gutter plus full-ink text; read drops both. No
+ * chevron, as in every flat list: the whole row opens, into the screen it points
+ * at or, failing that, the detail sheet.
  *
  * Swiping right toggles read (reversible, safe), and a full swipe commits it.
  * Swiping left reveals delete and dismiss; only dismiss is reachable by a full
@@ -57,9 +57,6 @@ export class NotificationRow {
   readonly isUnread = computed(() => !this.notification().readAt);
 
   readonly style = computed(() => categoryStyle(this.notification().category));
-
-  /** Drives the chevron: no route, no affordance to follow one. */
-  readonly hasTarget = computed(() => routeFor(this.notification().data) !== null);
 
   /** Clock time, not "2h" — the day divider above already said which day. */
   readonly time = computed(() => formatCalendarShort(this.notification().createdAt));

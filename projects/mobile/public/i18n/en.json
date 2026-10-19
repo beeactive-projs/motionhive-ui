@@ -1504,6 +1504,7 @@
     "markAllRead": "Mark all read",
     "markRead": "Mark read",
     "markUnread": "Mark unread",
+    "settings": "Notification settings",
     "toast": {
       "deleted": "Deleted"
     },

@@ -24,9 +24,9 @@ export const appConfig: ApplicationConfig = {
     // rendered as bare text with no border. The design this app is built to is
     // Material throughout, so it declares that rather than styling around it.
     // Material's built-in glyphs are the sharp set; this app's icons are all
-    // outline (.claude/rules/icons.md). The searchbar's cancel arrow reads the
+    // outline (.claude/rules/icons.md). The searchbar's cancel button reads the
     // same key. The name is registered in app.ts.
-    provideIonicAngular({ mode: 'md', backButtonIcon: 'arrow-back-outline' }),
+    provideIonicAngular({ mode: 'md', backButtonIcon: 'chevron-back-outline' }),
     // Messaging lives inside a tab stack here, not at web's /messages.
     { provide: MESSAGING_ROUTES, useValue: ['/tabs/messages'] },
     // Where core's guestGuard sends a signed-in user off the auth pages.

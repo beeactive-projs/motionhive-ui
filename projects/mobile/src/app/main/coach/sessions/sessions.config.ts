@@ -24,12 +24,12 @@ import {
 import {
   addOutline,
   alertCircleOutline,
-  arrowForwardCircleOutline,
   calendarOutline,
   cashOutline,
   checkmarkCircleOutline,
   chevronBackOutline,
   chevronDownOutline,
+  chevronForwardCircleOutline,
   chevronForwardOutline,
   closeCircleOutline,
   copyOutline,
@@ -62,12 +62,12 @@ import { SheetAction } from '../../../_shared/components/action-sheet/action-she
 export const SESSION_ICONS = {
   addOutline,
   alertCircleOutline,
-  arrowForwardCircleOutline,
   calendarOutline,
   cashOutline,
   checkmarkCircleOutline,
   chevronBackOutline,
   chevronDownOutline,
+  chevronForwardCircleOutline,
   chevronForwardOutline,
   closeCircleOutline,
   copyOutline,
@@ -314,7 +314,7 @@ export const SESSION_ACTIONS: readonly SheetAction<SessionActionId>[] = [
   {
     id: SessionActionIds.Open,
     label: 'sessions.actions.open',
-    icon: 'arrow-forward-circle-outline',
+    icon: 'chevron-forward-circle-outline',
     color: 'primary',
   },
   {

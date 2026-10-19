@@ -1,12 +1,17 @@
 import {
   alertCircleOutline,
   checkmarkDoneOutline,
-  chevronForwardOutline,
+  ellipsisHorizontalOutline,
+  eyeOffOutline,
   funnelOutline,
+  mailUnreadOutline,
+  settingsOutline,
   trashOutline,
 } from 'ionicons/icons';
 
 import { NotificationCategory, appLocale, translate } from 'core';
+
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 
 import {
   CATEGORY_ICONS,
@@ -24,10 +29,47 @@ export const NOTIFICATION_ICONS = {
   ...CATEGORY_ICONS,
   alertCircleOutline,
   checkmarkDoneOutline,
-  chevronForwardOutline,
+  ellipsisHorizontalOutline,
+  eyeOffOutline,
   funnelOutline,
+  mailUnreadOutline,
+  settingsOutline,
   trashOutline,
 };
+
+/** The verbs behind the header's ⋯ button: ones about the whole list. */
+export const NotificationListActions = {
+  MarkAllRead: 'markAllRead',
+  Settings: 'settings',
+} as const;
+
+export type NotificationListAction = (typeof NotificationListActions)[keyof typeof NotificationListActions];
+
+/**
+ * The header's More sheet. Mark all read stays listed with nothing unread,
+ * disabled, so the verb is always where it was. Tile colours follow the
+ * lists rule: marking done is success green, notification settings info,
+ * both `shade` for the white glyph's 3:1.
+ */
+export function notificationListActions(hasUnread: boolean): SheetAction<NotificationListAction>[] {
+  return [
+    {
+      id: NotificationListActions.MarkAllRead,
+      label: 'notifications.markAllRead',
+      icon: 'checkmark-done-outline',
+      color: 'success',
+      tone: 'shade',
+      disabled: !hasUnread,
+    },
+    {
+      id: NotificationListActions.Settings,
+      label: 'notifications.settings',
+      icon: 'settings-outline',
+      color: 'info',
+      tone: 'shade',
+    },
+  ];
+}
 
 /**
  * What the centre is narrowed to — the shape the filter sheet edits.
