@@ -98,7 +98,11 @@
     aspect-ratio: auto;
   }
 
-  ::ng-deep video {
+  /* The poster sits under the video and shows through wherever the clip has
+     not started: a reader with Reduce Motion or Low Power Mode on never
+     gets play(), and without this the panel was an empty box. */
+  ::ng-deep video,
+  ::ng-deep .poster {
     width: 100%;
     height: 100%;
     object-fit: cover;

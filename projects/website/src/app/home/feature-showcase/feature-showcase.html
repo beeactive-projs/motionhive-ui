@@ -28,7 +28,7 @@
            `track slug` makes the rebuild deliberate rather than Angular
            guessing at identity, and only one video is ever in the DOM. -->
       @for (slug of [f.slug]; track slug) {
-        <mh-media-demo bare [src]="f.preview" [caption]="''" />
+        <mh-media-demo bare [src]="f.preview" [poster]="f.poster" [caption]="''" />
       }
       <span class="fs__count" aria-hidden="true">{{ position() }}</span>
     </div>
