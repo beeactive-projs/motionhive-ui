@@ -13,7 +13,7 @@ import {
   NavController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowForwardOutline } from 'ionicons/icons';
+import { chevronForwardOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 
@@ -119,7 +119,7 @@ export class Login {
   });
 
   constructor() {
-    addIcons({ arrowForwardOutline });
+    addIcons({ chevronForwardOutline });
     const token = this._clientInviteService.token;
     if (token) this._clientInviteService.load(token).subscribe({ error: () => undefined });
   }

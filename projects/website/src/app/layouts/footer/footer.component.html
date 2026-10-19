@@ -5,6 +5,8 @@
         <mh-logo />
       </a>
       <p class="foot__tag" i18n="@@footer.tagline">The free home for coaches and the communities they build.</p>
+      <!-- Last in the source, so desktop reads logo, tagline, social. On a
+           phone `order` lifts it beside the logo, where the row has space. -->
       <div class="foot__social">
         @for (s of social; track s.label) {
           <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label">
@@ -29,19 +31,35 @@
       <button type="button" (click)="openFeedback()" i18n="@@footer.feedback">Send feedback</button>
     </nav>
 
-    <nav class="foot__col" aria-label="Legal" i18n-aria-label="@@footer.legal">
-      <span class="foot__h" i18n="@@footer.legal">Legal</span>
-      @for (l of support; track l.path) {
-        <a [routerLink]="l.path">{{ l.label }}</a>
-      }
-      <button type="button" (click)="openCookiePreferences()" i18n="@@footer.cookies">Cookie preferences</button>
-    </nav>
   </div>
 
+  <!-- Everything that is housekeeping on one rule: the copyright, the links
+       people look for once, and the language. Keeping them out of the grid
+       above leaves that to the pages we actually want read. -->
   <div class="foot__barwrap">
     <div class="mh-wrap foot__bar">
-      <span>© {{ currentYear }} MotionHive</span>
-      <span i18n="@@footer.made">Made for people who move together.</span>
+      <p class="foot__copy">
+        <span>© {{ currentYear }} MotionHive</span>
+        <span class="foot__sep" aria-hidden="true">·</span>
+        <span i18n="@@footer.made">Made for people who move together.</span>
+      </p>
+
+      <div class="foot__meta">
+        <nav class="foot__legal" aria-label="Legal" i18n-aria-label="@@footer.legal">
+          @for (l of support; track l.path) {
+            <a [routerLink]="l.path">{{ l.shortLabel ?? l.label }}</a>
+          }
+          <button type="button" (click)="openCookiePreferences()" i18n="@@footer.cookiesShort">Cookies</button>
+        </nav>
+
+        <div class="foot__lang">
+          <span class="foot__lang-label">
+            <mh-line-icon name="globe" />
+            <span i18n="@@footer.language">Language</span>
+          </span>
+          <mh-language-switcher variant="segmented" />
+        </div>
+      </div>
     </div>
   </div>
 </footer>

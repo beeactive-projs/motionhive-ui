@@ -23,14 +23,14 @@ Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 s
 
 - [`variables.css`](src/theme/variables.css) — tokens only (ramps, colour slots, washes, role tokens).
 - [`typography.css`](src/theme/typography.css) — headings + the `.mh-*` text roles (`mh-kicker`, `mh-section-label`, `mh-helper`, `mh-note-block`, `mh-footnote`).
-- [`layout.css`](src/theme/layout.css) — the layout primitives `.mh-page` and `.mh-section` (below), and `.mh-feed-page` for a screen that is a feed list.
+- [`layout.css`](src/theme/layout.css) — the layout primitives `.mh-page` and `.mh-section` (below), and `.mh-flat-page` for a screen that is a flat list.
 - [`components/`](src/theme/components/) — **one file per Ionic component** that needs a global skin (`ion-card.css`, `ion-list.css`, `ion-button.css`, …), imported from `styles.css`. General custom CSS for a component goes in its file — never back into `styles.css`, never copy-pasted across page `.scss` files. Add a new file (and its `@import`) when a component first needs a global rule.
 
 ### Rules for Claude (`.claude/rules/`)
 
 Topic rules live in [`.claude/rules/`](.claude/rules/) and load when Claude works on mobile files. They are binding like this file:
 
-- [`lists.md`](.claude/rules/lists.md): the two list kinds, grouped (`mh-card-list`) and feed (`mh-feed-list`, the WhatsApp chat list); rows, separators, leading hex tiles and their colours, trailing values.
+- [`lists.md`](.claude/rules/lists.md): the two list kinds, grouped (`mh-card-list`) and flat (`mh-flat-list`, the WhatsApp chat list); rows, separators, leading hex tiles and their colours, trailing values.
 - [`surfaces-and-sheets.md`](.claude/rules/surfaces-and-sheets.md): no outlines on card surfaces, one-surface sheets, `close()` before navigating.
 - [`ionic-gotchas.md`](.claude/rules/ionic-gotchas.md): `ion-item` padding and stacking, field errors, searchbar focus, accessible names on Ionic buttons.
 - [`colour-and-type.md`](.claude/rules/colour-and-type.md): the Tailwind-ramp palette, honey means selection, sentence-case kickers, tokens over literals.

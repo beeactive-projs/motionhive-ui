@@ -1,7 +1,7 @@
 <!-- WhatsApp's chat list: title and actions, a search field that is always
      there, then the filter pills. Searching folds the title and the pills
      away and keeps the same field, so the caret the tap put there stays. -->
-<ion-header class="mh-feed-header" [translucent]="true">
+<ion-header class="mh-flat-header" [translucent]="true">
   @if (!searchOpen()) {
     <ion-toolbar>
       <ion-title>{{ 'nav.messages' | translate }}</ion-title>
@@ -24,11 +24,11 @@
   }
 
   <ion-toolbar>
-    <!-- WhatsApp's search header: a back arrow beside the field. -->
+    <!-- WhatsApp's search header: a back chevron beside the field. -->
     @if (searchOpen()) {
       <ion-buttons slot="start">
         <ion-button [attr.aria-label]="'a11y.closeSearch' | translate" (click)="closeSearch()">
-          <ion-icon slot="icon-only" name="arrow-back-outline" />
+          <ion-icon slot="icon-only" name="chevron-back-outline" />
         </ion-button>
       </ion-buttons>
     }
@@ -73,9 +73,9 @@
   }
 </ion-header>
 
-<!-- A feed: the rows run edge to edge on white. The empty states are centred
+<!-- A flat list: the rows run edge to edge on white. The empty states are centred
      art, which needs the slate page behind it. -->
-<ion-content [fullscreen]="true" [class.mh-feed-page]="showFeed()">
+<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
   @if (!searchOpen()) {
     <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
       <ion-refresher-content />
@@ -95,7 +95,7 @@
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
-    <ion-list class="mh-feed-list">
+    <ion-list class="mh-flat-list">
       @for (_ of skeletonRows; track $index) {
         <ion-item>
           <ion-skeleton-text
@@ -121,7 +121,7 @@
 
     @if (people.results().length > 0) {
       <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
-      <ion-list class="mh-feed-list">
+      <ion-list class="mh-flat-list">
         @for (person of people.results(); track person.id) {
           <ion-item button detail="false" (click)="openPerson(person)">
             <mh-hex-avatar
@@ -145,7 +145,7 @@
 
     @if (store.visibleConversations().length > 0) {
       <div class="mh-section-label">{{ 'nav.messages' | translate }}</div>
-      <ion-list class="mh-feed-list">
+      <ion-list class="mh-flat-list">
         @for (conversation of store.visibleConversations(); track conversation.id) {
           <mh-conversation-row
             [conversation]="conversation"
@@ -173,7 +173,7 @@
       [message]="'messages.inbox.caughtUp.message' | translate"
     />
   } @else {
-    <ion-list class="mh-feed-list">
+    <ion-list class="mh-flat-list">
       @for (conversation of store.visibleConversations(); track conversation.id) {
         <mh-conversation-row
           [conversation]="conversation"

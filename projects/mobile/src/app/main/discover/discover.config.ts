@@ -1,7 +1,7 @@
 import {
   alertCircleOutline,
-  arrowForwardOutline,
   calendarOutline,
+  chevronForwardOutline,
   compassOutline,
   peopleOutline,
   searchOutline,
@@ -40,8 +40,8 @@ import {
 /** Every icon this feature renders — same guard idea as the other configs. */
 export const DISCOVER_ICONS = {
   alertCircleOutline,
-  arrowForwardOutline,
   calendarOutline,
+  chevronForwardOutline,
   compassOutline,
   peopleOutline,
   searchOutline,

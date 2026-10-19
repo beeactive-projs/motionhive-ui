@@ -27,6 +27,8 @@ import { FeatureCard } from '../_shared/ui/feature-card/feature-card';
 import { Stat } from '../_shared/ui/stat/stat';
 import { BlogPostCard } from '../blog/_shared/blog-post-card/blog-post-card';
 import { StickyCta } from '../_shared/sticky-cta/sticky-cta';
+import { FeatureShowcase } from './feature-showcase/feature-showcase';
+import { PathToggle } from './path-toggle/path-toggle';
 
 /**
  * Hero cluster hex — the pre-redesign diamond of 4 (top / two middle /
@@ -68,6 +70,8 @@ interface CommunityCard {
     Stat,
     BlogPostCard,
     StickyCta,
+    FeatureShowcase,
+    PathToggle,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -77,6 +81,19 @@ export class HomeComponent {
   /** The sticky CTA shows between these two (see StickyCta). */
   protected readonly heroElement = viewChild<ElementRef<HTMLElement>>('hero');
   protected readonly finalCtaElement = viewChild('finalCta', { read: ElementRef<HTMLElement> });
+  private readonly _blogRow = viewChild<ElementRef<HTMLElement>>('blogRow');
+
+  /**
+   * Moves the blog row by one card. Reads the real card width rather than a
+   * constant so it stays right when the cards size against the viewport.
+   */
+  protected scrollBlog(direction: 1 | -1): void {
+    const row = this._blogRow()?.nativeElement;
+    if (!row) return;
+    const card = row.firstElementChild as HTMLElement | null;
+    const step = card ? card.getBoundingClientRect().width + 12 : row.clientWidth;
+    row.scrollBy({ left: step * direction, behavior: 'smooth' });
+  }
 
   readonly features = FEATURES;
   readonly signupUrl = webAppLink(SIGNUP_URL);

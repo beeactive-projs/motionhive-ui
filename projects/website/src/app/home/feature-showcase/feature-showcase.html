@@ -1,0 +1,48 @@
+<!-- Scrolls past the page margin on the right so a cut tile shows there is
+     more, while the first tile still lines up with the heading above it. -->
+<div class="fs__tabs" [class.is-end]="atEnd()" (scroll)="onTabScroll($event)" role="tablist" aria-label="Features" i18n-aria-label="@@home.fs.tabs">
+  @for (f of features(); track f.slug; let i = $index) {
+    <button
+      type="button"
+      role="tab"
+      class="fs__tab"
+      [class.is-active]="active() === i"
+      [attr.aria-selected]="active() === i"
+      aria-controls="fs-panel"
+      (click)="select(i)"
+    >
+      <span class="fs__tab-ic" aria-hidden="true">{{ f.icon }}</span>
+      <span class="fs__tab-name">{{ f.name }}</span>
+    </button>
+  }
+</div>
+
+@if (current(); as f) {
+  <!-- One card holds the clip and what it is, so they read as one thing
+       rather than a picture with loose text under it. -->
+  <article class="fs__panel" id="fs-panel" role="tabpanel">
+    <div class="fs__clip">
+      <mh-media-demo
+        bare
+        [src]="f.preview"
+        [poster]="shotFor(f.slug)"
+        [caption]="''"
+      />
+      <span class="fs__count" aria-hidden="true">{{ position() }}</span>
+    </div>
+
+    <div class="fs__body">
+      <h3 class="fs__name">{{ f.name }}</h3>
+      <p class="fs__line">{{ f.oneLiner }}</p>
+      <a class="fs__cta" [routerLink]="['/features', f.slug]">
+        <span i18n="@@home.fs.how">See how it works</span>
+        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+  </article>
+}
+
+<a class="fs__all" routerLink="/features">
+  <span i18n="@@home.fs.all">See all features</span>
+  <i class="pi pi-arrow-right" aria-hidden="true"></i>
+</a>

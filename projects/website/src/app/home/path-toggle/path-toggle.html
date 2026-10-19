@@ -1,0 +1,24 @@
+<div class="pt__seg" role="tablist" aria-label="Who you are" i18n-aria-label="@@home.pt.who">
+  @for (p of paths(); track p.title; let i = $index) {
+    <button
+      type="button"
+      role="tab"
+      class="pt__seg-btn"
+      [class.is-active]="active() === i"
+      [attr.aria-selected]="active() === i"
+      (click)="select(i)"
+    >
+      {{ p.title }}
+    </button>
+  }
+</div>
+
+@if (current(); as p) {
+  <!-- Height is reserved for the longest list so the tap never shifts the page. -->
+  <div class="pt__panel" [style.--pt-rows]="tallest()">
+    <div class="pt__head">
+      <mh-hex [size]="44" [tone]="p.tone"><span class="pt__ic">{{ p.icon }}</span></mh-hex>
+    </div>
+    <mh-check-list [items]="p.points" [tone]="p.tone === 'teal' ? 'teal' : 'amber'" />
+  </div>
+}

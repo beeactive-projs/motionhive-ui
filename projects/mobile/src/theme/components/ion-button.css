@@ -134,6 +134,13 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
   --color: var(--ion-color-primary-contrast);
 }
 
+/* A count riding inside a chip ("Unread 3"), as WhatsApp does. Full ink: a
+   faded count fell under 4.5:1 on the idle chip's wash. */
+.mh-chip-row .chip .count {
+  margin-inline-start: 0.25rem;
+  font-weight: 600;
+}
+
 /* A clear button sitting on a card. Ionic gives it the honey *fill* colour,
    which is 2.05:1 on white; text wants the deep ink token. Scoped to rows so
    toolbar buttons keep Ionic's own treatment. */

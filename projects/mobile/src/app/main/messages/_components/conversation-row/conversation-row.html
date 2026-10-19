@@ -32,11 +32,11 @@
     <!-- WhatsApp's two lines: the name with its time, then the preview with
          the muted bell and the unread count. -->
     <ion-label>
-      <div class="mh-feed-line">
+      <div class="mh-row-line">
         <h2>{{ title() }}</h2>
         <ion-note class="time">{{ time() }}</ion-note>
       </div>
-      <div class="mh-feed-line">
+      <div class="mh-row-line">
         <p>{{ preview() }}</p>
         @if (isMuted()) {
           <ion-icon

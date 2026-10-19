@@ -25,4 +25,10 @@ export class BlogPostCard {
   readonly coverUrl = computed(() =>
     withCloudinaryTransform(this.post().coverImage, BLOG_COVER_PRESETS.homeCarousel),
   );
+
+  /**
+   * A post without a cover gets a branded tile rather than an empty grey box,
+   * which is what a missing image looked like in the phone carousel.
+   */
+  readonly hasCover = computed(() => !!this.post().coverImage && !!this.coverUrl());
 }

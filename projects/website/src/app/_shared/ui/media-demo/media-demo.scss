@@ -202,3 +202,12 @@
     background: rgba(255, 255, 255, 0.26);
   }
 }
+
+/* Already inside a card: the chrome and the shadow would be a frame on a
+   frame, and on a phone that is height the clip needs. */
+.device--bare {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}

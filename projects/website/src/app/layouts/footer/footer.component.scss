@@ -9,16 +9,13 @@
 
 .foot {
   display: grid;
-  grid-template-columns: 1.7fr 1fr 1fr 1fr;
+  grid-template-columns: 1.7fr 1fr 1fr;
   gap: 2.5rem;
   padding-block: 3.5rem 2.5rem;
 
   @media (max-width: 860px) {
     grid-template-columns: 1fr 1fr;
     gap: 2rem 1.5rem;
-  }
-  @media (max-width: 520px) {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -30,7 +27,13 @@
 
   @media (max-width: 860px) {
     grid-column: 1 / -1;
+    max-width: none;
+    gap: 0.875rem;
   }
+}
+
+.foot__brand .foot__social {
+  margin-top: 0.25rem;
 }
 
 .foot__tag {
@@ -103,10 +106,138 @@
 
 .foot__bar {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1rem 2rem;
   flex-wrap: wrap;
-  padding-block: 1.4rem;
+  padding-block: 1.25rem;
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.foot__copy {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.foot__meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Language: a setting, so it sits on its own row with a label rather than
+   pretending to be a nav column. */
+/* Desktop has the switch in the header, where it is in reach from any
+   scroll position. A second one down here is the same control twice. */
+.foot__lang {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.foot__lang-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.72);
+
+  mh-line-icon {
+    font-size: 1.0625rem;
+  }
+}
+
+/* One wrapping line. Lower contrast than the columns above: findable, not
+   competing with the pages we want read. */
+.foot__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.125rem;
+
+  a,
+  button {
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--p-primary-400);
+    }
+  }
+}
+
+@media (max-width: 53.75rem) {
+  /* Two columns all the way down. A single stacked column was the long
+     scroll the redesign set out to remove. */
+  .foot {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem 1.5rem;
+    padding-block: 2rem 1.25rem;
+  }
+
+  /* No room to stack the brand block here, so the social row lifts up
+     beside the logo. A wrapped flex row keeps it one element. */
+  .foot__brand {
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .foot__brand .foot__logo {
+    order: 1;
+  }
+
+  .foot__brand .foot__social {
+    order: 2;
+    margin-top: 0;
+  }
+
+  .foot__brand .foot__tag {
+    order: 3;
+    flex: 1 0 100%;
+  }
+
+  /* The bar unwinds into rows: language, then legal, then the copyright. */
+  .foot__bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.875rem;
+    /* The sticky sign-up bar sits over the bottom of the page. */
+    padding-block: 1.1rem 7rem;
+  }
+
+  .foot__meta {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.875rem;
+  }
+
+  /* The phone header keeps its switch in the drawer, so this is the one a
+     reader at the bottom of the page can actually reach. */
+  .foot__lang {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Stacked here: side by side they wrapped mid-sentence. */
+  .foot__copy {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .foot__sep {
+    display: none;
+  }
 }

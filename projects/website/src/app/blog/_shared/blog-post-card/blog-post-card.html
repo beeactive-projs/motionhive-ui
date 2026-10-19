@@ -5,8 +5,12 @@
   [class.post-card--grid]="variant() === 'grid'"
   [routerLink]="['/blog', post.slug]"
   [attr.aria-label]="'Read article: ' + post.title">
-  <div class="post-card__media">
-    <img [src]="coverUrl()" [alt]="post.title" loading="lazy" width="800" height="450" />
+  <div class="post-card__media" [class.post-card__media--none]="!hasCover()">
+    @if (hasCover()) {
+      <img [src]="coverUrl()" [alt]="post.title" loading="lazy" width="800" height="450" />
+    } @else {
+      <span class="post-card__fallback">{{ post.category | blogCategory }}</span>
+    }
   </div>
 
   <div class="post-card__body">

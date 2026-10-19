@@ -6,8 +6,10 @@ import { NotificationCategory } from 'core';
 import {
   NOTIFICATION_ICONS,
   NO_FILTERS,
+  NotificationListActions,
   activeFilterCount,
   categoryListLabel,
+  notificationListActions,
   sameFilters,
 } from './notifications.config';
 
@@ -97,5 +99,21 @@ describe('notification filters', () => {
     expect(categoryListLabel([Payments])).toBe('Payments');
     expect(categoryListLabel([Payments, Sessions])).toBe('Sessions and Payments');
     expect(categoryListLabel([Groups, Payments, Sessions])).toBe('Sessions, Groups and Payments');
+  });
+});
+
+describe('notificationListActions', () => {
+  const markAllRead = (hasUnread: boolean) =>
+    notificationListActions(hasUnread).find((action) => action.id === NotificationListActions.MarkAllRead);
+
+  it('keeps Mark all read listed, disabled while nothing is unread', () => {
+    expect(markAllRead(true)?.disabled).toBe(false);
+    expect(markAllRead(false)?.disabled).toBe(true);
+  });
+
+  it('offers the same verbs read or unread, none of them destructive', () => {
+    const ids = (hasUnread: boolean) => notificationListActions(hasUnread).map((action) => action.id);
+    expect(ids(false)).toEqual(ids(true));
+    expect(notificationListActions(true).some((action) => action.destructive)).toBe(false);
   });
 });
