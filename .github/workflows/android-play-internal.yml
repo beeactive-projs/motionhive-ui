@@ -26,7 +26,6 @@ jobs:
   build-and-upload:
     runs-on: ubuntu-latest
     env:
-      # Job level so the restore step's `if` can see it (a step's own env isn't visible to its `if`).
       GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
     steps:
       - uses: actions/checkout@v4
@@ -56,9 +55,16 @@ jobs:
           npx ng build mobile --configuration production
           npx cap sync android
 
+      # Required, not optional: a production build calls PushNotifications.register()
+      # once the user allows notifications, and without Firebase that throws natively
+      # and kills the app. Better a failed build than a release that crashes.
       - name: Restore google-services.json (push notifications)
-        if: ${{ env.GOOGLE_SERVICES_JSON != '' }}
-        run: echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error::GOOGLE_SERVICES_JSON secret is not set. Without it the app crashes when notifications are allowed."
+            exit 1
+          fi
+          echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
 
       - name: Restore upload keystore
         env:
