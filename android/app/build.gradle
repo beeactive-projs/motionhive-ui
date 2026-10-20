@@ -26,6 +26,9 @@ android {
         versionCode = Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
         versionName "1.0." + (System.getenv('VERSION_CODE') ?: '0')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Package the native libraries' symbol tables into the AAB so Play can symbolicate
+        // native crashes. Libraries that ship already stripped contribute nothing.
+        ndk { debugSymbolLevel 'SYMBOL_TABLE' }
         // The web app host whose links this build opens (App Links, see the
         // manifest). The Play testing build passes -PappLinkHost=dev.app.motionhive.fit
         // so it never claims production links it cannot resolve.
