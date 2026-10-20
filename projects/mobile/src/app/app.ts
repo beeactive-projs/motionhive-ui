@@ -2,13 +2,14 @@ import { Component, DestroyRef, afterNextRender, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { App as CapacitorApp } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
-import { AuthService } from 'core';
+import { AuthService, MessagingStore, NotificationStore } from 'core';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronDownOutline, closeOutline, searchOutline } from 'ionicons/icons';
 
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { ThemeService } from './_shared/services/theme.service';
 import { PushRegistrationService } from './_shared/services/push-registration.service';
+import { AppLinkService } from './_shared/services/app-link.service';
 
 @Component({
   selector: 'mh-root',
@@ -39,6 +40,15 @@ export class App {
    */
   private readonly _pushRegistration = inject(PushRegistrationService);
 
+  /**
+   * Instantiated for its constructor: it routes web app links (from emails)
+   * that Android hands to the app instead of the browser.
+   */
+  private readonly _appLinkService = inject(AppLinkService);
+
+  private readonly _messagingStore = inject(MessagingStore);
+  private readonly _notificationStore = inject(NotificationStore);
+
   constructor() {
     // The outline replacements for Ionic's built-in sharp glyphs, named by
     // string in app.config.ts (back button) and on every ion-searchbar and
@@ -54,6 +64,19 @@ export class App {
     const listener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
       if (!canGoBack) void CapacitorApp.exitApp();
     });
-    this._destroyRef.onDestroy(() => void listener.then((handle) => handle.remove()));
+
+    // Back from the background. Android freezes the WebView while the app is
+    // away, so the message stream and the counts are stale; both stores
+    // catch up. The WebView does not reliably fire `visibilitychange` for
+    // this, which is what the stores listen to on their own.
+    const resume = CapacitorApp.addListener('resume', () => {
+      this._messagingStore.resync();
+      this._notificationStore.refreshUnreadCount();
+    });
+
+    this._destroyRef.onDestroy(() => {
+      void listener.then((handle) => handle.remove());
+      void resume.then((handle) => handle.remove());
+    });
   }
 }

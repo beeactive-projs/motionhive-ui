@@ -20,9 +20,11 @@ import {
   ProfilePrivacy,
   ProfileService,
   PublicProfileStore,
+  publicProfileUrl,
   showApiError,
   UserPrivacySettings,
   UserService,
+  WEB_APP_URL,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
@@ -238,12 +240,10 @@ export class Profile implements OnInit {
     this.shareDialogVisible.set(true);
   }
 
-  /** Public URL of the current user's profile — `https://<origin>/@<handle>`. */
+  /** Public URL of the current user's profile — `<web app>/@<handle>`. */
   readonly shareUrl = computed(() => {
     const handle = this.profile()?.account.handle ?? '';
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://motionhive.fit';
-    return handle ? `${origin}/@${handle}` : origin;
+    return handle ? publicProfileUrl(handle) : WEB_APP_URL;
   });
 
   /** Preview card title — full name (+ instructor bio if present). */

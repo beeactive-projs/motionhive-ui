@@ -18,6 +18,7 @@ import {
   Hex,
   HexTone,
   InstructorSearchResult,
+  MARKETING_BLOG_URL,
   MyInstructor,
   ProfileService,
   SessionService,
@@ -57,8 +58,6 @@ const BLOG_LIMIT = 3;
 const COACHES_OWN_LIMIT = 2;
 const COACHES_SUGGESTED_LIMIT = 3;
 const COACH_TONES: HexTone[] = ['amber', 'teal', 'navySolid', 'coral'];
-/** Blog articles live on the public marketing site, not in-app. */
-const MARKETING_BLOG_URL = 'https://www.motionhive.fit/blog';
 /**
  * Category accent keys — these drive the `[data-tone]` CSS on the journal
  * chips/placeholders (home.scss), NOT the hex component. Kept independent of

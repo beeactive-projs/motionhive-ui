@@ -83,7 +83,7 @@ Other dimension roles: `--mh-tap-target` (2.75rem, the WCAG 44px minimum — use
 
 ## Environments
 
-Mobile never ships core's host-sniffing `environment.ts`. Both build configurations swap it via `fileReplacements`: production → `environment.mobile.ts` (fixed prod URLs), development → `environment.mobile-dev.ts` (browser serve → local API on :3800; native → dev Railway API). Keep the exported shape identical to `environment.ts`.
+Mobile never ships core's host-sniffing `environment.ts`. All three build configurations swap it via `fileReplacements`: production → `environment.mobile.ts` (fixed prod URLs, for a store release), staging → `environment.mobile-staging.ts` (a production build against the dev Railway API; the Play testing track ships this, built from `develop`), development → `environment.mobile-dev.ts` (local API on :3800, browser and native). Keep the exported shape identical to `environment.ts`.
 
 ## Angular rules (same bar as root CLAUDE.md)
 

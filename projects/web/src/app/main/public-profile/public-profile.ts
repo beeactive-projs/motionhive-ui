@@ -14,6 +14,8 @@ import {
   LockedAction,
   PublicProfileStore,
   ViewerMode,
+  WEB_APP_URL,
+  publicProfileUrl,
   type AvatarUser,
   type Product,
   type ProfileBadge,
@@ -113,12 +115,10 @@ export class PublicProfile implements OnInit {
     return u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() : '';
   });
 
-  /** Public URL for the share dialog — `https://<origin>/@<handle>`. */
+  /** Public URL for the share dialog — `<web app>/@<handle>`. */
   readonly shareUrl = computed(() => {
     const handle = this.userProfile()?.handle ?? '';
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://motionhive.fit';
-    return handle ? `${origin}/@${handle}` : origin;
+    return handle ? publicProfileUrl(handle) : WEB_APP_URL;
   });
 
   /** Title line shown inside the share-dialog preview card. */

@@ -26,6 +26,10 @@ android {
         versionCode = Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
         versionName "1.0." + (System.getenv('VERSION_CODE') ?: '0')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // The web app host whose links this build opens (App Links, see the
+        // manifest). The Play testing build passes -PappLinkHost=dev.app.motionhive.fit
+        // so it never claims production links it cannot resolve.
+        manifestPlaceholders = [appLinkHost: project.findProperty('appLinkHost') ?: 'app.motionhive.fit']
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
