@@ -68,6 +68,9 @@ export const environment = {
   //apiUrl: 'https://beeactive-api-production.up.railway.app',
   //apiUrl: 'http://localhost:3800',
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
+  // The mobile app's iOS OAuth client. Empty until it exists; the iOS app hides
+  // its Google button without it.
+  googleIosClientId: '',
   apiUrl: resolveApiUrl(),
   webAppUrl: resolveWebAppUrl(),
   websiteUrl: resolveWebsiteUrl(),

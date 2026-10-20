@@ -99,6 +99,9 @@
       </ion-button>
     </form>
 
+    <mh-social-sign-in [disabled]="isLoading()" (googleCredential)="onGoogleCredential($event)"
+      (googleFailed)="onGoogleFailed()" />
+
     <mh-terms-notice intro="auth.signUp.termsIntro" />
     }
   </div>

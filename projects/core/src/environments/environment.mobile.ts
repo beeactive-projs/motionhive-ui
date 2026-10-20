@@ -8,6 +8,9 @@ export const environment = {
   production: true,
   appUrl: 'https://app.motionhive.fit',
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
+  // The mobile app's iOS OAuth client. Empty until it exists; the iOS app hides
+  // its Google button without it.
+  googleIosClientId: '',
   apiUrl: 'https://motionhive-api-production.up.railway.app',
   webAppUrl: 'https://app.motionhive.fit',
   websiteUrl: 'https://www.motionhive.fit',

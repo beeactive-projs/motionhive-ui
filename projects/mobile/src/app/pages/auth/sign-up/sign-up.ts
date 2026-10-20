@@ -19,7 +19,7 @@ import {
 import { addIcons } from 'ionicons';
 import { personAddOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { finalize } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 
 import {
   APP_HOME_URL,
@@ -40,6 +40,7 @@ import { Notice } from '../../../_shared/components/notice/notice';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
 import { AcceptInvite } from '../_components/accept-invite/accept-invite';
 import { AuthHeader } from '../_components/auth-header/auth-header';
+import { SocialSignIn } from '../_components/social-sign-in/social-sign-in';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
 import { InviteLandingService } from '../invite-landing.service';
 
@@ -47,7 +48,8 @@ import { InviteLandingService } from '../invite-landing.service';
  * Sign up, which is also where a coach's client invite lands (`?token=`): the
  * email is fixed to the invited one, and the invite is accepted once the
  * account exists. Someone already signed in gets the accept card instead of
- * the form. The web app's sign-up, without social sign-in.
+ * the form. Google sign-up is the same call as Google sign-in: it makes the
+ * account when there is none.
  */
 @Component({
   selector: 'mh-sign-up',
@@ -74,6 +76,7 @@ import { InviteLandingService } from '../invite-landing.service';
     GuestControls,
     Notice,
     PasswordInput,
+    SocialSignIn,
     TermsNotice,
   ],
   providers: [ClientInviteService],
@@ -149,18 +152,25 @@ export class SignUp {
       isInstructor: this.hasInvitation ? false : isInstructor || undefined,
     };
 
+    this.signUp(this._authService.register(request), 'auth.signUp.error.registrationFailed');
+  }
+
+  protected onGoogleCredential(idToken: string): void {
+    this.signUp(this._authService.googleLogin({ idToken }), 'auth.common.googleFailed');
+  }
+
+  protected onGoogleFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.googleFailed'));
+  }
+
+  private signUp(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this._authService
-      .register(request)
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: () => this.acceptInvitationAndNavigate(),
-        error: (err) =>
-          this.errorMessage.set(
-            apiErrorMessage(err, this._translateService.instant('auth.signUp.error.registrationFailed')),
-          ),
-      });
+    request.pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: () => this.acceptInvitationAndNavigate(),
+      error: (err: unknown) =>
+        this.errorMessage.set(apiErrorMessage(err, this._translateService.instant(fallbackKey))),
+    });
   }
 
   private loadInvitation(token: string): void {

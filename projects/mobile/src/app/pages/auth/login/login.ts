@@ -15,7 +15,7 @@ import {
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { finalize } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 
 import {
   APP_HOME_URL,
@@ -38,6 +38,7 @@ import { AuthHeader } from '../_components/auth-header/auth-header';
 import { Logo } from '../../../_shared/components/logo/logo';
 import { Notice } from '../../../_shared/components/notice/notice';
 import { PasswordInput } from '../../../_shared/components/password-input/password-input';
+import { SocialSignIn } from '../_components/social-sign-in/social-sign-in';
 import { TermsNotice } from '../_components/terms-notice/terms-notice';
 import { InviteLandingService } from '../invite-landing.service';
 
@@ -68,6 +69,7 @@ import { InviteLandingService } from '../invite-landing.service';
     Logo,
     Notice,
     PasswordInput,
+    SocialSignIn,
     TermsNotice,
   ],
   providers: [ClientInviteService],
@@ -115,7 +117,11 @@ export class Login {
 
   protected readonly model = signal({ email: '', password: '' });
   protected readonly form = form(this.model, signInSchema, {
-    submission: { action: async () => this.signIn(), onInvalid: focusFirstInvalid },
+    submission: {
+      action: async () =>
+        this.signIn(this._authService.login(this.model()), 'auth.login.error.invalidCredentials'),
+      onInvalid: focusFirstInvalid,
+    },
   });
 
   constructor() {
@@ -124,26 +130,30 @@ export class Login {
     if (token) this._clientInviteService.load(token).subscribe({ error: () => undefined });
   }
 
-  private signIn(): void {
+  protected onGoogleCredential(idToken: string): void {
+    this.signIn(this._authService.googleLogin({ idToken }), 'auth.common.googleFailed');
+  }
+
+  protected onGoogleFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.googleFailed'));
+  }
+
+  /** Email and password or Google: both may hit the deletion cooling-off. */
+  private signIn(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this._authService
-      .login(this.model())
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: () => this.acceptInviteAndNavigate(),
-        error: (err: unknown) => {
-          const offer = scheduledDeletionFrom(err);
-          if (offer) {
-            this.keepOffer.set(offer);
-            this.keepOpen.set(true);
-            return;
-          }
-          this.errorMessage.set(
-            apiErrorMessage(err, this._translateService.instant('auth.login.error.invalidCredentials')),
-          );
-        },
-      });
+    request.pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: () => this.acceptInviteAndNavigate(),
+      error: (err: unknown) => {
+        const offer = scheduledDeletionFrom(err);
+        if (offer) {
+          this.keepOffer.set(offer);
+          this.keepOpen.set(true);
+          return;
+        }
+        this.errorMessage.set(apiErrorMessage(err, this._translateService.instant(fallbackKey)));
+      },
+    });
   }
 
   /** Keep the account: the deletion is cancelled and they are signed in. */

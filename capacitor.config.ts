@@ -17,6 +17,16 @@ const config: CapacitorConfig = {
       smallIcon: 'ic_stat_motionhive',
       iconColor: '#1e3a5f',
     },
+    // Google sign-in only. The others would bundle their SDKs (Facebook's
+    // adds its own permissions); turning one on needs a `cap sync`.
+    SocialLogin: {
+      providers: {
+        google: true,
+        facebook: false,
+        apple: false,
+        twitter: false,
+      },
+    },
   },
 };
 

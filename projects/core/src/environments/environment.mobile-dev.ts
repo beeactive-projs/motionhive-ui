@@ -23,6 +23,9 @@ export const environment = {
   production: false,
   appUrl: 'http://localhost:8100',
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
+  // The mobile app's iOS OAuth client. Empty until it exists; the iOS app hides
+  // its Google button without it.
+  googleIosClientId: '',
   apiUrl: resolveApiUrl(),
   // Local, to match the local API. An invite token minted against localhost
   // is meaningless to the production web app, so a prod origin here made the
