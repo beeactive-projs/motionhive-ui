@@ -24,6 +24,16 @@
 
         </activity>
 
+        <!-- Small icon and accent for every push. The server names no icon, so
+             these apply; without them Android masks the launcher icon into a
+             white blob. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_motionhive" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/mh_notification_accent" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -11,6 +11,12 @@ const config: CapacitorConfig = {
     Keyboard: {
       resize: 'body',
     },
+    // The rest timer alert. Same icon and accent as pushes, set in the
+    // Android manifest: android/app/src/main/res/drawable/ic_stat_motionhive.xml.
+    LocalNotifications: {
+      smallIcon: 'ic_stat_motionhive',
+      iconColor: '#1e3a5f',
+    },
   },
 };
 
