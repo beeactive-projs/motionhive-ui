@@ -27,7 +27,9 @@
                  the domain proves the claim with /.well-known/assetlinks.json
                  (projects/web/public). Only paths the app has a screen for:
                  group invites (/join) and public profiles (/@) stay on the web.
-                 The app maps them in _shared/config/app-link.config.ts. -->
+                 The app maps them in _shared/config/app-link.config.ts.
+                 iOS claims the same paths in apple-app-site-association
+                 (projects/web/public/.well-known); change both together. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

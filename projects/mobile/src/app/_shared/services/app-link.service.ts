@@ -13,12 +13,14 @@ import { resolveAppLink } from '../config/app-link.config';
 const SAME_TAP_MS = 2_000;
 
 /**
- * Opens web app links inside the app (Android App Links).
+ * Opens web app links inside the app (Android App Links, iOS universal
+ * links).
  *
  * An email's "Open conversation" or "Verify email" is a link to the web
- * app. The manifest claims those paths for this app and the web domain
- * confirms it with `/.well-known/assetlinks.json`, so Android hands the
- * tap to us instead of the browser. This routes it.
+ * app. The Android manifest and `/.well-known/apple-app-site-association`
+ * claim those paths for this app, and the web domain confirms it (for
+ * Android with `/.well-known/assetlinks.json`), so the OS hands the tap
+ * to us instead of the browser. This routes it.
  *
  * Only paths the app has a screen for are claimed, so a link that still
  * resolves to nothing (a profile tab mobile does not have) lands on home

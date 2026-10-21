@@ -1,0 +1,26 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["AB34A8FY5K.fit.motionhive.app"],
+        "components": [
+          { "/": "/auth/login*" },
+          { "/": "/auth/signup*" },
+          { "/": "/auth/reset-password*" },
+          { "/": "/auth/new-password*" },
+          { "/": "/auth/verify-email*" },
+          { "/": "/messages*" },
+          { "/": "/coaching/sessions*" },
+          { "/": "/coaching/clients*" },
+          { "/": "/coaching/pending-requests*" },
+          { "/": "/coaching/invoices*" },
+          { "/": "/coaching/payments*" },
+          { "/": "/sessions*" },
+          { "/": "/user/sessions*" },
+          { "/": "/groups*" },
+          { "/": "/profile*" }
+        ]
+      }
+    ]
+  }
+}

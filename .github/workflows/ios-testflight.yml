@@ -106,6 +106,7 @@ jobs:
           echo "ASC_KEY_ID=$KEY_ID" >> "$GITHUB_ENV"
           echo "ASC_ISSUER_ID=$(echo "$ASC_ISSUER_ID" | tr -d '[:space:]')" >> "$GITHUB_ENV"
 
+      # Staging opens dev web app links, matching the dev API it talks to.
       - name: Archive
         run: |
           xcodebuild archive \
@@ -114,7 +115,8 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
-            CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            APP_LINK_HOST=dev.app.motionhive.fit
 
       # Signing is manual, so the export needs no App Store Connect account.
       # (Exporting with destination=upload logs in through Xcode's account
