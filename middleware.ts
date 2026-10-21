@@ -31,8 +31,9 @@ const ONE_YEAR = 60 * 60 * 24 * 365;
 export default function middleware(request: Request): Response | undefined {
   const url = new URL(request.url);
 
-  // Safety: never touch the authenticated app domain if it ever shares this config.
-  if (url.hostname.startsWith('app.')) return undefined;
+  // Never touch the authenticated app (app. and dev.app.), which shares this
+  // config and has no /ro bundle: a redirect there lands on a 404.
+  if (/(?:^|\.)app\./.test(url.hostname)) return undefined;
 
   // Respect an explicit language choice forever.
   const cookies = request.headers.get('cookie') ?? '';
