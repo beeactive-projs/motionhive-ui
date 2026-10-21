@@ -20,6 +20,26 @@ jobs:
   build-and-upload:
     runs-on: macos-15
     steps:
+      # A missing secret otherwise only shows up at the upload, after a full
+      # macOS build. Fail first and name it.
+      - name: Check secrets
+        env:
+          IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROVISIONING_PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          missing=0
+          for name in IOS_DIST_CERT_P12 IOS_DIST_CERT_PASSWORD IOS_PROVISIONING_PROFILE ASC_KEY_P8 ASC_KEY_ID ASC_ISSUER_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is not set."
+              missing=1
+            fi
+          done
+          exit $missing
+
       - uses: actions/checkout@v4
 
       # Must always be higher than the last build uploaded for this
