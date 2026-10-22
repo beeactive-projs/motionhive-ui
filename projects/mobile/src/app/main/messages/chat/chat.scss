@@ -9,12 +9,18 @@
 .peer .who {
   display: flex;
   flex-direction: column;
+  /* A sliver between the two lines: stacked at line-height 1 with nothing
+     between them, the name's descenders ("p", "y") ran into the handle. */
+  gap: 0.125rem;
   min-width: 0;
   line-height: var(--mh-leading-none);
 }
 
 .peer .name {
   overflow: hidden;
+  /* Room for the descenders inside the name's own line, which the ellipsis
+     clipping would otherwise cut off. */
+  line-height: var(--mh-leading-heading);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -52,11 +58,14 @@ ion-footer ion-toolbar {
 /* The bottom clearance, while the keyboard is down. Ionic pads the home
    indicator only on a footer with no bottom tab bar in the page, and it
    counts the tab bar this screen hides, so on an iPhone the composer sat on
-   the home indicator. The floor keeps the pill off the screen's corner where
-   there is no safe area (the browser preview, Android with buttons). With the
-   keyboard up there is nothing to clear: the bar sits right on it. */
+   the home indicator. The composer's own 0.5rem bottom gutter comes off the
+   safe area, so the pill ends on the safe-area line like any iOS control
+   instead of a gutter above it (the full inset left ~42pt under the pill).
+   The floor keeps it off the screen's corner where there is no safe area
+   (the browser preview, Android with buttons). With the keyboard up there is
+   nothing to clear: the bar sits right on it. */
 ion-footer:not(.keyboard-open) ion-toolbar {
-  padding-bottom: max(var(--ion-safe-area-bottom, 0px), 0.75rem);
+  padding-bottom: max(calc(var(--ion-safe-area-bottom, 0px) - 0.5rem), 0.75rem);
 }
 
 .day {

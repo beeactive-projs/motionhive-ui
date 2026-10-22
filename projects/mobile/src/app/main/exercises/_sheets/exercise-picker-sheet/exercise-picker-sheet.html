@@ -27,7 +27,8 @@
       <ion-list [inset]="true" class="mh-card-list">
         @for (exercise of recents(); track exercise.id) {
           <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
-            [class.locked]="isLocked(exercise.id)" (select)="toggle(exercise)" />
+            [class.locked]="isLocked(exercise.id)" (select)="toggle(exercise)"
+            (preview)="preview(exercise)" />
         }
       </ion-list>
     }
@@ -39,7 +40,8 @@
       <ion-list [inset]="true" class="mh-card-list">
         @for (exercise of rows(); track exercise.id) {
           <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
-            [class.locked]="isLocked(exercise.id)" (select)="toggle(exercise)" />
+            [class.locked]="isLocked(exercise.id)" (select)="toggle(exercise)"
+            (preview)="preview(exercise)" />
         }
       </ion-list>
     }
@@ -50,6 +52,11 @@
     </ion-infinite-scroll>
   }
 </ng-template>
+
+<!-- Over the picker, not in place of it: the list and its ticks are still
+     there underneath when the reader is done looking. -->
+<mh-exercise-preview-sheet [(open)]="previewOpen" [exercise]="previewing()"
+  [selected]="previewing() ? isOn(previewing()!.id) : false" (toggle)="toggle($event)" />
 
 <mh-sheet-shell [(open)]="open" [title]="sheetTitle()" [subtitle]="context()"
   [sticky]="sticky" [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"

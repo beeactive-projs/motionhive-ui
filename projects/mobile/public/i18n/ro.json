@@ -590,7 +590,8 @@
         "existingFork": "Ai deja o copie, uite-o",
         "forkFailed": "Exercițiul nu a putut fi copiat.",
         "forked": "Copiat în exercițiile tale"
-      }
+      },
+      "showFrame": "Arată cadrul {{number}}"
     },
     "detailRows": {
       "kindLevel": "Tip și nivel",
@@ -713,7 +714,10 @@
       "loadError": "Catalogul nu a putut fi încărcat. Verifică-ți conexiunea.",
       "noMatch": "Niciun exercițiu nu are acest nume.",
       "recentlyUsed": "Folosite recent",
-      "results": "Rezultate"
+      "results": "Rezultate",
+      "about": "Despre {{name}}",
+      "add": "Adaugă",
+      "remove": "Elimină"
     },
     "row": {
       "equipmentMore": "{name} +{count}",

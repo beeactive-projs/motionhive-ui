@@ -46,7 +46,26 @@
   gap: 0.25rem;
 }
 
-.dots span {
+/* Says the frames can be driven, without a control sitting over the photo. */
+.hero.steppable {
+  cursor: pointer;
+}
+
+/* Buttons now, so the pair is reachable by tap as well as by swipe. The
+   target is padded out to a thumb while the dot itself stays small. */
+.dots button {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.dots button::after {
+  content: '';
   width: 0.375rem;
   height: 0.375rem;
   border-radius: var(--mh-radius-pill);
@@ -54,7 +73,7 @@
   transition: background 0.2s ease;
 }
 
-.dots span.on {
+.dots button.on::after {
   background: var(--ion-color-light);
 }
 

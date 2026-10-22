@@ -1,0 +1,60 @@
+<ng-template #body>
+  @if (shown(); as exercise) {
+    <!-- The movement first: it is what the reader opened this to see. -->
+    <div class="xp__hero" [class.placeholder]="!currentFrame() && !still()">
+      @if (currentFrame(); as frame) {
+        <img [src]="frame.url" [alt]="name()" />
+      } @else if (still(); as url) {
+        <img [src]="url" [alt]="name()" />
+      } @else {
+        <mh-hex-avatar size="xl" tone="wash" [color]="kindTone()" [icon]="kindIcon()"
+          [name]="name()" />
+      }
+
+      @if (frames().length > 1) {
+        <div class="xp__dots">
+          @for (frame of frames(); track frame.id; let i = $index) {
+            <button type="button" [class.on]="i === frameIndex()" (click)="stepFrame(i)"
+              [attr.aria-label]="'exercises.detail.showFrame' | translate: { number: i + 1 }"
+              [attr.aria-current]="i === frameIndex()"></button>
+          }
+        </div>
+      }
+    </div>
+
+    <h2 class="xp__name">{{ name() }}</h2>
+    @if (originalName(); as original) {
+      <p class="xp__original" lang="en">{{ original }}</p>
+    }
+
+    <div class="xp__facts">
+      @if (levelLabel(); as level) {
+        <ion-badge [attr.data-tone]="levelTone()">{{ level }}</ion-badge>
+      }
+      <span>{{ subline() }}</span>
+    </div>
+
+    @if (loading()) {
+      <div class="xp__loading">
+        <ion-skeleton-text [animated]="true" style="width: 90%" />
+        <ion-skeleton-text [animated]="true" style="width: 75%" />
+      </div>
+    } @else if (instructions(); as cues) {
+      <div class="mh-section-label">{{ 'exercises.fields.instructions' | translate }}</div>
+      <p class="xp__cues">{{ cues }}</p>
+    }
+  } @else {
+    <div class="xp__spinner"><ion-spinner name="crescent" /></div>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'exercises.picker.about' | translate: { name: name() }"
+  [body]="body"
+  [saveLabel]="(selected() ? 'exercises.picker.remove' : 'exercises.picker.add') | translate"
+  [canSave]="!!shown()"
+  [breakpoints]="[0, 0.85]"
+  [initialBreakpoint]="0.85"
+  (save)="submit()"
+/>

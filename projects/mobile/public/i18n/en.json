@@ -590,7 +590,8 @@
         "existingFork": "You already have a copy, here it is",
         "forkFailed": "Could not fork this exercise.",
         "forked": "Copied to your exercises"
-      }
+      },
+      "showFrame": "Show frame {{number}}"
     },
     "detailRows": {
       "kindLevel": "Kind & level",
@@ -713,7 +714,10 @@
       "loadError": "The catalog could not be loaded. Check your connection.",
       "noMatch": "No exercise matches that name.",
       "recentlyUsed": "Recently used",
-      "results": "Results"
+      "results": "Results",
+      "about": "About {{name}}",
+      "add": "Add",
+      "remove": "Remove"
     },
     "row": {
       "equipmentMore": "{name} +{count}",
