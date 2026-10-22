@@ -63,7 +63,7 @@ export class ExercisePreviewSheet {
   private readonly _steppedByHand = signal(false);
 
   /** Where a swipe started, in page coordinates. Null between gestures. */
-  private _swipeStartX: number | null = null;
+  private _swipeStart: { x: number; y: number } | null = null;
 
   readonly currentFrame = computed(() => {
     const frames = this.frames();
@@ -155,19 +155,24 @@ export class ExercisePreviewSheet {
   }
 
   onFrameTouchStart(event: TouchEvent): void {
-    this._swipeStartX = event.changedTouches[0]?.clientX ?? null;
+    const touch = event.changedTouches[0];
+    this._swipeStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
   }
 
   onFrameTouchEnd(event: TouchEvent): void {
-    const start = this._swipeStartX;
-    this._swipeStartX = null;
-    if (start === null) return;
-    const travelled = (event.changedTouches[0]?.clientX ?? start) - start;
-    if (Math.abs(travelled) < SWIPE_PX) {
+    const start = this._swipeStart;
+    const touch = event.changedTouches[0];
+    this._swipeStart = null;
+    if (!start || !touch) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    // Mostly up or down is the sheet being scrolled, not the photo.
+    if (Math.abs(dy) >= SWIPE_PX && Math.abs(dy) > Math.abs(dx)) return;
+    if (Math.abs(dx) < SWIPE_PX) {
       this._step(1);
       return;
     }
-    this._step(travelled < 0 ? 1 : -1);
+    this._step(dx < 0 ? 1 : -1);
   }
 
   submit(): void {
