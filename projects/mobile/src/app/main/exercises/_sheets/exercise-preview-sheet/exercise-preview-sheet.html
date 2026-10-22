@@ -1,7 +1,9 @@
 <ng-template #body>
   @if (shown(); as exercise) {
     <!-- The movement first: it is what the reader opened this to see. -->
-    <div class="xp__hero" [class.placeholder]="!currentFrame() && !still()">
+    <div class="xp__hero" [class.placeholder]="!currentFrame() && !still()"
+      [class.steppable]="frames().length > 1"
+      (touchstart)="onFrameTouchStart($event)" (touchend)="onFrameTouchEnd($event)">
       @if (currentFrame(); as frame) {
         <img [src]="frame.url" [alt]="name()" />
       } @else if (still(); as url) {

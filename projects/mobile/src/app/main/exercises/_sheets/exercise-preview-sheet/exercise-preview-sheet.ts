@@ -7,8 +7,15 @@ import { catchError, take } from 'rxjs/operators';
 import { Exercise, ExerciseMediaKind, ExerciseService } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { prefersReducedMotion } from '../../../../_shared/utils/motion';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { exerciseSubline, kindIcon, kindTone, levelLabel, levelTone } from '../../exercises.config';
+
+/** How long each position holds. Matches the full exercise page. */
+const FRAME_MS = 1400;
+
+/** Past this much travel a drag is a swipe; under it, a tap. */
+const SWIPE_PX = 30;
 
 /**
  * What one exercise is, without leaving the picker.
@@ -52,6 +59,12 @@ export class ExercisePreviewSheet {
 
   readonly frameIndex = signal(0);
 
+  /** Set once a reader drives the frames, so the timer stops fighting them. */
+  private readonly _steppedByHand = signal(false);
+
+  /** Where a swipe started, in page coordinates. Null between gestures. */
+  private _swipeStartX: number | null = null;
+
   readonly currentFrame = computed(() => {
     const frames = this.frames();
     return frames.length ? (frames[this.frameIndex() % frames.length] ?? null) : null;
@@ -88,6 +101,20 @@ export class ExercisePreviewSheet {
   readonly instructions = computed(() => this.full()?.instructions?.trim() || null);
 
   constructor() {
+    // The pair alternates here as it does on the full page, so the sheet
+    // shows the movement rather than a photograph of its start. Stops once
+    // a reader steps the frames themselves, and never runs for one who
+    // asked the OS for less motion: the dots are their control.
+    effect((onCleanup) => {
+      const count = this.frames().length;
+      if (!this.open() || count < 2 || prefersReducedMotion() || this._steppedByHand()) return;
+      const timer = setInterval(
+        () => this.frameIndex.update((index) => (index + 1) % count),
+        FRAME_MS,
+      );
+      onCleanup(() => clearInterval(timer));
+    });
+
     // Fetch when it opens, not when the row is rendered: a list of forty
     // rows would otherwise be forty requests nobody asked for.
     effect(() => {
@@ -101,6 +128,7 @@ export class ExercisePreviewSheet {
   private _load(id: string): void {
     this.full.set(null);
     this.frameIndex.set(0);
+    this._steppedByHand.set(false);
     this.loading.set(true);
     this._exerciseService
       .get(id)
@@ -114,7 +142,32 @@ export class ExercisePreviewSheet {
   }
 
   stepFrame(index: number): void {
+    this._steppedByHand.set(true);
     this.frameIndex.set(index);
+  }
+
+  /** Tap or swipe the photo itself, as on the full exercise page. */
+  private _step(delta: number): void {
+    const count = this.frames().length;
+    if (count < 2) return;
+    this._steppedByHand.set(true);
+    this.frameIndex.update((index) => (index + delta + count) % count);
+  }
+
+  onFrameTouchStart(event: TouchEvent): void {
+    this._swipeStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  onFrameTouchEnd(event: TouchEvent): void {
+    const start = this._swipeStartX;
+    this._swipeStartX = null;
+    if (start === null) return;
+    const travelled = (event.changedTouches[0]?.clientX ?? start) - start;
+    if (Math.abs(travelled) < SWIPE_PX) {
+      this._step(1);
+      return;
+    }
+    this._step(travelled < 0 ? 1 : -1);
   }
 
   submit(): void {
