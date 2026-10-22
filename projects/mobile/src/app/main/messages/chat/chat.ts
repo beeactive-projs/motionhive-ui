@@ -26,7 +26,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { Keyboard } from '@capacitor/keyboard';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
@@ -56,6 +57,49 @@ const DRAG_DISMISS_PX = 24;
 
 /** Things inside the thread that own their tap. */
 const INTERACTIVE = 'a, button, ion-button, input, textarea, [role="button"]';
+
+/**
+ * iOS: the send bar rides up with the keyboard instead of after it.
+ *
+ * The keyboard plugin resizes the page only once the keyboard has finished
+ * rising, plus 0.2s (its `Keyboard.m`), so the bar landed on the keys about
+ * half a second late. On this screen the plugin's resizing is held off and
+ * the bar is lifted on `keyboardWillShow`, which arrives with the keyboard's
+ * height as it starts to move. Android resizes the window itself, which the
+ * plugin cannot change, and keeps the default behaviour.
+ */
+const FOLLOWS_KEYBOARD = Capacitor.getPlatform() === 'ios';
+
+/**
+ * The iOS keyboard's animation: its duration, and a curve close to its
+ * spring (Ionic's own iOS easing). The bar and the thread both move on it.
+ */
+const KEYBOARD_ANIMATION_MS = 250;
+const KEYBOARD_TRANSITION = `transform ${KEYBOARD_ANIMATION_MS}ms cubic-bezier(0.36, 0.66, 0.04, 1)`;
+
+/**
+ * Chat screens holding the plugin's resizing off. A count, not a flag: the
+ * first send swaps the draft screen for the thread, and Ionic tells the new
+ * screen it is entering before it tells the old one it is leaving, so the old
+ * one must not turn resizing back on under the new one.
+ */
+let resizeHolds = 0;
+let resizeBefore: KeyboardResize = KeyboardResize.Body;
+
+async function holdKeyboardResize(): Promise<void> {
+  if (resizeHolds++ > 0) return;
+  try {
+    resizeBefore = (await Keyboard.getResizeMode()).mode;
+    await Keyboard.setResizeMode({ mode: KeyboardResize.None });
+  } catch {
+    // No plugin, nothing to hold.
+  }
+}
+
+async function releaseKeyboardResize(): Promise<void> {
+  if (resizeHolds === 0 || --resizeHolds > 0) return;
+  await Keyboard.setResizeMode({ mode: resizeBefore }).catch(() => undefined);
+}
 
 /**
  * One conversation.
@@ -97,11 +141,20 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
   private readonly _content = viewChild(IonContent);
   private readonly _contentHost = viewChild(IonContent, { read: ElementRef<HTMLElement> });
   private readonly _composer = viewChild(ChatComposer);
+  private readonly _footerHost = viewChild(IonFooter, { read: ElementRef<HTMLElement> });
+
+  private _holdingResize = false;
+  private _settleTimer: ReturnType<typeof setTimeout> | undefined;
+  /** iOS: how far the send bar is lifted to sit on the keyboard. */
+  private _lift = 0;
+  /** iOS: the room under the newest message for the keyboard, once settled. */
+  private _inset = 0;
 
   /**
-   * Keyboard up or down, from the native events. The footer pads the home
-   * indicator only while it is down; when it is up the keyboard covers that
-   * strip and the bar should sit right on it.
+   * Android: keyboard up or down, from the native events. The footer pads the
+   * home indicator only while it is down; when it is up the keyboard covers
+   * that strip and the bar should sit right on it. iOS keeps the padding and
+   * lifts the bar by the keyboard less that padding instead.
    */
   readonly keyboardOpen = signal(false);
 
@@ -304,17 +357,133 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
   private _watchKeyboard(): void {
     // No Keyboard plugin on the web build, where the browser handles this
     // itself — the listeners are native-only and their absence is not an error.
-    const listeners = [
-      Keyboard.addListener('keyboardDidShow', () => {
-        void this._content()?.scrollToBottom(0);
-      }),
-      Keyboard.addListener('keyboardWillShow', () => this.keyboardOpen.set(true)),
-      Keyboard.addListener('keyboardWillHide', () => this.keyboardOpen.set(false)),
-    ].map((pending) => pending.catch(() => null));
+    const listeners = (
+      FOLLOWS_KEYBOARD
+        ? [
+            Keyboard.addListener('keyboardWillShow', ({ keyboardHeight }) =>
+              void this._liftWithKeyboard(keyboardHeight),
+            ),
+            Keyboard.addListener('keyboardWillHide', () => void this._lowerWithKeyboard()),
+          ]
+        : [
+            Keyboard.addListener('keyboardDidShow', () => {
+              void this._content()?.scrollToBottom(0);
+            }),
+            Keyboard.addListener('keyboardWillShow', () => this.keyboardOpen.set(true)),
+            Keyboard.addListener('keyboardWillHide', () => this.keyboardOpen.set(false)),
+          ]
+    ).map((pending) => pending.catch(() => null));
 
     this._destroyRef.onDestroy(() => {
       for (const listener of listeners) void listener.then((handle) => handle?.remove());
+      clearTimeout(this._settleTimer);
+      if (this._holdingResize) void releaseKeyboardResize();
     });
+  }
+
+  /**
+   * iOS: lift the bar onto the keyboard as it rises, or as it changes height
+   * while up (emoji, suggestions). The bar keeps its bottom clearance, which
+   * the keyboard covers, so the lift is the keyboard less that clearance and
+   * the pill lands its usual gutter above the keys.
+   */
+  private async _liftWithKeyboard(keyboardHeight: number): Promise<void> {
+    const footer = this._footerHost()?.nativeElement;
+    const toolbar = footer?.querySelector('ion-toolbar');
+    const clearance = toolbar ? parseFloat(getComputedStyle(toolbar).paddingBottom) || 0 : 0;
+    await this._followKeyboard(Math.max(0, Math.round(keyboardHeight - clearance)));
+  }
+
+  private async _lowerWithKeyboard(): Promise<void> {
+    await this._followKeyboard(0);
+  }
+
+  /**
+   * Move the bar to `lift` with the keyboard, and the thread with it when the
+   * reader is following the conversation.
+   *
+   * Both start in the same synchronous step, on the same transition, so they
+   * move as one; the bar is placed directly rather than through a binding,
+   * which would land a frame later. The thread moves as a slide and, once
+   * there, the slide is swapped in one frame for the same picture made of
+   * room under the newest message plus a scroll, so it scrolls normally while
+   * the keyboard is up. It is only ever slid up, under the header: moving
+   * down, the room is turned back into an upward slide first, so no gap opens
+   * below the header. A reader scrolled back through history keeps their
+   * place, and the bar slides over the bottom of the thread.
+   */
+  private async _followKeyboard(lift: number): Promise<void> {
+    if (lift === this._lift) return;
+    const footer = this._footerHost()?.nativeElement;
+    const host = this._contentHost()?.nativeElement;
+    const scroller = await this._content()?.getScrollElement();
+    if (!footer || !host || !scroller) return;
+
+    clearTimeout(this._settleTimer);
+    this._lift = lift;
+    footer.style.transition = KEYBOARD_TRANSITION;
+    footer.style.transform = lift ? `translate3d(0, ${-lift}px, 0)` : '';
+
+    const following =
+      scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight <= FOLLOW_THRESHOLD_PX;
+
+    if (!following) {
+      this._placeThread(host, 0, false);
+      // More room now, out of sight; less room once the bar is down over it.
+      if (lift > this._inset) this._resizeInset(host, scroller, lift, false);
+      else {
+        this._settleTimer = setTimeout(
+          () => this._resizeInset(host, scroller, lift, false),
+          KEYBOARD_ANIMATION_MS,
+        );
+      }
+      return;
+    }
+
+    const base = Math.min(this._inset, lift);
+    if (base < this._inset) {
+      this._placeThread(host, -(this._inset - base), false);
+      this._resizeInset(host, scroller, base, true);
+      host.getBoundingClientRect();
+    }
+    this._placeThread(host, -(lift - base), true);
+    this._settleTimer = setTimeout(() => {
+      this._resizeInset(host, scroller, lift, true);
+      this._placeThread(host, 0, false);
+    }, KEYBOARD_ANIMATION_MS);
+  }
+
+  private _placeThread(host: HTMLElement, y: number, animate: boolean): void {
+    host.style.transition = animate ? KEYBOARD_TRANSITION : 'none';
+    host.style.transform = y ? `translate3d(0, ${y}px, 0)` : '';
+  }
+
+  /**
+   * Change the room under the newest message, optionally scrolling by the
+   * same amount so the picture holds still. The order matters: shrinking the
+   * room first would let the browser clamp the scroll, and the scroll would
+   * then be taken off twice.
+   */
+  private _resizeInset(
+    host: HTMLElement,
+    scroller: HTMLElement,
+    px: number,
+    keepPicture: boolean,
+  ): void {
+    const delta = px - this._inset;
+    if (delta > 0) {
+      this._setInset(host, px);
+      if (keepPicture) scroller.scrollTop += delta;
+    } else {
+      if (keepPicture) scroller.scrollTop += delta;
+      this._setInset(host, px);
+    }
+  }
+
+  private _setInset(host: HTMLElement, px: number): void {
+    this._inset = px;
+    if (px) host.style.setProperty('--mh-keyboard-inset', `${px}px`);
+    else host.style.removeProperty('--mh-keyboard-inset');
   }
 
   /**
@@ -382,6 +551,10 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
    */
   ionViewWillEnter(): void {
     this.store.setActiveId(this.conversationId());
+    if (FOLLOWS_KEYBOARD && !this._holdingResize) {
+      this._holdingResize = true;
+      void holdKeyboardResize();
+    }
   }
 
   /**
@@ -398,6 +571,11 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
     if (this.store.activeId() === this.conversationId()) this.store.setActiveId(null);
     // Leaving with the keyboard up would carry it onto the next screen.
     this._dismissKeyboard();
+    // Every other screen keeps the plugin's resizing.
+    if (this._holdingResize) {
+      this._holdingResize = false;
+      void releaseKeyboardResize();
+    }
   }
 
   dayLabel(dayKey: string): string {
