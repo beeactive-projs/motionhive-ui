@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
+  ActivatedRouteSnapshot,
   Event as RouterEvent,
   NavigationCancel,
   NavigationEnd,
@@ -25,7 +26,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 interface PluginHandle {
   remove: () => Promise<void>;
 }
-import { Observable, filter, fromEventPattern, map, merge } from 'rxjs';
+import { Observable, distinctUntilChanged, filter, fromEventPattern, map, merge, shareReplay } from 'rxjs';
 
 import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
 
@@ -53,6 +54,22 @@ export function isNavigationSettled(event: RouterEvent): boolean {
     event instanceof NavigationError ||
     event instanceof NavigationSkipped
   );
+}
+
+/**
+ * Whether the page at the end of this route tree asks for the bar to be
+ * hidden, via `data: { hideTabBar: true }`.
+ *
+ * Takes the snapshot root, not the live `routerState.root`. Under
+ * `IonicRouteStrategy` a page is detached and cached rather than destroyed,
+ * so the live tree can still lead to a chat the reader has left, and this
+ * answered "hide" for the rest of the session however often it was asked.
+ * The snapshot is rebuilt for every navigation.
+ */
+export function hidesTabBar(root: ActivatedRouteSnapshot): boolean {
+  let route = root;
+  while (route.firstChild) route = route.firstChild;
+  return route.data['hideTabBar'] === true;
 }
 
 /**
@@ -162,7 +179,9 @@ export class Tabs {
   private readonly _settled: Observable<unknown> = merge(
     this._router.events.pipe(filter(isNavigationSettled)),
     appReturns(),
-  );
+    // Shared, so the two signals below register one set of Capacitor
+    // listeners between them rather than one set each.
+  ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   /**
    * The active stack id — the first URL segment after `/tabs`. Derived from
@@ -170,7 +189,7 @@ export class Tabs {
    * lights the right button without anyone remembering to update state.
    */
   readonly activeTabId = toSignal(
-    this._settled.pipe(map(() => activeTabIdFromUrl(this._router.url))),
+    this._settled.pipe(map(() => activeTabIdFromUrl(this._router.url)), distinctUntilChanged()),
     { initialValue: activeTabIdFromUrl(this._router.url) },
   );
 
@@ -184,9 +203,15 @@ export class Tabs {
    * shows the bar. A bar that is wrongly visible for an instant is a smaller
    * fault than one that is wrongly gone until the app restarts.
    */
-  readonly hideTabBar = toSignal(this._settled.pipe(map(() => this._readHideTabBar())), {
-    initialValue: this._readHideTabBar(),
-  });
+  readonly hideTabBar = toSignal(
+    this._settled.pipe(
+      map(() => this._readHideTabBar()),
+      distinctUntilChanged(),
+    ),
+    {
+      initialValue: this._readHideTabBar(),
+    },
+  );
 
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
 
@@ -260,8 +285,6 @@ export class Tabs {
    * yet mid-construction; the `NavigationEnd` tick re-reads it.
    */
   private _readHideTabBar(): boolean {
-    let route = this._router.routerState.root;
-    while (route.firstChild) route = route.firstChild;
-    return route.snapshot?.data['hideTabBar'] === true;
+    return hidesTabBar(this._router.routerState.snapshot.root);
   }
 }

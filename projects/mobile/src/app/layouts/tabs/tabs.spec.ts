@@ -11,7 +11,7 @@ import {
 } from '@angular/router';
 import { describe, expect, it } from 'vitest';
 
-import { isNavigationSettled } from './tabs';
+import { hidesTabBar, isNavigationSettled } from './tabs';
 
 /**
  * The tab bar hides itself on the chat routes and shows itself again when the
@@ -60,5 +60,39 @@ describe('isNavigationSettled', () => {
     expect(
       isNavigationSettled(new RoutesRecognized(1, '/tabs/messages', '/tabs/messages', null!)),
     ).toBe(false);
+  });
+});
+
+/**
+ * A fake route node: only the two fields the traversal reads.
+ */
+function node(data: Record<string, unknown>, child?: unknown): unknown {
+  return { data, firstChild: child ?? null };
+}
+
+/**
+ * The bar is hidden on the chat routes and shown again on every other page.
+ * Reading the live `routerState.root` instead of its snapshot left it hidden
+ * for the rest of the session, because Ionic keeps a left page alive in its
+ * stack and the traversal kept arriving at the chat.
+ */
+describe('hidesTabBar', () => {
+  it('hides on the page that asks for it', () => {
+    const tree = node({}, node({}, node({ hideTabBar: true })));
+    expect(hidesTabBar(tree as never)).toBe(true);
+  });
+
+  it('shows on a page that does not, even under a parent that did', () => {
+    const tree = node({ hideTabBar: true }, node({}, node({})));
+    expect(hidesTabBar(tree as never)).toBe(false);
+  });
+
+  it('shows when nothing in the tree asks', () => {
+    expect(hidesTabBar(node({}, node({})) as never)).toBe(false);
+  });
+
+  it('reads the leaf, not an ancestor: only the page on screen decides', () => {
+    const tree = node({}, node({ hideTabBar: true }, node({ hideTabBar: false })));
+    expect(hidesTabBar(tree as never)).toBe(false);
   });
 });
