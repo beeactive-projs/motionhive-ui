@@ -39,7 +39,7 @@
 
     <form [formRoot]="form">
       @let firstName = form.firstName();
-      <ion-input id="firstName" fill="outline" labelPlacement="stacked" type="text" autocomplete="given-name"
+      <ion-input mode="md" id="firstName" fill="outline" labelPlacement="stacked" type="text" autocomplete="given-name"
         enterkeyhint="next" [label]="'form.label.firstName' | translate"
         [placeholder]="'auth.signUp.firstNamePlaceholder' | translate" [formField]="form.firstName" />
       @if (isInvalid(firstName)) {
@@ -47,7 +47,7 @@
       }
 
       @let lastName = form.lastName();
-      <ion-input id="lastName" fill="outline" labelPlacement="stacked" type="text" autocomplete="family-name"
+      <ion-input mode="md" id="lastName" fill="outline" labelPlacement="stacked" type="text" autocomplete="family-name"
         enterkeyhint="next" [label]="'form.label.lastName' | translate"
         [placeholder]="'auth.signUp.lastNamePlaceholder' | translate" [formField]="form.lastName" />
       @if (isInvalid(lastName)) {
@@ -55,7 +55,7 @@
       }
 
       @let email = form.email();
-      <ion-input id="email" fill="outline" labelPlacement="stacked" type="email" inputmode="email"
+      <ion-input mode="md" id="email" fill="outline" labelPlacement="stacked" type="email" inputmode="email"
         autocomplete="email" enterkeyhint="next" [label]="'auth.common.emailAddress' | translate"
         [placeholder]="'form.placeholder.email' | translate" [formField]="form.email" />
       @if (isInvalid(email)) {

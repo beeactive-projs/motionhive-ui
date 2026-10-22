@@ -18,7 +18,7 @@
 
   <div class="mh-section-label">{{ messageLabel() }}</div>
 
-  <ion-textarea fill="outline" [autoGrow]="true" [rows]="3" [maxlength]="500"
+  <ion-textarea mode="md" fill="outline" [autoGrow]="true" [rows]="3" [maxlength]="500"
     [placeholder]="'sessions.cancelSheet.placeholder' | translate" [value]="message()"
     (ionInput)="message.set($event.detail.value ?? '')" />
 

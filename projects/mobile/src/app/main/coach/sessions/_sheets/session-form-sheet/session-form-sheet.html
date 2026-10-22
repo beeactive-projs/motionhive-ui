@@ -10,12 +10,12 @@
   </div>
 
   <div class="mh-section-label">{{ 'form.label.title' | translate }}</div>
-  <ion-input fill="outline" [placeholder]="'sessions.form.titlePlaceholder' | translate" autocapitalize="sentences"
+  <ion-input mode="md" fill="outline" [placeholder]="'sessions.form.titlePlaceholder' | translate" autocapitalize="sentences"
     [attr.aria-label]="'form.label.title' | translate" [value]="title()"
     (ionInput)="title.set($event.detail.value ?? '')" />
 
   <div class="mh-section-label">{{ 'form.label.description' | translate }}</div>
-  <ion-textarea fill="outline" [placeholder]="'sessions.form.descriptionPlaceholder' | translate"
+  <ion-textarea mode="md" fill="outline" [placeholder]="'sessions.form.descriptionPlaceholder' | translate"
     autocapitalize="sentences" [attr.aria-label]="'form.label.description' | translate" [autoGrow]="true" [rows]="2"
     [value]="description()" (ionInput)="description.set($event.detail.value ?? '')" />
 
@@ -119,7 +119,7 @@
 
   @if (endMode() === EndModes.After) {
   <div class="inline-number">
-    <ion-input class="count" fill="outline" type="number" inputmode="numeric"
+    <ion-input mode="md" class="count" fill="outline" type="number" inputmode="numeric"
       [attr.aria-label]="'sessions.form.occurrences' | translate" [value]="endAfterOccurrences()"
       (ionInput)="setOccurrences($event.detail.value)" />
     <span>{{ 'sessions.form.occurrencesUnit' | translate: { count: endAfterOccurrences() } }}</span>
@@ -168,7 +168,7 @@
   </div>
 
   @if (isOnline()) {
-  <ion-input fill="outline" type="url" inputmode="url" placeholder="https://meet.google.com/…"
+  <ion-input mode="md" fill="outline" type="url" inputmode="url" placeholder="https://meet.google.com/…"
     [attr.aria-label]="'sessions.form.meetingLink' | translate" [value]="meetingUrl()"
     (ionInput)="meetingUrl.set($event.detail.value ?? '')" />
   <p class="mh-helper">{{ 'sessions.form.meetingLinkHint' | translate }}</p>
@@ -227,7 +227,7 @@
     @if (showCapacity()) {
     <div>
       <div class="mh-section-label">{{ 'sessions.form.capacity' | translate }}</div>
-      <ion-input fill="outline" type="number" inputmode="numeric" placeholder="12"
+      <ion-input mode="md" fill="outline" type="number" inputmode="numeric" placeholder="12"
         [attr.aria-label]="'sessions.form.spots' | translate" [value]="capacity()"
         (ionInput)="capacity.set(toNumber($event.detail.value))">
         <span slot="end" class="unit">{{ 'sessions.form.spotsUnit' | translate }}</span>
@@ -236,7 +236,7 @@
     }
     <div>
       <div class="mh-section-label">{{ 'form.label.price' | translate }}</div>
-      <ion-input fill="outline" type="number" inputmode="decimal" placeholder="0"
+      <ion-input mode="md" fill="outline" type="number" inputmode="decimal" placeholder="0"
         [attr.aria-label]="'form.label.price' | translate" [value]="priceAmount()"
         (ionInput)="priceAmount.set(toNumber($event.detail.value))">
         <ion-select toggleIcon="chevron-down-outline" slot="end" class="currency" interface="action-sheet"
@@ -265,7 +265,7 @@
 
   <div class="mh-section-label">{{ 'sessions.form.cancellation' | translate }}</div>
   <div class="inline-number">
-    <ion-input class="count" fill="outline" type="number" inputmode="numeric"
+    <ion-input mode="md" class="count" fill="outline" type="number" inputmode="numeric"
       [attr.aria-label]="'sessions.form.cancellationCutoff' | translate" [value]="cancellationCutoffHours()"
       (ionInput)="setCutoffHours($event.detail.value)" />
     <span>{{ 'sessions.form.cancellationHint' | translate }}</span>

@@ -82,7 +82,7 @@
   }
   } @else {
   <div class="mh-section-label">{{ 'clients.inviteSheet.emailLabel' | translate }}</div>
-  <ion-input type="email" inputmode="email" autocapitalize="off" autocorrect="off" autocomplete="email"
+  <ion-input mode="md" type="email" inputmode="email" autocapitalize="off" autocorrect="off" autocomplete="email"
     spellcheck="false" fill="outline" [placeholder]="'clients.inviteSheet.emailPlaceholder' | translate"
     [attr.aria-label]="'clients.inviteSheet.emailLabel' | translate"
     [maxlength]="emailMaxLength" [value]="email()"
@@ -96,7 +96,7 @@
   }
 
   <div class="mh-section-label">{{ 'clients.inviteSheet.messageLabel' | translate }}</div>
-  <ion-textarea fill="outline" [autoGrow]="true" [rows]="2" [maxlength]="500"
+  <ion-textarea mode="md" fill="outline" [autoGrow]="true" [rows]="2" [maxlength]="500"
     [placeholder]="'clients.inviteSheet.messagePlaceholder' | translate"
     [attr.aria-label]="'clients.inviteSheet.messageLabel' | translate" [value]="message()"
     (ionInput)="message.set($event.detail.value ?? '')" />

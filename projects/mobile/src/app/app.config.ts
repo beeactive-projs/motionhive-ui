@@ -18,15 +18,20 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    // Pinned, not auto-detected. `fill="outline"`/`"solid"` on ion-input,
-    // ion-textarea and ion-select are Material-only — Ionic ships no ios
-    // counterpart — so under an iOS user agent every field in every sheet
-    // rendered as bare text with no border. The design this app is built to is
-    // Material throughout, so it declares that rather than styling around it.
+    // Each platform gets its own mode, which is Ionic's default behaviour.
+    //
+    // This was pinned to `md` because `fill="outline"` on ion-input and
+    // ion-textarea is Material-only, so under iOS every field rendered as
+    // bare text with no border. The cost was paid on every other control:
+    // Material letter-spacing on buttons, tabs and segments, Material headers
+    // and a ripple an iPhone tap is too quick to show. The fields carry
+    // `mode="md"` themselves instead, which is what Ionic documents for
+    // exactly this case, so an iPhone gets iOS everywhere else.
+    //
     // Material's built-in glyphs are the sharp set; this app's icons are all
     // outline (.claude/rules/icons.md). The searchbar's cancel button reads the
     // same key. The name is registered in app.ts.
-    provideIonicAngular({ mode: 'md', backButtonIcon: 'chevron-back-outline' }),
+    provideIonicAngular({ backButtonIcon: 'chevron-back-outline' }),
     // Messaging lives inside a tab stack here, not at web's /messages.
     { provide: MESSAGING_ROUTES, useValue: ['/tabs/messages'] },
     // Where core's guestGuard sends a signed-in user off the auth pages.

@@ -1,6 +1,6 @@
 <ng-template #body>
   <div class="fields">
-    <ion-input
+    <ion-input mode="md"
       fill="outline"
       [label]="'form.label.name' | translate"
       labelPlacement="stacked"
@@ -9,7 +9,7 @@
       (ionInput)="name.set($event.detail.value ?? '')"
     />
 
-    <ion-textarea
+    <ion-textarea mode="md"
       fill="outline"
       [label]="'form.label.description' | translate"
       labelPlacement="stacked"

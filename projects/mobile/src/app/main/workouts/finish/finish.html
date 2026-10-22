@@ -71,7 +71,7 @@
 
         <section class="mh-section">
           <span class="mh-kicker">{{ 'form.label.notes' | translate }}</span>
-          <ion-textarea
+          <ion-textarea mode="md"
             fill="outline"
             [autoGrow]="true"
             [placeholder]="'workouts.finish.notesPlaceholder' | translate"
@@ -88,7 +88,7 @@
           <ion-card-content>
             <span class="mh-kicker">{{ 'workouts.finish.saveAsRoutine.title' | translate }}</span>
             <p>{{ 'workouts.finish.saveAsRoutine.message' | translate }}</p>
-            <ion-input
+            <ion-input mode="md"
               fill="outline"
               [label]="'form.label.name' | translate"
               labelPlacement="stacked"

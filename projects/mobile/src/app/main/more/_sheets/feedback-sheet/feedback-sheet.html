@@ -12,7 +12,7 @@
     }
   </div>
 
-  <ion-input
+  <ion-input mode="md"
     class="field"
     fill="outline"
     labelPlacement="stacked"
@@ -23,7 +23,7 @@
     (ionInput)="title.set($any($event).detail.value ?? '')"
   />
 
-  <ion-textarea
+  <ion-textarea mode="md"
     class="field"
     fill="outline"
     labelPlacement="stacked"

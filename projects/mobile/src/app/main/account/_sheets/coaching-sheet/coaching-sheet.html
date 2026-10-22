@@ -1,5 +1,5 @@
 <ng-template #body>
-  <ion-input
+  <ion-input mode="md"
     [label]="'form.label.displayName' | translate"
     labelPlacement="stacked"
     fill="outline"
@@ -8,7 +8,7 @@
     (ionInput)="displayName.set($event.detail.value ?? '')"
   />
 
-  <ion-input
+  <ion-input mode="md"
     class="field"
     [label]="'form.label.yearsOfExperience' | translate"
     labelPlacement="stacked"
@@ -21,7 +21,7 @@
     (ionInput)="yearsOfExperience.set($event.detail.value ? +$event.detail.value : null)"
   />
 
-  <ion-textarea
+  <ion-textarea mode="md"
     class="field"
     [label]="'form.label.bio' | translate"
     labelPlacement="stacked"
@@ -33,7 +33,7 @@
     (ionInput)="bio.set($event.detail.value ?? '')"
   />
 
-  <ion-input
+  <ion-input mode="md"
     class="field"
     [label]="'form.label.specializations' | translate"
     labelPlacement="stacked"

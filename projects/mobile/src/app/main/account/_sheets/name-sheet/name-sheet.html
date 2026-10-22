@@ -1,5 +1,5 @@
 <ng-template #body>
-  <ion-input
+  <ion-input mode="md"
     [label]="'form.label.firstName' | translate"
     labelPlacement="stacked"
     fill="outline"
@@ -8,7 +8,7 @@
     (ionInput)="firstName.set($event.detail.value ?? '')"
   />
 
-  <ion-input
+  <ion-input mode="md"
     class="ion-margin-top"
     [label]="'form.label.lastName' | translate"
     labelPlacement="stacked"

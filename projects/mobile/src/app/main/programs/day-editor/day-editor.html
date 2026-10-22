@@ -37,7 +37,7 @@
     <div class="mh-page">
       <span class="mh-kicker eyebrow">{{ eyebrow() }}</span>
 
-      <ion-input
+      <ion-input mode="md"
         fill="outline"
         [label]="'programs.dayEditor.dayName' | translate"
         labelPlacement="stacked"
@@ -47,7 +47,7 @@
         (ionBlur)="saveFields()"
       />
 
-      <ion-textarea
+      <ion-textarea mode="md"
         fill="outline"
         [label]="'programs.dayEditor.noteLabel' | translate"
         labelPlacement="stacked"

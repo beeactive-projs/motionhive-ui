@@ -57,6 +57,21 @@
   outline: var(--mh-ring-width) solid var(--ion-color-primary);
 }
 
+/* A day with nothing logged opens nothing, and looked identical to one that
+   does: the tap was simply ignored, which reads as the calendar being broken
+   rather than the day being empty. Lighter ink says there is nothing behind
+   it, and the cursor says so on the way to finding out. */
+.cell:disabled {
+  color: var(--ion-color-medium);
+  cursor: default;
+}
+
+/* Today is worth finding even with nothing on it. */
+.cell.today:disabled {
+  color: var(--ion-text-color);
+  opacity: 0.75;
+}
+
 ion-skeleton-text.cell {
   --border-radius: var(--mh-radius-control);
 }

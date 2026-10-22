@@ -20,6 +20,11 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { App as CapacitorApp } from '@capacitor/app';
+
+/** What `addListener` resolves to; only `remove` matters here. */
+interface PluginHandle {
+  remove: () => Promise<void>;
+}
 import { Observable, filter, fromEventPattern, map, merge } from 'rxjs';
 
 import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
@@ -51,18 +56,38 @@ export function isNavigationSettled(event: RouterEvent): boolean {
 }
 
 /**
- * Capacitor's `resume`, as a stream that removes its listener on unsubscribe.
+ * Every moment the app comes back to the front, as a stream that removes its
+ * listeners on unsubscribe.
  *
- * `addListener` resolves to the handle asynchronously, so a component torn
+ * Two events, because they cover different things. `resume` fires only on a
+ * true background-to-foreground transition. Being merely uncovered — the app
+ * switcher dismissed, a notification shade pulled down and let go, a share
+ * sheet closed — never backgrounds the app, so it fires `appStateChange`
+ * with `isActive` instead. Listening to only one of them leaves the other
+ * kind of return unnoticed.
+ *
+ * `addListener` resolves to its handle asynchronously, so a component torn
  * down before it settles would otherwise leak one.
  */
-function appResumes(): Observable<void> {
-  return fromEventPattern<void>(
+function appReturns(): Observable<void> {
+  const resumed = fromEventPattern<void>(
     (handler) => CapacitorApp.addListener('resume', handler as () => void),
-    (_handler, handle: Promise<{ remove: () => Promise<void> }>) => {
+    (_handler, handle: Promise<PluginHandle>) => {
       void handle?.then((listener) => listener.remove());
     },
   );
+
+  const reactivated = fromEventPattern<{ isActive: boolean }>(
+    (handler) => CapacitorApp.addListener('appStateChange', handler as (s: unknown) => void),
+    (_handler, handle: Promise<PluginHandle>) => {
+      void handle?.then((listener) => listener.remove());
+    },
+  ).pipe(
+    filter((state) => state.isActive),
+    map(() => undefined),
+  );
+
+  return merge(resumed, reactivated);
 }
 
 /**
@@ -130,14 +155,13 @@ export class Tabs {
    * chat on a flaky connection could hide the bar for the rest of the
    * session, on every tab, until the app was restarted.
    *
-   * Resume is here because coming back to a backgrounded app is a moment the
-   * state can be wrong with no navigation to notice it: iOS can reclaim the
-   * WebView while the app is away, and what comes back is restored rather
-   * than navigated to.
+   * Coming back to the front is here because it is a moment the state can be
+   * wrong with no navigation to notice it: iOS can reclaim the WebView while
+   * the app is away, and what comes back is restored rather than navigated to.
    */
   private readonly _settled: Observable<unknown> = merge(
     this._router.events.pipe(filter(isNavigationSettled)),
-    appResumes(),
+    appReturns(),
   );
 
   /**
