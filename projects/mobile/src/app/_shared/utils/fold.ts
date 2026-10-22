@@ -1,3 +1,4 @@
+import { prefersReducedMotion } from './motion';
 import { AnimationCallbackEvent } from '@angular/core';
 
 /**
@@ -142,6 +143,3 @@ function ionicRendered(element: Element): Promise<unknown> {
   return Promise.all(parts.map((part) => part.componentOnReady?.()));
 }
 
-function prefersReducedMotion(): boolean {
-  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-}

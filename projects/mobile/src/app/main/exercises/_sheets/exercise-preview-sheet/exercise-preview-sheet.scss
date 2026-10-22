@@ -100,3 +100,8 @@
   justify-content: center;
   padding: 2rem 0;
 }
+
+/* Says the frames can be driven, without a control over the photo. */
+.xp__hero.steppable {
+  cursor: pointer;
+}
