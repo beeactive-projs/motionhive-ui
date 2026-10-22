@@ -18,10 +18,23 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<!-- Google sign-in: the reversed iOS client ID (googleIosClientId in
+			     core's environments). Google's SDK refuses to start without it. -->
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.119425399334-l8dkteues0kljvkjalv411qkpl15d3mb</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

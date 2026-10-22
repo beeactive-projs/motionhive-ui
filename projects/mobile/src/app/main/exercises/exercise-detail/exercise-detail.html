@@ -36,16 +36,22 @@
     <mh-youtube-embed [url]="url" [title]="exercise.name" />
   </div>
   } @else if (hasHeroImage()) {
-  <div class="hero">
+  <!-- Tap or swipe to step the pair by hand. The timer covers most readers,
+       but not one who asked the OS for less motion, and they were the ones
+       left on the start position with no way forward. -->
+  <div class="hero" [class.steppable]="frames().length > 1"
+    (touchstart)="onFrameTouchStart($event)" (touchend)="onFrameTouchEnd($event)">
     @if (currentFrame(); as frame) {
     <img [src]="frame.url" [alt]="exercise.name" />
     }
     @if (frames().length > 1) {
-    <!-- Which of the two positions is showing. Decorative: the alternation
-         is the point, and announcing "frame 2 of 2" says nothing useful. -->
-    <div class="dots" aria-hidden="true">
+    <!-- Buttons, not decoration: on a reduced-motion phone these are the
+         control, so they have to be reachable without a gesture too. -->
+    <div class="dots">
       @for (frame of frames(); track frame.id; let i = $index) {
-      <span [class.on]="i === frameIndex()"></span>
+      <button type="button" [class.on]="i === frameIndex()" (click)="stepFrame(i - frameIndex())"
+        [attr.aria-label]="'exercises.detail.showFrame' | translate: { number: i + 1 }"
+        [attr.aria-current]="i === frameIndex()"></button>
       }
     </div>
     }

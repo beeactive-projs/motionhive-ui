@@ -1,13 +1,16 @@
 import {
   Component,
+  ElementRef,
   OnDestroy,
   computed,
   effect,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { IonButton, IonIcon, IonNote, IonTextarea } from '@ionic/angular/standalone';
+import { Keyboard } from '@capacitor/keyboard';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
@@ -23,6 +26,11 @@ const MAX_BODY_LENGTH = 4000;
  *
  * No Enter-to-send — on a phone Enter is a newline, so the button is the only
  * way to send. That is also why the field grows instead of scrolling.
+ *
+ * The keyboard stays up across sends, the way every messaging app behaves:
+ * the button never takes focus from the field. Closing it is the thread's
+ * job (a tap or a downward drag on the messages, or leaving the screen),
+ * through `dismissKeyboard()`.
  *
  * Two failures surface here rather than as a toast, because both leave the
  * message sitting in the box: a 429 counts the button down, and a rejected
@@ -46,6 +54,9 @@ export class ChatComposer implements OnDestroy {
 
   /** Local mirror of the store draft, so typing does not round-trip. */
   readonly value = signal('');
+
+  private readonly _field = viewChild(IonTextarea);
+  private readonly _fieldHost = viewChild(IonTextarea, { read: ElementRef<HTMLElement> });
 
   private readonly _now = signal(Date.now());
   private _tick: ReturnType<typeof setInterval> | undefined;
@@ -104,6 +115,30 @@ export class ChatComposer implements OnDestroy {
     if (text.length > 0 && this.store.sendError()) this.store.clearSendError();
   }
 
+  /**
+   * Stop the send button taking focus. Focus moves on the press, not the
+   * click, so cancelling the press keeps the caret (and the keyboard) in the
+   * field while the click still sends.
+   */
+  keepFocus(event: Event): void {
+    event.preventDefault();
+  }
+
+  /** Whether the field holds focus, which on a phone means the keyboard is up. */
+  hasFocus(): boolean {
+    const active = document.activeElement;
+    const host = this._fieldHost()?.nativeElement;
+    return !!active && !!host && host.contains(active);
+  }
+
+  /** Close the keyboard: blur the field, and ask the native side too. */
+  async dismissKeyboard(): Promise<void> {
+    const input = await this._field()?.getInputElement();
+    input?.blur();
+    // No Keyboard plugin on the web build, where the blur is enough.
+    await Keyboard.hide().catch(() => undefined);
+  }
+
   async send(): Promise<void> {
     if (!this.canSend()) return;
 
@@ -115,6 +150,9 @@ export class ChatComposer implements OnDestroy {
     // moment and restores it if the send fails, and the effect above
     // mirrors that back into this field.
     this.value.set('');
+    // A webview that moved focus anyway gets it back while still inside the
+    // tap, the only moment iOS lets a script raise the keyboard.
+    if (!this.hasFocus()) void this._field()?.setFocus();
 
     await this.store.sendMessage({
       conversationId: this.conversationId(),

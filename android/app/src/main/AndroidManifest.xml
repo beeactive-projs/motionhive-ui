@@ -22,7 +22,47 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- App Links: web app URLs from emails open here instead of the
+                 browser. The host is per build (appLinkHost in app/build.gradle);
+                 the domain proves the claim with /.well-known/assetlinks.json
+                 (projects/web/public). Only paths the app has a screen for:
+                 group invites (/join) and public profiles (/@) stay on the web.
+                 The app maps them in _shared/config/app-link.config.ts.
+                 iOS claims the same paths in apple-app-site-association
+                 (projects/web/public/.well-known); change both together. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="${appLinkHost}" />
+                <data android:pathPrefix="/auth/login" />
+                <data android:pathPrefix="/auth/signup" />
+                <data android:pathPrefix="/auth/reset-password" />
+                <data android:pathPrefix="/auth/new-password" />
+                <data android:pathPrefix="/auth/verify-email" />
+                <data android:pathPrefix="/messages" />
+                <data android:pathPrefix="/coaching/sessions" />
+                <data android:pathPrefix="/coaching/clients" />
+                <data android:pathPrefix="/coaching/pending-requests" />
+                <data android:pathPrefix="/coaching/invoices" />
+                <data android:pathPrefix="/coaching/payments" />
+                <data android:pathPrefix="/sessions" />
+                <data android:pathPrefix="/user/sessions" />
+                <data android:pathPrefix="/groups" />
+                <data android:pathPrefix="/profile" />
+            </intent-filter>
+
         </activity>
+
+        <!-- Small icon and accent for every push. The server names no icon, so
+             these apply; without them Android masks the launcher icon into a
+             white blob. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_motionhive" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/mh_notification_accent" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

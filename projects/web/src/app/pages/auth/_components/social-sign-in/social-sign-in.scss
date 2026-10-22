@@ -1,6 +1,11 @@
 // Holds the height of Google's button while its script loads.
+// Google's iframe document is light only. In dark mode the page is
+// `color-scheme: dark` (PrimeNG sets it on `.dark`), and Safari paints an
+// opaque white backdrop behind an iframe whose scheme differs from its
+// element's. Matching it keeps the iframe transparent around the button.
 .google {
   min-height: 2.75rem;
+  color-scheme: light;
 }
 
 :host ::ng-deep .p-divider-content {

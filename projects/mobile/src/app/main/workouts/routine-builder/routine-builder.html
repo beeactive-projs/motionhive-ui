@@ -9,9 +9,16 @@
       }
     </ion-buttons>
     <ion-title>{{ title() }}</ion-title>
-    @if (!showOverview()) {
+    <!-- Nothing while it loads: a saved routine opens to the ⋯, not to Save. -->
+    @if (!showOverview() && !loading()) {
       <ion-buttons slot="end">
         <ion-button [disabled]="!canSave() || saving()" (click)="save()">{{ 'button.save' | translate }}</ion-button>
+      </ion-buttons>
+    } @else if (showActions()) {
+      <ion-buttons slot="end">
+        <ion-button [attr.aria-label]="'a11y.moreActions' | translate" (click)="openActions()">
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        </ion-button>
       </ion-buttons>
     }
   </ion-toolbar>
@@ -157,15 +164,6 @@
         {{ 'workouts.common.addExercises' | translate }}
       </ion-button>
 
-      @if (!isNew()) {
-        <!-- Last, and the one row in red: the only thing here worth a second thought. -->
-        <ion-list [inset]="true" class="mh-card-list">
-          <ion-item button detail="false" (click)="deleteOpen.set(true)">
-            <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
-            <ion-label color="danger">{{ 'workouts.routineBuilder.deleteRow' | translate }}</ion-label>
-          </ion-item>
-        </ion-list>
-      }
     </div>
   }
 </ion-content>
@@ -186,30 +184,20 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
+        <!-- One button, the screen's main action; every other verb about
+             this routine is behind the ⋯ (docs/MOBILE-ACTIONS.md). Coaching,
+             a routine is something to shape: a starter becomes yours by
+             copying it, your own opens to Edit. Training, Start leads. -->
         @if (isCoachMode()) {
-          <!-- Coaching: a routine is something to shape and hand out. A
-               starter becomes yours by copying it; your own leads with Edit,
-               with a copy one quiet tap away for a variation. -->
           @if (readOnly()) {
-            <ion-button expand="block" [disabled]="copying()" (click)="makeCopy()">
+            <ion-button expand="block" [disabled]="copying()" (click)="askCopy()">
               {{ 'workouts.routineBuilder.makeCopy' | translate }}
             </ion-button>
           } @else {
             <ion-button expand="block" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
-            <div class="mh-quiet-actions">
-              <ion-button fill="clear" size="small" [disabled]="copying()" (click)="makeCopy()">
-                {{ 'workouts.routineBuilder.makeCopy' | translate }}
-              </ion-button>
-            </div>
           }
         } @else {
           <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
-          <!-- A starter has nothing to edit: starting it is how it becomes yours. -->
-          @if (!readOnly()) {
-            <div class="mh-quiet-actions">
-              <ion-button fill="clear" size="small" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
-            </div>
-          }
         }
       </div>
     </ion-toolbar>
@@ -224,7 +212,25 @@
   (picked)="onPicked($event)"
 />
 
+<mh-action-sheet
+  [(open)]="actionsOpen"
+  [title]="routine()?.name ?? ''"
+  [actions]="actions()"
+  (chosen)="onAction($event)"
+/>
+
 <mh-confirm-sheet
+  #copySheet
+  [(open)]="copyConfirmOpen"
+  [title]="'workouts.routineBuilder.copyConfirm.title' | translate"
+  [body]="copyBody()"
+  [confirmLabel]="'workouts.routineBuilder.makeCopy' | translate"
+  [saving]="copying()"
+  (confirm)="makeCopy()"
+/>
+
+<mh-confirm-sheet
+  #deleteSheet
   [(open)]="deleteOpen"
   [title]="'workouts.routineBuilder.delete.title' | translate"
   [body]="deleteBody()"

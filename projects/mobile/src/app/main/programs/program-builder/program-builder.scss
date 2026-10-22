@@ -135,3 +135,12 @@ ion-item.rest p {
 .week-summary .empty {
   color: var(--ion-color-medium);
 }
+
+/* Why Publish is not available yet, said above the button it disables. */
+.blocker {
+  margin: 0 0 0.5rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+  text-align: center;
+}

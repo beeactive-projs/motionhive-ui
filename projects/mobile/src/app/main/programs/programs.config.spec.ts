@@ -1,17 +1,19 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ProgramAssignmentStatus, ProgramStatus } from 'core';
+import { ProgramAssignmentStatus, ProgramSource, ProgramStatus } from 'core';
 
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   PROGRAM_ICONS,
+  ProgramActionIds,
   assignmentChip,
   assignmentSubline,
   assignmentTone,
   programMeta,
   programTone,
   scheduledDateFor,
+  visibleProgramActions,
   weekdayScheduleStart,
   weeksOf,
   weeksToDays,
@@ -130,8 +132,33 @@ describe('programs config', () => {
     expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Paused }))).toMatch(
       /shifts the remaining schedule forward/,
     );
-    expect(assignmentSubline(assignment())).toBe('25% done');
+    // Started is the fact a coach scans for; the percentage alone hid it.
+    expect(assignmentSubline(assignment())).toMatch(/^Started .+ · 25% done$/);
     expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Cancelled }))).toBe('');
+  });
+
+  // The ⋯ lists only what applies now (docs/MOBILE-ACTIONS.md): a draft can't
+  // be handed out yet, and a starter is MotionHive's to change, not the coach's.
+  it('offers only the actions that apply to the program as it is', () => {
+    const ids = (over: Record<string, unknown>) => visibleProgramActions(program(over)).map((a) => a.id);
+    expect(ids({ source: ProgramSource.Instructor })).toEqual([
+      ProgramActionIds.Assign,
+      ProgramActionIds.EditDetails,
+      ProgramActionIds.ViewAssignments,
+      ProgramActionIds.Duplicate,
+      ProgramActionIds.Unpublish,
+      ProgramActionIds.Delete,
+    ]);
+    expect(ids({ source: ProgramSource.Instructor, status: ProgramStatus.Draft })).toEqual([
+      ProgramActionIds.EditDetails,
+      ProgramActionIds.Duplicate,
+      ProgramActionIds.Delete,
+    ]);
+    expect(ids({ source: ProgramSource.System })).toEqual([
+      ProgramActionIds.Assign,
+      ProgramActionIds.ViewAssignments,
+      ProgramActionIds.Duplicate,
+    ]);
   });
 
   // The assign preview is only as good as this maths: a start date on the

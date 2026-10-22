@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { signal } from '@angular/core';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -422,5 +422,108 @@ describe('MessagingStore — mark as unread', () => {
       },
     });
     expect(store.filterCounts().unread).toBe(1);
+  });
+});
+
+describe('MessagingStore — catching up after the background', () => {
+  let store: MessagingStore;
+  let realtime: { reconnect: ReturnType<typeof vi.fn> };
+  let api: {
+    listConversations: ReturnType<typeof vi.fn>;
+    listMessages: ReturnType<typeof vi.fn>;
+  };
+  let authed: WritableSignal<boolean>;
+
+  function setVisibility(state: DocumentVisibilityState): void {
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => state,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-20T12:00:00Z'));
+
+    realtime = { reconnect: vi.fn() };
+    api = {
+      listConversations: vi.fn(() => of({ items: [], total: 0 })),
+      listMessages: vi.fn(() => of({ items: [], nextBefore: null })),
+    };
+    authed = signal(true);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        MessagingStore,
+        { provide: MessagingService, useValue: api },
+        {
+          provide: MessagingRealtimeService,
+          useValue: {
+            events$: new Subject(),
+            status: signal('open').asReadonly(),
+            lastEventId: signal<string | null>(null),
+            connect: vi.fn(),
+            disconnect: vi.fn(),
+            ...realtime,
+          },
+        },
+        {
+          provide: AuthStore,
+          useValue: {
+            user: signal({ id: ME }).asReadonly(),
+            isAuthenticated: authed.asReadonly(),
+          },
+        },
+        { provide: Router, useValue: { navigate: vi.fn(() => Promise.resolve(true)) } },
+      ],
+    });
+    store = TestBed.inject(MessagingStore);
+  });
+
+  afterEach(() => {
+    setVisibility('visible');
+    vi.useRealTimers();
+  });
+
+  it('opens a fresh stream and re-reads the inbox and the open thread', () => {
+    store.setActiveId(REAL_CONV);
+
+    store.resync();
+
+    expect(realtime.reconnect).toHaveBeenCalledTimes(1);
+    expect(api.listConversations).toHaveBeenCalledTimes(1);
+    expect(api.listMessages).toHaveBeenCalledWith(REAL_CONV, expect.anything());
+  });
+
+  it('treats the second resume signal of one return as the same return', () => {
+    store.resync();
+    vi.advanceTimersByTime(1_000);
+    store.resync();
+    expect(realtime.reconnect).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(10_000);
+    store.resync();
+    expect(realtime.reconnect).toHaveBeenCalledTimes(2);
+  });
+
+  it('does nothing when signed out', () => {
+    authed.set(false);
+    store.resync();
+    expect(realtime.reconnect).not.toHaveBeenCalled();
+    expect(api.listConversations).not.toHaveBeenCalled();
+  });
+
+  it('catches up when the page comes back after a real absence, not a glance', () => {
+    setVisibility('hidden');
+    vi.advanceTimersByTime(5_000);
+    setVisibility('visible');
+    expect(realtime.reconnect).not.toHaveBeenCalled();
+
+    setVisibility('hidden');
+    vi.advanceTimersByTime(60_000);
+    setVisibility('visible');
+    expect(realtime.reconnect).toHaveBeenCalledTimes(1);
   });
 });

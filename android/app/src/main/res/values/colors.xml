@@ -2,4 +2,8 @@
 <resources>
     <!-- Android 12+ system splash background. Matches the light Ionic background colour (slate-100). -->
     <color name="mh_splash_background">#f1f5f9</color>
+    <!-- Notification accent: the circle Android draws behind the white small icon.
+         The app icon's navy tile (logo-bg-navy), so the shade repeats the launcher
+         icon. Never honey: there is no honey tile. -->
+    <color name="mh_notification_accent">#1e3a5f</color>
 </resources>

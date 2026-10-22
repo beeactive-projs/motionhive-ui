@@ -144,6 +144,7 @@ export class ClientDetail implements ViewWillEnter {
   readonly archiveOpen = signal(false);
   readonly archiveSaving = signal(false);
   readonly assignOpen = signal(false);
+  readonly assignSaving = signal(false);
   /** Past plans are a record; folded away until asked for. */
   readonly pastPlansOpen = signal(false);
   /** Null until the coach picks: the default follows what there is to show. */
@@ -435,17 +436,23 @@ export class ClientDetail implements ViewWillEnter {
   onAssign(request: AssignRequest): void {
     const programId = request.programId;
     const clientId = this.store.client()?.clientId;
-    if (!programId || !clientId) return;
+    if (!programId || !clientId || this.assignSaving()) return;
+    this.assignSaving.set(true);
     this.store.assignPlan({ ...request, programId, clientId }).subscribe({
-      next: () =>
+      next: () => {
+        this.assignSaving.set(false);
+        this.assignOpen.set(false);
         void this._feedbackService.success(
           this._translateService.instant('programs.assignments.toast.assigned'),
-        ),
-      error: (error: unknown) =>
+        );
+      },
+      error: (error: unknown) => {
+        this.assignSaving.set(false);
         void this._feedbackService.error(
           error,
           this._translateService.instant('programs.assignments.toast.assignFailed'),
-        ),
+        );
+      },
     });
   }
 

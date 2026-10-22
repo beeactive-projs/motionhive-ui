@@ -1,0 +1,145 @@
+name: iOS → TestFlight
+
+on:
+  push:
+    branches: [develop]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'android/**'
+      - 'projects/web/**'
+      - 'projects/website/**'
+      - 'projects/admin/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: true
+
+jobs:
+  build-and-upload:
+    runs-on: macos-15
+    steps:
+      # A missing secret otherwise only shows up at the upload, after a full
+      # macOS build. Fail first and name it.
+      - name: Check secrets
+        env:
+          IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROVISIONING_PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          missing=0
+          for name in IOS_DIST_CERT_P12 IOS_DIST_CERT_PASSWORD IOS_PROVISIONING_PROFILE ASC_KEY_P8 ASC_KEY_ID ASC_ISSUER_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is not set."
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - uses: actions/checkout@v5
+
+      # Must always be higher than the last build uploaded for this
+      # MARKETING_VERSION. This workflow's run number only ever goes up.
+      - name: Set build number
+        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
+
+      # App Store Connect only accepts builds made with a current SDK.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Staging: a production build against the dev API, same as the Play
+      # testing track. See environment.mobile-staging.ts.
+      - name: Build mobile app (staging) & sync Capacitor
+        run: |
+          npx ng build mobile --configuration staging
+          npx cap sync ios
+
+      # Release is signed manually (project.pbxproj): the Apple Distribution
+      # certificate and the "MotionHive App Store" profile come from secrets
+      # and live in a throwaway keychain for this run only.
+      - name: Install signing certificate & provisioning profile
+        env:
+          IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROVISIONING_PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+          echo "$IOS_DIST_CERT_P12" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/dist.p12" -P "$IOS_DIST_CERT_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+
+          # Xcode 16+ reads the first folder; older versions the second.
+          for dir in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles" "$HOME/Library/MobileDevice/Provisioning Profiles"; do
+            mkdir -p "$dir"
+            echo "$IOS_PROVISIONING_PROFILE" | base64 --decode > "$dir/motionhive-app-store.mobileprovision"
+          done
+
+      # altool finds the key by its ID in ~/.appstoreconnect/private_keys. The
+      # IDs are trimmed: a space or line break pasted into a secret breaks auth.
+      - name: Restore App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          KEY_ID="$(echo "$ASC_KEY_ID" | tr -d '[:space:]')"
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          echo "$ASC_KEY_P8" | base64 --decode > "$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8"
+          echo "ASC_KEY_ID=$KEY_ID" >> "$GITHUB_ENV"
+          echo "ASC_ISSUER_ID=$(echo "$ASC_ISSUER_ID" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
+      # Staging opens dev web app links, matching the dev API it talks to.
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            APP_LINK_HOST=dev.app.motionhive.fit
+
+      # Signing is manual, so the export needs no App Store Connect account.
+      # (Exporting with destination=upload logs in through Xcode's account
+      # layer, which refused this App Manager key.)
+      - name: Export .ipa
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist ios/App/ExportOptions.plist \
+            -exportPath "$RUNNER_TEMP/export"
+
+      # Shows up in App Store Connect → TestFlight once Apple has processed it.
+      - name: Upload to TestFlight
+        run: |
+          xcrun altool --upload-app \
+            -f "$RUNNER_TEMP/export/App.ipa" \
+            -t ios \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Clean up signing material
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" || true
+          rm -f "$RUNNER_TEMP/dist.p12"
+          rm -rf "$HOME/.appstoreconnect/private_keys"

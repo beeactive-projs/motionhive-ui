@@ -40,10 +40,11 @@ export function withAppLanguage(url: string, language: AppLanguage): string {
 
 /**
  * Public marketing site — a third deploy, separate from both the API and the
- * web app, so it is not derived from `environment`. Blog articles are only
- * published here; every app that surfaces them links out to this origin.
+ * web app. Per environment like the others (`environment.websiteUrl`): a dev
+ * build links to the dev site. Blog articles are only published here; every
+ * app that surfaces them links out to this origin.
  */
-export const MARKETING_SITE_URL = 'https://www.motionhive.fit';
+export const MARKETING_SITE_URL = environment.websiteUrl;
 
 /** Blog index on the marketing site; append `/<slug>` for a single article. */
 export const MARKETING_BLOG_URL = `${MARKETING_SITE_URL}/blog`;

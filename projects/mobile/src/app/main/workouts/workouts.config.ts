@@ -34,6 +34,8 @@ import {
   chevronDownOutline,
   chevronForwardOutline,
   chevronUpOutline,
+  copyOutline,
+  createOutline,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
@@ -71,6 +73,8 @@ export const WORKOUT_ICONS = {
   chevronDownOutline,
   chevronForwardOutline,
   chevronUpOutline,
+  copyOutline,
+  createOutline,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
@@ -1115,4 +1119,49 @@ export function exerciseActions(skipped: boolean): ExerciseAction[] {
       destructive: true,
     },
   ];
+}
+
+// ─── Routine verbs ────────────────────────────────────────────────────────
+
+/**
+ * The verbs behind a routine's ⋯ (see docs/MOBILE-ACTIONS.md). Only on your
+ * own routine: a starter only reads, and copying it is its footer button.
+ */
+export const RoutineActionIds = {
+  Edit: 'edit',
+  Duplicate: 'duplicate',
+  Delete: 'delete',
+} as const;
+
+export type RoutineActionId = (typeof RoutineActionIds)[keyof typeof RoutineActionIds];
+
+export type RoutineAction = SheetAction<RoutineActionId>;
+
+/**
+ * Edit is left out when it is already the footer's button (coaching), since
+ * the screen's main action is never only in the sheet and never in both.
+ */
+export function routineActions(editInFooter: boolean): RoutineAction[] {
+  const actions: RoutineAction[] = [
+    {
+      id: RoutineActionIds.Edit,
+      label: 'button.edit',
+      icon: 'create-outline',
+      color: 'medium',
+    },
+    {
+      id: RoutineActionIds.Duplicate,
+      label: 'workouts.routineBuilder.makeCopy',
+      icon: 'copy-outline',
+      color: 'medium',
+    },
+    {
+      id: RoutineActionIds.Delete,
+      label: 'workouts.routineBuilder.delete.title',
+      icon: 'trash-outline',
+      color: 'danger',
+      destructive: true,
+    },
+  ];
+  return editInFooter ? actions.filter((action) => action.id !== RoutineActionIds.Edit) : actions;
 }

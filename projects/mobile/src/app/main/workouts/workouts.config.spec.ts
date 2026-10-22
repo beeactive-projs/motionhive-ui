@@ -8,6 +8,7 @@ import {
   CalendarDayStates,
   HeroStates,
   LogSources,
+  RoutineActionIds,
   WORKOUT_ICONS,
   assignedDayTone,
   bestTopSet,
@@ -38,6 +39,7 @@ import {
   planWeekLabel,
   prescriptionLine,
   recordSessionIds,
+  routineActions,
   routineTileColor,
   secondsToClock,
   trendGeometry,
@@ -122,6 +124,21 @@ describe('workouts config', () => {
     for (const name of iconNamesUsed()) {
       expect(registered, `${name} is rendered but not registered`).toContain(name);
     }
+  });
+
+  // The screen's main action is never only in the ⋯ and never in both: a
+  // coach's footer already says Edit, a trainee's says Start.
+  it('keeps the footer action out of the routine ⋯', () => {
+    expect(routineActions(true).map((a) => a.id)).toEqual([
+      RoutineActionIds.Duplicate,
+      RoutineActionIds.Delete,
+    ]);
+    expect(routineActions(false).map((a) => a.id)).toEqual([
+      RoutineActionIds.Edit,
+      RoutineActionIds.Duplicate,
+      RoutineActionIds.Delete,
+    ]);
+    expect(routineActions(false).at(-1)?.destructive).toBe(true);
   });
 
   it('rotates routine tiles so a list never reads as one grey block', () => {

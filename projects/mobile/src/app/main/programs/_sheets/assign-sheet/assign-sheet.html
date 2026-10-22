@@ -207,6 +207,7 @@
   [body]="body"
   [saveLabel]="'programs.assign.assign' | translate"
   [canSave]="canAssign()"
+  [saving]="saving()"
   [breakpoints]="[0, 0.9]"
   [initialBreakpoint]="0.9"
   (save)="submit()"

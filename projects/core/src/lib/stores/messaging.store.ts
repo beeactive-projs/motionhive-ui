@@ -2,6 +2,7 @@
 import {
   computed,
   DestroyRef,
+  DOCUMENT,
   effect,
   inject,
   Injectable,
@@ -121,6 +122,20 @@ const MESSAGE_PAGE_SIZE = 25;
 const DEFAULT_RETRY_AFTER_MS = 30_000;
 
 /**
+ * Two resume signals arrive for one return on a phone (the WebView's
+ * `visibilitychange` and the native resume event), so a second `resync()`
+ * inside this window is the same return and does nothing.
+ */
+const RESYNC_THROTTLE_MS = 5_000;
+
+/**
+ * How long the page has to be hidden before coming back counts as a return.
+ * A glance at another browser tab keeps its stream; a phone that slept, or a
+ * tab left for a meeting, catches up.
+ */
+const RESYNC_AFTER_HIDDEN_MS = 30_000;
+
+/**
  * MessagingStore — signal-based state for the messaging feature.
  *
  * Owns:
@@ -150,6 +165,7 @@ export class MessagingStore {
   private readonly _auth = inject(AuthStore);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _document = inject(DOCUMENT);
   /** Where messaging is mounted in the host app — see `MESSAGING_ROUTES`. */
   private readonly _routes = inject(MESSAGING_ROUTES);
 
@@ -239,6 +255,12 @@ export class MessagingStore {
    * Set after a 429; cleared once we successfully load again.
    */
   private rateLimitedUntilAt = 0;
+
+  /** `Date.now()` of the last `resync()` that ran. See RESYNC_THROTTLE_MS. */
+  private lastResyncAt = 0;
+
+  /** When the page was last hidden, or null while it is visible. */
+  private hiddenAt: number | null = null;
 
   /** Tracks the last `isAuthenticated()` value the effect acted on. */
   private lastAuthState: boolean | null = null;
@@ -466,6 +488,48 @@ export class MessagingStore {
     this._realtime.events$
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((envelope) => this.handleStreamEnvelope(envelope));
+
+    // Coming back after a while: see `resync()`. The mobile app also calls
+    // it on the native resume event, which a WebView does not always turn
+    // into a `visibilitychange`.
+    const onVisibility = () => {
+      if (this._document.visibilityState === 'hidden') {
+        this.hiddenAt = Date.now();
+        return;
+      }
+      const away = this.hiddenAt === null ? 0 : Date.now() - this.hiddenAt;
+      this.hiddenAt = null;
+      if (away >= RESYNC_AFTER_HIDDEN_MS) this.resync();
+    };
+    this._document.addEventListener('visibilitychange', onVisibility);
+    this._destroyRef.onDestroy(() =>
+      this._document.removeEventListener('visibilitychange', onVisibility),
+    );
+  }
+
+  /**
+   * Catch up after the app was in the background.
+   *
+   * A backgrounded phone freezes the WebView, and the stream dies with it
+   * or lingers as a socket that will never deliver again. The reconnect
+   * is a new EventSource, which sends no `Last-Event-ID`, so the server's
+   * replay does not cover the gap either. So: a fresh stream, then the
+   * inbox and the open thread re-read from the server, which is what the
+   * screen would have shown had the stream never stopped.
+   *
+   * Safe to call on every resume signal; repeats inside RESYNC_THROTTLE_MS
+   * are the same return and do nothing.
+   */
+  resync(): void {
+    if (!this._auth.isAuthenticated()) return;
+    const now = Date.now();
+    if (now - this.lastResyncAt < RESYNC_THROTTLE_MS) return;
+    this.lastResyncAt = now;
+
+    this._realtime.reconnect();
+    this.loadConversations({ force: true });
+    const active = this._activeId();
+    if (active) this.loadMessages(active, { force: true });
   }
 
   // ─── Inbox UI actions ─────────────────────────────────────────

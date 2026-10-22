@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+:host:empty {
+  display: none;
+}
+
+// "or" between two hairlines, like web's divider.
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--mh-color-separator);
+  }
+}
+
+// Google's neutral button (its branding rules: a plain surface, a thin grey
+// outline, the mark and the label), at the height and type of the auth pages'
+// submit button so the two read as a pair.
+ion-button.google {
+  --background: var(--ion-color-light);
+  --border-color: var(--ion-border-color);
+  --border-width: 1px;
+  --color: var(--ion-text-color);
+  --box-shadow: none;
+  height: 2.875rem;
+  margin: 0;
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  letter-spacing: normal;
+
+  svg {
+    width: var(--mh-icon-md);
+    height: var(--mh-icon-md);
+    margin-inline-end: 0.75rem;
+  }
+}

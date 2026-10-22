@@ -79,11 +79,11 @@ Other dimension roles: `--mh-tap-target` (2.75rem, the WCAG 44px minimum — use
 ## Core reuse contract
 
 - **Import from `'core'`**: models, constants (`API_ENDPOINTS`, `STORAGE_KEYS`, …), utils (api-error, date, form, …), HTTP services (`AuthService`, `TokenService`, `UserService`, `ClientService`, …), pure signal services (`ErrorDialogService`, `LoadingService`), stores (`AuthStore`, …), guards (`authGuard`, `instructorGuard`), interceptors (auth, error, loading, silent-request context), `environment`.
-- **Never import**: core UI components (logo, hex, segmented, dialog-shell, bottom-sheet, sticky-cta, action-list, avatar-stack, youtube-embed), `stripe-iframe.directive`, core `ThemeService`, `google-auth.service`/`facebook-auth.service` (don't work in a WebView), anything PrimeNG — including the `TableLazyLoadEvent`-shaped `ClientService.filterClients`/`filterPendingRequests` (use `getClients()`/`getPendingRequests()` instead).
+- **Never import**: core UI components (logo, hex, segmented, dialog-shell, bottom-sheet, sticky-cta, action-list, avatar-stack, youtube-embed), `stripe-iframe.directive`, core `ThemeService`, `google-auth.service`/`facebook-auth.service` (don't work in a WebView; Google sign-in goes through the native picker in `pages/auth/google-sign-in.service.ts`), anything PrimeNG — including the `TableLazyLoadEvent`-shaped `ClientService.filterClients`/`filterPendingRequests` (use `getClients()`/`getPendingRequests()` instead).
 
 ## Environments
 
-Mobile never ships core's host-sniffing `environment.ts`. Both build configurations swap it via `fileReplacements`: production → `environment.mobile.ts` (fixed prod URLs), development → `environment.mobile-dev.ts` (browser serve → local API on :3800; native → dev Railway API). Keep the exported shape identical to `environment.ts`.
+Mobile never ships core's host-sniffing `environment.ts`. All three build configurations swap it via `fileReplacements`: production → `environment.mobile.ts` (fixed prod URLs, for a store release), staging → `environment.mobile-staging.ts` (a production build against the dev Railway API; the Play testing track ships this, built from `develop`), development → `environment.mobile-dev.ts` (local API on :3800, browser and native). Keep the exported shape identical to `environment.ts`.
 
 ## Angular rules (same bar as root CLAUDE.md)
 

@@ -313,7 +313,12 @@
   (save)="saveNotes($event)"
 />
 
-<mh-assign-sheet [(open)]="assignOpen" [client]="store.client()" (assign)="onAssign($event)" />
+<mh-assign-sheet
+  [(open)]="assignOpen"
+  [client]="store.client()"
+  [saving]="assignSaving()"
+  (assign)="onAssign($event)"
+/>
 
 <mh-confirm-sheet
   [(open)]="archiveOpen"

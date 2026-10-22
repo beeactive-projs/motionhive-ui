@@ -22,6 +22,7 @@ import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-she
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
 import { ExerciseRow } from '../../_components/exercise-row/exercise-row';
+import { ExercisePreviewSheet } from '../exercise-preview-sheet/exercise-preview-sheet';
 import { RecentExercisesStore } from '../../recent-exercises.store';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -46,6 +47,7 @@ const PAGE_SIZE = 20;
   selector: 'mh-exercise-picker-sheet',
   imports: [
     ExerciseRow,
+    ExercisePreviewSheet,
     HexAvatar,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
@@ -221,6 +223,15 @@ export class ExercisePickerSheet {
 
   isOn(id: string): boolean {
     return this.selectedIds().includes(id) || this.isLocked(id);
+  }
+
+  /** The exercise being looked at, which is not the same as being picked. */
+  readonly previewing = signal<Exercise | null>(null);
+  readonly previewOpen = signal(false);
+
+  preview(exercise: Exercise): void {
+    this.previewing.set(exercise);
+    this.previewOpen.set(true);
   }
 
   toggle(exercise: Exercise): void {

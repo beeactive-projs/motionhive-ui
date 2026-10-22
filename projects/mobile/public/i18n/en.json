@@ -590,7 +590,8 @@
         "existingFork": "You already have a copy, here it is",
         "forkFailed": "Could not fork this exercise.",
         "forked": "Copied to your exercises"
-      }
+      },
+      "showFrame": "Show frame {{number}}"
     },
     "detailRows": {
       "kindLevel": "Kind & level",
@@ -713,7 +714,10 @@
       "loadError": "The catalog could not be loaded. Check your connection.",
       "noMatch": "No exercise matches that name.",
       "recentlyUsed": "Recently used",
-      "results": "Results"
+      "results": "Results",
+      "about": "About {{name}}",
+      "add": "Add",
+      "remove": "Remove"
     },
     "row": {
       "equipmentMore": "{name} +{count}",
@@ -1501,7 +1505,6 @@
     "post": "Post",
     "profile": "Profile",
     "program": "Program",
-    "programSettings": "Program settings",
     "programs": "Programs",
     "progress": "Progress",
     "resetPassword": "Reset password",
@@ -1745,6 +1748,10 @@
     "privateNoteAnonymous": "This person keeps the rest of their profile private."
   },
   "programs": {
+    "actions": {
+      "editDetails": "Edit details",
+      "unpublishHint": "Back to draft. Clients already on it keep their copy."
+    },
     "assign": {
       "assign": "Assign",
       "client": "Client",
@@ -1772,6 +1779,7 @@
       "pause": "Pause",
       "pausedSubline": "Paused. Resuming shifts the remaining schedule forward",
       "percentDone": "{percent}% done",
+      "startedPercent": "Started {date} · {percent}% done",
       "starts": "Starts {date}"
     },
     "assignments": {
@@ -1891,7 +1899,12 @@
       },
       "untitledDay": "Untitled day"
     },
+    "duplicate": {
+      "body": "You get a draft copy of {name} to change freely. This program, and the clients already on it, stay as they are.",
+      "title": "Duplicate this program?"
+    },
     "filter": {
+      "origin": "Made by",
       "showResults": "Show results",
       "title": "Filter programs"
     },
@@ -1930,15 +1943,12 @@
       "routine": "Routine"
     },
     "settings": {
-      "dayCount": "{count, plural, one {# day} other {# days}} of work so far.",
       "delete": {
         "body": "Delete {name}? Clients already assigned keep their own copy.",
         "bodyFallback": "Delete this program? Clients already assigned keep their own copy.",
-        "row": "Delete program…",
         "title": "Delete program"
       },
       "descriptionPlaceholder": "Who it is for, and what it builds.",
-      "duplicate": "Duplicate program",
       "length": "Length",
       "lengthAria": "Program length in weeks",
       "namePlaceholder": "12-week strength block",
@@ -1954,9 +1964,7 @@
         "required": "Choose one to save the new length."
       },
       "publish": "Publish",
-      "publishedNote": "Clients can be assigned to this program.",
       "shrinkWarning": "{count, plural, one {# day falls} other {# days fall}} outside this length and will be deleted.",
-      "title": "Program settings",
       "toast": {
         "deleteFailed": "Could not delete the program",
         "deleted": "Program deleted",
@@ -2570,11 +2578,14 @@
       "restOver": "Rest over"
     },
     "routineBuilder": {
+      "copyConfirm": {
+        "body": "You get your own copy of {name} to change freely. The original stays as it is.",
+        "title": "Make a copy?"
+      },
       "delete": {
         "message": "Delete {name}? Workouts already logged from it are kept.",
         "title": "Delete routine"
       },
-      "deleteRow": "Delete routine…",
       "makeCopy": "Make a copy",
       "name": {
         "label": "Routine name",

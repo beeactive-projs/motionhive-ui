@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "fit.motionhive.app",
+      "sha256_cert_fingerprints": [
+        "88:0D:DF:7C:FF:3B:A0:97:79:30:AD:EC:FD:8D:BB:82:26:86:6F:D9:B2:6A:87:36:F7:40:07:40:28:32:8F:B8"
+      ]
+    }
+  }
+]

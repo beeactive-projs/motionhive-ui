@@ -1,7 +1,14 @@
 import { Component, computed, input, output } from '@angular/core';
-import { IonBadge, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
+import {
+  IonBadge,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle } from 'ionicons/icons';
+import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { Exercise } from 'core';
 
@@ -54,7 +61,7 @@ function isLibraryExercise(exercise: Exercise | ExerciseRef): exercise is Exerci
  */
 @Component({
   selector: 'mh-exercise-row',
-  imports: [HexAvatar, IonBadge, IonIcon, IonItem, IonLabel],
+  imports: [HexAvatar, IonBadge, IonButton, IonIcon, IonItem, IonLabel, TranslatePipe],
   templateUrl: './exercise-row.html',
   styleUrl: './exercise-row.scss',
 })
@@ -68,6 +75,11 @@ export class ExerciseRow {
   readonly prescription = input<string | null>(null);
 
   readonly select = output<void>();
+  /**
+   * Asked for a closer look rather than a pick. Only wired in the picker,
+   * where tapping the row commits to an exercise the reader may not know.
+   */
+  readonly preview = output<void>();
 
   /** The full record when the row is in the library, and no prescription overrides it. */
   private readonly _library = computed(() => {
@@ -111,7 +123,7 @@ export class ExerciseRow {
   constructor() {
     // The row is hosted by three features; none of them should have to know
     // it draws a tick. Registered here, it renders wherever the row does.
-    addIcons({ checkmarkCircle });
+    addIcons({ checkmarkCircle, informationCircleOutline });
   }
 
   /**

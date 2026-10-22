@@ -390,6 +390,27 @@
                 }
               ]
             },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "10MB",
+                  "maximumError": "100MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "400kB",
+                  "maximumError": "800kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/core/src/environments/environment.ts",
+                  "with": "projects/core/src/environments/environment.mobile-staging.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,

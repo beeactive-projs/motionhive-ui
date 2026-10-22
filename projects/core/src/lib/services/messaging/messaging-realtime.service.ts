@@ -195,11 +195,16 @@ export class MessagingRealtimeService implements OnDestroy {
   }
 
   /**
-   * Cycle the connection. Public escape hatch — currently unused in
-   * the store (the error handler auto-reconnects), but kept for
-   * call sites that explicitly know the token rotated.
+   * Cycle the connection: a fresh ticket and a new stream. The store
+   * calls it when the app comes back from the background, where the old
+   * stream may be a dead socket that never reports an error.
    */
   reconnect(): void {
+    // A ticket in flight is already a fresh stream on its way. Cycling
+    // now would mark us idle, `connect()` would bail on the pending
+    // ticket, and that ticket would then be dropped on arrival: no
+    // stream at all.
+    if (this.ticketPending) return;
     this.disconnect();
     this.connect();
   }

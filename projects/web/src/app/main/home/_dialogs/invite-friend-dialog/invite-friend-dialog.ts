@@ -16,7 +16,7 @@ import { MessageModule } from 'primeng/message';
 import { TabsModule } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { AuthStore, InvitationService, environment, validationMessage } from 'core';
+import { AuthStore, InvitationService, SIGNUP_URL, validationMessage } from 'core';
 
 /**
  * Invite-a-friend dialog. Two paths:
@@ -60,13 +60,9 @@ export class InviteFriendDialog {
     const userId = this._authStore.user()?.id ?? '';
     const ref = userId ? `?ref=${encodeURIComponent(userId)}` : '';
     // Always link to the app's signup route — the marketing site
-    // doesn't host a registration form. In dev `environment.appUrl`
-    // is localhost; in prod we use the canonical app host.
-    const base =
-      environment.production && typeof window !== 'undefined'
-        ? 'https://app.motionhive.fit'
-        : environment.appUrl;
-    return `${base}/auth/signup${ref}`;
+    // doesn't host a registration form. SIGNUP_URL follows the
+    // environment, so an invite from dev lands on the dev app.
+    return `${SIGNUP_URL}${ref}`;
   });
 
   protected readonly canShare = signal(

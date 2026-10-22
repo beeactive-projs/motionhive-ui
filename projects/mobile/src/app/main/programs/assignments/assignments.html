@@ -71,4 +71,9 @@
   </ion-fab>
 </ion-content>
 
-<mh-assign-sheet [(open)]="assignOpen" [program]="store.program()" (assign)="onAssign($event)" />
+<mh-assign-sheet
+  [(open)]="assignOpen"
+  [program]="store.program()"
+  [saving]="assignSaving()"
+  (assign)="onAssign($event)"
+/>

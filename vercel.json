@@ -11,6 +11,11 @@
       "continue": true
     },
     {
+      "src": "^/\\.well-known/apple-app-site-association$",
+      "headers": { "Content-Type": "application/json" },
+      "continue": true
+    },
+    {
       "src": "^/en/?$",
       "status": 308,
       "headers": { "Location": "/" }

@@ -54,6 +54,9 @@ import {
 /** How long each frame of a two-frame demo holds before the other takes over. */
 const FRAME_MS = 1400;
 
+/** Past this much travel a drag is a swipe; under it, a tap. */
+const SWIPE_PX = 30;
+
 /**
  * One exercise, in full.
  *
@@ -124,6 +127,15 @@ export class ExerciseDetail implements ViewWillEnter {
   private readonly _forkSheet = viewChild(ConfirmSheet);
 
   readonly frameIndex = signal(0);
+
+  /**
+   * Stops the timer for good once a reader has driven the frames themselves.
+   * Having it resume under a thumb would fight the person using it.
+   */
+  private readonly _steppedByHand = signal(false);
+
+  /** Where a swipe started, in page coordinates. Null between gestures. */
+  private _swipeStartX: number | null = null;
 
   /**
    * Where back lands when there is no history to pop (a deep link, a
@@ -276,7 +288,7 @@ export class ExerciseDetail implements ViewWillEnter {
     // for less motion gets the start position, still.
     effect((onCleanup) => {
       const count = this.frames().length;
-      if (count < 2 || prefersReducedMotion()) return;
+      if (count < 2 || prefersReducedMotion() || this._steppedByHand()) return;
       const timer = setInterval(
         () => this.frameIndex.update((index) => (index + 1) % count),
         FRAME_MS
@@ -293,6 +305,39 @@ export class ExerciseDetail implements ViewWillEnter {
    */
   ionViewWillEnter(): void {
     if (this.exercise()) this._load(this.exerciseId(), { silent: true });
+  }
+
+  /**
+   * Step the frames by hand.
+   *
+   * The pair alternates on a timer, but not for a reader who asked the OS
+   * for less motion: they were left looking at the start position with two
+   * dots under it and no way to reach the second. Tapping or swiping the
+   * hero works for everyone, and takes the timer out of the way once used.
+   */
+  stepFrame(delta: number): void {
+    const count = this.frames().length;
+    if (count < 2) return;
+    this._steppedByHand.set(true);
+    this.frameIndex.update((index) => (index + delta + count) % count);
+  }
+
+  onFrameTouchStart(event: TouchEvent): void {
+    this._swipeStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  /** A short flick is a tap; past the threshold it is a swipe with a side. */
+  onFrameTouchEnd(event: TouchEvent): void {
+    const start = this._swipeStartX;
+    this._swipeStartX = null;
+    if (start === null) return;
+    const end = event.changedTouches[0]?.clientX ?? start;
+    const travelled = end - start;
+    if (Math.abs(travelled) < SWIPE_PX) {
+      this.stepFrame(1);
+      return;
+    }
+    this.stepFrame(travelled < 0 ? 1 : -1);
   }
 
   edit(): void {

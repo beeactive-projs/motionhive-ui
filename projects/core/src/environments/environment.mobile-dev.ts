@@ -23,11 +23,16 @@ export const environment = {
   production: false,
   appUrl: 'http://localhost:8100',
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
+  // The mobile app's iOS OAuth client. Its reversed form is the URL scheme in
+  // ios/App/App/Info.plist; change both together.
+  googleIosClientId: '119425399334-l8dkteues0kljvkjalv411qkpl15d3mb.apps.googleusercontent.com',
   apiUrl: resolveApiUrl(),
   // Local, to match the local API. An invite token minted against localhost
   // is meaningless to the production web app, so a prod origin here made the
   // signup half of the invite flow impossible to test.
   webAppUrl: 'http://localhost:4200',
+  // No local website server alongside the app; the dev site has the same pages.
+  websiteUrl: 'https://dev.motionhive.fit',
   facebookAppId: '888056193830836',
   primeUiLicenseKey:
     'eyJpZCI6IjhkZGJlNTZjLTY0YmYtNGM0YS1hZDEyLWE1NjYzYjU4YzdjOCIsInByb2R1Y3QiOiJwcmltZXVpIiwidGllciI6ImNvbW11bml0eSIsInR5cGUiOiJkZXYiLCJpYXQiOjE3ODU4MjY4MTEsImV4cCI6MTgxNzM2MjgxMX0.TUGio97ZwSoIbJ6rQN9HSAkM1TWMF2o0kTclcnb6hXOLHmSDzta2HVHU8X3yd-uTqYTXIcNGhY9ry9ZrsIEtCA',

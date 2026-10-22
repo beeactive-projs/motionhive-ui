@@ -30,12 +30,16 @@
     (ionInput)="onInput($event.detail.value ?? '')"
   />
 
+  <!-- pointerdown/mousedown keep focus in the field: a tap on Send must not
+       close the keyboard between one message and the next. -->
   <ion-button
     class="send"
     color="primary"
     shape="round"
     [disabled]="!canSend()"
     [attr.aria-label]="(isRateLimited() ? 'messages.composer.sendingPaused' : 'button.send') | translate"
+    (pointerdown)="keepFocus($event)"
+    (mousedown)="keepFocus($event)"
     (click)="send()"
   >
     @if (isRateLimited()) {

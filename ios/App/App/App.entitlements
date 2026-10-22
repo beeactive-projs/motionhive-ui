@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- APS_ENVIRONMENT is set per configuration in project.pbxproj:
+	     development for Debug, production for Release (TestFlight, App Store). -->
+	<key>aps-environment</key>
+	<string>$(APS_ENVIRONMENT)</string>
+	<!-- Universal links: web app URLs from emails open here instead of Safari.
+	     The host is per build (APP_LINK_HOST in project.pbxproj; the TestFlight
+	     workflow passes the dev host). The domain proves the claim with
+	     /.well-known/apple-app-site-association (projects/web/public), which
+	     lists the paths, mirroring the Android manifest. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:$(APP_LINK_HOST)</string>
+	</array>
+</dict>
+</plist>

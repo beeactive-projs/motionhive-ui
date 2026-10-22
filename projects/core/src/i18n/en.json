@@ -28,6 +28,7 @@
   },
   "auth": {
     "common": {
+      "continueWithGoogle": "Continue with Google",
       "createOneFree": "Create one for free",
       "emailAddress": "Email address",
       "forgotPassword": "Forgot password?",

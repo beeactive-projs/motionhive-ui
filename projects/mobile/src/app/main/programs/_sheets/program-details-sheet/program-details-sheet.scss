@@ -1,0 +1,49 @@
+/* Name, description and length, one under the other. */
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.length > .mh-kicker {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--ion-color-medium);
+}
+
+/* Shortening deletes the weeks that fall outside the new length, so the
+   count reads as a warning rather than help text. */
+.shrink-warning {
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-warning-wash-contrast);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+/* The question about the empty weeks, under the stepper it qualifies. Its
+   answers are full sentences, so they wrap instead of truncating. */
+.new-weeks {
+  margin-top: 1rem;
+}
+
+.new-weeks ion-list {
+  margin-inline: 0;
+}
+
+.new-weeks ion-radio::part(label) {
+  white-space: normal;
+  line-height: var(--mh-leading-body);
+}
+
+/* An attempted save without an answer outlines the question in the danger
+   ink, with the reason written under it. */
+.new-weeks ion-list.missing {
+  outline: 1px solid var(--ion-color-danger);
+}
+
+.choice-error {
+  margin: 0.5rem 0 0;
+  padding-inline: 0.875rem;
+  color: var(--ion-color-danger);
+  font-size: var(--mh-text-sm);
+}

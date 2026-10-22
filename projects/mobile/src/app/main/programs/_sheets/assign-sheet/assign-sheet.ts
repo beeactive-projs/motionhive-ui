@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import {
   IonBadge,
   IonButton,
@@ -119,7 +129,17 @@ export class AssignSheet {
   /** Opened from a client: they are fixed and the sheet picks the program. */
   readonly client = input<InstructorClient | null>(null);
 
+  /**
+   * The caller's request in flight. The sheet stays open with a spinner on
+   * Assign until the caller closes it on success; on failure it stays open
+   * with everything still filled in, so trying again is one tap.
+   */
+  readonly saving = input(false);
+
   readonly assign = output<AssignRequest>();
+
+  /** Set by Assign, until the request it sent has settled. */
+  private readonly _sent = signal(false);
 
   private readonly _clientService = inject(ClientService);
   private readonly _programService = inject(ProgramService);
@@ -321,6 +341,14 @@ export class AssignSheet {
       if (this.picksProgram()) this._loadPrograms();
       else this._loadClients();
     });
+    // Cleared once a sent request has settled with the sheet closed, which
+    // is a success. Cancel on its own keeps the half-filled form.
+    effect(() => {
+      const open = this.open();
+      if (this.saving() || !untracked(() => this._sent())) return;
+      this._sent.set(false);
+      if (!open) this.reset();
+    });
   }
 
   /**
@@ -420,8 +448,7 @@ export class AssignSheet {
       daysOfWeek: this.chosenDays().length ? this.chosenDays() : undefined,
       notes: this.notes().trim() || undefined,
     });
-    this.reset();
-    this.open.set(false);
+    this._sent.set(true);
   }
 
   reset(): void {

@@ -76,10 +76,9 @@ export const programRoutes: Routes = [
     title: 'pageTitle.program',
   },
   {
+    // The settings page became the builder's ⋯ sheet; an old link lands there.
     path: 'program/:id/settings',
-    loadComponent: () =>
-      import('./program-settings/program-settings').then((m) => m.ProgramSettings),
-    title: 'pageTitle.programSettings',
+    redirectTo: 'program/:id',
   },
   {
     path: 'program/:id/day/:workoutId',

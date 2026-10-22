@@ -28,6 +28,7 @@
   },
   "auth": {
     "common": {
+      "continueWithGoogle": "Continuă cu Google",
       "createOneFree": "Creează unul gratuit",
       "emailAddress": "Adresă de email",
       "forgotPassword": "Ai uitat parola?",

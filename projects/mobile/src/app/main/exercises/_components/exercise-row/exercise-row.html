@@ -18,6 +18,13 @@
   </ion-label>
 
   @if (isPicker()) {
+  <!-- Two targets, because picking and looking are different intents: the
+       row commits to an exercise, this asks what it is first. -->
+  <ion-button class="peek" slot="end" fill="clear" shape="round" color="medium"
+    [attr.aria-label]="'exercises.picker.about' | translate: { name: name() }"
+    (click)="$event.stopPropagation(); preview.emit()">
+    <ion-icon slot="icon-only" name="information-circle-outline" aria-hidden="true" />
+  </ion-button>
   @if (selected()) {
   <ion-icon class="tick" slot="end" name="checkmark-circle" aria-hidden="true" />
   }
