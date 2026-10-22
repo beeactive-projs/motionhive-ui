@@ -5,9 +5,12 @@
     </ion-buttons>
     <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [attr.aria-label]="'programs.settings.title' | translate" (click)="openSettings()">
-        <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
-      </ion-button>
+      @if (store.program()) {
+        <!-- Every verb about the program itself; the grid below is for its days. -->
+        <ion-button [attr.aria-label]="'a11y.moreActions' | translate" (click)="openActions()">
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        </ion-button>
+      }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -191,6 +194,66 @@
     </div>
   }
 </ion-content>
+
+@if (showFooter()) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <!-- The one thing a draft needs next. Assigning, once published, is
+           the first verb behind the ⋯. -->
+      <div class="mh-cta-bar">
+        @if (publishBlocker(); as blocker) {
+          <p class="blocker">{{ blocker }}</p>
+        }
+        <ion-button expand="block" [disabled]="!!publishBlocker() || store.saving()" (click)="publish()">
+          {{ 'programs.settings.publish' | translate }}
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}
+
+<mh-program-actions-sheet
+  [(open)]="actionsOpen"
+  [program]="store.program()"
+  [subtitle]="subtitle()"
+  (action)="onAction($event)"
+/>
+
+<mh-program-details-sheet
+  [(open)]="detailsOpen"
+  [program]="store.program()"
+  [saving]="store.saving()"
+  (save)="saveDetails($event)"
+/>
+
+<mh-assign-sheet
+  [(open)]="assignOpen"
+  [program]="store.program()"
+  [saving]="assignSaving()"
+  (assign)="onAssign($event)"
+/>
+
+<mh-confirm-sheet
+  #duplicateSheet
+  [(open)]="duplicateOpen"
+  [title]="'programs.duplicate.title' | translate"
+  [body]="duplicateBody()"
+  [confirmLabel]="'button.duplicate' | translate"
+  [saving]="store.saving()"
+  (confirm)="confirmDuplicate()"
+/>
+
+<mh-confirm-sheet
+  #deleteSheet
+  [(open)]="deleteOpen"
+  [title]="'programs.settings.delete.title' | translate"
+  [body]="deleteBody()"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  tone="danger"
+  [saving]="store.saving()"
+  (confirm)="confirmDelete()"
+/>
 
 <mh-copy-day-sheet
   [(open)]="copyDayOpen"

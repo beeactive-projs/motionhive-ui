@@ -9,7 +9,9 @@ import {
   closeOutline,
   funnelOutline,
   copyOutline,
+  createOutline,
   ellipsisHorizontalOutline,
+  eyeOffOutline,
   flashOutline,
   lockClosedOutline,
   peopleOutline,
@@ -25,6 +27,7 @@ import {
   ProgramAssignmentStatus,
   ProgramSize,
   ProgramSizes,
+  ProgramSource,
   ProgramStatus,
   translate,
   weekdayNames,
@@ -51,7 +54,9 @@ export const PROGRAM_ICONS = {
   closeOutline,
   funnelOutline,
   copyOutline,
+  createOutline,
   ellipsisHorizontalOutline,
+  eyeOffOutline,
   flashOutline,
   lockClosedOutline,
   peopleOutline,
@@ -197,6 +202,96 @@ export const CREATE_OPTIONS: readonly SheetAction<CreateChoice>[] = [
   },
 ];
 
+// ─── One program's actions ────────────────────────────────────────────────
+
+/**
+ * The verbs behind a program's ⋯ (see docs/MOBILE-ACTIONS.md). Publish is not
+ * among them: a draft's footer button is the step the screen is waiting on.
+ * Once published, the week grid gets the whole screen and Assign leads here.
+ */
+export const ProgramActionIds = {
+  Assign: 'assign',
+  EditDetails: 'editDetails',
+  ViewAssignments: 'viewAssignments',
+  Duplicate: 'duplicate',
+  Unpublish: 'unpublish',
+  Delete: 'delete',
+} as const;
+
+export type ProgramActionId = (typeof ProgramActionIds)[keyof typeof ProgramActionIds];
+
+/** `label` and `hint` are translation keys; the sheet translates them. */
+export const PROGRAM_ACTIONS: readonly SheetAction<ProgramActionId>[] = [
+  {
+    // Honey, because it is what a published program is for; the rest are plumbing.
+    id: ProgramActionIds.Assign,
+    label: 'programs.assignments.assignToClient',
+    icon: 'person-add-outline',
+    color: 'primary',
+  },
+  {
+    id: ProgramActionIds.EditDetails,
+    label: 'programs.actions.editDetails',
+    icon: 'create-outline',
+    color: 'medium',
+  },
+  {
+    id: ProgramActionIds.ViewAssignments,
+    label: 'programs.settings.viewAssignments',
+    icon: 'people-outline',
+    color: 'medium',
+  },
+  {
+    id: ProgramActionIds.Duplicate,
+    label: 'button.duplicate',
+    icon: 'copy-outline',
+    color: 'medium',
+  },
+  {
+    id: ProgramActionIds.Unpublish,
+    label: 'programs.settings.unpublish',
+    hint: 'programs.actions.unpublishHint',
+    icon: 'eye-off-outline',
+    color: 'medium',
+  },
+  {
+    id: ProgramActionIds.Delete,
+    label: 'programs.settings.delete.title',
+    icon: 'trash-outline',
+    color: 'danger',
+    destructive: true,
+  },
+];
+
+/** A MotionHive starter is in everyone's library and nobody's to change. */
+export function isOwnProgram(program: Program): boolean {
+  return program.source !== ProgramSource.System;
+}
+
+/**
+ * Only the verbs that apply to this program as it is now: assigning and
+ * assignments exist once it is published, and a starter can be copied and
+ * handed out but not changed.
+ */
+export function visibleProgramActions(program: Program): SheetAction<ProgramActionId>[] {
+  const own = isOwnProgram(program);
+  const published = program.status === ProgramStatus.Published;
+  return PROGRAM_ACTIONS.filter((action) => {
+    switch (action.id) {
+      case ProgramActionIds.Assign:
+      case ProgramActionIds.ViewAssignments:
+        return published;
+      case ProgramActionIds.Unpublish:
+        return own && published;
+      case ProgramActionIds.Duplicate:
+        return true;
+      case ProgramActionIds.EditDetails:
+      case ProgramActionIds.Delete:
+        return own;
+    }
+  });
+}
+
 // ─── Assignments ──────────────────────────────────────────────────────────
 
 /**
@@ -265,7 +360,11 @@ export function assignmentSubline(row: ProgramAssignment): string {
       return translate('programs.assignment.starts', { date: shortDayLabel(row.startDate) });
     case ProgramAssignmentStatus.Active:
     case ProgramAssignmentStatus.Completed:
-      return translate('programs.assignment.percentDone', { percent: row.completionPercent });
+      // The start date tells two runs of the same plan for one client apart.
+      return translate('programs.assignment.startedPercent', {
+        date: shortDayLabel(row.startDate),
+        percent: row.completionPercent,
+      });
     default:
       return '';
   }

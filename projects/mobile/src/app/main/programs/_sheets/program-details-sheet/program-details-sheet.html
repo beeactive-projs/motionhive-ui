@@ -1,0 +1,80 @@
+<ng-template #body>
+  <div class="fields">
+    <ion-input
+      fill="outline"
+      [label]="'form.label.name' | translate"
+      labelPlacement="stacked"
+      [placeholder]="'programs.settings.namePlaceholder' | translate"
+      [value]="name()"
+      (ionInput)="name.set($event.detail.value ?? '')"
+    />
+
+    <ion-textarea
+      fill="outline"
+      [label]="'form.label.description' | translate"
+      labelPlacement="stacked"
+      [autoGrow]="true"
+      [placeholder]="'programs.settings.descriptionPlaceholder' | translate"
+      [value]="description()"
+      (ionInput)="description.set($event.detail.value ?? '')"
+    />
+
+    <!-- Authored in weeks because that is how a block is planned; stored as
+         days, so an open-ended or day-counted plan needs no migration. -->
+    <section class="length">
+      <span class="mh-kicker">{{ 'programs.settings.length' | translate }}</span>
+      <div class="mh-stepper" role="group" [attr.aria-label]="'programs.settings.lengthAria' | translate">
+        <ion-button fill="clear" [disabled]="weeks() <= 1" [attr.aria-label]="'programs.settings.weekFewer' | translate" (click)="stepWeeks(-1)">
+          <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
+        </ion-button>
+        <span class="value" aria-live="polite">{{ weeks() }} <em>{{ weeksLabel() }}</em></span>
+        <ion-button fill="clear" [attr.aria-label]="'programs.settings.weekMore' | translate" (click)="stepWeeks(1)">
+          <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
+        </ion-button>
+      </div>
+      @if (doomedDays() > 0) {
+        <p class="shrink-warning">
+          {{ 'programs.settings.shrinkWarning' | translate: { count: doomedDays() } }}
+        </p>
+      }
+      <!-- Asked whenever the program gains weeks, with neither answer picked:
+           the coach decides what goes in them. -->
+      @if (askNewWeeks()) {
+        <div class="new-weeks" id="program-details-new-weeks">
+          <span class="mh-kicker" id="program-details-new-weeks-question">{{ newWeeksQuestion() }}</span>
+          <ion-list [inset]="true" class="mh-card-list" [class.missing]="newWeeksMissing()">
+            <ion-radio-group
+              aria-labelledby="program-details-new-weeks-question"
+              [value]="newWeeksChoice()"
+              (ionChange)="chooseNewWeeks($event.detail.value)"
+            >
+              <ion-item>
+                <ion-radio value="repeat" justify="start" labelPlacement="end">{{ repeatLabel() }}</ion-radio>
+              </ion-item>
+              <ion-item>
+                <ion-radio value="empty" justify="start" labelPlacement="end">{{ leaveEmptyLabel() }}</ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+          @if (newWeeksMissing()) {
+            <p class="choice-error" role="alert">{{ 'programs.settings.newWeeks.required' | translate }}</p>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'programs.actions.editDetails' | translate"
+  [subtitle]="program()?.name ?? ''"
+  [body]="body"
+  [saveLabel]="'button.save' | translate"
+  [dismissLabel]="'button.cancel' | translate"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  (save)="commit()"
+/>

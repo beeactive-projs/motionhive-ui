@@ -5,7 +5,16 @@ import { catchError, take } from 'rxjs/operators';
 
 import { Program, ProgramService, ProgramStatus, ProgramWorkout } from 'core';
 
-import { DAYS_PER_WEEK, DEFAULT_PROGRAM_WEEKS, weeksOf } from '../programs.config';
+import { DAYS_PER_WEEK, DEFAULT_PROGRAM_WEEKS, weeksOf, weeksToDays } from '../programs.config';
+
+/** What the details sheet saves: the program's own fields, not its days. */
+export interface ProgramDetailsChange {
+  name: string;
+  description: string;
+  weeks: number;
+  /** Fill the weeks a longer program gains by repeating the ones already built. */
+  repeatNewWeeks: boolean;
+}
 
 /** One week's worth of days, as the builder renders them. */
 export interface WeekCard {
@@ -98,6 +107,126 @@ export class ProgramBuilderStore {
     this._program.set(program);
     this._loading.set(false);
     this._error.set(false);
+  }
+
+  // ─── The program itself ───────────────────────────────────────
+
+  /**
+   * Name, description and length, from the details sheet.
+   *
+   * The update answers with the program alone, not its days, so the days
+   * already here are kept, minus the weeks a shorter length just dropped (the
+   * sheet named them before Save). Repeating into new weeks is a second
+   * request on purpose: the length is saved either way, and a failed repeat
+   * leaves empty weeks rather than a lost edit. `repeatFailed` says which.
+   */
+  saveDetails(
+    change: ProgramDetailsChange,
+    done: (error?: unknown, repeatFailed?: boolean) => void,
+  ): void {
+    const program = this._program();
+    if (!program || this._saving()) return;
+    this._saving.set(true);
+
+    this._programService
+      .update(program.id, {
+        name: change.name,
+        description: change.description || undefined,
+        durationDays: weeksToDays(change.weeks),
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: (saved) => {
+          const kept = (program.workouts ?? []).filter((w) => w.weekIndex < change.weeks);
+          this._program.set({ ...saved, workouts: saved.workouts ?? kept });
+          if (!change.repeatNewWeeks) {
+            this._saving.set(false);
+            done();
+            return;
+          }
+          this._programService
+            .repeatWeeks(program.id)
+            .pipe(take(1))
+            .subscribe({
+              next: (full) => {
+                this._program.set(full);
+                this._saving.set(false);
+                done();
+              },
+              error: (error: unknown) => {
+                this._saving.set(false);
+                done(error, true);
+              },
+            });
+        },
+        error: (error: unknown) => {
+          this._saving.set(false);
+          done(error);
+        },
+      });
+  }
+
+  /**
+   * Draft to published and back. Only the status moves: clients already on
+   * the plan keep their own copy, so nothing they see changes.
+   */
+  setStatus(status: ProgramStatus, done: (error?: unknown) => void): void {
+    const program = this._program();
+    if (!program || this._saving()) return;
+    this._saving.set(true);
+    this._programService
+      .update(program.id, { status })
+      .pipe(take(1))
+      .subscribe({
+        next: (saved) => {
+          this._program.update((current) => (current ? { ...current, status: saved.status } : current));
+          this._saving.set(false);
+          done();
+        },
+        error: (error: unknown) => {
+          this._saving.set(false);
+          done(error);
+        },
+      });
+  }
+
+  /** A copy owned by the caller, as a fresh draft. This program is untouched. */
+  duplicate(done: (copy: Program | null, error?: unknown) => void): void {
+    const program = this._program();
+    if (!program || this._saving()) return;
+    this._saving.set(true);
+    this._programService
+      .duplicate(program.id)
+      .pipe(take(1))
+      .subscribe({
+        next: (copy) => {
+          this._saving.set(false);
+          done(copy);
+        },
+        error: (error: unknown) => {
+          this._saving.set(false);
+          done(null, error);
+        },
+      });
+  }
+
+  remove(done: (error?: unknown) => void): void {
+    const program = this._program();
+    if (!program || this._saving()) return;
+    this._saving.set(true);
+    this._programService
+      .remove(program.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._saving.set(false);
+          done();
+        },
+        error: (error: unknown) => {
+          this._saving.set(false);
+          done(error);
+        },
+      });
   }
 
   // ─── Days ─────────────────────────────────────────────────────

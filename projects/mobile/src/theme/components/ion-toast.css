@@ -1,0 +1,9 @@
+/* Toasts — the "Saved", "Program assigned" and error messages.
+
+   The app runs Ionic in Material mode, whose toast is a 4px slab: a different
+   design language next to the 12px buttons and fields beside it. Same radius
+   as the controls and as `mh-notice`, the in-page way of saying how something
+   went. */
+ion-toast {
+  --border-radius: var(--mh-radius-control);
+}

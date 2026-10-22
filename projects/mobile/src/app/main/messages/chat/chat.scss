@@ -34,12 +34,10 @@
 }
 
 /* The send bar. The composer needs a toolbar around it rather than sitting
-   loose in the footer: the toolbar is what carries the surface colour, and
-   Ionic only pads the bottom safe area on an `ion-toolbar` that is the
-   footer's last child — a bare child sits under the home indicator. A hairline
-   holds the bar apart from the thread scrolling under it, so md's three-layer
-   drop shadow comes off (`ion-no-border` on the footer). Padding is zeroed
-   because the composer owns its own gutter. */
+   loose in the footer: the toolbar is what carries the surface colour. A
+   hairline holds the bar apart from the thread scrolling under it, so md's
+   three-layer drop shadow comes off (`ion-no-border` on the footer). Padding
+   is zeroed because the composer owns its own gutter. */
 ion-footer ion-toolbar {
   --background: var(--ion-card-background);
   --border-width: 1px 0 0;
@@ -49,6 +47,16 @@ ion-footer ion-toolbar {
   --padding-top: 0;
   --padding-bottom: 0;
   --min-height: 0;
+}
+
+/* The bottom clearance, while the keyboard is down. Ionic pads the home
+   indicator only on a footer with no bottom tab bar in the page, and it
+   counts the tab bar this screen hides, so on an iPhone the composer sat on
+   the home indicator. The floor keeps the pill off the screen's corner where
+   there is no safe area (the browser preview, Android with buttons). With the
+   keyboard up there is nothing to clear: the bar sits right on it. */
+ion-footer:not(.keyboard-open) ion-toolbar {
+  padding-bottom: max(var(--ion-safe-area-bottom, 0px), 0.75rem);
 }
 
 .day {

@@ -31,9 +31,9 @@ import {
   CreateChoice,
   CreateChoices,
   LIBRARY_PILLS,
-  ORIGIN_PILLS,
   PROGRAM_ICONS,
   ProgramOrigin,
+  ProgramOrigins,
 } from './programs.config';
 import { ProgramsStore } from './programs.store';
 
@@ -79,15 +79,15 @@ export class Programs implements ViewWillEnter {
 
   readonly skeletonRows = [1, 2, 3, 4];
   readonly pills = LIBRARY_PILLS;
-  readonly originPills = ORIGIN_PILLS;
   readonly filtersOpen = signal(false);
 
   /**
-   * Whether the sheet is holding anything back. One axis lives in there, so
-   * the count is 0 or 1 — but it reads the same as every other library.
+   * Whether the sheet is holding anything back. It holds whose content is
+   * shown, and "Mine" is where the library opens, so only a different choice
+   * counts: a badge that is always on says nothing.
    */
   readonly activeFilterCount = computed(() =>
-    this.store.size() === ProgramSizes.All ? 0 : 1,
+    this.store.origin() === ProgramOrigins.Mine ? 0 : 1,
   );
 
   openFilters(): void {

@@ -1,10 +1,19 @@
-import { Component, Injector, afterNextRender, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  Injector,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonItem,
@@ -21,21 +30,32 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { ProgramService, ProgramWorkout } from 'core';
+import {
+  ProgramAssignmentService,
+  ProgramService,
+  ProgramStatus,
+  ProgramWorkout,
+} from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { AssignRequest, AssignSheet } from '../_sheets/assign-sheet/assign-sheet';
 import { CopyDaySheet } from '../_sheets/copy-day-sheet/copy-day-sheet';
 import { CopyWeekSheet } from '../_sheets/copy-week-sheet/copy-week-sheet';
+import { ProgramActionsSheet } from '../_sheets/program-actions-sheet/program-actions-sheet';
+import { ProgramDetailsSheet } from '../_sheets/program-details-sheet/program-details-sheet';
 import {
   DEFAULT_PROGRAM_WEEKS,
   dayLabels,
+  isOwnProgram,
   PROGRAM_ICONS,
+  ProgramActionId,
+  ProgramActionIds,
   weekLabel,
   weeksToDays,
 } from '../programs.config';
-import { ProgramBuilderStore, WeekCard } from './program-builder.store';
+import { ProgramBuilderStore, ProgramDetailsChange, WeekCard } from './program-builder.store';
 
 /** The URL segment that means "a program that does not exist yet". */
 const NEW = 'new';
@@ -64,6 +84,7 @@ const UNTOUCHED_DRAFT_NAME_KEY = 'programs.builder.untitledProgram';
 @Component({
   selector: 'mh-program-builder',
   imports: [
+    AssignSheet,
     ConfirmSheet,
     CopyDaySheet,
     CopyWeekSheet,
@@ -72,6 +93,7 @@ const UNTOUCHED_DRAFT_NAME_KEY = 'programs.builder.untitledProgram';
     IonButton,
     IonButtons,
     IonContent,
+    IonFooter,
     IonHeader,
     IonIcon,
     IonItem,
@@ -81,6 +103,8 @@ const UNTOUCHED_DRAFT_NAME_KEY = 'programs.builder.untitledProgram';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    ProgramActionsSheet,
+    ProgramDetailsSheet,
     TranslatePipe,
   ],
   providers: [ProgramBuilderStore],
@@ -90,6 +114,7 @@ const UNTOUCHED_DRAFT_NAME_KEY = 'programs.builder.untitledProgram';
 export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   readonly store = inject(ProgramBuilderStore);
   private readonly _programService = inject(ProgramService);
+  private readonly _programAssignmentService = inject(ProgramAssignmentService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
@@ -122,12 +147,17 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     () => this.store.program()?.name ?? this._translateService.instant('programs.builder.titleFallback'),
   );
 
-  readonly subtitle = computed(() =>
-    this._translateService.instant('programs.builder.subtitle', {
+  /** "4 weeks · 8 days of work · Draft": its size, then whether it can be assigned yet. */
+  readonly subtitle = computed(() => {
+    const program = this.store.program();
+    const size = this._translateService.instant('programs.builder.subtitle', {
       weeks: this.store.weekCount(),
       days: this.store.filledDays(),
-    }),
-  );
+    });
+    if (!program) return size;
+    const status = this._translateService.instant(`enum.programStatus.${program.status}`);
+    return `${size} · ${status}`;
+  });
 
   readonly clearBody = computed(() => {
     const day = this.clearTarget();
@@ -441,11 +471,208 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
 
   // ─── Chrome ───────────────────────────────────────────────────
 
-  openSettings(): void {
+  /** A MotionHive starter can be copied and assigned, not changed. */
+  readonly isOwn = computed(() => {
     const program = this.store.program();
-    if (program) {
-      void this._router.navigate(['/tabs/programs/program', program.id, 'settings']);
+    return !!program && isOwnProgram(program);
+  });
+
+  /**
+   * Publish, while your program is a draft: the step this screen is waiting
+   * on. Once published the grid gets the whole screen, and Assign leads the
+   * ⋯ sheet (see docs/MOBILE-ACTIONS.md).
+   */
+  readonly showFooter = computed(
+    () => !!this.store.program() && !this.store.isPublished() && this.isOwn(),
+  );
+
+  /** What is still missing before this can be published, in one sentence; empty when nothing is. */
+  readonly publishBlocker = computed(() => {
+    const needsName = !this.store.program()?.name.trim();
+    const needsDays = this.store.filledDays() === 0;
+    if (needsName && needsDays) return this._translateService.instant('programs.settings.needs.both');
+    if (needsName) return this._translateService.instant('programs.settings.needs.name');
+    if (needsDays) return this._translateService.instant('programs.settings.needs.days');
+    return '';
+  });
+
+  /** Both lead off this page, so each is closed before navigating (see ConfirmSheet.close). */
+  private readonly _duplicateSheet = viewChild<ConfirmSheet>('duplicateSheet');
+  private readonly _deleteSheet = viewChild<ConfirmSheet>('deleteSheet');
+
+  readonly actionsOpen = signal(false);
+  readonly detailsOpen = signal(false);
+  readonly duplicateOpen = signal(false);
+  readonly deleteOpen = signal(false);
+  readonly assignOpen = signal(false);
+  readonly assignSaving = signal(false);
+
+  readonly duplicateBody = computed(() =>
+    this._translateService.instant('programs.duplicate.body', {
+      name: this.store.program()?.name ?? '',
+    }),
+  );
+
+  readonly deleteBody = computed(() => {
+    const name = this.store.program()?.name;
+    return name
+      ? this._translateService.instant('programs.settings.delete.body', { name })
+      : this._translateService.instant('programs.settings.delete.bodyFallback');
+  });
+
+  openActions(): void {
+    this.actionsOpen.set(true);
+  }
+
+  /** The sheet reports the verb; this screen decides what it means. */
+  onAction(id: ProgramActionId): void {
+    switch (id) {
+      case ProgramActionIds.Assign:
+        this.assignOpen.set(true);
+        return;
+      case ProgramActionIds.EditDetails:
+        this.detailsOpen.set(true);
+        return;
+      case ProgramActionIds.ViewAssignments:
+        this.openAssignments();
+        return;
+      case ProgramActionIds.Duplicate:
+        this.duplicateOpen.set(true);
+        return;
+      case ProgramActionIds.Unpublish:
+        this.unpublish();
+        return;
+      case ProgramActionIds.Delete:
+        this.deleteOpen.set(true);
+        return;
     }
+  }
+
+  saveDetails(change: ProgramDetailsChange): void {
+    this.store.saveDetails(change, (error, repeatFailed) => {
+      if (error && !repeatFailed) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.settings.toast.saveFailed'),
+        );
+        return;
+      }
+      // Saved either way once the first request landed; a failed repeat only
+      // leaves the new weeks empty, so the sheet closes and says so.
+      this.detailsOpen.set(false);
+      if (repeatFailed) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.settings.toast.repeatFailed'),
+        );
+        return;
+      }
+      void this._feedbackService.success(this._translateService.instant('toast.summary.saved'));
+    });
+  }
+
+  /** Straight away: it undoes cleanly from the ⋯, and nobody sees a draft change. */
+  publish(): void {
+    if (this.publishBlocker()) return;
+    this.store.setStatus(ProgramStatus.Published, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.settings.toast.saveFailed'),
+        );
+        return;
+      }
+      void this._feedbackService.success(
+        this._translateService.instant('programs.settings.toast.published'),
+      );
+    });
+  }
+
+  /** Back to draft, to rework it. Clients already on the plan keep their own copy. */
+  unpublish(): void {
+    this.store.setStatus(ProgramStatus.Draft, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.settings.toast.unpublishFailed'),
+        );
+        return;
+      }
+      void this._feedbackService.success(
+        this._translateService.instant('programs.settings.toast.unpublished'),
+      );
+    });
+  }
+
+  /**
+   * Lands on the copy rather than staying here: the reason to duplicate is to
+   * change something, and the thing to change is the new one.
+   */
+  confirmDuplicate(): void {
+    this.store.duplicate(async (copy, error) => {
+      if (!copy) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.settings.toast.duplicateFailed'),
+        );
+        return;
+      }
+      await this._duplicateSheet()?.close();
+      void this._feedbackService.success(
+        this._translateService.instant('programs.settings.toast.duplicated'),
+      );
+      void this._router.navigate(['/tabs/programs/program', copy.id], { replaceUrl: true });
+    });
+  }
+
+  confirmDelete(): void {
+    this.store.remove(async (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.settings.toast.deleteFailed'),
+        );
+        return;
+      }
+      // Gone already: nothing for the untouched-draft cleanup to delete on leave.
+      this._id = null;
+      await this._deleteSheet()?.close();
+      void this._feedbackService.success(
+        this._translateService.instant('programs.settings.toast.deleted'),
+      );
+      void this._router.navigate(['/tabs/programs'], { replaceUrl: true });
+    });
+  }
+
+  openAssignments(): void {
+    const program = this.store.program();
+    if (program) void this._router.navigate(['/tabs/programs/program', program.id, 'assignments']);
+  }
+
+  onAssign(request: AssignRequest): void {
+    const program = this.store.program();
+    if (!program || this.assignSaving()) return;
+    this.assignSaving.set(true);
+    this._programAssignmentService
+      // This program last, so nothing in the sheet's payload can override it.
+      .assign({ ...request, programId: program.id })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.assignSaving.set(false);
+          this.assignOpen.set(false);
+          void this._feedbackService.success(
+            this._translateService.instant('programs.assignments.toast.assigned'),
+          );
+        },
+        error: (error: unknown) => {
+          this.assignSaving.set(false);
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('programs.assignments.toast.assignFailed'),
+          );
+        },
+      });
   }
 
   /**

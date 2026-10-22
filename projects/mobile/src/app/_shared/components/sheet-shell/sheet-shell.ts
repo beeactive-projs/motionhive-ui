@@ -1,6 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   ElementRef,
   TemplateRef,
   computed,
@@ -199,6 +200,7 @@ export class SheetShell {
   private readonly _translateService = inject(TranslateService);
   private readonly _modal = viewChild(IonModal);
   private readonly _modalElement = viewChild(IonModal, { read: ElementRef });
+  private readonly _footer = viewChild('footer', { read: ElementRef });
 
   private readonly _refuseUserDismiss = async (_data?: unknown, role?: string): Promise<boolean> =>
     !USER_DISMISS_ROLES.includes(role);
@@ -211,6 +213,37 @@ export class SheetShell {
       this.title();
       if (this.presented()) this.syncDialogLabel();
     });
+    // Torn down mid-drag, with the footer still lifted out: nothing else
+    // will ever take it off the screen (see reclaimFooter).
+    inject(DestroyRef).onDestroy(() => {
+      const footer = this._footer()?.nativeElement as HTMLElement | undefined;
+      if (footer?.parentElement === document.body) footer.remove();
+    });
+  }
+
+  /**
+   * Put the footer back inside the sheet as it starts to close.
+   *
+   * With `expandToScroll` off, Ionic lifts the footer onto `<body>` for the
+   * length of a drag, so it stays pinned while the sheet moves, and puts it
+   * back only when the snap-back animation ends, up to half a second after
+   * the finger lifts. A close inside that window (Add tapped as the sheet
+   * settles) skips the return: the footer stayed on screen over every page
+   * after, its buttons dead and the tab bar under it. This is Ionic's own
+   * return step, run before the dismissal can strand it.
+   */
+  reclaimFooter(): void {
+    const footer = this._footer()?.nativeElement as HTMLElement | undefined;
+    if (!footer || footer.parentElement !== document.body) return;
+    const host = this._modalElement()?.nativeElement as HTMLElement | undefined;
+    const page = host?.querySelector<HTMLElement>('.ion-page');
+    footer.classList.remove('modal-footer-moving');
+    for (const property of ['position', 'width', 'height', 'top', 'left']) {
+      footer.style.removeProperty(property);
+    }
+    page?.style.removeProperty('padding-bottom');
+    if (page) page.appendChild(footer);
+    else footer.remove();
   }
 
   /**

@@ -1,7 +1,7 @@
 <ng-template #body>
-  <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
+  <div class="mh-section-label">{{ 'programs.filter.origin' | translate }}</div>
   <div class="chips">
-    @for (chip of sizeChips; track chip.value) {
+    @for (chip of originChips; track chip.value) {
       <ion-chip
         [class.selected]="isOn(chip.value)"
         [attr.aria-pressed]="isOn(chip.value)"
@@ -19,8 +19,8 @@
   [title]="'programs.filter.title' | translate"
   [body]="body"
   [saveLabel]="'programs.filter.showResults' | translate"
-  [dismissLabel]="'button.clear' | translate"
   [breakpoints]="[0, 0.5, 0.95]"
   [initialBreakpoint]="0.5"
   (save)="commit()"
+  (dismissed)="discard()"
 />

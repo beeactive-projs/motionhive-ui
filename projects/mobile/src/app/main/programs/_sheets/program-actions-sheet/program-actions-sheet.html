@@ -1,0 +1,7 @@
+<mh-action-sheet
+  [(open)]="open"
+  [title]="title()"
+  [subtitle]="subtitle()"
+  [actions]="visibleActions()"
+  (chosen)="action.emit($event)"
+/>

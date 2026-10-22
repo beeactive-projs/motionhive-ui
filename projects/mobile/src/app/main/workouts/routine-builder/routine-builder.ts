@@ -37,6 +37,7 @@ import {
   localDayKey,
 } from 'core';
 
+import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
@@ -52,9 +53,12 @@ import {
   DEFAULT_SETS,
   KeypadField,
   KeypadFields,
+  RoutineActionId,
+  RoutineActionIds,
   WORKOUT_ICONS,
   formatMeasure,
   prescriptionLine,
+  routineActions,
 } from '../workouts.config';
 
 /** The two targets a routine prescribes per exercise. */
@@ -105,6 +109,7 @@ const NEW = 'new';
 @Component({
   selector: 'mh-routine-builder',
   imports: [
+    ActionSheet,
     ConfirmSheet,
     EmptyState,
     ExerciseCard,
@@ -168,6 +173,11 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly pickerOpen = signal(false);
   readonly deleteOpen = signal(false);
   readonly deleting = signal(false);
+  readonly actionsOpen = signal(false);
+  readonly copyConfirmOpen = signal(false);
+  /** Both lead off this page, so each is closed before navigating (see ConfirmSheet.close). */
+  private readonly _copySheet = viewChild<ConfirmSheet>('copySheet');
+  private readonly _deleteSheet = viewChild<ConfirmSheet>('deleteSheet');
   /** A saved routine reads until Edit is tapped. */
   readonly editMode = signal(false);
 
@@ -230,6 +240,21 @@ export class RoutineBuilder implements ViewWillEnter {
 
   /** Editing a routine that already exists — Cancel puts it back. */
   readonly editingSaved = computed(() => !this.isNew() && this.editMode() && !this.readOnly());
+
+  /**
+   * The ⋯, on your own saved routine while it reads (docs/MOBILE-ACTIONS.md).
+   * A starter has one verb, copying it, and that is its footer button.
+   */
+  readonly showActions = computed(() => this.showOverview() && !this.readOnly());
+
+  /** Coaching puts Edit in the footer; training puts Start there, so Edit joins the sheet. */
+  readonly actions = computed(() => routineActions(this.isCoachMode()));
+
+  readonly copyBody = computed(() =>
+    this._translateService.instant('workouts.routineBuilder.copyConfirm.body', {
+      name: this.routine()?.name ?? '',
+    }),
+  );
 
   readonly title = computed(() => {
     if (this.isNew()) return this._translateService.instant('workouts.common.newRoutine');
@@ -368,7 +393,33 @@ export class RoutineBuilder implements ViewWillEnter {
       });
   }
 
+  // ─── Actions (the ⋯) ──────────────────────────────────────────
+
+  openActions(): void {
+    this.actionsOpen.set(true);
+  }
+
+  /** The sheet reports the verb; this screen decides what it means. */
+  onAction(id: RoutineActionId): void {
+    switch (id) {
+      case RoutineActionIds.Edit:
+        this.edit();
+        return;
+      case RoutineActionIds.Duplicate:
+        this.askCopy();
+        return;
+      case RoutineActionIds.Delete:
+        this.deleteOpen.set(true);
+        return;
+    }
+  }
+
   // ─── Copying ──────────────────────────────────────────────────
+
+  /** A copy is a new routine in the library, so it is asked first. */
+  askCopy(): void {
+    this.copyConfirmOpen.set(true);
+  }
 
   /**
    * A copy of this routine, owned by the caller — how a coach makes a
@@ -386,8 +437,9 @@ export class RoutineBuilder implements ViewWillEnter {
       .duplicate(id)
       .pipe(take(1))
       .subscribe({
-        next: (copy) => {
+        next: async (copy) => {
           this.copying.set(false);
+          await this._copySheet()?.close();
           void this._feedbackService.success(
             this._translateService.instant('workouts.routineBuilder.toast.copied'),
           );
@@ -588,9 +640,9 @@ export class RoutineBuilder implements ViewWillEnter {
       .remove(id)
       .pipe(take(1))
       .subscribe({
-        next: () => {
+        next: async () => {
           this.deleting.set(false);
-          this.deleteOpen.set(false);
+          await this._deleteSheet()?.close();
           void this._feedbackService.success(
             this._translateService.instant('workouts.routineBuilder.toast.deleted'),
           );

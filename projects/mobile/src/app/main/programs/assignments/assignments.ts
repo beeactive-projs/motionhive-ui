@@ -76,6 +76,7 @@ export class Assignments implements ViewWillEnter {
   readonly skeletonRows = [1, 2, 3];
 
   readonly assignOpen = signal(false);
+  readonly assignSaving = signal(false);
 
   constructor() {
     addIcons(PROGRAM_ICONS);
@@ -100,13 +101,18 @@ export class Assignments implements ViewWillEnter {
   }
 
   onAssign(request: AssignRequest): void {
+    // No program yet and the store would never answer, leaving the sheet spinning.
+    if (!this.store.program() || this.assignSaving()) return;
+    this.assignSaving.set(true);
     this.store.assign(request, (error) => {
+      this.assignSaving.set(false);
       if (error) {
         void this._feedbackService.error(
           error,
           this._translateService.instant('programs.assignments.toast.assignFailed'),
         );
       } else {
+        this.assignOpen.set(false);
         void this._feedbackService.success(
           this._translateService.instant('programs.assignments.toast.assigned'),
         );

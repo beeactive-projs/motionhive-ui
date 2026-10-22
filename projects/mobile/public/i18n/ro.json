@@ -1501,7 +1501,6 @@
     "post": "Postare",
     "profile": "Profil",
     "program": "Program",
-    "programSettings": "Setări program",
     "programs": "Programe",
     "progress": "Progres",
     "resetPassword": "Resetează parola",
@@ -1745,6 +1744,10 @@
     "privateNoteAnonymous": "Această persoană își păstrează restul profilului privat."
   },
   "programs": {
+    "actions": {
+      "editDetails": "Editează detaliile",
+      "unpublishHint": "Revine la ciornă. Clienții care îl au deja își păstrează copia."
+    },
     "assign": {
       "assign": "Atribuie",
       "client": "Client",
@@ -1772,6 +1775,7 @@
       "pause": "Pune pe pauză",
       "pausedSubline": "Pe pauză. La reluare, restul programului se amână corespunzător",
       "percentDone": "{percent}% realizat",
+      "startedPercent": "A început {date} · {percent}% realizat",
       "starts": "Începe {date}"
     },
     "assignments": {
@@ -1891,7 +1895,12 @@
       },
       "untitledDay": "Zi fără titlu"
     },
+    "duplicate": {
+      "body": "Primești o copie ciornă a programului {name}, pe care o poți schimba cum vrei. Programul acesta și clienții care îl urmează rămân neschimbați.",
+      "title": "Duplici acest program?"
+    },
     "filter": {
+      "origin": "Creat de",
       "showResults": "Arată rezultatele",
       "title": "Filtrează programele"
     },
@@ -1930,15 +1939,12 @@
       "routine": "Rutină"
     },
     "settings": {
-      "dayCount": "{count, plural, one {# zi} few {# zile} other {# de zile}} de lucru până acum.",
       "delete": {
         "body": "Ștergi {name}? Clienții care îl au deja atribuit își păstrează copia.",
         "bodyFallback": "Ștergi acest program? Clienții care îl au deja atribuit își păstrează copia.",
-        "row": "Șterge programul…",
         "title": "Șterge programul"
       },
       "descriptionPlaceholder": "Pentru cine este și ce dezvoltă.",
-      "duplicate": "Duplică programul",
       "length": "Durată",
       "lengthAria": "Durata programului în săptămâni",
       "namePlaceholder": "Bloc de forță de 12 săptămâni",
@@ -1954,9 +1960,7 @@
         "required": "Alege o variantă ca să salvezi noua durată."
       },
       "publish": "Publică",
-      "publishedNote": "Poți atribui acest program clienților.",
       "shrinkWarning": "{count, plural, one {O zi rămâne} few {# zile rămân} other {# de zile rămân}} în afara acestei durate și {count, plural, one {va fi ștearsă} other {vor fi șterse}}.",
-      "title": "Setările programului",
       "toast": {
         "deleteFailed": "Nu am putut șterge programul",
         "deleted": "Program șters",
@@ -2570,11 +2574,14 @@
       "restOver": "Pauza s-a terminat"
     },
     "routineBuilder": {
+      "copyConfirm": {
+        "body": "Primești propria copie a rutinei {name}, pe care o poți schimba cum vrei. Originalul rămâne neschimbat.",
+        "title": "Faci o copie?"
+      },
       "delete": {
         "message": "Ștergi {name}? Antrenamentele deja înregistrate pe baza ei se păstrează.",
         "title": "Șterge rutina"
       },
-      "deleteRow": "Șterge rutina…",
       "makeCopy": "Fă o copie",
       "name": {
         "label": "Numele rutinei",

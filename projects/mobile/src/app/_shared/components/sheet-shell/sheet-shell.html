@@ -3,7 +3,8 @@
 <ion-modal [canDismiss]="canDismiss()" [handleBehavior]="handleBehavior()" [isOpen]="open()"
   [breakpoints]="snapPoints()" [initialBreakpoint]="startPoint()" [handle]="true" [expandToScroll]="false"
   [attr.aria-label]="title()" [class]="modalClass()" (willPresent)="syncShadowAria()"
-  (didPresent)="presented.set(true)" (didDismiss)="open.set(false); presented.set(false); dismissed.emit()">
+  (didPresent)="presented.set(true)" (willDismiss)="reclaimFooter()"
+  (didDismiss)="reclaimFooter(); open.set(false); presented.set(false); dismissed.emit()">
   <!-- Everything the modal shows must live inside this template: Ionic moves
        the modal when it presents, and anything outside is left behind. -->
   <ng-template>
@@ -44,7 +45,7 @@
     }
 
     @if (showFooter()) {
-    <ion-footer class="ion-no-border">
+    <ion-footer #footer class="ion-no-border">
       <ion-toolbar>
         <!-- Not `ion-buttons`: that slot packs its children to one edge at
                toolbar-button size. The sheet's commit is a full-width bar. -->

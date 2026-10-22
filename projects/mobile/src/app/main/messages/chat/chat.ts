@@ -1,4 +1,14 @@
-import { Component, DestroyRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -26,6 +36,7 @@ import {
   dayDividerLabel,
   displayName,
   groupMessages,
+  isOptimisticMessageId,
 } from 'core';
 
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
@@ -36,6 +47,15 @@ import { MESSAGING_ICONS } from '../messages.config';
 
 /** How close to the bottom counts as "following the conversation". */
 const FOLLOW_THRESHOLD_PX = 120;
+
+/** Movement under which a touch on the thread is a tap, not a drag. */
+const TAP_SLOP_PX = 10;
+
+/** How far the finger travels down the thread before the keyboard closes. */
+const DRAG_DISMISS_PX = 24;
+
+/** Things inside the thread that own their tap. */
+const INTERACTIVE = 'a, button, ion-button, input, textarea, [role="button"]';
 
 /**
  * One conversation.
@@ -75,6 +95,15 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
   readonly store = inject(MessagingStore);
 
   private readonly _content = viewChild(IonContent);
+  private readonly _contentHost = viewChild(IonContent, { read: ElementRef<HTMLElement> });
+  private readonly _composer = viewChild(ChatComposer);
+
+  /**
+   * Keyboard up or down, from the native events. The footer pads the home
+   * indicator only while it is down; when it is up the keyboard covers that
+   * strip and the bar should sit right on it.
+   */
+  readonly keyboardOpen = signal(false);
 
   /** Null on the draft route — there is no conversation until the first send. */
   readonly conversationId = signal<string | null>(null);
@@ -200,6 +229,7 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
       });
 
     this._watchKeyboard();
+    afterNextRender(() => this._watchThreadTouches());
 
     // A thread grows at both ends: new messages at the bottom, history at the
     // top when "load earlier" fetches a page. Only the first should move the
@@ -219,9 +249,13 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
       // The state object also changes on loading flags, which move nothing.
       if (!grewAtBottom && !grewAtTop) return;
 
+      // Something just sent from this screen is always worth showing, even
+      // to someone who had scrolled up to read.
+      const sentHere = grewAtBottom && isOptimisticMessageId(newestId);
+
       // Wait for the rows to lay out, or we scroll to the height the content
       // had before them.
-      queueMicrotask(() => void this._settleScroll(grewAtBottom));
+      queueMicrotask(() => void this._settleScroll(grewAtBottom, sentHere));
     });
   }
 
@@ -234,7 +268,7 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
   /** Content height captured before a "load earlier" fetch. */
   private _heightBeforeOlder: number | null = null;
 
-  private async _settleScroll(grewAtBottom: boolean): Promise<void> {
+  private async _settleScroll(grewAtBottom: boolean, sentHere = false): Promise<void> {
     const content = this._content();
     if (!content) return;
     const el = await content.getScrollElement();
@@ -244,7 +278,7 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
       // follow someone who is already at the bottom — yanking a reader out of
       // the history they scrolled up to is worse than a missed message.
       const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-      if (!this._hasLanded || distanceFromBottom <= FOLLOW_THRESHOLD_PX) {
+      if (!this._hasLanded || sentHere || distanceFromBottom <= FOLLOW_THRESHOLD_PX) {
         await content.scrollToBottom(0);
       }
       this._hasLanded = true;
@@ -269,12 +303,76 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
    */
   private _watchKeyboard(): void {
     // No Keyboard plugin on the web build, where the browser handles this
-    // itself — the listener is native-only and its absence is not an error.
-    const listener = Keyboard.addListener('keyboardDidShow', () => {
-      void this._content()?.scrollToBottom(0);
-    }).catch(() => null);
+    // itself — the listeners are native-only and their absence is not an error.
+    const listeners = [
+      Keyboard.addListener('keyboardDidShow', () => {
+        void this._content()?.scrollToBottom(0);
+      }),
+      Keyboard.addListener('keyboardWillShow', () => this.keyboardOpen.set(true)),
+      Keyboard.addListener('keyboardWillHide', () => this.keyboardOpen.set(false)),
+    ].map((pending) => pending.catch(() => null));
 
-    this._destroyRef.onDestroy(() => void listener.then((handle) => handle?.remove()));
+    this._destroyRef.onDestroy(() => {
+      for (const listener of listeners) void listener.then((handle) => handle?.remove());
+    });
+  }
+
+  /**
+   * Close the keyboard the way messaging apps do: a tap on the thread, or a
+   * drag down it to read back. A webview cannot track the keyboard under the
+   * finger the way iMessage does, so the drag closes it at once once the
+   * finger has clearly moved down. Upward drags (towards newer messages)
+   * leave it alone.
+   *
+   * Touch events rather than scroll events: the thread also scrolls itself
+   * (to the newest message, when the keyboard opens), and that must not
+   * close the keyboard it is making room for. Passive, so scrolling never
+   * waits on these handlers.
+   */
+  private _watchThreadTouches(): void {
+    const host = this._contentHost()?.nativeElement;
+    if (!host) return;
+
+    let start: { x: number; y: number; moved: boolean; dismissed: boolean } | null = null;
+
+    const onStart = (event: TouchEvent): void => {
+      const touch = event.touches[0];
+      start = touch ? { x: touch.clientX, y: touch.clientY, moved: false, dismissed: false } : null;
+    };
+
+    const onMove = (event: TouchEvent): void => {
+      const touch = event.touches[0];
+      if (!start || !touch) return;
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      if (Math.abs(dx) > TAP_SLOP_PX || Math.abs(dy) > TAP_SLOP_PX) start.moved = true;
+      if (!start.dismissed && dy > DRAG_DISMISS_PX) {
+        start.dismissed = true;
+        this._dismissKeyboard();
+      }
+    };
+
+    const onEnd = (event: TouchEvent): void => {
+      const target = event.target as Element | null;
+      if (start && !start.moved && !target?.closest(INTERACTIVE)) this._dismissKeyboard();
+      start = null;
+    };
+
+    const options: AddEventListenerOptions = { passive: true };
+    host.addEventListener('touchstart', onStart, options);
+    host.addEventListener('touchmove', onMove, options);
+    host.addEventListener('touchend', onEnd, options);
+    this._destroyRef.onDestroy(() => {
+      host.removeEventListener('touchstart', onStart);
+      host.removeEventListener('touchmove', onMove);
+      host.removeEventListener('touchend', onEnd);
+    });
+  }
+
+  /** Only when the field has it: a tap that finds no keyboard does nothing. */
+  private _dismissKeyboard(): void {
+    const composer = this._composer();
+    if (composer?.hasFocus()) void composer.dismissKeyboard();
   }
 
   /**
@@ -298,6 +396,8 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
    */
   ionViewWillLeave(): void {
     if (this.store.activeId() === this.conversationId()) this.store.setActiveId(null);
+    // Leaving with the keyboard up would carry it onto the next screen.
+    this._dismissKeyboard();
   }
 
   dayLabel(dayKey: string): string {
