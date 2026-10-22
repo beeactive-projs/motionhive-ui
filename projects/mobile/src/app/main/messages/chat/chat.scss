@@ -31,12 +31,14 @@
   font-weight: 600;
 }
 
-/* Bubbles are the cards here, so the thread sits on the page background. */
+/* Bubbles are the cards here, so the thread sits on the page background.
+   On iOS the inset is the room the keyboard covers while it is up (chat.ts,
+   `_followKeyboard`), so the newest message can scroll above it. */
 .thread {
   --padding-start: 1rem;
   --padding-end: 1rem;
   --padding-top: 0.875rem;
-  --padding-bottom: 0.375rem;
+  --padding-bottom: calc(0.375rem + var(--mh-keyboard-inset, 0px));
 }
 
 /* The send bar. The composer needs a toolbar around it rather than sitting
@@ -63,7 +65,8 @@ ion-footer ion-toolbar {
    instead of a gutter above it (the full inset left ~42pt under the pill).
    The floor keeps it off the screen's corner where there is no safe area
    (the browser preview, Android with buttons). With the keyboard up there is
-   nothing to clear: the bar sits right on it. */
+   nothing to clear: on Android the padding comes off, and on iOS the lift
+   onto the keyboard already subtracts it. */
 ion-footer:not(.keyboard-open) ion-toolbar {
   padding-bottom: max(calc(var(--ion-safe-area-bottom, 0px) - 0.5rem), 0.75rem);
 }
