@@ -36,6 +36,7 @@ import {
 } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
+import { prefersReducedMotion } from '../../../_shared/utils/motion';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
@@ -477,6 +478,3 @@ function isConflict(error: unknown): boolean {
   return error instanceof HttpErrorResponse && error.status === 409;
 }
 
-function prefersReducedMotion(): boolean {
-  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-}

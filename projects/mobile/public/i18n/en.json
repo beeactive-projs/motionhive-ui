@@ -591,7 +591,7 @@
         "forkFailed": "Could not fork this exercise.",
         "forked": "Copied to your exercises"
       },
-      "showFrame": "Show frame {{number}}"
+      "showFrame": "Show frame {number}"
     },
     "detailRows": {
       "kindLevel": "Kind & level",
@@ -715,7 +715,7 @@
       "noMatch": "No exercise matches that name.",
       "recentlyUsed": "Recently used",
       "results": "Results",
-      "about": "About {{name}}",
+      "about": "About {name}",
       "add": "Add",
       "remove": "Remove"
     },

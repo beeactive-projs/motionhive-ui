@@ -1,6 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router } from '@angular/router';
+import {
+  Event as RouterEvent,
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationSkipped,
+  Router,
+} from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonBadge,
@@ -12,7 +19,8 @@ import {
   NavController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { filter, map } from 'rxjs';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Observable, filter, fromEventPattern, map, merge } from 'rxjs';
 
 import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
 
@@ -25,6 +33,37 @@ import {
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
 import { TabIds, TabItem } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
+
+/**
+ * A navigation that has stopped moving, however it ended.
+ *
+ * Exported for the spec: the whole point of the fix is the three events that
+ * are not `NavigationEnd`, and a test that asserted only the happy path
+ * would pass against the bug it exists to catch.
+ */
+export function isNavigationSettled(event: RouterEvent): boolean {
+  return (
+    event instanceof NavigationEnd ||
+    event instanceof NavigationCancel ||
+    event instanceof NavigationError ||
+    event instanceof NavigationSkipped
+  );
+}
+
+/**
+ * Capacitor's `resume`, as a stream that removes its listener on unsubscribe.
+ *
+ * `addListener` resolves to the handle asynchronously, so a component torn
+ * down before it settles would otherwise leak one.
+ */
+function appResumes(): Observable<void> {
+  return fromEventPattern<void>(
+    (handler) => CapacitorApp.addListener('resume', handler as () => void),
+    (_handler, handle: Promise<{ remove: () => Promise<void> }>) => {
+      void handle?.then((listener) => listener.remove());
+    },
+  );
+}
 
 /**
  * The tab shell. Which tabs exist is data (`TAB_SETS`), not structure — so a
@@ -80,15 +119,34 @@ export class Tabs {
   readonly hasBillDue = this._moreBadgesService.hasBillDue;
 
   /**
+   * Every moment the router has finished moving, successfully or not, plus
+   * every return from the background.
+   *
+   * `NavigationEnd` alone is the happy path. A navigation that is cancelled
+   * by a guard, fails to load its chunk, or is skipped as a no-op ends on its
+   * own event and rolls the router state back to the page still on screen —
+   * so anything derived only from `NavigationEnd` keeps whatever it computed
+   * for the page the reader was leaving. For the tab bar that meant leaving a
+   * chat on a flaky connection could hide the bar for the rest of the
+   * session, on every tab, until the app was restarted.
+   *
+   * Resume is here because coming back to a backgrounded app is a moment the
+   * state can be wrong with no navigation to notice it: iOS can reclaim the
+   * WebView while the app is away, and what comes back is restored rather
+   * than navigated to.
+   */
+  private readonly _settled: Observable<unknown> = merge(
+    this._router.events.pipe(filter(isNavigationSettled)),
+    appResumes(),
+  );
+
+  /**
    * The active stack id — the first URL segment after `/tabs`. Derived from
    * the router rather than stored, so a deep link or a programmatic navigation
    * lights the right button without anyone remembering to update state.
    */
   readonly activeTabId = toSignal(
-    this._router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      map(() => activeTabIdFromUrl(this._router.url)),
-    ),
+    this._settled.pipe(map(() => activeTabIdFromUrl(this._router.url))),
     { initialValue: activeTabIdFromUrl(this._router.url) },
   );
 
@@ -96,14 +154,15 @@ export class Tabs {
    * Routes that hide the bar, via `data: { hideTabBar: true }`. Opt-in: nested
    * pages keep it by default, and only a screen that owns the bottom edge (the
    * chat composer, under the keyboard) asks for it.
+   *
+   * Hiding is the exception, so it has to be the state that needs proving:
+   * every re-read either finds the flag on the page in front of the reader or
+   * shows the bar. A bar that is wrongly visible for an instant is a smaller
+   * fault than one that is wrongly gone until the app restarts.
    */
-  readonly hideTabBar = toSignal(
-    this._router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      map(() => this._readHideTabBar()),
-    ),
-    { initialValue: this._readHideTabBar() },
-  );
+  readonly hideTabBar = toSignal(this._settled.pipe(map(() => this._readHideTabBar())), {
+    initialValue: this._readHideTabBar(),
+  });
 
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
 
@@ -134,7 +193,9 @@ export class Tabs {
     this._moreBadgesService.refresh();
 
     // A request is answered inside the Clients stack, so leaving it is the
-    // moment the count can have changed — not every navigation.
+    // moment the count can have changed — not every navigation. `NavigationEnd`
+    // on purpose, unlike the signals above: a cancelled navigation means the
+    // reader never left, and refetching then would be a request for nothing.
     this._router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
