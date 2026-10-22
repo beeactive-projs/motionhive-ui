@@ -14,9 +14,9 @@ export const environment = {
   production: true,
   appUrl: 'https://dev.app.motionhive.fit',
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
-  // The mobile app's iOS OAuth client. Empty until it exists; the iOS app hides
-  // its Google button without it.
-  googleIosClientId: '',
+  // The mobile app's iOS OAuth client. Its reversed form is the URL scheme in
+  // ios/App/App/Info.plist; change both together.
+  googleIosClientId: '119425399334-l8dkteues0kljvkjalv411qkpl15d3mb.apps.googleusercontent.com',
   apiUrl: 'https://dev-motionhive-api-production.up.railway.app',
   // The dev web app, which reads the same dev database: a group invite or a
   // profile link made here only resolves there.
