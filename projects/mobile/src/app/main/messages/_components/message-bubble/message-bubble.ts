@@ -34,6 +34,7 @@ const TIGHT_RADIUS = 6;
   styleUrl: './message-bubble.scss',
   host: {
     '[class.mine]': 'isMine()',
+    '[style.margin-bottom]': 'marginBottom()',
   },
 })
 export class MessageBubble {

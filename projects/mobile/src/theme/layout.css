@@ -104,7 +104,7 @@
    Bind it only while the list is on screen; empty states and cards need the
    slate page behind them. */
 ion-content.mh-flat-page {
-  --background: var(--ion-card-background);
+  --background: var(--mh-color-flat-surface);
 }
 
 /* ─── Recurring blocks ─────────────────────────────────────────────

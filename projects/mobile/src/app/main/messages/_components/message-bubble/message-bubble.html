@@ -1,4 +1,4 @@
-<div class="row" [style.margin-bottom]="marginBottom()">
+<div class="row">
   @if (!isMine()) {
     <div class="gutter">
       @if (showAvatar()) {
@@ -12,33 +12,33 @@
     </div>
   }
 
-  <div class="stack">
-    <div
-      class="bubble"
-      [class.deleted]="isDeleted()"
-      [class.pending]="isPending()"
-      [style.border-radius]="radius()"
-    >
-      <!-- A deleted message's body is the BE's '[deleted]' placeholder, not
-           anything the sender wrote, so it gets the local wording. -->
-      @if (isDeleted()) {
-        {{ 'messages.bubble.deleted' | translate }}
-      } @else {
-        {{ message().body }}
-      }
-    </div>
-
-    @if (showMeta()) {
-      <div class="meta">
-        <span>{{ timeLabel() }}</span>
-        @if (showReceipt() && !isDeleted() && !isPending()) {
-          <ion-icon
-            name="checkmark-done-outline"
-            [class.read]="isRead()"
-            [attr.aria-label]="(isRead() ? 'messages.bubble.read' : 'messages.bubble.sent') | translate"
-          />
-        }
-      </div>
+  <div
+    class="bubble"
+    [class.deleted]="isDeleted()"
+    [class.pending]="isPending()"
+    [style.border-radius]="radius()"
+  >
+    <!-- A deleted message's body is the BE's '[deleted]' placeholder, not
+         anything the sender wrote, so it gets the local wording. -->
+    @if (isDeleted()) {
+      {{ 'messages.bubble.deleted' | translate }}
+    } @else {
+      {{ message().body }}
     }
   </div>
 </div>
+
+<!-- Outside the row, so the avatar lines up with the last bubble rather than
+     with the timestamp under it. -->
+@if (showMeta()) {
+  <div class="meta">
+    <span>{{ timeLabel() }}</span>
+    @if (showReceipt() && !isDeleted() && !isPending()) {
+      <ion-icon
+        name="checkmark-done-outline"
+        [class.read]="isRead()"
+        [attr.aria-label]="(isRead() ? 'messages.bubble.read' : 'messages.bubble.sent') | translate"
+      />
+    }
+  </div>
+}

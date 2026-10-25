@@ -1,4 +1,6 @@
-<ion-header [translucent]="true">
+<!-- The Messages header: title and bell on the row gutter, no hairline under
+     the bar, so switching between the two tabs keeps the header still. -->
+<ion-header class="mh-flat-header" [translucent]="true">
   <ion-toolbar>
     <ion-title>{{ 'nav.menu' | translate }}</ion-title>
     <ion-buttons slot="end">

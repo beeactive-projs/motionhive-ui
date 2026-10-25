@@ -49,6 +49,10 @@ ion-item.mh-list-row > [slot='start'] {
    row. The chevron is the muted ink at full strength: Ionic dims it to 25%,
    below the 3:1 a control needs. */
 ion-list.mh-card-list ion-item {
+  /* The rows take the card's fill, so a row never paints over its card in a
+     second colour; left to Ionic's iOS dark palette, items were the page's
+     black and only the card's corners showed. */
+  --background: var(--ion-card-background);
   --min-height: 2rem;
   --detail-icon-color: var(--ion-color-medium);
   --detail-icon-opacity: 1;
@@ -144,14 +148,14 @@ ion-list:is(.mh-card-list, .mh-flat-list) ion-item:has(> mh-hex-avatar[slot='sta
 ion-list.mh-flat-list {
   margin: 0;
   padding: 0;
-  background: var(--ion-card-background);
+  background: var(--mh-color-flat-surface);
 }
 
 /* 0.75rem around a 3.25rem avatar is WhatsApp's 76px row. The label's own
    md margins (10px top and bottom) would stack on that padding, so the
    padding alone sets the rhythm. */
 ion-list.mh-flat-list ion-item {
-  --background: var(--ion-card-background);
+  --background: var(--mh-color-flat-surface);
   --padding-top: 0.75rem;
   --padding-bottom: 0.75rem;
   --mh-row-inset: var(--mh-row-gutter);

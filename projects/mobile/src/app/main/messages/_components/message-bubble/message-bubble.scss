@@ -2,14 +2,22 @@
    exemption `mh-hex-avatar` takes for the hexagon. Colours still come from the
    theme; there is no literal hex in this file. */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+:host(.mine) {
+  align-items: flex-end;
+}
+
+/* Bottom-aligned, so the avatar sits level with the last bubble of the run. */
 .row {
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
-}
-
-:host(.mine) .row {
-  flex-direction: row-reverse;
+  max-width: 82%;
 }
 
 /* Reserved even when empty, so every bubble in a "them" run lines up with the
@@ -19,22 +27,11 @@
   width: 1.75rem;
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 74%;
-}
-
-:host(.mine) .stack {
-  align-items: flex-end;
-}
-
 .bubble {
   transition: opacity 0.18s ease;
   padding: 0.625rem 0.875rem;
-  background: var(--ion-card-background);
-  border: 1px solid var(--ion-border-color);
+  /* Theirs is Messenger's: a soft grey fill and no border. */
+  background: var(--mh-color-bubble);
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   line-height: var(--mh-leading-tight);
@@ -44,14 +41,12 @@
   overflow-wrap: anywhere;
 }
 
-/* Mine is honey with navy ink and no border — the fill carries the edge. */
+/* Mine is honey with navy ink. */
 :host(.mine) .bubble {
   background: var(--ion-color-primary);
-  border-color: transparent;
   color: var(--ion-color-primary-contrast);
 }
 
-/* A tombstone is the BE's '[deleted]' string; it reads as absence, not speech. */
 /* Not acknowledged by the server yet. Deliberately a fade rather than a
    spinner or a clock: it settles without a swap, so a send that lands in
    100ms reads as instant instead of flashing an indicator. */
@@ -59,9 +54,12 @@
   opacity: 0.55;
 }
 
-.bubble.deleted {
-  background: var(--mh-color-divider);
-  border-color: transparent;
+/* A tombstone is the BE's '[deleted]' string; it reads as absence, not speech. */
+.bubble.deleted,
+:host(.mine) .bubble.deleted {
+  /* An outline with no fill, so it reads as the hole a message left. */
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--ion-border-color);
   color: var(--ion-color-medium);
   font-style: italic;
 }
@@ -73,6 +71,11 @@
   margin: 0.25rem 0.25rem 0;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
+}
+
+/* Under their bubbles, past the avatar gutter (1.75rem + the 0.5rem gap). */
+:host(:not(.mine)) .meta {
+  margin-inline-start: 2.5rem;
 }
 
 .meta ion-icon {

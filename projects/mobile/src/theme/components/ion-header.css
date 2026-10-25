@@ -21,6 +21,12 @@ ion-header.mh-flat-header ion-toolbar {
   --padding-end: 0;
 }
 
+/* iOS's hairline under the last toolbar, the md shadow's twin. Matches
+   `.header-ios ion-toolbar:last-of-type` (0,2,1) and outranks it. */
+ion-header.mh-flat-header ion-toolbar:last-of-type {
+  --border-width: 0;
+}
+
 ion-header.mh-flat-header ion-title {
   padding-inline: var(--mh-row-gutter);
 }
@@ -43,9 +49,14 @@ ion-header.mh-flat-header ion-searchbar {
 }
 
 /* Beside the back chevron the field starts after the button, not on the
-   gutter. */
+   gutter, and tucks a little into the button's hit circle so the chevron
+   reads as part of the field's row rather than apart from it. */
 ion-header.mh-flat-header ion-buttons[slot='start'] + ion-searchbar {
   padding-inline-start: 0;
+  margin-inline-start: -0.25rem;
+  /* The host is `width: 100%`; without the 0.25rem back the field would
+     slide left off the end gutter instead of growing. */
+  width: calc(100% + 0.25rem);
 }
 
 ion-header.mh-flat-header .mh-chip-row {

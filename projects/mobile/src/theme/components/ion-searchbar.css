@@ -46,6 +46,20 @@ ion-searchbar.mh-search-pill .searchbar-input-container {
   min-height: 2.5rem;
 }
 
+/* iOS sets the glyph 5px in and the text 30px in at 17px; this app's field
+   is md's: glyph 16px in, text after 55px, at 16px. `!important` for the
+   scoped-CSS reason above, and because iOS also positions the placeholder
+   with inline styles. */
+.ios ion-searchbar .searchbar-search-icon {
+  inset-inline-start: 1rem !important;
+  margin-inline-start: 0 !important;
+}
+
+.ios ion-searchbar .searchbar-input {
+  padding-inline-start: 3.4375rem !important;
+  font-size: var(--mh-text-md) !important;
+}
+
 /* md pins the glyph 11px from the top of the bar it expects; in the taller
    field it has to ride centre. `!important` for the same scoped-CSS reason
    as the radius rule above. */

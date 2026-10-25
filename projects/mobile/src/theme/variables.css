@@ -192,14 +192,14 @@
    * at 10px. Component SCSS never writes a font-size literal; it picks the
    * nearest role here. Every step is rem, so system text size scales it.
    */
-  --mh-text-xs: 0.6875rem;  /* 11px — kickers, badges, timestamps, footnotes */
-  --mh-text-sm: 0.75rem;    /* 12px — meta, helper, secondary text */
+  --mh-text-xs: 0.6875rem; /* 11px — kickers, badges, timestamps, footnotes */
+  --mh-text-sm: 0.75rem; /* 12px — meta, helper, secondary text */
   --mh-text-base: 0.9375rem; /* 15px — body, controls */
-  --mh-text-md: 1rem;       /* 16px — emphasized body, inputs, card titles */
-  --mh-text-lg: 1.125rem;   /* 18px — section titles */
-  --mh-text-xl: 1.25rem;    /* 20px — empty states, in-card heroes */
-  --mh-text-2xl: 1.5rem;    /* 24px — page titles (h1), detail-screen titles */
-  --mh-text-3xl: 1.75rem;   /* 28px — hero numbers, display titles */
+  --mh-text-md: 1rem; /* 16px — emphasized body, inputs, card titles */
+  --mh-text-lg: 1.125rem; /* 18px — section titles */
+  --mh-text-xl: 1.25rem; /* 20px — empty states, in-card heroes */
+  --mh-text-2xl: 1.5rem; /* 24px — page titles (h1), detail-screen titles */
+  --mh-text-3xl: 1.75rem; /* 28px — hero numbers, display titles */
 
   /*
    * Icon sizes — an icon's font-size is its glyph box, so it takes one of
@@ -207,12 +207,12 @@
    * one; 20 sits an icon inline with 15–16px body text. Above 24 the steps
    * are display glyphs (empty states, hero tiles). See .claude/rules/icons.md.
    */
-  --mh-icon-sm: 1rem;       /* 16px — dense: tags, chips, inline meta */
-  --mh-icon-md: 1.25rem;    /* 20px — inline with body text, inside buttons */
-  --mh-icon-lg: 1.5rem;     /* 24px — toolbars, tab bar, standalone actions */
-  --mh-icon-xl: 2rem;       /* 32px — empty states, in-card heroes */
-  --mh-icon-2xl: 2.5rem;    /* 40px — xl hex tile glyph */
-  --mh-icon-3xl: 3rem;      /* 48px — 2xl hex tile glyph */
+  --mh-icon-sm: 1rem; /* 16px — dense: tags, chips, inline meta */
+  --mh-icon-md: 1.25rem; /* 20px — inline with body text, inside buttons */
+  --mh-icon-lg: 1.5rem; /* 24px — toolbars, tab bar, standalone actions */
+  --mh-icon-xl: 2rem; /* 32px — empty states, in-card heroes */
+  --mh-icon-2xl: 2.5rem; /* 40px — xl hex tile glyph */
+  --mh-icon-3xl: 3rem; /* 48px — 2xl hex tile glyph */
 
   /* Leading & tracking — four leadings, a kicker and a display tracking. */
   --mh-leading-none: 1;
@@ -237,7 +237,7 @@
    * Border widths — the only sanctioned px values besides 1px hairlines.
    * Everything else is a rem multiple of 0.125.
    */
-  --mh-ring-width: 2px;  /* focus/danger ring, avatar cutout ring */
+  --mh-ring-width: 2px; /* focus/danger ring, avatar cutout ring */
   --mh-spine-width: 3px; /* left accent spine (session rows, day rail) */
 
   /*
@@ -267,6 +267,21 @@
    * or dark: about 1.2:1 against the card, the weight of an iOS separator.
    */
   --mh-color-separator: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+
+  /*
+   * The surface of a flat screen (`mh-flat-page`, `mh-flat-list`: the
+   * Messages inbox and thread). In light it is the card's white; in dark the
+   * page's grey, since there the cards step lighter than the page.
+   */
+  --mh-color-flat-surface: var(--ion-card-background);
+
+  /*
+   * The other side's chat bubble on that flat surface. In light the surface
+   * is the card's white, so the bubble steps down to the divider grey; in
+   * dark it is the page's grey, so the bubble takes the card's lighter grey,
+   * the same fill as the grouped rows in the chat's details sheet.
+   */
+  --mh-color-bubble: var(--mh-color-divider);
 
   /*
    * The fill behind a selected chip, tile or day — honey's palest step,
@@ -500,7 +515,7 @@
 
 /*
  * Dark palette — navy surfaces so dark mode stays on-brand (brand surface
- * rule: honey on dark). Page bg = navy 900, card/toolbar bg = navy 800,
+ * rule: honey on dark). Backgrounds are greys (block at the end);
  * border = navy 700, text = navy 50. Only tokens flip here — the ramps
  * stay absolute. Stepped colors are linear mixes between background and
  * text, per Ionic's theming guide (they replace the gray defaults from
@@ -568,18 +583,15 @@
   --ion-color-dark-shade: var(--mh-slate-600);
   --ion-color-dark-tint: var(--mh-slate-400);
 
-  --ion-background-color: var(--mh-navy-900);
-  --ion-background-color-rgb: 14, 27, 49;
   --ion-text-color: var(--mh-navy-50);
   --ion-text-color-rgb: 240, 244, 248;
 
-  --ion-card-background: var(--mh-navy-800);
-  --ion-item-background: var(--mh-navy-800);
-  --ion-toolbar-background: var(--mh-navy-800);
-  --ion-tab-bar-background: var(--mh-navy-800);
+  /* Surfaces are set in the two-class block at the end of this file: Ionic's
+     `.ion-palette-dark.ios` / `.md` (palettes/dark.class.css) outrank this
+     one. */
   --ion-border-color: var(--mh-navy-700);
 
-  --ion-background-color-step-50: #19263b;
+  /* --ion-background-color-step-50: #19263b;
   --ion-background-color-step-100: #253145;
   --ion-background-color-step-150: #303c4f;
   --ion-background-color-step-200: #3b4659;
@@ -597,9 +609,9 @@
   --ion-background-color-step-800: #c3c9d0;
   --ion-background-color-step-850: #ced3da;
   --ion-background-color-step-900: #d9dee4;
-  --ion-background-color-step-950: #e5e9ee;
+  --ion-background-color-step-950: #e5e9ee; */
 
-  --ion-text-color-step-50: #e5e9ee;
+  /* --ion-text-color-step-50: #e5e9ee;
   --ion-text-color-step-100: #d9dee4;
   --ion-text-color-step-150: #ced3da;
   --ion-text-color-step-200: #c3c9d0;
@@ -617,36 +629,30 @@
   --ion-text-color-step-800: #3b4659;
   --ion-text-color-step-850: #303c4f;
   --ion-text-color-step-900: #253145;
-  --ion-text-color-step-950: #19263b;
+  --ion-text-color-step-950: #19263b; */
 }
 
 /*
- * Dark surfaces, at the specificity Ionic uses for its own.
+ * Dark surfaces, the same on both platforms, at the specificity Ionic uses
+ * for its own (`.ion-palette-dark.ios` / `.md`), later in the cascade.
  *
- * `@ionic/angular/css/palettes/dark.class.css` scopes its backgrounds to
- * `.ion-palette-dark.ios` and `.ion-palette-dark.md` — two classes against
- * the single-class block above — so only the tokens Ionic does not set kept
- * this theme's values. The toolbar and the tab bar stayed navy; everything
- * between them took Ionic's black for the page and a near-neutral grey for
- * cards and items, which is the grey that read as a second dark.
+ * The bars take md's dark grey; Ionic's iOS palette names no toolbar or tab
+ * bar colour, so they fell to a near-black step that read as the page.
  *
- * The black page stays: it is the body colour the app already had and the
- * one being matched here. What changes is the grey — cards and items take
- * the same black, so a row sits on the page rather than on a lighter patch
- * of it, and the navy chrome above and below stays the only other tone.
+ * The page and the flat screens take the bars' grey too, so the header, the
+ * page and the tab bar are one surface, not iOS's black, which read as a
+ * hole between them. Cards and items step up to iOS's elevated grouped grey
+ * so they still lift off it, as iOS draws grouped lists in a sheet.
  */
 .ion-palette-dark.ios,
 .ion-palette-dark.md {
-  --ion-background-color: #1c1c1d;
-  --ion-background-color-rgb: 28, 28, 29;
-  --ion-text-color: var(--mh-navy-50);
-  --ion-text-color-rgb: 240, 244, 248;
+  --ion-background-color: #1f1f1f;
+  --ion-background-color-rgb: 31, 31, 31;
+  --ion-card-background: #2c2c2e;
+  --ion-item-background: #2c2c2e;
+  --ion-toolbar-background: #1f1f1f;
+  --ion-tab-bar-background: #1f1f1f;
 
-  --ion-card-background: #1c1c1d;
-  --ion-item-background: #1c1c1d;
-
-  /* The chrome, unchanged: the navy the header and tab bar already had. */
-  --ion-toolbar-background: var(--mh-navy-800);
-  --ion-tab-bar-background: var(--mh-navy-800);
-  --ion-tab-bar-background-focused: var(--mh-navy-700);
+  --mh-color-flat-surface: var(--ion-background-color);
+  --mh-color-bubble: var(--ion-card-background);
 }

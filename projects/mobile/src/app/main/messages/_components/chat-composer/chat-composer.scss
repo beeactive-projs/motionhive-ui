@@ -14,19 +14,21 @@
      the two bottom corners of a solid fill to 0 for the Material underline,
      and floors it at 56px. Unfilled, the bare textarea publishes exactly the
      two variables the pill needs — `--background` and a radius that applies to
-     all four corners — and keeps its own 44px height. `--highlight-height`
-     kills md's focus underline, the last thing that read as a form field.
+     all four corners. `--highlight-height` kills md's focus underline, the
+     last thing that read as a form field.
 
      `!important` to opt out of the app-wide control radius in styles.css —
      this is the one field that is deliberately rounder than the standard, and
      that rule has to be `!important` to beat Ionic's own scoped CSS. */
-  --border-radius: 1.375rem !important;
+  --border-radius: var(--mh-radius-pill) !important;
   --padding-start: 0.875rem;
   --padding-end: 0.875rem;
   /* Symmetric, unlike the 18/8 Ionic uses to clear a floating label: half of
-     the 44px height less the line box, so one line sits centred in the pill. */
-  --padding-top: 0.875rem;
-  --padding-bottom: 0.875rem;
+     the 42px height less Inter's ~19px line box, so one line sits centred.
+     42px is the inbox's search pill; Ionic's own 44px floor comes down to it. */
+  --padding-top: 0.6875rem;
+  --padding-bottom: 0.6875rem;
+  min-height: 2.625rem;
   --background: var(--mh-color-divider);
   --highlight-height: 0;
   font-size: var(--mh-text-md);
@@ -35,7 +37,7 @@
   overflow-y: auto;
 }
 
-/* A circle the same 44px as the pill beside it. `color="primary"` is load-
+/* A circle the same 42px as the pill beside it. `color="primary"` is load-
    bearing, not decoration: inside a toolbar Ionic repaints an uncoloured solid
    button as an inverted chip — ink for the fill, toolbar background for the
    label — which would put white on honey at 2.2:1. The colour class opts out
@@ -45,8 +47,8 @@
   --padding-start: 0;
   --padding-end: 0;
   --box-shadow: none;
-  width: var(--mh-tap-target);
-  height: var(--mh-tap-target);
+  width: 2.625rem;
+  height: 2.625rem;
   margin: 0;
   font-weight: 600;
 }

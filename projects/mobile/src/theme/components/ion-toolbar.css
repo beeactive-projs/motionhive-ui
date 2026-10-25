@@ -1,0 +1,84 @@
+/* The header on iOS keeps the look the app was designed in, Material's;
+   everything else in the toolbar (height, press feedback, the back
+   transition) is iOS's own.
+
+   Ink: iOS paints toolbar buttons and the back button in
+   `--ion-color-primary`, so honey turned up on every icon in every header;
+   md gives them the toolbar's text colour. Set on the header's own buttons
+   only, not as `--ion-toolbar-color` on the bar: every button in a toolbar
+   reads that one first, so it also overrode the filter pills' own ink. A
+   button with its own `color` (the compose button) keeps it. */
+.ios ion-buttons ion-button:not(.ion-color),
+.ios ion-toolbar ion-back-button {
+  --color: var(--ion-text-color);
+}
+
+/* Height: md's 56px bar, not iOS's 44px plus 3px padding, which left the
+   header's round buttons sitting on the field below. */
+.ios ion-toolbar {
+  --min-height: 56px;
+  --padding-top: 0;
+  --padding-bottom: 0;
+}
+
+/* iOS pads a searchbar in a toolbar 1px above and 15px below; md, 3px each
+   side, so the field sits evenly between the title and the pills. */
+.ios ion-toolbar ion-searchbar {
+  min-height: 0;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/* Icon buttons: md's 48px hit circle with the glyph 12px in, which is what
+   ion-header.css places on the gutter. iOS sizes them 36x32 with 5px of
+   padding, so the back chevron in search mode sat 4px off the gutter. */
+.ios ion-buttons ion-button.button-has-icon-only.button-clear {
+  --padding-top: 0.75rem;
+  --padding-end: 0.75rem;
+  --padding-bottom: 0.75rem;
+  --padding-start: 0.75rem;
+  width: 3rem;
+  height: 3rem;
+  margin: 0;
+}
+
+/* The back button gets the same circle. iOS's is a 24px-wide box holding a
+   27px chevron pulled 4px left, so the glyph sat on the screen edge, not
+   where the icon buttons put theirs. */
+.ios ion-toolbar ion-back-button {
+  --icon-font-size: var(--mh-icon-lg);
+  --icon-margin-start: 0;
+  --icon-margin-end: 0;
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+  --min-width: 3rem;
+  --min-height: 3rem;
+}
+
+/* iOS top-aligns everything beside a searchbar (`align-self: start`), which
+   lifted the back chevron above the field's middle; md centres it. */
+.ios ion-toolbar.toolbar-searchbar ion-buttons {
+  align-self: center;
+}
+
+/* A translucent iOS header sets `--opacity: .8` on its toolbars for the bar's
+   background, and ion-button reads the same name for itself without setting
+   it, so every header button inherited the fade (honey + at 80%). */
+.header-translucent-ios ion-button {
+  --opacity: 1;
+}
+
+/* Title: iOS centres it absolutely between 90px insets at 17px semibold;
+   Material sets it in the flow, start-aligned, at 20px medium. Large and
+   small titles keep iOS's own layout. `:where()` holds this at (0,1,1), so
+   `ion-header.mh-flat-header ion-title` (ion-header.css) still sets the
+   flat header's gutter. */
+.ios ion-title:where(:not(.title-large, .title-small)) {
+  position: static;
+  width: auto;
+  height: auto;
+  padding-inline: 1.25rem;
+  font-size: var(--mh-text-xl);
+  font-weight: 500;
+  text-align: start;
+}

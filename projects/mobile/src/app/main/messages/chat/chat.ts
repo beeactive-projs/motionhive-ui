@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonBackButton,
+  ViewDidLeave,
   ViewWillEnter,
   ViewWillLeave,
   IonButton,
@@ -130,7 +131,7 @@ async function releaseKeyboardResize(): Promise<void> {
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
 })
-export class Chat implements ViewWillEnter, ViewWillLeave {
+export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
@@ -557,20 +558,27 @@ export class Chat implements ViewWillEnter, ViewWillLeave {
     }
   }
 
+  /** Leaving with the keyboard up would carry it onto the next screen. */
+  ionViewWillLeave(): void {
+    this._dismissKeyboard();
+  }
+
   /**
    * The store treats the active conversation as "on screen": it holds back the
    * unread count and marks incoming messages read. Leaving has to clear that,
    * or messages that arrive after you walk away are read on your behalf and
    * never badge.
    *
+   * On did-leave, not will-leave: a swipe back starts the leave, and one let
+   * go halfway is cancelled with no event to say so, so the screen stayed with
+   * its header blanked and the keyboard resizing back on.
+   *
    * Only if it is still ours. The first send leaves the draft page for the new
    * thread's page, which has already claimed the active id by the time this
    * runs; clearing it then blanked the new thread's header.
    */
-  ionViewWillLeave(): void {
+  ionViewDidLeave(): void {
     if (this.store.activeId() === this.conversationId()) this.store.setActiveId(null);
-    // Leaving with the keyboard up would carry it onto the next screen.
-    this._dismissKeyboard();
     // Every other screen keeps the plugin's resizing.
     if (this._holdingResize) {
       this._holdingResize = false;

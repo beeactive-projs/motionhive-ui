@@ -54,5 +54,5 @@ function readStoredPreference(): ThemePreference {
   const known = Object.values(ThemePreferences) as string[];
   return stored !== null && known.includes(stored)
     ? (stored as ThemePreference)
-    : ThemePreferences.System;
+    : ThemePreferences.Light;
 }

@@ -31,7 +31,10 @@ export const appConfig: ApplicationConfig = {
     // Material's built-in glyphs are the sharp set; this app's icons are all
     // outline (.claude/rules/icons.md). The searchbar's cancel button reads the
     // same key. The name is registered in app.ts.
-    provideIonicAngular({ backButtonIcon: 'chevron-back-outline' }),
+    //
+    // No back button text: iOS mode labels the chevron with a hardcoded
+    // English "Back", untranslated, and the md header never had one.
+    provideIonicAngular({ backButtonIcon: 'chevron-back-outline', backButtonText: '' }),
     // Messaging lives inside a tab stack here, not at web's /messages.
     { provide: MESSAGING_ROUTES, useValue: ['/tabs/messages'] },
     // Where core's guestGuard sends a signed-in user off the auth pages.

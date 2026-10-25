@@ -215,12 +215,13 @@ export class Messages implements ViewWillEnter {
 
   /**
    * Rows on screen (the inbox, its skeleton or search results): the page
-   * takes the list's white. Empty and error states keep the slate.
+   * takes the list's white. Empty and error states keep the slate, except
+   * in search, which keeps the inbox's surface throughout.
    */
   readonly showList = computed(
     () =>
       this.showSkeleton() ||
-      this.showSearchStart() ||
+      this.searchOpen() ||
       (this.people.isActive()
         ? !this.isSearchEmpty()
         : !this.showLoadError() && !this.isEmpty() && !this.isFilteredEmpty()),
