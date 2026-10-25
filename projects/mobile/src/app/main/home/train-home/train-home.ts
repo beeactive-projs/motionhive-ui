@@ -112,7 +112,7 @@ export class TrainHome implements OnInit, ViewWillEnter {
   }
 
   openBilling(): void {
-    void this._router.navigateByUrl('/tabs/home/billing');
+    void this._router.navigateByUrl('/tabs/more/billing');
   }
 
   openSessions(): void {

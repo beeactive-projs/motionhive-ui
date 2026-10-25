@@ -10,17 +10,24 @@
 
 .field {
   flex: 1;
-  /* A composer is a pill, and `fill="solid"` cannot be one: Ionic hard-codes
-     the two bottom corners of a solid fill to 0 for the Material underline,
-     and floors it at 56px. Unfilled, the bare textarea publishes exactly the
-     two variables the pill needs — `--background` and a radius that applies to
-     all four corners. `--highlight-height` kills md's focus underline, the
-     last thing that read as a form field.
+  /* The fill and the corners are painted on the host, not through Ionic's
+     `--background` / `--border-radius`. Past the height cap the host is what
+     scrolls, and Ionic paints those variables on a wrapper inside it, so the
+     rounded top scrolled away with the text and left a square edge. Painted
+     here they stay put, and the host clips the text to the rounded shape.
+     (`fill="solid"` is no help either: it squares the bottom corners for
+     md's underline and floors the field at 56px.) `--highlight-height` kills
+     md's focus underline, the last thing that read as a form field.
 
-     `!important` to opt out of the app-wide control radius in styles.css —
-     this is the one field that is deliberately rounder than the standard, and
-     that rule has to be `!important` to beat Ionic's own scoped CSS. */
-  --border-radius: var(--mh-radius-pill) !important;
+     A fixed radius of about half the one-line height, as WhatsApp and
+     Messenger draw theirs: one line still reads as a pill, and a long message
+     turns it into a rounded box instead of stretching a capsule around it.
+
+     The fill is the other side's bubble: grey in both themes, as WhatsApp's
+     field is. (The divider token is navy in dark mode.) */
+  background: var(--mh-color-bubble);
+  border-radius: 1.25rem;
+  --background: transparent;
   --padding-start: 0.875rem;
   --padding-end: 0.875rem;
   /* Symmetric, unlike the 18/8 Ionic uses to clear a floating label: half of
@@ -29,11 +36,12 @@
   --padding-top: 0.6875rem;
   --padding-bottom: 0.6875rem;
   min-height: 2.625rem;
-  --background: var(--mh-color-divider);
   --highlight-height: 0;
   font-size: var(--mh-text-md);
-  /* Past this the keyboard and the bar leave no thread visible. */
-  max-height: 40dvh;
+  /* About six lines, then the text scrolls inside the field and the caret
+     stays in view, so a long message never pushes the thread off screen. The
+     dvh cap keeps that true on a short screen with the keyboard up. */
+  max-height: min(8.625rem, 30dvh);
   overflow-y: auto;
 }
 

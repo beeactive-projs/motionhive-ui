@@ -36,12 +36,12 @@
 }
 
 // The handle reads as a chip rather than a caption — it is the thing people
-// copy, so it gets an edge.
+// copy, so it gets an edge. The edge alone, on the card's own fill: a tinted
+// fill under the muted ink drops it below 4.5:1 in both modes.
 .handle-chip {
   padding: 0.25rem 0.625rem;
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-pill);
-  background: var(--ion-background-color);
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
@@ -81,10 +81,12 @@
     flex: 1;
   }
 
-  // The secondary action is a quiet white button with the page's border and
-  // ink, not a tinted one — `color="medium"` would grey the label out.
-  // ion-button[fill='outline'] {
-  //   --border-color: var(--ion-border-color);
-  //   --color: var(--ion-text-color);
-  // }
+  // The secondary action is a quiet button with the page's border and ink,
+  // not a tinted one: `color="medium"` greys the label out until it reads as
+  // disabled. No `color` on it, either: Ionic's `.ion-color` rules would
+  // outrank these variables.
+  ion-button[fill='outline'] {
+    --border-color: var(--ion-border-color);
+    --color: var(--ion-text-color);
+  }
 }

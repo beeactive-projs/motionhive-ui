@@ -21,6 +21,9 @@
 } @else {
   <ion-header [translucent]="true">
     <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/more" />
+      </ion-buttons>
       <ion-title>{{ 'nav.discover' | translate }}</ion-title>
       <ion-buttons slot="end">
         <ion-button [attr.aria-label]="'discover.search.placeholder' | translate" (click)="openSearch()">

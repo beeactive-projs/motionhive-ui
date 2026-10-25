@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
+  IonBackButton,
   IonButton,
   IonButtons,
   IonChip,
@@ -81,6 +82,7 @@ import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
     DiscoverSessionRow,
     EmptyState,
     HexAvatar,
+    IonBackButton,
     IonButton,
     IonButtons,
     IonChip,

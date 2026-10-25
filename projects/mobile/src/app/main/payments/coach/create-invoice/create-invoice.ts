@@ -204,7 +204,7 @@ export class CreateInvoice implements ViewWillEnter {
               sendImmediately ? 'payments.toast.invoiceSent' : 'payments.toast.draftSaved',
             ),
           );
-          void this._router.navigate(['/tabs/home/payments', invoice.id], {
+          void this._router.navigate(['/tabs/more/payments', invoice.id], {
             replaceUrl: true,
           });
         },

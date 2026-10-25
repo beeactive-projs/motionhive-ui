@@ -1,8 +1,12 @@
 <ng-template #body>
   <div class="mh-section-label">{{ 'exercises.fields.kind' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (chip of kindChips(); track chip.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="isKindOn(chip.value)"
         [attr.aria-pressed]="isKindOn(chip.value)"
         (click)="toggleKind(chip.value)"
@@ -11,14 +15,18 @@
         @if (chip.count !== null) {
           <span class="count">{{ chip.count }}</span>
         }
-      </ion-chip>
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'exercises.fields.level' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (chip of levelChips(); track chip.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="isLevelOn(chip.value)"
         [attr.aria-pressed]="isLevelOn(chip.value)"
         (click)="toggleLevel(chip.value)"
@@ -27,14 +35,18 @@
         @if (chip.count !== null) {
           <span class="count">{{ chip.count }}</span>
         }
-      </ion-chip>
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'exercises.filterSheet.primaryMuscle' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (chip of muscleChips(); track chip.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="isMuscleOn(chip.value)"
         [attr.aria-pressed]="isMuscleOn(chip.value)"
         (click)="toggleMuscle(chip.value)"
@@ -43,19 +55,25 @@
         @if (chip.count !== null) {
           <span class="count">{{ chip.count }}</span>
         }
-      </ion-chip>
+      </ion-button>
     }
     <!-- Seventeen chips would bury Equipment below the fold; the eight that
          cover most of the catalogue lead, and the rest are one tap away. -->
     @if (hiddenMuscleCount() > 0) {
-      <ion-chip class="more" (click)="expandMuscles()">{{ showAllMusclesLabel() }}</ion-chip>
+      <ion-button class="chip more" fill="clear" shape="round" size="small" (click)="expandMuscles()">
+        {{ showAllMusclesLabel() }}
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'exercises.fields.equipment' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (chip of equipmentChips(); track chip.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="isEquipmentOn(chip.value)"
         [attr.aria-pressed]="isEquipmentOn(chip.value)"
         (click)="toggleEquipment(chip.value)"
@@ -64,7 +82,7 @@
         @if (chip.count !== null) {
           <span class="count">{{ chip.count }}</span>
         }
-      </ion-chip>
+      </ion-button>
     }
   </div>
 

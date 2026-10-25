@@ -119,14 +119,14 @@ describe('deep links', () => {
   // to pick the screen that matches who it was sent to.
   it('splits invoice alerts by side of the bill', () => {
     expect(routeFor({ screen: 'coaching/invoices', entityId: 'inv-1' })).toEqual([
-      '/tabs/home/payments',
+      '/tabs/more/payments',
       'inv-1',
     ]);
     expect(routeFor({ screen: 'profile/invoices', entityId: 'inv-1' })).toEqual([
-      '/tabs/home/billing',
+      '/tabs/more/billing',
       'inv-1',
     ]);
-    expect(routeFor({ screen: 'coaching/payments' })).toEqual(['/tabs/home/payments']);
+    expect(routeFor({ screen: 'coaching/payments' })).toEqual(['/tabs/more/payments']);
   });
 
   // A program assignment is the alert most likely to be tapped by a trainee,
@@ -140,10 +140,10 @@ describe('deep links', () => {
   // them a screen, so those two route and the rest still only get a name.
   it('routes the billing profile tabs and names the ones with no screen', () => {
     expect(routeFor({ screen: 'profile', queryParams: { tab: 'invoices' } })).toEqual([
-      '/tabs/home/billing',
+      '/tabs/more/billing',
     ]);
     expect(routeFor({ screen: 'profile', queryParams: { tab: 'memberships' } })).toEqual([
-      '/tabs/home/billing',
+      '/tabs/more/billing',
     ]);
     expect(routeFor({ screen: 'profile', queryParams: { tab: 'coaches' } })).toBeNull();
     expect(webOnlyLabel({ screen: 'profile', queryParams: { tab: 'coaches' } })).toBe('Coaches');

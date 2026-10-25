@@ -1,31 +1,34 @@
 <ng-template #body>
   <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (option of typeOptions; track option.value) {
-    <ion-chip [class.selected]="draft().type === option.value"
-      [attr.aria-pressed]="draft().type === option.value" (click)="toggleType(option.value)">
-      {{ option.label }}
-    </ion-chip>
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="draft().type === option.value"
+        [attr.aria-pressed]="draft().type === option.value" (click)="toggleType(option.value)">
+        {{ option.label }}
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'form.label.location' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (option of locationOptions; track option.value) {
-    <ion-chip [class.selected]="draft().locationKind === option.value"
-      [attr.aria-pressed]="draft().locationKind === option.value" (click)="toggleLocation(option.value)">
-      {{ option.label }}
-    </ion-chip>
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="draft().locationKind === option.value"
+        [attr.aria-pressed]="draft().locationKind === option.value" (click)="toggleLocation(option.value)">
+        {{ option.label }}
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'form.label.status' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (option of statusOptions; track option.value) {
-    <ion-chip [class.selected]="draft().status === option.value"
-      [attr.aria-pressed]="draft().status === option.value" (click)="toggleStatus(option.value)">
-      {{ option.label | translate }}
-    </ion-chip>
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="draft().status === option.value"
+        [attr.aria-pressed]="draft().status === option.value" (click)="toggleStatus(option.value)">
+        {{ option.label | translate }}
+      </ion-button>
     }
   </div>
 

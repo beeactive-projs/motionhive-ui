@@ -73,6 +73,16 @@
   display: none;
 }
 
+/* A filter sheet's chip group. Wrapping rather than scrolling: a sheet has
+   the height to spare, and a hidden chip in a filter list is a filter nobody
+   finds. Its chips are `ion-button.chip`s, the same skin as the
+   `.mh-chip-row` toggles (ion-button.css). */
+.mh-chip-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
 /* A kicker and its note on one baseline over a block of rows — "This week ·
    3 of 8 need a look", "Incoming · 1". The section's own gap binds it to the
    list below; the inline inset lines the text up with the row content beside

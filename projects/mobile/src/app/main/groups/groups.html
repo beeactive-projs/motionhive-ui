@@ -26,6 +26,9 @@
 } @else {
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/more" />
+    </ion-buttons>
     <ion-title>{{ 'nav.groups' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell class="round" />

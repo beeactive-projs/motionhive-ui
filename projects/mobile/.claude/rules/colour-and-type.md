@@ -13,11 +13,12 @@ The token tiers and the type scale are in `projects/mobile/CLAUDE.md`. These are
 - The palette **is** Tailwind's default ramps under product names (`primary` Amber, `info` Sky, `danger` Red, `success` Emerald, `medium` Slate…), with the source of truth in `projects/core/src/styles/theme-colors.ts`. Map a design hex to an existing ramp step before adding anything. A new hue gets its full Tailwind ramp in `theme-colors.ts` first, then the slot set in `variables.css`.
 - Variants come from adjacent ramp steps (600 shade, 400 tint), never from a mix formula.
 - Honey (`primary`) means action or selection: the primary CTA, a selected chip, the active tab. Never use it as a status colour.
+  - Unpicked filter chips are light navy (`--mh-color-chip-idle` / `-contrast`), with no outline: the `.mh-chip-row` strips and the filter sheets' `.mh-chip-cloud` groups alike (one skin, `.chip` in `ion-button.css`; don't restate it in a sheet's `.scss`), so a filter reads as navy pills with honey picks.
   - One exception, chosen to match WhatsApp's chat list: on an inbox row, the unread count badge and the unread timestamp are honey (muted rows too; the bell marks them), and so is the Messages tab's count. The unread timestamp stays at 600, like the rest of the type scale. Don't spread the honey to other lists.
 - Red (`danger`) on an action means it destroys something: block, delete, remove, cancel, archive, leave, discard, sign out. A verb that is not destructive is never red, even if it concerns alerts or notifications (those are `info`). As a status, red stays for real failures and overdue or conflicting states, plus the small unread dots and the Clients tab's count of requests waiting on the coach.
 - Status colours are neutral or semantic. Soft status chips use the wash pair: `background: var(--ion-color-<name>-wash); color: var(--ion-color-<name>-wash-contrast)`.
 - A white glyph needs 3:1 on its tile. Sky 500 and Emerald 500 miss it; use `tone="shade"` for those where the glyph carries meaning.
-- Hairlines between rows use `--mh-color-separator`. `--mh-color-divider` is a soft fill (pills, composer), not a line on a card.
+- Hairlines between rows use `--mh-color-separator`. `--mh-color-divider` is a soft fill (pills), not a line on a card. The chat composer and the other side's bubble take `--mh-color-bubble`.
 - Dark mode is Ionic's palette class on `<html>`. A colour that must differ in dark mode is a token with its override in `variables.css`. Use a component-level `:host-context(.ion-palette-dark)` rule only for what no token expresses (the auth pages' honeycomb flips navy to honey and changes its opacity).
 
 ## Type

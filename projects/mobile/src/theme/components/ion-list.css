@@ -209,11 +209,9 @@ ion-list.mh-flat-list ion-label :is(h2, h3) {
   line-height: var(--mh-leading-body);
 }
 
-/* Ionic greys only a `p` that is the label's direct child; inside a
-   `.mh-row-line` it would fall back to the body ink. */
+/* The muted ink comes from the global label rule (typography.css). */
 ion-list.mh-flat-list ion-label p {
   margin: 0;
-  color: var(--ion-color-medium);
   font-size: var(--mh-text-base);
   line-height: var(--mh-leading-body);
 }

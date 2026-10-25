@@ -1,32 +1,44 @@
 <ng-template #body>
   <div class="mh-section-label">{{ 'form.label.status' | translate }}</div>
-  <div class="chips">
-    <ion-chip
+  <div class="mh-chip-cloud">
+    <ion-button
+      class="chip"
+      fill="clear"
+      shape="round"
+      size="small"
       [class.selected]="!draft().unreadOnly"
       [attr.aria-pressed]="!draft().unreadOnly"
       (click)="setUnreadOnly(false)"
     >
       {{ 'common.all' | translate }}
-    </ion-chip>
-    <ion-chip
+    </ion-button>
+    <ion-button
+      class="chip"
+      fill="clear"
+      shape="round"
+      size="small"
       [class.selected]="draft().unreadOnly"
       [attr.aria-pressed]="draft().unreadOnly"
       (click)="setUnreadOnly(true)"
     >
       {{ 'notifications.filter.unread' | translate }}
-    </ion-chip>
+    </ion-button>
   </div>
 
   <div class="mh-section-label">{{ 'notifications.filter.category' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (option of categoryOptions; track option.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="isPicked(option.value)"
         [attr.aria-pressed]="isPicked(option.value)"
         (click)="toggleCategory(option.value)"
       >
         {{ option.label }}
-      </ion-chip>
+      </ion-button>
     }
   </div>
 

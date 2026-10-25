@@ -261,7 +261,7 @@
 
   /*
    * The hairline between rows of a grouped list (ion-list.css). Not the
-   * divider above: that one doubles as a soft fill (pills, composer) and is
+   * divider above: that one doubles as a soft fill (pills) and is
    * too pale to read as a line on a white card. Mixed from the ink rather
    * than a ramp step so it sits at the same weight on any card fill, light
    * or dark: about 1.2:1 against the card, the weight of an iOS separator.
@@ -282,6 +282,15 @@
    * the same fill as the grouped rows in the chat's details sheet.
    */
   --mh-color-bubble: var(--mh-color-divider);
+
+  /*
+   * An idle filter chip in a `.mh-chip-row` strip or a filter sheet's
+   * `.mh-chip-cloud`: a light navy fill, so the unpicked pills read as the
+   * brand's navy beside the honey picked one.
+   * Navy 700 ink on navy 100 is 10.9:1.
+   */
+  --mh-color-chip-idle: var(--mh-navy-100);
+  --mh-color-chip-idle-contrast: var(--mh-navy-700);
 
   /*
    * The fill behind a selected chip, tile or day — honey's palest step,
@@ -528,9 +537,6 @@
   /* On navy the step goes the other way: red 400 is 6.22:1 on the page. */
   --mh-color-danger-deep: var(--mh-danger-400);
 
-  /* Slate 100 would glare on a navy card; the divider tracks the border here. */
-  --mh-color-divider: var(--mh-navy-700);
-
   /* Selection inverts like the washes: deep honey fill, light ink. */
   --mh-color-selected-background: var(--mh-warning-950);
 
@@ -538,6 +544,12 @@
      (5.9:1). */
   --mh-color-calendar-coach: var(--mh-navy-400);
   --mh-color-calendar-coach-contrast: var(--mh-navy-900);
+
+  /* The idle filter chip lifts off the grey page as a true navy, a step
+     brighter than the slate wash it replaced. Navy 100 ink on navy 500 is
+     8.8:1. */
+  --mh-color-chip-idle: var(--mh-navy-500);
+  --mh-color-chip-idle-contrast: var(--mh-navy-100);
 
   /* Wash inverts: deep fill (step 900; honey 950), light ink (step 200;
      honey 300). */
@@ -564,6 +576,14 @@
   --ion-color-secondary-wash: var(--mh-slate-800);
   --ion-color-secondary-wash-contrast: var(--mh-slate-200);
 
+  /* The tile extension: a hex tile's solid fill where the slot colour itself
+     disappears on the dark card (navy 500 is 1.2:1 on it). Same lift as the
+     coach day: light navy fill, deep navy ink (5.9:1); the tile is 4.8:1 on
+     the card. Only slots that need it define it; hex-avatar falls back to
+     the slot colour. */
+  --ion-color-secondary-tile: var(--mh-navy-400);
+  --ion-color-secondary-tile-contrast: var(--mh-navy-900);
+
   /*
    * The saturated hues hold up on navy, so only the neutrals shift: Slate
    * 500 and 700 are too close to the card background to read as tiles, so
@@ -586,10 +606,9 @@
   --ion-text-color: var(--mh-navy-50);
   --ion-text-color-rgb: 240, 244, 248;
 
-  /* Surfaces are set in the two-class block at the end of this file: Ionic's
-     `.ion-palette-dark.ios` / `.md` (palettes/dark.class.css) outrank this
-     one. */
-  --ion-border-color: var(--mh-navy-700);
+  /* Surfaces, borders and the divider are set in the two-class block at the
+     end of this file: Ionic's `.ion-palette-dark.ios` / `.md`
+     (palettes/dark.class.css) outrank this one. */
 
   /* --ion-background-color-step-50: #19263b;
   --ion-background-color-step-100: #253145;
@@ -653,6 +672,36 @@
   --ion-toolbar-background: #1f1f1f;
   --ion-tab-bar-background: #1f1f1f;
 
+  /* Lines are neutral grey like the surfaces, never the old navy. The
+     border is iOS's dark grey, visible on the card as well as the page;
+     the divider, a soft fill as much as a line, is the step between it and
+     the card. The bars' hairlines take the list separator, so the header,
+     the tab bar and the rows draw one weight of line. */
+  --ion-border-color: #48484a;
+  --mh-color-divider: #3a3a3c;
+  --ion-toolbar-border-color: var(--mh-color-separator);
+  --ion-tab-bar-border-color: var(--mh-color-separator);
+
   --mh-color-flat-surface: var(--ion-background-color);
   --mh-color-bubble: var(--ion-card-background);
+
+  /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
+     and a sheet scales the scrim by how far it is open. */
+  --ion-backdrop-opacity: 0.6;
+}
+
+/*
+ * A sheet in dark mode is raised one step, as iOS draws its elevated
+ * surfaces: on the page grey it would have no edge but its corners. Its
+ * cards step up with it so they still lift off the sheet. The derived
+ * surfaces are restated because a `var()` resolves where it is declared
+ * (`<html>`), not where it is read.
+ */
+.ion-palette-dark ion-modal.mh-sheet {
+  --ion-background-color: #2c2c2e;
+  --ion-background-color-rgb: 44, 44, 46;
+  --ion-card-background: #3a3a3c;
+  --ion-item-background: #3a3a3c;
+  --mh-color-flat-surface: #2c2c2e;
+  --mh-color-bubble: #3a3a3c;
 }

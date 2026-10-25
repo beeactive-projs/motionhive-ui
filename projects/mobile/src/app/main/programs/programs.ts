@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
   IonChip,
@@ -52,6 +53,7 @@ import { ProgramsStore } from './programs.store';
     CreateSheet,
     ProgramFilterSheet,
     EmptyState,
+    IonBackButton,
     IonButton,
     IonButtons,
     IonChip,

@@ -1,15 +1,19 @@
 <ng-template #body>
   <div class="mh-section-label">{{ 'programs.filter.origin' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (chip of originChips; track chip.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="isOn(chip.value)"
         [attr.aria-pressed]="isOn(chip.value)"
         (click)="choose(chip.value)"
       >
         {{ chip.label | translate }}
         <span class="count">{{ countFor(chip.value) }}</span>
-      </ion-chip>
+      </ion-button>
     }
   </div>
 </ng-template>

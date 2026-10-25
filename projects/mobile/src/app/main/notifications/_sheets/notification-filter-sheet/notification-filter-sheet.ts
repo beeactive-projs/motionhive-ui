@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
-import { IonChip, IonNote } from '@ionic/angular/standalone';
+import { IonButton, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { NotificationCategory } from 'core';
@@ -27,7 +27,7 @@ import {
  */
 @Component({
   selector: 'mh-notification-filter-sheet',
-  imports: [IonChip, IonNote, SheetShell, TranslatePipe],
+  imports: [IonButton, IonNote, SheetShell, TranslatePipe],
   templateUrl: './notification-filter-sheet.html',
   styleUrl: './notification-filter-sheet.scss',
 })

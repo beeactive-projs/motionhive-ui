@@ -36,6 +36,9 @@ import { closeOutline } from 'ionicons/icons';
  */
 export const SHEET_PRESENTED_CLASS = 'mh-presented';
 
+/** Put on every sheet's `ion-modal`; the dark sheet surface in variables.css keys off it. */
+const SHEET_CLASS = 'mh-sheet';
+
 /** Put on the `ion-modal` of a `fit` sheet; the auto-height rules in ion-modal.css key off it. */
 const SHEET_FIT_CLASS = 'mh-sheet-fit';
 
@@ -176,7 +179,9 @@ export class SheetShell {
   readonly snapPoints = computed(() => (this.fit() ? FIT_BREAKPOINTS : this.breakpoints()));
   readonly startPoint = computed(() => (this.fit() ? 1 : this.initialBreakpoint()));
   readonly modalClass = computed(() =>
-    [this.presented() ? SHEET_PRESENTED_CLASS : '', this.fit() ? SHEET_FIT_CLASS : ''].filter(Boolean).join(' '),
+    [SHEET_CLASS, this.presented() ? SHEET_PRESENTED_CLASS : '', this.fit() ? SHEET_FIT_CLASS : '']
+      .filter(Boolean)
+      .join(' '),
   );
 
   /**

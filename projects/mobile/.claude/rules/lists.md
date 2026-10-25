@@ -22,7 +22,7 @@ Grouped lists are described first; the flat list has its own section at the end.
 - A grouped list is `<ion-list [inset]="true" class="mh-card-list">`. Nothing else makes a card list: no hand-rolled bordered `div` around `ion-item`s, no `ion-list [inset]` without the class.
 - The card has no outline and a `--mh-radius-card` radius; its fill lifts it off the grey page. Never add a border to it.
 - Place it with the page layout (`.mh-page`, `.mh-section`), never with a margin on the list.
-- The rows take the card's fill (`--ion-card-background`, set by the skin). In dark mode the page is the bars' grey (#1f1f1f) and cards step up to #2c2c2e.
+- The rows take the card's fill (`--ion-card-background`, set by the skin). In dark mode the page is the bars' grey (#1f1f1f) and cards step up to #2c2c2e; inside a sheet everything is one step higher (sheet #2c2c2e, cards #3a3a3c, see `surfaces-and-sheets.md`).
 - A flat list and its page paint `--mh-color-flat-surface`, never `--ion-card-background`: white in light, the page grey in dark.
 - A tab root made of cards (the Menu) still takes `mh-flat-header`, so its title and bell sit where the Messages tab puts them and no hairline closes the bar.
 

@@ -44,13 +44,19 @@ const MESSAGES: TabItem = {
 };
 
 // Groups sits in web's shared nav block, so both modes carry the same row.
-// Navy: honey is reserved for actions/selection, and the brighter hues are
-// taken by this row's coach-mode neighbours.
+// Violet: a group is people, and lists.md gives people violet on every screen.
 const GROUPS: MoreTile = {
   label: 'nav.groups',
   icon: 'people-outline',
-  iconColor: 'secondary',
+  iconColor: 'violet',
   route: '/tabs/groups',
+};
+
+const DISCOVER: MoreTile = {
+  label: 'nav.discover',
+  icon: 'compass-outline',
+  iconColor: 'teal',
+  route: '/tabs/discover',
 };
 
 export const COACH_TAB_SET: TabSet = {
@@ -79,16 +85,13 @@ export const COACH_TAB_SET: TabSet = {
           label: 'nav.payments',
           icon: 'card-outline',
           iconColor: 'success',
-          route: '/tabs/home/payments',
+          route: '/tabs/more/payments',
         },
       ],
     },
     {
       label: 'nav.community',
-      items: [
-        { label: 'nav.discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
-        GROUPS,
-      ],
+      items: [DISCOVER, GROUPS],
     },
   ],
 };
@@ -105,8 +108,9 @@ export const TRAIN_TAB_SET: TabSet = {
     { id: TabIds.Workouts, label: 'nav.workouts', icon: 'barbell-outline' },
     MESSAGES,
   ],
-  // "My training" mirrors web's mode group; the unlabeled card holds the
-  // shared/general rows, the way web's shared block carries no heading.
+  // The coach menu's shape: the mode's own workspace, then the shared
+  // community destinations. Every card carries a kicker: an unlabeled card
+  // under a labeled one reads as part of it.
   more: [
     {
       label: 'nav.myTraining',
@@ -114,20 +118,19 @@ export const TRAIN_TAB_SET: TabSet = {
         // The same library the coach side gets, read-only: a trainee looking
         // up a movement their plan names should not have to ask for it.
         { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
-      ],
-    },
-    {
-      label: '',
-      items: [
-        { label: 'nav.discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
-        GROUPS,
+        // What the trainee pays their coach: the training's money side, the
+        // way Payments sits in the coach's Coaching card.
         {
           label: 'nav.billing',
           icon: 'card-outline',
           iconColor: 'success',
-          route: '/tabs/home/billing',
+          route: '/tabs/more/billing',
         },
       ],
+    },
+    {
+      label: 'nav.community',
+      items: [DISCOVER, GROUPS],
     },
   ],
 };

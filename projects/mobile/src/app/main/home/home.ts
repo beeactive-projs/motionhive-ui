@@ -90,7 +90,7 @@ export class Home {
   }
 
   openRoleSwitch(): void {
-    void this._router.navigateByUrl('/tabs/home/switch-role');
+    void this._router.navigateByUrl('/tabs/more/switch-role');
   }
 
   /** Only one child is ever mounted, so this reaches whichever it is. */

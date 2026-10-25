@@ -82,7 +82,7 @@ export class More implements ViewWillEnter {
       .map((section) => ({
         ...section,
         items: section.items.map((entry) =>
-          entry.route === '/tabs/home/billing'
+          entry.route === '/tabs/more/billing'
             ? { ...entry, dot: this._moreBadgesService.hasBillDue }
             : entry,
         ),
@@ -114,12 +114,12 @@ export class More implements ViewWillEnter {
 
   /** Same destination as the home pill — a page that explains what a switch changes. */
   openSwitchRole(): void {
-    void this._router.navigateByUrl('/tabs/home/switch-role');
+    void this._router.navigateByUrl('/tabs/more/switch-role');
   }
 
   /** The identity card is the way into the account area, same as the home
    *  header's avatar. */
   openAccount(): void {
-    void this._router.navigateByUrl('/tabs/home/account');
+    void this._router.navigateByUrl('/tabs/more/account');
   }
 }

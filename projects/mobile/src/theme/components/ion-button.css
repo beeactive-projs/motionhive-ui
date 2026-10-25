@@ -89,22 +89,24 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
   font-size: var(--mh-icon-sm);
 }
 
-/* A toggle chip in the same strip — "All / Active / Requests / Archived".
+/* A toggle chip in the same strip — "All / Active / Requests / Archived" —
+   or in a filter sheet's `.mh-chip-cloud` (layout.css), so a filter is the
+   same control wherever it sits.
 
    An `ion-button`, not an `ion-chip`, because this one is a control: Ionic's
    chip renders a non-interactive element with no role and no tab stop, so
    `aria-pressed` on it names a state nothing can reach, and a keyboard or
-   switch user could not change the filter at all. Same wash/navy treatment as
+   switch user could not change the filter at all. Same light navy idle fill as
    `.mh-chip-row ion-chip` (ion-chip.css) so the two read as one vocabulary,
    and the same geometry as `.filters` beside it — with the trigger's roomier
    inline padding, which is also what lifts a two-letter label off its
    minimum. It must stay `fill="clear"`: a solid button in a toolbar is styled
    as an inverted chip and would ignore `--background`. */
-.mh-chip-row .chip {
-  --background: var(--ion-color-medium-wash);
-  --background-hover: var(--ion-color-medium-wash);
-  --background-activated: var(--ion-color-medium-wash);
-  --color: var(--ion-color-medium-wash-contrast);
+:is(.mh-chip-row, .mh-chip-cloud) .chip {
+  --background: var(--mh-color-chip-idle);
+  --background-hover: var(--mh-color-chip-idle);
+  --background-activated: var(--mh-color-chip-idle);
+  --color: var(--mh-color-chip-idle-contrast);
   --padding-start: 1rem;
   --padding-end: 1rem;
   flex: none;
@@ -127,7 +129,7 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
    segment underline and the active tab already use it, so a navy chip in the
    same toolbar read as a different system. Black on honey is 9.78:1, which
    is why the fill can carry small text at all. */
-.mh-chip-row .chip.selected {
+:is(.mh-chip-row, .mh-chip-cloud) .chip.selected {
   --background: var(--ion-color-primary);
   --background-hover: var(--ion-color-primary);
   --background-activated: var(--ion-color-primary-shade);
@@ -136,7 +138,7 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
 
 /* A count riding inside a chip ("Unread 3"), as WhatsApp does. Full ink: a
    faded count fell under 4.5:1 on the idle chip's wash. */
-.mh-chip-row .chip .count {
+:is(.mh-chip-row, .mh-chip-cloud) .chip .count {
   margin-inline-start: 0.25rem;
   font-weight: 600;
 }

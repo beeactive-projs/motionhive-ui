@@ -186,7 +186,7 @@ export class ClientPayments implements ViewWillEnter {
   }
 
   open(invoice: Invoice): void {
-    void this._router.navigate(['/tabs/home/billing', invoice.id]);
+    void this._router.navigate(['/tabs/more/billing', invoice.id]);
   }
 
   /** Saved cards live in Stripe's hosted portal — there is no card UI here. */

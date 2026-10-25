@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { IonChip, IonNote } from '@ionic/angular/standalone';
+import { IonButton, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subject, catchError, debounceTime, map, of, switchMap } from 'rxjs';
 
@@ -55,7 +55,7 @@ const MUSCLE_PREVIEW = 8;
  */
 @Component({
   selector: 'mh-exercise-filter-sheet',
-  imports: [IonChip, IonNote, SheetShell, TranslatePipe],
+  imports: [IonButton, IonNote, SheetShell, TranslatePipe],
   templateUrl: './exercise-filter-sheet.html',
   styleUrl: './exercise-filter-sheet.scss',
 })

@@ -105,16 +105,33 @@ export class HexAvatar {
     }
   });
 
-  readonly fillVariable = computed(
-    () => `var(--ion-color-${this.color()}${this.toneSuffix()})`,
-  );
+  /**
+   * The base tone goes through the slot's `-tile` extension when the palette
+   * defines one: navy vanishes on the dark card, so dark mode lifts it there
+   * (`theme/variables.css`).
+   */
+  readonly fillVariable = computed(() => {
+    const slot = `--ion-color-${this.color()}`;
+    return this.tone() === HexAvatarTones.Base
+      ? `var(${slot}-tile, var(${slot}))`
+      : `var(${slot}${this.toneSuffix()})`;
+  });
 
-  /** Wash carries its own ink; the solid tones both take the base contrast. */
-  readonly inkVariable = computed(() =>
-    this.tone() === HexAvatarTones.Wash
-      ? `var(--ion-color-${this.color()}-wash-contrast)`
-      : `var(--ion-color-${this.color()}-contrast)`,
-  );
+  /**
+   * Wash carries its own ink; base takes the tile's ink when the slot has a
+   * tile extension, and shade the slot's contrast.
+   */
+  readonly inkVariable = computed(() => {
+    const slot = `--ion-color-${this.color()}`;
+    switch (this.tone()) {
+      case HexAvatarTones.Wash:
+        return `var(${slot}-wash-contrast)`;
+      case HexAvatarTones.Base:
+        return `var(${slot}-tile-contrast, var(${slot}-contrast))`;
+      default:
+        return `var(${slot}-contrast)`;
+    }
+  });
 
   readonly initials = computed(() => {
     const parts = this.name().trim().split(/\s+/).filter(Boolean);

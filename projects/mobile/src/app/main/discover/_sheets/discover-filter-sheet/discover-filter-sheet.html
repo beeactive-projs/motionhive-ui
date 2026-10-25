@@ -1,54 +1,74 @@
 <ng-template #body>
   <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
-  <div class="chips">
-    <ion-chip
+  <div class="mh-chip-cloud">
+    <ion-button
+      class="chip"
+      fill="clear"
+      shape="round"
+      size="small"
       [class.selected]="draft().type === null"
       [attr.aria-pressed]="draft().type === null"
       (click)="setType(null)"
     >
       {{ 'discover.filterSheet.anyType' | translate }}
-    </ion-chip>
+    </ion-button>
     @for (option of typeOptions; track option.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="draft().type === option.value"
         [attr.aria-pressed]="draft().type === option.value"
         (click)="setType(option.value)"
       >
         {{ option.label }}
-      </ion-chip>
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'form.label.location' | translate }}</div>
-  <div class="chips">
-    <ion-chip
+  <div class="mh-chip-cloud">
+    <ion-button
+      class="chip"
+      fill="clear"
+      shape="round"
+      size="small"
       [class.selected]="draft().locationKind === null"
       [attr.aria-pressed]="draft().locationKind === null"
       (click)="setLocation(null)"
     >
       {{ 'discover.filterSheet.anywhere' | translate }}
-    </ion-chip>
+    </ion-button>
     @for (option of locationOptions; track option.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="draft().locationKind === option.value"
         [attr.aria-pressed]="draft().locationKind === option.value"
         (click)="setLocation(option.value)"
       >
         {{ option.label }}
-      </ion-chip>
+      </ion-button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'discover.filterSheet.dates' | translate }}</div>
-  <div class="chips">
+  <div class="mh-chip-cloud">
     @for (option of presetOptions; track option.value) {
-      <ion-chip
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
         [class.selected]="draft().datePreset === option.value"
         [attr.aria-pressed]="draft().datePreset === option.value"
         (click)="setPreset(option.value)"
       >
         {{ option.label | translate }}
-      </ion-chip>
+      </ion-button>
     }
   </div>
 </ng-template>

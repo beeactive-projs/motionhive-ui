@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home" />
+      <ion-back-button defaultHref="/tabs/more" />
     </ion-buttons>
     <ion-title>{{ 'nav.account' | translate }}</ion-title>
   </ion-toolbar>
@@ -53,7 +53,7 @@
         <ion-button expand="block" [disabled]="!handle()" (click)="openPublicProfile()">
           {{ 'button.viewProfile' | translate }}
         </ion-button>
-        <ion-button expand="block" fill="outline" color="medium" [disabled]="!handle()"
+        <ion-button expand="block" fill="outline" [disabled]="!handle()"
           (click)="shareSheetOpen.set(true)">
           {{ 'button.share' | translate }}
         </ion-button>
@@ -65,7 +65,6 @@
       <ion-note class="mh-kicker" color="medium">{{ 'account.sections.profile' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row [label]="'account.rows.profile' | translate" icon="person-outline" iconColor="primary"
-          [value]="'account.rows.profileHint' | translate"
           (select)="go('profile')" />
         @if (isInstructor()) {
         <mh-settings-row [label]="'account.rows.coachingProfile' | translate" icon="ribbon-outline" iconColor="info" iconTone="shade"
@@ -81,7 +80,7 @@
       <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row [label]="'nav.notifications' | translate" icon="notifications-outline" iconColor="info"
           iconTone="shade" (select)="go('notifications')" />
-        <mh-settings-row [label]="'account.rows.appearance' | translate" icon="color-palette-outline" iconColor="primary"
+        <mh-settings-row [label]="'account.rows.appearance' | translate" icon="color-palette-outline" iconColor="teal"
           [value]="themeLabel()" (select)="appearanceOpen.set(true)" />
         <mh-settings-row [label]="'form.label.language' | translate" [icon]="Tiles.language.icon" [iconColor]="Tiles.language.color"
           [value]="languageLabel" [disabled]="switchingLanguage()" (select)="languageOpen.set(true)" />
@@ -94,9 +93,12 @@
     <section class="mh-section">
       <ion-note class="mh-kicker" color="medium">{{ 'account.sections.privacy' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
-        <mh-settings-row [label]="'account.rows.privacy' | translate" icon="eye-outline" iconColor="info"
+        <!-- Violet: private by choice. Blocked people are switched off, so
+             that row is the muted tile, never red (it opens a list, it does
+             not block anyone). -->
+        <mh-settings-row [label]="'account.rows.privacy' | translate" icon="eye-outline" iconColor="violet"
           (select)="go('privacy')" />
-        <mh-settings-row [label]="'account.rows.blockedUsers' | translate" icon="ban-outline" iconColor="success" iconTone="shade"
+        <mh-settings-row [label]="'account.rows.blockedUsers' | translate" icon="ban-outline" iconColor="medium"
           (select)="go('blocked')" />
       </ion-list>
     </section>
@@ -110,17 +112,15 @@
           [note]="'account.rows.unverified' | translate: { email }" [detail]="false"
           [disabled]="resendingVerification()" (select)="onResendVerification()" />
         }
-        <!-- Quiet on purpose: last, grey, and it opens a page that explains
-             before anything happens. Findable, as Apple requires. -->
-        <mh-settings-row [label]="'account.rows.deleteAccount' | translate" icon="trash-outline" iconColor="medium"
+        <mh-settings-row [label]="'button.signOut' | translate" icon="log-out-outline" iconColor="danger" [detail]="false"
+          [disabled]="signingOut()" (select)="onSignOut()" />
+        <!-- Last, after the everyday sign out, and it opens a page that
+             explains before anything happens. Findable, as Apple requires.
+             Red like every destructive verb (lists.md). -->
+        <mh-settings-row [label]="'account.rows.deleteAccount' | translate" icon="trash-outline" iconColor="danger"
           (select)="go('delete')" />
       </ion-list>
     </section>
-
-    <ion-list [inset]="true" class="mh-card-list">
-      <mh-settings-row [label]="'button.signOut' | translate" icon="log-out-outline" iconColor="danger" [detail]="false"
-        [disabled]="signingOut()" (select)="onSignOut()" />
-    </ion-list>
 
     @if (memberSince(); as since) {
     <ion-text color="medium">

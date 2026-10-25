@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import {
-  IonChip,
+  IonButton,
   IonDatetime,
   IonDatetimeButton,
   IonItem,
@@ -50,7 +50,7 @@ export { NO_FILTERS, activeFilterCount };
 @Component({
   selector: 'mh-session-filter-sheet',
   imports: [
-    IonChip,
+    IonButton,
     IonDatetime,
     IonDatetimeButton,
     IonItem,

@@ -21,6 +21,7 @@ paths:
 
 - Every bottom sheet is built on `mh-sheet-shell` (or `mh-action-sheet`, `mh-confirm-sheet`, `mh-choice-sheet`, which use it). Don't use `ActionSheetController` or a bare `ion-modal`.
 - A sheet is one surface: header, body and footer all on `--ion-background-color`, with white cards (`mh-card-list`, boxes on `--ion-card-background`) on top. Never paint the header, body or a box the page colour to make a band or a well.
+- In dark mode a sheet is raised one step above the page, as iOS does for raised surfaces: the shell's `mh-sheet` class redefines the surface tokens inside the modal (sheet `#2c2c2e`, cards `#3a3a3c`, in `variables.css`), and the dark scrim is `--ion-backdrop-opacity: 0.6`. On the page grey the sheet otherwise had no edge but its corners. Keep reading the tokens in sheets; never hardcode the raised greys in a sheet's `.scss`.
 - The shell's header is fixed: title, optional subtitle, close X. Don't add header customisation.
 - Options inside a sheet are a grouped list (see `lists.md`), not loose `ion-item`s on the sheet background.
 - A list of verbs is `mh-action-sheet`: one card for the actions and a separate card for the destructive ones, each with a hex tile.

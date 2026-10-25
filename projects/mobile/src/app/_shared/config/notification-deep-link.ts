@@ -71,12 +71,12 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
   // not, which matches who each alert goes to.
   'coaching/invoices': (d) =>
     link(
-      d.entityId ? ['/tabs/home/payments', d.entityId] : ['/tabs/home/payments'],
+      d.entityId ? ['/tabs/more/payments', d.entityId] : ['/tabs/more/payments'],
       params(d),
     ),
-  'coaching/payments': (d) => link(['/tabs/home/payments'], params(d)),
+  'coaching/payments': (d) => link(['/tabs/more/payments'], params(d)),
   'profile/invoices': (d) =>
-    link(d.entityId ? ['/tabs/home/billing', d.entityId] : ['/tabs/home/billing'], params(d)),
+    link(d.entityId ? ['/tabs/more/billing', d.entityId] : ['/tabs/more/billing'], params(d)),
   sessions: traineeSessions,
   'user/sessions': traineeSessions,
   // Every group alert carries the group id, or nothing when the reader has
@@ -119,8 +119,8 @@ const PROFILE_TABS: Record<string, string> = {
  * own screen with a segment.
  */
 const PROFILE_TAB_ROUTES: Record<string, string[]> = {
-  memberships: ['/tabs/home/billing'],
-  invoices: ['/tabs/home/billing'],
+  memberships: ['/tabs/more/billing'],
+  invoices: ['/tabs/more/billing'],
 };
 
 /** The resolved link, or null when the notification has nowhere to go. */

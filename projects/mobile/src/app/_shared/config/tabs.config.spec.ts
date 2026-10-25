@@ -31,11 +31,11 @@ describe('activeTabIdFromUrl', () => {
 
   it('keeps a nested page on its parent tab', () => {
     // The whole reason the account area and a client page are nested rather than
-    // siblings. The three-segment case is what keeps the Home tab lit across
-    // every screen under /tabs/home/account.
+    // siblings. The three-segment case is what keeps the Menu tab lit across
+    // every screen under /tabs/more/account.
     expect(activeTabIdFromUrl('/tabs/clients/user-1')).toBe(TabIds.Clients);
-    expect(activeTabIdFromUrl('/tabs/home/account')).toBe(TabIds.Home);
-    expect(activeTabIdFromUrl('/tabs/home/account/profile')).toBe(TabIds.Home);
+    expect(activeTabIdFromUrl('/tabs/more/account')).toBe(TabIds.More);
+    expect(activeTabIdFromUrl('/tabs/more/account/profile')).toBe(TabIds.More);
   });
 
   it('ignores query strings and fragments', () => {
@@ -92,6 +92,15 @@ describe('tab set configuration', () => {
     for (const set of Object.values(TAB_SETS)) {
       const tiles = set.more.flatMap((section) => section.items);
       expect(tiles.some((tile) => tile.route === '/tabs/groups')).toBe(true);
+    }
+  });
+
+  it('labels every menu section', () => {
+    // An unlabeled card under a labeled one reads as part of that section.
+    for (const set of Object.values(TAB_SETS)) {
+      for (const section of set.more) {
+        expect(section.label).not.toBe('');
+      }
     }
   });
 

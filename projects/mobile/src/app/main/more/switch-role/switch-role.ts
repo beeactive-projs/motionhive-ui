@@ -29,8 +29,8 @@ import { ROLE_ICONS, ROLE_LIST, UPCOMING_ROLES } from '../../../_shared/config/r
  *
  * A pushed page rather than a sheet: switching role re-renders home, the tab
  * bar and the notification scope, which is more than a toggle should do
- * silently. It is pushed on the *home* stack, so returning to it always lands
- * on a tab both roles have — nothing can be orphaned by the switch.
+ * silently. It sits on the Menu stack, and picking a role always lands on
+ * Home, a tab both roles have — nothing can be orphaned by the switch.
  */
 @Component({
   selector: 'mh-switch-role',

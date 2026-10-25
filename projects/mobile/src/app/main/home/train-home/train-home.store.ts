@@ -91,7 +91,7 @@ export class TrainHomeStore {
         // Both, deliberately: an avatar without a claimed handle leaves the
         // profile unreachable by name.
         done: !!account?.avatarUrl && !!account?.handle,
-        route: '/tabs/home/account/profile',
+        route: '/tabs/more/account/profile',
       },
       {
         id: 'coach',

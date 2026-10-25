@@ -202,7 +202,7 @@ export class Account implements OnInit, ViewWillEnter {
   }
 
   go(path: string): void {
-    void this._router.navigateByUrl(`/tabs/home/account/${path}`);
+    void this._router.navigateByUrl(`/tabs/more/account/${path}`);
   }
 
   onThemePicked(value: string): void {

@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
-import { IonChip } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { SessionLocationKind, SessionType } from 'core';
@@ -26,7 +26,7 @@ import {
  */
 @Component({
   selector: 'mh-discover-filter-sheet',
-  imports: [IonChip, SheetShell, TranslatePipe],
+  imports: [IonButton, SheetShell, TranslatePipe],
   templateUrl: './discover-filter-sheet.html',
   styleUrl: './discover-filter-sheet.scss',
 })

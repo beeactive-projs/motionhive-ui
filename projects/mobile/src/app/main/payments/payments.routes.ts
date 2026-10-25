@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { coachGuard } from '../../_shared/guards/coach.guard';
 
 /**
- * Two areas, two addresses, both under `home` so the Home tab stays lit.
+ * Two areas, two addresses, both under `more` so the Menu tab stays lit.
  *
  * Payments gets no tab for either role: the coach chases money deliberately
  * (a visit, not an interruption) and a client's bill is rare enough that a

@@ -326,7 +326,7 @@ export class Notifications implements ViewWillEnter {
   }
 
   openSettings(): void {
-    void this._router.navigate(['/tabs/home/account/notifications']);
+    void this._router.navigate(['/tabs/more/account/notifications']);
   }
 
   retry(): void {

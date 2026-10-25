@@ -191,11 +191,11 @@ export class CoachPayments implements ViewWillEnter {
   }
 
   open(invoice: Invoice): void {
-    void this._router.navigate(['/tabs/home/payments', invoice.id]);
+    void this._router.navigate(['/tabs/more/payments', invoice.id]);
   }
 
   create(): void {
-    void this._router.navigate(['/tabs/home/payments/new']);
+    void this._router.navigate(['/tabs/more/payments/new']);
   }
 
   /** Connect onboarding is hosted by Stripe, so it leaves the app. */

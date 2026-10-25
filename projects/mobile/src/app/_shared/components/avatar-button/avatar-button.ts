@@ -12,7 +12,7 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
  * account page.
  *
  * Unlike the bell it links to a fixed address: the account stack is mounted
- * under the home tab only (app.routes.ts), so there is no per-tab copy to
+ * under the Menu tab only (app.routes.ts), so there is no per-tab copy to
  * stay inside. Geometry comes from the shared `ion-button.glyph` skin.
  */
 @Component({

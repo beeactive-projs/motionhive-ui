@@ -1,5 +1,5 @@
 import { Component, computed, input, model, output, signal } from '@angular/core';
-import { IonChip } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
@@ -16,7 +16,7 @@ import { ORIGIN_PILLS, ProgramOrigin } from '../../programs.config';
  */
 @Component({
   selector: 'mh-program-filter-sheet',
-  imports: [IonChip, SheetShell, TranslatePipe],
+  imports: [IonButton, SheetShell, TranslatePipe],
   templateUrl: './program-filter-sheet.html',
   styleUrl: './program-filter-sheet.scss',
 })

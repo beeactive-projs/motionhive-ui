@@ -12,20 +12,16 @@
     </div>
   }
 
+  <!-- A deleted message's body is the BE's '[deleted]' placeholder, not
+       anything the sender wrote, so it gets the local wording. The text sits
+       flush against the tags: the bubble is `pre-wrap`, so any whitespace
+       around it would render as a leading and trailing space. -->
   <div
     class="bubble"
     [class.deleted]="isDeleted()"
     [class.pending]="isPending()"
     [style.border-radius]="radius()"
-  >
-    <!-- A deleted message's body is the BE's '[deleted]' placeholder, not
-         anything the sender wrote, so it gets the local wording. -->
-    @if (isDeleted()) {
-      {{ 'messages.bubble.deleted' | translate }}
-    } @else {
-      {{ message().body }}
-    }
-  </div>
+  >{{ isDeleted() ? ('messages.bubble.deleted' | translate) : message().body }}</div>
 </div>
 
 <!-- Outside the row, so the avatar lines up with the last bubble rather than

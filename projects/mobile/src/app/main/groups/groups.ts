@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
+  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -55,6 +56,7 @@ import { GroupsStore } from './groups.store';
   imports: [
     EmptyState,
     HexAvatar,
+    IonBackButton,
     IonButton,
     IonButtons,
     IonContent,

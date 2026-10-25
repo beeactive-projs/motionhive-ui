@@ -19,6 +19,16 @@ ion-label[class] :is(h1, h2, h3) {
   font-weight: 600;
 }
 
+/* A label's second line is the muted ink. Ionic's iOS default is a 60% step
+   of the text colour, about 3:1 on the dark card and under AA; medium is
+   4.76:1 on white and about 6:1 on the dark card. It also reaches a `p`
+   nested in a wrapper (`.mh-row-line`), which Ionic leaves in the body ink.
+   A coloured item's label (`.in-item-color`) still inherits its colour:
+   Ionic's rule for it outranks this one. */
+ion-label[class] p {
+  color: var(--ion-color-medium);
+}
+
 /* Page title — tight to the kicker above it. Ionic's default h1 is a 1.5rem
    heading with 1rem of margin on both sides of it. */
 h1 {

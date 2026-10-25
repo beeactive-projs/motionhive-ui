@@ -3,10 +3,10 @@ import { Routes } from '@angular/router';
 import { coachGuard } from '../../_shared/guards/coach.guard';
 
 /**
- * The account area, mounted at `/tabs/home/account`.
+ * The account area, mounted at `/tabs/more/account`.
  *
- * Every path here keeps `home` as the first segment after `/tabs`, which is
- * what `activeTabIdFromUrl` reads — so the Home tab stays lit through the whole
+ * Every path here keeps `more` as the first segment after `/tabs`, which is
+ * what `activeTabIdFromUrl` reads — so the Menu tab stays lit through the whole
  * area instead of the bar going blank.
  */
 export const accountRoutes: Routes = [

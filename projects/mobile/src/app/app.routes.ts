@@ -45,32 +45,6 @@ export const routes: Routes = [
         loadComponent: () => import('./main/home/home').then((m) => m.Home),
       },
       {
-        path: 'home/account',
-        loadChildren: () =>
-          import('./main/account/account.routes').then((m) => m.accountRoutes),
-      },
-      {
-        // Only an instructor holds a second role, so only an instructor has
-        // anything to switch between.
-        path: 'home/switch-role',
-        canActivate: [coachGuard],
-        loadComponent: () =>
-          import('./main/home/switch-role/switch-role').then((m) => m.SwitchRole),
-      },
-      // Money, both sides, under `home` so the Home tab stays lit. Neither
-      // gets a tab: a coach chases payment deliberately, and a client's bill
-      // is rare enough that a permanent slot would sit empty.
-      {
-        path: 'home/payments',
-        loadChildren: () =>
-          import('./main/payments/payments.routes').then((m) => m.paymentsRoutes),
-      },
-      {
-        path: 'home/billing',
-        loadChildren: () =>
-          import('./main/payments/payments.routes').then((m) => m.billingRoutes),
-      },
-      {
         path: 'messages',
         loadChildren: () =>
           import('./main/messages/messages.routes').then((m) => m.messagesRoutes),
@@ -147,6 +121,33 @@ export const routes: Routes = [
       {
         path: 'more',
         loadComponent: () => import('./main/more/more').then((m) => m.More),
+      },
+      // Account, Switch role and money open from the Menu, so they sit under
+      // `more` and keep the Menu tab lit. Money gets no tab for either side: a
+      // coach chases payment deliberately, and a client's bill is rare enough
+      // that a permanent slot would sit empty.
+      {
+        path: 'more/payments',
+        loadChildren: () =>
+          import('./main/payments/payments.routes').then((m) => m.paymentsRoutes),
+      },
+      {
+        path: 'more/billing',
+        loadChildren: () =>
+          import('./main/payments/payments.routes').then((m) => m.billingRoutes),
+      },
+      {
+        path: 'more/account',
+        loadChildren: () =>
+          import('./main/account/account.routes').then((m) => m.accountRoutes),
+      },
+      {
+        // Only an instructor holds a second role, so only an instructor has
+        // anything to switch between.
+        path: 'more/switch-role',
+        canActivate: [coachGuard],
+        loadComponent: () =>
+          import('./main/more/switch-role/switch-role').then((m) => m.SwitchRole),
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
