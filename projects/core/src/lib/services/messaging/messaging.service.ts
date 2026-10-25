@@ -114,6 +114,17 @@ export class MessagingService {
     );
   }
 
+  /**
+   * "Delete chat", for the caller only: the thread and its history leave
+   * their inbox, the other participant keeps everything. A newer message
+   * brings the thread back with only that message in it.
+   */
+  clearConversation(conversationId: string): Observable<{ clearedAt: string }> {
+    return this._http.delete<{ clearedAt: string }>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.CONVERSATION(conversationId),
+    );
+  }
+
   deleteOwnMessage(messageId: string): Observable<MessageView> {
     return this._http.delete<MessageView>(
       this.baseUrl + API_ENDPOINTS.MESSAGING.MESSAGE(messageId),

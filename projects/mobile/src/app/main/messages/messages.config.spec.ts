@@ -76,10 +76,11 @@ describe('MESSAGING_ICONS', () => {
 });
 
 describe('conversationActions', () => {
-  it('offers profile, mute, then block for a person with a handle', () => {
+  it('offers profile, mute, delete, then block for a person with a handle', () => {
     expect(conversationActions(false, true).map((a) => a.id)).toEqual([
       ConversationActions.Profile,
       ConversationActions.Mute,
+      ConversationActions.Delete,
       ConversationActions.Block,
     ]);
   });
@@ -87,6 +88,7 @@ describe('conversationActions', () => {
   it('leaves out the profile row when there is no handle to open', () => {
     expect(conversationActions(false, false).map((a) => a.id)).toEqual([
       ConversationActions.Mute,
+      ConversationActions.Delete,
       ConversationActions.Block,
     ]);
   });
@@ -105,9 +107,12 @@ describe('conversationActions', () => {
     });
   });
 
-  it('keeps block alone in the destructive card', () => {
+  it('keeps only delete and block in the destructive card', () => {
     const destructive = conversationActions(false, true).filter((a) => a.destructive);
-    expect(destructive.map((a) => a.id)).toEqual([ConversationActions.Block]);
+    expect(destructive.map((a) => a.id)).toEqual([
+      ConversationActions.Delete,
+      ConversationActions.Block,
+    ]);
   });
 
   // The sheet renders these through `mh-hex-avatar`, which needs them registered.

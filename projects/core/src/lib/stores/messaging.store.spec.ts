@@ -425,6 +425,116 @@ describe('MessagingStore — mark as unread', () => {
   });
 });
 
+describe('MessagingStore — delete chat', () => {
+  const KEEP = 'conv-keep';
+  const GONE = 'conv-gone';
+
+  let store: MessagingStore;
+  let events$: Subject<unknown>;
+  let router: { navigate: ReturnType<typeof vi.fn> };
+  let api: {
+    listConversations: ReturnType<typeof vi.fn>;
+    clearConversation: ReturnType<typeof vi.fn>;
+    listMessages: ReturnType<typeof vi.fn>;
+    ackStreamEvent: ReturnType<typeof vi.fn>;
+  };
+
+  function row(id: string, unreadCount: number) {
+    return { ...sendResult().conversation, id, unreadCount };
+  }
+
+  beforeEach(() => {
+    events$ = new Subject();
+    router = { navigate: vi.fn(() => Promise.resolve(true)) };
+    api = {
+      listConversations: vi.fn(() =>
+        of({ items: [row(KEEP, 0), row(GONE, 2)], total: 2 }),
+      ),
+      clearConversation: vi.fn(() => of({ clearedAt: '2026-10-25T10:00:00Z' })),
+      listMessages: vi.fn(() => of({ items: [], nextBefore: null })),
+      ackStreamEvent: vi.fn(() => of(undefined)),
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        MessagingStore,
+        { provide: MessagingService, useValue: api },
+        {
+          provide: MessagingRealtimeService,
+          useValue: {
+            events$,
+            status: signal('open').asReadonly(),
+            lastEventId: signal<string | null>(null),
+            connect: vi.fn(),
+            disconnect: vi.fn(),
+            reconnect: vi.fn(),
+          },
+        },
+        {
+          provide: AuthStore,
+          useValue: {
+            user: signal({ id: ME }).asReadonly(),
+            isAuthenticated: signal(false).asReadonly(),
+          },
+        },
+        { provide: Router, useValue: router },
+      ],
+    });
+    store = TestBed.inject(MessagingStore);
+    store.loadConversations({ force: true });
+  });
+
+  it('drops the row, and its unread with it, once the server agrees', async () => {
+    expect(await store.deleteConversation(GONE)).toBe(true);
+
+    expect(api.clearConversation).toHaveBeenCalledWith(GONE);
+    expect(store.conversations().map((c) => c.id)).toEqual([KEEP]);
+    expect(store.unreadTotal()).toBe(0);
+  });
+
+  it('keeps the row when the server refuses', async () => {
+    api.clearConversation.mockReturnValue(
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+    );
+
+    expect(await store.deleteConversation(GONE)).toBe(false);
+    expect(store.conversations().map((c) => c.id)).toEqual([KEEP, GONE]);
+  });
+
+  it('leaves the thread when it is the one on screen', async () => {
+    store.openConversation(GONE);
+    router.navigate.mockClear();
+
+    await store.deleteConversation(GONE);
+
+    expect(store.activeId()).toBeNull();
+    expect(router.navigate).toHaveBeenCalledTimes(1);
+  });
+
+  it('follows a delete made on another device', () => {
+    events$.next({
+      id: 'evt-1',
+      event: {
+        type: 'conversation.cleared',
+        payload: { conversationId: GONE, userId: ME, clearedAt: '2026-10-25T10:00:00Z' },
+      },
+    });
+    expect(store.conversations().map((c) => c.id)).toEqual([KEEP]);
+  });
+
+  it("ignores someone else's delete", () => {
+    events$.next({
+      id: 'evt-1',
+      event: {
+        type: 'conversation.cleared',
+        payload: { conversationId: GONE, userId: 'someone-else', clearedAt: '2026-10-25T10:00:00Z' },
+      },
+    });
+    expect(store.conversations()).toHaveLength(2);
+  });
+});
+
 describe('MessagingStore — catching up after the background', () => {
   let store: MessagingStore;
   let realtime: { reconnect: ReturnType<typeof vi.fn> };
@@ -495,6 +605,23 @@ describe('MessagingStore — catching up after the background', () => {
     expect(realtime.reconnect).toHaveBeenCalledTimes(1);
     expect(api.listConversations).toHaveBeenCalledTimes(1);
     expect(api.listMessages).toHaveBeenCalledWith(REAL_CONV, expect.anything());
+  });
+
+  it('re-reads a cached thread on its next open, since it missed the same messages', () => {
+    store.loadMessages(REAL_CONV);
+    expect(api.listMessages).toHaveBeenCalledTimes(1);
+
+    // Back on the inbox when the app went to the background.
+    store.setActiveId(null);
+    store.resync();
+    expect(api.listMessages).toHaveBeenCalledTimes(1);
+
+    store.loadMessages(REAL_CONV);
+    expect(api.listMessages).toHaveBeenCalledTimes(2);
+
+    // Fresh again: a second open trusts the cache.
+    store.loadMessages(REAL_CONV);
+    expect(api.listMessages).toHaveBeenCalledTimes(2);
   });
 
   it('treats the second resume signal of one return as the same return', () => {

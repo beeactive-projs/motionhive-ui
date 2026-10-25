@@ -38,6 +38,12 @@ interface ConversationMessages {
   loading: boolean;
   /** True once we've loaded at least one page successfully. */
   hasLoaded: boolean;
+  /**
+   * The cache may be missing messages (the stream was down while the app
+   * was in the background). The items still render, and the next open
+   * re-reads the newest page instead of trusting them.
+   */
+  stale: boolean;
 }
 
 const EMPTY_MESSAGES: ConversationMessages = {
@@ -45,6 +51,7 @@ const EMPTY_MESSAGES: ConversationMessages = {
   nextBefore: null,
   loading: false,
   hasLoaded: false,
+  stale: false,
 };
 
 /**
@@ -515,7 +522,10 @@ export class MessagingStore {
    * is a new EventSource, which sends no `Last-Event-ID`, so the server's
    * replay does not cover the gap either. So: a fresh stream, then the
    * inbox and the open thread re-read from the server, which is what the
-   * screen would have shown had the stream never stopped.
+   * screen would have shown had the stream never stopped. Every other
+   * cached thread missed the same messages, so it is marked stale and
+   * re-read when it is next opened; otherwise the inbox row shows a
+   * message the thread does not.
    *
    * Safe to call on every resume signal; repeats inside RESYNC_THROTTLE_MS
    * are the same return and do nothing.
@@ -529,6 +539,14 @@ export class MessagingStore {
     this._realtime.reconnect();
     this.loadConversations({ force: true });
     const active = this._activeId();
+    this._messagesByConv.update((all) =>
+      Object.fromEntries(
+        Object.entries(all).map(([id, state]) => [
+          id,
+          id === active ? state : { ...state, stale: true },
+        ]),
+      ),
+    );
     if (active) this.loadMessages(active, { force: true });
   }
 
@@ -686,15 +704,32 @@ export class MessagingStore {
         .block(blockedId, reason ?? undefined)
         .pipe(
           tap(() => {
-            if (conversationId) {
-              this.removeConversation(conversationId);
-              this.dropConversationCaches(conversationId);
-              // If we were viewing this thread, navigate away.
-              if (this._activeId() === conversationId) {
-                this._activeId.set(null);
-                void this._router.navigate([...this._routes]);
-              }
-            }
+            if (conversationId) this.forgetConversation(conversationId);
+            resolve(true);
+          }),
+          catchError((err: unknown) => {
+            resolve(false);
+            return throwError(() => err);
+          }),
+        )
+        .subscribe({ error: () => resolve(false) });
+    });
+  }
+
+  /**
+   * "Delete chat", for this user only. Not optimistic: it is confirmed
+   * first and can't be undone, so the row goes once the server agrees.
+   * Then the same local cleanup as a block: the row, its cached
+   * messages and draft, and the thread itself if it is open. The SSE
+   * `conversation.cleared` event does the same on other devices.
+   */
+  deleteConversation(conversationId: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this._api
+        .clearConversation(conversationId)
+        .pipe(
+          tap(() => {
+            this.forgetConversation(conversationId);
             resolve(true);
           }),
           catchError((err: unknown) => {
@@ -793,8 +828,8 @@ export class MessagingStore {
 
   /**
    * Load the first page of messages for a conversation. Idempotent —
-   * skipped if a load is in flight OR we already have data and this
-   * isn't a forced refresh.
+   * skipped if a load is in flight OR we already have fresh data and
+   * this isn't a forced refresh.
    */
   loadMessages(conversationId: string, opts: { force?: boolean } = {}): void {
     // A pending thread exists only on this client — asking the server
@@ -803,7 +838,7 @@ export class MessagingStore {
 
     const state = this.messagesFor(conversationId);
     if (state.loading) return;
-    if (!opts.force && state.hasLoaded) return;
+    if (!opts.force && state.hasLoaded && !state.stale) return;
 
     this.patchMessages(conversationId, { loading: true });
 
@@ -818,6 +853,7 @@ export class MessagingStore {
             items: oldestFirst,
             nextBefore: page.nextBefore,
             hasLoaded: true,
+            stale: false,
           });
         }),
         catchError(() => EMPTY),
@@ -1298,6 +1334,9 @@ export class MessagingStore {
       case 'conversation.unread':
         this.applyConversationUnread(event);
         break;
+      case 'conversation.cleared':
+        this.applyConversationCleared(event);
+        break;
       case 'heartbeat':
         // No-op. The realtime service already tracks lastEventId.
         return;
@@ -1519,6 +1558,21 @@ export class MessagingStore {
     this.patchConversation(conversationId, { markedUnread });
   }
 
+  /**
+   * Apply a `conversation.cleared` event: the reader deleted the chat on
+   * another device. A newer message brings it back through the usual
+   * missing-row fetch in `applyMessageCreated`.
+   */
+  private applyConversationCleared(
+    event: Extract<MessagingStreamEvent, { type: 'conversation.cleared' }>,
+  ): void {
+    const { conversationId, userId } = event.payload;
+    const myId = this._auth.user()?.id ?? null;
+    if (userId !== myId) return;
+
+    this.forgetConversation(conversationId);
+  }
+
   // ─── Internal ─────────────────────────────────────────────────
 
   private onLogin(): void {
@@ -1650,6 +1704,20 @@ export class MessagingStore {
     this._composerDraft.update((all) => omitKey(all, id));
     this._threatFlagsByConv.update((all) => omitKey(all, id));
     this._sending.update((all) => omitKey(all, id));
+  }
+
+  /**
+   * The conversation is gone for this user (deleted here or on another
+   * device): drop the row and its caches, and leave the thread if it is
+   * the one on screen.
+   */
+  private forgetConversation(id: string): void {
+    this.removeConversation(id);
+    this.dropConversationCaches(id);
+    if (this._activeId() === id) {
+      this._activeId.set(null);
+      void this._router.navigate([...this._routes]);
+    }
   }
 }
 

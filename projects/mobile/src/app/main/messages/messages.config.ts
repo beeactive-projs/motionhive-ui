@@ -15,6 +15,7 @@ import {
   personOutline,
   searchOutline,
   sendOutline,
+  trashOutline,
 } from 'ionicons/icons';
 
 import { ConversationListItem, UserSearchResult, displayName } from 'core';
@@ -44,12 +45,14 @@ export const MESSAGING_ICONS = {
   personOutline,
   searchOutline,
   sendOutline,
+  trashOutline,
 };
 
 /** The verbs behind a row's "More" swipe. */
 export const ConversationActions = {
   Profile: 'profile',
   Mute: 'mute',
+  Delete: 'delete',
   Block: 'block',
 } as const;
 
@@ -57,10 +60,10 @@ export type ConversationAction = (typeof ConversationActions)[keyof typeof Conve
 
 /**
  * The More sheet for one conversation: the person, the notification switch,
- * then block on its own red card. The profile row needs a handle to route
- * to, so it is left out without one. Tile colours follow the lists rule:
- * people violet, notifications info. Red is block's alone: only a
- * destructive verb is red.
+ * then delete and block on their own red card. The profile row needs a
+ * handle to route to, so it is left out without one. Tile colours follow
+ * the lists rule: people violet, notifications info. Only a destructive
+ * verb is red.
  */
 export function conversationActions(
   muted: boolean,
@@ -83,6 +86,12 @@ export function conversationActions(
       icon: muted ? 'notifications-outline' : 'notifications-off-outline',
       color: 'info',
       tone: 'shade',
+    },
+    {
+      id: ConversationActions.Delete,
+      label: 'messages.actions.delete',
+      icon: 'trash-outline',
+      destructive: true,
     },
     {
       id: ConversationActions.Block,

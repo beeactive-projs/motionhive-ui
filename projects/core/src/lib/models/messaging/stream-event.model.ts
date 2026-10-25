@@ -41,12 +41,20 @@ export interface ConversationUnreadPayload {
   markedUnread: boolean;
 }
 
+/** The reader deleted the chat for themselves on another device. */
+export interface ConversationClearedPayload {
+  conversationId: string;
+  userId: string;
+  clearedAt: string;
+}
+
 export type MessagingStreamEvent =
   | { type: 'message.created'; payload: MessageCreatedPayload }
   | { type: 'message.deleted'; payload: MessageDeletedPayload }
   | { type: 'conversation.read'; payload: ConversationReadPayload }
   | { type: 'conversation.muted'; payload: ConversationMutedPayload }
   | { type: 'conversation.unread'; payload: ConversationUnreadPayload }
+  | { type: 'conversation.cleared'; payload: ConversationClearedPayload }
   | { type: 'heartbeat'; payload: { ts: number } };
 
 /** Wrapped at the EventSource level — `id` comes from SSE's id: line. */

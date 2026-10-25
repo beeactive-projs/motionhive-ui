@@ -5,8 +5,8 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
 
 /**
  * Right-rail content for a DM. v1 shows the participant snapshot and
- * three quick actions: Mute (toggle), Report (opens dialog), Block
- * (opens confirm dialog). The "Shared" section from the design
+ * four quick actions: Mute (toggle), Report (opens dialog), Delete chat
+ * and Block (each opens a confirm dialog). The "Shared" section from the design
  * (`N sessions together · groups in common · photos shared`) is
  * intentionally deferred because none of those queries are wired on
  * the BE.
@@ -21,6 +21,7 @@ export class DmDetailRail {
   readonly conversation = input.required<ConversationListItem>();
 
   readonly block = output<void>();
+  readonly delete = output<void>();
   readonly toggleMute = output<void>();
   readonly report = output<void>();
 

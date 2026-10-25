@@ -1173,6 +1173,7 @@
   "messages": {
     "actions": {
       "block": "Block",
+      "delete": "Delete chat",
       "mute": "Mute notifications",
       "unmute": "Unmute notifications"
     },
@@ -1197,10 +1198,16 @@
       "sendingPaused": "Sending paused",
       "tooLong": "That message is too long. Trim it and try again."
     },
+    "deleteSheet": {
+      "body": "It leaves your inbox on every device. {name} keeps their copy, and a new message from either of you starts the chat again.",
+      "irreversible": "You can't get these messages back.",
+      "title": "Delete this chat?"
+    },
     "details": {
       "block": "Block {name}",
       "blockManageNote": "Manage blocked people in Account → Blocked users.",
       "blockNote": "Blocking stops messages both ways.",
+      "delete": "Delete chat",
       "mute": "Mute notifications",
       "muteHint": "You'll still see the unread badge.",
       "sectionConversation": "Conversation",
@@ -1246,6 +1253,8 @@
     "toast": {
       "blockFailed": "Could not block them.",
       "blocked": "{name} blocked",
+      "deleted": "Chat deleted",
+      "deleteFailed": "Couldn't delete the chat.",
       "markUnreadFailed": "Couldn't mark it as unread.",
       "muteFailed": "Could not update notifications.",
       "muted": "Muted",

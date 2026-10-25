@@ -43,6 +43,7 @@
     <mh-dm-detail-rail
       [conversation]="conv"
       (block)="onBlock()"
+      (delete)="onDelete()"
       (toggleMute)="onToggleMute()"
       (report)="onReport()"
     />
@@ -94,6 +95,8 @@
   [conversationId]="conversation()?.id ?? null"
   [displayName]="otherName()"
 />
+
+<p-confirmdialog />
 
 <p-toast position="top-right" />
 

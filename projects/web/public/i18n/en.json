@@ -1603,6 +1603,11 @@
       "rateLimited": "Slow down. Try again in {seconds}s",
       "sendMessage": "Send message"
     },
+    "deleteDialog": {
+      "accept": "Delete chat",
+      "header": "Delete this chat?",
+      "message": "It leaves your inbox on every device. {name} keeps their copy, and a new message from either of you starts the chat again. You can't get these messages back."
+    },
     "emptyState": {
       "sub": "Pick a conversation, or start a new one.",
       "title": "Your messages"
@@ -1647,6 +1652,7 @@
     },
     "rail": {
       "block": "Block this user",
+      "delete": "Delete chat",
       "mute": "Mute notifications",
       "noParticipant": "No participant info",
       "quickActions": "Quick actions",
@@ -1700,6 +1706,7 @@
       "blockFailed": "Could not block",
       "blocked": "User blocked",
       "blockedDetail": "{name} can no longer message you.",
+      "deleteFailed": "Could not delete the chat",
       "muteFailed": "Could not update notifications",
       "muted": "Notifications muted",
       "mutedDetail": "You won’t get notifications for this conversation.",

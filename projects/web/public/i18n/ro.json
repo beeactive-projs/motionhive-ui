@@ -1603,6 +1603,11 @@
       "rateLimited": "Trimiți prea repede. Încearcă din nou în {seconds} s",
       "sendMessage": "Trimite mesajul"
     },
+    "deleteDialog": {
+      "accept": "Șterge conversația",
+      "header": "Ștergi conversația?",
+      "message": "Dispare din inboxul tău, pe toate dispozitivele. {name} își păstrează mesajele, iar un mesaj nou de la oricare dintre voi redeschide conversația. Mesajele nu mai pot fi recuperate."
+    },
     "emptyState": {
       "sub": "Alege o conversație sau începe una nouă.",
       "title": "Mesajele tale"
@@ -1647,6 +1652,7 @@
     },
     "rail": {
       "block": "Blochează acest utilizator",
+      "delete": "Șterge conversația",
       "mute": "Oprește notificările",
       "noParticipant": "Nu există detalii despre participant",
       "quickActions": "Acțiuni rapide",
@@ -1700,6 +1706,7 @@
       "blockFailed": "Nu am putut bloca",
       "blocked": "Utilizator blocat",
       "blockedDetail": "{name} nu îți mai poate trimite mesaje.",
+      "deleteFailed": "Nu am putut șterge conversația",
       "muteFailed": "Nu am putut actualiza notificările",
       "muted": "Notificări oprite",
       "mutedDetail": "Nu vei mai primi notificări pentru această conversație.",

@@ -35,6 +35,7 @@ import {
 } from 'core';
 
 import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
+import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
@@ -78,6 +79,7 @@ import {
   imports: [
     ActionSheet,
     BlockUserSheet,
+    ConfirmSheet,
     ConversationRow,
     EmptyState,
     HexAvatar,
@@ -141,10 +143,12 @@ export class Messages implements ViewWillEnter {
   /** Focusing the search field folds the title and the pills away. */
   readonly searchOpen = signal(false);
 
-  /** The row whose More was tapped; the More and block sheets act on it. */
+  /** The row whose More was tapped; the More, delete and block sheets act on it. */
   private readonly _actionTarget = signal<ConversationListItem | null>(null);
   readonly actionsOpen = signal(false);
   readonly blockOpen = signal(false);
+  readonly deleteOpen = signal(false);
+  readonly deleting = signal(false);
 
   readonly actionTitle = computed(() => {
     const target = this._actionTarget();
@@ -351,10 +355,33 @@ export class Messages implements ViewWillEnter {
       case ConversationActions.Mute:
         void this.toggleMute(target.id);
         break;
+      case ConversationActions.Delete:
+        this.deleteOpen.set(true);
+        break;
       case ConversationActions.Block:
         this.blockOpen.set(true);
         break;
     }
+  }
+
+  /** Delete for me only; the store drops the row once the server agrees. */
+  async deleteChat(): Promise<void> {
+    const target = this._actionTarget();
+    if (!target || this.deleting()) return;
+
+    this.deleting.set(true);
+    const ok = await this.store.deleteConversation(target.id);
+    this.deleting.set(false);
+
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.deleteFailed'),
+      );
+      return;
+    }
+    this.deleteOpen.set(false);
+    void this._feedbackService.success(this._translateService.instant('messages.toast.deleted'));
   }
 
   /** Same block as chat details; the store drops the row from the inbox itself. */

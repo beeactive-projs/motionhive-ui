@@ -10,6 +10,7 @@ import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { ThemeService } from './_shared/services/theme.service';
 import { PushRegistrationService } from './_shared/services/push-registration.service';
 import { AppLinkService } from './_shared/services/app-link.service';
+import { AppBadgeService } from './_shared/services/app-badge.service';
 
 @Component({
   selector: 'mh-root',
@@ -45,6 +46,12 @@ export class App {
    * that Android hands to the app instead of the browser.
    */
   private readonly _appLinkService = inject(AppLinkService);
+
+  /**
+   * Instantiated for its constructor: it keeps the app icon number equal
+   * to what is unread, lowering it as things are read.
+   */
+  private readonly _appBadgeService = inject(AppBadgeService);
 
   private readonly _messagingStore = inject(MessagingStore);
   private readonly _notificationStore = inject(NotificationStore);

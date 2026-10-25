@@ -207,14 +207,25 @@
 
 <mh-new-message-sheet />
 
-<!-- One More sheet and one block sheet for the whole list, aimed at whichever
-     row's More was tapped. -->
+<!-- One More sheet, one delete sheet and one block sheet for the whole list,
+     aimed at whichever row's More was tapped. -->
 <mh-action-sheet
   [(open)]="actionsOpen"
   [title]="actionTitle()"
   [subtitle]="actionSubtitle()"
   [actions]="actions()"
   (chosen)="onAction($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="deleteOpen"
+  [title]="'messages.deleteSheet.title' | translate"
+  [body]="'messages.deleteSheet.body' | translate: { name: actionTitle() }"
+  [confirmLabel]="'messages.actions.delete' | translate"
+  tone="danger"
+  [irreversible]="'messages.deleteSheet.irreversible' | translate"
+  [saving]="deleting()"
+  (confirm)="deleteChat()"
 />
 
 <mh-block-user-sheet [(open)]="blockOpen" [name]="actionTitle()" (confirm)="block($event)" />

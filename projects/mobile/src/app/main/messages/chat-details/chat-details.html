@@ -69,7 +69,30 @@
       {{ 'messages.details.blockNote' | translate }}<br />
       {{ 'messages.details.blockManageNote' | translate }}
     </ion-note>
+
+    <!-- Last, on its own: WhatsApp keeps deleting the chat apart from the
+         settings above it. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      <mh-settings-row
+        icon="trash-outline"
+        [label]="'messages.details.delete' | translate"
+        iconColor="danger"
+        [disabled]="!conversation()"
+        (select)="deleteOpen.set(true)"
+      />
+    </ion-list>
   </div>
 </ion-content>
 
 <mh-block-user-sheet [(open)]="blockOpen" [name]="name()" (confirm)="block($event)" />
+
+<mh-confirm-sheet
+  [(open)]="deleteOpen"
+  [title]="'messages.deleteSheet.title' | translate"
+  [body]="'messages.deleteSheet.body' | translate: { name: name() }"
+  [confirmLabel]="'messages.actions.delete' | translate"
+  tone="danger"
+  [irreversible]="'messages.deleteSheet.irreversible' | translate"
+  [saving]="deleting()"
+  (confirm)="deleteChat()"
+/>

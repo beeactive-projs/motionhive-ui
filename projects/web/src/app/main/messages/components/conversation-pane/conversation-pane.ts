@@ -8,9 +8,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { AuthStore, displayName, MessagingStore } from 'core';
+import { AuthStore, displayName, escapeHtml, MessagingStore } from 'core';
 import { BlockConfirmDialog } from '../../_dialogs/block-confirm-dialog/block-confirm-dialog';
 import { ReportConversationDialog } from '../../_dialogs/report-conversation-dialog/report-conversation-dialog';
 import { ChatComposer } from '../chat-composer/chat-composer';
@@ -38,13 +39,14 @@ import { ThreatBanner } from '../threat-banner/threat-banner';
     ChatComposer,
     ChatHeader,
     ChatThread,
+    ConfirmDialog,
     DmDetailRail,
     ReportConversationDialog,
     ThreatBanner,
     Toast,
     TranslatePipe,
   ],
-  providers: [MessageService],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './conversation-pane.html',
   styleUrl: './conversation-pane.scss',
 })
@@ -54,6 +56,7 @@ export class ConversationPane {
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
   private readonly _translateService = inject(TranslateService);
   protected readonly store = inject(MessagingStore);
 
@@ -144,6 +147,39 @@ export class ConversationPane {
     // user confirms (+ optionally picks a reason chip).
     if (!this.otherId()) return;
     this.blockDialogVisible.set(true);
+  }
+
+  /**
+   * Delete for me only. On success the store drops the row and routes
+   * back to the list, which unmounts this pane, so only a failure has a
+   * toast to show.
+   */
+  protected onDelete(): void {
+    const conv = this.conversation();
+    if (!conv) return;
+    this._confirmationService.confirm({
+      header: this._translateService.instant('messages.deleteDialog.header'),
+      message: this._translateService.instant('messages.deleteDialog.message', {
+        name: escapeHtml(this.otherName()),
+      }),
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary',
+      acceptLabel: this._translateService.instant('messages.deleteDialog.accept'),
+      rejectLabel: this._translateService.instant('button.cancel'),
+      acceptIcon: 'pi pi-trash',
+      rejectIcon: 'pi pi-times',
+      accept: () => void this.deleteConversation(conv.id),
+    });
+  }
+
+  private async deleteConversation(id: string): Promise<void> {
+    const ok = await this.store.deleteConversation(id);
+    if (ok) return;
+    this._messageService.add({
+      severity: 'error',
+      summary: this._translateService.instant('messages.toast.deleteFailed'),
+      detail: this._translateService.instant('common.pleaseTryAgain'),
+    });
   }
 
   protected onReport(): void {
