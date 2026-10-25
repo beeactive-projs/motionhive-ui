@@ -1,0 +1,14 @@
+<!-- The block is a direct child of the item: that is what the flat-list skin
+     keys the separator inset on (ion-list.css). -->
+<ion-item>
+  <ion-skeleton-text slot="start" [animated]="true" style="width: 3.25rem; height: 3.25rem" />
+  <ion-label>
+    <div class="mh-row-line">
+      <h2><ion-skeleton-text [animated]="true" [style.width]="titleWidth()" /></h2>
+      @if (time()) {
+        <ion-skeleton-text [animated]="true" style="width: 2.25rem; height: 0.75rem" />
+      }
+    </div>
+    <p><ion-skeleton-text [animated]="true" [style.width]="lineWidth()" /></p>
+  </ion-label>
+</ion-item>

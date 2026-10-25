@@ -1,4 +1,4 @@
-import { MessageView } from '../models/messaging';
+import { ConversationListItem, MessageView } from '../models/messaging';
 import { appLocale } from '../i18n/app-language';
 import { translate } from '../i18n/translator';
 
@@ -33,6 +33,20 @@ export function displayName(
     .join(' ')
     .trim();
   return full || fallback;
+}
+
+/**
+ * Whether a conversation matches a search: the group name or the other
+ * person's name, or the last message's preview. `query` is expected trimmed
+ * and lower-cased; an empty one matches everything.
+ */
+export function conversationMatches(conversation: ConversationListItem, query: string): boolean {
+  if (!query) return true;
+  const name =
+    conversation.type === 'GROUP'
+      ? (conversation.name ?? '')
+      : displayName(conversation.otherUser, '');
+  return `${name} ${conversation.lastMessagePreview ?? ''}`.toLowerCase().includes(query);
 }
 
 /**

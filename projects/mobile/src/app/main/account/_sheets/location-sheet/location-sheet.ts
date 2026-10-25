@@ -12,7 +12,13 @@ import { addIcons } from 'ionicons';
 import { locationOutline } from 'ionicons/icons';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, take, tap } from 'rxjs';
 
-import { PickedLocation, PlaceSearchService, ProfileService, StripeOnboardingStore } from 'core';
+import {
+  AuthStore,
+  PickedLocation,
+  PlaceSearchService,
+  ProfileService,
+  StripeOnboardingStore,
+} from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
@@ -50,6 +56,7 @@ export class LocationSheet {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _authStore = inject(AuthStore);
   private readonly _stripeOnboardingStore = inject(StripeOnboardingStore);
   private readonly _translateService = inject(TranslateService);
 
@@ -89,7 +96,10 @@ export class LocationSheet {
 
   constructor() {
     addIcons({ locationOutline });
-    this._stripeOnboardingStore.ensureLoaded();
+    // Only a coach can hold a Stripe account, and the status endpoint is
+    // coach-only: asked for a trainee, its 403 surfaced as an "Access denied"
+    // dialog over the profile page. A trainee's country is never locked.
+    if (this._authStore.isInstructor()) this._stripeOnboardingStore.ensureLoaded();
 
     effect(() => {
       if (!this.open()) return;

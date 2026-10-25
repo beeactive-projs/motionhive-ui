@@ -1,0 +1,20 @@
+<div class="day mh-day-pill">
+  <ion-skeleton-text class="pill" [animated]="true" />
+</div>
+
+@for (bubble of bubbles; track $index) {
+  <div class="row" [class.mine]="bubble.mine">
+    @if (!bubble.mine) {
+      <div class="gutter">
+        @if (bubble.last) {
+          <ion-skeleton-text class="avatar" [animated]="true" />
+        }
+      </div>
+    }
+    <ion-skeleton-text class="bubble" [animated]="true" [style.width]="bubble.width" />
+  </div>
+
+  @if (bubble.last) {
+    <ion-skeleton-text class="meta" [class.mine]="bubble.mine" [animated]="true" />
+  }
+}

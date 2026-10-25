@@ -6,19 +6,27 @@
 
     <ion-title>
       <div class="peer">
-        <mh-hex-avatar
-          size="sm"
-          aria-hidden="true"
-          [name]="title()"
-          [imageUrl]="avatarUrl()"
-          [color]="tone()"
-        />
-        <div class="who">
-          <span class="name">{{ title() }}</span>
-          @if (handle(); as tag) {
-            <span class="handle">&#64;{{ tag }}</span>
-          }
-        </div>
+        @if (showPeerSkeleton()) {
+          <ion-skeleton-text [animated]="true" style="width: 1.875rem; height: 1.625rem" />
+          <div class="who">
+            <ion-skeleton-text [animated]="true" style="width: 7rem; height: 0.875rem" />
+            <ion-skeleton-text [animated]="true" style="width: 4.5rem; height: 0.625rem" />
+          </div>
+        } @else {
+          <mh-hex-avatar
+            size="sm"
+            aria-hidden="true"
+            [name]="title()"
+            [imageUrl]="avatarUrl()"
+            [color]="tone()"
+          />
+          <div class="who">
+            <span class="name">{{ title() }}</span>
+            @if (handle(); as tag) {
+              <span class="handle">&#64;{{ tag }}</span>
+            }
+          </div>
+        }
       </div>
     </ion-title>
 
@@ -46,9 +54,7 @@
   }
 
   @if (loading() && !hasLoaded()) {
-    <div class="ion-text-center ion-padding-vertical">
-      <ion-spinner name="crescent" />
-    </div>
+    <mh-thread-skeleton />
   }
 
   @if (isDraft()) {

@@ -1,4 +1,4 @@
-<ion-item-sliding #sliding>
+<ion-item-sliding #sliding [disabled]="!swipeable()">
   <!-- Swipe right: WhatsApp's Read / Unread toggle. -->
   <ion-item-options side="start">
     <ion-item-option

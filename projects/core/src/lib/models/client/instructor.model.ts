@@ -1,5 +1,28 @@
 import { User } from '../user/user.model';
 import { InstructorCertification } from '../profile/instructor-profile.model';
+import { CoachSuggestionReason } from './client.enums';
+
+/**
+ * A coach from `GET /profile/instructors/suggested`, picked for the reader:
+ * never themselves, a coach they already have, or someone either side blocked.
+ */
+export interface SuggestedCoach {
+  /** Instructor profile id. */
+  id: string;
+  /** User id: what a draft message or a profile is addressed by. */
+  userId: string;
+  handle: string | null;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  displayName: string | null;
+  specializations: string[] | null;
+  yearsOfExperience: number | null;
+  city: string | null;
+  countryCode: string | null;
+  /** `string` too: a newer API may send a reason this build does not know. */
+  reason: CoachSuggestionReason | (string & {});
+}
 
 export interface MyInstructorProfile {
   userId: string;

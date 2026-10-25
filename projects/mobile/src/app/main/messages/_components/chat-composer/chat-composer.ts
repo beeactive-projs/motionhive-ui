@@ -154,10 +154,13 @@ export class ChatComposer implements OnDestroy {
     // tap, the only moment iOS lets a script raise the keyboard.
     if (!this.hasFocus()) void this._field()?.setFocus();
 
+    // A first message stays on this screen: the chat adopts the new
+    // conversation in place rather than being swapped for another page.
     await this.store.sendMessage({
       conversationId: this.conversationId(),
       recipientId,
       body,
+      navigate: false,
     });
   }
 

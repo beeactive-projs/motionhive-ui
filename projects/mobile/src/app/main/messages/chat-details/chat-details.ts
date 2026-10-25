@@ -18,6 +18,7 @@ import {
   IonLabel,
   IonList,
   IonNote,
+  IonSkeletonText,
   IonTitle,
   IonToggle,
   IonToolbar,
@@ -55,6 +56,7 @@ import { MESSAGING_ICONS } from '../messages.config';
     IonLabel,
     IonList,
     IonNote,
+    IonSkeletonText,
     IonTitle,
     IonToggle,
     IonToolbar,
@@ -107,6 +109,12 @@ export class ChatDetails {
   readonly avatarUrl = computed(() => this.otherUser()?.avatarUrl ?? null);
 
   readonly muted = computed(() => this.conversation()?.muted ?? false);
+
+  /**
+   * A permalink lands before the inbox row it reads from. Only while that
+   * load runs: a row that never turns up falls back to "this person".
+   */
+  readonly showHeroSkeleton = computed(() => !this.conversation() && this.store.loading());
 
   constructor() {
     addIcons(MESSAGING_ICONS);

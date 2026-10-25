@@ -1,0 +1,101 @@
+<!-- Messenger's "New message": the title bar, the field under it, then who
+     to write to. Same flat header and list as the inbox. -->
+<ion-header class="mh-flat-header" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/messages" />
+    </ion-buttons>
+    <ion-title>{{ 'messages.newMessage' | translate }}</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      class="mh-search-pill"
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      mhAutofocus
+      inputmode="search"
+      [placeholder]="'messages.inbox.searchPlaceholder' | translate"
+      [debounce]="0"
+      [value]="people.query()"
+      (ionInput)="onQueryChange($event.detail.value ?? '')"
+    />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
+  @if (!people.isActive()) {
+    @if (isStartLoading()) {
+      <!-- A placeholder label: which list comes first, Suggested or Frequent
+           contacts, is only known once both have loaded. -->
+      <div class="mh-section-label">
+        <ion-skeleton-text [animated]="true" style="width: 5rem; height: 0.75rem" />
+      </div>
+      <ion-list class="mh-flat-list">
+        @for (_ of startSkeletonRows; track $index) {
+          <mh-row-skeleton [index]="$index" />
+        }
+      </ion-list>
+    } @else {
+      @if (isStartEmpty()) {
+        <ion-note class="mh-note-block">{{ 'messages.compose.hint' | translate }}</ion-note>
+      }
+
+      @if (suggested().length > 0) {
+        <div class="mh-section-label">{{ 'messages.compose.suggested' | translate }}</div>
+        <ion-list class="mh-flat-list">
+          @for (person of suggested(); track person.id) {
+            <mh-person-row [person]="person" (select)="openPerson(person)" />
+          }
+        </ion-list>
+      }
+
+      @if (frequent().length > 0) {
+        <div class="mh-section-label">{{ 'messages.frequentContacts' | translate }}</div>
+        <ion-list class="mh-flat-list">
+          @for (person of frequent(); track person.id) {
+            <mh-person-row [person]="person" (select)="openPerson(person)" />
+          }
+        </ion-list>
+      }
+    }
+  } @else {
+    @if (isSearchEmpty()) {
+      <mh-empty-state
+        icon="search-outline"
+        [heading]="'empty.noResults' | translate"
+        [message]="'messages.inbox.noResultsMessage' | translate"
+      />
+    }
+
+    <!-- Only before the first answer: later keystrokes keep the last results
+         on screen until the next ones replace them. -->
+    @if (showPeopleSkeleton()) {
+      <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (_ of searchSkeletonRows; track $index) {
+          <mh-row-skeleton [index]="$index" />
+        }
+      </ion-list>
+    } @else if (results().length > 0) {
+      <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (person of results(); track person.id) {
+          <mh-person-row [person]="person" (select)="openPerson(person)" />
+        }
+      </ion-list>
+    }
+
+    @if (conversations().length > 0) {
+      <div class="mh-section-label">{{ 'nav.messages' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (conversation of conversations(); track conversation.id) {
+          <mh-conversation-row
+            [conversation]="conversation"
+            [swipeable]="false"
+            (select)="openConversation(conversation)"
+          />
+        }
+      </ion-list>
+    }
+  }
+</ion-content>

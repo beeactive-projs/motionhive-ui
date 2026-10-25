@@ -15,6 +15,7 @@ import {
 import {
   InstructorSearchResult,
   PublicInstructorProfile,
+  SuggestedCoach,
 } from '../../models/client/instructor.model';
 import { PaginatedReviews } from '../../models/review/review.model';
 import { InstructorGroupSummary } from '../../models/profile/instructor-group-summary.model';
@@ -90,6 +91,15 @@ export class ProfileService {
     const params = query ? new HttpParams().set('search', query) : undefined;
     return this._http.get<InstructorSearchResult[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROFILE.DISCOVER_INSTRUCTORS}`,
+      { params },
+    );
+  }
+
+  /** Coaches the server picks for the reader; the ranking (and later, sponsored places) is its call. */
+  suggestedInstructors(limit?: number): Observable<SuggestedCoach[]> {
+    const params = limit ? new HttpParams().set('limit', limit) : undefined;
+    return this._http.get<SuggestedCoach[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.SUGGESTED_INSTRUCTORS}`,
       { params },
     );
   }

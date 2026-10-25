@@ -1193,6 +1193,11 @@
       "placeholder": "Mesaj pentru {name}…",
       "placeholderGeneric": "Mesaj…"
     },
+    "compose": {
+      "hint": "Caută un antrenor, un client sau pe oricine altcineva de pe MotionHive ca să începi o conversație.",
+      "suggested": "Sugestii",
+      "yourCoach": "Antrenorul tău"
+    },
     "composer": {
       "sendingPaused": "Trimitere în pauză",
       "tooLong": "Mesajul e prea lung. Scurtează-l și încearcă din nou."
@@ -1214,6 +1219,7 @@
       "thisPerson": "această persoană",
       "title": "Detalii"
     },
+    "frequentContacts": "Contacte frecvente",
     "inbox": {
       "caughtUp": {
         "heading": "Ești la zi",
@@ -1232,12 +1238,6 @@
       "sectionPeople": "Persoane"
     },
     "newMessage": "Mesaj nou",
-    "newMessageSheet": {
-      "intro": "Caută un antrenor, un client sau pe oricine altcineva de pe MotionHive ca să începi o conversație.",
-      "noneHeading": "N-am găsit pe nimeni",
-      "noneMessage": "Verifică ortografia sau încearcă numele de familie.",
-      "searchPlaceholder": "Caută persoane"
-    },
     "row": {
       "markRead": "Citită",
       "markUnread": "Necitită",
@@ -2006,8 +2006,7 @@
     "clearAll": "Șterge tot",
     "personWithStatus": "{name}, {status}",
     "recent": "Recente",
-    "remove": "Elimină pe {name} din căutările recente",
-    "suggested": "Sugestii"
+    "remove": "Elimină pe {name} din căutările recente"
   },
   "sessions": {
     "actions": {

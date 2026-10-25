@@ -32,6 +32,18 @@ export const ClientRequestStatuses = {
 
 export type ClientRequestStatus = (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
 
+/**
+ * Why the API suggested a coach. Only SUGGESTED is sent today; sponsored
+ * placements will arrive under a new reason, so a reason this list does not
+ * know is treated as an ordinary suggestion.
+ */
+export const CoachSuggestionReasons = {
+  Suggested: 'SUGGESTED',
+} as const;
+
+export type CoachSuggestionReason =
+  (typeof CoachSuggestionReasons)[keyof typeof CoachSuggestionReasons];
+
 /** Translated on read — see `enumLabelMap`. */
 export const ClientStatusLabels: Record<InstructorClientStatus, string> = enumLabelMap(
   'clientStatus',

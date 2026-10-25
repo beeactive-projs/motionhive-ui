@@ -33,8 +33,8 @@ export interface PeopleSearch {
 }
 
 /**
- * Debounced people lookup against `/users/search`, shared by the inbox search
- * and the new-message sheet.
+ * Debounced people lookup against `/users/search`, shared by the inbox search,
+ * the new-message page and the clients invite sheet.
  *
  * `switchMap` matters here: a fast typist fires several requests and only the
  * last one's results may land, or an abandoned query overwrites a newer one.

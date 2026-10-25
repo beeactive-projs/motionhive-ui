@@ -1,0 +1,65 @@
+/* Mirrors `message-bubble.scss` and the transcript's day pill (chat.scss);
+   a change to the bubble's geometry belongs in both. */
+
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+ion-skeleton-text {
+  margin: 0;
+}
+
+.day {
+  margin: 0.375rem 0 0.875rem;
+}
+
+.pill {
+  width: 4.5rem;
+  height: 1.25rem;
+  --border-radius: var(--mh-radius-pill);
+}
+
+/* A fixed width rather than the bubble's max-width, so the bubble's own
+   width can be a share of it. */
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: 82%;
+  margin-bottom: 0.125rem;
+}
+
+.row.mine {
+  justify-content: flex-end;
+  margin-inline-start: auto;
+}
+
+.gutter {
+  flex: none;
+  width: 1.75rem;
+}
+
+.avatar {
+  width: 1.75rem;
+  height: 1.5rem;
+}
+
+/* One line of body text inside the bubble's 0.625rem padding. */
+.bubble {
+  height: 2.5rem;
+  --border-radius: 1.125rem;
+}
+
+.meta {
+  width: 2.5rem;
+  height: 0.625rem;
+  /* Under their bubbles, past the avatar gutter (1.75rem + the 0.5rem gap). */
+  margin-block: 0.25rem 0.75rem;
+  margin-inline: 2.5rem 0.25rem;
+}
+
+.meta.mine {
+  align-self: flex-end;
+  margin-inline-start: 0;
+}

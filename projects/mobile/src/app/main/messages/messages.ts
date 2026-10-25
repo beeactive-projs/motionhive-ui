@@ -8,14 +8,11 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonNote,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   InfiniteScrollCustomEvent,
@@ -30,7 +27,6 @@ import {
   InboxFilter,
   MessagingStore,
   UserBlockReason,
-  UserSearchResult,
   displayName,
 } from 'core';
 
@@ -38,28 +34,23 @@ import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet'
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../_shared/services/feedback.service';
-import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchStart } from '../../_shared/components/search-start/search-start';
-import {
-  RecentPerson,
-  RecentSearchScopes,
-  SuggestionStrip,
-} from '../../_shared/config/recent-searches.config';
-import { AvatarTone, avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
+import { RecentPerson, RecentSearchScopes } from '../../_shared/config/recent-searches.config';
 import { SearchHeaderFold } from '../../_shared/utils/fold';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
 import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
+import { PersonRow } from './_components/person-row/person-row';
+import { RowSkeleton } from './_components/row-skeleton/row-skeleton';
 import { BlockUserSheet } from './_sheets/block-user-sheet/block-user-sheet';
-import { NewMessageSheet } from './_sheets/new-message-sheet/new-message-sheet';
 import {
   ConversationAction,
   ConversationActions,
   MESSAGING_ICONS,
   conversationActions,
+  frequentContacts,
   recentFromPerson,
-  suggestedPeople,
 } from './messages.config';
 
 /**
@@ -71,8 +62,8 @@ import {
  * this page polling.
  *
  * Search returns two lists from two sources. Conversations are filtered in the
- * store, already in memory; people come from `/users/search`, which is how a
- * first message to someone new gets started.
+ * store, already in memory; people come from `/users/search`. The header's
+ * "+" is the other way to a first message: its own page, `NewMessage`.
  */
 @Component({
   selector: 'mh-messages',
@@ -82,7 +73,6 @@ import {
     ConfirmSheet,
     ConversationRow,
     EmptyState,
-    HexAvatar,
     IonButton,
     IonButtons,
     IonContent,
@@ -90,18 +80,16 @@ import {
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
-    IonLabel,
     IonList,
     IonNote,
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonSkeletonText,
     IonTitle,
     IonToolbar,
-    NewMessageSheet,
     NotificationBell,
+    PersonRow,
+    RowSkeleton,
     SearchStart,
     TranslatePipe,
   ],
@@ -115,6 +103,7 @@ export class Messages implements ViewWillEnter {
   private readonly _translateService = inject(TranslateService);
 
   readonly people = injectPeopleSearch();
+  readonly results = computed(() => this.people.results().map(recentFromPerson));
   readonly recents = injectRecentSearches(RecentSearchScopes.Messages);
 
   /** Folds the title, the pills and the back chevron as search opens and closes. */
@@ -139,6 +128,7 @@ export class Messages implements ViewWillEnter {
   ] as const;
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
+  readonly peopleSkeletonRows = [1, 2, 3];
 
   /** Focusing the search field folds the title and the pills away. */
   readonly searchOpen = signal(false);
@@ -165,19 +155,19 @@ export class Messages implements ViewWillEnter {
     return conversationActions(target?.muted ?? false, !!target?.otherUser?.handle);
   });
 
-  /** One strip: the people from the latest conversations. */
-  readonly strips = computed<SuggestionStrip[]>(() => [
-    {
-      label: this._translateService.instant('search.suggested'),
-      people: suggestedPeople(
-        this.store.conversations(),
-        this.recents.entries().map((person) => person.id),
-      ),
-    },
-  ]);
+  /**
+   * The people from the latest conversations, as rows under the recents:
+   * the same list, and the same rows, as the new-message page.
+   */
+  readonly frequent = computed(() =>
+    frequentContacts(
+      this.store.conversations(),
+      this.recents.entries().map((person) => person.id),
+    ),
+  );
 
   /**
-   * Search is open and nothing is typed yet: the recents and the strip, as
+   * Search is open and nothing is typed yet: the recents and frequent contacts, as
    * Messenger opens its search. With neither (a new account) the inbox stays,
    * which is still something to search through.
    */
@@ -185,14 +175,17 @@ export class Messages implements ViewWillEnter {
     () =>
       this.searchOpen() &&
       !this.people.query().trim() &&
-      (this.recents.entries().length > 0 || this.strips()[0].people.length > 0),
+      (this.recents.entries().length > 0 || this.frequent().length > 0),
   );
 
+  /** `people.isEmpty` waits for the answer, so "no results" never shows over the skeleton. */
   readonly isSearchEmpty = computed(
-    () =>
-      this.people.isActive() &&
-      this.people.results().length === 0 &&
-      this.store.visibleConversations().length === 0,
+    () => this.people.isEmpty() && this.store.visibleConversations().length === 0,
+  );
+
+  /** The first answer to a search is on its way and there is nothing yet to show. */
+  readonly showPeopleSkeleton = computed(
+    () => this.people.isSearching() && this.people.results().length === 0,
   );
 
   /** First load only. Once rows exist, a refresh happens under them. */
@@ -273,11 +266,6 @@ export class Messages implements ViewWillEnter {
     this.store.openConversation(id);
   }
 
-  /** A person from the search results. */
-  openPerson(person: UserSearchResult): void {
-    this.openRecent(recentFromPerson(person));
-  }
-
   /**
    * A conversation from the search results. Only a direct one is remembered:
    * a recent is a person, and a group has no one person to show.
@@ -315,7 +303,7 @@ export class Messages implements ViewWillEnter {
   }
 
   openCompose(): void {
-    this.store.enterComposeMode();
+    void this._router.navigate(['/tabs/messages/compose']);
   }
 
   onLoadMore(event: InfiniteScrollCustomEvent): void {
@@ -428,13 +416,5 @@ export class Messages implements ViewWillEnter {
 
   onRefresh(event: RefresherCustomEvent): void {
     this.store.loadConversations({ force: true, done: () => void event.target.complete() });
-  }
-
-  nameOf(person: UserSearchResult): string {
-    return displayName(person);
-  }
-
-  toneFor(id: string): AvatarTone {
-    return avatarToneFor(id);
   }
 }

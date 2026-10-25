@@ -1,14 +1,18 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ConversationListItem } from 'core';
+import { ConversationListItem, MyInstructor, SuggestedCoach } from 'core';
 
 import {
   ConversationActions,
   MESSAGING_ICONS,
   conversationActions,
+  frequentContacts,
+  personFromMyCoach,
+  personFromSuggestedCoach,
   recentFromPerson,
-  suggestedPeople,
+  stripPeople,
+  suggestedContacts,
 } from './messages.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -146,7 +150,7 @@ describe('search start', () => {
     expect(recentFromPerson(person('u1', 'Ana')).subline).toBeNull();
   });
 
-  it('suggests the people from the latest conversations, once each, minus the recents', () => {
+  it('offers frequent contacts from the latest conversations, once each, minus those shown', () => {
     const inbox = [
       conversation('c1', person('u1', 'Ana')),
       conversation('c2', null),
@@ -156,6 +160,65 @@ describe('search start', () => {
       conversation('c6', person('u4', 'Dan')),
     ];
 
-    expect(suggestedPeople(inbox, ['u2'], 2).map((entry) => entry.id)).toEqual(['u1', 'u3']);
+    expect(frequentContacts(inbox, ['u2'], 2).map((entry) => entry.id)).toEqual(['u1', 'u3']);
+  });
+
+  it('addresses an own coach by their user id, not the relationship id', () => {
+    const mine = {
+      id: 'relationship-1',
+      instructor: { id: 'u9', firstName: 'Ioana', lastName: 'Pop', handle: 'ioana' },
+    } as MyInstructor;
+
+    expect(personFromMyCoach(mine)).toEqual({
+      id: 'u9',
+      firstName: 'Ioana',
+      lastName: 'Pop',
+      avatarUrl: null,
+      handle: 'ioana',
+    });
+  });
+
+  it('addresses a suggested coach by their user id, not the profile id', () => {
+    const coach = {
+      id: 'profile-1',
+      userId: 'u8',
+      firstName: 'Radu',
+      lastName: 'Ene',
+      avatarUrl: null,
+      handle: null,
+    } as SuggestedCoach;
+
+    expect(personFromSuggestedCoach(coach).id).toBe('u8');
+  });
+
+  it('keeps a strip in order, once each, without anyone already shown, capped', () => {
+    const people = [
+      person('u1', 'Ana'),
+      person('u2', 'Bogdan'),
+      person('u1', 'Ana'),
+      person('u3', 'Corina'),
+    ];
+
+    expect(stripPeople(people, ['u2']).map((entry) => entry.id)).toEqual(['u1', 'u3']);
+    expect(stripPeople(people, [], 1).map((entry) => entry.id)).toEqual(['u1']);
+    expect(stripPeople(people, [], 0)).toEqual([]);
+  });
+
+  it('suggests own coaches first, said as such, then the server suggestions, capped as one', () => {
+    const mine = [
+      { id: 'r1', instructor: { id: 'u1', firstName: 'Ioana', lastName: 'Pop', handle: 'ioana' } },
+    ] as MyInstructor[];
+    const suggested = [
+      { userId: 'u1', firstName: 'Ioana', lastName: 'Pop', avatarUrl: null, handle: 'ioana' },
+      { userId: 'u2', firstName: 'Radu', lastName: 'Ene', avatarUrl: null, handle: 'radu' },
+      { userId: 'u3', firstName: 'Dan', lastName: 'Ilie', avatarUrl: null, handle: null },
+    ] as SuggestedCoach[];
+
+    const list = suggestedContacts(mine, suggested, 2);
+
+    expect(list.map((entry) => [entry.id, entry.subline])).toEqual([
+      ['u1', 'Your coach'],
+      ['u2', '@radu'],
+    ]);
   });
 });

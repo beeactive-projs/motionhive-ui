@@ -10,16 +10,22 @@
 <ion-content [fullscreen]="true">
   <div class="mh-page">
     <div class="hero">
-      <mh-hex-avatar
-        size="2xl"
-        aria-hidden="true"
-        [name]="name()"
-        [imageUrl]="avatarUrl()"
-        [color]="tone()"
-      />
-      <h1>{{ name() }}</h1>
-      @if (handle(); as tag) {
-        <ion-note class="handle">&#64;{{ tag }}</ion-note>
+      @if (showHeroSkeleton()) {
+        <ion-skeleton-text [animated]="true" style="width: 6.125rem; height: 5.25rem" />
+        <h1><ion-skeleton-text [animated]="true" style="width: 9rem" /></h1>
+        <ion-skeleton-text [animated]="true" style="width: 5rem; height: 0.75rem" />
+      } @else {
+        <mh-hex-avatar
+          size="2xl"
+          aria-hidden="true"
+          [name]="name()"
+          [imageUrl]="avatarUrl()"
+          [color]="tone()"
+        />
+        <h1>{{ name() }}</h1>
+        @if (handle(); as tag) {
+          <ion-note class="handle">&#64;{{ tag }}</ion-note>
+        }
       }
     </div>
 

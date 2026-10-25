@@ -1,0 +1,16 @@
+<ion-item button detail="false" (click)="select.emit()">
+  <mh-hex-avatar
+    slot="start"
+    size="lg"
+    aria-hidden="true"
+    [name]="person().name"
+    [imageUrl]="person().avatarUrl"
+    [color]="tone()"
+  />
+  <ion-label>
+    <h2>{{ person().name }}</h2>
+    @if (person().subline; as subline) {
+      <p>{{ subline }}</p>
+    }
+  </ion-label>
+</ion-item>

@@ -7,6 +7,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,6 +24,7 @@ import {
   IonHeader,
   IonIcon,
   IonNote,
+  IonSkeletonText,
   IonSpinner,
   IonTitle,
   IonToolbar,
@@ -45,6 +47,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { ChatComposer } from '../_components/chat-composer/chat-composer';
 import { MessageBubble } from '../_components/message-bubble/message-bubble';
+import { ThreadSkeleton } from '../_components/thread-skeleton/thread-skeleton';
 import { MESSAGING_ICONS } from '../messages.config';
 
 /** How close to the bottom counts as "following the conversation". */
@@ -79,10 +82,10 @@ const KEYBOARD_ANIMATION_MS = 250;
 const KEYBOARD_TRANSITION = `transform ${KEYBOARD_ANIMATION_MS}ms cubic-bezier(0.36, 0.66, 0.04, 1)`;
 
 /**
- * Chat screens holding the plugin's resizing off. A count, not a flag: the
- * first send swaps the draft screen for the thread, and Ionic tells the new
- * screen it is entering before it tells the old one it is leaving, so the old
- * one must not turn resizing back on under the new one.
+ * Chat screens holding the plugin's resizing off. A count, not a flag: when
+ * one chat replaces another (a notification opening a different thread),
+ * Ionic tells the new screen it is entering before it tells the old one it
+ * is leaving, so the old one must not turn resizing back on under the new one.
  */
 let resizeHolds = 0;
 let resizeBefore: KeyboardResize = KeyboardResize.Body;
@@ -107,7 +110,8 @@ async function releaseKeyboardResize(): Promise<void> {
  *
  * Serves two routes. `/tabs/messages/:id` is an existing thread;
  * `/tabs/messages/new?to=…` is a draft addressed by recipient, with no
- * conversation behind it until the first send creates one.
+ * conversation behind it until the first send creates one, which the draft
+ * then becomes without leaving the screen.
  */
 @Component({
   selector: 'mh-chat',
@@ -122,10 +126,12 @@ async function releaseKeyboardResize(): Promise<void> {
     IonHeader,
     IonIcon,
     IonNote,
+    IonSkeletonText,
     IonSpinner,
     IonTitle,
     IonToolbar,
     MessageBubble,
+    ThreadSkeleton,
     TranslatePipe,
   ],
   templateUrl: './chat.html',
@@ -184,6 +190,15 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
       ? this._draftRecipientName() || this._translateService.instant('messages.newMessage')
       : '';
   });
+
+  /**
+   * A deep link or cold boot opens the thread before the inbox row that names
+   * its peer. Only while that load runs: a row that never turns up leaves the
+   * header blank rather than shimmering for good.
+   */
+  readonly showPeerSkeleton = computed(
+    () => !this.isDraft() && !this.otherUser() && this.store.loading(),
+  );
 
   readonly tone = computed(() =>
     avatarToneFor(this.otherUser()?.id ?? this._draftRecipientId()),
@@ -252,23 +267,23 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
 
     this._route.paramMap.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params) => {
       const id = params.get('id');
-      this.conversationId.set(id);
-      this.store.setActiveId(id);
       // A different thread starts its own scroll history.
       this._newestId = null;
       this._count = 0;
       this._hasLanded = false;
-      if (!id) return;
+      this._enterThread(id);
+    });
 
-      this.store.loadMessages(id);
-      // Deep links and cold boots arrive before the inbox does, leaving no row
-      // to build the header from.
-      if (!this.store.conversations().some((row) => row.id === id)) {
-        this.store.loadConversations();
-      }
-      // Unconditional: `conversation()` is null until that list lands, so
-      // gating on `unreadCount > 0` would skip the call. markRead is idempotent.
-      this.store.markReadOnEntry(id);
+    // A draft becomes the thread on this same screen once there is one with
+    // the recipient: the first send created it, or the inbox turned up a DM
+    // the picker hadn't loaded. Swapping in another page for it slid a second
+    // chat in over the one just typed into and took the keyboard down. The
+    // URL keeps `new?to=`; reopening it resolves here again.
+    effect(() => {
+      if (this.conversationId() !== null) return;
+      const recipientId = this._draftRecipientId();
+      const existing = recipientId ? this.store.findDirectWith(recipientId) : null;
+      if (existing) untracked(() => this._enterThread(existing.id));
     });
 
     this._route.queryParamMap
@@ -311,6 +326,22 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
       // had before them.
       queueMicrotask(() => void this._settleScroll(grewAtBottom, sentHere));
     });
+  }
+
+  private _enterThread(id: string | null): void {
+    this.conversationId.set(id);
+    this.store.setActiveId(id);
+    if (!id) return;
+
+    this.store.loadMessages(id);
+    // Deep links and cold boots arrive before the inbox does, leaving no row
+    // to build the header from.
+    if (!this.store.conversations().some((row) => row.id === id)) {
+      this.store.loadConversations();
+    }
+    // Unconditional: `conversation()` is null until that list lands, so
+    // gating on `unreadCount > 0` would skip the call. markRead is idempotent.
+    this.store.markReadOnEntry(id);
   }
 
   /** Newest message the view has been scrolled to. */
@@ -573,9 +604,9 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
    * go halfway is cancelled with no event to say so, so the screen stayed with
    * its header blanked and the keyboard resizing back on.
    *
-   * Only if it is still ours. The first send leaves the draft page for the new
-   * thread's page, which has already claimed the active id by the time this
-   * runs; clearing it then blanked the new thread's header.
+   * Only if it is still ours. A chat replaced by another one finds the new
+   * page has already claimed the active id by the time this runs; clearing
+   * it then blanked the new thread's header.
    */
   ionViewDidLeave(): void {
     if (this.store.activeId() === this.conversationId()) this.store.setActiveId(null);

@@ -110,14 +110,16 @@ export class ExercisesStore {
   readonly error = this._error.asReadonly();
 
   /**
-   * How many full pages are on screen — derived, not tracked. A partial last
-   * page rounds down, so the next scroll asks for it again: rows already
-   * held are dropped by id, and anything that shifted into the gap (a row
-   * deleted above it, say) is picked up rather than skipped.
+   * How many pages are on screen, tracked rather than derived from the row
+   * count. Derived, a short page (a row deleted above it, or duplicates
+   * dropped by id) rounded down and asked for the same page again, forever.
+   * A row that shifts into a gap is picked up by the refresh on page entry.
    */
-  private readonly _pagesLoaded = computed(() => Math.floor(this._items().length / PAGE_SIZE));
+  private readonly _pagesLoaded = signal(0);
+  /** A page came back shorter than asked: the server has nothing past it. */
+  private readonly _endReached = signal(false);
 
-  readonly hasMore = computed(() => this._items().length < this._total());
+  readonly hasMore = computed(() => !this._endReached() && this._items().length < this._total());
 
   readonly activeFilterCount = computed(() => filterCount(this.filters()));
 
@@ -241,6 +243,9 @@ export class ExercisesStore {
           this._items.update((rows) =>
             replace ? response.items : appendUnique(rows, response.items),
           );
+          // A refresh re-reads several pages as one request; count it as them.
+          this._pagesLoaded.set(page - 1 + limit / PAGE_SIZE);
+          this._endReached.set(response.items.length < limit);
           this._total.set(response.total);
           if (response.facets) this._facets.set(response.facets);
           this._loaded.set(true);
@@ -261,7 +266,10 @@ export class ExercisesStore {
   }
 }
 
-/** Append, skipping rows already held — a re-asked partial page overlaps. */
+/**
+ * Append, skipping rows already held — a row added above the window pushes
+ * one down into the next page.
+ */
 function appendUnique(rows: Exercise[], incoming: Exercise[]): Exercise[] {
   const held = new Set(rows.map((row) => row.id));
   return [...rows, ...incoming.filter((row) => !held.has(row.id))];

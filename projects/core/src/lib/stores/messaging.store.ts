@@ -24,6 +24,7 @@ import {
   ThreatFlags,
   UserBlockReason,
 } from '../models/messaging';
+import { conversationMatches } from '../utils/messaging.utils';
 
 /**
  * Per-conversation message pagination + loading state. Stored in a
@@ -357,15 +358,7 @@ export class MessagingStore {
       // 'coaches' is disabled in the UI for v1; defensive no-op here.
       if (filter === 'coaches') return false;
 
-      if (query) {
-        const haystack =
-          (c.type === 'GROUP' ? c.name ?? '' : participantName(c)) +
-          ' ' +
-          (c.lastMessagePreview ?? '');
-        if (!haystack.toLowerCase().includes(query)) return false;
-      }
-
-      return true;
+      return conversationMatches(c, query);
     });
   });
 
@@ -887,13 +880,18 @@ export class MessagingStore {
    * global error interceptor.
    *
    * Returns the resolved conversationId so the picker can route.
+   *
+   * A first message routes into the new thread unless `navigate` is
+   * false — for a screen that adopts the conversation in place instead
+   * of being swapped for another page.
    */
   sendMessage(params: {
     conversationId: string | null;
     recipientId: string;
     body: string;
+    navigate?: boolean;
   }): Promise<string | null> {
-    const { conversationId, recipientId, body } = params;
+    const { conversationId, recipientId, body, navigate = true } = params;
     const trimmed = body.trim();
     if (!trimmed) return Promise.resolve(conversationId);
 
@@ -1056,9 +1054,11 @@ export class MessagingStore {
             if (!conversationId) {
               this._composeMode.set(false);
               this._activeId.set(realConvId);
-              void this._router.navigate([...this._routes, realConvId], {
-                replaceUrl: true,
-              });
+              if (navigate) {
+                void this._router.navigate([...this._routes, realConvId], {
+                  replaceUrl: true,
+                });
+              }
             }
 
             resolve(realConvId);
@@ -1730,13 +1730,6 @@ export class MessagingStore {
 const PREVIEW_MAX = 200;
 function previewFromBody(body: string): string {
   return body.slice(0, PREVIEW_MAX);
-}
-
-/** Helper for the search filter — pulls the DM other-user's display name. */
-function participantName(c: ConversationListItem): string {
-  const u = c.otherUser;
-  if (!u) return '';
-  return `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim();
 }
 
 /**

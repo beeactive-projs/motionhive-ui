@@ -102,27 +102,26 @@
   } @else if (showSkeleton()) {
     <ion-list class="mh-flat-list">
       @for (_ of skeletonRows; track $index) {
-        <ion-item>
-          <ion-skeleton-text
-            slot="start"
-            [animated]="true"
-            style="width: 3.25rem; height: 3.25rem"
-          />
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 75%" /></p>
-          </ion-label>
-        </ion-item>
+        <mh-row-skeleton [index]="$index" [time]="true" />
       }
     </ion-list>
   } @else if (showSearchStart()) {
     <mh-search-start
       [recents]="recents.entries()"
-      [strips]="strips()"
       (select)="openRecent($event)"
       (remove)="removeRecent($event)"
       (clearAll)="clearRecents()"
     />
+
+    <!-- Rows, not a strip: the same list, drawn the same, as the new-message page. -->
+    @if (frequent().length > 0) {
+      <div class="mh-section-label">{{ 'messages.frequentContacts' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (person of frequent(); track person.id) {
+          <mh-person-row [person]="person" (select)="openRecent(person)" />
+        }
+      </ion-list>
+    }
   } @else if (people.isActive()) {
     @if (isSearchEmpty()) {
       <mh-empty-state
@@ -132,26 +131,20 @@
       />
     }
 
-    @if (people.results().length > 0) {
+    <!-- Only before the first answer: later keystrokes keep the last results
+         on screen until the next ones replace them. -->
+    @if (showPeopleSkeleton()) {
       <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
       <ion-list class="mh-flat-list">
-        @for (person of people.results(); track person.id) {
-          <ion-item button detail="false" (click)="openPerson(person)">
-            <mh-hex-avatar
-              slot="start"
-              size="lg"
-              aria-hidden="true"
-              [name]="nameOf(person)"
-              [imageUrl]="person.avatarUrl"
-              [color]="toneFor(person.id)"
-            />
-            <ion-label>
-              <h2>{{ nameOf(person) }}</h2>
-              @if (person.handle; as tag) {
-                <p>&#64;{{ tag }}</p>
-              }
-            </ion-label>
-          </ion-item>
+        @for (_ of peopleSkeletonRows; track $index) {
+          <mh-row-skeleton [index]="$index" />
+        }
+      </ion-list>
+    } @else if (results().length > 0) {
+      <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (person of results(); track person.id) {
+          <mh-person-row [person]="person" (select)="openRecent(person)" />
         }
       </ion-list>
     }
@@ -204,8 +197,6 @@
     </ion-infinite-scroll>
   }
 </ion-content>
-
-<mh-new-message-sheet />
 
 <!-- One More sheet, one delete sheet and one block sheet for the whole list,
      aimed at whichever row's More was tapped. -->

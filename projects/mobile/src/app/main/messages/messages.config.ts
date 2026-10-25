@@ -18,7 +18,14 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 
-import { ConversationListItem, UserSearchResult, displayName } from 'core';
+import {
+  ConversationListItem,
+  MyInstructor,
+  SuggestedCoach,
+  UserSearchResult,
+  displayName,
+  translate,
+} from 'core';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import { RecentPerson, SUGGESTION_LIMIT } from '../../_shared/config/recent-searches.config';
@@ -114,25 +121,83 @@ export function recentFromPerson(person: UserSearchResult): RecentPerson {
   };
 }
 
+/** A coach the reader already has, as a person. */
+export function personFromMyCoach({ instructor }: MyInstructor): UserSearchResult {
+  return {
+    id: instructor.id,
+    firstName: instructor.firstName,
+    lastName: instructor.lastName,
+    avatarUrl: instructor.avatarUrl ?? null,
+    handle: instructor.handle ?? null,
+  };
+}
+
+/** A suggested coach, as a person: keyed by user id, which is what a draft chat is addressed to. */
+export function personFromSuggestedCoach(coach: SuggestedCoach): UserSearchResult {
+  return {
+    id: coach.userId,
+    firstName: coach.firstName,
+    lastName: coach.lastName,
+    avatarUrl: coach.avatarUrl,
+    handle: coach.handle,
+  };
+}
+
 /**
- * The strip under the recents: the people from the latest conversations,
- * in inbox order (newest message first). Groups have no one person to show,
- * and someone already in the recents is not offered twice.
+ * The people of one strip or list, in the order given: once each, without
+ * anyone in `excludeIds` (the recents, the lists above), capped.
  */
-export function suggestedPeople(
-  conversations: readonly ConversationListItem[],
+export function stripPeople(
+  people: readonly UserSearchResult[],
   excludeIds: readonly string[],
   limit = SUGGESTION_LIMIT,
 ): RecentPerson[] {
   const seen = new Set(excludeIds);
-  const people: RecentPerson[] = [];
+  const strip: RecentPerson[] = [];
 
-  for (const conversation of conversations) {
-    const person = conversation.otherUser;
-    if (!person || seen.has(person.id)) continue;
+  for (const person of people) {
+    if (strip.length >= limit) break;
+    if (seen.has(person.id)) continue;
     seen.add(person.id);
-    people.push(recentFromPerson(person));
-    if (people.length === limit) break;
+    strip.push(recentFromPerson(person));
   }
-  return people;
+  return strip;
+}
+
+/**
+ * The new-message page's "Suggested": the reader's own coaches, said as
+ * such, then the coaches the server suggests (each with their handle, where a
+ * sponsored one will later say so). One list, capped as a whole.
+ */
+export function suggestedContacts(
+  mine: readonly MyInstructor[],
+  suggested: readonly SuggestedCoach[],
+  limit = SUGGESTION_LIMIT,
+): RecentPerson[] {
+  const own = stripPeople(mine.map(personFromMyCoach), [], limit).map((person) => ({
+    ...person,
+    subline: translate('messages.compose.yourCoach'),
+  }));
+  const others = stripPeople(
+    suggested.map(personFromSuggestedCoach),
+    own.map((person) => person.id),
+    limit - own.length,
+  );
+  return [...own, ...others];
+}
+
+/**
+ * Frequent contacts: the people from the latest conversations, in inbox
+ * order (newest message first). The inbox carries no message counts, so
+ * recency stands in for frequency. Groups have no one person to show.
+ */
+export function frequentContacts(
+  conversations: readonly ConversationListItem[],
+  excludeIds: readonly string[],
+  limit = SUGGESTION_LIMIT,
+): RecentPerson[] {
+  const people = conversations.flatMap((conversation) =>
+    conversation.otherUser ? [conversation.otherUser] : [],
+  );
+  return stripPeople(people, excludeIds, limit);
 }

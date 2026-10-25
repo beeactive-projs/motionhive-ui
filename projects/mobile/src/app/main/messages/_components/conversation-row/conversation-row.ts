@@ -55,6 +55,8 @@ export class ConversationRow {
   private readonly _translateService = inject(TranslateService);
 
   readonly conversation = input.required<ConversationListItem>();
+  /** Off where the row only opens its thread (the new-message results). */
+  readonly swipeable = input(true);
 
   readonly select = output<void>();
   readonly markRead = output<void>();

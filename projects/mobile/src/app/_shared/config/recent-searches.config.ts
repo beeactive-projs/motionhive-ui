@@ -30,7 +30,7 @@ export interface SuggestedPerson extends RecentPerson {
 
 /** One labelled row of people under the recents. */
 export interface SuggestionStrip {
-  /** Translated: "Suggested", "Newest clients". */
+  /** Translated: "Pending requests", "Newest clients". */
   label: string;
   people: SuggestedPerson[];
 }
@@ -46,7 +46,7 @@ export type RecentSearchScope = (typeof RecentSearchScopes)[keyof typeof RecentS
 /** Messenger keeps a longer run; three fit above the suggestions without scrolling. */
 export const RECENT_SEARCH_LIMIT = 3;
 
-/** How many people a suggestion strip offers. */
+/** How many people a suggestion strip, or a suggestion list of rows, offers. */
 export const SUGGESTION_LIMIT = 8;
 
 /** Newest first, one entry per person, capped. */

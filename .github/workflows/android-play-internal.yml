@@ -15,8 +15,8 @@ on:
       track:
         description: 'Play track to upload to'
         type: choice
-        default: internal
-        options: [internal, alpha]
+        default: alpha
+        options: [alpha, internal]
 
 concurrency:
   group: android-play
@@ -91,7 +91,9 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: fit.motionhive.app
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          track: ${{ inputs.track || 'internal' }}
+          # alpha = the default closed testing track. Pushes go there; pick
+          # internal on a manual run to skip Google's review.
+          track: ${{ inputs.track || 'alpha' }}
           status: completed
           releaseName: ${{ env.VERSION_CODE }} (${{ github.sha }})
 

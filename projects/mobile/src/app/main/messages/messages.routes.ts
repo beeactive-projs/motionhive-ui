@@ -10,14 +10,21 @@ import { Routes } from '@angular/router';
  * `new` is a draft thread: the chat screen with no conversation behind it yet,
  * addressed by a `?to=` recipient. It has to be declared before `:id` or the
  * parameterised route would swallow it and try to load a conversation called
- * "new". Once the first message sends, the store swaps the URL for the real
- * conversation id.
+ * "new". Once the first message sends, the draft adopts the new conversation
+ * on the same screen; the URL keeps `new?to=`, which resolves to the thread.
  */
 export const messagesRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./messages').then((m) => m.Messages),
     title: 'pageTitle.messages',
+  },
+  {
+    // Who to write to. Picking replaces it with the thread or the draft below.
+    // Before `:id`, or the parameterised route swallows "compose".
+    path: 'compose',
+    loadComponent: () => import('./new-message/new-message').then((m) => m.NewMessage),
+    title: 'pageTitle.newMessage',
   },
   {
     // The composer owns the bottom edge — the keyboard opens straight onto it,

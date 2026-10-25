@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, ElementRef, computed, inject, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRouteSnapshot,
@@ -21,12 +21,17 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { App as CapacitorApp } from '@capacitor/app';
-
-/** What `addListener` resolves to; only `remove` matters here. */
-interface PluginHandle {
-  remove: () => Promise<void>;
-}
-import { Observable, distinctUntilChanged, filter, fromEventPattern, map, merge, shareReplay } from 'rxjs';
+import {
+  Observable,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  fromEventPattern,
+  map,
+  merge,
+  share,
+  shareReplay,
+} from 'rxjs';
 
 import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
 
@@ -39,6 +44,18 @@ import {
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
 import { TabIds, TabItem } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
+
+/** What `addListener` resolves to; only `remove` matters here. */
+interface PluginHandle {
+  remove: () => Promise<void>;
+}
+
+/**
+ * `ion-tab-bar` with the internal state it hides itself by while the keyboard
+ * is up. Not in Ionic's typings: it is a Stencil `@State`, though still a live
+ * property on the element.
+ */
+type KeyboardAwareTabBar = HTMLIonTabBarElement & { keyboardVisible?: boolean };
 
 /**
  * A navigation that has stopped moving, however it ended.
@@ -147,8 +164,13 @@ export class Tabs {
   private readonly _navController = inject(NavController);
   private readonly _router = inject(Router);
 
+  private readonly _tabBar = viewChild.required(IonTabBar, { read: ElementRef });
+
   /** The stack the last navigation ended in, to notice leaving Clients. */
   private _lastTabId = activeTabIdFromUrl(this._router.url);
+
+  /** Shared, so every reader below registers one set of Capacitor listeners. */
+  private readonly _appReturns = appReturns().pipe(share());
 
   /** Only an instructor has two modes; everyone else is permanently training. */
   readonly canSwitchMode = this._authStore.isInstructor;
@@ -178,9 +200,8 @@ export class Tabs {
    */
   private readonly _settled: Observable<unknown> = merge(
     this._router.events.pipe(filter(isNavigationSettled)),
-    appReturns(),
-    // Shared, so the two signals below register one set of Capacitor
-    // listeners between them rather than one set each.
+    this._appReturns,
+    // Shared, so the two signals below subscribe once between them.
   ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   /**
@@ -256,6 +277,12 @@ export class Tabs {
         this._lastTabId = tabId;
         if (left) this._moreBadgesService.refreshPendingRequests(true);
       });
+
+    // The keyboard is certainly down once it has finished hiding, and after a
+    // return from the background, which closes it on both platforms.
+    merge(this._appReturns, fromEvent(window, 'keyboardDidHide'))
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this._clearKeyboardHide());
   }
 
   /**
@@ -286,5 +313,19 @@ export class Tabs {
    */
   private _readHideTabBar(): boolean {
     return hidesTabBar(this._router.routerState.snapshot.root);
+  }
+
+  /**
+   * Undoes `ion-tab-bar`'s own keyboard hide, which can stick. The bar sets
+   * `display: none` on `keyboardWillShow` and only lifts it on
+   * `keyboardWillHide`, and then only once `ion-app` is back to the height it
+   * measured on the first keyboard of the session (iOS, `resize: 'body'`).
+   * Background the app with the keyboard up and the hide event can be lost;
+   * come back at a different height and the wait never ends. Either way the
+   * bar stays gone, on every tab, until a keyboard opens and closes cleanly.
+   */
+  private _clearKeyboardHide(): void {
+    const tabBar = this._tabBar().nativeElement as KeyboardAwareTabBar;
+    if (tabBar.keyboardVisible) tabBar.keyboardVisible = false;
   }
 }

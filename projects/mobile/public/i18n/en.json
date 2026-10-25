@@ -1193,6 +1193,11 @@
       "placeholder": "Message {name}…",
       "placeholderGeneric": "Message…"
     },
+    "compose": {
+      "hint": "Search for a coach, a client or anyone else on MotionHive to start a conversation.",
+      "suggested": "Suggested",
+      "yourCoach": "Your coach"
+    },
     "composer": {
       "sendingPaused": "Sending paused",
       "tooLong": "That message is too long. Trim it and try again."
@@ -1214,6 +1219,7 @@
       "thisPerson": "this person",
       "title": "Details"
     },
+    "frequentContacts": "Frequent contacts",
     "inbox": {
       "caughtUp": {
         "heading": "All caught up",
@@ -1232,12 +1238,6 @@
       "sectionPeople": "People"
     },
     "newMessage": "New message",
-    "newMessageSheet": {
-      "intro": "Search for a coach, a client or anyone else on MotionHive to start a conversation.",
-      "noneHeading": "Nobody found",
-      "noneMessage": "Check the spelling, or try their last name.",
-      "searchPlaceholder": "Search people"
-    },
     "row": {
       "markRead": "Read",
       "markUnread": "Unread",
@@ -2006,8 +2006,7 @@
     "clearAll": "Clear all",
     "personWithStatus": "{name}, {status}",
     "recent": "Recent",
-    "remove": "Remove {name} from recent searches",
-    "suggested": "Suggested"
+    "remove": "Remove {name} from recent searches"
   },
   "sessions": {
     "actions": {
