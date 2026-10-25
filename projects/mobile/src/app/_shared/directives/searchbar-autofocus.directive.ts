@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, ElementRef, afterNextRender, inject } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, afterNextRender, inject, input } from '@angular/core';
 import { IonSearchbar } from '@ionic/angular/standalone';
 
 import { SHEET_PRESENTED_CLASS } from '../components/sheet-shell/sheet-shell';
@@ -17,12 +17,19 @@ import { SHEET_PRESENTED_CLASS } from '../components/sheet-shell/sheet-shell';
  *   keyboard mid-slide fights the sheet for the screen. So under a modal the
  *   directive waits for `ionModalDidPresent` — unless the sheet is already
  *   up, which is the case for a searchbar revealed by a segment switch.
+ * - A searchbar built with its page (`mhAutofocus="afterEnter"`, the new
+ *   message page) waits for the page's `ionViewDidEnter`. Focused mid-slide,
+ *   the field is still off to the right, and WebKit scrolled the clipped
+ *   toolbar sideways to reveal it, leaving the pill stuck off the left edge.
  */
 @Directive({ selector: 'ion-searchbar[mhAutofocus]' })
 export class SearchbarAutofocusDirective {
   private readonly _searchbar = inject(IonSearchbar, { self: true });
   private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly _destroyRef = inject(DestroyRef);
+
+  /** `afterEnter` when the searchbar is part of its page from the start. */
+  readonly mhAutofocus = input<'' | 'afterEnter'>('');
 
   constructor() {
     // Not in the constructor itself: a searchbar that is the first node of a
@@ -31,6 +38,14 @@ export class SearchbarAutofocusDirective {
   }
 
   private _arm(): void {
+    const page = this._elementRef.nativeElement.closest('.ion-page');
+    if (this.mhAutofocus() === 'afterEnter' && page) {
+      const onEnter = () => this._focus();
+      page.addEventListener('ionViewDidEnter', onEnter, { once: true });
+      this._destroyRef.onDestroy(() => page.removeEventListener('ionViewDidEnter', onEnter));
+      return;
+    }
+
     const modal = this._elementRef.nativeElement.closest('ion-modal');
     if (!modal || modal.classList.contains(SHEET_PRESENTED_CLASS)) {
       this._focus();

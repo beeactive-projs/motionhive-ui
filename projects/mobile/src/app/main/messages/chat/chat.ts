@@ -98,11 +98,28 @@ async function holdKeyboardResize(): Promise<void> {
   } catch {
     // No plugin, nothing to hold.
   }
+  clearResizedBody();
 }
 
 async function releaseKeyboardResize(): Promise<void> {
   if (resizeHolds === 0 || --resizeHolds > 0) return;
   await Keyboard.setResizeMode({ mode: resizeBefore }).catch(() => undefined);
+  clearResizedBody();
+}
+
+/**
+ * Give the page back the height the plugin took for the keyboard.
+ *
+ * `resize: 'body'` sets `document.body`'s height to the room above the
+ * keyboard and takes it off only on a keyboard hide that arrives in that
+ * mode. A thread opened with the keyboard still up (a row picked from the
+ * inbox search) switches to `none` first, the hide that follows is ignored,
+ * and the body stayed cut short: the composer, then the tab bar back on the
+ * inbox, halfway up the screen. The plugin also believes the keyboard is
+ * down by then, so no later hide in `body` mode undid it either.
+ */
+function clearResizedBody(): void {
+  document.body.style.removeProperty('height');
 }
 
 /**
