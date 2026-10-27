@@ -33,6 +33,38 @@ export const ClientRequestStatuses = {
 export type ClientRequestStatus = (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
 
 /**
+ * Delivery of an imported invite's email (`emailStatus` on a pending row).
+ * Absent on invites sent one at a time, which never tracked it.
+ */
+export const ClientInviteEmailStatuses = {
+  Queued: 'QUEUED',
+  Sent: 'SENT',
+  Failed: 'FAILED',
+} as const;
+
+export type ClientInviteEmailStatus =
+  (typeof ClientInviteEmailStatuses)[keyof typeof ClientInviteEmailStatuses];
+
+/**
+ * What a client import does with one row, from `POST /clients/import/preview`.
+ * Each is a fact about the coach's own data; the API never says whether an
+ * address has a MotionHive account, so both kinds of person read Invite.
+ */
+export const ClientImportRowStatuses = {
+  Invite: 'INVITE',
+  AlreadyInvited: 'ALREADY_INVITED',
+  AlreadyClient: 'ALREADY_CLIENT',
+  ArchivedClient: 'ARCHIVED_CLIENT',
+  RequestedYou: 'REQUESTED_YOU',
+  Duplicate: 'DUPLICATE',
+  InvalidEmail: 'INVALID_EMAIL',
+  Self: 'SELF',
+} as const;
+
+export type ClientImportRowStatus =
+  (typeof ClientImportRowStatuses)[keyof typeof ClientImportRowStatuses];
+
+/**
  * Why the API suggested a coach. Only SUGGESTED is sent today; sponsored
  * placements will arrive under a new reason, so a reason this list does not
  * know is treated as an ordinary suggestion.

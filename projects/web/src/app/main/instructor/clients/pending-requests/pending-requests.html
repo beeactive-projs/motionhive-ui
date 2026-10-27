@@ -69,11 +69,17 @@
         <tr [id]="'request-row-' + row.id" [class.ring-2]="highlightedRequestId() === row.id"
           [class.ring-primary-400]="highlightedRequestId() === row.id">
           <td>
-            <mh-user-info [user]="row.client" />
+            <mh-user-info [user]="clientPerson(row)" />
           </td>
           <td>{{ clientEmail(row) }}</td>
           <td class="text-center">
+            <!-- An imported invite still in flight says so instead of "Email sent". -->
+            @if (emailStatusTag(row); as tag) {
+            <p-tag [value]="tag.labelKey | translate" [severity]="tag.failed ? 'danger' : 'secondary'" class="w-full"
+              rounded [pTooltip]="tag.failed ? ('clients.pendingRequests.emailStatus.failedHint' | translate) : undefined" />
+            } @else {
             <p-tag [value]="typeLabel(row)" severity="warn" class="w-full" rounded />
+            }
           </td>
           <td class="text-center">{{ row.createdAt | date: 'dd MMM yyyy HH:mm' }}</td>
           <td class="text-center">{{ row.expiresAt ? (row.expiresAt | date: 'dd MMM yyyy HH:mm') : '—' }}</td>
@@ -224,8 +230,13 @@
             [id]="'request-row-' + request.id" [class.ring-2]="highlightedRequestId() === request.id"
             [class.ring-primary-400]="highlightedRequestId() === request.id">
             <div class="flex items-start justify-between gap-2">
-              <mh-user-info [user]="request.client" class="min-w-0" />
+              <mh-user-info [user]="clientPerson(request)" class="min-w-0" />
+              @if (emailStatusTag(request); as tag) {
+              <p-tag [value]="tag.labelKey | translate" [severity]="tag.failed ? 'danger' : 'secondary'" rounded
+                class="text-xs shrink-0" />
+              } @else {
               <p-tag [value]="typeLabel(request)" severity="warn" rounded class="text-xs shrink-0" />
+              }
             </div>
 
             <div class="text-surface-600 dark:text-surface-400 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">

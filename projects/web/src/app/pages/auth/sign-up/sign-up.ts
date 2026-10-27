@@ -146,7 +146,15 @@ export class SignUp {
 
   private loadInvitation(token: string): void {
     this._clientInviteService.load(token).subscribe({
-      next: (details) => this.model.update((value) => ({ ...value, email: details.invitedEmail })),
+      // An imported invite also carries the name the coach typed: a start
+      // the person can correct, never over anything they already typed.
+      next: (details) =>
+        this.model.update((value) => ({
+          ...value,
+          email: details.invitedEmail,
+          firstName: value.firstName || details.invitedFirstName || '',
+          lastName: value.lastName || details.invitedLastName || '',
+        })),
       error: () =>
         this.errorMessage.set(
           this._translateService.instant('auth.signUp.error.invalidInvitation'),

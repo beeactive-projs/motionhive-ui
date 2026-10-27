@@ -251,6 +251,151 @@
         "message": "Are you sure you want to unarchive {name}?"
       }
     },
+    "import": {
+      "backToClients": "Back to clients",
+      "columns": {
+        "error": {
+          "noEmail": "Choose the column that holds the email addresses.",
+          "twoEmails": "Two columns are set to Email. Pick one.",
+          "twoOf": "Two columns are set to {field}. Pick one."
+        },
+        "head": {
+          "examples": "Examples",
+          "importAs": "Import as",
+          "inFile": "In your file"
+        },
+        "matchedAll": "{count, plural, one {We matched the column from its title. Check it and continue.} other {We matched all # columns from their titles. Check them and continue.}}",
+        "matchedNoTitles": "Your file has no title row, so we guessed from what each column holds. Check them and continue.",
+        "noPeople": "Nobody to import yet. The template's example rows (@example.com) are always skipped, so add your clients under them.",
+        "noteHint": "Notes stay private. They're copied into the client's notes when they accept.",
+        "partial": "{imported, plural, one {# column} other {# columns}} of {total} will be imported.",
+        "pasted": "Pasted rows",
+        "peopleFound": "{count, plural, one {# person found} other {# people found}}",
+        "replace": "Replace",
+        "subtitle": "We guessed from the titles, so change anything that's off.",
+        "title": "What does each column hold?",
+        "untitled": "Column {n}"
+      },
+      "done": {
+        "another": "Import another list",
+        "body": "{count, plural, one {# person gets} other {# people get}} an email from you in the next few minutes. Each invitation stays open for 30 days, and Pending requests shows who has joined.",
+        "leftOut": "Left out (unticked or no valid email)",
+        "seePending": "See pending requests",
+        "sent": "Invitations sent",
+        "skipped": "Skipped (already connected or listed twice)",
+        "title": "Invitations on their way"
+      },
+      "field": {
+        "email": "Email",
+        "emailRequired": "Email (required)",
+        "firstName": "First name",
+        "fullName": "Full name",
+        "ignore": "Don't import",
+        "lastName": "Last name",
+        "note": "Private note"
+      },
+      "guide": {
+        "columns": "Only the email is required. Add first and last names, or one full name column, and a private note if you keep one.",
+        "privacy": "Each person gets one email with your name and a link to start training with you. Nobody becomes your client until they accept.",
+        "required": "Required",
+        "template": "Download the template",
+        "title": "What your list needs"
+      },
+      "preview": {
+        "title": "Email preview",
+        "to": "To:"
+      },
+      "review": {
+        "allReady": "Everyone on the list is ready.",
+        "chip": {
+          "fixed": "Fixed",
+          "invalid": "Check this email",
+          "missing": "Add an email",
+          "skipped": "Skipped"
+        },
+        "confirm": {
+          "header": "Send the invitations?",
+          "message": "{count, plural, one {# person gets} other {# people get}} an email from MotionHive with your name and a link to start training with you. Once sent, it can't be taken back.",
+          "notYet": "Not yet"
+        },
+        "dailyCap": "{remaining, plural, =0 {You can't send more invitations today.} one {You can send # more invitation today.} other {You can send # more invitations today.}} Leave some people out or send the rest tomorrow.",
+        "emailPlaceholder": "Add their email",
+        "empty": "Nobody here.",
+        "filterLabel": "Show",
+        "fixCount": "{count, plural, one {# person needs an email.} other {# people need an email.}}",
+        "fixRest": "{count, plural, one {Fix it below, or they won't get an invite.} other {Fix them below, or they won't get an invite.}}",
+        "footer": "{count, plural, one {# person gets an invitation} other {# people get an invitation}}",
+        "include": "Include this person",
+        "leftOut": "{count} left out",
+        "localeHint": "For people without an account yet. Anyone already on MotionHive gets it in their own language.",
+        "localeLabel": "Email language",
+        "localeYours": "{language} (your language)",
+        "messageHint": "Shown in every invitation.",
+        "messageLabel": "Personal message",
+        "messagePlaceholder": "A few words for your clients",
+        "optional": "(optional)",
+        "previewEmail": "Preview email",
+        "reason": {
+          "ALREADY_CLIENT": "Already your client",
+          "ALREADY_INVITED": "Invited on {date}",
+          "ARCHIVED_CLIENT": "In your archived clients. Restore them from your client list.",
+          "DUPLICATE": "Listed twice. Only one invite goes out.",
+          "REQUESTED_YOU": "Already asked to join you. Accept them in Pending requests.",
+          "SELF": "This is your own email",
+          "atSign": "Looks like “(at)” instead of “@”"
+        },
+        "resend": "Also send again to people you already invited ({count})",
+        "search": "Search names or emails",
+        "selectAll": "Select everyone who gets an invite",
+        "send": "Send {count, plural, one {# invitation} other {# invitations}}",
+        "summary": {
+          "all": "Everyone",
+          "fix": "To fix",
+          "invite": "Getting an invite",
+          "skipped": "Skipped"
+        }
+      },
+      "source": {
+        "chooseFile": "Choose a file",
+        "dropHint": "Excel (.xlsx) or CSV, up to {max} people.",
+        "dropTitle": "Drop your file here",
+        "error": {
+          "empty": "We couldn't find anyone in this list.",
+          "oldExcel": "This is an older Excel file (.xls). Open it in Excel and save it as .xlsx or CSV.",
+          "tooMany": "This list has {count} people. You can import up to {max} at a time, so split it into smaller files.",
+          "unreadable": "We couldn't read this file. Check that it's a spreadsheet and try again."
+        },
+        "nothingSent": "Nothing is sent until you review the list.",
+        "pasteHide": "Hide paste box",
+        "pasteHint": "Select the cells in Excel or Google Sheets, copy them and paste them here, title row included.",
+        "pasteLabel": "Paste from a spreadsheet",
+        "pastePlaceholder": "Paste your rows here",
+        "pasteShow": "Paste rows instead"
+      },
+      "steps": {
+        "columns": "Match the columns",
+        "list": "Add your list",
+        "review": "Review and send"
+      },
+      "subtitle": "Bring your client list over from a spreadsheet. Everyone on it gets an invitation to train with you on MotionHive.",
+      "template": {
+        "fileName": "motionhive-clients.xlsx",
+        "header": {
+          "email": "Email",
+          "firstName": "First name",
+          "lastName": "Last name",
+          "note": "Note"
+        },
+        "sampleNote": "Knee injury in 2025, wants to run a 10k",
+        "sheetName": "Clients"
+      },
+      "title": "Import clients",
+      "toast": {
+        "checkFailed": "Couldn't check the list",
+        "previewFailed": "Couldn't load the preview",
+        "sendFailed": "Couldn't send the invitations"
+      }
+    },
     "inviteDialog": {
       "changeSelection": "Change selection",
       "copied": "Copied!",
@@ -282,6 +427,7 @@
         "message": "No clients with this status. Try a different one, or clear the filter to see everyone.",
         "title": "No clients match this filter"
       },
+      "importClients": "Import clients",
       "lens": {
         "all": "All clients",
         "ariaLabel": "Client view",
@@ -304,6 +450,11 @@
         "expires": "Expires",
         "message": "Message",
         "sent": "Sent"
+      },
+      "emailStatus": {
+        "FAILED": "Couldn't send",
+        "QUEUED": "Sending",
+        "failedHint": "Resend to try again."
       },
       "empty": {
         "message": "Invitations you send and incoming client requests will show up here.",
@@ -2203,6 +2354,7 @@
   "pageTitle": {
     "approvals": "Approvals",
     "attendance": "Attendance",
+    "clientImport": "Import clients",
     "clientProfile": "Client profile",
     "clients": "Clients",
     "conversation": "Conversation",

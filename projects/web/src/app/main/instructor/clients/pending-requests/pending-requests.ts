@@ -14,6 +14,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   clientDisplayName,
+  ClientInviteEmailStatuses,
+  clientPerson as clientPersonOf,
   clientEmail as clientEmailOf,
   ClientRequestType,
   ClientRequestTypes,
@@ -25,6 +27,7 @@ import {
   InstructorClient,
   escapeHtml,
   showApiError,
+  UserInfo as UserInfoData,
 } from 'core';
 import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MenuItem, MessageService, SelectItem } from 'primeng/api';
@@ -365,6 +368,25 @@ export class PendingRequests {
 
   clientEmail(row: InstructorClient): string {
     return clientEmailOf(row);
+  }
+
+  /** The account, or the name and address an email-only invite was given. */
+  clientPerson(row: InstructorClient): UserInfoData | null {
+    return clientPersonOf(row);
+  }
+
+  /**
+   * Only imported invites track their email. Sent is the normal case and
+   * says nothing; the other two are worth a tag.
+   */
+  emailStatusTag(row: InstructorClient): { labelKey: string; failed: boolean } | null {
+    if (row.emailStatus === ClientInviteEmailStatuses.Queued) {
+      return { labelKey: 'clients.pendingRequests.emailStatus.QUEUED', failed: false };
+    }
+    if (row.emailStatus === ClientInviteEmailStatuses.Failed) {
+      return { labelKey: 'clients.pendingRequests.emailStatus.FAILED', failed: true };
+    }
+    return null;
   }
 
   isIncoming(row: InstructorClient): boolean {

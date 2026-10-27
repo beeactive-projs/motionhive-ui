@@ -50,7 +50,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "projects/web/src/main.ts",
-            "allowedCommonJsDependencies": ["@messageformat/core"],
+            "allowedCommonJsDependencies": ["@messageformat/core", "papaparse"],
             "tsConfig": "projects/web/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [

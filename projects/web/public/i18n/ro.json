@@ -251,6 +251,151 @@
         "message": "Sigur vrei să dezarhivezi relația cu {name}?"
       }
     },
+    "import": {
+      "backToClients": "Înapoi la clienți",
+      "columns": {
+        "error": {
+          "noEmail": "Alege coloana cu adresele de email.",
+          "twoEmails": "Ai marcat două coloane ca Email. Păstrează doar una.",
+          "twoOf": "Ai marcat două coloane ca {field}. Păstrează doar una."
+        },
+        "head": {
+          "examples": "Exemple",
+          "importAs": "Se importă ca",
+          "inFile": "În fișierul tău"
+        },
+        "matchedAll": "{count, plural, one {Am recunoscut coloana după titlu. Verific-o și continuă.} few {Am recunoscut toate cele # coloane după titluri. Verifică-le și continuă.} other {Am recunoscut toate cele # de coloane după titluri. Verifică-le și continuă.}}",
+        "matchedNoTitles": "Fișierul nu are rând de titluri, așa că am ghicit după conținutul coloanelor. Verifică-le și continuă.",
+        "noPeople": "Nu e încă nimeni de importat. Rândurile de exemplu din model (@example.com) sunt mereu omise, așa că adaugă-ți clienții sub ele.",
+        "noteHint": "Notițele rămân private. Când persoana acceptă invitația, le găsești la notițele clientului.",
+        "partial": "Se importă {imported} {total, plural, one {din # coloană} few {din # coloane} other {din # de coloane}}.",
+        "pasted": "Rânduri lipite",
+        "peopleFound": "{count, plural, one {# persoană găsită} few {# persoane găsite} other {# de persoane găsite}}",
+        "replace": "Înlocuiește",
+        "subtitle": "Am ghicit după titluri, așa că corectează ce nu e bine.",
+        "title": "Ce conține fiecare coloană?",
+        "untitled": "Coloana {n}"
+      },
+      "done": {
+        "another": "Importă altă listă",
+        "body": "{count, plural, one {# persoană primește} few {# persoane primesc} other {# de persoane primesc}} un email de la tine în câteva minute. Fiecare invitație e valabilă 30 de zile, iar în Cereri în așteptare vezi cine a acceptat.",
+        "leftOut": "Lăsate deoparte (debifate sau fără email valid)",
+        "seePending": "Vezi cererile în așteptare",
+        "sent": "Invitații trimise",
+        "skipped": "Omise (deja conectate cu tine sau duplicate)",
+        "title": "Invitațiile pleacă acum"
+      },
+      "field": {
+        "email": "Email",
+        "emailRequired": "Email (obligatoriu)",
+        "firstName": "Prenume",
+        "fullName": "Nume complet",
+        "ignore": "Nu se importă",
+        "lastName": "Nume de familie",
+        "note": "Notiță privată"
+      },
+      "guide": {
+        "columns": "Doar emailul e obligatoriu. Poți adăuga prenumele și numele (sau o singură coloană cu numele complet) și notițe private, dacă ai.",
+        "privacy": "Fiecare persoană primește un singur email cu numele tău și un link ca să înceapă antrenamentele cu tine. Nimeni nu devine clientul tău până nu acceptă.",
+        "required": "Obligatoriu",
+        "template": "Descarcă modelul",
+        "title": "Ce trebuie să conțină lista"
+      },
+      "preview": {
+        "title": "Previzualizare email",
+        "to": "Către:"
+      },
+      "review": {
+        "allReady": "Toată lista e gata de trimis.",
+        "chip": {
+          "fixed": "Corectat",
+          "invalid": "Verifică emailul",
+          "missing": "Adaugă emailul",
+          "skipped": "Nu se trimite"
+        },
+        "confirm": {
+          "header": "Trimiți invitațiile?",
+          "message": "{count, plural, one {# persoană primește} few {# persoane primesc} other {# de persoane primesc}} un email de la MotionHive cu numele tău și un link ca să înceapă antrenamentele cu tine. Odată trimis, emailul nu mai poate fi anulat.",
+          "notYet": "Nu acum"
+        },
+        "dailyCap": "{remaining, plural, =0 {Azi nu mai poți trimite invitații.} one {Azi mai poți trimite o singură invitație.} few {Azi mai poți trimite # invitații.} other {Azi mai poți trimite # de invitații.}} Lasă câteva persoane deoparte sau trimite restul mâine.",
+        "emailPlaceholder": "Adaugă emailul",
+        "empty": "Nu e nimeni aici.",
+        "filterLabel": "Arată",
+        "fixCount": "{count, plural, one {# persoană nu are un email valid.} few {# persoane nu au un email valid.} other {# de persoane nu au un email valid.}}",
+        "fixRest": "{count, plural, one {Corectează adresa mai jos, altfel nu primește invitație.} few {Corectează adresele mai jos, altfel nu primesc invitație.} other {Corectează adresele mai jos, altfel nu primesc invitație.}}",
+        "footer": "{count, plural, one {# persoană primește invitație} few {# persoane primesc invitație} other {# de persoane primesc invitație}}",
+        "include": "Include această persoană",
+        "leftOut": "{count, plural, one {# lăsată deoparte} few {# lăsate deoparte} other {# lăsate deoparte}}",
+        "localeHint": "Pentru cei care nu au încă cont. Cine folosește deja MotionHive îl primește în limba sa.",
+        "localeLabel": "Limba emailului",
+        "localeYours": "{language} (limba ta)",
+        "messageHint": "Apare în fiecare invitație.",
+        "messageLabel": "Mesaj personal",
+        "messagePlaceholder": "Câteva cuvinte pentru clienții tăi",
+        "optional": "(opțional)",
+        "previewEmail": "Vezi emailul",
+        "reason": {
+          "ALREADY_CLIENT": "Face deja parte dintre clienții tăi",
+          "ALREADY_INVITED": "Invitație trimisă pe {date}",
+          "ARCHIVED_CLIENT": "Printre clienții arhivați. Persoana poate fi reactivată din lista de clienți.",
+          "DUPLICATE": "Apare de două ori. Se trimite o singură invitație.",
+          "REQUESTED_YOU": "Ți-a trimis deja o cerere. O poți accepta în Cereri în așteptare.",
+          "SELF": "E emailul tău",
+          "atSign": "Pare scris „(at)” în loc de „@”"
+        },
+        "resend": "Retrimite invitația și persoanelor deja invitate ({count})",
+        "search": "Caută după nume sau email",
+        "selectAll": "Selectează pe toți cei care primesc invitație",
+        "send": "Trimite {count, plural, one {# invitație} few {# invitații} other {# de invitații}}",
+        "summary": {
+          "all": "Toată lista",
+          "fix": "De corectat",
+          "invite": "Primesc invitație",
+          "skipped": "Omise"
+        }
+      },
+      "source": {
+        "chooseFile": "Alege un fișier",
+        "dropHint": "Excel (.xlsx) sau CSV, cel mult {max} de persoane.",
+        "dropTitle": "Trage fișierul aici",
+        "error": {
+          "empty": "Nu am găsit pe nimeni în listă.",
+          "oldExcel": "Acesta e un fișier Excel mai vechi (.xls). Deschide-l în Excel și salvează-l ca .xlsx sau CSV.",
+          "tooMany": "Lista are {count, plural, one {# persoană} few {# persoane} other {# de persoane}}. Poți importa cel mult {max} de persoane odată, așa că împarte-o în fișiere mai mici.",
+          "unreadable": "Nu am putut citi fișierul. Verifică dacă e un fișier Excel sau CSV și încearcă din nou."
+        },
+        "nothingSent": "Nimic nu se trimite până nu verifici lista.",
+        "pasteHide": "Ascunde câmpul de lipire",
+        "pasteHint": "Selectează celulele în Excel sau Google Sheets, copiază-le și lipește-le aici, cu tot cu rândul de titluri.",
+        "pasteLabel": "Lipește dintr-un tabel",
+        "pastePlaceholder": "Lipește rândurile aici",
+        "pasteShow": "Lipește rândurile direct"
+      },
+      "steps": {
+        "columns": "Potrivește coloanele",
+        "list": "Adaugă lista",
+        "review": "Verifică și trimite"
+      },
+      "subtitle": "Adu-ți lista de clienți dintr-un tabel. Fiecare persoană de pe listă primește o invitație să se antreneze cu tine pe MotionHive.",
+      "template": {
+        "fileName": "motionhive-clienti.xlsx",
+        "header": {
+          "email": "Email",
+          "firstName": "Prenume",
+          "lastName": "Nume",
+          "note": "Observații"
+        },
+        "sampleNote": "Accidentare la genunchi în 2025, vrea să alerge 10 km",
+        "sheetName": "Clienți"
+      },
+      "title": "Importă clienți",
+      "toast": {
+        "checkFailed": "Lista nu a putut fi verificată",
+        "previewFailed": "Previzualizarea nu a putut fi încărcată",
+        "sendFailed": "Invitațiile nu au putut fi trimise"
+      }
+    },
     "inviteDialog": {
       "changeSelection": "Schimbă selecția",
       "copied": "Copiat!",
@@ -282,6 +427,7 @@
         "message": "Niciun client cu acest status. Încearcă altul sau șterge filtrul ca să-i vezi pe toți.",
         "title": "Niciun client nu corespunde acestui filtru"
       },
+      "importClients": "Importă clienți",
       "lens": {
         "all": "Toți clienții",
         "ariaLabel": "Vizualizare clienți",
@@ -304,6 +450,11 @@
         "expires": "Expiră",
         "message": "Mesaj",
         "sent": "Trimisă"
+      },
+      "emailStatus": {
+        "FAILED": "Nu s-a putut trimite",
+        "QUEUED": "Se trimite",
+        "failedHint": "Retrimite invitația ca să mai încerci o dată."
       },
       "empty": {
         "message": "Invitațiile pe care le trimiți și cererile primite de la clienți vor apărea aici.",
@@ -2203,6 +2354,7 @@
   "pageTitle": {
     "approvals": "Aprobări",
     "attendance": "Prezență",
+    "clientImport": "Importă clienți",
     "clientProfile": "Profil client",
     "clients": "Clienți",
     "conversation": "Conversație",

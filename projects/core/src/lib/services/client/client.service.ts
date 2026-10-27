@@ -7,6 +7,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
+  ClientImportEmailPreview,
+  ClientImportEmailPreviewRequest,
+  ClientImportRequest,
+  ClientImportResult,
   ClientListParams,
   ClientListResponse,
   ClientRequest,
@@ -119,6 +123,30 @@ export class ClientService {
   ): Observable<{ message: string; request: ClientRequest }> {
     return this._http.post<{ message: string; request: ClientRequest }>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE}`,
+      dto,
+    );
+  }
+
+  /** What an import would do with each row. Nothing is saved or sent. */
+  previewImport(dto: ClientImportRequest): Observable<ClientImportResult> {
+    return this._http.post<ClientImportResult>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.IMPORT_PREVIEW}`,
+      dto,
+    );
+  }
+
+  /** The invite email an import sends, rendered with the coach's own name and message. */
+  previewImportEmail(dto: ClientImportEmailPreviewRequest): Observable<ClientImportEmailPreview> {
+    return this._http.post<ClientImportEmailPreview>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.IMPORT_EMAIL_PREVIEW}`,
+      dto,
+    );
+  }
+
+  /** Import a client list: one invitation per new person, emails queued. */
+  importClients(dto: ClientImportRequest): Observable<ClientImportResult> {
+    return this._http.post<ClientImportResult>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.IMPORT}`,
       dto,
     );
   }

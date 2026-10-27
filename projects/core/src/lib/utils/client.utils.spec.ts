@@ -9,6 +9,7 @@ import { InstructorClient } from '../models/client/client.model';
 import {
   clientDisplayName,
   clientEmail,
+  clientPerson,
   clientStatusLabel,
   isIncomingRequest,
   isOpenableClient,
@@ -64,6 +65,34 @@ describe('clientDisplayName / clientEmail', () => {
     });
     expect(clientDisplayName(invite)).toBe('radu@example.com');
     expect(clientEmail(invite)).toBe('radu@example.com');
+  });
+
+  // An imported invite carries the name from the coach's spreadsheet.
+  it('names an imported invite the way the coach did', () => {
+    const imported = row({
+      status: InstructorClientStatuses.Pending,
+      requestType: ClientRequestTypes.InstructorToClient,
+      clientId: null,
+      invitedEmail: 'ana@example.com',
+      invitedFirstName: 'Ana',
+      invitedLastName: 'Pop',
+    });
+    expect(clientDisplayName(imported)).toBe('Ana Pop');
+    expect(clientEmail(imported)).toBe('ana@example.com');
+    expect(clientPerson(imported)).toEqual({
+      firstName: 'Ana',
+      lastName: 'Pop',
+      email: 'ana@example.com',
+    });
+  });
+
+  it('draws the account when there is one, nothing when there is no one', () => {
+    expect(clientPerson(row({ status: InstructorClientStatuses.Active, client: user }))).toBe(
+      user,
+    );
+    expect(clientPerson(row({ status: InstructorClientStatuses.Active, clientId: null }))).toBe(
+      null,
+    );
   });
 
   it('uses the caller-supplied fallback when nothing is usable', () => {

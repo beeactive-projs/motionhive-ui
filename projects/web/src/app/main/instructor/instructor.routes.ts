@@ -19,6 +19,12 @@ export const instructorRoutes: Routes = [
     loadComponent: () => import('./clients/clients').then((m) => m.Clients),
     title: 'pageTitle.clients',
   },
+  // Before `clients/:id`, which would otherwise read "import" as a client id.
+  {
+    path: 'clients/import',
+    loadComponent: () => import('./clients/import/client-import').then((m) => m.ClientImport),
+    title: 'pageTitle.clientImport',
+  },
   {
     path: 'clients/:id',
     loadComponent: () =>

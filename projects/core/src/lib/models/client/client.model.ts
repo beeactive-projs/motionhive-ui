@@ -1,9 +1,12 @@
 import type {
   InstructorClientStatus,
   InitiatedBy,
+  ClientImportRowStatus,
+  ClientInviteEmailStatus,
   ClientRequestType,
   ClientRequestStatus,
 } from './client.enums';
+import type { AppLanguage } from '../common/language.enums';
 import { PaginatedResponse } from '../common/pagination.model';
 import { User } from '../user/user.model';
 
@@ -30,6 +33,11 @@ export interface InstructorClient {
   createdAt: string;
   updatedAt: string;
   invitedEmail: string | null;
+  /** The name the coach gave someone with no account yet (client import). */
+  invitedFirstName?: string | null;
+  invitedLastName?: string | null;
+  /** Delivery of an imported invite's email; absent on other rows. */
+  emailStatus?: ClientInviteEmailStatus | null;
   requestType: ClientRequestType;
   expiresAt: string | null;
   // instructor?: ClientUser;
@@ -43,6 +51,9 @@ export interface ClientRequest {
   fromUserId: string;
   toUserId: string | null;
   invitedEmail: string | null;
+  invitedFirstName?: string | null;
+  invitedLastName?: string | null;
+  emailStatus?: ClientInviteEmailStatus | null;
   type: ClientRequestType;
   message: string | null;
   status: ClientRequestStatus;
@@ -72,8 +83,66 @@ export type CreateClientInvitation =
 export interface InvitationDetails {
   token: string;
   invitedEmail: string;
+  /** The coach's spelling of the invitee's name, for signup to start from. */
+  invitedFirstName?: string | null;
+  invitedLastName?: string | null;
   instructor: { firstName: string; lastName: string };
   expiresAt: string;
+}
+
+/** One person from a coach's spreadsheet. Only `email` is required. */
+export interface ClientImportRow {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  /** The coach's private note; becomes the client's notes when they accept. */
+  note?: string;
+}
+
+/** Body of `POST /clients/import/preview` and `POST /clients/import`. */
+export interface ClientImportRequest {
+  rows: ClientImportRow[];
+  /** One personal message, in every invite email. */
+  message?: string;
+  /** Email language for people with no account; one with an account reads theirs. */
+  locale?: AppLanguage;
+  /** Also send again to people already invited (renews them for 30 days). */
+  resendPending?: boolean;
+}
+
+export interface ClientImportRowResult {
+  /** Position in the submitted `rows`. */
+  index: number;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  status: ClientImportRowStatus;
+  /** When the invite already out was sent (ALREADY_INVITED only). */
+  invitedAt: string | null;
+}
+
+export interface ClientImportResult {
+  dryRun: boolean;
+  rows: ClientImportRowResult[];
+  counts: Record<ClientImportRowStatus, number>;
+  /** Invite emails this import sends, or in a preview would send. */
+  toSend: number;
+  /** Invite emails the coach has left in the last 24 hours, before this import. */
+  dailyRemaining: number;
+}
+
+/** Body of `POST /clients/import/email-preview`. */
+export interface ClientImportEmailPreviewRequest {
+  message?: string;
+  locale?: AppLanguage;
+  /** Who the sample is addressed to: the first person on the list. */
+  recipientFirstName?: string;
+}
+
+/** The import's invite email, rendered by the API exactly as it will be sent. */
+export interface ClientImportEmailPreview {
+  subject: string;
+  html: string;
 }
 
 export interface UpdateClientPayload {

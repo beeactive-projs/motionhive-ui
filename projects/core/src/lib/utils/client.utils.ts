@@ -5,6 +5,7 @@ import {
   PendingClientLabels,
 } from '../models/client/client.enums';
 import { InstructorClient } from '../models/client/client.model';
+import { UserInfo } from '../models/user/user.model';
 import { translate } from '../i18n/translator';
 import { displayName } from './messaging.utils';
 
@@ -19,13 +20,34 @@ import { displayName } from './messaging.utils';
  * no `requestType`. Most of what follows keys off that discriminator.
  */
 
-/** "First Last", or the invited address for someone not on the platform yet. */
+/**
+ * "First Last". For someone not on the platform yet, the name the coach gave
+ * them (an imported invite), else the invited address.
+ */
 export function clientDisplayName(
   client: InstructorClient,
   fallback = translate('common.thisClient'),
 ): string {
   if (client.client) return displayName(client.client, fallback);
-  return client.invitedEmail ?? fallback;
+  return displayName(invitedPerson(client), client.invitedEmail ?? fallback);
+}
+
+/**
+ * Who a row is about, in the shape `mh-user-info` draws: the account, or for
+ * an email-only invite the name and address the coach gave. Null when there
+ * is neither, so the avatar falls back to its blank state.
+ */
+export function clientPerson(client: InstructorClient): UserInfo | null {
+  if (client.client) return client.client;
+  return client.invitedEmail ? invitedPerson(client) : null;
+}
+
+function invitedPerson(client: InstructorClient): UserInfo {
+  return {
+    firstName: client.invitedFirstName ?? null,
+    lastName: client.invitedLastName ?? null,
+    email: client.invitedEmail,
+  };
 }
 
 export function clientEmail(client: InstructorClient): string {

@@ -15,6 +15,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   clientDisplayName,
   clientEmail as clientEmailOf,
+  clientPerson as clientPersonOf,
   ClientService,
   clientStatusLabel as clientStatusLabelOf,
   injectIsMobile,
@@ -27,6 +28,7 @@ import {
   escapeHtml,
   showApiError,
   TagSeverity,
+  UserInfo as UserInfoData,
 } from 'core';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
@@ -303,6 +305,10 @@ export class Clients implements OnInit {
     this.showInviteDialog.set(true);
   }
 
+  goToImport(): void {
+    this._router.navigate(['/coaching/clients/import']);
+  }
+
   openNotesDialog(client: InstructorClient): void {
     this.editingClient.set(client);
     this.showNotesDialog.set(true);
@@ -395,6 +401,11 @@ export class Clients implements OnInit {
 
   clientEmail(client: InstructorClient): string {
     return clientEmailOf(client);
+  }
+
+  /** The account, or the name and address an email-only invite was given. */
+  clientPerson(client: InstructorClient): UserInfoData | null {
+    return clientPersonOf(client);
   }
 
   clientStatusLabel(client: InstructorClient): string {

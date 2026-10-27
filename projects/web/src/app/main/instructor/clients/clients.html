@@ -42,6 +42,11 @@
         {{ 'nav.requests' | translate }}
       </button>
       }
+      <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined"
+        (click)="goToImport()">
+        <i class="pi pi-upload"></i>
+        {{ 'clients.list.importClients' | translate }}
+      </button>
       <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openInviteDialog()">
         <i class="pi pi-user-plus"></i>
         {{ 'clients.common.inviteClient' | translate }}
@@ -105,10 +110,10 @@
           <td>
             @if (isOpenable(client)) {
             <button type="button" class="text-left hover:opacity-70" (click)="openClient(client)">
-              <mh-user-info [user]="client.client" />
+              <mh-user-info [user]="clientPerson(client)" />
             </button>
             } @else {
-            <mh-user-info [user]="client.client" />
+            <mh-user-info [user]="clientPerson(client)" />
             }
           </td>
           <td>{{ clientEmail(client) }}</td>
@@ -261,10 +266,10 @@
             <div class="flex items-start justify-between gap-2">
               @if (isOpenable(client)) {
               <button type="button" class="min-w-0 text-left hover:opacity-70" (click)="openClient(client)">
-                <mh-user-info [user]="client.client" />
+                <mh-user-info [user]="clientPerson(client)" />
               </button>
               } @else {
-              <mh-user-info [user]="client.client" class="min-w-0" />
+              <mh-user-info [user]="clientPerson(client)" class="min-w-0" />
               }
               <p-tag [value]="clientStatusLabel(client)" [severity]="statusSeverity(client.status)" rounded
                 class="text-xs shrink-0" />
