@@ -1,7 +1,5 @@
-/* The header is `mh-flat-header`, the sections are `.mh-section-label` +
-   `.mh-flat-list`, and the rows bring their own skin. The one layout of its
-   own: the Share link card sits on the row gutter, so its edge lines up with
-   the search field and the caption above it (user decision, 2026-10-27). */
+/* The Share link card sits on the row gutter, so its edge lines up with the
+   search field and the caption above it (user decision, 2026-10-27). */
 .door {
   padding: 0.5rem var(--mh-row-gutter) 0;
 }

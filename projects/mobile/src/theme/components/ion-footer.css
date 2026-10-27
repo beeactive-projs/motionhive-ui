@@ -1,0 +1,12 @@
+/* The footer is the header's twin (ion-header.css): the page's colour
+   (variables.css) and no edge. `ion-tabs .ion-page` is an app page; a
+   sheet's footer keeps the shell's hairline. (0,1,2) beats md's
+   `.footer-md` shadow (0,1,0); (0,2,3) beats iOS's
+   `.footer-ios ion-toolbar:first-of-type` hairline (0,2,1). */
+ion-tabs .ion-page > ion-footer {
+  box-shadow: none;
+}
+
+ion-tabs .ion-page > ion-footer ion-toolbar:first-of-type {
+  --border-width: 0;
+}

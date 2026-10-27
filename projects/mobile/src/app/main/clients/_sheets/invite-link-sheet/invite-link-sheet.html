@@ -1,37 +1,41 @@
 <ng-template #body>
   @if (url(); as link) {
-    <!-- Always dark on white, dark mode included: a scanner needs the
-         contrast, and an inverted code reads badly on many of them. -->
-    <div class="code">
-      @if (qrHtml(); as svg) {
-        <div class="qr" [innerHTML]="svg" aria-hidden="true"></div>
-      } @else if (qrFailed()) {
-        <mh-hex-avatar icon="qr-code-outline" size="xl" color="medium" tone="wash" aria-hidden="true" />
-      } @else {
-        <ion-spinner name="crescent" aria-hidden="true" />
-      }
-      <p class="url">{{ displayUrl() }}</p>
+    <div class="mh-stack">
+      <!-- Always dark on white, dark mode included: a scanner needs the
+           contrast, and an inverted code reads badly on many of them. -->
+      <div class="code">
+        @if (qrHtml(); as svg) {
+          <div class="qr" [innerHTML]="svg" aria-hidden="true"></div>
+        } @else if (qrFailed()) {
+          <mh-hex-avatar icon="qr-code-outline" size="xl" color="medium" tone="wash" aria-hidden="true" />
+        } @else {
+          <ion-spinner name="crescent" aria-hidden="true" />
+        }
+        <p class="url">{{ displayUrl() }}</p>
+      </div>
+
+      <section class="mh-section">
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item button [detail]="false" (click)="share()">
+            <mh-hex-avatar slot="start" size="sm" icon="share-social-outline" color="info" tone="shade" />
+            <ion-label>{{ 'clients.invite.linkSheet.share' | translate }}</ion-label>
+          </ion-item>
+          <ion-item button [detail]="false" (click)="copyLink()">
+            <mh-hex-avatar slot="start" size="sm" icon="copy-outline" color="teal" />
+            <ion-label>{{ 'clients.invite.linkSheet.copy' | translate }}</ion-label>
+          </ion-item>
+          <!-- Off until there is a code to enlarge. -->
+          <ion-item button [detail]="false" [disabled]="!qrHtml()" (click)="fullScreenOpen.set(true)">
+            <mh-hex-avatar slot="start" size="sm" icon="scan-outline" color="violet" />
+            <ion-label>{{ 'clients.invite.linkSheet.fullScreen' | translate }}</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <!-- Said plainly: the link opens a profile, and the person still has to
+             ask. Better that than a coach wondering why nobody arrived. -->
+        <p class="mh-footnote">{{ 'clients.invite.linkSheet.hint' | translate }}</p>
+      </section>
     </div>
-
-    <ion-list [inset]="true" class="mh-card-list">
-      <ion-item button [detail]="false" (click)="share()">
-        <mh-hex-avatar slot="start" size="sm" icon="share-social-outline" color="info" tone="shade" />
-        <ion-label>{{ 'clients.invite.linkSheet.share' | translate }}</ion-label>
-      </ion-item>
-      <ion-item button [detail]="false" (click)="copyLink()">
-        <mh-hex-avatar slot="start" size="sm" icon="copy-outline" color="teal" />
-        <ion-label>{{ 'clients.invite.linkSheet.copy' | translate }}</ion-label>
-      </ion-item>
-      <!-- Off until there is a code to enlarge. -->
-      <ion-item button [detail]="false" [disabled]="!qrHtml()" (click)="fullScreenOpen.set(true)">
-        <mh-hex-avatar slot="start" size="sm" icon="scan-outline" color="violet" />
-        <ion-label>{{ 'clients.invite.linkSheet.fullScreen' | translate }}</ion-label>
-      </ion-item>
-    </ion-list>
-
-    <!-- Said plainly: the link opens a profile, and the person still has to
-         ask. Better that than a coach wondering why nobody arrived. -->
-    <p class="mh-helper">{{ 'clients.invite.linkSheet.hint' | translate }}</p>
   } @else {
     <mh-empty-state
       icon="at-outline"

@@ -2,7 +2,7 @@
      there, then the filter pills. Searching folds the title and the pills
      away and keeps the same field, so the caret the tap put there stays.
      They fold rather than vanish, so the field glides up to its place. -->
-<ion-header class="mh-flat-header" [translucent]="true">
+<ion-header [translucent]="true">
   @if (!searchOpen()) {
     <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
       <ion-title>{{ 'nav.messages' | translate }}</ion-title>
@@ -78,9 +78,8 @@
   }
 </ion-header>
 
-<!-- A flat list: the rows run edge to edge on white, and the loading, empty and
-     error states sit on the same white, so the page never changes colour under
-     the reader. -->
+<!-- A flat list: the rows run edge to edge on the page, and the loading, empty
+     and error states sit on the same page. -->
 <ion-content [fullscreen]="true" class="mh-flat-page">
   @if (!searchOpen()) {
     <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">

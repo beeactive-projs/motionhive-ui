@@ -21,9 +21,9 @@ Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 s
 
 ### Theme structure (`src/theme/`)
 
-- [`variables.css`](src/theme/variables.css) — tokens only (ramps, colour slots, washes, role tokens).
+- [`variables.css`](src/theme/variables.css) — tokens only (ramps, colour slots, washes, role tokens), plus the sheet context that redefines Ionic's page and card tokens inside a sheet.
 - [`typography.css`](src/theme/typography.css) — headings + the `.mh-*` text roles (`mh-kicker`, `mh-section-label`, `mh-helper`, `mh-note-block`, `mh-footnote`).
-- [`layout.css`](src/theme/layout.css) — the layout primitives `.mh-page` and `.mh-section` (below), and `.mh-flat-page` for a screen that is a flat list.
+- [`layout.css`](src/theme/layout.css) — the layout primitives `.mh-page`, `.mh-section` and `.mh-stack` (below), the row-gutter inset for text beside a list, and the note placement on a flat page (`mh-flat-page` on `ion-content`).
 - [`components/`](src/theme/components/) — **one file per Ionic component** that needs a global skin (`ion-card.css`, `ion-list.css`, `ion-button.css`, …), imported from `styles.css`. General custom CSS for a component goes in its file — never back into `styles.css`, never copy-pasted across page `.scss` files. Add a new file (and its `@import`) when a component first needs a global rule.
 
 ### Rules for Claude (`.claude/rules/`)
@@ -31,7 +31,7 @@ Ionic Angular + Capacitor app (`projects/mobile`). Coach-facing mobile app; v1 s
 Topic rules live in [`.claude/rules/`](.claude/rules/) and load when Claude works on mobile files. They are binding like this file:
 
 - [`lists.md`](.claude/rules/lists.md): the two list kinds, grouped (`mh-card-list`) and flat (`mh-flat-list`, the WhatsApp chat list); rows, separators, leading hex tiles and their colours, trailing values.
-- [`surfaces-and-sheets.md`](.claude/rules/surfaces-and-sheets.md): no outlines on card surfaces, one-surface sheets, `close()` before navigating.
+- [`surfaces-and-sheets.md`](.claude/rules/surfaces-and-sheets.md): the surfaces (page, sheet), bars that are the page, no outlines on card surfaces, one-surface sheets, `close()` before navigating.
 - [`ionic-gotchas.md`](.claude/rules/ionic-gotchas.md): `ion-item` padding and stacking, field errors, searchbar focus, accessible names on Ionic buttons.
 - [`colour-and-type.md`](.claude/rules/colour-and-type.md): the Tailwind-ramp palette, honey means selection, sentence-case kickers, tokens over literals.
 - [`icons.md`](.claude/rules/icons.md): outline only (and its state-pair exceptions), one stroke weight, the `--mh-icon-*` size scale, hex tile glyphs, optical sizing.
@@ -42,7 +42,7 @@ Add to them when a decision should hold for everyone; keep this file for the str
 ### Layout rule — components are margin-free, pages place them
 
 - **Component skins carry no margins.** `ion-card`, `mh-card-list` and friends are layout-neutral (`margin: 0` in their skin); where they sit on a screen is the screen's decision. Never re-introduce a placement margin into `theme/components/` or into a shared component's own `.scss`.
-- **Pages opt into the layout primitives:** wrap the scrolling content in `<div class="mh-page">` (one gutter, `--mh-page-gutter`, and one vertical rhythm, `--mh-page-rhythm`, via flex gap) and glue a label to its block with `<section class="mh-section">` (kicker/`mh-section-label` + card-list, bound by `--mh-section-gap`). Fixed-slot elements (`ion-refresher`) and sheet/modal components stay outside the wrapper.
+- **Pages opt into the layout primitives:** wrap the scrolling content in `<div class="mh-page">` (one gutter, `--mh-page-gutter`, and one vertical rhythm, `--mh-page-rhythm`, via flex gap) and glue a label to its block with `<section class="mh-section">` (kicker/`mh-section-label` + card-list, bound by `--mh-section-gap`). Fixed-slot elements (`ion-refresher`) and sheet/modal components stay outside the wrapper. A sheet body made of several cards uses `.mh-stack`: the same rhythm, no gutter (the sheet pads its sides).
 - Page-specific placement that the primitives don't cover (a sticky-CTA clearance, a two-tile row, a full-bleed list screen's card inset) belongs in that page's `.scss` — layout in the page, skin in the theme.
 
 ### CSS variable standard (four tiers — use the highest that fits)
@@ -72,7 +72,7 @@ Every dimension in this project sits on a **0.125rem grid** (1rem = 16px, so the
 | `--mh-text-2xl` | 1.5rem (24px) | page titles (`h1`), detail-screen titles |
 | `--mh-text-3xl` | 1.75rem (28px) | hero numbers, display titles |
 
-Display/glyph sizes above the ladder (avatar initials at `1.75`/`2.25`/`2.75rem`) may stay on-grid literals. `line-height` comes from `--mh-leading-none|heading|tight|body` (1 / 1.2 / 1.4 / 1.55; headings take `heading`, never `tight`; a bare `line-height: 0` layout hack is not typography and stays). `letter-spacing` for kickers is `--mh-tracking-kicker` (0.08em) — never a per-component tracking value. Font families only via `--ion-font-family` / `--mh-font-heading`. Weights: Inter 400 / 500 / 600, with 700 only for display figures (rest timer, invoice totals); Poppins 600 only, 800 for the wordmark. Poppins ships just those two faces (`theme/fonts.css`), so any other weight silently draws as the nearest one.
+Display/glyph sizes above the ladder (avatar initials at `1.75`/`2.25`/`2.75rem`) may stay on-grid literals. `line-height` comes from `--mh-leading-none|heading|tight|body` (1 / 1.2 / 1.4 / 1.55; headings take `heading`, never `tight`; a bare `line-height: 0` layout hack is not typography and stays). `letter-spacing` for kickers is `--mh-tracking-kicker` (0.08em) — never a per-component tracking value; a kicker worn as a section label is untracked (`layout.css`). Font families only via `--ion-font-family` / `--mh-font-heading`. Weights: Inter 400 / 500 / 600, with 700 only for display figures (rest timer, invoice totals); Poppins 600 only, 800 for the wordmark. Poppins ships just those two faces (`theme/fonts.css`), so any other weight silently draws as the nearest one.
 
 Other dimension roles: `--mh-tap-target` (2.75rem, the WCAG 44px minimum — use it for anything sized as a touch target) and `--mh-radius-sheet` (1.25rem sheet top corners). The layout and row steps are tokens too — `--mh-page-gutter` (1rem), `--mh-page-rhythm` (0.75rem), `--mh-section-gap` (0.375rem), `--mh-bar-gutter` (1.25rem, for the chip strip and the CTA bar, which sit wider than the page), `--mh-row-gutter` (0.875rem), `--mh-row-pad` (0.5rem), `--mh-flat-row-pad` (0.75rem) and `--mh-row-line` (1.5rem, one line of a flat-list row) — so a screen that needs the page's own rhythm reads it rather than restating the number. **No `vh` for keyboard-adjacent UI** — use `dvh` so the WebView's dynamic chrome/keyboard is accounted for.
 

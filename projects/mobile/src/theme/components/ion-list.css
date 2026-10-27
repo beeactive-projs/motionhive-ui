@@ -1,10 +1,10 @@
 /* The grouped list: a card that happens to be a list, drawn the iOS
    inset-grouped way — no outline, a large radius, the card lifted off the
-   page by its fill alone. `ion-list` publishes no CSS variables for radius or
-   background, so these are literal rules — the one thing Ionic's API cannot
-   express here. `[inset]` earns its place anyway: it is what supplies
-   `overflow: hidden`, which clips the first and last rows' backgrounds to the
-   corner radius.
+   page by its fill alone. The fill is Ionic's own: the list and its rows
+   paint `--ion-item-background`, which every surface context sets to the
+   card colour (variables.css). `ion-list` publishes no CSS variable for its
+   radius, so that is a literal rule. `[inset]` supplies `overflow: hidden`,
+   which clips the first and last rows' backgrounds to the corner radius.
 
    Skin only — `margin: 0` makes the list layout-neutral; the page's layout
    container places it. Specificity: `[inset]` reflects to a `.list-inset`
@@ -16,14 +16,6 @@ ion-list.list-inset.mh-card-list {
   margin: 0;
   padding: 0;
   border-radius: var(--mh-radius-card);
-  background: var(--ion-card-background);
-}
-
-/* A card on a flat screen. The flat surface is the card's own white in light,
-   so the card takes `--mh-color-flat-card` instead; the rows read the same
-   variable, so they follow. */
-ion-content.mh-flat-page ion-list.list-inset.mh-card-list {
-  --ion-card-background: var(--mh-color-flat-card);
 }
 
 /* One spacing standard for every list row. Ionic's own numbers differ mode to
@@ -56,10 +48,6 @@ ion-item.mh-list-row > [slot='start'] {
    the 3rem row. The chevron is the muted ink at full strength: Ionic dims it
    to 25%, below the 3:1 a control needs. */
 ion-list.mh-card-list ion-item {
-  /* The rows take the card's fill, so a row never paints over its card in a
-     second colour; left to Ionic's iOS dark palette, items were the page's
-     black and only the card's corners showed. */
-  --background: var(--ion-card-background);
   --min-height: 2rem;
   --detail-icon-color: var(--ion-color-medium);
   --detail-icon-opacity: 1;
@@ -150,19 +138,21 @@ ion-list:is(.mh-card-list, .mh-flat-list) ion-item:has(> mh-hex-avatar[slot='sta
    and a preview with its badges on the second. It shares the separator
    above: it starts where the text starts, so it never cuts under the
    avatar, and stops at the gutter, under the end of the time.
+   It lives only on a flat page (`ion-content.mh-flat-page`), whose surface
+   is the page colour: white in light, the page grey in dark (variables.css).
    Specificity: Ionic's `.list-md` (0,1,0) paints its own background and an
    8px band; this (0,1,1) replaces both. */
 ion-list.mh-flat-list {
   margin: 0;
   padding: 0;
-  background: var(--mh-color-flat-surface);
+  background: var(--ion-background-color);
 }
 
 /* `--mh-flat-row-pad` around a 3.25rem avatar is WhatsApp's 76px row. The
    label's own md margins (10px top and bottom) would stack on that padding,
    so the padding alone sets the rhythm. */
 ion-list.mh-flat-list ion-item {
-  --background: var(--mh-color-flat-surface);
+  --background: var(--ion-background-color);
   --padding-top: var(--mh-flat-row-pad);
   --padding-bottom: var(--mh-flat-row-pad);
   --mh-row-inset: var(--mh-row-gutter);
@@ -248,13 +238,6 @@ ion-list.mh-flat-list ion-label p {
 
 .mh-row-line > ion-note {
   font-size: var(--mh-text-sm);
-}
-
-/* A label over a flat list (search's "People" and "Messages", a notification
-   day) lines up with the rows' gutter, not the card-list inset it has inside
-   `.mh-page`. */
-.mh-section-label:has(+ ion-list.mh-flat-list) {
-  padding-inline: var(--mh-row-gutter);
 }
 
 /* Under a label the label is the seam, so the first row drops its top

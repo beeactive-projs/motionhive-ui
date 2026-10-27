@@ -31,22 +31,38 @@
   padding-block: 0;
 }
 
-/* Kickers used as section labels get the same inline alignment: the row
-   gutter, so the label sits on the row content beside it. */
-.mh-section > .mh-kicker {
+/* A kicker worn as a section label takes the section label's look: the
+   muted ink, no kicker tracking (made for capitals). `.warm` and `.today`
+   still warm it to honey. */
+.mh-section > .mh-kicker,
+.mh-section-head .mh-kicker,
+.mh-day-header .mh-kicker {
+  color: var(--ion-color-medium);
+  letter-spacing: normal;
+}
+
+/* Text beside a list starts on the row gutter, in line with the tiles and
+   avatars. A label over chips or a field keeps its own small inset. */
+.mh-section > .mh-kicker,
+.mh-section-label:has(+ ion-list) {
   padding-inline: var(--mh-row-gutter);
 }
 
-/* The page gutter already indents the note; keep only a whisper of inset so
-   explanatory text doesn't span edge-to-edge. */
 .mh-page > .mh-note-block,
 .mh-section > .mh-note-block {
-  padding: 0 0.5rem;
+  padding: 0 var(--mh-row-gutter);
 }
 
 .mh-page > .mh-footnote,
 .mh-section > .mh-footnote {
-  padding-inline: 0.5rem;
+  padding-inline: var(--mh-row-gutter);
+}
+
+/* `.mh-page`'s rhythm without its gutter: a sheet body made of cards. */
+.mh-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mh-page-rhythm);
 }
 
 /* `ion-list-header` (inside mh-section-header) brings Ionic's own 1rem start
@@ -96,10 +112,6 @@
   padding-inline: var(--mh-row-gutter);
 }
 
-.mh-section-head .mh-kicker {
-  color: var(--ion-color-medium);
-}
-
 .mh-section-head.warm .mh-kicker {
   color: var(--mh-color-honey-deep);
 }
@@ -108,22 +120,11 @@
   font-size: var(--mh-text-sm);
 }
 
-/* A screen that is a flat list (`mh-flat-list`, WhatsApp's chat list): the rows
-   run edge to edge, so the list sits straight in `ion-content`, outside
-   `.mh-page`, and the page takes the rows' white. Without it a short list
-   stops at its last row and the slate shows through, reading as cut off.
-   Set it for good, never bound to a signal: the loading, empty and error
-   states sit on the same white, so the page never changes colour under the
-   reader (lists.md, "The list and its page"). */
-ion-content.mh-flat-page {
-  --background: var(--mh-color-flat-surface);
-}
-
-/* A note straight on a flat screen is the caption of the field above it
-   ("Type at least 2 characters"), so it lines up with the rows' gutter, the
-   field and the section labels, and hugs the field: the searchbar already
-   pads 8px under the pill, and the block's 1rem section break on top of that
-   read as a separate paragraph. */
+/* A flat screen (`mh-flat-page` on `ion-content`): a note straight on it is
+   the caption of the field above it ("Type at least 2 characters"), so it
+   lines up with the rows' gutter, the field and the section labels, and
+   hugs the field: the searchbar already pads 8px under the pill, and the
+   block's 1rem section break on top of that read as a separate paragraph. */
 ion-content.mh-flat-page > .mh-note-block {
   padding: 0.25rem var(--mh-row-gutter) 0.375rem;
 }

@@ -84,7 +84,5 @@
 }
 
 ion-footer ion-toolbar {
-  --background: var(--ion-background-color);
-  --border-width: 0;
   padding: 0.5rem 0.75rem calc(0.25rem + env(safe-area-inset-bottom));
 }

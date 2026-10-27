@@ -71,8 +71,7 @@
 /* Title: iOS centres it absolutely between 90px insets at 17px semibold;
    Material sets it in the flow, start-aligned, at 20px medium. Large and
    small titles keep iOS's own layout. `:where()` holds this at (0,1,1), so
-   `ion-header.mh-flat-header ion-title` (ion-header.css) still sets the
-   flat header's gutter. */
+   ion-header.css still sets a page title's gutter. */
 .ios ion-title:where(:not(.title-large, .title-small)) {
   position: static;
   width: auto;

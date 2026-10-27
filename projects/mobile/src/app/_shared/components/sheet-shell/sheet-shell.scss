@@ -1,14 +1,8 @@
-// One surface for the whole sheet — header, body and footer all on the page
-// slate, the iOS grouped-sheet way — so its cards read as raised and nothing
-// splits the sheet into bands. Both are documented `ion-modal` variables;
-// `ion-content` paints the slate itself.
+// One surface for the whole sheet: header, body and footer all read the
+// sheet's own surface (variables.css, `ion-modal.mh-sheet`), so nothing
+// splits it into bands.
 ion-modal {
   --border-radius: var(--mh-radius-sheet) var(--mh-radius-sheet) 0 0;
-  --background: var(--ion-background-color);
-}
-
-ion-header ion-toolbar {
-  --background: var(--ion-background-color);
 }
 
 // The sheet header: title over its optional subtitle, start-aligned.
@@ -60,8 +54,7 @@ ion-header ion-toolbar {
 // and the row gets its own padding because the buttons are the bar now rather
 // than toolbar-sized text.
 ion-footer ion-toolbar {
-  --background: var(--ion-background-color);
-  --border-width: 1px 0 0;
+  --border-width: var(--mh-hairline) 0 0;
   --border-color: var(--ion-border-color);
   --padding-start: 1rem;
   --padding-end: 1rem;
@@ -91,7 +84,7 @@ ion-footer ion-toolbar {
 // card hairline rather than the medium palette's own grey: the outline stays
 // quiet next to the filled confirm, and the label still reads.
 .actions .secondary {
-  --border-width: 1px;
+  --border-width: var(--mh-hairline);
   --border-color: var(--ion-border-color);
   --color: var(--ion-text-color);
 }

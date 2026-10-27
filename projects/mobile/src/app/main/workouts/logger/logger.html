@@ -163,7 +163,7 @@
 <!-- One slot, three states: the keypad while a cell is open, the rest timer
      while resting, and nothing otherwise. Both dock so the grid above stays
      readable — never an overlay. -->
-<ion-footer class="ion-no-border">
+<ion-footer>
   @if (showKeypad()) {
     <mh-numeric-keypad
       [field]="keypadField()"

@@ -4,9 +4,12 @@
    current selection is what honey is reserved for. A product decision over
    contrast: `--ion-color-primary` is about 2:1 on the white bar, under the
    3:1 a glyph needs; the selection still reads from every other tab being
-   grey. On the dark bar it clears AA easily. */
+   grey. On the dark bar it clears AA easily.
+
+   No edge: like the header, the bar is the page's colour (variables.css). */
 ion-tab-bar {
   --color-selected: var(--ion-color-primary);
+  --border: 0;
 }
 
 /* Material's tab glyph is 22px, off the icon grid. */

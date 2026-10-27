@@ -1,6 +1,6 @@
 <ng-template #body>
   @if (url(); as link) {
-  <div class="link-block">
+  <div class="mh-stack link-block">
     <p class="url">{{ link }}</p>
     <div class="actions">
       <ion-button expand="block" (click)="share()">
@@ -22,7 +22,7 @@
     <ion-note class="hint">{{ 'groups.joinLink.hint' | translate }}</ion-note>
   </div>
   } @else {
-  <div class="link-block empty">
+  <div class="mh-stack link-block empty">
     <ion-icon name="link-outline" class="glyph" aria-hidden="true" />
     <p class="lead">{{ 'groups.joinLink.empty.title' | translate }}</p>
     <ion-note class="hint">{{ 'groups.joinLink.empty.hint' | translate }}</ion-note>

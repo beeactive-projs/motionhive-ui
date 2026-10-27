@@ -22,9 +22,8 @@ export class EmptyState {
   readonly heading = input.required<string>();
   readonly message = input<string | null>(null);
   /**
-   * Ionic palette name for the tile. Navy by default — the brand surface, and
-   * the only neutral that survives both pages: the slate page is itself a
-   * pale slate, so a washed grey tile disappears into it.
+   * Ionic palette name for the tile. Navy by default: the brand surface, and
+   * an empty screen is not a status (lists.md, "Empty states").
    */
   readonly color = input('secondary');
   /** Omit to render no action. */

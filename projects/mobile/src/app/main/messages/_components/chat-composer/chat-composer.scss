@@ -23,9 +23,8 @@
      Messenger draw theirs: one line still reads as a pill, and a long message
      turns it into a rounded box instead of stretching a capsule around it.
 
-     The fill is the other side's bubble: grey in both themes, as WhatsApp's
-     field is. (The divider token is navy in dark mode.) */
-  background: var(--mh-color-bubble);
+     The fill is the other side's bubble, the flat page's card. */
+  background: var(--ion-card-background);
   border-radius: 1.25rem;
   --background: transparent;
   --padding-start: 0.875rem;

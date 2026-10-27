@@ -1,8 +1,8 @@
 /* A note without a `color` is the muted ink, the same grey as everything
    secondary. Ionic's iOS default is a 35% step of the text colour (about
    2.3:1 on a card, under AA), which left trailing values ("Dark",
-   "English") and the account handle hard to read. Medium is 4.76:1 on
-   white and about 6:1 on the dark card. A note with a `color` paints
+   "English") and the account handle hard to read. Medium is 6.9:1 on the
+   light card and about 5.4:1 on the dark one. A note with a `color` paints
    through `.ion-color` and is untouched. */
 ion-note {
   --color: var(--ion-color-medium);

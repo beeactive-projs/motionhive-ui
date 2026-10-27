@@ -1,57 +1,55 @@
-/* The flat header: the title bar, search field and filter pills over a
-   flat list (`mh-flat-list`), as WhatsApp stacks them. Every part sits on
-   the list's own gutter, `--mh-row-gutter`, so the title, the field, the
-   first pill and the avatars share one left edge, and the end buttons, the
-   field and the row times share one right edge.
+/* One header for every screen, as WhatsApp stacks it: no edge, and every
+   part on the rows' gutter, `--mh-row-gutter`, so the title, the field, the
+   first pill and the avatars or tiles share one left edge, and the end
+   buttons share the row times' right edge. The bar is the page's colour
+   (variables.css), so header and page read as one surface.
 
-   Ionic gives each part its own inset (md: the title 20px, the searchbar
-   8px around the field, the toolbar 4px before its buttons), and the pill
-   strip's global padding is sized for card pages. The toolbars are zeroed
-   and each part is placed on the gutter instead. */
-/* No drop shadow: the header and the list are one white surface, as in
-   WhatsApp, and the first row's hairline (ion-list.css) is the only seam.
-   The same effect as Ionic's `ion-no-border` class, kept in the skin so a
-   flat header needs one class. (0,1,1) beats md's `.header-md` (0,1,0). */
-ion-header.mh-flat-header {
+   `ion-tabs .ion-page` is an app page: the auth pages (outside the tabs)
+   keep their website header and sheets their shell's. Ionic gives each part
+   its own inset (md: the title 20px, the searchbar 8px around the field, the
+   toolbar 4px before its buttons), so the toolbars are zeroed and each part
+   is placed on the gutter instead. */
+
+/* No drop shadow: (0,1,2) beats md's `.header-md` (0,1,0). */
+ion-tabs .ion-page > ion-header {
   box-shadow: none;
 }
 
-ion-header.mh-flat-header ion-toolbar {
+ion-tabs .ion-page > ion-header ion-toolbar {
   --padding-start: 0;
   --padding-end: 0;
 }
 
-/* iOS's hairline under the last toolbar, the md shadow's twin. Matches
-   `.header-ios ion-toolbar:last-of-type` (0,2,1) and outranks it. */
-ion-header.mh-flat-header ion-toolbar:last-of-type {
+/* No iOS hairline under the last toolbar, the md shadow's twin: (0,2,3)
+   beats `.header-ios ion-toolbar:last-of-type` (0,2,1). */
+ion-tabs .ion-page > ion-header ion-toolbar:last-of-type {
   --border-width: 0;
 }
 
-ion-header.mh-flat-header ion-title {
+ion-tabs .ion-page > ion-header ion-title {
   padding-inline: var(--mh-row-gutter);
 }
 
 /* Less the 2px margin Ionic puts around each toolbar button, so the last
    button's edge, not its margin, lands on the gutter. */
-ion-header.mh-flat-header ion-buttons[slot='end'] {
+ion-tabs .ion-page > ion-header ion-buttons[slot='end'] {
   margin-inline-end: calc(var(--mh-row-gutter) - 0.125rem);
 }
 
-/* The back chevron (a page's back button, or search mode): its glyph, not
-   its tap area, starts on the gutter. An md toolbar button pads its glyph
-   by 0.75rem. */
-ion-header.mh-flat-header ion-buttons[slot='start'] {
+/* The back chevron: its glyph, not its tap area, starts on the gutter. An
+   md toolbar button pads its glyph by 0.75rem. */
+ion-tabs .ion-page > ion-header ion-buttons[slot='start'] {
   margin-inline-start: calc(var(--mh-row-gutter) - 0.75rem);
 }
 
-ion-header.mh-flat-header ion-searchbar {
+ion-tabs .ion-page > ion-header ion-searchbar {
   padding-inline: var(--mh-row-gutter);
 }
 
 /* Beside the back chevron the field starts after the button, not on the
    gutter, and tucks a little into the button's hit circle so the chevron
    reads as part of the field's row rather than apart from it. */
-ion-header.mh-flat-header ion-buttons[slot='start'] + ion-searchbar {
+ion-tabs .ion-page > ion-header ion-buttons[slot='start'] + ion-searchbar {
   padding-inline-start: 0;
   margin-inline-start: -0.25rem;
   /* The host is `width: 100%`; without the 0.25rem back the field would
@@ -59,6 +57,6 @@ ion-header.mh-flat-header ion-buttons[slot='start'] + ion-searchbar {
   width: calc(100% + 0.25rem);
 }
 
-ion-header.mh-flat-header .mh-chip-row {
+ion-tabs .ion-page > ion-header .mh-chip-row {
   padding-inline: var(--mh-row-gutter);
 }

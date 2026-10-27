@@ -12,7 +12,7 @@ There are two kinds of list, and every `ion-list` is one of them. [`theme/compon
 |---|---|---|
 | Looks like | iOS Mail "Mailboxes", WhatsApp settings and sheets | WhatsApp's chat list |
 | For | settings, details, options, verbs, short fixed sets | the content of a screen: conversations, people, search results, notifications, activity |
-| Shape | white cards with rounded corners on the slate page, inside `.mh-page` | white rows edge to edge, straight in `ion-content` |
+| Shape | slate cards with rounded corners on the page, inside `.mh-page` | rows edge to edge on the page, straight in `ion-content` |
 | Rows | one line, a small tile, a value or chevron | a large avatar and two lines, a title with its time and a preview with its badges |
 
 Grouped lists are described first; the flat list has its own section at the end. Both share the separator.
@@ -20,11 +20,16 @@ Grouped lists are described first; the flat list has its own section at the end.
 ## The card
 
 - A grouped list is `<ion-list [inset]="true" class="mh-card-list">`. Nothing else makes a card list: no hand-rolled bordered `div` around `ion-item`s, no `ion-list [inset]` without the class.
-- The card has no outline and a `--mh-radius-card` radius; its fill lifts it off the grey page. Never add a border to it.
+- The card has no outline and a `--mh-radius-card` radius; its fill lifts it off the page. Never add a border to it.
 - Place it with the page layout (`.mh-page`, `.mh-section`), never with a margin on the list.
-- The rows take the card's fill (`--ion-card-background`, set by the skin). In dark mode the page is the bars' grey (#1f1f1f) and cards step up to #2c2c2e; inside a sheet everything is one step higher (sheet #2c2c2e, cards #3a3a3c, see `surfaces-and-sheets.md`).
-- A flat list and its page paint `--mh-color-flat-surface`, never `--ion-card-background`: white in light, the page grey in dark.
-- A tab root made of cards (the Menu) still takes `mh-flat-header`, so its title and bell sit where the Messages tab puts them and no hairline closes the bar.
+- The card and its rows paint Ionic's `--ion-item-background`, which every surface context keeps equal to `--ion-card-background`; neither the skin nor a row sets a background of its own. The page and card colours per context (page, sheet) are in `surfaces-and-sheets.md`, "Surfaces".
+- A flat list lives only on a flat page and paints the page colour, `--ion-background-color` (`surfaces-and-sheets.md`, "Surfaces").
+
+## Text beside a list
+
+- A label over a list (`.mh-section-label`, or a `.mh-kicker` in `.mh-section`, `.mh-section-head` or `.mh-day-header`) is one look: small semibold in the muted ink, untracked (user decision, 2026-10-27). Don't add tracking or a colour to one.
+- Labels, notes and footnotes beside a list start on `--mh-row-gutter`, in line with the tiles and avatars. The theme does it (`layout.css`); don't pad them per page. A label over chips or a field keeps its own small inset.
+- A footnote under a list is a `.mh-footnote` inside the list's `.mh-section`, so the section gap binds it to the card. `.mh-helper` is the line under a field, not under a list.
 
 ## Rows
 
@@ -89,9 +94,9 @@ The WhatsApp chat list. First use: the Messages inbox ([`messages.html`](../../s
 ### The list and its page
 
 - A flat list is `<ion-list class="mh-flat-list">`, without `[inset]`. It sits straight in `ion-content`, outside `.mh-page`; the rows run edge to edge.
-- A flat screen carries `class="mh-flat-page"` on `ion-content` (from `layout.css`) for good, not bound to a signal: the surface is the screen's, not the list's. Its loading, empty and error states sit on the same white the rows do, so the page never changes colour under the reader (user decision, 2026-10-27).
-- A label over a flat list (search's "People", "Messages") is a `.mh-section-label` directly before the list. The skin moves it onto the row gutter.
-- The header over a flat list carries `class="mh-flat-header"` on `ion-header` ([`ion-header.css`](../../src/theme/components/ion-header.css)). It puts the title, the end buttons, the search field, the back chevron and the `.mh-chip-row` pills on `--mh-row-gutter`, so they line up with the avatars on the left and with the row times on the right. Don't pad these parts per page. It also drops Ionic's md header shadow: header and list are one white surface.
+- A flat screen carries `class="mh-flat-page"` on `ion-content` for good, not bound to a signal. It places the search notes under the field (`layout.css`); the surfaces are the same as any page's. The loading, empty and error states sit on the page the rows do.
+- A label over a flat list (search's "People", "Messages") is a `.mh-section-label` directly before the list (see "Text beside a list").
+- The header needs no class. Every app page's header ([`ion-header.css`](../../src/theme/components/ion-header.css)) puts the title, the end buttons, the search field, the back chevron and the `.mh-chip-row` pills on `--mh-row-gutter`, so they line up with the avatars on the left and with the row times on the right, and has no shadow or hairline. Don't pad these parts per page (user decision, 2026-10-27).
 - The first row of a flat list has a hairline above it as well (drawn by the skin, same inset as the separators). That line, not a shadow or a border on the header, is the seam between header and list.
 
 ### Rows
@@ -128,7 +133,7 @@ A flat list split into labelled groups (the notification days, search's People a
 
 ### Notifications
 
-The bell's list is a grouped flat list, after Apple Mail's inbox: one label per day (`dayDividerLabel`), no search field, the Filters / All / Unread strip in the `mh-flat-header`. A category filter drops the day labels and shows one run.
+The bell's list is a grouped flat list, after Apple Mail's inbox: one label per day (`dayDividerLabel`), no search field, the Filters / All / Unread strip in the header. A category filter drops the day labels and shows one run.
 
 - The leading item is the category's `mh-hex-avatar` at `size="lg"`, `tone="wash"`, since a notification has no person behind it.
 - The body is one line with an ellipsis. The full text is in the screen the row opens, or in the detail sheet.
@@ -136,7 +141,7 @@ The bell's list is a grouped flat list, after Apple Mail's inbox: one label per 
 
 ### Clients
 
-The coach's Clients tab is one flat list off `/clients`, laid out like the Messages inbox: title, bell and the honey "+" (invite) in the `mh-flat-header`, the search field always there under them, then the All / Active / Requests / Archived chips. There are no segments and no "Needs attention" lens: the roster (`/coach/roster`) is not read here (user decision, 2026-10-19). Requests are the Requests chip (PENDING); there is no header button, menu row or page for them (user decision, 2026-10-19). A pending row opens the request sheet ([`request-sheet`](../../src/app/main/clients/_sheets/request-sheet/request-sheet.html), an `mh-action-sheet`): who, how long it has waited, their message, then Accept / Decline for an incoming request or Resend / Withdraw for a sent invitation. Home's banner and a request notification open the tab on the chip with `?filter=requests`, and the Clients tab carries a red count of the requests waiting on the coach (`incoming` from `/clients/requests/pending/count`, never `count`, which includes the invitations the coach sent).
+The coach's Clients tab is one flat list off `/clients`, laid out like the Messages inbox: title, bell and the honey "+" (invite) in the header, the search field always there under them, then the All / Active / Requests / Archived chips. There are no segments and no "Needs attention" lens: the roster (`/coach/roster`) is not read here (user decision, 2026-10-19). Requests are the Requests chip (PENDING); there is no header button, menu row or page for them (user decision, 2026-10-19). A pending row opens the request sheet ([`request-sheet`](../../src/app/main/clients/_sheets/request-sheet/request-sheet.html), an `mh-action-sheet`): who, how long it has waited, their message, then Accept / Decline for an incoming request or Resend / Withdraw for a sent invitation. Home's banner and a request notification open the tab on the chip with `?filter=requests`, and the Clients tab carries a red count of the requests waiting on the coach (`incoming` from `/clients/requests/pending/count`, never `count`, which includes the invitations the coach sent).
 
 - Inviting is the header's honey "+", not a floating button. It opens the invite page below, not a sheet.
 - Opening search resets the chip to All: the pills fold away with the title, so a chip left on would narrow the results with nothing on screen saying so. A term under the API's floor gets a note under the header.
@@ -149,7 +154,7 @@ Inviting was a sheet with an `ion-segment` and it is a page now, [`invite-client
 - **One field, and what is typed decides the door.** A name lists People; an address adds an "Invite by email" row under its own label. There is no segment, no mode and no second screen. `isEmailQuery` gates the section (so a half-typed `ana@` can say what is wrong with it) and `inviteEmail` gates the row (so it can never offer an address `@IsEmail()` refuses). Both live in `invite.utils.ts`, covered by `clients.config.spec.ts`.
 - **The Invite button sends.** The decision is reversible one swipe away in the list, and a confirm step would make inviting three people at a gym nine taps instead of three. "Invite" is a real button (user decision, 2026-10-27): `ion-button.mh-row-action` (`ion-button.css`) in `slot="end"`, centred on the row, never inside a 1.5rem line, where its 2rem would push the 4.5rem row off the pixel grid. The row itself takes no taps, so each person is one control. Once sent, the button gives way to an `ion-badge` in the same slot: neutral "Sending", green "Invited". The email row uses the same button, which opens its sheet.
 - **Search notes sit under the field** (user decision, 2026-10-27): the start hint, the minimum-length note, an address error and the "only people you are not connected to" scope all come first in the content, before the Share link row or any results. On a flat screen a `.mh-note-block` takes the row gutter and hugs the field (`layout.css`).
-- **Share link or QR is a card**, like the Menu's account card (user decision, 2026-10-27): an `mh-card-list` with an `md` tile and a chevron, its edge on the row gutter beside the search field. A card on a flat screen fills with `--mh-color-flat-card` (the skin swaps it in), since the card's white would vanish on the white flat surface in light mode.
+- **Share link or QR is a card**, like the Menu's account card (user decision, 2026-10-27): an `mh-card-list` with an `md` tile and a chevron, its edge on the row gutter beside the search field. It is an ordinary card, slate on the white page like every card.
 - **The email door gets a sheet**, because it has something to confirm: the address in the shell's subtitle, an "Add a note" disclosure (the note is kept only here — nothing on mobile renders a coach's invite message in-app), the expiry line, then Send. The address is snapshotted when the sheet opens; the field behind it stays live.
 - **Leaving forces the list to reload, once.** `ClientsStore.reenter()` measures time since the last load, so the normal path — open the tab, invite, come back — lands inside its window and the new pending row would not appear. The invite page tells `ClientsRefreshService` (on every send, and on Done with the Requests chip), and the Clients page reads it in `ionViewWillEnter`, which every way back fires, with one load: a chip change reloads by itself, an unchanged chip gets a refresh. Done returns to the bare `/tabs/clients`.
 - **Never hand the list an instruction in the URL on the way back.** The chevron, the swipe and Android's back button all pop to the page's saved URL, query string included (only the browser's own back is popstate), so a `?filter=` or a reload flag left there is replayed on every later return from a client page: the chip snaps back under a coach who picked another, and the list reloads for nothing.
@@ -189,7 +194,7 @@ A screen with nothing to show says so through [`mh-empty-state`](../../src/app/_
 
 - The order is fixed — a `2xl` `mh-hex-avatar`, the heading at `--mh-text-xl`, the message, the action. Nothing else goes in it.
 - **The action is a plain `fill="clear"` button in `color="primary"`** — the brand honey straight from the palette, not the deep `mh-text-link` ink. There is no solid or outline variant; an empty screen has one thing left to do and the words are enough for it. The honey is light on a white page (2.05:1) and is being looked at.
-- The tile is the brand navy unless the screen means a hue, and it takes the base tone, not a wash: the page is itself a pale slate, so a washed grey tile disappears into it. An empty screen is not a status, and a load error destroys nothing, so it never turns red.
+- The tile is the brand navy unless the screen means a hue, and it takes the base tone, not a wash. An empty screen is not a status, and a load error destroys nothing, so it never turns red.
 - The message is one sentence. The block caps its own width at about thirty characters a line so it breaks into a short stack under the heading; don't pass a paragraph.
 - It fills the screen only where there is a screen to fill: `min-block-size: 100%` catches `ion-content`'s scroll box and resolves to nothing inside `.mh-page` or a sheet body, where the block keeps its natural height. The same component is both the whole-screen state and the one under a half-filled section, so don't wrap it in a spacer either way.
-- On a flat screen the block sits on the same white the rows do: `mh-flat-page` is permanent there, so an empty inbox and a full one are one surface (see "The list and its page").
+- The block sits on the page the rows do, so an empty inbox and a full one are one surface.

@@ -77,7 +77,7 @@ export class SearchHeaderFold {
 
   /**
    * The back chevron opens sideways, pushing the field over. It starts at the
-   * width that leaves the field where it was: in a flat header the chevron's
+   * width that leaves the field where it was: in an app header the chevron's
    * margin is the gutter less 0.75rem (`ion-header.css`), and the field sat
    * on the gutter, so 0.75rem more puts its start in the same place.
    */

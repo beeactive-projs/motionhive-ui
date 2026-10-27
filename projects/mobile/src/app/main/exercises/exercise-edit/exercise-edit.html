@@ -69,7 +69,7 @@
 </ion-content>
 
 @if (exercise()) {
-<ion-footer class="ion-no-border">
+<ion-footer>
   <ion-toolbar>
     <ion-button expand="block" [disabled]="!form.isValid() || saving()" (click)="save()">
       @if (saving()) {

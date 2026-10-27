@@ -11,19 +11,8 @@ ion-toolbar {
   --min-height: 4.375rem;
   --padding-start: 1rem;
   --padding-end: 0.5rem;
-  --border-width: 0 0 1px;
+  --border-width: 0 0 var(--mh-hairline);
   --border-color: var(--ion-border-color);
-}
-
-// Web's guest page is white. The app's slate-50 page exists so white cards
-// read on it; the auth pages have no cards, so they take the card surface.
-// Dark keeps the app's navy page.
-ion-content {
-  --background: var(--ion-card-background);
-}
-
-:host-context(.ion-palette-dark) ion-content {
-  --background: var(--ion-background-color);
 }
 
 // The honeycomb behind the page (`<div slot="fixed" class="honeycomb">`, with

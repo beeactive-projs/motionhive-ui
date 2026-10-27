@@ -18,11 +18,11 @@ The token tiers and the type scale are in `projects/mobile/CLAUDE.md`. These are
 - Red (`danger`) on an action means it destroys something: block, delete, remove, cancel, archive, leave, discard, sign out. A verb that is not destructive is never red, even if it concerns alerts or notifications (those are `info`). As a status, red stays for real failures and overdue or conflicting states, plus the small unread dots and the Clients tab's count of requests waiting on the coach.
 - Status colours are neutral or semantic. Soft status chips use the wash pair: `background: var(--ion-color-<name>-wash); color: var(--ion-color-<name>-wash-contrast)`.
 - A white glyph needs 3:1 on its tile. Sky 500 and Emerald 500 miss it; use `tone="shade"` for those where the glyph carries meaning.
-- Hairlines between rows use `--mh-color-separator`. `--mh-color-divider` is a soft fill (pills), not a line on a card. The chat composer and the other side's bubble take `--mh-color-bubble`.
+- Hairlines between rows use `--mh-color-separator`. `--mh-color-divider` is a soft fill (pills), not a line on a card. The chat composer and the other side's bubble take `--ion-card-background` (slate on the white flat page).
 - Dark mode is Ionic's palette class on `<html>`. A colour that must differ in dark mode is a token with its override in `variables.css`. Use a component-level `:host-context(.ion-palette-dark)` rule only for what no token expresses (the auth pages' honeycomb flips navy to honey and changes its opacity).
 
 ## Type
 
-- Sentence case for all visible text. `mh-kicker` is never uppercased: no `ion-text-uppercase` beside it, no `text-transform` on it. The kicker look comes from weight and `--mh-tracking-kicker`. Don't add new uppercase micro-labels.
+- Sentence case for all visible text. `mh-kicker` is never uppercased: no `ion-text-uppercase` beside it, no `text-transform` on it. The kicker look comes from weight and `--mh-tracking-kicker`, except a kicker worn as a section label, which is untracked (`layout.css`; `lists.md`, "Text beside a list"). Don't add new uppercase micro-labels.
 - `font-size` is always a `--mh-text-*` token, and dimensions sit on the 0.125rem grid (see CLAUDE.md). Off-grid literals like `0.7rem` or `0.8rem` are bugs; snap them to a token when you touch the file.
 - Secondary text is secondary by colour (`--ion-color-medium`) before size. A row's trailing value stays at the label's size.

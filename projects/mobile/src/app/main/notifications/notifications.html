@@ -1,6 +1,4 @@
-<!-- The flat header (as Messages, without the search field): back, title and
-     the ⋯ menu, then the filter strip, every part on the rows' gutter. -->
-<ion-header class="mh-flat-header" [translucent]="true">
+<ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" />
@@ -75,9 +73,8 @@
   }
 </ion-header>
 
-<!-- A flat list: the rows run edge to edge on white, grouped under day labels as
-     Mail groups its inbox. The empty and error states sit on the same white,
-     so the page never changes colour under the reader. -->
+<!-- A flat list: the rows run edge to edge on the page, grouped under day labels
+     as Mail groups its inbox. The empty and error states sit on the same page. -->
 <ion-content [fullscreen]="true" class="mh-flat-page">
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />

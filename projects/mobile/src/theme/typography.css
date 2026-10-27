@@ -21,9 +21,9 @@ ion-label[class] :is(h1, h2, h3) {
 
 /* A label's second line is the muted ink. Ionic's iOS default is a 60% step
    of the text colour, about 3:1 on the dark card and under AA; medium is
-   4.76:1 on white and about 6:1 on the dark card. It also reaches a `p`
-   nested in a wrapper (`.mh-row-line`), which Ionic leaves in the body ink.
-   A coloured item's label (`.in-item-color`) still inherits its colour:
+   6.9:1 on the light card and about 5.4:1 on the dark one. It also reaches
+   a `p` nested in a wrapper (`.mh-row-line`), which Ionic leaves in the body
+   ink. A coloured item's label (`.in-item-color`) still inherits its colour:
    Ionic's rule for it outranks this one. */
 ion-label[class] p {
   color: var(--ion-color-medium);
@@ -67,10 +67,11 @@ h1 {
   letter-spacing: var(--mh-tracking-kicker);
 }
 
-/* The mono label that titles a group of rows ("PEOPLE", "CONVERSATION").
-   Every list screen has a few; ion-list-header is a row with its own type
-   scale, not a standalone label. Inside `.mh-section` the block padding is
-   neutralized — the section owns the spacing there (see layout.css). */
+/* The label that titles a group of rows ("People", "Messages"). Every list
+   screen has a few; ion-list-header is a row with its own type scale, not a
+   standalone label. Inside `.mh-section` the block padding is neutralized —
+   the section owns the spacing there — and over a list the inline padding is
+   the row gutter (see layout.css). */
 .mh-section-label {
   padding: 1rem 0.375rem 0.375rem;
   color: var(--ion-color-medium);
@@ -91,10 +92,6 @@ h1 {
   gap: 0.375rem;
   padding: 0.75rem 0 0.5rem;
   background: var(--ion-background-color);
-}
-
-.mh-day-header .mh-kicker {
-  color: var(--ion-color-medium);
 }
 
 .mh-day-header.today .mh-kicker {

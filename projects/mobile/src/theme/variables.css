@@ -281,47 +281,24 @@
   /*
    * The danger slot (red 500) is 3.76:1 on white: enough for an outline,
    * short of AA for text. Field errors and invalid labels use this step,
-   * 4.83:1 on white and 4.62:1 on the slate page.
+   * 4.83:1 on the white page and 4.4:1 on slate-100 (a card, a sheet).
    */
   --mh-color-danger-deep: var(--mh-danger-600);
 
   /*
-   * The hairline between rows inside a card — one step lighter than
-   * `--ion-border-color`, which outlines the card itself.
+   * A soft fill one step off the card (pills, wells, the search field), as
+   * #3a3a3c is on the dark card.
    */
-  --mh-color-divider: var(--mh-slate-100);
+  --mh-color-divider: var(--mh-slate-200);
 
   /*
    * The hairline between rows of a grouped list (ion-list.css). Not the
    * divider above: that one doubles as a soft fill (pills) and is
-   * too pale to read as a line on a white card. Mixed from the ink rather
+   * too pale to read as a line on a card. Mixed from the ink rather
    * than a ramp step so it sits at the same weight on any card fill, light
    * or dark: about 1.2:1 against the card, the weight of an iOS separator.
    */
   --mh-color-separator: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-
-  /*
-   * The surface of a flat screen (`mh-flat-page`, `mh-flat-list`: the
-   * Messages inbox and thread). In light it is the card's white; in dark the
-   * page's grey, since there the cards step lighter than the page.
-   */
-  --mh-color-flat-surface: var(--ion-card-background);
-
-  /*
-   * The other side's chat bubble on that flat surface. In light the surface
-   * is the card's white, so the bubble steps down to the divider grey; in
-   * dark it is the page's grey, so the bubble takes the card's lighter grey,
-   * the same fill as the grouped rows in the chat's details sheet.
-   */
-  --mh-color-bubble: var(--mh-color-divider);
-
-  /*
-   * A grouped card set on that flat surface (the invite page's "Share link
-   * or QR"). Same steps as the bubble: a white card on the white surface
-   * would have no edge in light, so it takes the divider grey; in dark it
-   * keeps the card's grey, which already lifts off the page.
-   */
-  --mh-color-flat-card: var(--mh-color-divider);
 
   /*
    * An idle filter chip in a `.mh-chip-row` strip or a filter sheet's
@@ -351,18 +328,20 @@
 
   /*
    * ── Tier 1: Ionic global tokens ─────────────────────────────────────────
-   * Light surfaces — slate page, white cards. Ionic's default light
-   * background is pure white, which makes a white card invisible; the
-   * design's card-based screens need the page one step darker than the
-   * things sitting on it.
+   * Light surfaces mirror dark: one white page for every screen and its
+   * bars, cards one slate step off it, a sheet one step further (its block
+   * at the end of this file). Surfaces read only these: page and bars
+   * `--ion-background-color`, cards and bubbles `--ion-card-background`.
+   * The border sits a step above the sheet's cards, as #48484a does in dark,
+   * so an outline still shows on them.
    */
-  --ion-background-color: var(--mh-slate-100);
-  --ion-background-color-rgb: 241, 245, 249;
-  --ion-card-background: #ffffff;
-  --ion-item-background: #ffffff;
-  --ion-toolbar-background: #ffffff;
-  --ion-tab-bar-background: #ffffff;
-  --ion-border-color: var(--mh-slate-200);
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-card-background: var(--mh-slate-100);
+  --ion-item-background: var(--mh-slate-100);
+  --ion-toolbar-background: var(--ion-background-color);
+  --ion-tab-bar-background: var(--ion-background-color);
+  --ion-border-color: var(--mh-slate-300);
 
   /*
    * Ink is Midnight Navy, not black. Ionic leaves `--ion-text-color`
@@ -467,15 +446,16 @@
   /*
    * Neutrals — Slate, not Ionic's default grays. The surfaces above already
    * come from the Slate ramp, so Ionic's #92949c / #222428 read as a second,
-   * colder gray sitting on top of them. Steps 500 and 700, with their
-   * neighbours as shade/tint.
+   * colder gray sitting on top of them. Steps 600 and 700, with their
+   * neighbours as shade/tint. Medium is the muted ink on the slate cards:
+   * 500 is 4.3:1 there, under AA; 600 is 6.9:1 (6.2:1 on a sheet's cards).
    */
-  --ion-color-medium: var(--mh-slate-500);
-  --ion-color-medium-rgb: 100, 116, 139;
+  --ion-color-medium: var(--mh-slate-600);
+  --ion-color-medium-rgb: 71, 85, 105;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: var(--mh-slate-600);
-  --ion-color-medium-tint: var(--mh-slate-400);
+  --ion-color-medium-shade: var(--mh-slate-700);
+  --ion-color-medium-tint: var(--mh-slate-500);
 
   --ion-color-dark: var(--mh-slate-700);
   --ion-color-dark-rgb: 51, 65, 85;
@@ -512,7 +492,7 @@
   --ion-color-teal-wash-contrast: var(--mh-teal-700);
   --ion-color-coral-wash: var(--mh-coral-100);
   --ion-color-coral-wash-contrast: var(--mh-coral-700);
-  --ion-color-medium-wash: var(--mh-slate-100);
+  --ion-color-medium-wash: var(--mh-slate-200);
   --ion-color-medium-wash-contrast: var(--mh-slate-600);
   --ion-color-dark-wash: var(--mh-slate-200);
   --ion-color-dark-wash-contrast: var(--mh-navy-900);
@@ -709,22 +689,15 @@
   --ion-background-color-rgb: 31, 31, 31;
   --ion-card-background: #2c2c2e;
   --ion-item-background: #2c2c2e;
-  --ion-toolbar-background: #1f1f1f;
-  --ion-tab-bar-background: #1f1f1f;
+  --ion-toolbar-background: var(--ion-background-color);
+  --ion-tab-bar-background: var(--ion-background-color);
 
   /* Lines are neutral grey like the surfaces, never the old navy. The
      border is iOS's dark grey, visible on the card as well as the page;
      the divider, a soft fill as much as a line, is the step between it and
-     the card. The bars' hairlines take the list separator, so the header,
-     the tab bar and the rows draw one weight of line. */
+     the card. The bars draw no line at all (ion-header/footer/tab-bar.css). */
   --ion-border-color: #48484a;
   --mh-color-divider: #3a3a3c;
-  --ion-toolbar-border-color: var(--mh-color-separator);
-  --ion-tab-bar-border-color: var(--mh-color-separator);
-
-  --mh-color-flat-surface: var(--ion-background-color);
-  --mh-color-bubble: var(--ion-card-background);
-  --mh-color-flat-card: var(--ion-card-background);
 
   /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
      and a sheet scales the scrim by how far it is open. */
@@ -732,18 +705,30 @@
 }
 
 /*
- * A sheet in dark mode is raised one step, as iOS draws its elevated
- * surfaces: on the page grey it would have no edge but its corners. Its
- * cards step up with it so they still lift off the sheet. The derived
- * surfaces are restated because a `var()` resolves where it is declared
- * (`<html>`), not where it is read.
+ * A sheet is raised one step above the page, as iOS draws its elevated
+ * surfaces: it takes the card's step and its cards the next, so they still
+ * lift off it. The toolbar is restated because a `var()` resolves where it
+ * is declared (`<html>`), not where it is read.
  */
+ion-modal.mh-sheet {
+  --ion-background-color: var(--mh-slate-100);
+  --ion-background-color-rgb: 241, 245, 249;
+  --ion-card-background: var(--mh-slate-200);
+  --ion-item-background: var(--mh-slate-200);
+  --ion-toolbar-background: var(--mh-slate-100);
+}
+
 .ion-palette-dark ion-modal.mh-sheet {
   --ion-background-color: #2c2c2e;
   --ion-background-color-rgb: 44, 44, 46;
   --ion-card-background: #3a3a3c;
   --ion-item-background: #3a3a3c;
-  --mh-color-flat-surface: #2c2c2e;
-  --mh-color-bubble: #3a3a3c;
-  --mh-color-flat-card: #3a3a3c;
+  --ion-toolbar-background: #2c2c2e;
+
+  /* The muted ink steps up with the surface: slate-400 is 4.4:1 on these
+     cards, under AA; slate-300 is 7.6:1. */
+  --ion-color-medium: var(--mh-slate-300);
+  --ion-color-medium-rgb: 203, 213, 225;
+  --ion-color-medium-shade: var(--mh-slate-400);
+  --ion-color-medium-tint: var(--mh-slate-200);
 }
