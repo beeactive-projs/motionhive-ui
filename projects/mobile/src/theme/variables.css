@@ -234,9 +234,41 @@
   --mh-row-gutter: 0.875rem;
 
   /*
-   * Border widths — the only sanctioned px values besides 1px hairlines.
+   * A row's vertical padding. The grouped row's 0.5rem sits outside Ionic's
+   * `--min-height` (2rem), which is where the 3rem row comes from; the flat
+   * list overrides it with its own, wider step.
+   */
+  --mh-row-pad: 0.5rem;
+  --mh-flat-row-pad: 0.75rem;
+
+  /*
+   * One line of a flat-list row. A row is exactly two of these plus its
+   * padding above and below — 0.75 + 1.5 + 1.5 + 0.75 = 4.5rem — and the
+   * number has to be exact: left to the type's own leading a row came out
+   * 72.047px, the fraction piled up row on row, and the separators that
+   * straddled two device pixels drew visibly thicker.
+   */
+  --mh-row-line: 1.5rem;
+
+  /*
+   * The page's layout primitives (layout.css). Components carry no margins;
+   * a screen opts into these and gets the app's one gutter and one rhythm.
+   */
+  --mh-page-gutter: 1rem; /* the scrolling column's side padding */
+  --mh-page-rhythm: 0.75rem; /* the gap between blocks down a page */
+  --mh-section-gap: 0.375rem; /* binds a label to the block it names */
+  /*
+   * Strips that sit wider than the page gutter: the chip row above a list and
+   * the call-to-action bar under it, both of which may close against a
+   * toolbar hairline and would read as clipped flush against one.
+   */
+  --mh-bar-gutter: 1.25rem;
+
+  /*
+   * Border widths — the only sanctioned px values in the project.
    * Everything else is a rem multiple of 0.125.
    */
+  --mh-hairline: 1px; /* every rule, separator and control outline */
   --mh-ring-width: 2px; /* focus/danger ring, avatar cutout ring */
   --mh-spine-width: 3px; /* left accent spine (session rows, day rail) */
 
@@ -282,6 +314,14 @@
    * the same fill as the grouped rows in the chat's details sheet.
    */
   --mh-color-bubble: var(--mh-color-divider);
+
+  /*
+   * A grouped card set on that flat surface (the invite page's "Share link
+   * or QR"). Same steps as the bubble: a white card on the white surface
+   * would have no edge in light, so it takes the divider grey; in dark it
+   * keeps the card's grey, which already lifts off the page.
+   */
+  --mh-color-flat-card: var(--mh-color-divider);
 
   /*
    * An idle filter chip in a `.mh-chip-row` strip or a filter sheet's
@@ -684,6 +724,7 @@
 
   --mh-color-flat-surface: var(--ion-background-color);
   --mh-color-bubble: var(--ion-card-background);
+  --mh-color-flat-card: var(--ion-card-background);
 
   /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
      and a sheet scales the scrim by how far it is open. */
@@ -704,4 +745,5 @@
   --ion-item-background: #3a3a3c;
   --mh-color-flat-surface: #2c2c2e;
   --mh-color-bubble: #3a3a3c;
+  --mh-color-flat-card: #3a3a3c;
 }

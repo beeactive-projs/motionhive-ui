@@ -27,10 +27,10 @@ import {
  *   `clients.icons.ts`    the icon registry every screen here registers
  *   `clients.filters.ts`  the status chips and the search floor
  *   `roster-labels.ts`    plain language over the roster numbers (client detail)
- *   `invite.utils.ts`     the invite sheet's modes, expiry and link
+ *   `invite.utils.ts`     the invite page's expiry, link, email gate and row states
  *   `requests.utils.ts`   the request sheet's date labels
  * Address validation lives in core (`email.utils`) — the web invite dialog
- * has to agree with the sheet here about what a valid address is.
+ * has to agree with the page here about what a valid address is.
  */
 
 /**

@@ -33,8 +33,8 @@ import { RecentPerson, SUGGESTION_LIMIT } from '../../../_shared/config/recent-s
 import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchbar-autofocus.directive';
 import { injectPeopleSearch } from '../../../_shared/utils/people-search';
 import { ConversationRow } from '../_components/conversation-row/conversation-row';
-import { PersonRow } from '../_components/person-row/person-row';
-import { RowSkeleton } from '../_components/row-skeleton/row-skeleton';
+import { PersonRow } from '../../../_shared/components/person-row/person-row';
+import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import {
   MESSAGING_ICONS,
   frequentContacts,
@@ -139,11 +139,6 @@ export class NewMessage implements ViewWillEnter {
 
   readonly isSearchEmpty = computed(
     () => this.people.isEmpty() && this.conversations().length === 0,
-  );
-
-  /** Rows on screen take the list's surface; the hint and empty state keep the page's. */
-  readonly showList = computed(() =>
-    this.people.isActive() ? !this.isSearchEmpty() : !this.isStartEmpty(),
   );
 
   constructor() {

@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ClientRequestTypes,
+  GroupMember,
   InstructorClient,
   InstructorClientStatuses,
   RosterClient,
   SIGNUP_URL,
 } from 'core';
 
+import { daysBetween } from '../../_shared/utils/dates';
 import {
   CLIENT_ACTIONS,
   ClientActionIds,
@@ -34,8 +36,18 @@ import {
   matchesClientQuery,
 } from './clients.filters';
 import { CLIENT_ICONS } from './clients.icons';
-import { inviteLink } from './invite.utils';
-import { daysBetween, receivedLabel, sentMetaLabel } from './requests.utils';
+import { candidatesFrom } from './invite-client/group-suggestions.store';
+import {
+  INVITE_EXPIRY_DAYS,
+  INVITE_MESSAGE_MAX_LENGTH,
+  InviteRowStates,
+  inviteEmail,
+  inviteLink,
+  inviteRowState,
+  isDuplicateInvite,
+  isEmailQuery,
+} from './invite.utils';
+import { receivedLabel, sentMetaLabel } from './requests.utils';
 import { adherenceLabel, lastActiveLabel } from './roster-labels';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -286,9 +298,9 @@ describe('client rows', () => {
   });
 });
 
-describe('invite sheet', () => {
+describe('invite page', () => {
   // Address validation moved to core (`email.utils`), next to `client.utils`:
-  // the web invite dialog has to agree with this sheet about what a valid
+  // the web invite dialog has to agree with this page about what a valid
   // address is. Its cases live in `email.utils.spec.ts`.
 
   // The link must be the web app's signup page — inside the WebView,
@@ -296,6 +308,138 @@ describe('invite sheet', () => {
   it('builds the invite link on the web signup address', () => {
     expect(inviteLink('abc123')).toBe(`${SIGNUP_URL}?token=abc123`);
     expect(inviteLink('a b/c')).toBe(`${SIGNUP_URL}?token=a%20b%2Fc`);
+  });
+
+  // The page's copy promises a window the BE owns. This said 14 once, while
+  // the Requests row rendered the server's own `expiresAt` saying 30.
+  it('states the expiry the API actually sets', () => {
+    expect(INVITE_EXPIRY_DAYS).toBe(30);
+  });
+
+  // The field's `maxlength` and the DTO's ceiling are the same number or the
+  // counter is decoration — same contract as NOTES_MAX_LENGTH.
+  it('caps the note at one named length', () => {
+    expect(INVITE_MESSAGE_MAX_LENGTH).toBe(500);
+  });
+
+  // Whether the email door exists at all. Deliberately loose: it only decides
+  // whether to show the section, and a half-typed address gets to say why it
+  // is not valid yet rather than silently offering nothing.
+  it('tells an attempted address apart from a name', () => {
+    expect(isEmailQuery('ana')).toBe(false);
+    expect(isEmailQuery('ana popescu')).toBe(false);
+    expect(isEmailQuery('')).toBe(false);
+    expect(isEmailQuery('ana@')).toBe(true);
+    expect(isEmailQuery(' ana@x.com ')).toBe(true);
+    // A handle, not a broken address: the `@` needs a local part before it.
+    expect(isEmailQuery('@motionhive')).toBe(false);
+    // Whitespace means they are still typing a name.
+    expect(isEmailQuery('ana @x.com')).toBe(false);
+  });
+
+  it('offers only an address the API will accept', () => {
+    expect(inviteEmail('ana@example.com')).toBe('ana@example.com');
+    expect(inviteEmail('ana@')).toBeNull();
+    expect(inviteEmail('ana')).toBeNull();
+    // Trimmed, never lowercased: the BE normalises, and a UI that rewrites
+    // what someone typed looks like it misheard them.
+    expect(inviteEmail('  Ana@Example.com  ')).toBe('Ana@Example.com');
+    // The 254-character ceiling comes from core, so the row can never offer
+    // what `@IsEmail()` refuses.
+    expect(inviteEmail(`${'a'.repeat(250)}@example.com`)).toBeNull();
+  });
+
+  describe('row state', () => {
+    const invited = new Set(['u-1']);
+
+    it('starts idle and follows the send', () => {
+      expect(inviteRowState('u-2', invited, null)).toBe(InviteRowStates.Idle);
+      expect(inviteRowState('u-2', invited, 'u-2')).toBe(InviteRowStates.Sending);
+      expect(inviteRowState('u-1', invited, null)).toBe(InviteRowStates.Invited);
+    });
+
+    // A response landing after the set has been written would otherwise put
+    // a row that is demonstrably done back into "Sending", and leave it there.
+    it('keeps an invited row invited even while a send is tracked', () => {
+      expect(inviteRowState('u-1', invited, 'u-1')).toBe(InviteRowStates.Invited);
+    });
+  });
+
+  // Already invited is not a failure: the row should settle on the truth
+  // rather than a button that will keep failing. It matters because the
+  // people search may not exclude PENDING relationships.
+  it('tells a duplicate invitation apart from a real failure', () => {
+    expect(isDuplicateInvite({ status: 409 })).toBe(true);
+    expect(isDuplicateInvite({ status: 400 })).toBe(false);
+    expect(isDuplicateInvite({ status: 500 })).toBe(false);
+    expect(isDuplicateInvite(null)).toBe(false);
+    expect(isDuplicateInvite('conflict')).toBe(false);
+  });
+
+  describe('group suggestions', () => {
+    const member = (overrides: Partial<GroupMember> = {}): GroupMember =>
+      ({
+        id: 'm-1',
+        groupId: 'g-1',
+        userId: 'u-1',
+        role: 'MEMBER',
+        isOwner: false,
+        sharedHealthInfo: false,
+        nickname: null,
+        joinedAt: '2026-01-01T00:00:00.000Z',
+        leftAt: null,
+        user: {
+          id: 'u-1',
+          firstName: 'Cristi',
+          lastName: 'Munteanu',
+          handle: 'cristi',
+          avatarUrl: undefined,
+        },
+        ...overrides,
+      }) as GroupMember;
+
+    it('offers a group member who is not a client yet', () => {
+      expect(candidatesFrom([member()])).toEqual([
+        {
+          id: 'u-1',
+          firstName: 'Cristi',
+          lastName: 'Munteanu',
+          handle: 'cristi',
+          avatarUrl: null,
+        },
+      ]);
+    });
+
+    it('leaves out people who are already clients', () => {
+      expect(candidatesFrom([member({ isClient: true })])).toEqual([]);
+    });
+
+    // The coach owns their own groups, so without this the first suggestion
+    // a coach sees is an invitation to themselves.
+    it('leaves out the coach themselves', () => {
+      expect(candidatesFrom([member()], 'u-1')).toEqual([]);
+    });
+
+    // A member the API did not expand has no name to draw.
+    it('skips a member with no user attached', () => {
+      expect(candidatesFrom([member({ user: undefined })])).toEqual([]);
+    });
+
+    it('offers someone once however many groups they share', () => {
+      const rows = [member(), member({ id: 'm-2', groupId: 'g-2' })];
+      expect(candidatesFrom(rows).map((person) => person.id)).toEqual(['u-1']);
+    });
+
+    it('caps the list', () => {
+      const rows = Array.from({ length: 5 }, (_, i) =>
+        member({
+          id: `m-${i}`,
+          userId: `u-${i}`,
+          user: { id: `u-${i}`, firstName: 'A', lastName: 'B', handle: null } as GroupMember['user'],
+        }),
+      );
+      expect(candidatesFrom(rows, null, 3)).toHaveLength(3);
+    });
   });
 });
 
@@ -305,7 +449,7 @@ describe('search floor', () => {
   // back as the whole directory under a search box reading `a`. The floor
   // here is what tells the store to hold the term back and narrow in memory
   // instead, and it has to match the API's.
-  it('matches the minimum the API and the invite sheet both use', () => {
+  it('matches the minimum the API and the invite page both use', () => {
     expect(MIN_SEARCH_LENGTH).toBe(2);
   });
 });

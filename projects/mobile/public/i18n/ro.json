@@ -362,9 +362,11 @@
     },
     "empty": {
       "byEmailHint": "Merge și înainte să se înscrie",
+      "byEmailTitle": "Invită prin email",
       "cta": "Invită primul client",
       "message": "Invită oamenii pe care îi antrenezi deja sau așteaptă cereri. Oricine de pe MotionHive te poate găsi în Descoperă și îți poate cere să vă conectați.",
-      "onPlatformHint": "Deja pe MotionHive",
+      "onPlatformHint": "Are deja un cont",
+      "onPlatformTitle": "Caută pe MotionHive",
       "title": "Niciun client încă"
     },
     "filters": {
@@ -373,36 +375,64 @@
       "archived": "Arhivați",
       "requests": "Cereri"
     },
-    "inviteClient": "Invită un client",
-    "inviteSheet": {
-      "byEmail": "Invită prin email",
-      "emailHint": "Va primi un email cu un link ca să se înscrie și să se conecteze cu tine.",
-      "emailLabel": "Adresă de email",
-      "emailPlaceholder": "client@example.com",
+    "invite": {
+      "emailSheet": {
+        "addNote": "Adaugă o notă",
+        "body": "Va primi un email cu un link ca să se înscrie și să se conecteze cu tine.",
+        "hideNote": "Ascunde nota",
+        "noteLabel": "Notă",
+        "notePlaceholder": "O notă personală de inclus",
+        "title": "Invită prin email"
+      },
       "expiry": "Invitațiile expiră după {count, plural, one {# zi} few {# zile} other {# de zile}}.",
-      "messageLabel": "Mesaj",
-      "messagePlaceholder": "O notă personală (opțional)",
+      "hint": "Caută pe oricine de pe MotionHive sau scrie o adresă de email ca să inviți pe cineva care nu e încă aici.",
+      "inviteAction": "Invită",
+      "inviteEmailRowLabel": "Invită {email} prin email",
+      "inviteRowLabel": "Invită {name}",
+      "invited": "Invitat",
+      "linkRow": {
+        "hint": "Îl scanează, pe loc",
+        "title": "Trimite linkul sau codul QR"
+      },
+      "linkSheet": {
+        "copy": "Copiază linkul",
+        "fullScreen": "Arată codul QR pe tot ecranul",
+        "hint": "Linkul deschide profilul tău public, unde poate vedea ce oferi și te poate contacta.",
+        "noHandle": {
+          "action": "Alege un nume de utilizator",
+          "message": "Linkul tău se construiește din numele de utilizator, așa că ai nevoie de unul ca să-l poți trimite.",
+          "title": "Niciun nume de utilizator"
+        },
+        "scanTitle": "Scanează cu camera telefonului",
+        "share": "Trimite linkul",
+        "title": "Trimite linkul sau codul QR"
+      },
       "minChars": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}}.",
       "noResults": {
-        "message": "Verifică scrierea sau încearcă adresa de email.",
+        "message": "Verifică scrierea sau scrie adresa lui de email.",
         "title": "N-am găsit pe nimeni"
       },
-      "onPlatform": "Caută pe platformă",
+      "notOnPlatform": "Nu e încă pe MotionHive",
+      "scope": "Apar doar persoanele cu care nu ești deja conectat.",
       "searchLabel": "Caută persoane",
-      "searchPlaceholder": "Caută după nume sau email",
-      "searchScope": "Apar doar utilizatorii platformei cu care nu ești deja conectat.",
+      "searchPlaceholder": "Caută după nume sau scrie un email",
+      "sectionEmail": "Invită prin email",
+      "sectionGroups": "Din grupurile tale",
+      "sectionPeople": "Persoane",
       "send": "Trimite invitația",
-      "sendTo": "Trimite invitația · {name}",
+      "sending": "Se trimite",
       "sent": {
         "message": "Am trimis la {email} un link ca să se înscrie și să se conecteze cu tine. Poți să-l trimiți și tu.",
         "shareLink": "Distribuie linkul de invitație",
         "title": "Invitație trimisă"
       },
+      "sentAnnouncement": "Invitație trimisă către {name}",
       "share": {
         "text": "Vino pe MotionHive ca să-ți planificăm antrenamentele într-un singur loc.",
         "title": "Vino alături de mine pe MotionHive"
       }
     },
+    "inviteClient": "Invită un client",
     "list": {
       "filterByStatus": "Filtrează clienții după status",
       "loadError": "Clienții nu au putut fi încărcați",
@@ -453,6 +483,7 @@
     },
     "thisPerson": "această persoană",
     "toast": {
+      "alreadyInvited": "Are deja o invitație de la tine.",
       "archiveFailed": "Clientul nu a putut fi arhivat.",
       "archived": "Client arhivat",
       "invitationResent": "Invitație retrimisă",
@@ -469,6 +500,51 @@
       "unarchiveFailed": "Clientul nu a putut fi dezarhivat.",
       "unarchived": "Client dezarhivat",
       "withdrawFailed": "Invitația nu a putut fi retrasă."
+    }
+  },
+  "coaches": {
+    "aCoach": "un antrenor",
+    "actions": {
+      "accept": "Acceptă invitația",
+      "decline": "Refuză invitația",
+      "leaveEllipsis": "Încheie colaborarea…",
+      "message": "Mesaj",
+      "viewProfile": "Vezi profilul"
+    },
+    "confirm": {
+      "leave": {
+        "body": "Îți păstrezi istoricul, iar el și-l păstrează pe al lui. Nu va fi anunțat, iar oricare dintre voi poate relua mai târziu.",
+        "confirm": "Încheie colaborarea",
+        "title": "Închei colaborarea cu {name}?",
+        "titleFallback": "Închei această colaborare?"
+      }
+    },
+    "empty": {
+      "cta": "Caută un antrenor",
+      "message": "Când un antrenor te invită, invitația te așteaptă aici. Poți căuta și tu unul.",
+      "title": "Niciun antrenor deocamdată"
+    },
+    "loadError": "Nu am putut încărca antrenorii",
+    "row": {
+      "invited": {
+        "daysAgo": "Te-a invitat acum {count, plural, one {# zi} few {# zile} other {# de zile}}",
+        "today": "Te-a invitat azi",
+        "yesterday": "Te-a invitat ieri"
+      },
+      "since": "Te antrenează din {date}"
+    },
+    "sections": {
+      "invitations": "Invitații",
+      "yours": "Antrenorii tăi"
+    },
+    "title": "Antrenorii mei",
+    "toast": {
+      "acceptFailed": "Invitația nu a putut fi acceptată",
+      "accepted": "{name} îți este acum antrenor",
+      "declineFailed": "Invitația nu a putut fi refuzată",
+      "declined": "Invitație refuzată",
+      "leaveFailed": "Colaborarea nu a putut fi încheiată",
+      "left": "Colaborare încheiată"
     }
   },
   "discover": {
@@ -1222,6 +1298,7 @@
     "frequentContacts": "Contacte frecvente",
     "inbox": {
       "caughtUp": {
+        "action": "Vezi toate mesajele",
         "heading": "Ești la zi",
         "message": "Nu ai mesaje necitite."
       },
@@ -1495,10 +1572,12 @@
     "group": "Grup",
     "groups": "Grupuri",
     "history": "Istoric",
+    "inviteClient": "Invită client",
     "invoice": "Factură",
     "manageGroup": "Gestionează grupul",
     "manageSessions": "Gestionează sesiunile",
     "messages": "Mesaje",
+    "myCoaches": "Antrenorii mei",
     "mySessions": "Sesiunile mele",
     "newExercise": "Exercițiu nou",
     "newGroup": "Grup nou",

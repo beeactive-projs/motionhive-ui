@@ -164,7 +164,7 @@
   } @else if (isFilteredEmpty()) {
   <mh-empty-state icon="calendar-outline" [heading]="'empty.nothingMatches' | translate"
     [message]="'sessions.agenda.noMatch.message' | translate" [actionLabel]="'button.clearFilters' | translate"
-    actionFill="outline" (action)="clearFilters()" />
+    (action)="clearFilters()" />
   } @else if (view() === 'day') {
   <mh-day-rail [instances]="dayInstances()" (select)="open($event)" (pickHour)="createAt($event)" />
   } @else {

@@ -1,14 +1,15 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonItem, IonLabel } from '@ionic/angular/standalone';
 
-import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { RecentPerson } from '../../../../_shared/config/recent-searches.config';
-import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
+import { HexAvatar } from '../hex-avatar/hex-avatar';
+import { RecentPerson } from '../../config/recent-searches.config';
+import { avatarToneFor } from '../../utils/avatar-tone.utils';
 
 /**
  * One person in a flat list: avatar, name, and the line under it (a handle,
- * "Your coach"). The people rows of the inbox search and the new-message
- * page, so the same person reads the same on both.
+ * "Your coach", "Invited you today"). The people rows of the inbox search,
+ * the new-message page and the coaches page, so the same person reads the
+ * same everywhere.
  */
 @Component({
   selector: 'mh-person-row',

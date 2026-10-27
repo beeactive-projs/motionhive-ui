@@ -1,3 +1,40 @@
-ion-icon {
-  font-size: var(--mh-icon-xl);
+// One centred column, the way WhatsApp draws an empty screen: the tile carries
+// the weight, the action is a plain link rather than a button.
+//
+// `min-block-size: 100%` fills only where the parent has a real height — the
+// scroll box of an `ion-content`, which is the whole of this block's screen.
+// Inside `.mh-page` or a sheet body the parent's height is auto, the
+// percentage resolves to none, and the block falls back to its own height.
+:host {
+  display: flex;
+  min-block-size: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem var(--mh-page-gutter);
+  text-align: center;
+}
+
+h2 {
+  margin: 1.5rem 0 0;
+  font-size: var(--mh-text-xl);
+}
+
+// About thirty characters to the line, so the message breaks into a short
+// stack under the heading instead of running the width of the screen.
+p {
+  max-inline-size: 20rem;
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+  text-wrap: pretty;
+}
+
+// The brand colour straight from the palette, not the deep ink `mh-text-link`
+// uses: honey on the page surface is a light 2.05:1, so this one is being
+// looked at before it settles.
+ion-button {
+  margin: 1.25rem 0 0;
+  font-weight: 600;
 }

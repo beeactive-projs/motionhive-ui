@@ -23,6 +23,13 @@ export function coachStackOf(url: string): CoachStack {
   return url.startsWith(CoachStacks.Programs) ? CoachStacks.Programs : CoachStacks.Clients;
 }
 
+/**
+ * The invite page. Only the Clients stack has one: it is reached from that
+ * tab's header and its empty state, and inviting from a plan's roster would
+ * leave back with nothing to pop.
+ */
+export const CLIENT_INVITE_PATH = `${CoachStacks.Clients}/invite`;
+
 /** The client page's own path, as router commands. */
 export function clientPath(stack: CoachStack, clientId: string): string[] {
   return stack === CoachStacks.Programs ? [stack, 'client', clientId] : [stack, clientId];

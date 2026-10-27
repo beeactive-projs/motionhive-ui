@@ -10,7 +10,7 @@ const DEBOUNCE_MS = 300;
 const LIMIT = 20;
 
 /**
- * Narrowing the directory. The inbox searches everyone; the invite sheet wants
+ * Narrowing the directory. The inbox searches everyone; the invite page wants
  * trainees only, and only ones the coach is not already connected to.
  */
 export interface PeopleSearchOptions {
@@ -34,7 +34,7 @@ export interface PeopleSearch {
 
 /**
  * Debounced people lookup against `/users/search`, shared by the inbox search,
- * the new-message page and the clients invite sheet.
+ * the new-message page and the clients invite page.
  *
  * `switchMap` matters here: a fast typist fires several requests and only the
  * last one's results may land, or an abandoned query overwrites a newer one.

@@ -76,9 +76,10 @@ export class ClientService {
     );
   }
 
-  getMyInstructors(): Observable<InstructorListResponse> {
+  getMyInstructors(opts?: { silent?: boolean }): Observable<InstructorListResponse> {
     return this._http.get<InstructorListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.MY_INSTRUCTORS}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 
@@ -88,9 +89,10 @@ export class ClientService {
     );
   }
 
-  getPendingRequests(): Observable<ClientRequest[]> {
+  getPendingRequests(opts?: { silent?: boolean }): Observable<ClientRequest[]> {
     return this._http.get<ClientRequest[]>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.PENDING_REQUESTS}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 

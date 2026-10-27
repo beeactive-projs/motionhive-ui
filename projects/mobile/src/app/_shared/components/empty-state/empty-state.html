@@ -1,14 +1,11 @@
-<div class="ion-padding ion-text-center">
-  <ion-icon [name]="icon()" color="medium" aria-hidden="true" />
-  <h2>{{ heading() }}</h2>
+<mh-hex-avatar size="2xl" [icon]="icon()" [color]="color()" />
 
-  @if (message(); as text) {
-    <ion-text color="medium">
-      <p>{{ text }}</p>
-    </ion-text>
-  }
+<h2>{{ heading() }}</h2>
 
-  @if (actionLabel(); as label) {
-    <ion-button [fill]="actionFill()" (click)="action.emit()">{{ label }}</ion-button>
-  }
-</div>
+@if (message(); as text) {
+  <p>{{ text }}</p>
+}
+
+@if (actionLabel(); as label) {
+  <ion-button fill="clear" color="primary" (click)="action.emit()">{{ label }}</ion-button>
+}

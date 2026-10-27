@@ -70,6 +70,20 @@ export class MoreBadgesService {
     this._mode() === NavModes.Coach ? this._pendingRequests() : 0,
   );
 
+  /**
+   * Whether a coach has invited this reader and is waiting — the dot on the
+   * Menu's Coaches row, which is the only place on mobile an invitation can
+   * be answered.
+   *
+   * Same number as `pendingRequests`, read in the other mode: `incoming` is
+   * whatever is waiting on whoever is asking, which in train mode is a
+   * coach's invitation and in coach mode a trainee's request. A dot rather
+   * than a count — the point is only that something is waiting.
+   */
+  readonly hasCoachInvites = computed(
+    () => this._mode() === NavModes.Train && this._pendingRequests() > 0,
+  );
+
   refresh(): void {
     this.refreshOpenInvoices();
     this.refreshPendingRequests();
@@ -85,9 +99,14 @@ export class MoreBadgesService {
       });
   }
 
-  /** Only a coach can have requests; anyone else keeps the count at zero. */
+  /**
+   * Both roles have requests waiting on them: a coach has trainees asking,
+   * a trainee has coaches inviting. This used to return early for anyone
+   * without the INSTRUCTOR role, which left a trainee with no way to learn
+   * an invitation had arrived — the reason one could not be answered on a
+   * phone at all. The mode gates live on the two computeds above instead.
+   */
   refreshPendingRequests(force = false): void {
-    if (!this._authStore.isInstructor()) return;
     if (this._pendingInFlight) return;
     if (!force && Date.now() - this._pendingFetchedAt < PENDING_FRESH_MS) return;
 

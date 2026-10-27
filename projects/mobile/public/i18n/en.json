@@ -362,9 +362,11 @@
     },
     "empty": {
       "byEmailHint": "Works before they join",
+      "byEmailTitle": "Invite by email",
       "cta": "Invite your first client",
       "message": "Invite the people you already train, or wait for requests. Anyone on MotionHive can find you on Discover and ask to connect.",
-      "onPlatformHint": "Already on MotionHive",
+      "onPlatformHint": "They already have an account",
+      "onPlatformTitle": "Find on MotionHive",
       "title": "No clients yet"
     },
     "filters": {
@@ -373,36 +375,64 @@
       "archived": "Archived",
       "requests": "Requests"
     },
-    "inviteClient": "Invite client",
-    "inviteSheet": {
-      "byEmail": "Invite by email",
-      "emailHint": "They'll get an email with a link to join and connect with you.",
-      "emailLabel": "Email address",
-      "emailPlaceholder": "client@example.com",
+    "invite": {
+      "emailSheet": {
+        "addNote": "Add a note",
+        "body": "They'll get an email with a link to join and connect with you.",
+        "hideNote": "Hide note",
+        "noteLabel": "Note",
+        "notePlaceholder": "A personal note to include",
+        "title": "Invite by email"
+      },
       "expiry": "Invitations expire after {count, plural, one {# day} other {# days}}.",
-      "messageLabel": "Message",
-      "messagePlaceholder": "A personal note to include (optional)",
+      "hint": "Search for anyone on MotionHive, or type an email address to invite someone who is not here yet.",
+      "inviteAction": "Invite",
+      "inviteEmailRowLabel": "Invite {email} by email",
+      "inviteRowLabel": "Invite {name}",
+      "invited": "Invited",
+      "linkRow": {
+        "hint": "They scan it, right here",
+        "title": "Share link or QR"
+      },
+      "linkSheet": {
+        "copy": "Copy link",
+        "fullScreen": "Show QR full screen",
+        "hint": "The link opens your public profile, where they can see what you offer and get in touch.",
+        "noHandle": {
+          "action": "Choose a username",
+          "message": "Your link is built from your username, so you need one before you can share it.",
+          "title": "No username yet"
+        },
+        "scanTitle": "Scan with your phone camera",
+        "share": "Share link",
+        "title": "Share link or QR"
+      },
       "minChars": "Type at least {count, plural, one {# character} other {# characters}}.",
       "noResults": {
-        "message": "Check the spelling, or try their email.",
+        "message": "Check the spelling, or type their email address instead.",
         "title": "Nobody found"
       },
-      "onPlatform": "Find on platform",
+      "notOnPlatform": "Not on MotionHive yet",
+      "scope": "Only people you are not already connected to are shown.",
       "searchLabel": "Search people",
-      "searchPlaceholder": "Search by name or email",
-      "searchScope": "Only platform users without an existing relationship with you are shown.",
+      "searchPlaceholder": "Search by name, or type an email",
+      "sectionEmail": "Invite by email",
+      "sectionGroups": "From your groups",
+      "sectionPeople": "People",
       "send": "Send invitation",
-      "sendTo": "Send invitation · {name}",
+      "sending": "Sending",
       "sent": {
         "message": "We emailed {email} a link to join and connect with you. You can also share it yourself.",
         "shareLink": "Share invite link",
         "title": "Invitation sent"
       },
+      "sentAnnouncement": "Invitation sent to {name}",
       "share": {
         "text": "Join me on MotionHive so we can plan your training in one place.",
         "title": "Join me on MotionHive"
       }
     },
+    "inviteClient": "Invite client",
     "list": {
       "filterByStatus": "Filter clients by status",
       "loadError": "Couldn't load your clients",
@@ -453,6 +483,7 @@
     },
     "thisPerson": "this person",
     "toast": {
+      "alreadyInvited": "They already have an invitation from you.",
       "archiveFailed": "Could not archive this client.",
       "archived": "Client archived",
       "invitationResent": "Invitation resent",
@@ -469,6 +500,51 @@
       "unarchiveFailed": "Could not unarchive this client.",
       "unarchived": "Client unarchived",
       "withdrawFailed": "Could not withdraw the invitation."
+    }
+  },
+  "coaches": {
+    "aCoach": "a coach",
+    "actions": {
+      "accept": "Accept invitation",
+      "decline": "Decline invitation",
+      "leaveEllipsis": "End coaching…",
+      "message": "Message",
+      "viewProfile": "View profile"
+    },
+    "confirm": {
+      "leave": {
+        "body": "You keep your history and they keep theirs. They will not be told, and either of you can start again later.",
+        "confirm": "End coaching",
+        "title": "End coaching with {name}?",
+        "titleFallback": "End this coaching?"
+      }
+    },
+    "empty": {
+      "cta": "Find a coach",
+      "message": "When a coach invites you, the invitation waits here. You can also go looking for one yourself.",
+      "title": "No coaches yet"
+    },
+    "loadError": "Couldn't load your coaches",
+    "row": {
+      "invited": {
+        "daysAgo": "Invited you {count, plural, one {# day ago} other {# days ago}}",
+        "today": "Invited you today",
+        "yesterday": "Invited you yesterday"
+      },
+      "since": "Coaching you since {date}"
+    },
+    "sections": {
+      "invitations": "Invitations",
+      "yours": "Your coaches"
+    },
+    "title": "My coaches",
+    "toast": {
+      "acceptFailed": "Couldn't accept the invitation",
+      "accepted": "{name} is now your coach",
+      "declineFailed": "Couldn't decline the invitation",
+      "declined": "Invitation declined",
+      "leaveFailed": "Couldn't end the coaching",
+      "left": "Coaching ended"
     }
   },
   "discover": {
@@ -1222,6 +1298,7 @@
     "frequentContacts": "Frequent contacts",
     "inbox": {
       "caughtUp": {
+        "action": "View all messages",
         "heading": "All caught up",
         "message": "You have no unread messages."
       },
@@ -1495,10 +1572,12 @@
     "group": "Group",
     "groups": "Groups",
     "history": "History",
+    "inviteClient": "Invite client",
     "invoice": "Invoice",
     "manageGroup": "Manage group",
     "manageSessions": "Manage sessions",
     "messages": "Messages",
+    "myCoaches": "My coaches",
     "mySessions": "My sessions",
     "newExercise": "New exercise",
     "newGroup": "New group",

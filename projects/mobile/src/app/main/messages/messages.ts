@@ -41,8 +41,8 @@ import { SearchHeaderFold } from '../../_shared/utils/fold';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
 import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
-import { PersonRow } from './_components/person-row/person-row';
-import { RowSkeleton } from './_components/row-skeleton/row-skeleton';
+import { PersonRow } from '../../_shared/components/person-row/person-row';
+import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { BlockUserSheet } from './_sheets/block-user-sheet/block-user-sheet';
 import {
   ConversationAction,
@@ -208,20 +208,6 @@ export class Messages implements ViewWillEnter {
       !this.people.isActive() &&
       this.store.conversations().length > 0 &&
       this.store.visibleConversations().length === 0,
-  );
-
-  /**
-   * Rows on screen (the inbox, its skeleton or search results): the page
-   * takes the list's white. Empty and error states keep the slate, except
-   * in search, which keeps the inbox's surface throughout.
-   */
-  readonly showList = computed(
-    () =>
-      this.showSkeleton() ||
-      this.searchOpen() ||
-      (this.people.isActive()
-        ? !this.isSearchEmpty()
-        : !this.showLoadError() && !this.isEmpty() && !this.isFilteredEmpty()),
   );
 
   constructor() {

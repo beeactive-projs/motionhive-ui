@@ -20,6 +20,7 @@ ion-icon {
 ion-icon:is(
     [name$='-circle'],
     [name$='-circle-outline'],
+    [name='at-outline'],
     [name='ban-outline'],
     [name='compass-outline'],
     [name='ellipse-outline'],

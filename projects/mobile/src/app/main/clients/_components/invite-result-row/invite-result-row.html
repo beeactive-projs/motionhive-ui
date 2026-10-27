@@ -1,0 +1,33 @@
+<!-- The verb is a real button in `slot="end"`, centred on the row rather than
+     in a 1.5rem line: a 2rem button would push the line, and the 4.5rem row
+     with it, off the pixel grid. The row itself is not tappable, so there is
+     one control per person. -->
+<ion-item detail="false">
+  <mh-hex-avatar
+    slot="start"
+    size="lg"
+    aria-hidden="true"
+    [name]="name()"
+    [imageUrl]="person().avatarUrl"
+    [color]="tone()"
+  />
+  <ion-label>
+    <h2>{{ name() }}</h2>
+    @if (handle(); as tag) {
+      <p>{{ tag }}</p>
+    }
+  </ion-label>
+  @if (isIdle()) {
+    <ion-button
+      slot="end"
+      shape="round"
+      class="mh-row-action"
+      [attr.aria-label]="'clients.invite.inviteRowLabel' | translate: { name: name() }"
+      (click)="invite.emit()"
+    >
+      {{ 'clients.invite.inviteAction' | translate }}
+    </ion-button>
+  } @else {
+    <ion-badge slot="end" [attr.data-tone]="statusTone()">{{ statusLabel() | translate }}</ion-badge>
+  }
+</ion-item>

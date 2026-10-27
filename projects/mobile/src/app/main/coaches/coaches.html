@@ -1,0 +1,91 @@
+<!-- The Messages header: back chevron and title on the row gutter, no
+     hairline under the bar, so the list below is one surface with it. -->
+<ion-header class="mh-flat-header" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/more" />
+    </ion-buttons>
+    <ion-title>{{ 'coaches.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.isStale()) {
+    <mh-stale-bar (retry)="retry()" />
+  }
+
+  @if (store.showSkeleton()) {
+    <!-- A placeholder label: which section comes first is only known once
+         the two calls have landed. -->
+    <div class="mh-section-label">
+      <ion-skeleton-text [animated]="true" style="width: 6rem; height: 0.75rem" />
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (_ of skeletonRows; track $index) {
+        <mh-row-skeleton [index]="$index" />
+      }
+    </ion-list>
+  } @else if (store.showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'coaches.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (store.isEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      [heading]="'coaches.empty.title' | translate"
+      [message]="'coaches.empty.message' | translate"
+      [actionLabel]="'coaches.empty.cta' | translate"
+      (action)="openDiscover()"
+    />
+  } @else {
+    <!-- Invitations first: they are the only part of this screen that is
+         waiting on the reader. -->
+    @if (store.invites(); as invites) {
+      @if (invites.length > 0) {
+        <div class="mh-section-label">{{ 'coaches.sections.invitations' | translate }}</div>
+        <ion-list class="mh-flat-list">
+          @for (row of invites; track row.id) {
+            <mh-person-row [person]="row.person" (select)="openInvite(row)" />
+          }
+        </ion-list>
+      }
+    }
+
+    @if (store.coaches(); as coaches) {
+      @if (coaches.length > 0) {
+        <div class="mh-section-label">{{ 'coaches.sections.yours' | translate }}</div>
+        <ion-list class="mh-flat-list">
+          @for (row of coaches; track row.id) {
+            <mh-person-row [person]="row.person" (select)="openCoach(row)" />
+          }
+        </ion-list>
+      }
+    }
+  }
+</ion-content>
+
+<mh-action-sheet
+  [(open)]="sheetOpen"
+  [title]="sheetTitle()"
+  [subtitle]="sheetSubtitle()"
+  [actions]="actions()"
+  (chosen)="onAction($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="leaveOpen"
+  [title]="leaveTitle()"
+  [body]="'coaches.confirm.leave.body' | translate"
+  [confirmLabel]="'coaches.confirm.leave.confirm' | translate"
+  tone="danger"
+  [saving]="leaveSaving()"
+  (confirm)="leave()"
+/>

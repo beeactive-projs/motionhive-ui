@@ -10,8 +10,6 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonRefresher,
   IonRefresherContent,
@@ -28,6 +26,7 @@ import { BellNotification, NotificationStore, dayDividerLabel, localDayKey } fro
 
 import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { queryParamsFor, routeFor } from '../../_shared/config/notification-deep-link';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { NotificationRow } from './_components/notification-row/notification-row';
@@ -79,8 +78,6 @@ interface NotificationDay {
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
-    IonLabel,
     IonList,
     IonRefresher,
     IonRefresherContent,
@@ -91,6 +88,7 @@ interface NotificationDay {
     NotificationFilterSheet,
     NotificationRow,
     NotificationsEmpty,
+    RowSkeleton,
     TranslatePipe,
   ],
   templateUrl: './notifications.html',
@@ -169,11 +167,6 @@ export class Notifications implements ViewWillEnter {
 
   readonly isEmpty = computed(
     () => this.store.hasLoadedList() && this.store.notifications().length === 0,
-  );
-
-  /** The rows are on screen, so the page takes their white (`mh-flat-page`). */
-  readonly showList = computed(
-    () => this.showSkeleton() || (this.store.hasLoadedList() && !this.isEmpty()),
   );
 
   constructor() {

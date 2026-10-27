@@ -1,0 +1,174 @@
+<!-- The new-message header: back and title on the row gutter, the field under
+     them with the caret already in it, no hairline closing the bar. -->
+<ion-header class="mh-flat-header" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/clients" />
+    </ion-buttons>
+    <ion-title>{{ 'clients.inviteClient' | translate }}</ion-title>
+    @if (anySent()) {
+      <ion-buttons slot="end">
+        <ion-button (click)="done()">{{ 'button.done' | translate }}</ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      class="mh-search-pill"
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      mhAutofocus="afterEnter"
+      inputmode="search"
+      autocapitalize="off"
+      autocorrect="off"
+      spellcheck="false"
+      [placeholder]="'clients.invite.searchPlaceholder' | translate"
+      [attr.aria-label]="'clients.invite.searchLabel' | translate"
+      [debounce]="0"
+      [value]="people.query()"
+      (ionInput)="onQuery($event.detail.value ?? '')"
+    />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <!-- The button turns into a badge and nothing else changes, so the flip is
+       otherwise silent. -->
+  <p class="mh-visually-hidden" role="status">{{ announcement() }}</p>
+
+  <!-- Everything said about the search sits straight under the field, as its
+       caption, rather than after whatever list the search produced. -->
+  @if (showStartHint()) {
+    <ion-note class="mh-note-block">{{ 'clients.invite.hint' | translate }}</ion-note>
+  } @else if (queryTooShort() && !isEmail()) {
+    <ion-note class="mh-note-block">
+      {{ 'clients.invite.minChars' | translate: { count: minSearchLength } }}
+    </ion-note>
+  }
+
+  @if (addressError(); as error) {
+    <ion-note class="mh-note-block" role="alert">{{ error }}</ion-note>
+  }
+
+  @if (people.isActive() && !showSkeleton() && rows().length > 0) {
+    <ion-note class="mh-note-block">{{ 'clients.invite.scope' | translate }}</ion-note>
+  }
+
+  @if (showStartHint()) {
+    <!-- The door that needs no recipient at all: a code to scan, or a link to
+         paste into whatever thread the conversation is already in. A card,
+         like the Menu's account card: it goes somewhere, where the rows below
+         act on the spot. -->
+    <div class="door">
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="true" (click)="openLinkSheet()">
+          <mh-hex-avatar
+            slot="start"
+            size="md"
+            aria-hidden="true"
+            icon="qr-code-outline"
+            color="primary"
+            tone="wash"
+          />
+          <ion-label>
+            <h2>{{ 'clients.invite.linkRow.title' | translate }}</h2>
+            <p>{{ 'clients.invite.linkRow.hint' | translate }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    @if (suggestions.loading()) {
+      <div class="mh-section-label">{{ 'clients.invite.sectionGroups' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (_ of skeletonRows; track $index) {
+          <mh-row-skeleton [index]="$index" />
+        }
+      </ion-list>
+    } @else if (suggestions.hasAny()) {
+      <div class="mh-section-label">{{ 'clients.invite.sectionGroups' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (row of suggestionRows(); track row.person.id) {
+          <mh-invite-result-row
+            [person]="row.person"
+            [state]="row.state"
+            (invite)="invite(row.person)"
+          />
+        }
+      </ion-list>
+    }
+  }
+
+  @if (showSkeleton()) {
+    <div class="mh-section-label">{{ 'clients.invite.sectionPeople' | translate }}</div>
+    <ion-list class="mh-flat-list">
+      @for (_ of skeletonRows; track $index) {
+        <mh-row-skeleton [index]="$index" />
+      }
+    </ion-list>
+  } @else if (rows().length > 0) {
+    <div class="mh-section-label">{{ 'clients.invite.sectionPeople' | translate }}</div>
+    <ion-list class="mh-flat-list">
+      @for (row of rows(); track row.person.id) {
+        <mh-invite-result-row
+          [person]="row.person"
+          [state]="row.state"
+          (invite)="invite(row.person)"
+        />
+      }
+    </ion-list>
+  }
+
+  <!-- The second door, and the reason there is no segment: it appears only
+       once what is typed is an address. -->
+  @if (address(); as email) {
+    <div class="mh-section-label">{{ 'clients.invite.sectionEmail' | translate }}</div>
+    <ion-list class="mh-flat-list">
+      <!-- The same Invite button as the people rows; here it opens the sheet
+           that confirms the address. -->
+      <ion-item detail="false">
+        <mh-hex-avatar
+          slot="start"
+          size="lg"
+          aria-hidden="true"
+          icon="mail-outline"
+          color="info"
+          tone="wash"
+        />
+        <ion-label>
+          <h2>{{ email }}</h2>
+          <p>{{ 'clients.invite.notOnPlatform' | translate }}</p>
+        </ion-label>
+        <ion-button
+          slot="end"
+          shape="round"
+          class="mh-row-action"
+          [attr.aria-label]="'clients.invite.inviteEmailRowLabel' | translate: { email }"
+          (click)="openEmailSheet()"
+        >
+          {{ 'clients.invite.inviteAction' | translate }}
+        </ion-button>
+      </ion-item>
+    </ion-list>
+  }
+
+  @if (isSearchEmpty()) {
+    <mh-empty-state
+      icon="person-outline"
+      [heading]="'clients.invite.noResults.title' | translate"
+      [message]="'clients.invite.noResults.message' | translate"
+    />
+  }
+</ion-content>
+
+<mh-invite-email-sheet
+  [(open)]="emailSheetOpen"
+  [address]="emailAddress()"
+  [saving]="emailSaving()"
+  [sentToken]="sentToken()"
+  (send)="sendEmailInvite($event)"
+  (share)="shareInviteLink()"
+  (done)="finishEmailInvite()"
+/>
+
+<mh-invite-link-sheet [(open)]="linkSheetOpen" [handle]="handle()" (chooseHandle)="chooseHandle()" />

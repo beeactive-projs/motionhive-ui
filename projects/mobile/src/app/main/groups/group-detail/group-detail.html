@@ -203,7 +203,7 @@
          would be wrong. -->
     <mh-empty-state icon="people-outline" [heading]="'groups.detail.members.needsMore.title' | translate"
       [message]="'groups.detail.members.needsMore.message' | translate"
-      [actionLabel]="'button.loadMore' | translate" actionFill="outline" (action)="loadMoreMembers()" />
+      [actionLabel]="'button.loadMore' | translate" (action)="loadMoreMembers()" />
     } @else if (store.isFilteredEmpty()) {
     <mh-empty-state icon="people-outline" [heading]="'groups.common.nobodyMatches' | translate"
       [message]="'groups.detail.members.noMatch' | translate" />

@@ -94,11 +94,11 @@
   } @else if (store.isFilteredEmpty()) {
   <mh-empty-state icon="search-outline" [heading]="'empty.nothingMatches' | translate"
     [message]="'exercises.library.noMatch' | translate"
-    [actionLabel]="'button.clearFilters' | translate" actionFill="outline" (action)="clearNarrowing()" />
+    [actionLabel]="'button.clearFilters' | translate" (action)="clearNarrowing()" />
   } @else if (store.isEmpty()) {
   <mh-empty-state icon="barbell-outline" [heading]="'exercises.library.empty.title' | translate"
     [message]="'exercises.library.empty.message' | translate"
-    [actionLabel]="'button.tryAgain' | translate" actionFill="outline" (action)="retry()" />
+    [actionLabel]="'button.tryAgain' | translate" (action)="retry()" />
   } @else {
   <div class="mh-page">
     <span class="mh-kicker meta">{{ metaLabel() }}</span>

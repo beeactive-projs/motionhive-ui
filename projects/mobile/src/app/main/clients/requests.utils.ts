@@ -1,13 +1,14 @@
-import { InstructorClient, startOfDay, translate } from 'core';
+import { InstructorClient, translate } from 'core';
 
-/** The request sheet's own helpers: since when a request has been waiting. */
+import { daysBetween } from '../../_shared/utils/dates';
 
-/** Whole local days from `iso` up to `now` — negative when `iso` is ahead. */
-export function daysBetween(iso: string, now: number): number {
-  const from = startOfDay(new Date(iso)).getTime();
-  const to = startOfDay(new Date(now)).getTime();
-  return Math.round((to - from) / 86_400_000);
-}
+/**
+ * The request sheet's own helpers: since when a request has been waiting.
+ *
+ * The day arithmetic itself is shared (`_shared/utils/dates`) — the trainee's
+ * coaches page counts the same days about the same requests from the other
+ * side, and the two must not drift.
+ */
 
 /** "Received today" / "Received yesterday" / "Received 3 days ago". */
 export function receivedLabel(iso: string, now: number): string {

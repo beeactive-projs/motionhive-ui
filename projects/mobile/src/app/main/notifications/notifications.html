@@ -76,9 +76,9 @@
 </ion-header>
 
 <!-- A flat list: the rows run edge to edge on white, grouped under day labels as
-     Mail groups its inbox. The empty and error states are centred art, which
-     needs the slate page behind it. -->
-<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
+     Mail groups its inbox. The empty and error states sit on the same white,
+     so the page never changes colour under the reader. -->
+<ion-content [fullscreen]="true" class="mh-flat-page">
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
@@ -99,13 +99,7 @@
     </div>
     <ion-list class="mh-flat-list">
       @for (_ of skeletonRows; track $index) {
-        <ion-item>
-          <ion-skeleton-text slot="start" [animated]="true" style="width: 3.25rem; height: 3.25rem" />
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 85%" /></p>
-          </ion-label>
-        </ion-item>
+        <mh-row-skeleton [index]="$index" [time]="true" />
       }
     </ion-list>
   } @else if (isEmpty()) {

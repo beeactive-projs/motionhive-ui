@@ -223,11 +223,13 @@ export class ClientsStore {
     this._fetchPage(this._page() + 1, done);
   }
 
-  setFilter(id: ClientFilterId): void {
-    if (id === this.filter()) return;
+  /** True when the chip changed, which reloads the list from page 1. */
+  setFilter(id: ClientFilterId): boolean {
+    if (id === this.filter()) return false;
     this.filter.set(id);
     this._resetList();
     this.loadList({ force: true });
+    return true;
   }
 
   /**
@@ -281,12 +283,6 @@ export class ClientsStore {
    */
   loadPendingCount(force = false): void {
     this._moreBadgesService.refreshPendingRequests(force);
-  }
-
-  /** A new invitation is a new PENDING row and one more request in flight. */
-  onInviteSent(): void {
-    this.loadList({ force: true });
-    this.loadPendingCount(true);
   }
 
   // ── Mutations ────────────────────────────────────────────────────────────

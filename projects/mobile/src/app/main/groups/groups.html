@@ -128,14 +128,14 @@
     } @else {
     <mh-empty-state icon="compass-outline" [heading]="'groups.list.noGroups.title' | translate"
       [message]="'groups.list.noGroups.memberMessage' | translate"
-      [actionLabel]="'groups.list.discoverGroups' | translate" actionFill="outline"
+      [actionLabel]="'groups.list.discoverGroups' | translate"
       (action)="discoverGroups()" />
     }
     } @else {
     <!-- In groups, but nobody has posted in any of them. -->
     <mh-empty-state icon="chatbubble-outline" [heading]="'groups.list.feed.empty.title' | translate"
       [message]="'groups.list.feed.empty.message' | translate"
-      [actionLabel]="'groups.list.feed.seeGroups' | translate" actionFill="outline"
+      [actionLabel]="'groups.list.feed.seeGroups' | translate"
       (action)="setSegment(Segments.Mine)" />
     }
     } @else {
@@ -225,7 +225,7 @@
     } @else {
     <mh-empty-state icon="compass-outline" [heading]="'groups.list.mine.empty.title' | translate"
       [message]="'groups.list.mine.empty.message' | translate"
-      [actionLabel]="'groups.list.discoverGroups' | translate" actionFill="outline"
+      [actionLabel]="'groups.list.discoverGroups' | translate"
       (action)="discoverGroups()" />
     }
     } @else {

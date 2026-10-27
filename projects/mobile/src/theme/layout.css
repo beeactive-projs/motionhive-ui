@@ -13,14 +13,14 @@
 .mh-page {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem 1rem;
+  gap: var(--mh-page-rhythm);
+  padding: var(--mh-page-rhythm) var(--mh-page-gutter) var(--mh-page-gutter);
 }
 
 .mh-section {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--mh-section-gap);
 }
 
 /* Inside a section the label's own block padding would double the spacing the
@@ -31,9 +31,10 @@
   padding-block: 0;
 }
 
-/* Kickers used as section labels get the same inline alignment. */
+/* Kickers used as section labels get the same inline alignment: the row
+   gutter, so the label sits on the row content beside it. */
 .mh-section > .mh-kicker {
-  padding-inline: 0.875rem;
+  padding-inline: var(--mh-row-gutter);
 }
 
 /* The page gutter already indents the note; keep only a whisper of inset so
@@ -63,9 +64,9 @@
 .mh-chip-row {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.375rem;
+  gap: var(--mh-section-gap);
   overflow-x: auto;
-  padding: 0.625rem 1.25rem;
+  padding: 0.625rem var(--mh-bar-gutter);
   scrollbar-width: none;
 }
 
@@ -80,7 +81,7 @@
 .mh-chip-cloud {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
+  gap: var(--mh-section-gap);
 }
 
 /* A kicker and its note on one baseline over a block of rows — "This week ·
@@ -91,8 +92,8 @@
 .mh-section-head {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding-inline: 0.875rem;
+  gap: var(--mh-section-gap);
+  padding-inline: var(--mh-row-gutter);
 }
 
 .mh-section-head .mh-kicker {
@@ -111,10 +112,20 @@
    run edge to edge, so the list sits straight in `ion-content`, outside
    `.mh-page`, and the page takes the rows' white. Without it a short list
    stops at its last row and the slate shows through, reading as cut off.
-   Bind it only while the list is on screen; empty states and cards need the
-   slate page behind them. */
+   Set it for good, never bound to a signal: the loading, empty and error
+   states sit on the same white, so the page never changes colour under the
+   reader (lists.md, "The list and its page"). */
 ion-content.mh-flat-page {
   --background: var(--mh-color-flat-surface);
+}
+
+/* A note straight on a flat screen is the caption of the field above it
+   ("Type at least 2 characters"), so it lines up with the rows' gutter, the
+   field and the section labels, and hugs the field: the searchbar already
+   pads 8px under the pill, and the block's 1rem section break on top of that
+   read as a separate paragraph. */
+ion-content.mh-flat-page > .mh-note-block {
+  padding: 0.25rem var(--mh-row-gutter) 0.375rem;
 }
 
 /* ─── Recurring blocks ─────────────────────────────────────────────
@@ -132,7 +143,7 @@ ion-content.mh-flat-page {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.5rem 1.25rem;
+  padding: 0.5rem var(--mh-bar-gutter);
 }
 
 .mh-cta-bar ion-button {
@@ -162,7 +173,7 @@ ion-content.mh-flat-page {
   flex: 1;
   align-items: center;
   overflow: hidden;
-  border: 1px solid var(--ion-border-color);
+  border: var(--mh-hairline) solid var(--ion-border-color);
   border-radius: var(--mh-radius-control);
   background: var(--ion-card-background);
 }

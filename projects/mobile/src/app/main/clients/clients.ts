@@ -11,14 +11,11 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonNote,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
@@ -37,7 +34,9 @@ import {
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { SearchStart } from '../../_shared/components/search-start/search-start';
+import { StaleBar } from '../../_shared/components/stale-bar/stale-bar';
 import {
   RecentPerson,
   RecentSearchScopes,
@@ -51,8 +50,8 @@ import { SearchHeaderFold } from '../../_shared/utils/fold';
 import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { ClientRow } from './_components/client-row/client-row';
 import { ClientsEmpty } from './_components/clients-empty/clients-empty';
+import { ClientsRefreshService } from './_services/clients-refresh.service';
 import { ClientNotesSheet } from './_sheets/client-notes-sheet/client-notes-sheet';
-import { InviteClientSheet } from './_sheets/invite-client-sheet/invite-client-sheet';
 import { RequestSheet } from './_sheets/request-sheet/request-sheet';
 import {
   RequestActionId,
@@ -61,6 +60,7 @@ import {
   pendingClients,
   recentFromClient,
 } from './clients.config';
+import { CLIENT_INVITE_PATH } from './client-paths';
 import {
   CLIENT_FILTERS,
   ClientFilterId,
@@ -93,20 +93,18 @@ import { ClientsStore } from './clients.store';
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
-    IonLabel,
     IonList,
     IonNote,
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonSkeletonText,
     IonTitle,
     IonToolbar,
-    InviteClientSheet,
     NotificationBell,
     RequestSheet,
+    RowSkeleton,
     SearchStart,
+    StaleBar,
     TranslatePipe,
   ],
   templateUrl: './clients.html',
@@ -118,6 +116,7 @@ export class Clients implements ViewWillEnter {
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
+  private readonly _clientsRefreshService = inject(ClientsRefreshService);
   private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
   private readonly _searchbar = viewChild(IonSearchbar);
@@ -169,8 +168,6 @@ export class Clients implements ViewWillEnter {
   /** Focusing the search field folds the title and the pills away. */
   readonly searchOpen = signal(false);
 
-  readonly inviteOpen = signal(false);
-
   // The row a swipe verb is about, per sheet. Each sheet keeps its own so a
   // second swipe while one is open cannot swap the person under it.
   readonly notesOpen = signal(false);
@@ -218,17 +215,6 @@ export class Clients implements ViewWillEnter {
   });
 
   /**
-   * Rows on screen (the list or its skeleton): the page takes the list's
-   * white. Empty and error states keep the slate.
-   */
-  readonly showList = computed(
-    () =>
-      this.store.showSkeleton() ||
-      this.showSearchStart() ||
-      (!this.store.showLoadError() && !this.store.isEmpty() && !this.store.isFilteredEmpty()),
-  );
-
-  /**
    * What a screen reader is told once a search or a filter settles. Nothing
    * is on screen to say it otherwise: the list simply becomes shorter.
    *
@@ -265,9 +251,24 @@ export class Clients implements ViewWillEnter {
   // refetches — quietly, since rows already on screen stay put. `reenter`
   // holds that back for a few seconds, so stepping into a client and straight
   // back out does not re-fire the list and the count for data seconds old.
+  //
+  // An invitation just sent is the one change `reenter`'s window would hide:
+  // it measures time since the last load, not time on the page, so the normal
+  // path — open the tab, invite, come back — lands inside it. The invite page
+  // says so through `ClientsRefreshService`, read here because every way back
+  // fires this hook, and acted on with one load: a chip change reloads by
+  // itself, so only an unchanged chip needs the refresh.
   ionViewWillEnter(): void {
     this._resent.set(new Set());
-    this.store.reenter();
+
+    const pending = this._clientsRefreshService.consume();
+    if (!pending) {
+      this.store.reenter();
+    } else if (pending.filter && this._showFilter(pending.filter)) {
+      this.store.loadPendingCount();
+    } else {
+      this.store.refresh();
+    }
   }
 
   setFilter(id: ClientFilterId): void {
@@ -359,8 +360,9 @@ export class Clients implements ViewWillEnter {
     this.recents.clear();
   }
 
+  /** Inviting is its own page now, pushed onto this tab's stack. */
   openInvite(): void {
-    this.inviteOpen.set(true);
+    void this._router.navigate([CLIENT_INVITE_PATH]);
   }
 
   // ── Row verbs ────────────────────────────────────────────────────────────
@@ -565,15 +567,20 @@ export class Clients implements ViewWillEnter {
     this.store.refresh();
   }
 
-  /**
-   * Search covers every client and hides the chips, so a chip asked for by
-   * the URL closes it first; otherwise the chip would narrow the results with
-   * nothing on screen saying so.
-   */
+  /** The chip a Clients tab URL asks for, if any. */
   private _applyUrlFilter(url: string): void {
     const id = filterFromUrl(url);
-    if (!id) return;
+    if (id) this._showFilter(id);
+  }
+
+  /**
+   * Puts the list on a chip someone else asked for: a URL or the invite page.
+   * Search covers every client and hides the chips, so it closes first;
+   * otherwise the chip would narrow the results with nothing on screen saying
+   * so. True when the chip changed, which reloads the list.
+   */
+  private _showFilter(id: ClientFilterId): boolean {
     if (this.searchOpen()) this.closeSearch();
-    this.store.setFilter(id);
+    return this.store.setFilter(id);
   }
 }

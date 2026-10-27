@@ -6,16 +6,29 @@ import { Routes } from '@angular/router';
  * Every path keeps `clients` as the first segment after `/tabs` so the tab
  * stays lit on the pushed screens — same rule as sessions and messages.
  *
- * Invite, notes, archive and a pending request are sheets driven from a
- * page, not routes: each is modal over the screen that opened it and needs
- * that screen's context when it closes. Requests have no page of their own;
- * they are the list's Requests chip (`?filter=requests`).
+ * Notes, archive and a pending request are sheets driven from a page, not
+ * routes: each is modal over the screen that opened it and needs that
+ * screen's context when it closes. Requests have no page of their own; they
+ * are the list's Requests chip (`?filter=requests`).
+ *
+ * Inviting used to be a sheet too, for the same reason, and it was the wrong
+ * call: picking who to invite is a search over everyone, which wants a whole
+ * screen and the keyboard on arrival, and it needs no context from the list
+ * behind it. It is a page now, after `new-message` — which answers the same
+ * kind of question about a different relationship.
  */
 export const clientsRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./clients').then((m) => m.Clients),
     title: 'pageTitle.clients',
+  },
+  {
+    // Before `:clientId`, or the parameterised route reads "invite" as a
+    // client id and the page 404s on a user that does not exist.
+    path: 'invite',
+    loadComponent: () => import('./invite-client/invite-client').then((m) => m.InviteClient),
+    title: 'pageTitle.inviteClient',
   },
   {
     // Someone's public profile, from the client page or a request. Before

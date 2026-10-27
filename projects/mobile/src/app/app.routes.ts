@@ -142,6 +142,14 @@ export const routes: Routes = [
           import('./main/account/account.routes').then((m) => m.accountRoutes),
       },
       {
+        // The trainee's side of a coaching relationship, and the only place
+        // on mobile a coach's invitation can be answered. No guard: anyone
+        // can be invited by a coach, a coach who also trains included.
+        path: 'more/coaches',
+        loadChildren: () =>
+          import('./main/coaches/coaches.routes').then((m) => m.coachesRoutes),
+      },
+      {
         // Only an instructor holds a second role, so only an instructor has
         // anything to switch between.
         path: 'more/switch-role',

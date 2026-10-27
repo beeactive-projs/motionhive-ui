@@ -22,7 +22,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
+<ion-content [fullscreen]="true" class="mh-flat-page">
   @if (!people.isActive()) {
     @if (isStartLoading()) {
       <!-- A placeholder label: which list comes first, Suggested or Frequent

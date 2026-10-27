@@ -341,7 +341,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "projects/mobile/src/main.ts",
-            "allowedCommonJsDependencies": ["@messageformat/core"],
+            "allowedCommonJsDependencies": ["@messageformat/core", "qrcode", "dijkstrajs"],
             "outputPath": "dist/mobile",
             "tsConfig": "projects/mobile/tsconfig.app.json",
             "inlineStyleLanguage": "scss",

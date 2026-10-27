@@ -77,9 +77,10 @@
   }
 </ion-header>
 
-<!-- A flat list: the rows run edge to edge on white. The empty states are
-     centred art, which needs the slate page behind it. -->
-<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
+<!-- A flat list: the rows run edge to edge on white, and the loading, empty
+     and error states sit on the same white, so the page never changes colour
+     under the reader. -->
+<ion-content [fullscreen]="true" class="mh-flat-page">
   <!-- The toolbar shows the page's name but `ion-title` is not a heading, so
        a screen reader had nothing to land on and the outline began at h2. -->
   <h1 class="mh-visually-hidden">{{ 'nav.clients' | translate }}</h1>
@@ -94,7 +95,7 @@
     </ion-refresher>
   }
 
-  <!-- Why a one-character term is not searching everyone; the invite sheet
+  <!-- Why a one-character term is not searching everyone; the invite page
        says the same under its own people search. -->
   @if (searchOpen() && store.queryTooShort()) {
     <ion-note class="mh-note-block">
@@ -103,14 +104,7 @@
   }
 
   @if (store.isStale()) {
-    <!-- A status, so neutral-semantic rather than honey. -->
-    <div class="stale" role="status">
-      <div class="stale-bar">
-        <ion-icon name="cloud-offline-outline" aria-hidden="true" />
-        <span>{{ 'error.staleData' | translate }}</span>
-        <ion-button size="small" fill="clear" (click)="retry()">{{ 'button.tryAgain' | translate }}</ion-button>
-      </div>
-    </div>
+    <mh-stale-bar (retry)="retry()" />
   }
 
   @if (store.showLoadError()) {
@@ -133,13 +127,7 @@
     <!-- The real rows' geometry, so nothing shifts when data lands. -->
     <ion-list class="mh-flat-list" aria-busy="true">
       @for (_ of skeletonRows; track $index) {
-        <ion-item>
-          <ion-skeleton-text slot="start" [animated]="true" style="width: 3.25rem; height: 3.25rem" />
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-          </ion-label>
-        </ion-item>
+        <mh-row-skeleton [index]="$index" />
       }
     </ion-list>
   } @else if (store.isEmpty()) {
@@ -153,7 +141,6 @@
         [heading]="'empty.nothingMatches' | translate"
         [message]="'clients.directory.noMatch.message' | translate"
         [actionLabel]="'button.clear' | translate"
-        actionFill="outline"
         (action)="clearFilters()"
       />
     } @else {
@@ -162,7 +149,6 @@
         [heading]="'clients.directory.noStatus.title' | translate"
         [message]="'clients.directory.noStatus.message' | translate"
         [actionLabel]="'clients.directory.noStatus.action' | translate"
-        actionFill="outline"
         (action)="clearFilters()"
       />
     }
@@ -186,8 +172,6 @@
     </ion-infinite-scroll>
   }
 </ion-content>
-
-<mh-invite-client-sheet [(open)]="inviteOpen" (sent)="store.onInviteSent()" />
 
 <mh-request-sheet
   [(open)]="requestOpen"

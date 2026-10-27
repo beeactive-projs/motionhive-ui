@@ -115,6 +115,9 @@ export const TRAIN_TAB_SET: TabSet = {
     {
       label: 'nav.myTraining',
       items: [
+        // Who coaches this reader — and the only screen on mobile where a
+        // coach's invitation can be accepted, so it carries the dot for one.
+        { label: 'nav.coaches', icon: 'people-outline', iconColor: 'violet', route: '/tabs/more/coaches' },
         // The same library the coach side gets, read-only: a trainee looking
         // up a movement their plan names should not have to ask for it.
         { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },

@@ -78,9 +78,10 @@
   }
 </ion-header>
 
-<!-- A flat list: the rows run edge to edge on white. The empty states are centred
-     art, which needs the slate page behind it. -->
-<ion-content [fullscreen]="true" [class.mh-flat-page]="showList()">
+<!-- A flat list: the rows run edge to edge on white, and the loading, empty and
+     error states sit on the same white, so the page never changes colour under
+     the reader. -->
+<ion-content [fullscreen]="true" class="mh-flat-page">
   @if (!searchOpen()) {
     <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
       <ion-refresher-content />
@@ -177,6 +178,8 @@
       icon="checkmark-circle"
       [heading]="'messages.inbox.caughtUp.heading' | translate"
       [message]="'messages.inbox.caughtUp.message' | translate"
+      [actionLabel]="'messages.inbox.caughtUp.action' | translate"
+      (action)="setFilter(Filters.All)"
     />
   } @else {
     <ion-list class="mh-flat-list">

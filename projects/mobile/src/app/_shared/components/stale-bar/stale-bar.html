@@ -1,0 +1,7 @@
+<div class="stale-bar">
+  <ion-icon name="cloud-offline-outline" aria-hidden="true" />
+  <span>{{ 'error.staleData' | translate }}</span>
+  <ion-button size="small" fill="clear" (click)="retry.emit()">
+    {{ 'button.tryAgain' | translate }}
+  </ion-button>
+</div>

@@ -1,0 +1,75 @@
+<ng-template #body>
+  @if (sentToken()) {
+    <!-- The email went; the link is here for the coach to hand over as well. -->
+    <div class="sent">
+      <!-- Decorative: the heading right under it says the same words, and
+           `mh-hex-avatar` gives a named tile a hidden label of its own. The
+           filled glyph: this is the done mark, not the "accept" verb. -->
+      <mh-hex-avatar
+        aria-hidden="true"
+        icon="checkmark-circle"
+        size="xl"
+        color="success"
+        tone="wash"
+      />
+      <h2>{{ 'clients.invite.sent.title' | translate }}</h2>
+      <p>{{ 'clients.invite.sent.message' | translate: { email: address() } }}</p>
+      <div class="actions">
+        <ion-button expand="block" fill="outline" (click)="share.emit()">
+          <ion-icon slot="start" name="share-outline" aria-hidden="true" />
+          {{ 'clients.invite.sent.shareLink' | translate }}
+        </ion-button>
+        <ion-button expand="block" (click)="done.emit()">{{ 'button.done' | translate }}</ion-button>
+      </div>
+    </div>
+  } @else {
+    <p class="mh-helper">{{ 'clients.invite.emailSheet.body' | translate }}</p>
+
+    <!-- Folded away: worth having for a cold email, worth nothing on the
+         main path, where another open field is a reason to stop. -->
+    <ion-button
+      class="note-toggle"
+      fill="clear"
+      size="small"
+      [attr.aria-expanded]="noteOpen()"
+      (click)="toggleNote()"
+    >
+      {{ noteToggleLabel() | translate }}
+      <ion-icon
+        slot="end"
+        aria-hidden="true"
+        [name]="noteOpen() ? 'chevron-up-outline' : 'chevron-down-outline'"
+      />
+    </ion-button>
+
+    @if (noteOpen()) {
+      <ion-textarea
+        mode="md"
+        fill="outline"
+        [autoGrow]="true"
+        [rows]="2"
+        [maxlength]="messageMaxLength"
+        [placeholder]="'clients.invite.emailSheet.notePlaceholder' | translate"
+        [attr.aria-label]="'clients.invite.emailSheet.noteLabel' | translate"
+        [value]="note()"
+        (ionInput)="note.set($event.detail.value ?? '')"
+      />
+    }
+
+    <p class="mh-helper">{{ 'clients.invite.expiry' | translate: { count: expiryDays } }}</p>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'clients.invite.emailSheet.title' | translate"
+  [subtitle]="address()"
+  [body]="body"
+  [saveLabel]="'clients.invite.send' | translate"
+  [dismissLabel]="'button.cancel' | translate"
+  [saving]="saving()"
+  [showFooter]="!sentToken()"
+  [breakpoints]="[0, 0.6, 0.95]"
+  [initialBreakpoint]="0.6"
+  (save)="onSend()"
+/>

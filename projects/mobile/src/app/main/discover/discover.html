@@ -196,7 +196,6 @@
           [heading]="'empty.nothingMatches' | translate"
           [message]="'discover.feed.noMatches' | translate"
           [actionLabel]="'button.clearFilters' | translate"
-          actionFill="outline"
           (action)="clearFilters()"
         />
       } @else {
@@ -272,7 +271,6 @@
         [heading]="'empty.noResults' | translate"
         [message]="'discover.search.empty' | translate"
         [actionLabel]="'button.clearSearch' | translate"
-        actionFill="outline"
         (action)="clearSearch()"
       />
     } @else {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
@@ -76,16 +76,24 @@ export class More implements ViewWillEnter {
   /** Named the way the pill names it — "Coach"/"Trainee", never the mode word. */
   readonly roleLabel = computed(() => ROLES[this._mode()].label);
 
+  /**
+   * The rows that carry a live dot, by route. A static config cannot read a
+   * store, so they are named here.
+   */
+  private readonly _dots = new Map<string, Signal<boolean>>([
+    ['/tabs/more/billing', this._moreBadgesService.hasBillDue],
+    ['/tabs/more/coaches', this._moreBadgesService.hasCoachInvites],
+  ]);
+
   /** The mode's sections, with the live dots spliced onto their rows. */
   readonly sections = computed<readonly MoreSection[]>(() => {
     return TAB_SETS[this._mode()].more
       .map((section) => ({
         ...section,
-        items: section.items.map((entry) =>
-          entry.route === '/tabs/more/billing'
-            ? { ...entry, dot: this._moreBadgesService.hasBillDue }
-            : entry,
-        ),
+        items: section.items.map((entry) => {
+          const dot = this._dots.get(entry.route);
+          return dot ? { ...entry, dot } : entry;
+        }),
       }))
       .filter((section) => section.items.length > 0);
   });

@@ -19,6 +19,13 @@ ion-list.list-inset.mh-card-list {
   background: var(--ion-card-background);
 }
 
+/* A card on a flat screen. The flat surface is the card's own white in light,
+   so the card takes `--mh-color-flat-card` instead; the rows read the same
+   variable, so they follow. */
+ion-content.mh-flat-page ion-list.list-inset.mh-card-list {
+  --ion-card-background: var(--mh-color-flat-card);
+}
+
 /* One spacing standard for every list row. Ionic's own numbers differ mode to
    mode (md pads 1rem with no vertical air at all) and the row components had
    each started restating their own — these variables are the single source
@@ -31,8 +38,8 @@ ion-list ion-item,
 ion-item.mh-list-row {
   --padding-start: var(--mh-row-gutter);
   --inner-padding-end: var(--mh-row-gutter);
-  --padding-top: 0.5rem;
-  --padding-bottom: 0.5rem;
+  --padding-top: var(--mh-row-pad);
+  --padding-bottom: var(--mh-row-pad);
 }
 
 /* One gap between a leading tile (or icon, avatar, checkbox) and the label.
@@ -45,9 +52,9 @@ ion-item.mh-list-row > [slot='start'] {
 
 /* ─── Rows of a grouped list ───────────────────────────────────────────
    Rows are 3rem at least. Ionic hands `--min-height` on to the inner row,
-   which sits inside the vertical padding, so 2rem + 2 × 0.5rem is the 3rem
-   row. The chevron is the muted ink at full strength: Ionic dims it to 25%,
-   below the 3:1 a control needs. */
+   which sits inside the vertical padding, so 2rem + 2 × `--mh-row-pad` is
+   the 3rem row. The chevron is the muted ink at full strength: Ionic dims it
+   to 25%, below the 3:1 a control needs. */
 ion-list.mh-card-list ion-item {
   /* The rows take the card's fill, so a row never paints over its card in a
      second colour; left to Ionic's iOS dark palette, items were the page's
@@ -101,7 +108,7 @@ ion-list:is(.mh-card-list, .mh-flat-list) ion-item::after {
   inset-block-end: 0;
   inset-inline-start: var(--mh-row-inset);
   inset-inline-end: var(--mh-row-gutter);
-  height: 1px;
+  height: var(--mh-hairline);
   background: var(--mh-color-separator);
   pointer-events: none;
 }
@@ -151,13 +158,13 @@ ion-list.mh-flat-list {
   background: var(--mh-color-flat-surface);
 }
 
-/* 0.75rem around a 3.25rem avatar is WhatsApp's 76px row. The label's own
-   md margins (10px top and bottom) would stack on that padding, so the
-   padding alone sets the rhythm. */
+/* `--mh-flat-row-pad` around a 3.25rem avatar is WhatsApp's 76px row. The
+   label's own md margins (10px top and bottom) would stack on that padding,
+   so the padding alone sets the rhythm. */
 ion-list.mh-flat-list ion-item {
   --background: var(--mh-color-flat-surface);
-  --padding-top: 0.75rem;
-  --padding-bottom: 0.75rem;
+  --padding-top: var(--mh-flat-row-pad);
+  --padding-bottom: var(--mh-flat-row-pad);
   --mh-row-inset: var(--mh-row-gutter);
 }
 
@@ -173,7 +180,7 @@ ion-list.mh-flat-list > :first-child ion-item::before {
   inset-block-start: 0;
   inset-inline-start: var(--mh-row-inset);
   inset-inline-end: var(--mh-row-gutter);
-  height: 1px;
+  height: var(--mh-hairline);
   background: var(--mh-color-separator);
   pointer-events: none;
 }
@@ -188,15 +195,15 @@ ion-list.mh-flat-list ion-item > ion-label {
   margin-block: 0;
 }
 
-/* Each line of a flat-list row is a whole 1.5rem box, so a row is exactly
-   0.75 + 1.5 + 1.5 + 0.75 = 4.5rem. Left to the type's own leading (16px
-   and 15px at 1.55) a row came out 72.047px; the fraction piled up row on
-   row, every separator landed on a different sub-pixel, and the ones that
+/* Each line of a flat-list row is a whole `--mh-row-line` box, so a row is
+   exactly 0.75 + 1.5 + 1.5 + 0.75 = 4.5rem. Left to the type's own leading
+   (16px and 15px at 1.55) a row came out 72.047px; the fraction piled up row
+   on row, every separator landed on a different sub-pixel, and the ones that
    straddled two device pixels drew visibly thicker. The text keeps its
    leading; `.mh-row-line` already centres it, and a bare h2 or p stays a
    block so its ellipsis still works. */
 ion-list.mh-flat-list ion-label > :is(.mh-row-line, h2, h3, p) {
-  block-size: 1.5rem;
+  block-size: var(--mh-row-line);
 }
 
 /* The title is Inter, not the heading face the global h2 rule puts on it:

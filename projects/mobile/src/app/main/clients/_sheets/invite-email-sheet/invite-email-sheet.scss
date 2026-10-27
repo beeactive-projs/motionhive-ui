@@ -1,23 +1,10 @@
-/* The mode switch sits above whichever field it reveals. */
-ion-segment {
-  margin-bottom: 0.75rem;
-}
-
-/* Ionic pads the searchbar for a toolbar; inside a padded sheet body the
-   field should meet the segment's edges. */
-ion-searchbar {
-  padding-inline: 0;
-}
-
-/* Handle under a person's name. */
-.handle {
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-}
-
-/* The pick mark: an empty ring until chosen, a filled honey circle after. */
-.pick {
-  font-size: var(--mh-icon-md);
+/* The disclosure sits tight under the line it expands on, and keeps the
+   body's edges rather than a button's own inset. */
+.note-toggle {
+  --padding-start: 0;
+  --padding-end: 0.25rem;
+  margin: 0.25rem 0 0.5rem;
+  align-self: flex-start;
 }
 
 /* Sent state — the same centred hero column the empty screens use. */

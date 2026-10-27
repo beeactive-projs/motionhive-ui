@@ -85,7 +85,7 @@ export function filterFromUrl(url: string): ClientFilterId | null {
  * That answer is indistinguishable from a match, which is how a single `a`
  * came back as the whole directory under a search box reading "a". The
  * directory holds a shorter term back and narrows in memory instead, and says
- * so under the field. Same floor as the invite sheet's people search.
+ * so under the field. Same floor as the invite page's people search.
  */
 export const MIN_SEARCH_LENGTH = 2;
 

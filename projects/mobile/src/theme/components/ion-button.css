@@ -81,7 +81,7 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
 }
 
 .mh-chip-row .filters.active {
-  border: 1px solid var(--mh-color-honey-deep);
+  border: var(--mh-hairline) solid var(--mh-color-honey-deep);
   border-radius: var(--mh-radius-pill);
 }
 
@@ -150,6 +150,23 @@ ion-item ion-button[fill='clear'] {
   --color: var(--mh-color-honey-deep);
 }
 
+/* A verb at the end of a flat-list row ("Invite"): a solid honey capsule in
+   `slot="end"`, centred on the row rather than in one of its 1.5rem lines.
+   The chips' 2rem, not Ionic's small-button floor, so it fits the row's 3rem
+   content box and never moves the row off its 4.5rem grid. */
+ion-item ion-button.mh-row-action {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --box-shadow: none;
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  margin-inline-start: 0.75rem;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
 /* The same fix for a clear button used as a text link on a page ("Forgot
    password?", "Create one for free"), which sits on the page surface rather
    than in a row. */
@@ -182,7 +199,7 @@ ion-button.mh-text-link.inline {
    Ionic exposes the style and width, so no wrapper is needed. */
 ion-button.mh-add-dashed {
   --border-style: dashed;
-  --border-width: 1px;
+  --border-width: var(--mh-hairline);
   --border-color: var(--ion-border-color);
   --color: var(--mh-color-honey-deep);
   margin: 0;
