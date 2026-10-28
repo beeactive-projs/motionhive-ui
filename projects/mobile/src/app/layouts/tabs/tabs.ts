@@ -42,6 +42,7 @@ import {
   TAB_SETS,
 } from '../../_shared/config/tabs.config';
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
+import { SaveRoutineSheet } from '../../main/workouts/_sheets/save-routine-sheet/save-routine-sheet';
 import { TabIds, TabItem } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
 
@@ -152,6 +153,7 @@ function appReturns(): Observable<void> {
     IonTabButton,
     IonTabs,
     NotificationBanner,
+    SaveRoutineSheet,
     TranslatePipe,
   ],
   templateUrl: './tabs.html',

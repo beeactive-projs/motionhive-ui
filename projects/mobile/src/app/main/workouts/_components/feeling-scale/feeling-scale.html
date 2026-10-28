@@ -1,0 +1,38 @@
+<div class="scale" role="radiogroup" [attr.aria-label]="label()" [attr.aria-readonly]="!editable() || null">
+  @for (feeling of feelings; track feeling.value) {
+    <button
+      type="button"
+      class="cell"
+      role="radio"
+      [class.on]="value() === feeling.value"
+      [attr.aria-checked]="value() === feeling.value"
+      [attr.aria-label]="('workouts.finish.rating' | translate: { value: feeling.value }) + ', ' + (feeling.label | translate)"
+      [disabled]="!editable()"
+      (click)="pick(feeling)"
+    >
+      <span class="hex">
+        <svg [attr.viewBox]="viewBox" aria-hidden="true">
+          <defs>
+            <clipPath [attr.id]="clipId(feeling)">
+              <path [attr.d]="path" />
+            </clipPath>
+          </defs>
+          <path class="comb" [attr.d]="path" />
+          <g [attr.clip-path]="'url(#' + clipId(feeling) + ')'">
+            <rect
+              class="honey"
+              x="0"
+              width="100"
+              [attr.y]="hexTop"
+              [attr.height]="hexHeight"
+              [style.transform]="honeyScale(feeling)"
+            />
+          </g>
+          <path class="rim" [attr.d]="path" />
+        </svg>
+        <span class="glyph" aria-hidden="true">{{ feeling.glyph }}</span>
+      </span>
+      <span class="label" aria-hidden="true">{{ feeling.label | translate }}</span>
+    </button>
+  }
+</div>

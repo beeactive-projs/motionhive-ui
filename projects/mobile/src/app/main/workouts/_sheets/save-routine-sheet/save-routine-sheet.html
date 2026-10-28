@@ -1,0 +1,23 @@
+<ng-template #body>
+  <p class="mh-helper">{{ 'workouts.finish.saveAsRoutine.message' | translate }}</p>
+  <ion-input mode="md"
+    fill="outline"
+    [label]="'form.label.name' | translate"
+    labelPlacement="stacked"
+    [maxlength]="maxLength"
+    [value]="name()"
+    (ionInput)="name.set($any($event).detail.value ?? '')"
+  />
+</ng-template>
+
+<mh-sheet-shell
+  [open]="service.isOpen()"
+  (openChange)="onOpenChange($event)"
+  [title]="'workouts.finish.saveAsRoutine.title' | translate"
+  [saveLabel]="'workouts.finish.saveAsRoutine.action' | translate"
+  [body]="body"
+  [fit]="true"
+  [canSave]="!!name().trim()"
+  [saving]="saving()"
+  (save)="save()"
+/>

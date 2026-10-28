@@ -21,6 +21,8 @@ export class ThemeService {
   private readonly _document = inject(DOCUMENT);
   private readonly _systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
   private readonly _systemDark = signal(this._systemDarkQuery.matches);
+  /** A screen with a navy top (the workout summary) needs light status icons in light mode too. */
+  private readonly _darkTop = signal(false);
 
   readonly preference = signal<ThemePreference>(readStoredPreference());
   readonly isDark = computed(
@@ -37,10 +39,16 @@ export class ThemeService {
       // The status bar sits outside the WebView, so the palette class cannot
       // reach it — switching to dark in-app otherwise leaves black icons on a
       // navy toolbar. `Style.Dark` means "light content", i.e. for a dark bar.
-      void StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light }).catch(() => {
+      const darkBar = isDark || this._darkTop();
+      void StatusBar.setStyle({ style: darkBar ? Style.Dark : Style.Light }).catch(() => {
         // Not a native platform.
       });
     });
+  }
+
+  /** On while a screen with a navy top is showing; off again on leaving it. */
+  setDarkTop(on: boolean): void {
+    this._darkTop.set(on);
   }
 
   setPreference(preference: ThemePreference): void {

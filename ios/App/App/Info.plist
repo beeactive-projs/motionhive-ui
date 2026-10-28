@@ -79,5 +79,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>MotionHive saves your workout card to Photos when you choose Save Image.</string>
 </dict>
 </plist>

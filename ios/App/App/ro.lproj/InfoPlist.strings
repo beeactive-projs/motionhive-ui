@@ -1,0 +1,2 @@
+/* Shown when someone picks "Salvează imaginea" on a shared workout card. */
+"NSPhotoLibraryAddUsageDescription" = "MotionHive salvează cardul antrenamentului în Poze când alegi Salvează imaginea.";

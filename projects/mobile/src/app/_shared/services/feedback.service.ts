@@ -6,6 +6,14 @@ import { ErrorDialogService, apiErrorMessage } from 'core';
 
 const SUCCESS_DURATION_MS = 1500;
 const ERROR_DURATION_MS = 3000;
+/** Long enough to read the message and reach the button. */
+const ACTION_DURATION_MS = 5000;
+
+/** A follow-up offered on the toast itself ("Save as routine"). */
+export interface ToastAction {
+  label: string;
+  run: () => void;
+}
 
 /**
  * Toast feedback for the screens that write.
@@ -24,9 +32,19 @@ export class FeedbackService {
   private readonly _toastController = inject(ToastController);
   private readonly _errorDialog = inject(ErrorDialogService);
 
-  async success(message: string): Promise<void> {
+  /**
+   * `action` puts one button on the toast and keeps it up longer. Only for
+   * an optional next step that is also reachable elsewhere: a toast goes
+   * away on its own, so it must never be the only way to something.
+   */
+  async success(message: string, action?: ToastAction): Promise<void> {
     void this._vibrate(NotificationType.Success);
-    await this._present(message, 'success', SUCCESS_DURATION_MS);
+    await this._present(
+      message,
+      'success',
+      action ? ACTION_DURATION_MS : SUCCESS_DURATION_MS,
+      action,
+    );
   }
 
   /** Neutral confirmation — "No changes", and other non-events. */
@@ -52,12 +70,18 @@ export class FeedbackService {
     await this._present(apiErrorMessage(error, fallback), 'danger', ERROR_DURATION_MS);
   }
 
-  private async _present(message: string, color: string, duration: number): Promise<void> {
+  private async _present(
+    message: string,
+    color: string,
+    duration: number,
+    action?: ToastAction,
+  ): Promise<void> {
     const toast = await this._toastController.create({
       message,
       color,
       duration,
       position: 'bottom',
+      buttons: action ? [{ text: action.label, handler: () => action.run() }] : undefined,
     });
     await toast.present();
   }

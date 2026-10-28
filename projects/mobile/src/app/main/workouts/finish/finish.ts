@@ -9,7 +9,7 @@ import {
   IonContent,
   IonFooter,
   IonHeader,
-  IonInput,
+  IonIcon,
   IonItem,
   IonLabel,
   IonList,
@@ -19,38 +19,79 @@ import {
   IonTitle,
   IonToolbar,
   ViewWillEnter,
+  ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { LoggedExercise, WorkoutLog, WorkoutLogService, WorkoutLogStatus } from 'core';
+import {
+  AuthStore,
+  LoggedExercise,
+  PersonalRecord,
+  WorkoutLog,
+  WorkoutLogService,
+  WorkoutLogStatus,
+  appLocale,
+} from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
+import { HEX_PATH, HEX_VIEW_BOX } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ThemeService } from '../../../_shared/services/theme.service';
+import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
+import { SaveRoutineService } from '../_services/save-routine.service';
+import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
 import {
-  FEELINGS,
+  NOTE_MAX_LENGTH,
   WORKOUT_ICONS,
+  cheerKey,
+  durationClock,
   exerciseSetSummary,
-  workoutDuration,
+  formatMeasure,
+  volumeGainPercent,
   workoutTiles,
+  workoutVolume,
 } from '../workouts.config';
 
+/** A streak shorter than this is just training, not yet a streak. */
+const STREAK_WORTH_SAYING = 2;
+/** The highlights row holds two; past that it stops being a highlight. */
+const MAX_HIGHLIGHTS = 2;
+
+interface HeroStat {
+  label: string;
+  value: string;
+}
+
+interface Highlight {
+  glyph: string;
+  title: string;
+  detail: string;
+  /** Honey for a record, the one thing worth a colour. */
+  honey: boolean;
+}
+
 /**
- * Finish and summary.
+ * Finish and summary: a reward first, a form second.
  *
- * Metric tiles are conditional on what the session actually contained —
- * volume only where something was loaded, reps for bodyweight, time for
- * holds. Compositing them into one number is the mistake every app that
- * tried it made.
+ * The hero says what was done, in the numbers the session actually holds
+ * (volume only where something was loaded, reps for bodyweight, time for
+ * holds; never one composite). Highlights appear only when they are true:
+ * a record beaten, a streak of weeks, more volume than the last time this
+ * routine was done. Never praise that did not happen.
  *
- * Doubles as the read-only view of a past workout, reached from History.
+ * The logger completes the workout before opening this, with
+ * `?from=logger`; the rating and note then arrive on a second complete
+ * call, which the API applies to a finished workout. Without the flag this
+ * is the read-only view of a past workout, reached from History.
  */
 @Component({
   selector: 'mh-workout-finish',
   imports: [
     EmptyState,
+    FeelingScale,
     IonBackButton,
     IonButton,
     IonButtons,
@@ -59,7 +100,7 @@ import {
     IonContent,
     IonFooter,
     IonHeader,
-    IonInput,
+    IonIcon,
     IonItem,
     IonLabel,
     IonList,
@@ -68,21 +109,27 @@ import {
     IonTextarea,
     IonTitle,
     IonToolbar,
-    StatTile,
+    ShareWorkoutSheet,
     TranslatePipe,
   ],
   templateUrl: './finish.html',
   styleUrl: './finish.scss',
 })
-export class Finish implements ViewWillEnter {
+export class Finish implements ViewWillEnter, ViewWillLeave {
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _themeService = inject(ThemeService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _saveRoutineService = inject(SaveRoutineService);
 
-  readonly feelings = FEELINGS;
-  readonly skeletonTiles = [1, 2, 3];
+  readonly hexPath = HEX_PATH;
+  readonly hexViewBox = HEX_VIEW_BOX;
+  /** The four small hexes thrown around the tick; each has its own place and colour. */
+  readonly sparks = [1, 2, 3, 4];
+  readonly skeletonStats = [1, 2, 3];
 
   readonly log = signal<WorkoutLog | null>(null);
   readonly loading = signal(false);
@@ -91,14 +138,115 @@ export class Finish implements ViewWillEnter {
 
   readonly feeling = signal<number | null>(null);
   readonly note = signal('');
-  readonly routineName = signal('');
-  readonly savingRoutine = signal(false);
+  readonly noteMaxLength = NOTE_MAX_LENGTH;
+  /** Sharing is its own deliberate step, never part of saving. */
+  readonly shareOpen = signal(false);
+
+  /** Opened by the logger the moment the workout finished. */
+  private readonly _justFinished = signal(false);
 
   readonly showSkeleton = computed(() => this.loading() && !this.log());
   readonly showError = computed(() => this.error() && !this.log());
 
-  /** Already finished — then this is a read-only look back, not a form. */
-  readonly isReview = computed(() => this.log()?.status === WorkoutLogStatus.Completed);
+  /** A look back from History: the feedback shows as given, not as a form. */
+  readonly isReview = computed(() => !this._justFinished());
+
+  /** Only close to the limit: a counter from the first letter is noise. */
+  readonly showNoteCounter = computed(() => this.note().length > NOTE_MAX_LENGTH - 200);
+
+  /** "Thu, 22 Oct · 18:47": when it finished, in the reader's calendar. */
+  readonly whenLabel = computed(() => {
+    const at = this.log()?.completedAt;
+    if (!at) return '';
+    const date = new Date(at);
+    const locale = appLocale();
+    return [
+      date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' }),
+      date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
+    ].join(' · ');
+  });
+
+  /**
+   * Straight after finishing, a cheer with the person's name; looking back,
+   * the workout's own name, since praise for an old session rings false.
+   */
+  readonly heroTitle = computed(() => {
+    const log = this.log();
+    if (!log) return '';
+    if (this.isReview()) return log.name;
+    const name = this._authStore.user()?.firstName?.trim();
+    return name
+      ? this._translateService.instant(cheerKey(log.id), { name })
+      : this._translateService.instant('workouts.finish.cheerNoName');
+  });
+
+  /** "Leg day · your 12th workout", each part only when there is one. */
+  readonly heroSubtitle = computed(() => {
+    const log = this.log();
+    if (!log) return '';
+    const parts: string[] = [];
+    if (!this.isReview()) parts.push(log.name);
+    const number = log.summary?.workoutNumber;
+    if (number) {
+      parts.push(this._translateService.instant('workouts.finish.workoutNumber', { count: number }));
+    }
+    return parts.join(' · ');
+  });
+
+  /** Duration, sets, then the session's own measure: three at most. */
+  readonly heroStats = computed<HeroStat[]>(() => {
+    const log = this.log();
+    if (!log) return [];
+    return [
+      {
+        label: this._translateService.instant('workouts.tiles.duration'),
+        value: durationClock(log.durationSeconds),
+      },
+      ...workoutTiles(log).slice(0, 2),
+    ];
+  });
+
+  readonly highlights = computed<Highlight[]>(() => {
+    const log = this.log();
+    if (!log) return [];
+    const list: Highlight[] = [];
+
+    const records = log.personalRecords ?? [];
+    if (records.length > 0) {
+      list.push({
+        glyph: '🏆',
+        title: this._translateService.instant('workouts.finish.highlights.record', {
+          count: records.length,
+        }),
+        detail: this._recordLine(records[0]),
+        honey: true,
+      });
+    }
+
+    // Today's streak says nothing about an old workout.
+    const weeks = log.summary?.streakWeeks ?? 0;
+    if (!this.isReview() && weeks >= STREAK_WORTH_SAYING) {
+      list.push({
+        glyph: '🔥',
+        title: this._translateService.instant('workouts.finish.highlights.streak', { count: weeks }),
+        detail: this._translateService.instant('workouts.finish.highlights.streakDetail'),
+        honey: false,
+      });
+    }
+
+    // A record already says it was a good day; this is for the days without one.
+    const gain = volumeGainPercent(workoutVolume(log), log.summary?.previousVolumeKg ?? null);
+    if (records.length === 0 && gain !== null) {
+      list.push({
+        glyph: '📈',
+        title: this._translateService.instant('workouts.finish.highlights.volume', { percent: gain }),
+        detail: this._translateService.instant('workouts.finish.highlights.volumeDetail'),
+        honey: false,
+      });
+    }
+
+    return list.slice(0, MAX_HIGHLIGHTS);
+  });
 
   /** A freestyle session is the one that can become a routine. */
   readonly canSaveAsRoutine = computed(() => {
@@ -106,14 +254,10 @@ export class Finish implements ViewWillEnter {
     return !!log && !log.assignedWorkoutId && !log.sourceProgramId;
   });
 
-  readonly durationLabel = computed(
-    () => workoutDuration(this.log()?.durationSeconds) || '—',
-  );
-
-  /** Only the modalities the session actually contained get a tile. */
-  readonly tiles = computed(() => {
+  /** Saved as a routine this session, by its name; the offer is not made twice. */
+  readonly savedRoutineName = computed(() => {
     const log = this.log();
-    return log ? workoutTiles(log) : [];
+    return log ? this._saveRoutineService.savedName(log.id) : null;
   });
 
   readonly exercises = computed<LoggedExercise[]>(() => this.log()?.exercises ?? []);
@@ -123,12 +267,23 @@ export class Finish implements ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
+    this._themeService.setDarkTop(true);
     this.load();
   }
 
+  ionViewWillLeave(): void {
+    this._themeService.setDarkTop(false);
+  }
+
   load(): void {
-    const id = this._route.snapshot.paramMap.get('id');
-    if (!id) return;
+    const snapshot = this._route.snapshot;
+    const id = snapshot.paramMap.get('id');
+    if (!id) {
+      void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
+      return;
+    }
+    const firstLook = !this.log() && snapshot.queryParamMap.get('from') === 'logger';
+    this._justFinished.set(snapshot.queryParamMap.get('from') === 'logger');
 
     this.loading.set(true);
     this.error.set(false);
@@ -137,11 +292,17 @@ export class Finish implements ViewWillEnter {
       .pipe(take(1))
       .subscribe({
         next: (log) => {
+          // Still running: a summary of it would be wrong in every number.
+          if (log.status === WorkoutLogStatus.InProgress) {
+            this.loading.set(false);
+            void this._router.navigate(['/tabs/workouts/log', log.id], { replaceUrl: true });
+            return;
+          }
           this.log.set(log);
           this.feeling.set(log.feelingRating);
           this.note.set(log.notes ?? '');
-          this.routineName.set(this._suggestName(log));
           this.loading.set(false);
+          if (firstLook) void this._celebrate();
         },
         error: () => {
           this.error.set(true);
@@ -154,9 +315,18 @@ export class Finish implements ViewWillEnter {
     return exerciseSetSummary(exercise);
   }
 
-  save(): void {
+  /**
+   * Save, and the close button too: what was picked or typed is kept either
+   * way, since the workout itself is already saved and walking away should
+   * not cost the note.
+   */
+  done(): void {
     const log = this.log();
     if (!log || this.saving()) return;
+    if (!this._hasNewFeedback(log)) {
+      this._leave(log);
+      return;
+    }
 
     this.saving.set(true);
     this._workoutLogService
@@ -168,10 +338,7 @@ export class Finish implements ViewWillEnter {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          void this._feedbackService.success(
-            this._translateService.instant('workouts.finish.toast.saved'),
-          );
-          void this._router.navigate(['/tabs/workouts']);
+          this._leave(log);
         },
         error: (err) => {
           this.saving.set(false);
@@ -183,30 +350,62 @@ export class Finish implements ViewWillEnter {
       });
   }
 
-  saveAsRoutine(): void {
-    const log = this.log();
-    const name = this.routineName().trim();
-    if (!log || !name || this.savingRoutine()) return;
+  /** The message is kept with the workout; sharing again starts from it. */
+  onCaptionSaved(caption: string | null): void {
+    this.log.update((log) => (log ? { ...log, shareCaption: caption } : log));
+  }
 
-    this.savingRoutine.set(true);
-    this._workoutLogService
-      .saveAsRoutine(log.id, { name })
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          this.savingRoutine.set(false);
-          void this._feedbackService.success(
-            this._translateService.instant('workouts.finish.toast.routineSaved', { name }),
-          );
-        },
-        error: (err) => {
-          this.savingRoutine.set(false);
-          void this._feedbackService.error(
-            err,
-            this._translateService.instant('workouts.finish.toast.routineSaveFailed'),
-          );
-        },
+  openSaveRoutine(): void {
+    const log = this.log();
+    if (log) this._saveRoutineService.open({ logId: log.id, suggestedName: this._suggestName(log) });
+  }
+
+  private _hasNewFeedback(log: WorkoutLog): boolean {
+    return this.feeling() !== log.feelingRating || this.note().trim() !== (log.notes ?? '');
+  }
+
+  /**
+   * Back to the Workouts tab. A freestyle session's toast offers to keep it
+   * as a routine; the same offer stays on the workout in History.
+   */
+  private _leave(log: WorkoutLog): void {
+    const offer =
+      this.canSaveAsRoutine() && !this.savedRoutineName()
+        ? {
+            label: this._translateService.instant('workouts.finish.saveAsRoutine.action'),
+            run: () =>
+              this._saveRoutineService.open({ logId: log.id, suggestedName: this._suggestName(log) }),
+          }
+        : undefined;
+    void this._router.navigate(['/tabs/workouts']);
+    void this._feedbackService.success(
+      this._translateService.instant('workouts.finish.toast.saved'),
+      offer,
+    );
+  }
+
+  /** "Back squat 100 kg × 5": the set that earned it, else what it added. */
+  private _recordLine(record: PersonalRecord): string {
+    if (record.setWeightKg != null && record.setReps != null) {
+      return this._translateService.instant('workouts.finish.highlights.recordSet', {
+        name: record.exerciseName,
+        weight: formatMeasure(record.setWeightKg),
+        reps: record.setReps,
       });
+    }
+    return this._translateService.instant('workouts.finish.highlights.recordGain', {
+      name: record.exerciseName,
+      delta: formatMeasure(record.deltaKg),
+    });
+  }
+
+  /** One buzz as the summary lands, the moment the work is done. */
+  private async _celebrate(): Promise<void> {
+    try {
+      await Haptics.notification({ type: NotificationType.Success });
+    } catch {
+      // No haptics on this device or platform.
+    }
   }
 
   /** "Bench press day" — the first exercise is what people call a session. */

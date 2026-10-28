@@ -2451,16 +2451,39 @@
       "sessions": "Sesiuni",
       "setValue": "{weight} × {reps}"
     },
+    "feeling": {
+      "good": "Bine",
+      "great": "Super",
+      "hard": "Greu",
+      "ok": "Ok",
+      "tiring": "Obositor"
+    },
     "finish": {
-      "done": "Gata",
-      "howDidItFeel": "Cum te-ai simțit?",
-      "logged": "Înregistrat",
+      "cheer": {
+        "1": "Bravo, {name}!",
+        "2": "Încă un antrenament la activ, {name}!",
+        "3": "Antrenament solid, {name}!",
+        "4": "Foarte bine, {name}!",
+        "5": "Asta a fost tare, {name}!",
+        "6": "Te-ai ținut de cuvânt, {name}!"
+      },
+      "cheerNoName": "Antrenament încheiat!",
+      "highlights": {
+        "record": "{count, plural, one {Record nou} few {# recorduri noi} other {# de recorduri noi}}",
+        "recordGain": "{name} +{delta} kg",
+        "recordSet": "{name} {weight} kg × {reps}",
+        "streak": "{count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
+        "streakDetail": "la rând",
+        "volume": "+{percent}% volum",
+        "volumeDetail": "față de data trecută"
+      },
+      "howDidItFeel": "Cum a fost antrenamentul?",
       "notesPlaceholder": "Ceva de ținut minte pentru data viitoare?",
       "rating": "Nota {value} din 5",
-      "saveAndFinish": "Salvează și termină",
       "saveAsRoutine": {
         "action": "Salvează rutina",
         "message": "Păstrează antrenamentul ca să-l repeți mai târziu.",
+        "saved": "Am salvat antrenamentul în rutinele tale ca „{name}”",
         "title": "Salvezi ca rutină?"
       },
       "suggestedName": "Ziua de {name}",
@@ -2470,7 +2493,8 @@
         "saveFailed": "Nu am putut salva antrenamentul",
         "saved": "Antrenament salvat"
       },
-      "whatYouDid": "Ce ai făcut"
+      "whatYouDid": "Ce ai făcut",
+      "workoutNumber": "{count, selectordinal, one {primul antrenament} other {al #-lea antrenament}}"
     },
     "history": {
       "calendar": {
@@ -2554,6 +2578,7 @@
       "discard": {
         "irreversible": "Acțiunea nu poate fi anulată",
         "message": "Tot ce ai înregistrat în acest antrenament se șterge. Dacă sari peste un antrenament planificat e altceva: acela rămâne în istoric.",
+        "nothingTicked": "Nu ai bifat încă nicio serie, așa că nu ai ce termina. Renunță la antrenament sau continuă și bifează ce ai făcut.",
         "title": "Renunță la antrenament"
       },
       "empty": {
@@ -2593,6 +2618,7 @@
       "toast": {
         "discardFailed": "Nu am putut renunța la antrenament",
         "discarded": "Ai renunțat la antrenament",
+        "finishFailed": "Nu am putut termina antrenamentul",
         "nothingToRepeat": "Antrenamentul acela nu avea exerciții de repetat",
         "pauseFailed": "Nu am putut pune antrenamentul pe pauză",
         "removeSetFailed": "Nu am putut elimina seria",
@@ -2731,6 +2757,33 @@
       "REST_PAUSE": "Rest-pause",
       "WARMUP": "Î"
     },
+    "share": {
+      "action": "Distribuie",
+      "card": {
+        "coach": "Program de la {name}",
+        "kicker": "Antrenamentul #{number} · {date}",
+        "record": "Record · {detail}",
+        "streak": "{count, plural, one {# săptămână la rând} few {# săptămâni la rând} other {# de săptămâni la rând}}"
+      },
+      "fromNote": "Din notița ta",
+      "message": "Mesajul tău",
+      "messagePlaceholder": "Scrie ceva despre antrenament",
+      "onCard": "Pe card",
+      "preview": "Previzualizarea cardului pe care îl distribui",
+      "show": {
+        "coach": "Numele antrenorului",
+        "kg": "Greutăți (kg)",
+        "record": "Record"
+      },
+      "suggestions": {
+        "done": "Încă un antrenament bifat ✅",
+        "hive": "Stupul nu doarme 🐝"
+      },
+      "title": "Distribuie antrenamentul",
+      "toast": {
+        "failed": "Nu am putut distribui antrenamentul"
+      }
+    },
     "starters": {
       "empty": {
         "message": "Antrenamentele predefinite MotionHive nu sunt disponibile acum. Încearcă din nou puțin mai târziu.",
@@ -2740,6 +2793,7 @@
     },
     "tiles": {
       "distance": "Distanță",
+      "duration": "Durată",
       "reps": "Repetări",
       "sets": "Serii",
       "time": "Timp",

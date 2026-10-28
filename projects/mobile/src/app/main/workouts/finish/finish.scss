@@ -1,69 +1,320 @@
-/* The hero card: the outcome, the session's name, and how long it ran. */
-
-/* The ink form of success, not the fill: plain success green on a white card
-   is 2.42:1, which is a label you cannot read. */
-.hero .done {
-  color: var(--ion-color-success-wash-contrast);
+/* ─── Hero ─────────────────────────────────────────────────────────
+   Navy from the top of the screen: the toolbar and the hero are one
+   surface, so the status bar flips to light icons while this is showing
+   (ThemeService.setDarkTop). Navy reads as the brand in both themes. */
+.hero-header ion-toolbar {
+  --background: var(--mh-navy-900);
+  --color: var(--mh-navy-50);
+  --border-width: 0;
 }
 
-.hero h2 {
-  margin: 0.25rem 0 0;
+.hero-header ion-back-button,
+.hero-header ion-button {
+  --color: var(--mh-navy-50);
+}
+
+.when {
+  color: var(--mh-navy-300);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem 1.5rem;
+  background: var(--mh-navy-900);
+  color: var(--mh-navy-50);
+  text-align: center;
+  isolation: isolate;
+}
+
+/* A faint honeycomb, drawn as a mask so its colour stays a theme token. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ion-color-primary);
+  opacity: 0.07;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cpath d='M0 28L16 0h32l16 28-16 28H16zM64 28h32' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E");
+  mask-size: 96px 56px;
+  pointer-events: none;
+}
+
+.badge {
+  position: relative;
+  width: 5rem;
+  aspect-ratio: 100 / 86.6;
+  margin-bottom: 0.5rem;
+}
+
+.badge .cell {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--ion-color-success);
+}
+
+.badge .tick {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--ion-color-success-contrast);
+  --ionicon-stroke-width: 56px;
+}
+
+.spark {
+  position: absolute;
+  overflow: visible;
+}
+
+.spark-1 {
+  left: -1.125rem;
+  top: 0.375rem;
+  width: 1rem;
+  fill: var(--ion-color-primary);
+  rotate: -14deg;
+}
+
+.spark-2 {
+  right: -1.25rem;
+  top: -0.25rem;
+  width: 0.75rem;
+  fill: var(--mh-teal-400);
+}
+
+.spark-3 {
+  right: -0.75rem;
+  bottom: 0.125rem;
+  width: 1.125rem;
+  fill: var(--mh-coral-400);
+  rotate: 12deg;
+}
+
+.spark-4 {
+  left: -0.5rem;
+  bottom: -0.375rem;
+  width: 0.625rem;
+  fill: var(--mh-violet-400);
+}
+
+/* Straight after finishing the cell pops in and the sparks fly out. */
+.celebrate .badge {
+  animation: pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.celebrate .spark {
+  animation: fling 520ms ease-out both;
+}
+
+.celebrate .spark-2 {
+  animation-delay: 60ms;
+}
+
+.celebrate .spark-3 {
+  animation-delay: 120ms;
+}
+
+.celebrate .spark-4 {
+  animation-delay: 180ms;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes fling {
+  from {
+    transform: translate(0, 0.75rem) scale(0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebrate .badge,
+  .celebrate .spark {
+    animation: none;
+  }
+}
+
+.title {
+  margin: 0;
+  color: var(--mh-navy-50);
+  font-family: var(--mh-font-heading);
   font-size: var(--mh-text-2xl);
   font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
 }
 
-.hero .duration {
-  margin: 0.25rem 0 0;
-  color: var(--ion-color-medium);
+.subtitle {
+  margin: 0;
+  color: var(--mh-navy-200);
   font-size: var(--mh-text-base);
-  font-weight: 600;
+  text-wrap: balance;
+}
+
+/* ─── Stats ────────────────────────────────────────────────────────
+   Big, even numbers: tabular figures so 52:14 and 6.240 line up. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(var(--stats, 3), 1fr);
+  gap: 0.5rem;
+  align-self: stretch;
+  margin: 0.75rem 0 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.625rem 0.375rem;
+  border: 1px solid var(--mh-navy-700);
+  border-radius: var(--mh-radius-control);
+  background: var(--mh-navy-800);
+}
+
+.stat dd {
+  margin: 0;
+  color: var(--mh-navy-50);
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat dt {
+  color: var(--mh-navy-300);
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
 }
 
 .hero ion-skeleton-text {
-  margin: 0.375rem 0;
+  --background-rgb: 217, 226, 236;
+  margin: 0.25rem 0;
 }
 
-/* ─── Feelings ────────────────────────────────────────────────────
-   Five same-sized tiles sized for a thumb, one of which is pressed. Plain
-   buttons on theme tokens: a rating grid, like the set grid, is a row of
-   equal cells, and Ionic's button chrome fights that. */
-.feelings {
-  display: flex;
+.hero .skeleton-badge {
+  width: 5rem;
+  height: 4.33rem;
+  border-radius: var(--mh-radius-control);
+}
+
+/* ─── Body ───────────────────────────────────────────────────────── */
+.body {
+  padding-top: 1rem;
+}
+
+.highlights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
-.feeling {
-  flex: 1;
-  height: 3rem;
+.highlights.single {
+  grid-template-columns: 1fr;
+}
+
+.highlight {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  padding: 0.625rem 0.75rem;
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-control);
   background: var(--ion-card-background);
-  color: var(--ion-text-color);
-  font-size: 1.375rem;
-  cursor: pointer;
 }
 
-.feeling.on {
-  border-color: var(--mh-color-honey-deep);
-  background: var(--mh-color-selected-background);
-}
-
-/* The one prompt slot, on the honey wash — a question, not a status. */
-.prompt {
+/* A record is the one thing worth a colour. */
+.highlight.honey {
+  border-color: color-mix(in srgb, var(--ion-color-primary) 35%, transparent);
   background: var(--ion-color-primary-wash);
 }
 
-.prompt .mh-kicker {
-  color: var(--ion-color-primary-wash-contrast);
+.highlight .glyph {
+  font-size: 1.375rem;
+  line-height: 1;
 }
 
-.prompt p {
-  margin: 0.25rem 0 0.75rem;
+.highlight .text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.highlight-title {
   font-size: var(--mh-text-sm);
+  font-weight: 600;
 }
 
-.prompt ion-button {
-  margin: 0.625rem 0 0;
+.highlight-detail {
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.highlight.honey .highlight-detail {
+  color: var(--ion-color-primary-wash-contrast);
+  font-weight: 600;
+}
+
+/* How it felt and the note: one card, the only form on the screen. */
+.feedback {
+  margin: 0 0 0.75rem;
+}
+
+.feedback ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.card-title {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+}
+
+.given-note {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-base);
+  white-space: pre-line;
+}
+
+.save-routine,
+.routine-saved {
+  margin: 0 0 0.75rem;
+}
+
+/* Share beside Save, Save the wider: sharing is optional, saving is the way on. */
+.actions {
+  display: flex;
+  gap: 0.625rem;
+}
+
+.actions ion-button {
+  margin: 0;
+}
+
+.actions .save {
+  flex: 1;
 }
 
 /* A skipped exercise stays in the record, quieter. */

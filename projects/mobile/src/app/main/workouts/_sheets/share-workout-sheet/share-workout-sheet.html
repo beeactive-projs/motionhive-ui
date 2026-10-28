@@ -1,0 +1,67 @@
+<ng-template #body>
+  <!-- The image that will be sent, redrawn as the choices change. -->
+  <div class="preview">
+    @if (preview(); as src) {
+      <img [src]="src" [alt]="'workouts.share.preview' | translate" />
+    } @else {
+      <ion-spinner name="crescent" />
+    }
+  </div>
+
+  <div class="mh-section-label">{{ 'workouts.share.onCard' | translate }}</div>
+  <div class="mh-chip-cloud">
+    <ion-button class="chip" fill="clear" shape="round" size="small"
+      [class.selected]="showKg()" [attr.aria-pressed]="showKg()" (click)="toggleKg()">
+      {{ 'workouts.share.show.kg' | translate }}
+    </ion-button>
+    @if (hasRecord()) {
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="showRecord()" [attr.aria-pressed]="showRecord()" (click)="toggleRecord()">
+        {{ 'workouts.share.show.record' | translate }}
+      </ion-button>
+    }
+    @if (hasCoach()) {
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="showCoach()" [attr.aria-pressed]="showCoach()" (click)="toggleCoach()">
+        {{ 'workouts.share.show.coach' | translate }}
+      </ion-button>
+    }
+  </div>
+
+  <ion-input mode="md"
+    class="message"
+    fill="outline"
+    [label]="'workouts.share.message' | translate"
+    labelPlacement="stacked"
+    [placeholder]="'workouts.share.messagePlaceholder' | translate"
+    [maxlength]="captionMaxLength"
+    [counter]="true"
+    [value]="caption()"
+    (ionInput)="caption.set($any($event).detail.value ?? '')"
+  />
+
+  <div class="mh-chip-cloud">
+    @if (noteLine()) {
+      <ion-button class="chip" fill="clear" shape="round" size="small" (click)="useNote()">
+        {{ 'workouts.share.fromNote' | translate }}
+      </ion-button>
+    }
+    @for (key of suggestions; track key) {
+      <ion-button class="chip" fill="clear" shape="round" size="small" (click)="useSuggestion(key)">
+        {{ key | translate }}
+      </ion-button>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'workouts.share.title' | translate"
+  [saveLabel]="'workouts.share.action' | translate"
+  [body]="body"
+  [canSave]="!!preview()"
+  [saving]="sharing()"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  (save)="share()"
+/>

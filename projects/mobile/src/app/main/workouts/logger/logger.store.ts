@@ -38,6 +38,8 @@ export class LoggerStore {
    */
   private readonly _inFlight = new Set<string>();
   private readonly _queued = new Map<string, { exerciseId: string; payload: LogSetPayload }>();
+  /** Waiting for every set write above to land; see `whenSettled`. */
+  private _settled: (() => void)[] = [];
 
   readonly log = this._log.asReadonly();
   readonly loading = this._loading.asReadonly();
@@ -174,7 +176,27 @@ export class LoggerStore {
           return;
         }
         if (saved) this._replaceSet(exerciseId, saved);
+        if (this._saving() === 0) this._flushSettled();
       });
+  }
+
+  /**
+   * Runs `then` once no set write is in flight or waiting. Finishing goes
+   * through here: the API refuses sets on a finished workout, so the tick
+   * that came just before Finish has to land first or it is lost.
+   */
+  whenSettled(then: () => void): void {
+    if (this._saving() === 0) {
+      then();
+      return;
+    }
+    this._settled.push(then);
+  }
+
+  private _flushSettled(): void {
+    const waiting = this._settled;
+    this._settled = [];
+    waiting.forEach((then) => then());
   }
 
   addSet(exerciseId: string): void {

@@ -211,6 +211,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly discardConfirmOpen = signal(false);
   readonly finishConfirmOpen = signal(false);
   readonly discarding = signal(false);
+  readonly finishing = signal(false);
+  /** The discard sheet was opened by Finish with nothing ticked. */
+  readonly discardFromFinish = signal(false);
   /** Asked on the way out: keep the clock running, or pause it. */
   readonly leaveOpen = signal(false);
 
@@ -298,6 +301,14 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       ? this._translateService.instant('workouts.logger.remove.messageWithSets', { name, count: done })
       : this._translateService.instant('workouts.logger.remove.message', { name });
   });
+
+  readonly discardBody = computed(() =>
+    this._translateService.instant(
+      this.discardFromFinish()
+        ? 'workouts.logger.discard.nothingTicked'
+        : 'workouts.logger.discard.message',
+    ),
+  );
 
   readonly finishBody = computed(() => {
     const { done, total } = this.store.progress();
@@ -760,26 +771,73 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /**
    * Finishing with sets still unticked is allowed — an explicit finish marks
    * the workout complete even when partial — but it is worth one question,
-   * because the alternative reading is "I tapped the wrong thing".
+   * because the alternative reading is "I tapped the wrong thing". With
+   * nothing ticked at all there is nothing to record, so the way out
+   * offered is discard.
    */
   finish(): void {
-    if (!this.store.log()) return;
+    if (!this.store.log() || this.finishing()) return;
+    // A tap on Finish while typing is a Done for that cell, as everywhere.
+    this._keepTyped();
+    this.editing.set(null);
+
     const { done, total } = this.store.progress();
-    if (total > 0 && done < total) {
+    if (done === 0) {
+      this.openDiscard(true);
+      return;
+    }
+    if (done < total) {
       this.finishConfirmOpen.set(true);
       return;
     }
-    this._goToFinish();
+    this._complete();
   }
 
-  async confirmFinish(): Promise<void> {
-    await this._finishSheet()?.close();
-    this._goToFinish();
+  confirmFinish(): void {
+    this._complete(() => this._finishSheet()?.close());
   }
 
-  private _goToFinish(): void {
+  /** `fromFinish`: Finish found nothing ticked, so the sheet says why it is here. */
+  openDiscard(fromFinish = false): void {
+    this.discardFromFinish.set(fromFinish);
+    this.discardConfirmOpen.set(true);
+  }
+
+  /**
+   * Completes the workout here, so the summary opens on a finished one: its
+   * duration and records are only set by completing. Waits for set writes
+   * still on their way first, or the last tick before Finish is refused.
+   */
+  private _complete(closeSheet?: () => Promise<void> | undefined): void {
     const log = this.store.log();
-    if (log) void this._router.navigate(['/tabs/workouts/finish', log.id]);
+    if (!log || this.finishing()) return;
+    this.finishing.set(true);
+    this.restEndsAt.set(null);
+
+    this.store.whenSettled(() =>
+      this._workoutLogService
+        .complete(log.id)
+        .pipe(take(1))
+        .subscribe({
+          next: async () => {
+            this.finishing.set(false);
+            await closeSheet?.();
+            // Replaced, so back from the summary returns to wherever the
+            // workout was opened from rather than into a finished logger.
+            void this._router.navigate(['/tabs/workouts/finish', log.id], {
+              queryParams: { from: 'logger' },
+              replaceUrl: true,
+            });
+          },
+          error: (err) => {
+            this.finishing.set(false);
+            void this._feedbackService.error(
+              err,
+              this._translateService.instant('workouts.logger.toast.finishFailed'),
+            );
+          },
+        }),
+    );
   }
 
   private _startFreestyle(): void {

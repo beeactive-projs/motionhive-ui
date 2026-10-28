@@ -14,7 +14,7 @@
       }
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button class="finish" fill="solid" shape="round" [disabled]="!store.log()" (click)="finish()">
+      <ion-button class="finish" fill="solid" shape="round" [disabled]="!store.log() || finishing()" (click)="finish()">
         {{ 'workouts.logger.finish' | translate }}
       </ion-button>
     </ion-buttons>
@@ -152,7 +152,7 @@
       <!-- Last and quiet: throwing the session away is the rare path, and
            leaving the page is not it. -->
       @if (store.log()) {
-        <ion-button class="discard" expand="block" fill="clear" color="danger" size="small" (click)="discardConfirmOpen.set(true)">
+        <ion-button class="discard" expand="block" fill="clear" color="danger" size="small" (click)="openDiscard()">
           {{ 'workouts.logger.discard.title' | translate }}
         </ion-button>
       }
@@ -221,7 +221,7 @@
   #discardSheet
   [(open)]="discardConfirmOpen"
   [title]="'workouts.logger.discard.title' | translate"
-  [body]="'workouts.logger.discard.message' | translate"
+  [body]="discardBody()"
   [confirmLabel]="'button.discard' | translate"
   [cancelLabel]="'workouts.common.keepGoing' | translate"
   tone="danger"
@@ -237,5 +237,6 @@
   [body]="finishBody()"
   [confirmLabel]="'workouts.logger.finish' | translate"
   [cancelLabel]="'workouts.common.keepGoing' | translate"
+  [saving]="finishing()"
   (confirm)="confirmFinish()"
 />

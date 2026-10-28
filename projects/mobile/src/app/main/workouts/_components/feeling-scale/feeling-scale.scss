@@ -1,0 +1,114 @@
+/* Five equal cells sized for a thumb. Plain buttons on theme tokens: a
+   rating row is a row of equal cells, and Ionic's button chrome fights that. */
+.scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.25rem;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cell:disabled {
+  cursor: default;
+}
+
+.hex {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 3.5rem;
+  aspect-ratio: 100 / 86.6;
+}
+
+.hex svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The empty comb follows the text colour, so it reads on light and dark. */
+.comb {
+  fill: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+}
+
+.honey {
+  fill: var(--mh-warning-300);
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: transform 200ms ease-out;
+}
+
+.rim {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 5;
+}
+
+.glyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.label {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+}
+
+.on .honey {
+  fill: var(--ion-color-primary);
+}
+
+.on .rim {
+  stroke: var(--mh-color-honey-deep);
+}
+
+.on .label {
+  color: var(--mh-color-honey-deep);
+  font-weight: 600;
+}
+
+/* Fills with a short wobble when picked. */
+.on .hex {
+  animation: wobble 260ms ease-out;
+}
+
+@keyframes wobble {
+  40% {
+    transform: scale(1.1) rotate(-4deg);
+  }
+  70% {
+    transform: scale(0.97) rotate(2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .on .hex {
+    animation: none;
+  }
+
+  .honey {
+    transition: none;
+  }
+}
+
+/* A past workout: the answer given is the point; the rest step back. */
+:host(.readonly) .cell:not(.on) {
+  opacity: 0.4;
+}

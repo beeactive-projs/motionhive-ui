@@ -31,14 +31,14 @@ export type HexAvatarTone = (typeof HexAvatarTones)[keyof typeof HexAvatarTones]
  * porting that component's geometry code. Same shape as web — change it there
  * and here together.
  */
-const HEX_PATH =
+export const HEX_PATH =
   'M 94.50 40.47 Q 100.00 50.00 94.50 59.53 L 80.50 83.77 Q 75.00 93.30 64.00 93.30 ' +
   'L 36.00 93.30 Q 25.00 93.30 19.50 83.77 L 5.50 59.53 Q 0.00 50.00 5.50 40.47 ' +
   'L 19.50 16.23 Q 25.00 6.70 36.00 6.70 L 64.00 6.70 Q 75.00 6.70 80.50 16.23 ' +
   'L 94.50 40.47 Z';
 
 /** Tight bounds of the path above — width:height is 1 : cos 30°. */
-const HEX_VIEW_BOX = '0 6.7 100 86.6';
+export const HEX_VIEW_BOX = '0 6.7 100 86.6';
 
 /** Clip paths are referenced by id, so every instance needs its own. */
 let seq = 0;

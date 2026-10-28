@@ -15,10 +15,12 @@ import {
   calendarCells,
   calendarDayState,
   calendarWeek,
+  cheerKey,
   clockDigitsToDisplay,
   clockDigitsToSeconds,
   compactPrescription,
   dateRail,
+  durationClock,
   heroState,
   exerciseSessionLine,
   exerciseDoneSummary,
@@ -43,10 +45,12 @@ import {
   routineTileColor,
   secondsToClock,
   trendGeometry,
+  volumeGainPercent,
   workoutClock,
   workoutDuration,
   workoutMetaLine,
   workoutTiles,
+  workoutVolume,
 } from './workouts.config';
 import { workoutRoutes } from './workouts.routes';
 
@@ -587,5 +591,39 @@ describe('workouts config', () => {
     expect(exerciseSetSummary({ isSkipped: false, sets: [set(), set({ isCompleted: false })] } as never)).toBe('1 of 2 sets');
     expect(exerciseSetSummary({ isSkipped: false, sets: [set()] } as never)).toBe('1 of 1 set');
     expect(exerciseSetSummary({ isSkipped: true, sets: [set()] } as never)).toBe('Skipped');
+  });
+});
+
+describe('the finish summary', () => {
+  it('reads a session length as a clock, with hours only past the hour', () => {
+    expect(durationClock(3134)).toBe('52:14');
+    expect(durationClock(59)).toBe('0:59');
+    expect(durationClock(3912)).toBe('1:05:12');
+    expect(durationClock(null)).toBe('0:00');
+  });
+
+  it('opens with the same line every time a workout is reopened', () => {
+    const key = cheerKey('3f7fb893-d954-4af5-8782-e14115115ba8');
+    expect(key).toMatch(/^workouts\.finish\.cheer\.[1-6]$/);
+    expect(cheerKey('3f7fb893-d954-4af5-8782-e14115115ba8')).toBe(key);
+  });
+
+  it('counts volume over completed, loaded sets only', () => {
+    const log = {
+      exercises: [
+        { sets: [set({ weightKg: 100, reps: 5 }), set({ weightKg: 80, reps: 8, isCompleted: false })] },
+        { sets: [set({ weightKg: null, reps: 12 })] },
+      ],
+    };
+    expect(workoutVolume(log as never)).toBe(500);
+  });
+
+  it('only ever says more volume than last time, never less', () => {
+    expect(volumeGainPercent(5400, 5000)).toBe(8);
+    expect(volumeGainPercent(4800, 5000)).toBeNull();
+    expect(volumeGainPercent(5000, 5000)).toBeNull();
+    expect(volumeGainPercent(5000, null)).toBeNull();
+    // Under half a percent rounds to nothing worth saying.
+    expect(volumeGainPercent(5020, 5000)).toBeNull();
   });
 });

@@ -34,6 +34,7 @@ import {
   chevronDownOutline,
   chevronForwardOutline,
   chevronUpOutline,
+  closeOutline,
   copyOutline,
   createOutline,
   ellipsisHorizontalOutline,
@@ -47,6 +48,7 @@ import {
   refreshOutline,
   removeOutline,
   repeatOutline,
+  shareOutline,
   timeOutline,
   trashOutline,
   trendingUpOutline,
@@ -73,6 +75,7 @@ export const WORKOUT_ICONS = {
   chevronDownOutline,
   chevronForwardOutline,
   chevronUpOutline,
+  closeOutline,
   copyOutline,
   createOutline,
   ellipsisHorizontalOutline,
@@ -86,6 +89,7 @@ export const WORKOUT_ICONS = {
   refreshOutline,
   removeOutline,
   repeatOutline,
+  shareOutline,
   timeOutline,
   trashOutline,
   trendingUpOutline,
@@ -1038,14 +1042,69 @@ export function exerciseSetSummary(exercise: LoggedExercise): string {
   return translate('workouts.meta.setsDone', { done, total: sets.length });
 }
 
-/** The emoji scale, as a rating affordance rather than decorative copy. */
-export const FEELINGS: readonly { value: number; glyph: string }[] = [
-  { value: 1, glyph: '😣' },
-  { value: 2, glyph: '😕' },
-  { value: 3, glyph: '😐' },
-  { value: 4, glyph: '🙂' },
-  { value: 5, glyph: '💪' },
+/** The longest post-workout note the API takes (`CompleteWorkoutDto.notes`). */
+export const NOTE_MAX_LENGTH = 4000;
+
+export interface Feeling {
+  value: number;
+  glyph: string;
+  /** Translation key. Describes the session, so Romanian needs no gender. */
+  label: string;
+  /** How full of honey its cell is, 0 to 1; the top one is full. */
+  fill: number;
+}
+
+/**
+ * How the session felt, 1 to 5: the same value the API stores, shown as a
+ * honey cell filling up (`mh-feeling-scale`) rather than a row of faces.
+ */
+export const FEELINGS: readonly Feeling[] = [
+  { value: 1, glyph: '😣', label: 'workouts.feeling.hard', fill: 0.12 },
+  { value: 2, glyph: '😮‍💨', label: 'workouts.feeling.tiring', fill: 0.32 },
+  { value: 3, glyph: '🙂', label: 'workouts.feeling.ok', fill: 0.52 },
+  { value: 4, glyph: '😄', label: 'workouts.feeling.good', fill: 0.74 },
+  { value: 5, glyph: '🤩', label: 'workouts.feeling.great', fill: 1 },
 ];
+
+/** "52:14", or "1:05:12" past the hour: how a finished session's length reads. */
+export function durationClock(seconds: number | null | undefined): string {
+  const total = Math.max(0, Math.round(seconds ?? 0));
+  const hours = Math.floor(total / 3600);
+  const mins = Math.floor((total % 3600) / 60);
+  const secs = String(total % 60).padStart(2, '0');
+  return hours > 0 ? `${hours}:${String(mins).padStart(2, '0')}:${secs}` : `${mins}:${secs}`;
+}
+
+/** How many lines `workouts.finish.cheer` holds. */
+const CHEER_LINES = 6;
+
+/**
+ * The line the summary opens with. Picked from the workout's id, so it
+ * varies from one workout to the next but never changes on a reopen.
+ */
+export function cheerKey(logId: string): string {
+  let hash = 0;
+  for (const ch of logId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return `workouts.finish.cheer.${(hash % CHEER_LINES) + 1}`;
+}
+
+/** Kilograms moved over the completed, loaded sets. */
+export function workoutVolume(log: WorkoutLog): number {
+  return (log.exercises ?? [])
+    .flatMap((exercise) => exercise.sets ?? [])
+    .filter((set) => set.isCompleted)
+    .reduce((sum, set) => sum + loadedVolume(set), 0);
+}
+
+/**
+ * Whole percent more volume than last time, or null: no comparison, or
+ * not more. Only good news is said; a lighter day is not a failure.
+ */
+export function volumeGainPercent(current: number, previous: number | null): number | null {
+  if (!previous || previous <= 0 || current <= previous) return null;
+  const gain = Math.round(((current - previous) / previous) * 100);
+  return gain > 0 ? gain : null;
+}
 
 // ─── Leaving the logger ───────────────────────────────────────────────────
 

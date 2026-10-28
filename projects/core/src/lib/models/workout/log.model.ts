@@ -37,6 +37,8 @@ export interface WorkoutLog {
   pausedSeconds?: number;
   feelingRating: number | null;
   notes: string | null;
+  /** The line on the shared card. Never the private note. */
+  shareCaption?: string | null;
   /**
    * Future export hooks — activity-type codes written when this log is
    * mirrored *out* to Apple Health / Health Connect. Write-only placeholders
@@ -62,11 +64,16 @@ export interface WorkoutLog {
   /**
    * 1RM personal records broken in this session (Epley-estimated from
    * loaded sets). Present on the detail endpoint after the workout is
-   * completed; absent otherwise.
+   * completed; absent otherwise. A first time on an exercise is not one.
    */
   personalRecords?: PersonalRecord[];
   /** History list only — count of session PRs, for the badge. */
   prCount?: number;
+  /**
+   * What the finish screen celebrates. The owner's detail read of a
+   * completed workout only; never on a coach's read.
+   */
+  summary?: WorkoutSummary;
 }
 
 export interface PersonalRecord {
@@ -75,8 +82,22 @@ export interface PersonalRecord {
   exerciseName: string;
   /** New 1RM in kg. */
   weightKg: number;
-  /** Improvement over prior best; equals `weightKg` for first-ever PRs. */
+  /** Improvement over the previous best, always above zero. */
   deltaKg: number;
+  /** The set that earned it, "100 × 5". Null when it can't be told. */
+  setWeightKg?: number | null;
+  setReps?: number | null;
+}
+
+export interface WorkoutSummary {
+  /** 12 for "your 12th workout". */
+  workoutNumber: number;
+  /** Consecutive weeks with a workout, this week or last included. */
+  streakWeeks: number;
+  /** Routines only: the volume (kg) the previous time it was done. */
+  previousVolumeKg: number | null;
+  /** The coach whose plan it came from; null for your own training. */
+  coachName?: string | null;
 }
 
 export interface LoggedExercise {
@@ -182,4 +203,6 @@ export interface CompleteWorkoutPayload {
   /** 1–5. */
   feelingRating?: number;
   notes?: string;
+  /** The line on the shared card, 80 at most; empty clears it. */
+  shareCaption?: string;
 }

@@ -2451,16 +2451,39 @@
       "sessions": "Sessions",
       "setValue": "{weight} × {reps}"
     },
+    "feeling": {
+      "good": "Good",
+      "great": "Great",
+      "hard": "Hard",
+      "ok": "OK",
+      "tiring": "Tiring"
+    },
     "finish": {
-      "done": "Done",
+      "cheer": {
+        "1": "Nice work, {name}!",
+        "2": "Another one done, {name}!",
+        "3": "Strong session, {name}!",
+        "4": "Well done, {name}!",
+        "5": "That was a good one, {name}!",
+        "6": "You showed up, {name}!"
+      },
+      "cheerNoName": "Workout done!",
+      "highlights": {
+        "record": "{count, plural, one {New record} other {# new records}}",
+        "recordGain": "{name} +{delta} kg",
+        "recordSet": "{name} {weight} kg × {reps}",
+        "streak": "{count, plural, one {# week} other {# weeks}}",
+        "streakDetail": "in a row",
+        "volume": "+{percent}% volume",
+        "volumeDetail": "vs last time"
+      },
       "howDidItFeel": "How did it feel?",
-      "logged": "Logged",
       "notesPlaceholder": "Anything worth remembering next time?",
       "rating": "Rating {value} of 5",
-      "saveAndFinish": "Save & finish",
       "saveAsRoutine": {
         "action": "Save routine",
         "message": "Keep this workout to repeat later.",
+        "saved": "Saved to your routines as \"{name}\"",
         "title": "Save as routine?"
       },
       "suggestedName": "{name} day",
@@ -2470,7 +2493,8 @@
         "saveFailed": "Could not save the workout",
         "saved": "Workout saved"
       },
-      "whatYouDid": "What you did"
+      "whatYouDid": "What you did",
+      "workoutNumber": "your {count, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} workout"
     },
     "history": {
       "calendar": {
@@ -2554,6 +2578,7 @@
       "discard": {
         "irreversible": "This cannot be undone",
         "message": "Everything logged in this session is deleted. Skipping a planned workout is a different thing: that keeps the record.",
+        "nothingTicked": "No sets are ticked, so there is nothing to finish yet. Discard the workout, or keep going and tick what you did.",
         "title": "Discard workout"
       },
       "empty": {
@@ -2593,6 +2618,7 @@
       "toast": {
         "discardFailed": "Could not discard the workout",
         "discarded": "Workout discarded",
+        "finishFailed": "Could not finish the workout",
         "nothingToRepeat": "That workout had no exercises to repeat",
         "pauseFailed": "Could not pause the workout",
         "removeSetFailed": "Could not remove that set",
@@ -2731,6 +2757,33 @@
       "REST_PAUSE": "Rest pause",
       "WARMUP": "W"
     },
+    "share": {
+      "action": "Share",
+      "card": {
+        "coach": "Program by {name}",
+        "kicker": "Workout #{number} · {date}",
+        "record": "Record · {detail}",
+        "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}"
+      },
+      "fromNote": "From your note",
+      "message": "Your message",
+      "messagePlaceholder": "Say something about it",
+      "onCard": "On the card",
+      "preview": "Preview of the card you are sharing",
+      "show": {
+        "coach": "Coach's name",
+        "kg": "Weights (kg)",
+        "record": "Record"
+      },
+      "suggestions": {
+        "done": "Another workout done ✅",
+        "hive": "The hive never sleeps 🐝"
+      },
+      "title": "Share workout",
+      "toast": {
+        "failed": "Could not share the workout"
+      }
+    },
     "starters": {
       "empty": {
         "message": "MotionHive's starter routines are not available right now. Try again in a moment.",
@@ -2740,6 +2793,7 @@
     },
     "tiles": {
       "distance": "Distance",
+      "duration": "Duration",
       "reps": "Reps",
       "sets": "Sets",
       "time": "Time",
