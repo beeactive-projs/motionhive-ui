@@ -2850,5 +2850,19 @@
       "SUGGESTION": "Sugestie"
     },
     "typeLabel": "Despre ce este?"
+  },
+  "workoutVisibility": {
+    "hint": {
+      "COACHES_ONLY": "Antrenorii tăi activi, inclusiv nota și notița ta.",
+      "ONLY_ME": "Doar tu. Un antrenor vede în continuare antrenamentele din planul pe care ți l-a dat."
+    },
+    "newWorkouts": "Antrenamente noi",
+    "planCoachNote": "{name} vede mereu antrenamentele din planul pe care ți l-a dat.",
+    "saveFailed": "Nu am putut schimba cine îl vede",
+    "section": "Antrenamentele tale",
+    "sectionNote": "De aici pornește fiecare antrenament nou. Poți schimba oricare dintre ele din rezumatul lui.",
+    "sheetTitle": "Cine vede antrenamentul?",
+    "visibleTo": "Vizibil pentru",
+    "youAndCoach": "Tu și {name}"
   }
 }

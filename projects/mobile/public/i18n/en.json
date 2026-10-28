@@ -2850,5 +2850,19 @@
       "SUGGESTION": "Suggestion"
     },
     "typeLabel": "What is it about?"
+  },
+  "workoutVisibility": {
+    "hint": {
+      "COACHES_ONLY": "Your active coaches, with your rating and note.",
+      "ONLY_ME": "Just you. A coach still sees workouts from their own plan."
+    },
+    "newWorkouts": "New workouts",
+    "planCoachNote": "{name} always sees workouts from their plan.",
+    "saveFailed": "Could not change who sees it",
+    "section": "Your workouts",
+    "sectionNote": "Where each new workout starts. You can change any single one from its summary.",
+    "sheetTitle": "Who sees this workout?",
+    "visibleTo": "Visible to",
+    "youAndCoach": "You and {name}"
   }
 }

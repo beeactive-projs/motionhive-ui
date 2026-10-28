@@ -30,13 +30,24 @@ import {
   AuthStore,
   LoggedExercise,
   PersonalRecord,
+  ProfilePrivacy,
+  ProfilePrivacyLabels,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
   appLocale,
 } from 'core';
 
+import {
+  ChoiceOption,
+  ChoiceSheet,
+} from '../../../_shared/components/choice-sheet/choice-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
+import {
+  WORKOUT_VISIBILITY_LEVELS,
+  workoutVisibilityHint,
+} from '../../../_shared/config/workout-visibility.config';
 import { HEX_PATH, HEX_VIEW_BOX } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ThemeService } from '../../../_shared/services/theme.service';
@@ -90,6 +101,7 @@ interface Highlight {
 @Component({
   selector: 'mh-workout-finish',
   imports: [
+    ChoiceSheet,
     EmptyState,
     FeelingScale,
     IonBackButton,
@@ -109,6 +121,7 @@ interface Highlight {
     IonTextarea,
     IonTitle,
     IonToolbar,
+    SettingsRow,
     ShareWorkoutSheet,
     TranslatePipe,
   ],
@@ -141,6 +154,44 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
   readonly noteMaxLength = NOTE_MAX_LENGTH;
   /** Sharing is its own deliberate step, never part of saving. */
   readonly shareOpen = signal(false);
+  readonly visibilityOpen = signal(false);
+  readonly savingVisibility = signal(false);
+
+  readonly visibility = computed(() => this.log()?.visibility ?? ProfilePrivacy.OnlyMe);
+  /** The coach whose plan this was; they see it at any level. */
+  private readonly _planCoach = computed(() => this.log()?.summary?.coachName ?? null);
+
+  /** "You and Bogdan" on a coach's plan, where "Only me" would not be true. */
+  readonly visibilityLabel = computed(() => {
+    const coach = this._planCoach();
+    return this.visibility() === ProfilePrivacy.OnlyMe && coach
+      ? this._translateService.instant('workoutVisibility.youAndCoach', { name: coach })
+      : ProfilePrivacyLabels[this.visibility()];
+  });
+
+  readonly visibilityIcon = computed(() =>
+    this.visibility() === ProfilePrivacy.OnlyMe ? 'lock-closed-outline' : 'people-outline',
+  );
+
+  readonly visibilityOptions = computed<ChoiceOption[]>(() =>
+    WORKOUT_VISIBILITY_LEVELS.map((level) => ({
+      value: level,
+      label:
+        level === ProfilePrivacy.OnlyMe && this._planCoach()
+          ? this._translateService.instant('workoutVisibility.youAndCoach', {
+              name: this._planCoach(),
+            })
+          : ProfilePrivacyLabels[level],
+      hint: this._translateService.instant(workoutVisibilityHint(level)),
+    })),
+  );
+
+  readonly visibilityNote = computed(() => {
+    const coach = this._planCoach();
+    return coach
+      ? this._translateService.instant('workoutVisibility.planCoachNote', { name: coach })
+      : '';
+  });
 
   /** Opened by the logger the moment the workout finished. */
   private readonly _justFinished = signal(false);
@@ -345,6 +396,31 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
           void this._feedbackService.error(
             err,
             this._translateService.instant('workouts.finish.toast.saveFailed'),
+          );
+        },
+      });
+  }
+
+  /** Saves at once, and puts the old level back if the server refuses. */
+  onVisibilityPicked(value: string): void {
+    const log = this.log();
+    const level = WORKOUT_VISIBILITY_LEVELS.find((candidate) => candidate === value);
+    if (!log || !level || level === this.visibility() || this.savingVisibility()) return;
+
+    const previous = this.visibility();
+    this.log.set({ ...log, visibility: level });
+    this.savingVisibility.set(true);
+    this._workoutLogService
+      .setVisibility(log.id, level)
+      .pipe(take(1))
+      .subscribe({
+        next: () => this.savingVisibility.set(false),
+        error: (err) => {
+          this.savingVisibility.set(false);
+          this.log.update((current) => (current ? { ...current, visibility: previous } : current));
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workoutVisibility.saveFailed'),
           );
         },
       });

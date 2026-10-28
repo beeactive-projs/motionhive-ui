@@ -17,7 +17,9 @@ export type PrivacyControlledField =
   | 'phone'
   | 'city'
   | 'language'
-  | 'timezone';
+  | 'timezone'
+  /** Not a profile field: the level new workouts start at. */
+  | 'workouts';
 
 export type UserPrivacySettings = Partial<
   Record<PrivacyControlledField, ProfilePrivacy>
@@ -42,6 +44,8 @@ export const PROFILE_PRIVACY_DEFAULTS: Record<
   city: ProfilePrivacy.Public,
   language: ProfilePrivacy.CoachesOnly,
   timezone: ProfilePrivacy.CoachesOnly,
+  // Training is private until the person says otherwise.
+  workouts: ProfilePrivacy.OnlyMe,
 };
 
 /**

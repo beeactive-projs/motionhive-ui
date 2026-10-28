@@ -26,16 +26,24 @@ import {
 
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { ChoiceOption, ChoiceSheet } from '../_sheets/choice-sheet/choice-sheet';
+import { ChoiceOption, ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
 import { ACCOUNT_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
 import { DETAIL_TILES } from '../../../_shared/config/detail-tiles.config';
+import {
+  WORKOUT_VISIBILITY_LEVELS,
+  workoutVisibilityHint,
+} from '../../../_shared/config/workout-visibility.config';
 
 interface PrivacyRow {
   field: PrivacyControlledField;
   labelKey: string;
   icon: string;
   iconColor: string;
+  /** The levels offered; all three when absent. */
+  levels?: readonly ProfilePrivacy[];
+  /** The line under each level; the profile wording when absent. */
+  hint?: (level: ProfilePrivacy) => string;
 }
 
 /**
@@ -49,6 +57,19 @@ export const PRIVACY_ROWS: readonly PrivacyRow[] = [
   { field: 'language', labelKey: 'form.label.language', icon: DETAIL_TILES.language.icon, iconColor: DETAIL_TILES.language.color },
   { field: 'timezone', labelKey: 'form.label.timezone', icon: DETAIL_TILES.timezone.icon, iconColor: DETAIL_TILES.timezone.color },
 ];
+
+/**
+ * Not a detail on the profile: the level each new workout starts at. Every
+ * workout can still be changed from its summary.
+ */
+export const WORKOUTS_PRIVACY_ROW: PrivacyRow = {
+  field: 'workouts',
+  labelKey: 'workoutVisibility.newWorkouts',
+  icon: 'barbell-outline',
+  iconColor: 'primary',
+  levels: WORKOUT_VISIBILITY_LEVELS,
+  hint: workoutVisibilityHint,
+};
 
 /**
  * "Who can see my details": one row per detail, each opening a choice of
@@ -84,6 +105,7 @@ export class AccountPrivacy implements OnInit {
 
   readonly account = this.store.account;
   readonly rows = PRIVACY_ROWS;
+  readonly workoutsRow = WORKOUTS_PRIVACY_ROW;
 
   /** The detail whose sheet is open. */
   readonly editing = signal<PrivacyRow | null>(null);
@@ -91,11 +113,18 @@ export class AccountPrivacy implements OnInit {
   /** Fields with a save in flight: a second tap would race the first. */
   readonly saving = signal<ReadonlySet<PrivacyControlledField>>(new Set());
 
-  readonly levelOptions: ChoiceOption[] = Object.values(ProfilePrivacy).map((level) => ({
-    value: level,
-    label: ProfilePrivacyLabels[level],
-    hint: this._translateService.instant(`account.privacy.hint.${level}`),
-  }));
+  /** The open row's levels, each with the line that says what it means there. */
+  readonly levelOptions = computed<ChoiceOption[]>(() => {
+    const row = this.editing();
+    const levels = row?.levels ?? Object.values(ProfilePrivacy);
+    return levels.map((level) => ({
+      value: level,
+      label: ProfilePrivacyLabels[level],
+      hint: this._translateService.instant(
+        row?.hint ? row.hint(level) : `account.privacy.hint.${level}`,
+      ),
+    }));
+  });
 
   readonly sheetTitle = computed(() => {
     const row = this.editing();
@@ -133,7 +162,9 @@ export class AccountPrivacy implements OnInit {
 
   onPicked(value: string): void {
     const row = this.editing();
-    const level = Object.values(ProfilePrivacy).find((candidate) => candidate === value);
+    const level = (row?.levels ?? Object.values(ProfilePrivacy)).find(
+      (candidate) => candidate === value,
+    );
     const account = this.account();
     if (!row || !level || !account) return;
 

@@ -14,7 +14,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline } from 'ionicons/icons';
 
-import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SheetShell } from '../sheet-shell/sheet-shell';
 
 export interface ChoiceOption {
   value: string;

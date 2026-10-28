@@ -273,6 +273,11 @@
   font-weight: 600;
 }
 
+/* Flush with the cards around it rather than inset again. */
+.visibility {
+  margin: 0 0 0.75rem;
+}
+
 /* How it felt and the note: one card, the only form on the screen. */
 .feedback {
   margin: 0 0 0.75rem;

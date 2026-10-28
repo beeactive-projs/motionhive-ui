@@ -1,4 +1,5 @@
 import type { AssignedSet } from './assignment.model';
+import type { ProfilePrivacy } from '../profile/profile.enums';
 import type { ExerciseKind } from '../exercise/exercise.enums';
 import type {
   ExerciseSetType,
@@ -39,6 +40,11 @@ export interface WorkoutLog {
   notes: string | null;
   /** The line on the shared card. Never the private note. */
   shareCaption?: string | null;
+  /**
+   * Who besides the owner sees it; the profile privacy levels. The coach
+   * whose plan it came from sees it at any level.
+   */
+  visibility?: ProfilePrivacy;
   /**
    * Future export hooks — activity-type codes written when this log is
    * mirrored *out* to Apple Health / Health Connect. Write-only placeholders

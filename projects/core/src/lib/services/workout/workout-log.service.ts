@@ -13,6 +13,7 @@ import type {
   WorkoutLog,
 } from '../../models/workout/log.model';
 import type { Routine } from '../../models/workout/routine.model';
+import type { ProfilePrivacy } from '../../models/profile/profile.enums';
 
 export interface PaginatedWorkoutLogs {
   items: WorkoutLog[];
@@ -96,6 +97,17 @@ export class WorkoutLogService {
     return this._http.post<WorkoutLog>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COMPLETE(id)}`,
       payload,
+    );
+  }
+
+  /** Who besides the owner sees this workout. Owner only. */
+  setVisibility(
+    id: string,
+    visibility: ProfilePrivacy,
+  ): Observable<{ id: string; visibility: ProfilePrivacy }> {
+    return this._http.patch<{ id: string; visibility: ProfilePrivacy }>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.VISIBILITY(id)}`,
+      { visibility },
     );
   }
 

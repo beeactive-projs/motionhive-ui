@@ -90,6 +90,18 @@
         </div>
       }
 
+      <!-- Who sees it, said plainly; the coach of a plan always does. -->
+      <ion-list [inset]="true" class="mh-card-list visibility">
+        <mh-settings-row
+          [label]="'workoutVisibility.visibleTo' | translate"
+          [icon]="visibilityIcon()"
+          iconColor="medium"
+          [value]="visibilityLabel()"
+          [disabled]="savingVisibility()"
+          (select)="visibilityOpen.set(true)"
+        />
+      </ion-list>
+
       @if (!isReview()) {
         <ion-card class="feedback">
           <ion-card-content>
@@ -169,6 +181,15 @@
     </ion-toolbar>
   </ion-footer>
 }
+
+<mh-choice-sheet
+  [(open)]="visibilityOpen"
+  [title]="'workoutVisibility.sheetTitle' | translate"
+  [options]="visibilityOptions()"
+  [selected]="visibility()"
+  [footnote]="visibilityNote()"
+  (picked)="onVisibilityPicked($event)"
+/>
 
 @if (log(); as log) {
   <mh-share-workout-sheet

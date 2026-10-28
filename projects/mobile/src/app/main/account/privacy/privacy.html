@@ -26,6 +26,22 @@
           />
         }
       </ion-list>
+
+      <!-- Training, not a detail on the profile: where new workouts start. -->
+      <div class="mh-section-label">{{ 'workoutVisibility.section' | translate }}</div>
+      <ion-list [inset]="true" class="mh-card-list">
+        <mh-settings-row
+          [label]="workoutsRow.labelKey | translate"
+          [icon]="workoutsRow.icon"
+          [iconColor]="workoutsRow.iconColor"
+          [value]="levelLabel(workoutsRow.field)"
+          [disabled]="isSaving(workoutsRow.field)"
+          (select)="choose(workoutsRow)"
+        />
+      </ion-list>
+      <ion-note class="mh-note-block" color="medium">
+        {{ 'workoutVisibility.sectionNote' | translate }}
+      </ion-note>
     } @else {
       <ion-list [inset]="true" class="mh-card-list">
         @for (row of rows; track row.field) {
@@ -40,7 +56,7 @@
   <mh-choice-sheet
     [(open)]="sheetOpen"
     [title]="sheetTitle()"
-    [options]="levelOptions"
+    [options]="levelOptions()"
     [selected]="sheetSelected()"
     (picked)="onPicked($event)"
   />

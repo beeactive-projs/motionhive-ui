@@ -46,7 +46,7 @@ import {
 } from '../../_shared/services/theme.service';
 import { ACCOUNT_ICONS } from './account.config';
 import { AccountStore } from './account.store';
-import { ChoiceOption, ChoiceSheet } from './_sheets/choice-sheet/choice-sheet';
+import { ChoiceOption, ChoiceSheet } from '../../_shared/components/choice-sheet/choice-sheet';
 import { PhotoSheet } from './_sheets/photo-sheet/photo-sheet';
 import { ShareSheet } from './_sheets/share-sheet/share-sheet';
 import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
