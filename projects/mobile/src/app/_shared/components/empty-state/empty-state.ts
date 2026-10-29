@@ -22,10 +22,11 @@ export class EmptyState {
   readonly heading = input.required<string>();
   readonly message = input<string | null>(null);
   /**
-   * Ionic palette name for the tile. Navy by default: the brand surface, and
-   * an empty screen is not a status (lists.md, "Empty states").
+   * Ionic palette name for the tile, in its wash. Honey by default, as on
+   * every hand-built empty screen (clients, sessions, notifications): one
+   * look wherever a list has nothing to show (lists.md, "Empty states").
    */
-  readonly color = input('secondary');
+  readonly color = input('primary');
   /** Omit to render no action. */
   readonly actionLabel = input<string | null>(null);
 

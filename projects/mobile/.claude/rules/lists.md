@@ -194,7 +194,7 @@ A screen with nothing to show says so through [`mh-empty-state`](../../src/app/_
 
 - The order is fixed — a `2xl` `mh-hex-avatar`, the heading at `--mh-text-xl`, the message, the action. Nothing else goes in it.
 - **The action is a plain `fill="clear"` button in `color="primary"`** — the brand honey straight from the palette, not the deep `mh-text-link` ink. There is no solid or outline variant; an empty screen has one thing left to do and the words are enough for it. The honey is light on a white page (2.05:1) and is being looked at.
-- The tile is the brand navy unless the screen means a hue, and it takes the base tone, not a wash. An empty screen is not a status, and a load error destroys nothing, so it never turns red.
+- The tile is honey in its wash (`color="primary" tone="wash"`), the same tile the hand-built empty screens use (clients, sessions, notifications), so every list with nothing to show looks the same (user decision, 2026-10-29). A load error destroys nothing, so it never turns red.
 - The message is one sentence. The block caps its own width at about thirty characters a line so it breaks into a short stack under the heading; don't pass a paragraph.
 - It fills the screen only where there is a screen to fill: `min-block-size: 100%` catches `ion-content`'s scroll box and resolves to nothing inside `.mh-page` or a sheet body, where the block keeps its natural height. The same component is both the whole-screen state and the one under a half-filled section, so don't wrap it in a spacer either way.
 - The block sits on the page the rows do, so an empty inbox and a full one are one surface.

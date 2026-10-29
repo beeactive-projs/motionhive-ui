@@ -83,6 +83,12 @@
                   [xLabels]="xLabels()"
                   [label]="chartLabel()"
                 />
+                @if (chartPoints().length === 1) {
+                  <!-- One estimate is a dot, not a trend; say why the line is missing. -->
+                  <ion-note class="first-point">
+                    {{ 'workouts.exerciseProgress.firstPoint' | translate }}
+                  </ion-note>
+                }
               }
             </ion-card-content>
           </ion-card>

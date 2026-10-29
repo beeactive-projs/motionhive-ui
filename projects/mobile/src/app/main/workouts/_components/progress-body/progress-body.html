@@ -42,6 +42,15 @@
       <ion-list [inset]="true" class="mh-card-list">
         @for (record of records(); track record.exerciseId) {
           <ion-item button [detail]="true" (click)="openExercise(record)">
+            <!-- Decorative: the exercise's name is the very next thing in the row. -->
+            <mh-hex-avatar
+              slot="start"
+              size="md"
+              tone="wash"
+              color="primary"
+              icon="trophy-outline"
+              aria-hidden="true"
+            />
             <ion-label>
               <h2>{{ record.exerciseName }}</h2>
               <p>{{ recordLine(record) }}</p>

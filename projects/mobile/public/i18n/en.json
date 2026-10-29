@@ -2508,6 +2508,7 @@
       "best": "Best",
       "bestSet": "Best set",
       "chartLabel": "Estimated 1-rep max went from {from} to {to} kg",
+      "firstPoint": "Just one session so far. The line appears with the next one.",
       "delta": "{sign}{value} kg in {range}",
       "empty": {
         "message": "Log this exercise in a workout and it shows up here.",

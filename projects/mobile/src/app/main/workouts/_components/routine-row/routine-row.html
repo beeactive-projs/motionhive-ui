@@ -11,14 +11,7 @@
     <ion-badge slot="end" [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
   }
   @if (startable()) {
-    <ion-button
-      slot="end"
-      class="start"
-      fill="outline"
-      size="small"
-      [disabled]="starting()"
-      (click)="onStart($event)"
-    >
+    <ion-button slot="end" class="start" size="small" [disabled]="starting()" (click)="onStart($event)">
       {{ 'button.start' | translate }}
     </ion-button>
   }

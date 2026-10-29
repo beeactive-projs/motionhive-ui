@@ -80,15 +80,9 @@
 
       <div class="actions">
         @if (canMessage() && !isPending()) {
-          <!-- Honey unless the page has a more pressing next step: with no
-               plan, the Assign card holds the one honey button. -->
-          <ion-button
-            class="message"
-            [fill]="showNoPlan() ? 'outline' : 'solid'"
-            [color]="showNoPlan() ? undefined : 'primary'"
-            [class.quiet]="showNoPlan()"
-            (click)="message()"
-          >
+          <!-- Always honey: talking to the client is this page's first verb,
+               plan or no plan. -->
+          <ion-button class="message" color="primary" (click)="message()">
             <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
             {{ 'clients.actions.message' | translate }}
           </ion-button>

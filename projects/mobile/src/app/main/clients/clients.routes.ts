@@ -51,8 +51,16 @@ export const clientsRoutes: Routes = [
   // Training and Progress are tabs of the client page now; their old
   // addresses open it on that tab. Before `:clientId`, so the two-segment
   // paths are matched first.
-  { path: ':clientId/progress', redirectTo: clientTabRedirect(CoachStacks.Clients, 'progress') },
-  { path: ':clientId/training', redirectTo: clientTabRedirect(CoachStacks.Clients, 'training') },
+  {
+    path: ':clientId/progress',
+    pathMatch: 'full',
+    redirectTo: clientTabRedirect(CoachStacks.Clients, 'progress'),
+  },
+  {
+    path: ':clientId/training',
+    pathMatch: 'full',
+    redirectTo: clientTabRedirect(CoachStacks.Clients, 'training'),
+  },
   {
     // A session with this client, opened from their page. Here, not as a jump
     // to the Sessions tab, so back returns to the client.

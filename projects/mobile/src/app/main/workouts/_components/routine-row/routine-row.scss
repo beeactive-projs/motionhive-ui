@@ -20,11 +20,9 @@ ion-badge {
   border-radius: var(--mh-radius-pill);
 }
 
-// Start as a quiet outline in body ink, a hairline ring: the honey goes to
-// Start empty workout above the list.
+// Start in honey, the same small solid button as a paused plan's Resume:
+// starting is the row's one action, and nothing above the list competes
+// for the honey now that a new workout lives in the page's ⋯ menu.
 .start {
-  --border-width: 1px;
-  --border-color: var(--ion-border-color);
-  --color: var(--ion-text-color);
   margin-inline-start: 0.5rem;
 }

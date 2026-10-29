@@ -444,13 +444,13 @@ describe('workouts config', () => {
   });
 
   // A parameterised path listed before a literal one swallows it.
-  it('routes an exercise progress page without shadowing Progress', () => {
-    const paths = workoutRoutes.map((route) => route.path);
-    const progress = paths.indexOf('progress');
-    const exercise = paths.indexOf('progress/:exerciseId');
-    expect(progress).toBeGreaterThan(-1);
-    expect(exercise).toBeGreaterThan(progress);
-    expect(exercise).toBeLessThan(paths.indexOf('routine/:id'));
+  // A redirect matches by prefix unless told otherwise: `progress` sent
+  // every `progress/:exerciseId` back to the tab, so a record opened nothing.
+  it('sends only the old tab addresses to their tab, never the pages under them', () => {
+    const redirects = workoutRoutes.filter((route) => route.redirectTo);
+    expect(redirects.map((route) => route.path)).toEqual(['history', 'progress', 'exercises']);
+    for (const route of redirects) expect(route.pathMatch).toBe('full');
+    expect(workoutRoutes.some((route) => route.path === 'progress/:exerciseId')).toBe(true);
   });
 
   it('names only the parts of the meta line it actually knows', () => {

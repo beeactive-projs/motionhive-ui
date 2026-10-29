@@ -34,6 +34,7 @@ export const programRoutes: Routes = [
   // addresses open it on that tab.
   {
     path: 'client/:clientId/training',
+    pathMatch: 'full',
     redirectTo: clientTabRedirect(CoachStacks.Programs, 'training'),
   },
   {
@@ -44,6 +45,7 @@ export const programRoutes: Routes = [
   },
   {
     path: 'client/:clientId/progress',
+    pathMatch: 'full',
     redirectTo: clientTabRedirect(CoachStacks.Programs, 'progress'),
   },
   {

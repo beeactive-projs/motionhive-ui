@@ -2508,6 +2508,7 @@
       "best": "Cel mai bun",
       "bestSet": "Cea mai bună serie",
       "chartLabel": "1RM estimat a trecut de la {from} la {to} kg",
+      "firstPoint": "Deocamdată e o singură sesiune. Linia apare de la următoarea.",
       "delta": "{sign}{value} kg în {range}",
       "empty": {
         "message": "Fă exercițiul într-un antrenament și apare aici.",

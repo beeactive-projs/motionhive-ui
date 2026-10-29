@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline, lockClosedOutline, trendingUpOutline } from 'ionicons/icons';
+import { alertCircleOutline, lockClosedOutline, trendingUpOutline, trophyOutline } from 'ionicons/icons';
 import { take } from 'rxjs/operators';
 
 import {
@@ -100,7 +100,7 @@ export class ProgressBody {
 
   constructor() {
     // Its own, since it also sits on a client's page that registers others.
-    addIcons({ alertCircleOutline, lockClosedOutline, trendingUpOutline });
+    addIcons({ alertCircleOutline, lockClosedOutline, trendingUpOutline, trophyOutline });
   }
 
   /** The name rides along so the next page can title itself before it loads. */

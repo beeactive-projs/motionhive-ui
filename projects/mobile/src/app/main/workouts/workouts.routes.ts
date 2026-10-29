@@ -26,9 +26,11 @@ export const workoutRoutes: Routes = [
     title: 'pageTitle.starterRoutines',
   },
   // History, Progress and the exercise library are tabs of the Workouts
-  // page now; their old addresses open it on that tab.
-  { path: 'history', redirectTo: workoutTabRedirect(WorkoutTabs.History) },
-  { path: 'progress', redirectTo: workoutTabRedirect(WorkoutTabs.Progress) },
+  // page now; their old addresses open it on that tab. `full`: a redirect
+  // matches by prefix otherwise, and `progress` swallowed every
+  // `progress/:exerciseId`, so a record opened nothing.
+  { path: 'history', pathMatch: 'full', redirectTo: workoutTabRedirect(WorkoutTabs.History) },
+  { path: 'progress', pathMatch: 'full', redirectTo: workoutTabRedirect(WorkoutTabs.Progress) },
   {
     // One exercise's progress, opened from a record on the Progress tab. A
     // sibling rather than a child route, so the tab stays lit and back
@@ -38,7 +40,7 @@ export const workoutRoutes: Routes = [
       import('./exercise-progress/exercise-progress').then((m) => m.ExerciseProgress),
     title: 'pageTitle.exerciseProgress',
   },
-  { path: 'exercises', redirectTo: workoutTabRedirect(WorkoutTabs.Exercises) },
+  { path: 'exercises', pathMatch: 'full', redirectTo: workoutTabRedirect(WorkoutTabs.Exercises) },
   {
     // The catalog page, pushed onto THIS stack rather than the exercises tab:
     // checking what a movement is must not tear down the routine you are
