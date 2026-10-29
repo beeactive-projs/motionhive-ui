@@ -6,7 +6,11 @@
         <ion-back-button defaultHref="/tabs/workouts" />
       } @else {
         <!-- Closing keeps what was picked or typed, like Save. -->
-        <ion-button [attr.aria-label]="'a11y.close' | translate" [disabled]="saving()" (click)="done()">
+        <ion-button
+          [attr.aria-label]="'a11y.close' | translate"
+          [disabled]="saving()"
+          (click)="done()"
+        >
           <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
         </ion-button>
       }
@@ -14,9 +18,12 @@
     <ion-title>
       <span class="when">{{ whenLabel() }}</span>
     </ion-title>
-    @if (isReview() && log()) {
+    @if (isReview() && log() && !takenDown()) {
       <ion-buttons slot="end">
-        <ion-button [attr.aria-label]="'workouts.share.title' | translate" (click)="shareOpen.set(true)">
+        <ion-button
+          [attr.aria-label]="'workouts.share.title' | translate"
+          (click)="shareOpen.set(true)"
+        >
           <ion-icon slot="icon-only" name="share-outline" aria-hidden="true" />
         </ion-button>
       </ion-buttons>
@@ -45,7 +52,19 @@
       </div>
     </section>
   } @else if (log(); as log) {
-    <section class="hero" [class.celebrate]="!isReview()">
+    <section class="hero" [class.celebrate]="!isReview()" [class.with-photo]="!!photoUrl()">
+      @if (photoUrl(); as src) {
+        <!-- The photo is the cover; the numbers sit on it like a poster. -->
+        <img class="cover" [src]="src" [alt]="'workouts.photo.alt' | translate" />
+        <ion-button
+          class="change-photo"
+          size="small"
+          shape="round"
+          (click)="photoActionsOpen.set(true)"
+        >
+          {{ 'workouts.photo.change' | translate }}
+        </ion-button>
+      }
       <!-- The brand cell with a tick, and a few hexes thrown in the air. -->
       <div class="badge" aria-hidden="true">
         @for (spark of sparks; track spark) {
@@ -89,6 +108,23 @@
           }
         </div>
       }
+      @if (!photoUrl()) {
+        <!-- One optional tap: the photo becomes this workout's cover. -->
+        <button type="button" class="add-photo" [disabled]="uploadingPhoto()" (click)="pickPhoto()">
+          <span class="add-photo-icon" aria-hidden="true">
+            @if (uploadingPhoto()) {
+              <ion-spinner name="crescent" />
+            } @else {
+              <ion-icon name="camera-outline" />
+            }
+          </span>
+          <span class="add-photo-text">
+            <span class="add-photo-title">{{ 'workouts.photo.add' | translate }}</span>
+            <span class="add-photo-hint">{{ 'workouts.photo.addHint' | translate }}</span>
+          </span>
+        </button>
+      }
+      <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoPicked($event)" />
 
       <!-- Who sees it, said plainly; the coach of a plan always does. -->
       <ion-list [inset]="true" class="mh-card-list visibility">
@@ -106,8 +142,12 @@
         <ion-card class="feedback">
           <ion-card-content>
             <h2 class="card-title">{{ 'workouts.finish.howDidItFeel' | translate }}</h2>
-            <mh-feeling-scale [label]="'workouts.finish.howDidItFeel' | translate" [(value)]="feeling" />
-            <ion-textarea mode="md"
+            <mh-feeling-scale
+              [label]="'workouts.finish.howDidItFeel' | translate"
+              [(value)]="feeling"
+            />
+            <ion-textarea
+              mode="md"
               fill="outline"
               [autoGrow]="true"
               [maxlength]="noteMaxLength"
@@ -145,7 +185,12 @@
             {{ 'workouts.finish.saveAsRoutine.saved' | translate: { name } }}
           </p>
         } @else {
-          <ion-button class="save-routine" expand="block" fill="outline" (click)="openSaveRoutine()">
+          <ion-button
+            class="save-routine"
+            expand="block"
+            fill="outline"
+            (click)="openSaveRoutine()"
+          >
             {{ 'workouts.finish.saveAsRoutine.action' | translate }}
           </ion-button>
         }
@@ -172,15 +217,31 @@
   <ion-footer>
     <ion-toolbar>
       <div class="mh-cta-bar actions">
-        <ion-button class="share" fill="outline" [disabled]="saving()" (click)="shareOpen.set(true)">
-          <ion-icon slot="start" name="share-outline" aria-hidden="true" />
-          {{ 'workouts.share.action' | translate }}
-        </ion-button>
-        <ion-button class="save" [disabled]="saving()" (click)="done()">{{ 'button.save' | translate }}</ion-button>
+        @if (!takenDown()) {
+          <ion-button
+            class="share"
+            fill="outline"
+            [disabled]="saving()"
+            (click)="shareOpen.set(true)"
+          >
+            <ion-icon slot="start" name="share-outline" aria-hidden="true" />
+            {{ 'workouts.share.action' | translate }}
+          </ion-button>
+        }
+        <ion-button class="save" [disabled]="saving()" (click)="done()">{{
+          'button.save' | translate
+        }}</ion-button>
       </div>
     </ion-toolbar>
   </ion-footer>
 }
+
+<mh-action-sheet
+  [(open)]="photoActionsOpen"
+  [title]="'workouts.photo.actionsTitle' | translate"
+  [actions]="photoActions"
+  (chosen)="onPhotoAction($event)"
+/>
 
 <mh-choice-sheet
   [(open)]="visibilityOpen"
@@ -196,6 +257,7 @@
     [(open)]="shareOpen"
     [log]="log"
     [note]="note()"
+    [photoUrl]="photoUrl()"
     (captionSaved)="onCaptionSaved($event)"
   />
 }

@@ -291,10 +291,11 @@ export class Account implements OnInit, ViewWillEnter {
     }
   }
 
+  /** Your profile as others see it, in the app; a coach's web page is one tap on from there. */
   openPublicProfile(): void {
     const handle = this.handle();
     if (!handle) return;
-    window.open(`${WEB_APP_URL}/@${handle}`, '_blank', 'noopener');
+    void this._router.navigate(['/tabs/more/account/person', handle]);
   }
 
   onSignOut(): void {

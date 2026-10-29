@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
@@ -15,6 +15,7 @@ import {
   IonList,
   IonNote,
   IonSkeletonText,
+  IonSpinner,
   IonTextarea,
   IonTitle,
   IonToolbar,
@@ -38,10 +39,9 @@ import {
   appLocale,
 } from 'core';
 
-import {
-  ChoiceOption,
-  ChoiceSheet,
-} from '../../../_shared/components/choice-sheet/choice-sheet';
+import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
+import { SheetAction } from '../../../_shared/components/action-sheet/action-sheet.model';
+import { ChoiceOption, ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import {
@@ -53,6 +53,7 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ThemeService } from '../../../_shared/services/theme.service';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
 import { SaveRoutineService } from '../_services/save-routine.service';
+import { WorkoutPhotoStore, preparePhoto } from '../_services/workout-photo';
 import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
 import {
   NOTE_MAX_LENGTH,
@@ -65,6 +66,15 @@ import {
   workoutTiles,
   workoutVolume,
 } from '../workouts.config';
+
+type PhotoAction = 'change' | 'remove';
+
+/** One glyph per level, the same ones the level names suggest. */
+const VISIBILITY_ICONS: Record<ProfilePrivacy, string> = {
+  [ProfilePrivacy.OnlyMe]: 'lock-closed-outline',
+  [ProfilePrivacy.CoachesOnly]: 'people-outline',
+  [ProfilePrivacy.Public]: 'globe-outline',
+};
 
 /** A streak shorter than this is just training, not yet a streak. */
 const STREAK_WORTH_SAYING = 2;
@@ -101,6 +111,7 @@ interface Highlight {
 @Component({
   selector: 'mh-workout-finish',
   imports: [
+    ActionSheet,
     ChoiceSheet,
     EmptyState,
     FeelingScale,
@@ -118,6 +129,7 @@ interface Highlight {
     IonList,
     IonNote,
     IonSkeletonText,
+    IonSpinner,
     IonTextarea,
     IonTitle,
     IonToolbar,
@@ -157,6 +169,17 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
   readonly visibilityOpen = signal(false);
   readonly savingVisibility = signal(false);
 
+  /** The workout's photo as an object URL; the bytes only come through the API. */
+  readonly photoUrl = signal<string | null>(null);
+  readonly uploadingPhoto = signal(false);
+  readonly photoActionsOpen = signal(false);
+  readonly photoActions: readonly SheetAction<PhotoAction>[] = [
+    { id: 'change', label: 'workouts.photo.change', icon: 'image-outline' },
+    { id: 'remove', label: 'workouts.photo.remove', icon: 'trash-outline', destructive: true },
+  ];
+  private readonly _photoInput = viewChild<ElementRef<HTMLInputElement>>('photoInput');
+  private readonly _photoStore = inject(WorkoutPhotoStore);
+
   readonly visibility = computed(() => this.log()?.visibility ?? ProfilePrivacy.OnlyMe);
   /** The coach whose plan this was; they see it at any level. */
   private readonly _planCoach = computed(() => this.log()?.summary?.coachName ?? null);
@@ -169,12 +192,15 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
       : ProfilePrivacyLabels[this.visibility()];
   });
 
-  readonly visibilityIcon = computed(() =>
-    this.visibility() === ProfilePrivacy.OnlyMe ? 'lock-closed-outline' : 'people-outline',
-  );
+  readonly visibilityIcon = computed(() => VISIBILITY_ICONS[this.visibility()]);
+
+  /** Taken down after a report: it stays off the profile and out of groups. */
+  readonly takenDown = computed(() => !!this.log()?.takenDownAt);
 
   readonly visibilityOptions = computed<ChoiceOption[]>(() =>
-    WORKOUT_VISIBILITY_LEVELS.map((level) => ({
+    WORKOUT_VISIBILITY_LEVELS.filter(
+      (level) => !(this.takenDown() && level === ProfilePrivacy.Public),
+    ).map((level) => ({
       value: level,
       label:
         level === ProfilePrivacy.OnlyMe && this._planCoach()
@@ -187,6 +213,7 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
   );
 
   readonly visibilityNote = computed(() => {
+    if (this.takenDown()) return this._translateService.instant('workoutVisibility.takenDown');
     const coach = this._planCoach();
     return coach
       ? this._translateService.instant('workoutVisibility.planCoachNote', { name: coach })
@@ -239,7 +266,9 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
     if (!this.isReview()) parts.push(log.name);
     const number = log.summary?.workoutNumber;
     if (number) {
-      parts.push(this._translateService.instant('workouts.finish.workoutNumber', { count: number }));
+      parts.push(
+        this._translateService.instant('workouts.finish.workoutNumber', { count: number }),
+      );
     }
     return parts.join(' · ');
   });
@@ -279,7 +308,9 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
     if (!this.isReview() && weeks >= STREAK_WORTH_SAYING) {
       list.push({
         glyph: '🔥',
-        title: this._translateService.instant('workouts.finish.highlights.streak', { count: weeks }),
+        title: this._translateService.instant('workouts.finish.highlights.streak', {
+          count: weeks,
+        }),
         detail: this._translateService.instant('workouts.finish.highlights.streakDetail'),
         honey: false,
       });
@@ -290,7 +321,9 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
     if (records.length === 0 && gain !== null) {
       list.push({
         glyph: '📈',
-        title: this._translateService.instant('workouts.finish.highlights.volume', { percent: gain }),
+        title: this._translateService.instant('workouts.finish.highlights.volume', {
+          percent: gain,
+        }),
         detail: this._translateService.instant('workouts.finish.highlights.volumeDetail'),
         honey: false,
       });
@@ -354,6 +387,7 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
           this.note.set(log.notes ?? '');
           this.loading.set(false);
           if (firstLook) void this._celebrate();
+          this._loadPhoto(log);
         },
         error: () => {
           this.error.set(true);
@@ -401,6 +435,91 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
       });
   }
 
+  pickPhoto(): void {
+    this._photoInput()?.nativeElement.click();
+  }
+
+  /**
+   * Re-encoded on the phone first (no location leaves it), then sent; the
+   * hero shows the local copy at once rather than fetching it back.
+   */
+  async onPhotoPicked(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // the same photo can be picked again after a failure
+    const log = this.log();
+    if (!file || !log || this.uploadingPhoto()) return;
+
+    this.uploadingPhoto.set(true);
+    let jpeg: Blob;
+    try {
+      jpeg = await preparePhoto(file);
+    } catch {
+      this.uploadingPhoto.set(false);
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('workouts.photo.toast.unreadable'),
+      );
+      return;
+    }
+    this._photoStore
+      .upload(log.id, jpeg)
+      .pipe(take(1))
+      .subscribe({
+        next: ({ url, version }) => {
+          this.uploadingPhoto.set(false);
+          this.photoUrl.set(url);
+          this.log.update((current) =>
+            current ? { ...current, hasPhoto: true, photoVersion: version } : current,
+          );
+        },
+        error: (err) => {
+          this.uploadingPhoto.set(false);
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.photo.toast.uploadFailed'),
+          );
+        },
+      });
+  }
+
+  onPhotoAction(action: PhotoAction): void {
+    if (action === 'change') {
+      this.pickPhoto();
+      return;
+    }
+    const log = this.log();
+    if (!log) return;
+    this._photoStore
+      .remove(log.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.photoUrl.set(null);
+          this.log.update((current) =>
+            current ? { ...current, hasPhoto: false, photoVersion: null } : current,
+          );
+        },
+        error: (err) =>
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.photo.toast.removeFailed'),
+          ),
+      });
+  }
+
+  /** Quietly without one: a photo that will not load is not worth an error. */
+  private _loadPhoto(log: WorkoutLog): void {
+    if (!log.hasPhoto) {
+      this.photoUrl.set(null);
+      return;
+    }
+    this._photoStore
+      .url(log.id, log.photoVersion ?? null)
+      .pipe(take(1))
+      .subscribe({ next: (url) => this.photoUrl.set(url), error: () => this.photoUrl.set(null) });
+  }
+
   /** Saves at once, and puts the old level back if the server refuses. */
   onVisibilityPicked(value: string): void {
     const log = this.log();
@@ -433,7 +552,8 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
 
   openSaveRoutine(): void {
     const log = this.log();
-    if (log) this._saveRoutineService.open({ logId: log.id, suggestedName: this._suggestName(log) });
+    if (log)
+      this._saveRoutineService.open({ logId: log.id, suggestedName: this._suggestName(log) });
   }
 
   private _hasNewFeedback(log: WorkoutLog): boolean {
@@ -450,7 +570,10 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
         ? {
             label: this._translateService.instant('workouts.finish.saveAsRoutine.action'),
             run: () =>
-              this._saveRoutineService.open({ logId: log.id, suggestedName: this._suggestName(log) }),
+              this._saveRoutineService.open({
+                logId: log.id,
+                suggestedName: this._suggestName(log),
+              }),
           }
         : undefined;
     void this._router.navigate(['/tabs/workouts']);

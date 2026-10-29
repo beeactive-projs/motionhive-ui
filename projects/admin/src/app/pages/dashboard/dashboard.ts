@@ -74,6 +74,11 @@ export class Dashboard {
       { label: 'Open disputes', value: o.payments.openDisputes, alert: o.payments.openDisputes > 0 },
       { label: 'Failed webhooks', value: o.payments.failedWebhooks, alert: o.payments.failedWebhooks > 0 },
       { label: 'Open reports', value: o.moderation.openMessageReports, alert: o.moderation.openMessageReports > 0 },
+      {
+        label: 'Open workout reports',
+        value: o.moderation.openWorkoutReports,
+        alert: o.moderation.openWorkoutReports > 0,
+      },
     ];
   }
 }

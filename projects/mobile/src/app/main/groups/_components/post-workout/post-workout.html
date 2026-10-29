@@ -1,0 +1,30 @@
+@if (linked()) {
+  <button
+    type="button"
+    class="card"
+    (click)="open()"
+    [attr.aria-label]="'groups.postWorkout.open' | translate: { name: workout().name }"
+  >
+    <ng-container *ngTemplateOutlet="body" />
+    <ion-icon class="chevron" name="chevron-forward-outline" aria-hidden="true" />
+  </button>
+} @else {
+  <div class="card">
+    <ng-container *ngTemplateOutlet="body" />
+  </div>
+}
+
+<ng-template #body>
+  <mh-hex-avatar
+    size="sm"
+    icon="barbell-outline"
+    color="primary"
+    [name]="'groups.postWorkout.label' | translate"
+  />
+  <span class="text">
+    <span class="name">{{ workout().name }}</span>
+    @if (summary()) {
+      <span class="meta">{{ summary() }}</span>
+    }
+  </span>
+</ng-template>

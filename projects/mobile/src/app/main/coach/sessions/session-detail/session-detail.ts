@@ -18,6 +18,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  NavController,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -60,6 +61,7 @@ import { ClockService } from '../../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../../_shared/utils/share';
+import { ProfileStacks, stackRootOf } from '../../../../_shared/utils/stack-paths';
 import { CapacitySheet } from '../_sheets/capacity-sheet/capacity-sheet';
 import { CancelSessionSheet } from '../_sheets/cancel-session-sheet/cancel-session-sheet';
 import { MessageSignupsSheet } from '../_sheets/message-signups-sheet/message-signups-sheet';
@@ -101,6 +103,14 @@ interface DetailRow {
   tone: HexAvatarTone;
   title: string;
   detail: string | null;
+}
+
+const SESSIONS_STACK = ProfileStacks.CoachSessions;
+
+/** Sessions' own stack, or the Clients or Programs one a client page opened it in. */
+function sessionStackOf(url: string): string {
+  const root = stackRootOf(url);
+  return root === ProfileStacks.Clients || root === ProfileStacks.Programs ? root : SESSIONS_STACK;
 }
 
 /**
@@ -146,7 +156,15 @@ interface DetailRow {
 export class SessionDetail implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _navController = inject(NavController);
   private readonly _destroyRef = inject(DestroyRef);
+
+  /**
+   * The stack this session was opened in. Its own Sessions tab, or a
+   * client's page under Clients or Programs, so back returns to the client
+   * rather than to the agenda.
+   */
+  readonly stack = sessionStackOf(this._router.url);
   private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
@@ -832,7 +850,7 @@ export class SessionDetail implements ViewWillEnter {
 
   openProfile(participant: SessionParticipant): void {
     const handle = participant.user?.handle;
-    if (handle) void this._router.navigate(['/tabs/coach/sessions/person', handle]);
+    if (handle) void this._router.navigate([this.stack, 'person', handle]);
   }
 
   /** No handle, no profile to open — the row stays inert rather than 404ing. */
@@ -883,8 +901,13 @@ export class SessionDetail implements ViewWillEnter {
     this.cancelOpen.set(true);
   }
 
+  /** Gone from the agenda, so back where it was opened from: a client stays a client. */
   onCancelled(): void {
-    void this._router.navigate(['/tabs/coach/sessions']);
+    if (this.stack === SESSIONS_STACK) {
+      void this._router.navigate([SESSIONS_STACK]);
+      return;
+    }
+    void this._navController.back();
   }
 
   openActions(): void {

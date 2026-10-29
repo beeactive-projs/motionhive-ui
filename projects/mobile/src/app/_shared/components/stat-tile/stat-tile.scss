@@ -10,12 +10,22 @@ ion-card-title {
   font-variant-numeric: tabular-nums;
 }
 
+// Sentence case, untracked: three tiles share 390px, and caps with tracking
+// broke a one-word label mid-word ("WORKOUT S"). Ionic's ios subtitle
+// uppercases by default, so both are undone here.
 ion-card-subtitle {
   font-size: var(--mh-text-xs);
-  letter-spacing: var(--mh-tracking-kicker);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 p {
   margin: 0.125rem 0 0;
   font-size: var(--mh-text-xs);
+}
+
+// Three to a row (`.mh-tiles`), a value like "12.450 kg" needs the width
+// Ionic's 16px sides take.
+:host-context(.mh-tiles) ion-card-content {
+  padding-inline: 0.75rem;
 }

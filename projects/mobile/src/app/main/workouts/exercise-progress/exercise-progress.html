@@ -24,7 +24,16 @@
     />
   } @else {
     <div class="mh-page">
-      <ion-segment [value]="range()" (ionChange)="setRange($event.detail.value)">
+      @if (clientName) {
+        <!-- Whose numbers these are, under a title that names the exercise:
+             one line each, rather than two names crowding the header. -->
+        <ion-note class="client">{{ clientName }}</ion-note>
+      }
+      <ion-segment
+        class="mh-segment-fit"
+        [value]="range()"
+        (ionChange)="setRange($event.detail.value)"
+      >
         @for (option of ranges; track option) {
           <ion-segment-button [value]="option">
             <ion-label>{{ 'workouts.exerciseProgress.range.' + option | translate }}</ion-label>

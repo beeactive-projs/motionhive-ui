@@ -18,6 +18,7 @@ import {
   IonLabel,
   IonList,
   IonNote,
+  IonRouterOutlet,
   IonSkeletonText,
   IonTitle,
   IonToggle,
@@ -34,6 +35,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
+import { ProfileStacks, personBase, stackRootOf } from '../../../_shared/utils/stack-paths';
 import { MESSAGING_ICONS } from '../messages.config';
 
 /**
@@ -69,6 +71,14 @@ import { MESSAGING_ICONS } from '../messages.config';
 export class ChatDetails {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _outlet = inject(IonRouterOutlet);
+  /** The stack the chat was opened in; its links and back stay there. */
+  private readonly _stack = stackRootOf(this._router.url);
+  /**
+   * Back on a cold load, and past a deleted thread: the Messages list, or
+   * the stack the chat was opened from.
+   */
+  readonly backHref = this._stack ?? ProfileStacks.Messages;
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
@@ -132,7 +142,7 @@ export class ChatDetails {
 
   openProfile(): void {
     const handle = this.handle();
-    if (handle) void this._router.navigate(['/tabs/messages/person', handle]);
+    if (handle) void this._router.navigate([personBase(this._stack), handle]);
   }
 
   async toggleMute(): Promise<void> {
@@ -183,8 +193,14 @@ export class ChatDetails {
     // Close before routing, or the sheet is stranded over the inbox.
     await this._deleteSheet()?.close();
     void this._feedbackService.success(this._translateService.instant('messages.toast.deleted'));
+    // Off the thread that no longer exists: to the inbox on the Messages
+    // tab, and elsewhere back past it to the screen that opened it.
+    if (this._stack && this._stack !== ProfileStacks.Messages && this._outlet.canGoBack(2)) {
+      await this._outlet.pop(2);
+      return;
+    }
     // `replaceUrl`, so Back cannot return to a thread that no longer exists.
-    await this._router.navigateByUrl('/tabs/messages', { replaceUrl: true });
+    await this._router.navigateByUrl(this.backHref, { replaceUrl: true });
   }
 
   /** The reason is optional moderation metadata on the BE; the sheet collects it

@@ -1,7 +1,11 @@
-/* The History shortcut sits beside the bell and matches its glyph size, which
-   the bell sets in its own skin. */
-.history ion-icon {
-  font-size: var(--mh-icon-lg);
+/* The tab row under the title: the client page's words, on the bar's
+   gutter. */
+.tabs-bar {
+  --min-height: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: var(--mh-page-gutter);
+  --padding-end: var(--mh-page-gutter);
 }
 
 /* ─── Resume ──────────────────────────────────────────────────────

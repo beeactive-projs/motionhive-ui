@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../../person/person.routes';
 
 /**
  * The sessions area, mounted at `/tabs/coach/sessions` behind `coachGuard`.
@@ -16,12 +17,8 @@ export const sessionsRoutes: Routes = [
     loadComponent: () => import('./sessions').then((m) => m.Sessions),
     title: 'pageTitle.manageSessions',
   },
-  {
-    // Before `:id`, or the parameterised route swallows "person".
-    path: 'person/:handle',
-    loadComponent: () => import('../../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
+  // Before `:id`, or the parameterised route swallows "person".
+  ...personRoutes,
   {
     path: ':id',
     loadComponent: () =>

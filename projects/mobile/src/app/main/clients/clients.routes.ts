@@ -1,4 +1,7 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../person/person.routes';
+import { programPageRoutes } from '../programs/program-pages.routes';
+import { CoachStacks, clientTabRedirect } from './client-paths';
 
 /**
  * The coach's Clients area, mounted at `/tabs/clients` behind `coachGuard`.
@@ -30,41 +33,38 @@ export const clientsRoutes: Routes = [
     loadComponent: () => import('./invite-client/invite-client').then((m) => m.InviteClient),
     title: 'pageTitle.inviteClient',
   },
+  // Someone's public profile, from the client page or a request, and the
+  // chat and groups it opens. Before `:clientId`, or the parameterised
+  // routes swallow "person".
+  ...personRoutes,
+  // A client's plan, opened from their page: the same pages the Programs
+  // tab mounts, here so back returns to the client. Before `:clientId`.
+  ...programPageRoutes,
   {
-    // Someone's public profile, from the client page or a request. Before
-    // `:clientId`, or the parameterised routes swallow "person".
-    path: 'person/:handle',
-    loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
-  {
-    // The trainee's own Progress screens, read for one client. Same reason as
-    // training below for living here, and declared before `:clientId`.
+    // One exercise of the trainee's own Progress, read for one client, from
+    // the Progress tab. Declared before `:clientId`.
     path: ':clientId/progress/:exerciseId',
     loadComponent: () =>
       import('../workouts/exercise-progress/exercise-progress').then((m) => m.ExerciseProgress),
     title: 'pageTitle.exerciseProgress',
   },
+  // Training and Progress are tabs of the client page now; their old
+  // addresses open it on that tab. Before `:clientId`, so the two-segment
+  // paths are matched first.
+  { path: ':clientId/progress', redirectTo: clientTabRedirect(CoachStacks.Clients, 'progress') },
+  { path: ':clientId/training', redirectTo: clientTabRedirect(CoachStacks.Clients, 'training') },
   {
-    path: ':clientId/progress',
-    loadComponent: () => import('../workouts/progress/progress').then((m) => m.Progress),
-    title: 'pageTitle.progress',
-  },
-  {
-    // A client's training and one logged workout. Mounted here rather than
-    // under programs because they are reached from the person, and switching
-    // tabs mid-review would lose the client you were looking at.
-    //
-    // `:clientId/training`, not `client/:clientId/training`: the detail route
-    // below is `:clientId`, and a stray literal segment in one of the two
-    // shapes is what deep links and guards get wrong. Declared before
-    // `:clientId` so the two-segment path is matched first.
-    path: ':clientId/training',
+    // A session with this client, opened from their page. Here, not as a jump
+    // to the Sessions tab, so back returns to the client.
+    path: 'session/:id',
     loadComponent: () =>
-      import('../programs/client-training/client-training').then((m) => m.ClientTraining),
-    title: 'pageTitle.training',
+      import('../coach/sessions/session-detail/session-detail').then((m) => m.SessionDetail),
+    title: 'pageTitle.session',
   },
   {
+    // One logged workout. Mounted here rather than under programs because it
+    // is reached from the person, and switching tabs mid-review would lose
+    // the client you were looking at.
     path: 'log/:id',
     loadComponent: () =>
       import('../programs/log-review/log-review').then((m) => m.LogReview),

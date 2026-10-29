@@ -1,0 +1,44 @@
+<ion-item
+  class="mh-session-row mh-list-row"
+  button
+  detail="false"
+  lines="none"
+  [attr.data-tone]="tone()"
+  (click)="select.emit()"
+>
+  @if (rail(); as day) {
+    <div class="when" slot="start">
+      <span class="time">{{ day.day }}</span>
+      <span class="duration">{{ day.weekday }}</span>
+    </div>
+  }
+
+  <ion-label>
+    <h2>{{ workout().name }}</h2>
+    <div class="tags">
+      @if (records(); as badge) {
+        <ion-badge [attr.data-tone]="badge.tone">{{ badge.label }}</ion-badge>
+      }
+      @if (meta()) {
+        <ion-note>{{ meta() }}</ion-note>
+      }
+    </div>
+    @if (workout().shareCaption; as caption) {
+      <p class="caption">{{ 'person.workouts.caption' | translate: { text: caption } }}</p>
+    }
+  </ion-label>
+
+  @if (withMenu()) {
+    <ion-button
+      slot="end"
+      fill="clear"
+      shape="round"
+      [attr.aria-label]="'person.workouts.menu' | translate: { name: workout().name }"
+      (click)="onMenu($event)"
+    >
+      <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+    </ion-button>
+  } @else {
+    <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
+  }
+</ion-item>

@@ -1,0 +1,113 @@
+<ion-searchbar
+  class="search"
+  searchIcon="search-outline"
+  clearIcon="close-outline"
+  inputmode="search"
+  [debounce]="0"
+  [placeholder]="'exercises.library.searchPlaceholder' | translate"
+  [value]="searchInput()"
+  (ionInput)="onQuery($event.detail.value ?? '')"
+/>
+
+<!-- The filter trigger leads the strip, and the count in its label is the
+     thing you need to know before you wonder why the list is short. -->
+<div class="mh-chip-row bar">
+  <ion-button
+    class="filters"
+    fill="clear"
+    shape="round"
+    size="small"
+    [class.active]="store.activeFilterCount() > 0"
+    (click)="filterOpen.set(true)"
+  >
+    <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
+    @if (store.activeFilterCount() > 0) {
+      {{ 'common.filtersCount' | translate: { count: store.activeFilterCount() } }}
+    } @else {
+      {{ 'common.filters' | translate }}
+    }
+  </ion-button>
+
+  @for (pill of pills(); track pill.value) {
+    <!-- `ion-button`, not `ion-chip`, as on History: the chip has no role,
+         so a screen reader would never say which one is on. -->
+    <ion-button
+      class="chip"
+      fill="clear"
+      shape="round"
+      size="small"
+      [class.selected]="store.ownership() === pill.value"
+      [attr.aria-pressed]="store.ownership() === pill.value"
+      (click)="setOwnership(pill.value)"
+    >
+      {{ pill.label }}
+    </ion-button>
+  }
+</div>
+
+@if (store.showError()) {
+  <mh-empty-state
+    icon="alert-circle-outline"
+    [heading]="'exercises.library.loadError' | translate"
+    [message]="'error.checkConnection' | translate"
+    [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()"
+  />
+} @else if (store.showSkeleton()) {
+  <!-- Mirrors the row shape so nothing shifts when the rows land. -->
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (_ of skeletonRows; track $index) {
+      <ion-item>
+        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 65%" /></p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+} @else if (store.isFilteredEmpty()) {
+  <mh-empty-state
+    icon="search-outline"
+    [heading]="'empty.nothingMatches' | translate"
+    [message]="'exercises.library.noMatch' | translate"
+    [actionLabel]="'button.clearFilters' | translate"
+    (action)="clearNarrowing()"
+  />
+} @else if (store.isEmpty()) {
+  <mh-empty-state
+    icon="barbell-outline"
+    [heading]="'exercises.library.empty.title' | translate"
+    [message]="'exercises.library.empty.message' | translate"
+    [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()"
+  />
+} @else {
+  <span class="mh-kicker meta">{{ metaLabel() }}</span>
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (exercise of store.items(); track exercise.id) {
+      <mh-exercise-row [exercise]="exercise" [myUserId]="myUserId()" (select)="open(exercise)" />
+    }
+  </ion-list>
+
+  @if (store.hasMore()) {
+    <ion-button
+      class="show-more"
+      fill="clear"
+      expand="block"
+      [disabled]="store.loading()"
+      (click)="store.loadMore()"
+    >
+      {{ 'button.showMoreItems' | translate }}
+    </ion-button>
+  }
+}
+
+<mh-exercise-filter-sheet
+  [(open)]="filterOpen"
+  [filters]="store.filters()"
+  [facets]="store.facets()"
+  [ownership]="store.ownership()"
+  [search]="store.search()"
+  (applied)="applyFilters($event)"
+/>

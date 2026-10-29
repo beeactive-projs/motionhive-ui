@@ -5,23 +5,61 @@
     </ion-buttons>
     <ion-title>{{ name() }}</ion-title>
   </ion-toolbar>
+
+  @if (isSelf()) {
+    <!-- Your own page, as someone else would see it. A segment like every
+         page level switch in the app; the band below stays decoration. -->
+    <ion-toolbar>
+      <ion-segment [value]="store.previewAs()" (ionChange)="setPreviewAs($event.detail.value)">
+        <ion-segment-button value="PUBLIC">
+          <ion-label>{{ 'person.preview.anyone' | translate }}</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="COACH">
+          <ion-label>{{ 'person.preview.coaches' | translate }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="mh-page">
-    @if (notFound()) {
+  @if (store.notFound()) {
+    <div class="mh-page">
       <mh-empty-state
         icon="alert-circle-outline"
         [heading]="'person.unavailable.title' | translate"
         [message]="'person.unavailable.message' | translate"
       />
-    } @else if (loading() && !profile()) {
+    </div>
+  } @else if (store.showError()) {
+    <div class="mh-page">
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'person.loadFailed' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="store.retry()"
+      />
+    </div>
+  } @else if (store.showSkeleton()) {
+    <div class="band" aria-hidden="true"></div>
+    <div class="mh-page" aria-busy="true">
       <div class="hero">
-        <ion-skeleton-text [animated]="true" style="width: 6rem; height: 6.75rem" />
+        <mh-hex-avatar size="2xl" color="medium" tone="wash" />
         <ion-skeleton-text [animated]="true" style="width: 45%; height: 1.25rem" />
         <ion-skeleton-text [animated]="true" style="width: 30%" />
       </div>
-    } @else if (profile(); as person) {
+    </div>
+  } @else if (store.profile(); as person) {
+    <!-- The honeycomb the finish screen celebrates with, as a quiet band:
+         honey for a person, navy for a coach. -->
+    <div
+      class="band"
+      [attr.data-tone]="person.isInstructor ? 'navy' : 'honey'"
+      aria-hidden="true"
+    ></div>
+
+    <div class="mh-page">
       <div class="hero">
         <mh-hex-avatar
           size="2xl"
@@ -31,16 +69,7 @@
           [color]="tone()"
         />
         <h1>{{ name() }}</h1>
-        <ion-note class="handle">&#64;{{ person.handle }}</ion-note>
-
-        <!-- Where they are, beside who they are: public by default, and the
-             one detail most people look for first. -->
-        @if (location(); as place) {
-          <p class="place">
-            <ion-icon name="location-outline" aria-hidden="true" />
-            {{ place }}
-          </p>
-        }
+        <ion-note class="handle">{{ handleLine() }}</ion-note>
 
         @if (roles().length > 0) {
           <div class="roles">
@@ -48,6 +77,21 @@
               <ion-chip [outline]="true" color="medium">{{ role }}</ion-chip>
             }
           </div>
+        }
+        @if (rating() || experience()) {
+          <div class="facts">
+            @if (rating(); as score) {
+              <span><ion-icon name="star-outline" aria-hidden="true" />{{ score }}</span>
+            }
+            @if (experience(); as years) {
+              <span><ion-icon name="ribbon-outline" aria-hidden="true" />{{ years }}</span>
+            }
+          </div>
+        }
+        @if (coachSince(); as since) {
+          <ion-badge data-tone="navy">{{
+            'person.coachSince' | translate: { date: since }
+          }}</ion-badge>
         }
 
         <!-- A coach's shareable page: offerings, reviews and booking live
@@ -58,127 +102,232 @@
             <ion-icon slot="end" name="open-outline" aria-hidden="true" />
           </ion-button>
         }
+        @if (isSelf()) {
+          <ion-note class="preview">
+            {{
+              (store.previewAs() === 'COACH'
+                ? 'person.preview.asCoaches'
+                : 'person.preview.asAnyone'
+              ) | translate
+            }}
+          </ion-note>
+        } @else if (layout().initial === null && memberSince(); as since) {
+          <ion-note class="preview">{{
+            'person.memberSince' | translate: { date: since }
+          }}</ion-note>
+        }
       </div>
-
-      @if (hasNothingToShow()) {
-        <ion-note class="mh-note-block empty">
-          @if (firstName(); as first) {
-            {{ 'person.noDetails' | translate: { name: first } }}
-          } @else {
-            {{ 'person.noDetailsAnonymous' | translate }}
-          }
-        </ion-note>
-      }
-
-      @if (bio(); as about) {
-        <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.about' | translate }}</div>
-          <ion-note class="about">{{ about }}</ion-note>
-        </section>
-      }
-
-      @if (specializations().length > 0) {
-        <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.specialisesIn' | translate }}</div>
-          <div class="tags">
-            @for (item of specializations(); track item) {
-              <ion-chip [outline]="true" color="medium">{{ item }}</ion-chip>
-            }
-          </div>
-        </section>
-      }
-
-      @if (experience() || rating()) {
-        <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.coaching' | translate }}</div>
-          <ion-list [inset]="true" class="mh-card-list">
-            @if (experience(); as years) {
-              <ion-item>
-                <mh-hex-avatar slot="start" size="sm" icon="ribbon-outline" color="info" />
-                <ion-label><h3>{{ years }}</h3></ion-label>
-              </ion-item>
-            }
-            @if (rating(); as score) {
-              <ion-item>
-                <mh-hex-avatar slot="start" size="sm" icon="star-outline" color="primary" />
-                <ion-label><h3>{{ score }}</h3></ion-label>
-              </ion-item>
-            }
-          </ion-list>
-        </section>
-      }
 
       @if (sharedGroups().length > 0) {
         <section class="mh-section">
           <div class="mh-section-label">{{ 'person.groupsInCommon' | translate }}</div>
-          <!-- Labels, not links: a group opens in its own tab, and back from
-               there would not return here. -->
-          <div class="tags">
+          <!-- One line that scrolls sideways. Each opens the group in this
+               stack, so back returns here. -->
+          <div class="groups">
             @for (group of sharedGroups(); track group.id) {
-              <ion-chip [outline]="true" color="medium">{{ group.name }}</ion-chip>
+              <ion-chip
+                [outline]="true"
+                color="medium"
+                role="link"
+                tabindex="0"
+                (click)="openGroup(group)"
+                (keydown.enter)="openGroup(group)"
+              >
+                {{ group.name }}
+              </ion-chip>
             }
           </div>
         </section>
       }
-
-      @if (hasDetails()) {
-        <!-- Only what their privacy settings let this viewer see: email and
-             phone are theirs alone by default, language and time zone go to
-             their coaches. Last, under the public basics. -->
-        <section class="mh-section">
-          <div class="mh-section-label">{{ 'person.details' | translate }}</div>
-          <ion-list [inset]="true" class="mh-card-list details">
-            @if (person.email; as email) {
-              <ion-item [href]="'mailto:' + email">
-                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.email.icon" [color]="Tiles.email.color" />
-                <ion-label><h3>{{ email }}</h3></ion-label>
-              </ion-item>
-            }
-            @if (person.phone; as phone) {
-              <ion-item [href]="'tel:' + phone">
-                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.phone.icon" [color]="Tiles.phone.color" />
-                <ion-label><h3>{{ phone }}</h3></ion-label>
-              </ion-item>
-            }
-            @if (language(); as spoken) {
-              <ion-item>
-                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.language.icon" [color]="Tiles.language.color" />
-                <ion-label>
-                  <h3>{{ spoken }}</h3>
-                  <p>{{ 'form.label.language' | translate }}</p>
-                </ion-label>
-              </ion-item>
-            }
-            @if (localTime(); as time) {
-              <ion-item>
-                <mh-hex-avatar slot="start" size="sm" [icon]="Tiles.timezone.icon" [color]="Tiles.timezone.color" />
-                <ion-label>
-                  <h3>{{ time }}</h3>
-                  <p>{{ 'person.localTime' | translate }}</p>
-                </ion-label>
-              </ion-item>
-            }
-          </ion-list>
-          @if (firstName(); as first) {
-            <ion-note class="mh-footnote shared">{{ 'person.contactShared' | translate: { name: first } }}</ion-note>
-          }
-        </section>
+      @if (layout().tabs.length > 1) {
+        <ion-segment
+          class="mh-tabs"
+          mode="md"
+          [scrollable]="true"
+          [value]="tab()"
+          (ionChange)="setTab($event.detail.value)"
+        >
+          <ion-segment-button [value]="Tabs.Activity">
+            <ion-label>{{ 'person.tabs.activity' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button [value]="Tabs.About">
+            <ion-label>{{ 'person.about' | translate }}</ion-label>
+          </ion-segment-button>
+        </ion-segment>
       }
-
-      @if (memberSince(); as since) {
-        <ion-note class="mh-note-block">{{ 'person.memberSince' | translate: { date: since } }}</ion-note>
+      @if (tab() === Tabs.Activity) {
+        @if (isSelf()) {
+          <ion-note class="mh-note-block">
+            {{
+              (store.previewAs() === 'COACH'
+                ? 'person.activity.coachesHint'
+                : 'person.activity.publicHint'
+              ) | translate
+            }}
+          </ion-note>
+        }
+        @for (month of months(); track month.key) {
+          <section class="mh-section">
+            <div class="mh-section-label">{{ month.label }}</div>
+            <div>
+              @for (workout of month.workouts; track workout.id) {
+                <mh-profile-workout-row
+                  [workout]="workout"
+                  [withMenu]="!isSelf()"
+                  (select)="openWorkout(workout)"
+                  (menu)="openWorkoutMenu(workout)"
+                />
+              }
+            </div>
+          </section>
+        }
+        @if (store.hasMoreWorkouts()) {
+          <ion-button
+            fill="clear"
+            expand="block"
+            [disabled]="store.loadingWorkouts()"
+            (click)="store.loadMoreWorkouts()"
+          >
+            {{ 'button.showMoreItems' | translate }}
+          </ion-button>
+        }
       }
-    }
-  </div>
+      @if (tab() === Tabs.About) {
+        @if (bio(); as about) {
+          <ion-note class="about">{{ about }}</ion-note>
+        }
+        @if (specializations().length > 0) {
+          <section class="mh-section">
+            <div class="mh-section-label">{{ 'person.specialisesIn' | translate }}</div>
+            <div class="tags">
+              @for (item of specializations(); track item) {
+                <ion-chip [outline]="true" color="medium">{{ item }}</ion-chip>
+              }
+            </div>
+          </section>
+        }
+        @if (hasDetails()) {
+          <!-- Only what their privacy settings let this viewer see: email and
+               phone are theirs alone by default, language and time zone go to
+               their coaches. -->
+          <section class="mh-section">
+            <div class="mh-section-label">{{ 'person.details' | translate }}</div>
+            <ion-list [inset]="true" class="mh-card-list details">
+              @if (person.email; as email) {
+                <ion-item [href]="'mailto:' + email">
+                  <mh-hex-avatar
+                    slot="start"
+                    size="sm"
+                    [icon]="Tiles.email.icon"
+                    [color]="Tiles.email.color"
+                  />
+                  <ion-label
+                    ><h3>{{ email }}</h3></ion-label
+                  >
+                </ion-item>
+              }
+              @if (person.phone; as phone) {
+                <ion-item [href]="'tel:' + phone">
+                  <mh-hex-avatar
+                    slot="start"
+                    size="sm"
+                    [icon]="Tiles.phone.icon"
+                    [color]="Tiles.phone.color"
+                  />
+                  <ion-label
+                    ><h3>{{ phone }}</h3></ion-label
+                  >
+                </ion-item>
+              }
+              @if (language(); as spoken) {
+                <ion-item>
+                  <mh-hex-avatar
+                    slot="start"
+                    size="sm"
+                    [icon]="Tiles.language.icon"
+                    [color]="Tiles.language.color"
+                  />
+                  <ion-label>
+                    <h3>{{ spoken }}</h3>
+                    <p>{{ 'form.label.language' | translate }}</p>
+                  </ion-label>
+                </ion-item>
+              }
+              @if (localTime(); as time) {
+                <ion-item>
+                  <mh-hex-avatar
+                    slot="start"
+                    size="sm"
+                    [icon]="Tiles.timezone.icon"
+                    [color]="Tiles.timezone.color"
+                  />
+                  <ion-label>
+                    <h3>{{ time }}</h3>
+                    <p>{{ 'person.localTime' | translate }}</p>
+                  </ion-label>
+                </ion-item>
+              }
+            </ion-list>
+            @if (firstName(); as first) {
+              <ion-note class="mh-footnote">{{
+                'person.contactShared' | translate: { name: first }
+              }}</ion-note>
+            }
+          </section>
+        }
+      }
+      @if (layout().initial === null) {
+        <!-- Nothing past a name and a handle. Said out loud, or the page
+             reads as one that failed to load. -->
+        <div class="nothing" role="note">
+          <ion-icon name="lock-closed-outline" aria-hidden="true" />
+          <span>
+            @if (firstName(); as first) {
+              {{ 'person.noDetails' | translate: { name: first } }}
+            } @else {
+              {{ 'person.noDetailsAnonymous' | translate }}
+            }
+          </span>
+        </div>
+      } @else if (memberSince(); as since) {
+        <ion-note class="mh-note-block">{{
+          'person.memberSince' | translate: { date: since }
+        }}</ion-note>
+      }
+    </div>
+  }
 </ion-content>
 
-@if (profile() && !isSelf()) {
+@if (store.profile(); as person) {
   <ion-footer [translucent]="true">
     <ion-toolbar>
-      <ion-button expand="block" class="cta" (click)="message()">
-        <ion-icon slot="start" name="chatbubble-ellipses-outline" aria-hidden="true" />
-        {{ 'person.message' | translate }}
-      </ion-button>
+      @if (isSelf()) {
+        <ion-button expand="block" class="cta" (click)="editProfile()">
+          <ion-icon slot="start" name="create-outline" aria-hidden="true" />
+          {{ 'person.editProfile' | translate }}
+        </ion-button>
+      } @else {
+        <ion-button expand="block" class="cta" (click)="message()">
+          <ion-icon slot="start" name="chatbubble-ellipses-outline" aria-hidden="true" />
+          {{ 'person.message' | translate }}
+        </ion-button>
+      }
     </ion-toolbar>
   </ion-footer>
+
+  @if (!isSelf()) {
+    <mh-action-sheet
+      [(open)]="workoutMenuOpen"
+      [title]="workoutTarget()?.name ?? ''"
+      [actions]="workoutActions"
+      (chosen)="onWorkoutAction($event)"
+    />
+
+    <mh-report-workout-sheet
+      [(open)]="reportOpen"
+      [workout]="workoutTarget()"
+      [handle]="person.handle"
+      [ownerName]="person.firstName ?? ''"
+    />
+  }
 }

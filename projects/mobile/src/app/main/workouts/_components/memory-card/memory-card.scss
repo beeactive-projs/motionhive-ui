@@ -1,0 +1,87 @@
+/* A moment, so the finish screen's navy and honeycomb rather than a
+   card-surface row: the one place on History that is not a record. */
+:host {
+  display: block;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  min-height: 9.5rem;
+  padding: 1rem;
+  overflow: hidden;
+  border-radius: var(--mh-radius-card);
+  background: var(--mh-navy-900);
+  color: var(--mh-navy-50);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  isolation: isolate;
+}
+
+/* The finish screen's honeycomb, drawn the same way, for a memory without
+   a photo. */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ion-color-primary);
+  opacity: 0.12;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cpath d='M0 28L16 0h32l16 28-16 28H16zM64 28h32' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E");
+  mask-size: 96px 56px;
+  pointer-events: none;
+}
+
+/* Under a photo, a navy fade from the words' side keeps them on AA. */
+.card.with-photo::before {
+  z-index: 0;
+  background: linear-gradient(90deg, rgba(14, 27, 49, 0.92) 0%, rgba(14, 27, 49, 0.25) 80%);
+  opacity: 1;
+  mask-image: none;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.when,
+.words {
+  position: relative;
+  z-index: 1;
+}
+
+.when {
+  /* The light honey the finish screen and the mock use on navy. */
+  color: var(--mh-warning-300);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.progress {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+  font-weight: 700;
+  line-height: var(--mh-leading-heading);
+}
+
+.line {
+  color: var(--mh-navy-300);
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
+}

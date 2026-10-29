@@ -25,7 +25,7 @@ import { ProgramAssignment, ProgramAssignmentStatus } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
-import { CoachStacks, clientPath } from '../../clients/client-paths';
+import { clientPath, coachStackOf } from '../../clients/client-paths';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AssignmentRow } from '../_components/assignment-row/assignment-row';
 import { AssignRequest, AssignSheet } from '../_sheets/assign-sheet/assign-sheet';
@@ -69,6 +69,8 @@ export class Assignments implements ViewWillEnter {
   readonly store = inject(AssignmentsStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  /** Programs, or Clients when the plan was opened from a client's page. */
+  readonly stack = coachStackOf(this._router.url);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
 
@@ -125,7 +127,7 @@ export class Assignments implements ViewWillEnter {
    * plan's list. Their page carries the rest: profile, training, progress.
    */
   openClient(row: ProgramAssignment): void {
-    void this._router.navigate(clientPath(CoachStacks.Programs, row.clientId));
+    void this._router.navigate(clientPath(this.stack, row.clientId));
   }
 
   setStatus(row: ProgramAssignment, status: ProgramAssignmentStatus): void {

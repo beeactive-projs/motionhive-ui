@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../person/person.routes';
 
 /**
  * The trainee's coaches area, mounted at `/tabs/more/coaches`.
@@ -15,10 +16,6 @@ export const coachesRoutes: Routes = [
     loadComponent: () => import('./coaches').then((m) => m.Coaches),
     title: 'pageTitle.myCoaches',
   },
-  {
-    // Before any parameterised route this area might gain.
-    path: 'person/:handle',
-    loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
+  // Before any parameterised route this area might gain.
+  ...personRoutes,
 ];

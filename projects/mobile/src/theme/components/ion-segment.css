@@ -20,3 +20,58 @@ ion-segment-button {
 ion-segment-button {
   --color-checked: var(--mh-color-honey-deep);
 }
+
+/* A segment whose labels nearly fill their buttons, like the range
+   "12 săptămâni". Full width with plain letter spacing, then sides per
+   mode: Material needs none; iOS sizes its buttons to their labels, so
+   with none it shrank the bar and the labels touched, and 6px keeps them
+   apart while everything fits. Each button is still its share to tap. */
+ion-segment.mh-segment-fit {
+  width: 100%;
+}
+
+ion-segment.mh-segment-fit ion-segment-button {
+  min-width: 0;
+  letter-spacing: normal;
+}
+
+.md ion-segment.mh-segment-fit ion-segment-button {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.ios ion-segment.mh-segment-fit ion-segment-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+}
+
+/* Page tabs as underlined words: a client's Overview / Sessions / Training /
+   Progress, a person's Activity / About. Always Material's underline (the
+   segment sets `mode="md"`), on iOS too, since a pill segment reads as a
+   filter rather than a page's sections. Labels sit at their own width from
+   the start edge, the active one in body ink over a honey bar; the row
+   scrolls if a language runs long. */
+ion-segment.mh-tabs {
+  justify-content: flex-start;
+  gap: 1.25rem;
+  --background: transparent;
+}
+
+ion-segment.mh-tabs ion-segment-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  --color: var(--ion-color-medium);
+  --color-checked: var(--ion-text-color);
+  --indicator-color: var(--ion-color-primary);
+  --indicator-height: 0.15625rem;
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 2.75rem;
+  font-size: var(--mh-text-base);
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+ion-segment.mh-tabs ion-segment-button.segment-button-checked {
+  font-weight: 600;
+}

@@ -1,4 +1,7 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../person/person.routes';
+import { CoachStacks, clientTabRedirect } from '../clients/client-paths';
+import { programPageRoutes } from './program-pages.routes';
 
 /**
  * The coach's authoring area, mounted at `/tabs/programs`.
@@ -24,23 +27,14 @@ export const programRoutes: Routes = [
       import('../workouts/routine-builder/routine-builder').then((m) => m.RoutineBuilder),
     title: 'pageTitle.routine',
   },
-  {
-    // The catalog page, pushed onto THIS stack so back returns to the routine
-    // or day it was opened from. On the Workouts stack, back had nothing of
-    // the coach's to pop and fell through to the exercise list.
-    path: 'exercise/:exerciseId',
-    loadComponent: () =>
-      import('../exercises/exercise-detail/exercise-detail').then((m) => m.ExerciseDetail),
-    title: 'pageTitle.exercise',
-  },
   // A client, opened from a plan's list of who is on it — the same screens
   // the Clients tab mounts, pushed onto THIS stack so back returns to the
   // plan. See `clients/client-paths.ts`.
+  // Training and Progress are tabs of the client page now; their old
+  // addresses open it on that tab.
   {
     path: 'client/:clientId/training',
-    loadComponent: () =>
-      import('./client-training/client-training').then((m) => m.ClientTraining),
-    title: 'pageTitle.training',
+    redirectTo: clientTabRedirect(CoachStacks.Programs, 'training'),
   },
   {
     path: 'client/:clientId/progress/:exerciseId',
@@ -50,8 +44,7 @@ export const programRoutes: Routes = [
   },
   {
     path: 'client/:clientId/progress',
-    loadComponent: () => import('../workouts/progress/progress').then((m) => m.Progress),
-    title: 'pageTitle.progress',
+    redirectTo: clientTabRedirect(CoachStacks.Programs, 'progress'),
   },
   {
     path: 'client/:clientId',
@@ -60,35 +53,17 @@ export const programRoutes: Routes = [
     title: 'pageTitle.client',
   },
   {
+    // A session with a client, from their page in this stack; back returns there.
+    path: 'session/:id',
+    loadComponent: () =>
+      import('../coach/sessions/session-detail/session-detail').then((m) => m.SessionDetail),
+    title: 'pageTitle.session',
+  },
+  {
     path: 'log/:id',
     loadComponent: () => import('./log-review/log-review').then((m) => m.LogReview),
     title: 'pageTitle.workout',
   },
-  {
-    path: 'person/:handle',
-    loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
-  {
-    path: 'program/:id',
-    loadComponent: () =>
-      import('./program-builder/program-builder').then((m) => m.ProgramBuilder),
-    title: 'pageTitle.program',
-  },
-  {
-    // The settings page became the builder's ⋯ sheet; an old link lands there.
-    path: 'program/:id/settings',
-    redirectTo: 'program/:id',
-  },
-  {
-    path: 'program/:id/day/:workoutId',
-    loadComponent: () => import('./day-editor/day-editor').then((m) => m.DayEditor),
-    title: 'pageTitle.day',
-  },
-  {
-    path: 'program/:id/assignments',
-    loadComponent: () =>
-      import('./assignments/assignments').then((m) => m.Assignments),
-    title: 'pageTitle.assignments',
-  },
+  ...personRoutes,
+  ...programPageRoutes,
 ];

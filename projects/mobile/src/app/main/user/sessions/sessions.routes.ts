@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../../person/person.routes';
 
 /**
  * The trainee's sessions area, mounted at `/tabs/user/sessions`.
@@ -24,11 +25,7 @@ export const userSessionsRoutes: Routes = [
       ),
     title: 'pageTitle.cancelledDeclined',
   },
-  {
-    path: 'person/:handle',
-    loadComponent: () => import('../../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
+  ...personRoutes,
   {
     path: ':id',
     loadComponent: () =>

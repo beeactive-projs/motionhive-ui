@@ -1,4 +1,4 @@
-<ion-item button [detail]="detail()" lines="none" (click)="select.emit()">
+<ion-item button [detail]="detail() && !startable()" lines="none" (click)="select.emit()">
   <!-- Decorative: the name it would announce is the very next thing in the row. -->
   <mh-hex-avatar slot="start" size="md" tone="wash" icon="flash-outline" [color]="color()" />
 
@@ -9,5 +9,17 @@
 
   @if (level(); as value) {
     <ion-badge slot="end" [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
+  }
+  @if (startable()) {
+    <ion-button
+      slot="end"
+      class="start"
+      fill="outline"
+      size="small"
+      [disabled]="starting()"
+      (click)="onStart($event)"
+    >
+      {{ 'button.start' | translate }}
+    </ion-button>
   }
 </ion-item>

@@ -12,6 +12,8 @@ import {
 } from 'core';
 
 import { instanceMeta, instanceTone } from '../../sessions.config';
+import { addIcons } from 'ionicons';
+import { chevronForwardOutline } from 'ionicons/icons';
 
 /** Hold this long for the quick-actions sheet. */
 const LONG_PRESS_MS = 500;
@@ -98,6 +100,8 @@ export class SessionRow {
   private _pressTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
+    // Its own glyphs: the row sits on pages that register others.
+    addIcons({ chevronForwardOutline });
     // A filter or a refresh can drop this row mid-press.
     this._destroyRef.onDestroy(() => this.onPressEnd());
   }

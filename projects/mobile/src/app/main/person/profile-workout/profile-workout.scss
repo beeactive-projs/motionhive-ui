@@ -1,0 +1,29 @@
+/* The photo leads when there is one: full width, the card's corners, never
+   taller than most of a screen. */
+.photo {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  object-fit: cover;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+/* On the kicker's inset, so the date, the name and the words line up. */
+.name,
+.caption {
+  padding-inline: var(--mh-row-gutter);
+}
+
+.name {
+  margin: 0;
+}
+
+/* Their own words, in body ink, as they wrote them. */
+.caption {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+  white-space: pre-line;
+}

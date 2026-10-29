@@ -1,25 +1,116 @@
+/* ── The band ──────────────────────────────────────────────────────────
+   The finish screen's honeycomb, drawn the same way (a mask, so its colour
+   stays a theme token), as a quiet strip the avatar sits over. Honey wash
+   for a person, navy for a coach. */
+.band {
+  position: relative;
+  height: 5.5rem;
+  background: var(--ion-color-primary-wash);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ion-color-primary);
+  opacity: 0.18;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cpath d='M0 28L16 0h32l16 28-16 28H16zM64 28h32' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E");
+  mask-size: 96px 56px;
+  pointer-events: none;
+}
+
+.band[data-tone='navy'] {
+  background: var(--mh-navy-900);
+}
+
+.band[data-tone='navy']::before {
+  background: var(--mh-navy-300);
+  opacity: 0.22;
+}
+
+/* ── The identity block ────────────────────────────────────────────────
+   Centred, like the chat details and the client page; the avatar rides up
+   over the band. */
 .hero {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 1.25rem 0 0.25rem;
-}
-
-.hero h1 {
+  margin-top: calc(-3.25rem - var(--mh-page-rhythm));
   text-align: center;
 }
 
-.handle {
+.hero mh-hex-avatar {
+  filter: drop-shadow(0 0 0.1875rem var(--ion-background-color));
+}
+
+.hero h1 {
+  margin: 0.25rem 0 0;
+}
+
+.handle,
+.preview {
   font-size: var(--mh-text-sm);
   font-weight: 600;
+}
+
+.preview {
+  font-weight: 500;
 }
 
 .roles {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+/* Rating and experience on one line under the name, each with its glyph. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  ion-icon {
+    font-size: var(--mh-icon-sm);
+  }
+}
+
+/* The coach's web page: a quiet outline, so the footer stays the one honey
+   action on the screen. Tall enough for a thumb. */
+.public-page {
+  --color: var(--mh-color-honey-deep);
+  --border-color: var(--ion-border-color);
+  min-height: var(--mh-tap-target);
   margin-top: 0.25rem;
+}
+
+/* Groups in common: one line of chips that scrolls sideways. */
+.groups {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  ion-chip {
+    flex: none;
+  }
 }
 
 .cta {
@@ -29,7 +120,8 @@
 .about {
   display: block;
   padding: 0 0.375rem;
-  color: var(--ion-color-dark);
+  /* Body ink: `--ion-color-dark` turns faint on the dark theme's surface. */
+  color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   line-height: var(--mh-leading-body);
   /* Bios are free text, so honour the author's own line breaks. */
@@ -41,35 +133,21 @@
   flex-wrap: wrap;
 }
 
-.empty {
-  text-align: center;
-}
-
-/* City and country under the handle, with the pin as its only decoration. */
-.place {
-  display: inline-flex;
+/* "Hasn't shared anything else": a note, so the neutral surface rather than
+   a status wash. Nothing has gone wrong here. */
+.nothing {
+  display: flex;
   align-items: center;
-  gap: 0.25rem;
-  margin: 0;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
 
   ion-icon {
-    font-size: var(--mh-icon-sm);
+    flex: none;
+    font-size: var(--mh-icon-md);
   }
-}
-
-/* The coach's web page: a quiet outline, so Message stays the one honey
-   action on the screen. Tall enough for a thumb. */
-.public-page {
-  --color: var(--mh-color-honey-deep);
-  --border-color: var(--ion-border-color);
-  min-height: var(--mh-tap-target);
-  margin-top: 0.25rem;
-}
-
-/* "Shared by Elena." under the contact rows, aligned with the list text. */
-.shared {
-  display: block;
-  padding: 0 0.375rem;
 }

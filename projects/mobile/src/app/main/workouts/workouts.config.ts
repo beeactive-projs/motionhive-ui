@@ -1,3 +1,5 @@
+import { inject } from '@angular/core';
+import { RedirectFunction, Router } from '@angular/router';
 import {
   AssignedWorkout,
   ExerciseProgress,
@@ -21,12 +23,15 @@ import {
   startOfDay,
   startOfMonth,
   translate,
+  weekStart,
 } from 'core';
 import {
   addOutline,
   alertCircleOutline,
   backspaceOutline,
   barbellOutline,
+  calendarOutline,
+  cameraOutline,
   checkmarkCircle,
   checkmarkCircleOutline,
   checkmarkOutline,
@@ -34,13 +39,17 @@ import {
   chevronDownOutline,
   chevronForwardOutline,
   chevronUpOutline,
+  closeCircleOutline,
   closeOutline,
   copyOutline,
   createOutline,
+  ellipsisHorizontal,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
   flashOutline,
+  globeOutline,
+  imageOutline,
   lockClosedOutline,
   pauseOutline,
   peopleOutline,
@@ -53,6 +62,7 @@ import {
   timeOutline,
   trashOutline,
   trendingUpOutline,
+  trophyOutline,
 } from 'ionicons/icons';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
@@ -69,6 +79,8 @@ export const WORKOUT_ICONS = {
   alertCircleOutline,
   backspaceOutline,
   barbellOutline,
+  calendarOutline,
+  cameraOutline,
   checkmarkCircle,
   checkmarkCircleOutline,
   checkmarkOutline,
@@ -76,13 +88,17 @@ export const WORKOUT_ICONS = {
   chevronDownOutline,
   chevronForwardOutline,
   chevronUpOutline,
+  closeCircleOutline,
   closeOutline,
   copyOutline,
   createOutline,
+  ellipsisHorizontal,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
   flashOutline,
+  globeOutline,
+  imageOutline,
   lockClosedOutline,
   pauseOutline,
   peopleOutline,
@@ -95,7 +111,67 @@ export const WORKOUT_ICONS = {
   timeOutline,
   trashOutline,
   trendingUpOutline,
+  trophyOutline,
 };
+
+/**
+ * The Workouts page's tabs: what you train from, what you did, how it is
+ * going, and the movements it is all built from.
+ */
+export const WorkoutTabs = {
+  Routines: 'routines',
+  History: 'history',
+  Progress: 'progress',
+  Exercises: 'exercises',
+} as const;
+
+export type WorkoutTab = (typeof WorkoutTabs)[keyof typeof WorkoutTabs];
+
+/** A `?tab=` value, or the Routines tab for anything else. */
+export function workoutTabFrom(value: unknown): WorkoutTab {
+  return value === WorkoutTabs.History ||
+    value === WorkoutTabs.Progress ||
+    value === WorkoutTabs.Exercises
+    ? value
+    : WorkoutTabs.Routines;
+}
+
+/** The two ways to begin, behind the Workouts page's ⋯. */
+export const WorkoutStartActions = {
+  StartEmpty: 'start-empty',
+  NewRoutine: 'new-routine',
+} as const;
+
+export type WorkoutStartAction = (typeof WorkoutStartActions)[keyof typeof WorkoutStartActions];
+
+/** The ⋯ sheet's verbs; while a workout is open, starting another is not one. */
+export function workoutStartActions(canStart: boolean): SheetAction<WorkoutStartAction>[] {
+  return [
+    ...(canStart
+      ? [
+          {
+            id: WorkoutStartActions.StartEmpty,
+            label: 'workouts.home.startEmpty',
+            icon: 'play-outline',
+          },
+        ]
+      : []),
+    {
+      id: WorkoutStartActions.NewRoutine,
+      label: 'workouts.common.newRoutine',
+      icon: 'add-outline',
+    },
+  ];
+}
+
+/**
+ * The old History, Progress and exercise library pages are tabs of the
+ * Workouts page now; their addresses, which notifications and the exercise
+ * page still use, open it on that tab.
+ */
+export function workoutTabRedirect(tab: WorkoutTab): RedirectFunction {
+  return () => inject(Router).createUrlTree(['/tabs/workouts'], { queryParams: { tab } });
+}
 
 /**
  * How many empty sets a freshly added exercise starts with. The API creates
@@ -542,7 +618,7 @@ export function calendarDayState(logs: WorkoutLog[], isFuture: boolean): Calenda
 
 /**
  * The month as 42 cells, Monday first, with the neighbouring months' days
- * filling the edges. Six rows always, like the sessions month sheet: a fixed
+ * filling the edges. Six rows always, like the sessions month card: a fixed
  * height stops the page jumping between months. Logs land on their local day,
  * never the UTC one.
  */
@@ -650,10 +726,12 @@ export function oneRepMaxPoints(
   now: number,
 ): TrendPoint[] {
   const from = rangeStart(range, now);
-  const timed = series
-    .map((point) => ({ x: new Date(point.recordedAt).getTime(), y: point.weightKg }))
-    .filter((point) => point.x <= now)
-    .sort((a, b) => a.x - b.x);
+  const timed = bestPerDay(
+    series
+      .map((point) => ({ x: new Date(point.recordedAt).getTime(), y: point.weightKg }))
+      .filter((point) => point.x <= now)
+      .sort((a, b) => a.x - b.x),
+  );
   const before = timed.filter((point) => point.x < from);
   const inside = timed.filter((point) => point.x >= from);
   const points: TrendPoint[] = [];
@@ -665,6 +743,23 @@ export function oneRepMaxPoints(
   const last = points.at(-1);
   if (last && last.x < now && (carried || inside.length > 1)) points.push({ x: now, y: last.y });
   return points;
+}
+
+/**
+ * One point per local day, that day's best. Two workouts on one day would
+ * otherwise draw a vertical line, and a day of them can be all there is.
+ */
+function bestPerDay(points: readonly TrendPoint[]): TrendPoint[] {
+  const days: TrendPoint[] = [];
+  for (const point of points) {
+    const last = days.at(-1);
+    if (last && localDayKey(new Date(last.x)) === localDayKey(new Date(point.x))) {
+      if (point.y >= last.y) days[days.length - 1] = point;
+      continue;
+    }
+    days.push(point);
+  }
+  return days;
 }
 
 /** How far the estimate moved across the range; null when it has no span. */
@@ -791,6 +886,114 @@ export function trendGeometry(
 export function trendTicks(from: number, to: number, count: number): number[] {
   if (count < 2) return [to];
   return Array.from({ length: count }, (_, i) => from + ((to - from) * i) / (count - 1));
+}
+
+/** A month of History's photo grid, newest first. */
+export interface LogMonth {
+  key: string;
+  label: string;
+  logs: WorkoutLog[];
+}
+
+/**
+ * Items under the local month `dateOf` puts them in, newest month first and
+ * the list's order within one; an item without a date is left out. Newest
+ * first even when the list's order and those dates disagree (a workout
+ * finished the month after it began). History's photos and a profile's
+ * workouts both read it.
+ */
+export function monthGroups<T>(
+  items: readonly T[],
+  dateOf: (item: T) => string | null | undefined,
+): { key: string; label: string; items: T[] }[] {
+  const months: { key: string; label: string; items: T[] }[] = [];
+  for (const item of items) {
+    const at = dateOf(item);
+    if (!at) continue;
+    const date = new Date(at);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    let month = months.find((candidate) => candidate.key === key);
+    if (!month) {
+      month = {
+        key,
+        label: date.toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' }),
+        items: [],
+      };
+      months.push(month);
+    }
+    month.items.push(item);
+  }
+  return months.sort((a, b) => b.key.localeCompare(a.key));
+}
+
+/**
+ * Logs under the local month they were finished in (or started, for one
+ * still open).
+ */
+export function logMonths(logs: readonly WorkoutLog[]): LogMonth[] {
+  return monthGroups(logs, (log) => log.completedAt ?? log.startedAt).map(
+    ({ items, ...month }) => ({
+      ...month,
+      logs: items,
+    }),
+  );
+}
+
+export interface LogWeek {
+  /** The week's Monday, `yyyy-mm-dd`, local. */
+  key: string;
+  monday: Date;
+  /** "Week of 26 Oct", over the week's card. */
+  label: string;
+  logs: WorkoutLog[];
+}
+
+/**
+ * Logs by the Monday-first week they started in, newest week first and
+ * each week in the order given. A log lands on its local day, as on the
+ * calendar.
+ */
+export function logWeeks(logs: readonly WorkoutLog[]): LogWeek[] {
+  const weeks: LogWeek[] = [];
+  for (const log of logs) {
+    const monday = weekStart(new Date(log.startedAt));
+    const key = localDayKey(monday);
+    let week = weeks.find((candidate) => candidate.key === key);
+    if (!week) {
+      const date = monday.toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' });
+      week = { key, monday, label: translate('workouts.history.weekOf', { date }), logs: [] };
+      weeks.push(week);
+    }
+    week.logs.push(log);
+  }
+  return weeks.sort((a, b) => b.key.localeCompare(a.key));
+}
+
+/** "A month ago", "3 months ago", "A year ago": how far back a memory is. */
+export function memoryWhen(monthsAgo: number): string {
+  return monthsAgo >= 12 && monthsAgo % 12 === 0
+    ? translate('workouts.memory.yearsAgo', { count: monthsAgo / 12 })
+    : translate('workouts.memory.monthsAgo', { count: monthsAgo });
+}
+
+/**
+ * The first of each local month inside the span, at most `max` of them
+ * spread evenly. A month name belongs where its month begins: evenly spaced
+ * ticks put two in one month and read "Sep Sep".
+ */
+export function monthTicks(from: number, to: number, max: number): number[] {
+  const starts: number[] = [];
+  const cursor = new Date(from);
+  cursor.setDate(1);
+  cursor.setHours(0, 0, 0, 0);
+  cursor.setMonth(cursor.getMonth() + 1);
+  while (cursor.getTime() <= to) {
+    starts.push(cursor.getTime());
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  if (starts.length <= max) return starts;
+  const step = Math.ceil(starts.length / max);
+  return starts.filter((_, i) => i % step === 0);
 }
 
 function round2(value: number): number {

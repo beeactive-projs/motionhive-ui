@@ -86,6 +86,13 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
   // Note the comment alert points at the group too, not the post: that is
   // what the server sends, and guessing a post id here would break the tap.
   groups: (d) => link(d.entityId ? ['/tabs/groups', d.entityId] : ['/tabs/groups'], params(d)),
+  // One of the reader's own finished workouts (a takedown notice): its
+  // summary, where its visibility shows. Without an id, their history.
+  'user/workout-log': (d) =>
+    link(
+      d.entityId ? ['/tabs/workouts/finish', d.entityId] : ['/tabs/workouts/history'],
+      params(d),
+    ),
 };
 
 /**

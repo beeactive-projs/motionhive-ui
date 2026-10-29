@@ -23,6 +23,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  NavController,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
@@ -40,6 +41,7 @@ import {
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { CoachStacks, coachStackOf } from '../../clients/client-paths';
 import { AssignRequest, AssignSheet } from '../_sheets/assign-sheet/assign-sheet';
 import { CopyDaySheet } from '../_sheets/copy-day-sheet/copy-day-sheet';
 import { CopyWeekSheet } from '../_sheets/copy-week-sheet/copy-week-sheet';
@@ -117,6 +119,9 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   private readonly _programAssignmentService = inject(ProgramAssignmentService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _navController = inject(NavController);
+  /** Programs, or Clients when the plan was opened from a client's page. */
+  readonly stack = coachStackOf(this._router.url);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _injector = inject(Injector);
@@ -251,13 +256,13 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
 
     const existing = week.days[dayIndex];
     if (existing) {
-      void this._router.navigate(['/tabs/programs/program', program.id, 'day', existing.id]);
+      void this._router.navigate([this.stack, 'program', program.id, 'day', existing.id]);
       return;
     }
 
     // An empty cell creates the day, then opens it — one tap, not two.
     this.store.addDay(week.index, dayIndex, (workoutId) => {
-      void this._router.navigate(['/tabs/programs/program', program.id, 'day', workoutId]);
+      void this._router.navigate([this.stack, 'program', program.id, 'day', workoutId]);
     });
   }
 
@@ -621,7 +626,7 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
       void this._feedbackService.success(
         this._translateService.instant('programs.settings.toast.duplicated'),
       );
-      void this._router.navigate(['/tabs/programs/program', copy.id], { replaceUrl: true });
+      void this._router.navigate([this.stack, 'program', copy.id], { replaceUrl: true });
     });
   }
 
@@ -640,13 +645,19 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
       void this._feedbackService.success(
         this._translateService.instant('programs.settings.toast.deleted'),
       );
-      void this._router.navigate(['/tabs/programs'], { replaceUrl: true });
+      // Past the deleted plan: to the list on the Programs tab, and from a
+      // client's page back to it.
+      if (this.stack === CoachStacks.Programs) {
+        void this._router.navigate([this.stack], { replaceUrl: true });
+      } else {
+        void this._navController.back();
+      }
     });
   }
 
   openAssignments(): void {
     const program = this.store.program();
-    if (program) void this._router.navigate(['/tabs/programs/program', program.id, 'assignments']);
+    if (program) void this._router.navigate([this.stack, 'program', program.id, 'assignments']);
   }
 
   onAssign(request: AssignRequest): void {
@@ -724,7 +735,7 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
           this._id = program.id;
           // Same program under its real id: keep the weeks as they are.
           this._openFor = program.id;
-          void this._router.navigate(['/tabs/programs/program', program.id], {
+          void this._router.navigate([this.stack, 'program', program.id], {
             replaceUrl: true,
           });
         },
@@ -733,7 +744,7 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
             err,
             this._translateService.instant('programs.builder.toast.startFailed'),
           );
-          void this._router.navigate(['/tabs/programs']);
+          void this._router.navigate([this.stack]);
         },
       });
   }

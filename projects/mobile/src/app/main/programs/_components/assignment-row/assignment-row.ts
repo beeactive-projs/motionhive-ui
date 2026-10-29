@@ -7,6 +7,8 @@ import { ProgramAssignment, ProgramAssignmentStatus, displayName } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { assignmentChip, assignmentSubline, assignmentTone } from '../../programs.config';
+import { addIcons } from 'ionicons';
+import { barbellOutline } from 'ionicons/icons';
 
 /** Who the row is about: the client (on a program) or the plan (on a client). */
 export const AssignmentRowSubjects = {
@@ -71,6 +73,11 @@ export class AssignmentRow {
   readonly canResume = computed(
     () => this.assignment().status === ProgramAssignmentStatus.Paused,
   );
+
+  constructor() {
+    // Its own glyphs: the row sits on pages that register others.
+    addIcons({ barbellOutline });
+  }
 
   onRowClick(): void {
     if (this.tappable()) this.select.emit();

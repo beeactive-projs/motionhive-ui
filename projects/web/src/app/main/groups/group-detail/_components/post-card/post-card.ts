@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CardModule } from 'primeng/card';
 import { ButtonDirective } from 'primeng/button';
-import { Post } from 'core';
+import { Post, formatTotalDuration, translate } from 'core';
 import { PostReactionBar } from '../post-reaction-bar/post-reaction-bar';
 import { PostCommentList } from '../post-comment-list/post-comment-list';
 import { PostHeader } from '../post-header/post-header';
@@ -55,6 +55,21 @@ export class PostCard {
   readonly contentClampLines = computed(() =>
     this.hasImages() ? 2 : 10,
   );
+
+  /** "52 min · 18 sets · 1 record": what a shared workout's summary carries. */
+  readonly workoutLine = computed(() => {
+    const workout = this.post().workout;
+    if (!workout) return '';
+    const parts: string[] = [];
+    if (workout.durationSeconds) parts.push(formatTotalDuration(workout.durationSeconds / 60));
+    if (workout.setsCompleted > 0) {
+      parts.push(translate('groups.postWorkout.sets', { count: workout.setsCompleted }));
+    }
+    if (workout.recordCount > 0) {
+      parts.push(translate('groups.postWorkout.records', { count: workout.recordCount }));
+    }
+    return parts.join(' · ');
+  });
 
   /**
    * Heuristic for "is the content long enough that we should bother

@@ -28,8 +28,9 @@ export class GroupService {
   private readonly _http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}${API_ENDPOINTS.GROUPS.BASE}`;
 
-  getMyGroups(): Observable<Group[]> {
-    return this._http.get<Group[]>(this.baseUrl);
+  /** Your groups, each with your role in it (whether you may post depends on it). */
+  getMyGroups(): Observable<GroupWithMyRole[]> {
+    return this._http.get<GroupWithMyRole[]>(this.baseUrl);
   }
 
   getInstructorsGroups(): Observable<Group[]> {

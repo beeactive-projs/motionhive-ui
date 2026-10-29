@@ -1,5 +1,6 @@
 import { PaginatedResponse } from '../common/pagination.model';
 import type { PostApprovalState } from '../group/group.enums';
+import type { ProfileWorkout } from '../profile/public-user-profile.model';
 
 /**
  * Post — V1 model: each post belongs to exactly one group. Cross-posting
@@ -35,7 +36,15 @@ export interface Post {
    * per-group feed because the group is implicit in the URL.
    */
   group?: { id: string; name: string; logoUrl: string | null } | null;
+  /**
+   * A finished workout shared into the group, as its safe summary. Null for
+   * an ordinary post or once the workout is gone; absent from older APIs.
+   */
+  workout?: PostWorkout | null;
 }
+
+/** A workout card on a post; `onProfile` when its author made it Public. */
+export type PostWorkout = ProfileWorkout & { onProfile: boolean };
 
 export interface PostComment {
   id: string;
@@ -58,9 +67,12 @@ export interface PostComment {
 }
 
 export interface CreatePostPayload {
+  /** May be empty when the post carries a workout: the card says enough. */
   content: string;
   groupIds: string[];
   mediaUrls?: string[];
+  /** One of your own finished workouts, shown as a card. */
+  workoutLogId?: string;
 }
 
 /** POST /posts response — one item per group in `groupIds`. */

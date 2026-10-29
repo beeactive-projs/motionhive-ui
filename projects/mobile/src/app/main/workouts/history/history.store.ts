@@ -2,13 +2,30 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 
-import { STORAGE_KEYS, WorkoutLog, WorkoutLogService, startOfMonth } from 'core';
+import {
+  STORAGE_KEYS,
+  WorkoutLog,
+  WorkoutLogService,
+  WorkoutMemory,
+  dayRange,
+  monthRange,
+  startOfMonth,
+} from 'core';
 
+import { PagedList } from '../../../_shared/utils/paged-list';
 import { calendarCells, monthDoneCount } from '../workouts.config';
 
-const PAGE_SIZE = 25;
-/** The API caps `limit` at 100 — four pages is the most one request can re-read. */
-const MAX_REFRESH_PAGES = 4;
+/** A page of History; Show more reads the next. */
+const PAGE_SIZE = 15;
+
+/** History's chips: everything, only the ones with a photo, or with a record. */
+export const HistoryFilters = {
+  All: 'all',
+  Photos: 'photo',
+  Records: 'record',
+} as const;
+
+export type HistoryFilter = (typeof HistoryFilters)[keyof typeof HistoryFilters];
 /**
  * One request's worth of a month for the calendar. The API caps `limit` at
  * 100; a month with more logs than that shows its first hundred, which no one
@@ -16,60 +33,79 @@ const MAX_REFRESH_PAGES = 4;
  */
 const MONTH_LIMIT = 100;
 
-interface FetchOptions {
-  page: number;
-  limit: number;
-  /** Replace the rows on screen (a refresh) or append to them (scroll). */
-  replace: boolean;
-  done?: () => void;
-}
-
 /**
- * Page-scoped state for the training history.
+ * State for the training history, the Workouts page's History tab.
  *
- * Everything logged, newest first, paged. Skipped days stay in the list
- * rather than disappearing — a skip was a decision, and a history that hides
- * them reads as a cleaner training record than the one that actually
- * happened.
+ * Everything logged, newest first, paged. Skipped days of a plan stay in the
+ * list (the API's `kind=all` returns them as SKIPPED rows) rather than
+ * disappearing — a skip was a decision, and a history that hides them reads
+ * as a cleaner training record than the one that actually happened. The
+ * photo and record chips are finished workouts only. A day tapped on the
+ * calendar narrows the list to it.
  *
- * Same shape as the exercise library's store: `refresh` re-reads the whole
- * loaded window in place so coming back from a workout three pages down does
- * not snap the list to the top, and a response is dropped if a newer request
- * has gone out since.
+ * The paging is a `PagedList`: `refresh` re-reads the whole loaded window in
+ * place so coming back from a workout three pages down does not snap the list
+ * to the top, and a response is dropped if a newer request has gone out since.
  */
 @Injectable()
 export class HistoryStore {
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _translateService = inject(TranslateService);
 
-  private readonly _items = signal<WorkoutLog[]>([]);
-  private readonly _total = signal(0);
-  private readonly _loading = signal(false);
-  private readonly _loaded = signal(false);
-  private readonly _error = signal(false);
-  private _seq = 0;
+  private readonly _filter = signal<HistoryFilter>(HistoryFilters.All);
+  private readonly _memory = signal<WorkoutMemory | null>(null);
+  private readonly _day = signal<string | null>(null);
+  private readonly _calendarOpen = signal(false);
 
-  readonly items = this._items.asReadonly();
-  readonly total = this._total.asReadonly();
-  readonly loading = this._loading.asReadonly();
+  private readonly _list = new PagedList<WorkoutLog>(PAGE_SIZE, (page, limit) => {
+    const filter = this._filter();
+    const day = this._day();
+    return this._workoutLogService.list({
+      page,
+      limit,
+      ...(filter === HistoryFilters.All ? { kind: 'all' as const } : { has: filter }),
+      ...(day ? dayRange(day) : {}),
+    });
+  });
 
-  private readonly _pagesLoaded = computed(() => Math.floor(this._items().length / PAGE_SIZE));
+  readonly items = this._list.items;
+  readonly filter = this._filter.asReadonly();
+  /** A workout from a while back next to real progress since; null when there is none. */
+  readonly memory = this._memory.asReadonly();
+  readonly total = this._list.total;
+  readonly loading = this._list.loading;
+  /** The calendar day the list is narrowed to, as `yyyy-mm-dd`; null for every day. */
+  readonly day = this._day.asReadonly();
+  /** The calendar shows when asked for, from the button beside the chips. */
+  readonly calendarOpen = this._calendarOpen.asReadonly();
 
-  readonly hasMore = computed(() => this._items().length < this._total());
+  readonly hasMore = this._list.hasMore;
 
   /** First load over an empty list — the only state that may shimmer. */
-  readonly showSkeleton = computed(() => this._loading() && this._items().length === 0);
+  readonly showSkeleton = computed(() => this._list.loading() && this._list.items().length === 0);
 
-  readonly showError = computed(() => this._error() && this._items().length === 0);
+  readonly showError = computed(() => this._list.failed() && this._list.items().length === 0);
 
   readonly isEmpty = computed(
-    () => this._loaded() && !this._loading() && !this._error() && this._items().length === 0,
+    () =>
+      this._list.loaded() &&
+      !this._list.loading() &&
+      !this._list.failed() &&
+      this._list.items().length === 0,
   );
 
-  /** "42 workouts logged" — the line that says how big the record is. */
-  readonly countLabel = computed(() =>
-    this._translateService.instant('workouts.history.count', { count: this._total() }),
-  );
+  /**
+   * "12 workouts with a photo", or with a record. None under All, whose
+   * rows count skipped days too.
+   */
+  readonly countLabel = computed(() => {
+    if (this._filter() === HistoryFilters.All) return '';
+    const key =
+      this._filter() === HistoryFilters.Photos
+        ? 'workouts.history.countPhotos'
+        : 'workouts.history.countRecords';
+    return this._translateService.instant(key, { count: this._list.total() });
+  });
 
   // ─── Calendar ──────────────────────────────────────────────────────────
   // A month window of its own, independent of the paged list: scrolling the
@@ -103,9 +139,40 @@ export class HistoryStore {
    * on its day in the calendar.
    */
   refresh(done?: () => void): void {
-    const pages = Math.min(Math.max(this._pagesLoaded(), 1), MAX_REFRESH_PAGES);
-    this._fetch({ page: 1, limit: pages * PAGE_SIZE, replace: true, done });
+    this._list.refresh(done);
     this.refreshMonth();
+    this._fetchMemory();
+  }
+
+  /** A chip: the list starts over under the new filter. */
+  setFilter(filter: HistoryFilter): void {
+    if (filter === this._filter()) return;
+    this._filter.set(filter);
+    this._restart();
+  }
+
+  /** Narrow the list to a calendar day, or null for every day again. */
+  setDay(key: string | null): void {
+    if (key === this._day()) return;
+    this._day.set(key);
+    this._restart();
+  }
+
+  toggleCalendar(): void {
+    this._calendarOpen.update((open) => !open);
+  }
+
+  private _restart(): void {
+    this._list.clear();
+    this._list.reset();
+  }
+
+  /** Quiet on failure: History stands without its memory. */
+  private _fetchMemory(): void {
+    this._workoutLogService
+      .getMemory()
+      .pipe(take(1))
+      .subscribe({ next: (memory) => this._memory.set(memory ?? null), error: () => undefined });
   }
 
   setMonth(month: Date): void {
@@ -117,13 +184,11 @@ export class HistoryStore {
 
   refreshMonth(): void {
     const seq = ++this._monthSeq;
-    const from = this._month();
-    const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
     this._monthLoading.set(true);
     this._monthError.set(false);
 
     this._workoutLogService
-      .list({ dateFrom: from.toISOString(), dateTo: to.toISOString(), limit: MONTH_LIMIT })
+      .list({ kind: 'all', limit: MONTH_LIMIT, ...monthRange(this._month()) })
       .pipe(take(1))
       .subscribe({
         next: (response) => {
@@ -153,47 +218,7 @@ export class HistoryStore {
   }
 
   loadMore(done?: () => void): void {
-    if (this._loading() || !this.hasMore()) {
-      done?.();
-      return;
-    }
-    this._fetch({ page: this._pagesLoaded() + 1, limit: PAGE_SIZE, replace: false, done });
-  }
-
-  private _fetch({ page, limit, replace, done }: FetchOptions): void {
-    const seq = ++this._seq;
-    this._loading.set(true);
-    this._error.set(false);
-
-    this._workoutLogService
-      .list({ page, limit })
-      .pipe(take(1))
-      .subscribe({
-        next: (response) => {
-          if (seq !== this._seq) {
-            done?.();
-            return;
-          }
-          this._items.update((rows) =>
-            replace ? response.items : appendUnique(rows, response.items),
-          );
-          this._total.set(response.total);
-          this._loaded.set(true);
-          this._loading.set(false);
-          done?.();
-        },
-        error: () => {
-          if (seq !== this._seq) {
-            done?.();
-            return;
-          }
-          // A failed later page keeps what we have; the next scroll retries.
-          if (replace) this._error.set(true);
-          this._loaded.set(true);
-          this._loading.set(false);
-          done?.();
-        },
-      });
+    this._list.more(done);
   }
 }
 
@@ -204,10 +229,4 @@ function readCollapsed(): boolean {
   } catch {
     return false;
   }
-}
-
-/** Append, skipping rows already held — a re-asked partial page overlaps. */
-function appendUnique(rows: WorkoutLog[], incoming: WorkoutLog[]): WorkoutLog[] {
-  const held = new Set(rows.map((row) => row.id));
-  return [...rows, ...incoming.filter((row) => !held.has(row.id))];
 }

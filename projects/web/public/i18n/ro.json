@@ -1438,6 +1438,10 @@
         "groupsRequired": "Alege cel puțin un grup."
       }
     },
+    "postWorkout": {
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
+      "sets": "{count, plural, one {# serie} few {# serii} other {# de serii}}"
+    },
     "posts": {
       "createFirst": "Creează prima postare",
       "empty": {

@@ -6,6 +6,11 @@ export interface TrendLabel {
   /** Epoch ms. */
   at: number;
   label: string;
+  /**
+   * Centred on its tick, as a month name over where the month begins. Left
+   * out, the first label starts at its tick and the last ends at it.
+   */
+  align?: 'middle';
 }
 
 /**
@@ -39,10 +44,21 @@ export class TrendChart {
   readonly xTicks = computed(() => {
     const span = Math.max(this.to() - this.from(), 1);
     const labels = this.xLabels();
-    return labels.map((tick, index) => ({
-      label: tick.label,
-      left: ((tick.at - this.from()) / span) * 100,
-      align: index === 0 ? 'start' : index === labels.length - 1 ? 'end' : 'middle',
-    }));
+    return labels.map((tick, index) => {
+      const left = ((tick.at - this.from()) / span) * 100;
+      // A centred label this close to an edge would hang off the card.
+      const align = tick.align
+        ? left < 8
+          ? 'start'
+          : left > 92
+            ? 'end'
+            : 'middle'
+        : index === 0
+          ? 'start'
+          : index === labels.length - 1
+            ? 'end'
+            : 'middle';
+      return { label: tick.label, left, align };
+    });
   });
 }

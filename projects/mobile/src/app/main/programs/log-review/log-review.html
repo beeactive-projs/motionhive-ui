@@ -41,6 +41,10 @@
         </ion-card-content>
       </ion-card>
 
+      @if (photoUrl(); as src) {
+        <img class="photo" [src]="src" [alt]="'programs.logReview.photoAlt' | translate" />
+      }
+
       <div class="mh-tiles">
         @for (tile of tiles(); track tile.label) {
           <mh-stat-tile [label]="tile.label" [value]="tile.value" />

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { coachGuard } from '../../_shared/guards/coach.guard';
+import { personRoutes } from '../person/person.routes';
 
 /**
  * The account area, mounted at `/tabs/more/account`.
@@ -20,6 +21,8 @@ export const accountRoutes: Routes = [
     loadComponent: () => import('./profile/profile').then((m) => m.Profile),
     title: 'pageTitle.profile',
   },
+  // Your own profile, previewed as others see it ("View profile").
+  ...personRoutes,
   {
     path: 'notifications',
     loadComponent: () =>

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" [text]="'nav.groups' | translate" />
+      <ion-back-button [defaultHref]="backHref" [text]="backLabel | translate" />
     </ion-buttons>
     <ion-title>{{ store.group()?.name ?? ('groups.common.group' | translate) }}</ion-title>
     <ion-buttons slot="end">
@@ -66,7 +66,6 @@
     </div>
   </div>
   }
-
   @if (store.showGroupError()) {
   <mh-empty-state icon="alert-circle-outline" [heading]="'groups.common.loadGroupError' | translate"
     [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
@@ -95,7 +94,6 @@
       <span>{{ 'groups.compose.placeholder' | translate }}</span>
     </button>
     }
-
     @if (store.showLoadError()) {
     <mh-empty-state icon="alert-circle-outline" [heading]="'groups.detail.posts.loadError' | translate"
       [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
@@ -143,6 +141,9 @@
         <span class="post-body">{{ post.content }}</span>
       </button>
 
+            @if (post.workout; as workout) {
+              <mh-post-workout [workout]="workout" [handle]="post.author?.handle" />
+            }
       @if (post.mediaUrls; as photos) {
       <!-- A photo opens the viewer, not the post: tapping a picture to read
            the comments under it is not what the tap meant. -->
@@ -272,7 +273,6 @@
       }
     </div>
     }
-
     @if (canShareJoinLink()) {
     <!-- The only way into an invite-only group for someone who is not your
          client, so it sits with the group's own settings rather than under
@@ -287,7 +287,6 @@
       </ion-item>
     </ion-list>
     }
-
     @if (canLeaveGroup()) {
     <!-- The owner never sees this: the API answers "Group owner cannot
          leave. Transfer ownership first or delete the group." -->
@@ -300,7 +299,6 @@
     }
   </div>
   }
-
   @if ((isPosts() && store.postsHasMore()) || (isMembers() && store.membersHasMore())) {
   <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
     <ion-infinite-scroll-content />

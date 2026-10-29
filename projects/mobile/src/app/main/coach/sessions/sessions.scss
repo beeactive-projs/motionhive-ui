@@ -1,27 +1,13 @@
-/* Summary line above the week strip. */
+/* The day view's line under its title: a warning you must read on the
+   left, the workload total on the right. */
 .summary {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.375rem;
-  padding: 0 1.25rem 0.5rem;
+  padding: 0.25rem 1.25rem 0.5rem;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
-}
-
-.summary b {
-  color: var(--ion-text-color);
-  font-weight: 600;
-}
-
-.summary .sep {
-  color: var(--ion-color-medium-tint);
-}
-
-/* The day view splits its two facts to the edges: a warning you must read on
-   the left, the workload total on the right. */
-.summary.day {
-  justify-content: space-between;
-  padding-top: 0.25rem;
 }
 
 .conflict {
@@ -29,109 +15,26 @@
   font-weight: 600;
 }
 
-/* Month label, Today, and the agenda/day toggle — one row. The month label
-   takes the slack so the two controls stay hard right. */
-.controls {
+/* "1 this week · 1 signup", once above the agenda: how busy the week is,
+   with the room a sentence needs. */
+.week-summary {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 1.25rem 0.625rem;
-}
-
-.controls .month {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.125rem;
-  margin-inline-end: auto;
-  min-width: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  text-align: start;
-  white-space: nowrap;
-}
-
-.controls .month ion-icon {
-  font-size: var(--mh-icon-sm);
-}
-
-/* Paired with the segment beside it: same track colour, same 30px, so the two
-   read as one row of controls rather than two sizes of pill. */
-.controls .today {
-  display: inline-flex;
-  align-items: center;
-  flex: none;
-  height: 1.875rem;
-  padding: 0 0.75rem;
-  border: none;
-  border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-divider);
-  color: var(--ion-color-dark);
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.375rem;
+  margin: 0 0 0.5rem;
+  padding: 0 0.375rem;
+  color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
+}
+
+.week-summary b {
+  color: var(--ion-text-color);
   font-weight: 600;
 }
 
-/* Agenda/Day toggle — a grey track carrying the checked view as a white pill.
-   Three Ionic assumptions have to be undone to get there.
-
-   Layout: the segment expects to own its row (`width: 100%`, `grid-auto-columns:
-   1fr`). This one shares a row with the month label and Today, so it is sized to
-   its own labels instead — `max-content` columns, plus `min-width: 0` to drop
-   the button's 90px floor, which alone would overflow a 402px row.
-
-   Height: `closest('ion-toolbar')` earns the segment an `in-toolbar` class whose
-   `min-height: var(--min-height)` reads the *toolbar's* variable through
-   inheritance — 56px. Redeclaring `--min-height` here is what fixes it; a plain
-   `min-height` of ours only ties that rule on specificity and resolves on
-   stylesheet load order, which is not a coin worth flipping. The label's own
-   margins come off for the same reason — md gives a label-only segment button
-   12px top and bottom, sized for a 48px toolbar tab. 30px less the 3px of track
-   padding leaves the buttons at WCAG 2.5.8's 24px target floor.
-
-   Colour: Material marks the checked button with a 2px underline, and the design
-   is the iOS-style pill — so the indicator is zeroed and the fill moves onto the
-   button itself. Inside a toolbar Ionic routes those colours through
-   `--ion-toolbar-segment-*`, which is both the documented hook and the only one
-   that outranks its own `:host(.in-toolbar)` block. */
-.view {
-  --min-height: 1.875rem;
-  --background: var(--mh-color-divider);
-  --ion-toolbar-segment-background-checked: var(--ion-card-background);
-  --ion-toolbar-segment-color: var(--ion-color-medium);
-  --ion-toolbar-segment-color-checked: var(--ion-text-color);
-  flex: none;
-  width: auto;
-  grid-auto-columns: max-content;
-  padding: 0.25rem;
-  border-radius: var(--mh-radius-control);
-
-  &.pr-5 {
-    margin-right: 0.75rem;
-  }
-}
-
-.view ion-segment-button {
-  /* Stated here, not inherited: the global skin puts honey-deep ink on every
-     checked segment button, and this pill's checked label is the page's own
-     ink on a white fill instead. */
-  --color-checked: var(--ion-text-color);
-  --indicator-height: 0;
-  /* Concentric with the track: the outer radius less the padding it sits in. */
-  --border-radius: calc(var(--mh-radius-control) - 0.25rem);
-  --padding-start: 0.75rem;
-  --padding-end: 0.75rem;
-  min-width: 0;
-  min-height: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  letter-spacing: normal;
-  line-height: var(--mh-leading-none);
-  & ion-label {
-    margin: 0;
-  }
+.week-summary .sep {
+  color: var(--ion-color-medium-tint);
 }
 
 /* Week strip. A seven-column grid is the shape; Ionic's grid is for page

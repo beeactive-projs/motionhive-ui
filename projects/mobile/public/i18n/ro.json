@@ -309,34 +309,86 @@
     },
     "detail": {
       "addNote": "Adaugă o notiță privată",
+      "attention": {
+        "reason": {
+          "behind": "Rămas în urmă cu planul",
+          "dropped": "În scădere",
+          "neverStarted": "Nu a început",
+          "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}"
+        },
+        "detail": {
+          "dropped": "A scăzut de la {previous}% la {current}% față de perioada anterioară.",
+          "neverStarted": "Are un plan atribuit, dar nu a înregistrat niciun antrenament."
+        }
+      },
+      "clientSince": "Client din {date}",
       "expires": "Expiră pe {date}",
       "loadError": {
         "message": "Clientul nu a putut fi încărcat.",
         "title": "Clientul nu a putut fi încărcat"
       },
+      "noPlan": {
+        "title": "Niciun plan atribuit",
+        "body": "Nu i-ai atribuit nimic, așa că nu are ce urma."
+      },
+      "noteKicker": "Notița ta · doar tu",
+      "overview": {
+        "nextSession": "Următoarea sesiune",
+        "lastWorkout": "Ultimul antrenament",
+        "planActive": "Plan activ",
+        "planPaused": "Plan · pe pauză",
+        "planWaiting": "Plan · în așteptare"
+      },
       "pastWindow": "{count, plural, one {Ultima zi} few {Ultimele # zile} other {Ultimele # de zile}}",
+      "pending": {
+        "title": "{name} nu a răspuns încă",
+        "body": "Planurile, antrenamentele și progresul apar după ce invitația e acceptată."
+      },
       "plans": {
         "assign": "Atribuie un plan",
         "hidePast": "Ascunde planurile încheiate",
         "none": "Niciun plan atribuit încă.",
         "showPast": "{count, plural, one {Arată # plan încheiat} few {Arată # planuri încheiate} other {Arată # de planuri încheiate}}"
       },
-      "progressLink": "Progres și recorduri",
       "sections": {
-        "notes": "Notițele tale private",
         "plans": "Planuri",
-        "sessions": "Sesiuni",
-        "thisWeek": "Săptămâna aceasta",
-        "training": "Antrenament"
+        "thisWeek": "Săptămâna aceasta"
       },
       "sessions": {
+        "label": "Ce sesiuni",
+        "noneOnDay": "Nicio sesiune în această zi.",
         "nonePast": "Nicio sesiune împreună în ultima vreme.",
         "noneUpcoming": "Nimic programat încă.",
         "past": "Trecute",
         "upcoming": "Viitoare"
       },
       "since": "Din {date}",
-      "trainingLink": "Plan și antrenamente înregistrate",
+      "tabs": {
+        "overview": "Prezentare",
+        "sessions": "Sesiuni",
+        "training": "Antrenament",
+        "progress": "Progres"
+      },
+      "training": {
+        "clearDay": "Arată toate zilele, nu doar {date}",
+        "empty": {
+          "all": "Nimic înregistrat încă.",
+          "day": "Nimic în această zi.",
+          "own": "Încă nu îți arată niciun antrenament făcut pe cont propriu.",
+          "plan": "Încă niciun antrenament din planurile tale.",
+          "skipped": "Niciun antrenament sărit."
+        },
+        "kinds": {
+          "all": "Toate",
+          "label": "Ce antrenamente",
+          "own": "Proprii",
+          "plan": "Din plan",
+          "skipped": "Sărite"
+        },
+        "legendOwn": "Propriu",
+        "privacyNote": "Antrenamentele pe care clientul le face în afara planului rămân private dacă nu le partajează, așa că lista poate să nu includă tot ce a făcut.",
+        "workouts": "Antrenamente"
+      },
       "upcomingWindow": "Următoarele {count, plural, one {# zi} few {# zile} other {# de zile}}",
       "viewProfile": "Vezi profilul",
       "week": {
@@ -344,9 +396,9 @@
         "footnote": "{completed, plural, one {# făcut} few {# făcute} other {# făcute}} · {skipped, plural, one {# sărit} few {# sărite} other {# sărite}} · {remaining, plural, one {# rămas} few {# rămase} other {# rămase}}",
         "label": "antrenamente făcute",
         "trend": {
-          "down": "{count, plural, one {Cu # punct sub săptămâna trecută} few {Cu # puncte sub săptămâna trecută} other {Cu # de puncte sub săptămâna trecută}}",
           "level": "La fel ca săptămâna trecută",
-          "up": "{count, plural, one {Cu # punct peste săptămâna trecută} few {Cu # puncte peste săptămâna trecută} other {Cu # de puncte peste săptămâna trecută}}"
+          "upFrom": "Crescut de la {previous}%",
+          "downFrom": "Scăzut de la {previous}%"
         }
       }
     },
@@ -1149,6 +1201,10 @@
       "DISABLED": "Membrii pot citi și comenta.",
       "OPEN": "Membrii postează direct în grup."
     },
+    "postWorkout": {
+      "label": "Antrenament",
+      "open": "Deschide {name} pe profil"
+    },
     "preview": {
       "locked": "Postările și membrii devin vizibili după ce intri în grup.",
       "notFound": {
@@ -1571,7 +1627,6 @@
     "exercises": "Exerciții",
     "group": "Grup",
     "groups": "Grupuri",
-    "history": "Istoric",
     "inviteClient": "Invită client",
     "invoice": "Factură",
     "manageGroup": "Gestionează grupul",
@@ -1593,13 +1648,11 @@
     "profile": "Profil",
     "program": "Program",
     "programs": "Programe",
-    "progress": "Progres",
     "resetPassword": "Resetează parola",
     "routine": "Rutină",
     "session": "Sesiune",
     "signIn": "Autentificare",
     "starterRoutines": "Antrenamente predefinite",
-    "training": "Antrenamente",
     "verifyEmail": "Verifică emailul",
     "workout": "Antrenament",
     "workoutComplete": "Antrenament încheiat",
@@ -1806,14 +1859,13 @@
   },
   "person": {
     "about": "Despre",
-    "coaching": "Ca antrenor",
     "contactShared": "{name} a ales să le facă vizibile.",
     "experience": "{count, plural, one {# an de experiență} few {# ani de experiență} other {# de ani de experiență}}",
     "groupsInCommon": "Grupuri comune",
     "memberSince": "Pe MotionHive din {date}.",
     "message": "Mesaj",
-    "noDetails": "{name} nu a adăugat încă detalii în profil.",
-    "noDetailsAnonymous": "Nu a adăugat încă detalii în profil.",
+    "noDetails": "{name} nu a făcut vizibil nimic altceva aici.",
+    "noDetailsAnonymous": "Nimic altceva nu e vizibil aici.",
     "rating": "{average} · {count, plural, one {# recenzie} few {# recenzii} other {# de recenzii}}",
     "specialisesIn": "Specializări",
     "unavailable": {
@@ -1822,17 +1874,56 @@
     },
     "viewPublicPage": "Vezi pagina publică",
     "details": "Detalii",
-    "localTime": "Ora locală"
-  },
-  "profileView": {
+    "localTime": "Ora locală",
     "loadFailed": "Profilul nu a putut fi încărcat",
-    "message": "Mesaj",
-    "notFound": {
-      "message": "Persoana poate și-a schimbat numele de utilizator sau și-a închis contul.",
-      "title": "Profil negăsit"
+    "workouts": {
+      "caption": "„{text}”",
+      "menu": "Mai multe pentru „{name}”",
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
+      "report": {
+        "action": "Raportează antrenamentul",
+        "category": {
+          "HARASSMENT": "Hărțuire sau mesaje de ură",
+          "IMPERSONATION": "Se dă drept altcineva",
+          "OTHER": "Altceva",
+          "SCAM": "Înșelătorie sau fraudă",
+          "SEXUAL": "Nuditate sau conținut sexual",
+          "SPAM": "Spam sau reclamă"
+        },
+        "failed": "Nu am putut trimite raportul.",
+        "issue": "Motivul",
+        "lead": "Spune-i echipei MotionHive ce nu e în regulă cu „{workout}”. {name} nu va ști că ai fost tu.",
+        "leadAnonymous": "Spune-i echipei MotionHive ce nu e în regulă cu „{workout}”. Persoana care l-a postat nu va ști că ai fost tu.",
+        "notes": "Vrei să ne spui mai multe? (opțional)",
+        "send": "Trimite raportul",
+        "sent": "Mulțumim. Echipa MotionHive va analiza raportul.",
+        "title": "Raportează antrenamentul"
+      }
     },
-    "privateNote": "{name} își păstrează restul profilului privat.",
-    "privateNoteAnonymous": "Această persoană își păstrează restul profilului privat."
+    "tabs": {
+      "activity": "Activitate"
+    },
+    "preview": {
+      "anyone": "Oricine",
+      "coaches": "Antrenorii tăi",
+      "asAnyone": "Așa îți vede profilul oricine pe MotionHive",
+      "asCoaches": "Așa îți văd profilul antrenorii tăi"
+    },
+    "activity": {
+      "publicHint": "Aici apar doar antrenamentele pe care le-ai setat Public. Poți schimba asta la fiecare antrenament.",
+      "coachesHint": "Antrenorii tăi văd și antrenamentele setate Doar antrenorii. Poți schimba asta la fiecare antrenament."
+    },
+    "coachSince": "Te antrenează din {date}",
+    "editProfile": "Editează profilul",
+    "workout": {
+      "title": "Antrenament",
+      "photoAlt": "Fotografie de la antrenament",
+      "records": "Recorduri",
+      "unavailable": {
+        "title": "Antrenament indisponibil",
+        "message": "Poate a devenit privat sau a fost șters."
+      }
+    }
   },
   "programs": {
     "actions": {
@@ -1915,19 +2006,6 @@
         "weekDeleted": "Am șters săptămâna {week}"
       },
       "untitledProgram": "Program fără titlu"
-    },
-    "clientTraining": {
-      "empty": {
-        "heading": "Nimic încă",
-        "message": "Atribuie un program și activitatea clientului va apărea aici."
-      },
-      "error": "Nu am putut încărca antrenamentele clientului",
-      "nothingLogged": "Nimic înregistrat în această perioadă.",
-      "plan": "Plan",
-      "planSubline": "{percent}% realizat · început {date}",
-      "privacyNote": "Antrenamentele pe care clientul le face în afara planului rămân private dacă nu le partajează, așa că lista poate să nu includă tot ce a făcut.",
-      "recentWorkouts": "Antrenamente recente",
-      "titleFallback": "Antrenamente"
     },
     "common": {
       "clientFallback": "Client",
@@ -2020,6 +2098,7 @@
       "felt": "Cum s-a simțit: {rating} din 5",
       "howItWent": "Cum a mers",
       "logged": "Înregistrat",
+      "photoAlt": "Fotografia lor de la antrenament",
       "quotedNote": "„{note}”",
       "title": "Antrenament",
       "whatTheyDid": "Ce a făcut"
@@ -2101,6 +2180,10 @@
     },
     "agenda": {
       "backToAgenda": "Înapoi la agendă",
+      "calendar": {
+        "hide": "Ascunde luna",
+        "show": "Arată luna"
+      },
       "dayConflicts": "{count, plural, one {# conflict la {time}} few {# conflicte la {time}} other {# de conflicte la {time}}}",
       "dayTotal": "{sessions} · {duration} programate",
       "loadError": {
@@ -2116,11 +2199,7 @@
         "signups": "{count, plural, one {înscriere} few {înscrieri} other {de înscrieri}}",
         "thisWeek": "{count, plural, one {sesiune săptămâna asta} few {sesiuni săptămâna asta} other {de sesiuni săptămâna asta}}"
       },
-      "truncated": "Afișăm primele 100 de sesiuni din acest interval. Restrânge intervalul ca să le vezi pe cele de mai târziu.",
-      "view": {
-        "agenda": "Agendă",
-        "day": "Zi"
-      }
+      "truncated": "Afișăm primele 100 de sesiuni din acest interval. Restrânge intervalul ca să le vezi pe cele de mai târziu."
     },
     "badge": {
       "pending": "{count} în așteptare"
@@ -2341,11 +2420,6 @@
       },
       "title": "Scrie celor înscriși"
     },
-    "monthSheet": {
-      "jump": "Sari",
-      "jumpTo": "Sari la {date}",
-      "title": "Sari la"
-    },
     "noteSheet": {
       "helper": "Doar tu vezi notița. E legată de această persoană și de această sesiune.",
       "placeholder": "Și-a tot cruțat genunchiul stâng. Verifică săptămâna viitoare.",
@@ -2413,6 +2487,7 @@
       "keepGoing": "Continuă",
       "newRoutine": "Rutină nouă",
       "progress": "Progres",
+      "routines": "Rutine",
       "startFailed": "Nu am putut începe antrenamentul",
       "startWorkout": "Începe antrenamentul",
       "starterRoutines": "Antrenamente predefinite",
@@ -2502,10 +2577,12 @@
         "dayLabel": "{date}: {state}",
         "done": "{count, plural, one {# făcut} few {# făcute} other {# de făcute}}",
         "expand": "Arată toată luna",
+        "hide": "Ascunde calendarul",
         "legendCoach": "Planul antrenorului",
         "legendSelf": "Antrenamentul meu",
         "legendSkipped": "Sărit",
         "loadError": "Nu am putut încărca luna",
+        "show": "Arată calendarul",
         "state": {
           "coach": "plan de la antrenor, făcut",
           "none": "niciun antrenament",
@@ -2513,11 +2590,30 @@
           "skipped": "sărit"
         }
       },
-      "count": "{count, plural, one {# antrenament înregistrat} few {# antrenamente înregistrate} other {# de antrenamente înregistrate}}",
+      "clearDay": "Arată toate zilele, nu doar {date}",
+      "countPhotos": "{count, plural, one {# antrenament cu poză} few {# antrenamente cu poze} other {# de antrenamente cu poze}}",
+      "countRecords": "{count, plural, one {# antrenament cu record} few {# antrenamente cu recorduri} other {# de antrenamente cu recorduri}}",
       "empty": {
         "message": "Termină un antrenament și îl vei vedea aici.",
         "title": "Nimic înregistrat încă"
-      }
+      },
+      "emptyDay": "Nimic în această zi.",
+      "emptyPhotos": {
+        "message": "Adaugă una în rezumat, când termini un antrenament.",
+        "title": "Încă nicio poză"
+      },
+      "emptyRecords": {
+        "message": "Un antrenament apare aici când îți depășești cel mai bun rezultat la un exercițiu.",
+        "title": "Încă niciun record"
+      },
+      "filters": {
+        "all": "Toate",
+        "label": "Filtrează istoricul",
+        "photo": "Cu poze",
+        "record": "Recorduri"
+      },
+      "openPhoto": "{name}, {day}",
+      "weekOf": "Săptămâna din {date}"
     },
     "home": {
       "coldStart": {
@@ -2530,14 +2626,14 @@
       "fromYourCoach": "De la antrenorul tău",
       "inProgress": "În desfășurare · {elapsed}",
       "noRoutines": "Salvează un antrenament ca rutină și va apărea aici, gata de repetat.",
-      "openHistory": "Deschide istoricul",
       "paused": "Pe pauză · {elapsed}",
       "percentDone": "{percent}% gata",
+      "startActions": "Începe sau creează",
       "startEmpty": "Începe un antrenament nou",
       "startsOn": "Începe {date}",
       "weekOf": "Săptămâna {week} din {total}",
       "yourCoach": "Antrenorul tău",
-      "yourRoutines": "Rutinele tale"
+      "yourRoutinesCount": "Rutinele tale · {count}"
     },
     "keypad": {
       "backspace": "Șterge",
@@ -2561,7 +2657,8 @@
     },
     "logRow": {
       "coach": "Antrenor",
-      "repeat": "Repetă {name}"
+      "repeat": "Repetă {name}",
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}"
     },
     "logger": {
       "addExercise": "Adaugă exercițiu",
@@ -2633,6 +2730,19 @@
       "setsDone": "{done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
       "week": "Săptămâna {number}"
     },
+    "photo": {
+      "actionsTitle": "Fotografia antrenamentului",
+      "add": "Adaugă o fotografie",
+      "addHint": "Un selfie, sala, priveliștea. O văd doar cei care pot vedea antrenamentul.",
+      "alt": "Fotografia antrenamentului tău",
+      "change": "Schimbă fotografia",
+      "remove": "Șterge fotografia",
+      "toast": {
+        "removeFailed": "Nu am putut șterge fotografia",
+        "unreadable": "Nu am putut deschide fotografia",
+        "uploadFailed": "Nu am putut adăuga fotografia"
+      }
+    },
     "plan": {
       "allWeeks": "Toate săptămânile",
       "doneCount": "{done} / {total} gata",
@@ -2674,7 +2784,8 @@
         "title": "Nimic de arătat încă"
       },
       "last12Weeks": "Ultimele 12 săptămâni",
-      "records": "Recorduri"
+      "records": "Recorduri",
+      "recordLine": "1RM estimat · {date}"
     },
     "restAlert": {
       "body": "E timpul pentru următoarea serie.",
@@ -2766,6 +2877,19 @@
         "streak": "{count, plural, one {# săptămână la rând} few {# săptămâni la rând} other {# de săptămâni la rând}}"
       },
       "fromNote": "Din notița ta",
+      "group": {
+        "done": "Distribuit în {group}",
+        "failed": "Nu am putut distribui în grup",
+        "hint": "Membrii văd cardul și mesajul tău. Niciodată notița, greutățile sau fotografia.",
+        "none": "Niciunul dintre grupurile tale nu primește încă postări de la membri.",
+        "pending": "Trimis în {group}. Apare după ce grupul îl aprobă.",
+        "title": "Sau distribuie-l într-un grup"
+      },
+      "look": {
+        "badge": "Fotografie întreagă",
+        "comb": "Fagure",
+        "strip": "Bandă de miere"
+      },
       "message": "Mesajul tău",
       "messagePlaceholder": "Scrie ceva despre antrenament",
       "onCard": "Pe card",
@@ -2811,10 +2935,16 @@
       "upNextWithDate": "Urmează · {date}"
     },
     "units": {
-      "hours": "{value} h",
       "kg": "{value} kg",
       "kgShort": "kg",
       "meters": "{value} m"
+    },
+    "memory": {
+      "monthsAgo": "{count, plural, one {Acum o lună} few {Acum # luni} other {Acum # de luni}}",
+      "yearsAgo": "{count, plural, one {Acum un an} few {Acum # ani} other {Acum # de ani}}",
+      "progress": "{exercise}: {from} → {to} kg",
+      "line": "Uite cât ai crescut de atunci.",
+      "open": "Deschide {name}"
     }
   },
   "feedback": {
@@ -2854,7 +2984,8 @@
   "workoutVisibility": {
     "hint": {
       "COACHES_ONLY": "Antrenorii tăi activi, inclusiv nota și notița ta.",
-      "ONLY_ME": "Doar tu. Un antrenor vede în continuare antrenamentele din planul pe care ți l-a dat."
+      "ONLY_ME": "Doar tu. Un antrenor vede în continuare antrenamentele din planul pe care ți l-a dat.",
+      "PUBLIC": "Oricine îți deschide profilul, fără notiță și fără greutăți."
     },
     "newWorkouts": "Antrenamente noi",
     "planCoachNote": "{name} vede mereu antrenamentele din planul pe care ți l-a dat.",
@@ -2862,6 +2993,7 @@
     "section": "Antrenamentele tale",
     "sectionNote": "De aici pornește fiecare antrenament nou. Poți schimba oricare dintre ele din rezumatul lui.",
     "sheetTitle": "Cine vede antrenamentul?",
+    "takenDown": "Scos de pe profilul tău după o raportare, deci nu mai poate fi public sau distribuit.",
     "visibleTo": "Vizibil pentru",
     "youAndCoach": "Tu și {name}"
   }

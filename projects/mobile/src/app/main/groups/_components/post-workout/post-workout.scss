@@ -1,0 +1,48 @@
+/* A workout in a post: one tidy row, like a link preview. */
+:host {
+  display: block;
+  margin: 0.5rem 0 0;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-primary-wash);
+  color: var(--ion-text-color);
+  font: inherit;
+  text-align: left;
+}
+
+button.card {
+  cursor: pointer;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.chevron {
+  flex: none;
+  color: var(--ion-color-medium);
+}

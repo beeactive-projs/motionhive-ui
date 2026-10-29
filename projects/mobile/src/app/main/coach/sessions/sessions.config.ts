@@ -28,7 +28,6 @@ import {
   cashOutline,
   checkmarkCircleOutline,
   chevronBackOutline,
-  chevronDownOutline,
   chevronForwardCircleOutline,
   chevronForwardOutline,
   closeCircleOutline,
@@ -66,7 +65,6 @@ export const SESSION_ICONS = {
   cashOutline,
   checkmarkCircleOutline,
   chevronBackOutline,
-  chevronDownOutline,
   chevronForwardCircleOutline,
   chevronForwardOutline,
   closeCircleOutline,
@@ -785,7 +783,7 @@ function union(a: DayWindow, b: DayWindow): DayWindow {
  * Widen `anchor` with whatever else we would like loaded, but only while the
  * result still fits the API's cap.
  *
- * Widening-only was the previous rule and it was wrong: paging the month sheet
+ * Widening-only was the previous rule and it was wrong: paging the month card
  * forward kept growing one window until it crossed 180 days and every further
  * request 400'd. What the user is looking at has to win, so anything that will
  * not fit is dropped rather than the request being broken.

@@ -89,6 +89,39 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
   font-size: var(--mh-icon-sm);
 }
 
+/* The calendar's button, an icon in the same capsule, at the end of the
+   strip: the month stays out of the way until asked for. */
+.mh-chip-row .filters.calendar-toggle {
+  margin-inline-start: auto;
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+}
+
+/* The day a list is narrowed to from its calendar, with the way back to
+   every day: a honey pill under the chips (History, a client's Training
+   and Sessions). The same height as the chips above it. */
+ion-button.mh-day-chip {
+  --background: var(--mh-color-selected-background);
+  --background-hover: var(--mh-color-selected-background);
+  --background-activated: var(--mh-color-selected-background);
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+  align-self: flex-start;
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+ion-button.mh-day-chip ion-icon {
+  margin-inline-start: 0.375rem;
+  font-size: var(--mh-icon-sm);
+}
+
 /* A toggle chip in the same strip — "All / Active / Requests / Archived" —
    or in a filter sheet's `.mh-chip-cloud` (layout.css), so a filter is the
    same control wherever it sits.

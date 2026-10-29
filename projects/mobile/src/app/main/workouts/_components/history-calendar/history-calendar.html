@@ -71,7 +71,7 @@
     }
 
     <div class="legend">
-      @for (entry of legend; track entry.state) {
+      @for (entry of legend(); track entry.state) {
         <span class="entry">
           <i [attr.data-state]="entry.state" aria-hidden="true"></i>
           {{ entry.label | translate }}

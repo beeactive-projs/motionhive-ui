@@ -44,6 +44,7 @@ import {
   recordSessionIds,
   secondsToClock,
   shortDayLabel,
+  monthTicks,
   trendTicks,
 } from '../workouts.config';
 
@@ -104,9 +105,9 @@ export class ExerciseProgress implements ViewWillEnter {
   private readonly _clientId = this._activatedRoute.snapshot.paramMap.get('clientId');
   private readonly _stack = coachStackOf(this._router.url);
 
-  /** Back on a cold load: the progress screen this was opened from. */
+  /** Back on a cold load: the Progress this was opened from, a client's tab or your own page. */
   readonly backHref = this._clientId
-    ? `${clientUrl(this._stack, this._clientId)}/progress`
+    ? `${clientUrl(this._stack, this._clientId)}?tab=progress`
     : '/tabs/workouts/progress';
 
   readonly ranges = PROGRESS_RANGES;
@@ -124,6 +125,14 @@ export class ExerciseProgress implements ViewWillEnter {
   /** The record row's name, so the title is there before the data is. */
   private readonly _stateName =
     (history.state as { exerciseName?: string } | null)?.exerciseName ?? '';
+
+  /**
+   * Whose numbers a coach is reading, carried in from their Progress tab.
+   * A cold load has no name to show, and the page stands without it.
+   */
+  readonly clientName = this._clientId
+    ? ((history.state as { clientName?: string } | null)?.clientName ?? '')
+    : '';
 
   readonly title = computed(() => this.progress()?.exercise.name ?? this._stateName);
 
@@ -185,15 +194,21 @@ export class ExerciseProgress implements ViewWillEnter {
     });
   });
 
-  /** Month names under a long range; day and month under four weeks. */
+  /**
+   * Day and month at the ends and middle of four weeks; over a longer range,
+   * month names where each month begins, so no name appears twice.
+   */
   readonly xLabels = computed<TrendLabel[]>(() => {
-    const short = this.range() === '4w';
-    const format: Intl.DateTimeFormatOptions = short
-      ? { day: 'numeric', month: 'short' }
-      : { month: 'short' };
-    return trendTicks(this.rangeFrom(), this.now(), short ? 3 : 4).map((at) => ({
+    if (this.range() === '4w') {
+      return trendTicks(this.rangeFrom(), this.now(), 3).map((at) => ({
+        at,
+        label: new Date(at).toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' }),
+      }));
+    }
+    return monthTicks(this.rangeFrom(), this.now(), 4).map((at) => ({
       at,
-      label: new Date(at).toLocaleDateString(appLocale(), format),
+      label: new Date(at).toLocaleDateString(appLocale(), { month: 'short' }),
+      align: 'middle' as const,
     }));
   });
 

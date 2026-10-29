@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/coach/sessions" />
+      <ion-back-button [defaultHref]="stack" />
     </ion-buttons>
     <ion-title>{{ 'common.session' | translate }}</ion-title>
     @if (instance()) {
@@ -80,7 +80,6 @@
           </div>
         </div>
       }
-
       @if (lifecycle() !== 'past') {
         <ion-list [inset]="true" class="mh-card-list">
           <ion-item>
@@ -126,7 +125,6 @@
           }
         </ion-list>
       }
-
       @if (liveBanner(); as note) {
         <!-- Says only what the clock and the roster know. The design also shows
              a lobby count, but `joinInfo` 403s for the coach on their own
@@ -189,7 +187,6 @@
           <p class="mh-footnote">{{ 'sessions.detail.remindersHint' | translate }}</p>
         </section>
       }
-
       @if (isFull()) {
         <div class="full-banner">
           <ion-icon name="people-outline" aria-hidden="true" />
@@ -201,7 +198,6 @@
           </div>
         </div>
       }
-
       @if (lifecycle() !== 'past') {
         <section class="mh-section">
           <ion-note class="mh-kicker section-label" color="medium">
@@ -213,7 +209,6 @@
           </div>
         </section>
       }
-
       @if (attendanceSummary(); as summary) {
         <div class="attendance-summary">
           <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
@@ -239,7 +234,6 @@
         @if (editingAttendance() && attendees().length > 0) {
           <ion-note class="mh-note-block">{{ 'sessions.detail.attendanceHint' | translate }}</ion-note>
         }
-
         @if (attendees().length === 0) {
           <ion-note class="mh-note-block">{{ 'sessions.detail.noSignups' | translate }}</ion-note>
         } @else {
@@ -332,7 +326,6 @@
                 }
               </ion-item>
             }
-
             @if (hiddenAttendees() > 0) {
               <ion-item button detail="false" (click)="attendeesExpanded.set(true)">
                 <ion-label class="show-all">
@@ -388,7 +381,6 @@
           </div>
         </section>
       }
-
       @if (description(); as text) {
         <!-- What signups read before booking. The design's card here is a note
              to attendees, which no field backs — this is the one piece of the

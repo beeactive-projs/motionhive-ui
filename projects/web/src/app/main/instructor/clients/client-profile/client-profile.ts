@@ -323,11 +323,11 @@ export class ClientProfile {
   /**
    * Sessions, one page at a time, split by whether they have happened.
    *
-   * "Upcoming" reads forward from now and sorts ascending (the next one
-   * first); "Past" reads backward and sorts descending (the most recent
-   * first). Both are what you actually want to see at the top, and they
-   * are different orders — so the sort follows the scope rather than
-   * being fixed.
+   * "Upcoming" reads forward from now, the next one first; "Past" reads
+   * backward, the most recent first. Both are what you actually want to
+   * see at the top, and they are different orders, so the order follows
+   * the scope. The server sorts, so each page continues the last one
+   * (sorting a page here put the oldest sessions on page one).
    *
    * The window is 89 days rather than 90 because the server rejects a
    * span *greater than* 180 days, and two `Date`s built microseconds
@@ -348,17 +348,14 @@ export class ClientProfile {
         clientId: c.clientId,
         dateFrom: new Date(upcoming ? now : now - DAYS * 86_400_000).toISOString(),
         dateTo: new Date(upcoming ? now + DAYS * 86_400_000 : now).toISOString(),
+        // Past pages from the latest back, so page one is the most recent.
+        order: upcoming ? 'asc' : 'desc',
         page,
         limit: ClientProfile.PAGE,
       })
       .subscribe({
         next: (res) => {
-          const sorted = [...res.items].sort((a, b) =>
-            upcoming
-              ? a.startAt.localeCompare(b.startAt)
-              : b.startAt.localeCompare(a.startAt),
-          );
-          this.sessions.update((cur) => (append ? [...cur, ...sorted] : sorted));
+          this.sessions.update((cur) => (append ? [...cur, ...res.items] : res.items));
           this.sessionsTotal.set(res.total);
           this.sessionsPage.set(page);
           this.sessionsLoaded.set(true);

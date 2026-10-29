@@ -1,10 +1,10 @@
 <ion-item
   class="mh-session-row mh-list-row"
-  button
+  [button]="openable()"
   detail="false"
   lines="none"
   [attr.data-tone]="tone()"
-  (click)="select.emit()"
+  (click)="onSelect()"
 >
   <div class="when" slot="start">
     <span class="time">{{ rail().day }}</span>
@@ -14,6 +14,9 @@
   <ion-label>
     <h2>{{ log().name }}</h2>
     <div class="tags">
+      @if (records(); as badge) {
+        <ion-badge [attr.data-tone]="badge.tone">{{ badge.label }}</ion-badge>
+      }
       @if (sourceChip(); as source) {
         <ion-badge [attr.data-tone]="source.tone">{{ source.label }}</ion-badge>
       }
@@ -26,7 +29,8 @@
     </div>
   </ion-label>
 
-  @if (repeatable()) {
+  <!-- A skipped plan day has nothing to repeat or open. -->
+  @if (repeatable() && openable()) {
     <ion-button
       slot="end"
       fill="clear"
@@ -36,7 +40,7 @@
     >
       <ion-icon slot="icon-only" name="refresh-outline" aria-hidden="true" />
     </ion-button>
-  } @else {
+  } @else if (openable()) {
     <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
   }
 </ion-item>

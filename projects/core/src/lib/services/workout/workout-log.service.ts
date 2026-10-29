@@ -11,6 +11,7 @@ import type {
   LoggedSet,
   StartWorkoutPayload,
   WorkoutLog,
+  WorkoutMemory,
 } from '../../models/workout/log.model';
 import type { Routine } from '../../models/workout/routine.model';
 import type { ProfilePrivacy } from '../../models/profile/profile.enums';
@@ -31,6 +32,34 @@ export interface ListWorkoutLogsQuery {
   dateTo?: string;
   /** Case-insensitive match on the session name. */
   search?: string;
+  /** Only workouts with a photo, or with a record. */
+  has?: WorkoutLogFilter;
+  /**
+   * `all`: with the skipped days of your plans, as rows of status SKIPPED
+   * and nothing to open. Ignored beside `has` or `search`.
+   */
+  kind?: 'all';
+}
+
+/** What History's filters keep. */
+export type WorkoutLogFilter = 'photo' | 'record';
+
+/**
+ * Which of a client's workouts a coach reads: `all` adds the skipped days
+ * of their plans (rows with status SKIPPED and nothing to open), `plan` and
+ * `own` split the finished ones, `skipped` is the skips alone. Omitted,
+ * the finished workouts only.
+ */
+export type CoachLogKind = 'all' | 'plan' | 'own' | 'skipped';
+
+export interface CoachClientLogsQuery {
+  page?: number;
+  limit?: number;
+  kind?: CoachLogKind;
+  /** Inclusive lower bound on the day. */
+  dateFrom?: string;
+  /** Exclusive upper bound on the day. */
+  dateTo?: string;
 }
 
 /**
@@ -100,6 +129,35 @@ export class WorkoutLogService {
     );
   }
 
+  /**
+   * Sets the finished workout's one photo, replacing any before it. Send a
+   * re-encoded JPEG: the API takes nothing else, and strips its metadata.
+   */
+  uploadPhoto(id: string, jpeg: Blob): Observable<{ hasPhoto: true; photoVersion: number }> {
+    const form = new FormData();
+    form.append('file', jpeg, 'photo.jpg');
+    return this._http.post<{ hasPhoto: true; photoVersion: number }>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.PHOTO(id)}`,
+      form,
+    );
+  }
+
+  /**
+   * The photo's bytes. There is no public link to it: the API checks who
+   * is asking and streams it, so it comes as a blob, not a URL.
+   */
+  getPhoto(id: string, size: 'full' | 'thumb' = 'full'): Observable<Blob> {
+    return this._http.get(`${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.PHOTO(id)}`, {
+      responseType: 'blob',
+      // A small 3:4 crop for a grid of them; the whole photo otherwise.
+      params: size === 'thumb' ? { size } : {},
+    });
+  }
+
+  deletePhoto(id: string): Observable<void> {
+    return this._http.delete<void>(`${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.PHOTO(id)}`);
+  }
+
   /** Who besides the owner sees this workout. Owner only. */
   setVisibility(
     id: string,
@@ -123,7 +181,19 @@ export class WorkoutLogService {
     if (query.dateFrom) p = p.set('dateFrom', query.dateFrom);
     if (query.dateTo) p = p.set('dateTo', query.dateTo);
     if (query.search?.trim()) p = p.set('search', query.search.trim());
+    if (query.has) p = p.set('has', query.has);
+    if (query.kind) p = p.set('kind', query.kind);
     return this._http.get<PaginatedWorkoutLogs>(this._base, { params: p });
+  }
+
+  /**
+   * History's memory: a workout from a while back and how far one of its
+   * lifts has come since. Null (200) when nothing has improved.
+   */
+  getMemory(): Observable<WorkoutMemory | null> {
+    return this._http.get<WorkoutMemory | null>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.MEMORY}`,
+    );
   }
 
   /**
@@ -133,11 +203,14 @@ export class WorkoutLogService {
    */
   listForClient(
     clientId: string,
-    query: ListWorkoutLogsQuery = {},
+    query: CoachClientLogsQuery = {},
   ): Observable<PaginatedWorkoutLogs> {
     let p = new HttpParams();
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
+    if (query.kind) p = p.set('kind', query.kind);
+    if (query.dateFrom) p = p.set('dateFrom', query.dateFrom);
+    if (query.dateTo) p = p.set('dateTo', query.dateTo);
     return this._http.get<PaginatedWorkoutLogs>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_LIST_FOR_CLIENT(clientId)}`,
       { params: p },
@@ -149,6 +222,13 @@ export class WorkoutLogService {
     return this._http.get<WorkoutLog>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_BY_ID(id)}`,
     );
+  }
+
+  /** The photo of a workout the coach may open, as bytes like `getPhoto`. */
+  getPhotoForCoach(id: string): Observable<Blob> {
+    return this._http.get(`${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_PHOTO(id)}`, {
+      responseType: 'blob',
+    });
   }
 
   /** Look up the log produced by a given assigned workout. 404s if
@@ -187,7 +267,10 @@ export class WorkoutLogService {
     loggedExerciseId: string,
   ): Observable<void> {
     return this._http.delete<void>(
-      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.REMOVE_EXERCISE(workoutLogId, loggedExerciseId)}`,
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.REMOVE_EXERCISE(
+        workoutLogId,
+        loggedExerciseId,
+      )}`,
     );
   }
 
@@ -217,7 +300,10 @@ export class WorkoutLogService {
     skipped: boolean,
   ): Observable<LoggedExercise> {
     return this._http.patch<LoggedExercise>(
-      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SKIP_EXERCISE(workoutLogId, loggedExerciseId)}`,
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SKIP_EXERCISE(
+        workoutLogId,
+        loggedExerciseId,
+      )}`,
       { skipped },
     );
   }
@@ -233,7 +319,10 @@ export class WorkoutLogService {
     exerciseId: string,
   ): Observable<LoggedExercise> {
     return this._http.patch<LoggedExercise>(
-      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SWAP_EXERCISE(workoutLogId, loggedExerciseId)}`,
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SWAP_EXERCISE(
+        workoutLogId,
+        loggedExerciseId,
+      )}`,
       { exerciseId },
     );
   }

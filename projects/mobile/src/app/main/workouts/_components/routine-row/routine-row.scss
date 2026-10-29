@@ -19,3 +19,12 @@ ion-badge {
   margin-inline-start: 0.5rem;
   border-radius: var(--mh-radius-pill);
 }
+
+// Start as a quiet outline in body ink, a hairline ring: the honey goes to
+// Start empty workout above the list.
+.start {
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --color: var(--ion-text-color);
+  margin-inline-start: 0.5rem;
+}

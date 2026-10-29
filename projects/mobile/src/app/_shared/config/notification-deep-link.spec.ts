@@ -35,6 +35,7 @@ const SCREENS_THE_API_EMITS = [
   'coaching/subscriptions',
   'coaching/pending-requests',
   'coaching/exercises',
+  'user/workout-log',
 ];
 
 describe('deep links', () => {

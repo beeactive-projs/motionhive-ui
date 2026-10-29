@@ -7,9 +7,10 @@ import {
   CARD_FONTS,
   CARD_HEIGHT,
   CARD_WIDTH,
+  CardTemplate,
   ShareCardContent,
   cardPalette,
-  drawShareCard,
+  drawCard,
 } from './share-card';
 
 /** How a share ended: sent somewhere, or put away by the person. */
@@ -27,7 +28,12 @@ export class ShareCardService {
   private _fontsReady: Promise<unknown> | null = null;
 
   /** The card as a PNG data URL, for the preview and for sharing. */
-  async render(content: ShareCardContent, dark: boolean): Promise<string> {
+  async render(
+    content: ShareCardContent,
+    dark: boolean,
+    template: CardTemplate = 'comb',
+    photo: CanvasImageSource | null = null,
+  ): Promise<string> {
     // The faces are bundled, but a face is only loaded once text asks for
     // it; a canvas would otherwise draw the first card in a fallback.
     this._fontsReady ??= Promise.all(CARD_FONTS.map((face) => this._document.fonts.load(face)));
@@ -40,7 +46,13 @@ export class ShareCardService {
     if (!ctx) throw new Error('Canvas 2D is not available');
 
     const styles = getComputedStyle(this._document.documentElement);
-    drawShareCard(ctx, content, cardPalette(dark, (name) => styles.getPropertyValue(name).trim()));
+    drawCard(
+      ctx,
+      content,
+      cardPalette(dark, (name) => styles.getPropertyValue(name).trim()),
+      template,
+      photo,
+    );
     return canvas.toDataURL('image/png');
   }
 
@@ -88,5 +100,7 @@ export class ShareCardService {
 /** Closing the share sheet is a choice, not a failure. */
 function isCancel(err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err ?? '');
-  return /cancel|abort/i.test(message) || (err instanceof DOMException && err.name === 'AbortError');
+  return (
+    /cancel|abort/i.test(message) || (err instanceof DOMException && err.name === 'AbortError')
+  );
 }

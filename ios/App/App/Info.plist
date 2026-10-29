@@ -81,5 +81,7 @@
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>MotionHive saves your workout card to Photos when you choose Save Image.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MotionHive uses the camera when you take a photo for a workout or a post.</string>
 </dict>
 </plist>

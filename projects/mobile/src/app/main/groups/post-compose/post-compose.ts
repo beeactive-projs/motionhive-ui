@@ -23,6 +23,7 @@ import { GroupService, GroupWithMyRole, GroupsRefreshService, PostService } from
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { groupLinks } from '../../../_shared/utils/stack-paths';
 import {
   IMAGE_MAX_BYTES,
   POST_MAX_IMAGES,
@@ -78,6 +79,9 @@ export class PostCompose {
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  /** The stack the group was opened in: the Groups tab, or a profile's. */
+  private readonly _links = groupLinks(this._router.url);
+  readonly backHref = this._links.home;
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
@@ -244,7 +248,9 @@ export class PostCompose {
                 : 'groups.compose.toast.posted',
             ),
           );
-          void this._router.navigate(['/tabs/groups', this._groupId()], { replaceUrl: true });
+          void this._router.navigate(this._links.group(this._groupId() ?? ''), {
+            replaceUrl: true,
+          });
         },
         error: (error: unknown) => {
           this.submitting.set(false);

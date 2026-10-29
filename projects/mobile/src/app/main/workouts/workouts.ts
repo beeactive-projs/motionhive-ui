@@ -1,5 +1,15 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
   IonButtons,
@@ -15,6 +25,8 @@ import {
   IonProgressBar,
   IonRefresher,
   IonRefresherContent,
+  IonSegment,
+  IonSegmentButton,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -29,26 +41,39 @@ import { take } from 'rxjs/operators';
 import {
   ProgramAssignmentKind,
   Routine,
+  RoutineService,
   TrainingDayPlan,
   WorkoutLogService,
   displayName,
   localDayKey,
 } from 'core';
 
+import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
-import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
 import { ClockService } from '../../_shared/services/clock.service';
 import { FeedbackService } from '../../_shared/services/feedback.service';
+import { ExerciseLibrary } from '../exercises/_components/exercise-library/exercise-library';
+import { ExercisesStore } from '../exercises/exercises.store';
+import { HistoryBody } from './_components/history-body/history-body';
+import { ProgressBody } from './_components/progress-body/progress-body';
 import { RoutineRow } from './_components/routine-row/routine-row';
 import { TodayHero } from './_components/today-hero/today-hero';
+import { ActiveWorkoutService } from './_services/active-workout.service';
+import { HistoryStore } from './history/history.store';
 import {
   WORKOUT_ICONS,
+  WorkoutStartAction,
+  WorkoutStartActions,
+  WorkoutTab,
+  WorkoutTabs,
   planWeekLabel,
   routineTileColor,
   workoutClock,
+  workoutStartActions,
+  workoutTabFrom,
 } from './workouts.config';
 import { WorkoutsStore } from './workouts.store';
 
@@ -56,12 +81,18 @@ import { WorkoutsStore } from './workouts.store';
 const PLAN_PREVIEW_LIMIT = 3;
 
 /**
- * The Workouts tab — the trainee's front door to training.
+ * The Workouts tab — the trainee's front door to training, in four tabs:
+ * Routines (what you train from), History (what you did), Progress (how it
+ * is going) and Exercises (the movements it is built from). `?tab=` opens
+ * one; the old History, Progress and library addresses redirect here. The
+ * lists keep their state across tab switches (their stores live on this
+ * page) and re-read when shown.
  *
- * Order is deliberate and matches the design: anything already in progress
- * outranks everything, then what a plan says to do today, then the
- * empty-workout on-ramp, then the libraries. A casual user who never opens a
- * plan still has a one-tap way to start.
+ * The two ways to begin, an empty workout and a new routine, sit behind the
+ * header's ⋯. Routines' order is deliberate: anything already in progress
+ * outranks everything, then what a plan says to do today, the plans, and
+ * your routines with Start on each. A casual user who never opens a plan
+ * still has a one-tap way to start.
  *
  * One workout at a time: while a session is open, nothing on this page offers
  * to start another. Today's day turns into something to look at, and the
@@ -70,7 +101,9 @@ const PLAN_PREVIEW_LIMIT = 3;
 @Component({
   selector: 'mh-workouts',
   imports: [
+    ActionSheet,
     EmptyState,
+    ExerciseLibrary,
     HexAvatar,
     IonButton,
     IonButtons,
@@ -86,23 +119,32 @@ const PLAN_PREVIEW_LIMIT = 3;
     IonProgressBar,
     IonRefresher,
     IonRefresherContent,
+    IonSegment,
+    IonSegmentButton,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    HistoryBody,
     NotificationBell,
+    ProgressBody,
     RoutineRow,
     SessionRowSkeleton,
-    SettingsRow,
     TodayHero,
     TranslatePipe,
   ],
-  providers: [WorkoutsStore],
+  providers: [WorkoutsStore, HistoryStore, ExercisesStore],
   templateUrl: './workouts.html',
   styleUrl: './workouts.scss',
 })
 export class Workouts implements ViewWillEnter, ViewWillLeave {
   readonly store = inject(WorkoutsStore);
+  private readonly _historyStore = inject(HistoryStore);
+  private readonly _exercisesStore = inject(ExercisesStore);
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _routineService = inject(RoutineService);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _clockService = inject(ClockService);
   private readonly _translateService = inject(TranslateService);
   private readonly _workoutLogService = inject(WorkoutLogService);
@@ -119,6 +161,19 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
 
   readonly skeletonRows = [1, 2, 3];
   readonly routineTileColor = routineTileColor;
+  readonly Tabs = WorkoutTabs;
+
+  /** The tab a link asked for, until you pick another. */
+  readonly tab = signal<WorkoutTab>(WorkoutTabs.Routines);
+  private readonly _progressBody = viewChild(ProgressBody);
+  /** The routine whose Start was tapped, while it starts. */
+  readonly startingId = signal<string | null>(null);
+  /** Where an exercise opens from the Exercises tab: this stack, so back returns here. */
+  readonly exerciseBase = ['/tabs/workouts/exercise'];
+
+  readonly actionsOpen = signal(false);
+  /** The ⋯ sheet: an empty workout (unless one is open) and a new routine. */
+  readonly startActions = computed(() => workoutStartActions(!this.store.inProgress()));
 
   /** Every plan, or the first few: a long list would bury the routines. */
   readonly showAllPlans = signal(false);
@@ -142,6 +197,19 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   constructor() {
     addIcons(WORKOUT_ICONS);
 
+    // `?tab=` on arrival, and again when a link (a redirect from the old
+    // History or Progress address) lands on this page while it is alive.
+    this._route.queryParamMap.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params) => {
+      const tab = params.get('tab');
+      if (tab) this.setTab(tab);
+    });
+
+    // Progress reads its numbers each time it is shown.
+    effect(() => {
+      const body = this._progressBody();
+      if (body) untracked(() => body.load());
+    });
+
     effect((onCleanup) => {
       if (!this._visible() || !this.store.inProgress() || this.isPaused()) return;
       this._now.set(Date.now());
@@ -156,15 +224,47 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
     this._clockService.bump();
     this._visible.set(true);
     this.store.load();
+    // A workout finished since belongs at the top of History, and in Progress.
+    if (this.tab() === WorkoutTabs.History) this._historyStore.refresh();
+    if (this.tab() === WorkoutTabs.Progress) this._progressBody()?.load();
+    if (this.tab() === WorkoutTabs.Exercises) this._exercisesStore.refresh();
+  }
+
+  setTab(value: unknown): void {
+    const tab = workoutTabFrom(value);
+    if (tab === this.tab()) return;
+    this.tab.set(tab);
+    if (tab === WorkoutTabs.History) this._historyStore.refresh();
+    if (tab === WorkoutTabs.Exercises) this._exercisesStore.refresh();
+  }
+
+  onStartAction(action: WorkoutStartAction): void {
+    if (action === WorkoutStartActions.StartEmpty) this.startEmpty();
+    else this.newRoutine();
   }
 
   ionViewWillLeave(): void {
     this._visible.set(false);
   }
 
+  /** Pull to refresh re-reads the tab on screen. */
   onRefresh(event: RefresherCustomEvent): void {
-    this._clockService.bump();
-    this.store.load({ done: () => void event.target.complete() });
+    const done = () => void event.target.complete();
+    switch (this.tab()) {
+      case WorkoutTabs.History:
+        this._historyStore.refresh(done);
+        return;
+      case WorkoutTabs.Progress:
+        this._progressBody()?.load();
+        done();
+        return;
+      case WorkoutTabs.Exercises:
+        this._exercisesStore.refresh(done);
+        return;
+      default:
+        this._clockService.bump();
+        this.store.load({ done });
+    }
   }
 
   retry(): void {
@@ -237,6 +337,32 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
     void this._router.navigate(['/tabs/workouts/routine', routine.id]);
   }
 
+  /** Start straight from the list, the same as from the routine's own page. */
+  startRoutine(routine: Routine): void {
+    if (this.startingId()) return;
+    this.startingId.set(routine.id);
+    this._activeWorkoutService.startOrResume(
+      () =>
+        this._routineService
+          .start(routine.id)
+          .pipe(take(1))
+          .subscribe({
+            next: (log) => {
+              this.startingId.set(null);
+              void this._router.navigate(['/tabs/workouts/log', log.id]);
+            },
+            error: (err) => {
+              this.startingId.set(null);
+              void this._feedbackService.error(
+                err,
+                this._translateService.instant('workouts.routineBuilder.toast.startFailed'),
+              );
+            },
+          }),
+      { onBlocked: () => this.startingId.set(null) },
+    );
+  }
+
   // ─── Libraries ────────────────────────────────────────────────
 
   newRoutine(): void {
@@ -245,18 +371,6 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
 
   openStarters(): void {
     void this._router.navigate(['/tabs/workouts/starters']);
-  }
-
-  openHistory(): void {
-    void this._router.navigate(['/tabs/workouts/history']);
-  }
-
-  openProgress(): void {
-    void this._router.navigate(['/tabs/workouts/progress']);
-  }
-
-  openExercises(): void {
-    void this._router.navigate(['/tabs/workouts/exercises']);
   }
 
   openPlan(planId: string): void {

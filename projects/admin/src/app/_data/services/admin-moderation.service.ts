@@ -55,6 +55,30 @@ export class AdminModerationService {
     return this._http.patch<DbRow>(`${this._api}/admin/messaging/velocity-alarms/${id}/review`, {});
   }
 
+  // ── Workout reports ──
+  workoutReports(
+    page: number,
+    limit: number,
+    status?: string,
+  ): Observable<PaginatedResponse<DbRow>> {
+    return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/content/workout-reports`, {
+      params: this.page(page, limit, status ? { status } : undefined),
+    });
+  }
+  /** RESOLVED with `takeDown` removes the workout from public view for good. */
+  resolveWorkoutReport(id: string, status: string, takeDown = false): Observable<DbRow> {
+    return this._http.patch<DbRow>(`${this._api}/admin/content/workout-reports/${id}`, {
+      status,
+      takeDown,
+    });
+  }
+  /** The reported workout's private photo. Every view is audited server-side. */
+  workoutReportPhoto(id: string): Observable<Blob> {
+    return this._http.get(`${this._api}/admin/content/workout-reports/${id}/photo`, {
+      responseType: 'blob',
+    });
+  }
+
   // ── Content ──
   posts(page: number, limit: number, q?: string): Observable<PaginatedResponse<DbRow>> {
     return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/content/posts`, {

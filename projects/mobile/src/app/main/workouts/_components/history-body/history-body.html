@@ -1,0 +1,163 @@
+<!-- The chips, and at their end the way to the calendar: it stays out of
+     the way until asked for. -->
+<div
+  class="mh-chip-row bar"
+  role="group"
+  [attr.aria-label]="'workouts.history.filters.label' | translate"
+>
+  @for (option of filters; track option.id) {
+    <!-- `ion-button`, not `ion-chip`, as on Clients: the chip has no role,
+         so a screen reader would never say which one is on. -->
+    <ion-button
+      class="chip"
+      fill="clear"
+      shape="round"
+      size="small"
+      [class.selected]="store.filter() === option.id"
+      [attr.aria-pressed]="store.filter() === option.id"
+      (click)="store.setFilter(option.id)"
+    >
+      {{ option.label | translate }}
+    </ion-button>
+  }
+  <ion-button
+    class="filters calendar-toggle"
+    fill="clear"
+    shape="round"
+    size="small"
+    [class.active]="store.calendarOpen()"
+    [attr.aria-pressed]="store.calendarOpen()"
+    [attr.aria-label]="
+      (store.calendarOpen() ? 'workouts.history.calendar.hide' : 'workouts.history.calendar.show')
+        | translate
+    "
+    (click)="store.toggleCalendar()"
+  >
+    <ion-icon slot="icon-only" name="calendar-outline" aria-hidden="true" />
+  </ion-button>
+</div>
+
+@if (store.calendarOpen()) {
+  <!-- An empty month is still a month: the calendar stays above the empty state. -->
+  <mh-history-calendar
+    [cells]="store.calendarCells()"
+    [month]="store.month()"
+    [doneCount]="store.monthDoneCount()"
+    [collapsed]="store.collapsed()"
+    [loading]="store.monthSkeleton()"
+    [error]="store.monthError()"
+    [selected]="store.day()"
+    (collapsedChange)="store.setCollapsed($event)"
+    (monthChange)="store.setMonth($event)"
+    (daySelect)="onDaySelect($event)"
+    (retry)="store.refreshMonth()"
+  />
+}
+@if (store.day()) {
+  <ion-button
+    class="mh-day-chip"
+    fill="clear"
+    shape="round"
+    size="small"
+    [attr.aria-label]="'workouts.history.clearDay' | translate: { date: dayLabel() }"
+    (click)="clearDay()"
+  >
+    {{ dayLabel() }}
+    <ion-icon slot="end" name="close-circle-outline" aria-hidden="true" />
+  </ion-button>
+}
+@if (store.showError()) {
+  <mh-empty-state
+    icon="alert-circle-outline"
+    [heading]="'workouts.loadError.history' | translate"
+    [message]="'error.checkConnection' | translate"
+    [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()"
+  />
+} @else if (store.showSkeleton()) {
+  <!-- Mirrors the row shape so nothing shifts when the rows land. -->
+  <div>
+    @for (_ of skeletonRows; track $index) {
+      <mh-session-row-skeleton />
+    }
+  </div>
+} @else if (store.isEmpty()) {
+  @if (store.day()) {
+    <ion-note class="mh-note-block">{{ 'workouts.history.emptyDay' | translate }}</ion-note>
+  } @else {
+    @switch (store.filter()) {
+      @case (Filters.Photos) {
+        <mh-empty-state
+          icon="camera-outline"
+          [heading]="'workouts.history.emptyPhotos.title' | translate"
+          [message]="'workouts.history.emptyPhotos.message' | translate"
+        />
+      }
+      @case (Filters.Records) {
+        <mh-empty-state
+          icon="trophy-outline"
+          [heading]="'workouts.history.emptyRecords.title' | translate"
+          [message]="'workouts.history.emptyRecords.message' | translate"
+        />
+      }
+      @default {
+        <mh-empty-state
+          icon="time-outline"
+          [heading]="'workouts.history.empty.title' | translate"
+          [message]="'workouts.history.empty.message' | translate"
+        />
+      }
+    }
+  }
+} @else {
+  @if (store.filter() === Filters.All && !store.day()) {
+    @if (store.memory(); as memory) {
+      <!-- A workout from a while back next to real progress since: the
+           reason to come back here, only when it is true. -->
+      <mh-memory-card [memory]="memory" (open)="openId(memory.workout.id)" />
+    }
+  }
+  @if (store.countLabel()) {
+    <span class="mh-kicker meta">{{ store.countLabel() }}</span>
+  }
+  @if (store.filter() === Filters.Photos) {
+    <!-- The photos as the memories they are: a grid, by month. -->
+    @for (month of photoMonths(); track month.key) {
+      <section class="mh-section">
+        <div class="mh-section-label">{{ month.label }}</div>
+        <div class="photo-grid">
+          @for (log of month.logs; track log.id) {
+            <mh-photo-tile [log]="log" (select)="open(log)" />
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    @for (week of weeks(); track week.key) {
+      <div class="mh-section-label log-week">{{ week.label }}</div>
+      <div class="mh-row-group">
+        @for (log of week.logs; track log.id) {
+          <mh-log-row
+            [log]="log"
+            [repeatable]="true"
+            [showSource]="true"
+            (select)="open(log)"
+            (repeat)="repeat(log)"
+          />
+        }
+      </div>
+    }
+  }
+}
+@if (store.hasMore() && !store.showError()) {
+  <!-- A page at a time, when asked for: a year of training is a long scroll. -->
+  <ion-button
+    class="show-more"
+    fill="clear"
+    expand="block"
+    [disabled]="store.loading()"
+    (click)="store.loadMore()"
+  >
+    {{ 'button.showMoreItems' | translate }}
+  </ion-button>
+}

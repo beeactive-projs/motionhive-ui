@@ -20,12 +20,20 @@ export class RosterService {
    * report a failed load themselves. The Clients triage refreshes on every
    * entry and keeps its stale rows with an inline bar over them; a blocking
    * alert on top of that is the same failure said three times.
+   *
+   * `clientId` asks for that one person's row, for a page about them,
+   * rather than the whole roster.
    */
-  roster(window: RosterWindow = '4w', opts?: { silent?: boolean }): Observable<RosterSummary> {
+  roster(
+    window: RosterWindow = '4w',
+    opts?: { silent?: boolean; clientId?: string },
+  ): Observable<RosterSummary> {
+    let params = new HttpParams().set('window', window);
+    if (opts?.clientId) params = params.set('clientId', opts.clientId);
     return this._http.get<RosterSummary>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_ROSTER}`,
       {
-        params: new HttpParams().set('window', window),
+        params,
         ...(opts?.silent ? { context: silentRequest() } : {}),
       },
     );

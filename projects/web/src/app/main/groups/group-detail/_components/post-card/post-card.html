@@ -1,56 +1,93 @@
 <p-card class="shadow-md">
   <div class="flex flex-col gap-3">
-
     <!-- Header -->
     <mh-post-header
       [post]="post()"
       [canModerate]="canModerate()"
       [showGroupBadge]="showGroupBadge()"
       (editRequested)="editRequested.emit($event)"
-      (deleteRequested)="deleteRequested.emit($event)" />
+      (deleteRequested)="deleteRequested.emit($event)"
+    />
 
-    <!-- Body -->
-    <div class="flex flex-col gap-1">
-      <p class="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap wrap-break-word post-content"
-        [class.post-content--clamped]="!contentExpanded() && isContentLong()"
-        [style.--clamp-lines]="contentClampLines()">
-        {{ post().content }}
-      </p>
-      @if (isContentLong()) {
-        <button type="button"
-          class="self-start text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
-          (click)="toggleContent()">
-          {{ (contentExpanded() ? 'button.showLess' : 'groups.post.readMore') | translate }}
-        </button>
-      }
-    </div>
+    <!-- Body: a shared workout may come with no words. -->
+    @if (post().content) {
+      <div class="flex flex-col gap-1">
+        <p
+          class="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap wrap-break-word post-content"
+          [class.post-content--clamped]="!contentExpanded() && isContentLong()"
+          [style.--clamp-lines]="contentClampLines()"
+        >
+          {{ post().content }}
+        </p>
+        @if (isContentLong()) {
+          <button
+            type="button"
+            class="self-start text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+            (click)="toggleContent()"
+          >
+            {{ (contentExpanded() ? 'button.showLess' : 'groups.post.readMore') | translate }}
+          </button>
+        }
+      </div>
+    }
+
+    <!-- A shared workout, as its safe summary: no note, weights or photo. -->
+    @if (post().workout; as workout) {
+      <div
+        class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-primary-50 dark:bg-primary-950 px-3 py-2"
+      >
+        <i class="pi pi-bolt text-primary-600 dark:text-primary-400" aria-hidden="true"></i>
+        <div class="flex flex-col min-w-0">
+          <span class="text-sm font-semibold text-surface-900 dark:text-surface-0 truncate">{{
+            workout.name
+          }}</span>
+          @if (workoutLine()) {
+            <span class="text-xs text-surface-500 dark:text-surface-400">{{ workoutLine() }}</span>
+          }
+        </div>
+      </div>
+    }
 
     <!-- Images -->
     @if (visibleImages().length > 0) {
-    <div class="post-gallery" [attr.data-count]="visibleImages().length">
-      @for (url of visibleImages(); track url; let i = $index, last = $last) {
-      <button type="button"
-        class="post-gallery__cell bg-surface-100 dark:bg-surface-800 cursor-pointer hover:opacity-95 transition-opacity"
-        [attr.aria-label]="'groups.post.openPhoto' | translate: { index: i + 1 }"
-        (click)="openPhoto(i)">
-        <img [src]="url" [alt]="'groups.post.imageAlt' | translate: { index: i + 1 }" loading="lazy" />
-        @if (last && extraImageCount() > 0) {
-        <div class="post-gallery__overlay">+{{ extraImageCount() }}</div>
+      <div class="post-gallery" [attr.data-count]="visibleImages().length">
+        @for (url of visibleImages(); track url; let i = $index, last = $last) {
+          <button
+            type="button"
+            class="post-gallery__cell bg-surface-100 dark:bg-surface-800 cursor-pointer hover:opacity-95 transition-opacity"
+            [attr.aria-label]="'groups.post.openPhoto' | translate: { index: i + 1 }"
+            (click)="openPhoto(i)"
+          >
+            <img
+              [src]="url"
+              [alt]="'groups.post.imageAlt' | translate: { index: i + 1 }"
+              loading="lazy"
+            />
+            @if (last && extraImageCount() > 0) {
+              <div class="post-gallery__overlay">+{{ extraImageCount() }}</div>
+            }
+          </button>
         }
-      </button>
-      }
-    </div>
+      </div>
     }
 
     <!-- Action bar -->
     <div class="flex items-center gap-2 pt-1">
       <mh-post-reaction-bar [post]="post()" />
-      <button pButton type="button" text severity="secondary" size="small" rounded (click)="toggleComments()">
+      <button
+        pButton
+        type="button"
+        text
+        severity="secondary"
+        size="small"
+        rounded
+        (click)="toggleComments()"
+      >
         <i class="pi pi-comment"></i>
         @if (post().commentCount > 0) {
-        {{ post().commentCount }}
+          {{ post().commentCount }}
         } @else {
-        {{ 'groups.post.comment' | translate }}
+          {{ 'groups.post.comment' | translate }}
         }
       </button>
     </div>

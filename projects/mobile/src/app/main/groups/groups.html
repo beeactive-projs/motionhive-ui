@@ -77,7 +77,6 @@
     </div>
   </div>
   }
-
   @if (store.showLoadError()) {
   <mh-empty-state icon="alert-circle-outline" [heading]="'groups.list.loadError' | translate"
     [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
@@ -159,8 +158,12 @@
           <p>{{ postedAt(post.postedAt) }}</p>
         </div>
       </div>
-      <p class="post-body">{{ post.content }}</p>
-
+            @if (post.content) {
+              <p class="post-body">{{ post.content }}</p>
+            }
+            @if (post.workout; as workout) {
+              <mh-post-workout [workout]="workout" [handle]="post.author?.handle" />
+            }
       @if (post.mediaUrls; as photos) {
       <mh-post-gallery [urls]="photos" [authorName]="authorNameOf(post)"
         (openPhoto)="openPhoto(post.id, $event)" />
@@ -246,13 +249,11 @@
     }
   </div>
   }
-
   @if (hasMore()) {
   <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
     <ion-infinite-scroll-content />
   </ion-infinite-scroll>
   }
-
   @if (canCreate() && !searchOpen()) {
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button [attr.aria-label]="'groups.list.createGroup' | translate" (click)="createGroup()">

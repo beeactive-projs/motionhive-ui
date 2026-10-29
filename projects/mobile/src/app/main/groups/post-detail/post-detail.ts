@@ -18,6 +18,7 @@ import {
   IonTextarea,
   IonTitle,
   IonToolbar,
+  NavController,
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
@@ -39,6 +40,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../_shared/components/sheet-shell/sheet-shell';
 import { PostGallery } from '../_components/post-gallery/post-gallery';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { groupLinks } from '../../../_shared/utils/stack-paths';
 import {
   COMMENT_MAX_LENGTH,
   POST_MAX_LENGTH,
@@ -48,6 +50,7 @@ import {
 } from '../groups.config';
 import { GROUP_ICONS } from '../groups.icons';
 import { PostDetailStore } from './post-detail.store';
+import { PostWorkoutCard } from '../_components/post-workout/post-workout';
 
 /**
  * One post, its comments, and the box to add one.
@@ -60,6 +63,7 @@ import { PostDetailStore } from './post-detail.store';
 @Component({
   selector: 'mh-post-detail',
   imports: [
+    PostWorkoutCard,
     ConfirmSheet,
     EmptyState,
     HexAvatar,
@@ -90,6 +94,10 @@ export class PostDetail implements ViewWillEnter {
   readonly store = inject(PostDetailStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _navController = inject(NavController);
+  /** The stack the post was opened in: the Groups tab, or a profile's. */
+  private readonly _links = groupLinks(this._router.url);
+  readonly backHref = this._links.home;
   private readonly _authStore = inject(AuthStore);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _feedbackService = inject(FeedbackService);
@@ -210,7 +218,7 @@ export class PostDetail implements ViewWillEnter {
   openPhoto(index: number): void {
     const post = this.store.post();
     if (!post) return;
-    void this._router.navigate(['/tabs/groups/post', post.id, 'photos'], {
+    void this._router.navigate(this._links.post(post.id, 'photos'), {
       queryParams: { index },
     });
   }
@@ -218,7 +226,7 @@ export class PostDetail implements ViewWillEnter {
   openProfile(row: Post | PostComment): void {
     const handle = row.author?.handle;
     if (!handle) return;
-    void this._router.navigate(['/tabs/u', handle]);
+    void this._router.navigate(this._links.person(handle));
   }
 
   mayDeleteComment(comment: PostComment): boolean {
@@ -360,7 +368,8 @@ export class PostDetail implements ViewWillEnter {
         );
         // Back to the group: the screen it was deleted from no longer has
         // anything to show.
-        void this._router.navigateByUrl('/tabs/groups');
+        if (this._links.inGroupsTab) void this._router.navigateByUrl(this._links.home);
+        else void this._navController.back();
       },
       error: (error: unknown) => {
         this.deletingPost.set(false);

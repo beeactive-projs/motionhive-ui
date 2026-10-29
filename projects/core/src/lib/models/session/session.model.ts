@@ -306,6 +306,8 @@ export interface ListInstancesQuery {
   /** Narrow your own calendar to one person's bookings. */
   clientId?: string;
   status?: SessionInstanceStatus;
+  /** By start time; `desc` for a past list, so page one is the latest. Default `asc`. */
+  order?: 'asc' | 'desc';
   page?: number;
   limit?: number;
 }

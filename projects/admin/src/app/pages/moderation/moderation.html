@@ -13,17 +13,40 @@
   <!-- Per-section filters -->
   @if (current.searchable) {
     <input pInputText [(ngModel)]="q" (keyup.enter)="reload()" placeholder="search" class="w-56" />
-    <button pButton type="button" size="small" (click)="reload()"><i class="pi pi-search"></i> Search</button>
+    <button pButton type="button" size="small" (click)="reload()">
+      <i class="pi pi-search"></i> Search
+    </button>
+  }
+  @if (section === 'reports' || section === 'workoutReports') {
+    <p-select
+      [(ngModel)]="reportStatus"
+      (onChange)="reload()"
+      [options]="reportStatuses"
+      placeholder="Any status"
+      [showClear]="true"
+      appendTo="body"
+      styleClass="w-40"
+    />
   }
   @if (section === 'reports') {
-    <p-select [(ngModel)]="reportStatus" (onChange)="reload()" [options]="reportStatuses"
-      placeholder="Any status" [showClear]="true" appendTo="body" styleClass="w-40" />
-    <p-select [(ngModel)]="reportCategory" (onChange)="reload()" [options]="reportCategories"
-      placeholder="Any category" [showClear]="true" appendTo="body" styleClass="w-44" />
+    <p-select
+      [(ngModel)]="reportCategory"
+      (onChange)="reload()"
+      [options]="reportCategories"
+      placeholder="Any category"
+      [showClear]="true"
+      appendTo="body"
+      styleClass="w-44"
+    />
   }
   @if (section === 'velocity') {
     <div class="flex items-center gap-2">
-      <p-checkbox [(ngModel)]="velocityIncludeReviewed" [binary]="true" inputId="increv" (onChange)="reload()" />
+      <p-checkbox
+        [(ngModel)]="velocityIncludeReviewed"
+        [binary]="true"
+        inputId="increv"
+        (onChange)="reload()"
+      />
       <label for="increv" class="text-sm text-[var(--p-text-color)]">Include reviewed</label>
     </div>
   }
@@ -60,24 +83,101 @@
       <td class="whitespace-nowrap text-right">
         @switch (section) {
           @case ('reports') {
-            <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="resolveReport(row, 'RESOLVED')">
+            <button
+              pButton
+              type="button"
+              size="small"
+              severity="secondary"
+              [text]="true"
+              (click)="resolveReport(row, 'RESOLVED')"
+            >
               Resolve
             </button>
-            <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="resolveReport(row, 'DISMISSED')">
+            <button
+              pButton
+              type="button"
+              size="small"
+              severity="secondary"
+              [text]="true"
+              (click)="resolveReport(row, 'DISMISSED')"
+            >
               Dismiss
             </button>
           }
+          @case ('workoutReports') {
+            @if (hasPhoto(row)) {
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [text]="true"
+                (click)="showPhoto(row)"
+              >
+                Photo
+              </button>
+            }
+            @if (canDeleteContent() && isOpenReport(row)) {
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="danger"
+                [text]="true"
+                (click)="takeDown(row)"
+              >
+                Take down
+              </button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [text]="true"
+                (click)="dismissWorkoutReport(row)"
+              >
+                Dismiss
+              </button>
+            }
+          }
           @case ('velocity') {
-            <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="reviewAlarm(row)">Review</button>
+            <button
+              pButton
+              type="button"
+              size="small"
+              severity="secondary"
+              [text]="true"
+              (click)="reviewAlarm(row)"
+            >
+              Review
+            </button>
           }
           @case ('posts') {
             @if (canDeleteContent()) {
-              <button pButton type="button" size="small" severity="danger" [text]="true" (click)="deleteContent(row)">Delete</button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="danger"
+                [text]="true"
+                (click)="deleteContent(row)"
+              >
+                Delete
+              </button>
             }
           }
           @case ('reviews') {
             @if (canDeleteContent()) {
-              <button pButton type="button" size="small" severity="danger" [text]="true" (click)="deleteContent(row)">Delete</button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="danger"
+                [text]="true"
+                (click)="deleteContent(row)"
+              >
+                Delete
+              </button>
             }
           }
         }
@@ -86,7 +186,10 @@
   </ng-template>
   <ng-template #emptymessage>
     <tr>
-      <td [attr.colspan]="current.columns.length + 1" class="py-6 text-center text-[var(--p-text-muted-color)]">
+      <td
+        [attr.colspan]="current.columns.length + 1"
+        class="py-6 text-center text-[var(--p-text-muted-color)]"
+      >
         Nothing here.
       </td>
     </tr>
@@ -94,3 +197,17 @@
 </p-table>
 
 <p-confirmdialog />
+
+<!-- A reported workout's private photo. Loaded on request, never cached. -->
+<p-dialog
+  header="Reported photo"
+  [visible]="!!photoUrl()"
+  (visibleChange)="!$event && closePhoto()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: 'min(90vw, 640px)' }"
+>
+  @if (photoUrl(); as url) {
+    <img [src]="url" alt="Reported workout photo" class="block h-auto w-full rounded" />
+  }
+</p-dialog>

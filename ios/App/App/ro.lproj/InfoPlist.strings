@@ -1,2 +1,5 @@
 /* Shown when someone picks "Salvează imaginea" on a shared workout card. */
 "NSPhotoLibraryAddUsageDescription" = "MotionHive salvează cardul antrenamentului în Poze când alegi Salvează imaginea.";
+
+/* Shown the first time someone takes a photo for a workout or a post. */
+"NSCameraUsageDescription" = "MotionHive folosește camera când faci o fotografie pentru un antrenament sau o postare.";

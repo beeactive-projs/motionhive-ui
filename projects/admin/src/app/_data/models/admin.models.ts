@@ -98,7 +98,7 @@ export interface AdminOverview {
     openDisputes: number;
     failedWebhooks: number;
   };
-  moderation: { openMessageReports: number };
+  moderation: { openMessageReports: number; openWorkoutReports: number };
 }
 
 export interface AdminInsights {

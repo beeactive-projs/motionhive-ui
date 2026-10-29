@@ -1,5 +1,15 @@
 import { DatePipe } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -9,7 +19,6 @@ import {
   IonButton,
   IonButtons,
   IonCard,
-  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -20,7 +29,6 @@ import {
   IonSegment,
   IonSegmentButton,
   IonSkeletonText,
-  IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
@@ -31,11 +39,17 @@ import {
   ProgramAssignment,
   ProgramAssignmentStatus,
   SessionInstance,
+  WorkoutLog,
+  WorkoutLogStatus,
   clientDisplayName,
   clientEmail,
+  appLocale,
   clientStatusLabel,
+  formatSessionDuration,
+  formatSessionTime,
   localDayKey,
   sessionDayLabel,
+  sessionMinutes,
 } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
@@ -44,7 +58,14 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
+import { SessionMonth } from '../../coach/sessions/_components/session-month/session-month';
 import { SessionRow } from '../../coach/sessions/_components/session-row/session-row';
+import { instancePlaceLabel } from '../../coach/sessions/sessions.config';
+import { assignmentSubline } from '../../programs/programs.config';
+import { logMeta, logWeeks, shortDayLabel } from '../../workouts/workouts.config';
+import { HistoryCalendar } from '../../workouts/_components/history-calendar/history-calendar';
+import { LogRow } from '../../workouts/_components/log-row/log-row';
+import { ProgressBody } from '../../workouts/_components/progress-body/progress-body';
 import {
   AssignmentRow,
   AssignmentRowSubjects,
@@ -52,11 +73,23 @@ import {
 import { AssignRequest, AssignSheet } from '../../programs/_sheets/assign-sheet/assign-sheet';
 import { ClientActionsSheet } from '../_sheets/client-actions-sheet/client-actions-sheet';
 import { ClientNotesSheet } from '../_sheets/client-notes-sheet/client-notes-sheet';
-import { ClientActionId, ClientActionIds } from '../clients.config';
+import {
+  ClientActionId,
+  ClientActionIds,
+  ClientTab,
+  ClientTabs,
+  clientTabFrom,
+} from '../clients.config';
 import { CLIENT_ICONS } from '../clients.icons';
-import { clientPath, coachStackOf } from '../client-paths';
-import { adherenceLabel, lastActiveLabel } from '../roster-labels';
-import { ClientDetailStore, PAST_DAYS, UPCOMING_DAYS } from './client-detail.store';
+import { coachStackOf } from '../client-paths';
+import { adherenceLabel, attentionReason, lastActiveLabel } from '../roster-labels';
+import {
+  ClientDetailStore,
+  PAST_DAYS,
+  TrainingKind,
+  TrainingKinds,
+  UPCOMING_DAYS,
+} from './client-detail.store';
 
 /** Which way the Sessions section looks. */
 const SessionScopes = {
@@ -66,15 +99,18 @@ const SessionScopes = {
 type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
 
 /**
- * One client: who they are, how their week is going, the plans they are on,
- * their sessions either side of today, and the coach's private notes. Only
- * grounded sections — the This week card exists only when the roster has
- * this person, Sessions only when there are any — so nothing on the screen
- * is invented.
+ * One client, in four tabs: Overview (who they are, how their week is going,
+ * and one row each for the next session, the plan and the last workout),
+ * Sessions either side of today, Training (plans and what they logged), and
+ * Progress (the trainee's own numbers, read for this client). Only grounded
+ * sections: the This week card exists only when the roster has this person,
+ * a row only when there is one, so nothing on the screen is invented. A
+ * pending invite has nothing to tab through and shows only who is awaited.
  *
  * Mounted under Clients and under Programs (from a plan's list of who is on
  * it); every link out stays in whichever stack it was opened in, so back
- * always returns here. See `client-paths.ts`.
+ * always returns here. See `client-paths.ts`. `?tab=` opens a tab, which is
+ * where the old training and progress addresses now land.
  *
  * The URL is the source of truth: a refresh, a deep link, or a tap from any
  * list all land here with the client's user id and load from it.
@@ -90,9 +126,9 @@ type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
     DatePipe,
     EmptyState,
     HexAvatar,
+    HistoryCalendar,
     IonBackButton,
     IonBadge,
-    IonChip,
     IonButton,
     IonButtons,
     IonCard,
@@ -106,8 +142,10 @@ type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
     IonSegment,
     IonSegmentButton,
     IonSkeletonText,
-    IonTitle,
     IonToolbar,
+    LogRow,
+    ProgressBody,
+    SessionMonth,
     SessionRow,
     TranslatePipe,
   ],
@@ -128,6 +166,7 @@ export class ClientDetail implements ViewWillEnter {
   readonly PlanStatuses = ProgramAssignmentStatus;
   readonly RowSubjects = AssignmentRowSubjects;
   readonly Scopes = SessionScopes;
+  readonly Tabs = ClientTabs;
   readonly skeletonRows = [1, 2, 3];
   /** The Upcoming sessions window, named beside its kicker. */
   readonly upcomingDays = UPCOMING_DAYS;
@@ -149,6 +188,38 @@ export class ClientDetail implements ViewWillEnter {
   readonly pastPlansOpen = signal(false);
   /** Null until the coach picks: the default follows what there is to show. */
   private readonly _sessionScope = signal<SessionScope | null>(null);
+
+  /** The Sessions list's chips. */
+  readonly sessionScopes: readonly { id: SessionScope; label: string }[] = [
+    { id: SessionScopes.Upcoming, label: 'clients.detail.sessions.upcoming' },
+    { id: SessionScopes.Past, label: 'clients.detail.sessions.past' },
+  ];
+  /** The Sessions calendar shows when asked for, from the button beside the chips. */
+  readonly sessionCalendarOpen = signal(false);
+
+  /** The Training list's chips, in the design's order. */
+  readonly kinds: readonly { id: TrainingKind; label: string }[] = [
+    { id: TrainingKinds.All, label: 'clients.detail.training.kinds.all' },
+    { id: TrainingKinds.Plan, label: 'clients.detail.training.kinds.plan' },
+    { id: TrainingKinds.Own, label: 'clients.detail.training.kinds.own' },
+    { id: TrainingKinds.Skipped, label: 'clients.detail.training.kinds.skipped' },
+  ];
+
+  /** The name rides the bar once the identity's own has scrolled away. */
+  readonly compact = signal(false);
+  private readonly _nameEl = viewChild<ElementRef<HTMLElement>>('nameEl');
+  /** The Training calendar shows when asked for, from the button beside the chips. */
+  readonly calendarOpen = signal(false);
+
+  /** The tab a link asked for, until the coach picks another. */
+  private readonly _tab = signal<ClientTab>(
+    clientTabFrom(this._route.snapshot.queryParamMap.get('tab')),
+  );
+  /** A pending invite has only the Overview: nothing else exists yet. */
+  readonly tab = computed<ClientTab>(() => (this.isPending() ? ClientTabs.Overview : this._tab()));
+  readonly showTabs = computed(() => !!this.store.client() && !this.isPending());
+
+  private readonly _progressBody = viewChild(ProgressBody);
 
   readonly name = computed(() => {
     const client = this.store.client();
@@ -208,19 +279,36 @@ export class ClientDetail implements ViewWillEnter {
         : SessionScopes.Past),
   );
 
-  readonly showSessions = computed(
-    () => this.store.sessions().length > 0 || this.store.pastSessions().length > 0,
-  );
+  /** The first booked session, for the Overview's door into Sessions. */
+  readonly nextSession = computed(() => {
+    const instance = this.store.sessions()[0];
+    if (!instance) return null;
+    const minutes = sessionMinutes(instance);
+    return {
+      instance,
+      time: formatSessionTime(instance.startAt),
+      weekday: new Date(instance.startAt).toLocaleDateString(appLocale(), { weekday: 'short' }),
+      title:
+        instance.titleOverride ??
+        instance.template?.title ??
+        this._translateService.instant('common.session'),
+      meta: [minutes ? formatSessionDuration(minutes) : '', instancePlaceLabel(instance)]
+        .filter(Boolean)
+        .join(' · '),
+    };
+  });
 
   /**
-   * The scope's sessions under day headers, as every session list in the app
-   * reads. The row shows only the time — it was built for lists that already
-   * say the day — so without these five past sessions read as five "15:00"s.
-   * The order is the store's: soonest first ahead, most recent first behind.
+   * The sessions under day headers, as every session list in the app reads:
+   * the day tapped on the calendar, else the chip's list. The row shows only
+   * the time — it was built for lists that already say the day — so without
+   * these, five past sessions read as five "15:00"s. The order is the
+   * store's: soonest first ahead, most recent first behind.
    */
   readonly sessionDays = computed(() => {
-    const sessions =
-      this.sessionScope() === SessionScopes.Upcoming
+    const sessions = this.store.sessionDay()
+      ? this.store.daySessions()
+      : this.sessionScope() === SessionScopes.Upcoming
         ? this.store.sessions()
         : this.store.pastSessions();
     const days: { key: string; label: string; instances: SessionInstance[] }[] = [];
@@ -232,6 +320,28 @@ export class ClientDetail implements ViewWillEnter {
       else days.push({ key, label: sessionDayLabel(start), instances: [instance] });
     }
     return days;
+  });
+
+  /** More of the chip's list to read; none while a day is picked. */
+  readonly hasMoreSessions = computed(() =>
+    this.store.sessionDay()
+      ? false
+      : this.sessionScope() === SessionScopes.Upcoming
+        ? this.store.hasMoreSessions()
+        : this.store.hasMorePast(),
+  );
+
+  /** The chip's list is reading its next page. */
+  readonly moreSessionsLoading = computed(() =>
+    this.sessionScope() === SessionScopes.Upcoming
+      ? this.store.upcomingLoading()
+      : this.store.pastLoading(),
+  );
+
+  /** "Fri 30 Oct", the day the Sessions list is narrowed to. */
+  readonly sessionDayLabel = computed(() => {
+    const day = this.store.sessionDay();
+    return day ? shortDayLabel(day) : '';
   });
 
   readonly weekPercent = computed(() => {
@@ -256,9 +366,9 @@ export class ClientDetail implements ViewWillEnter {
   });
 
   /**
-   * "12 points up on last week" — the week's adherence against the one
-   * before, so a coach can tell a dip from a habit. Silent when either week
-   * had nothing due: a change from nothing is not a trend.
+   * "Up from 50%" — the week's adherence against the one before, so a coach
+   * can tell a dip from a habit. Silent when either week had nothing due: a
+   * change from nothing is not a trend.
    */
   readonly weekTrend = computed(() => {
     const roster = this.store.roster();
@@ -266,12 +376,113 @@ export class ClientDetail implements ViewWillEnter {
     const previous = roster?.previousAdherencePercent;
     if (current == null || previous == null) return null;
     const delta = Math.round(current - previous);
-    if (delta === 0) return this._translateService.instant('clients.detail.week.trend.level');
+    if (delta === 0) {
+      return {
+        direction: 'level',
+        icon: 'remove-outline',
+        label: this._translateService.instant('clients.detail.week.trend.level'),
+      };
+    }
+    const params = { previous: Math.round(previous) };
+    if (delta > 0) {
+      return {
+        direction: 'up',
+        icon: 'trending-up-outline',
+        label: this._translateService.instant('clients.detail.week.trend.upFrom', params),
+      };
+    }
+    return {
+      direction: 'down',
+      icon: 'trending-down-outline',
+      label: this._translateService.instant('clients.detail.week.trend.downFrom', params),
+    };
+  });
+
+  /**
+   * Why the roster flagged this week, in the web roster's words ("Dropping
+   * off", "Down from 80% to 25%…"). Null when it is not flagged.
+   */
+  readonly attention = computed(() => {
+    const roster = this.store.roster();
+    return roster && this.store.week()?.flagged ? attentionReason(roster) : null;
+  });
+
+  /** Who a pending invite waits for: the first name, or the address the invite went to. */
+  readonly firstName = computed(() => {
+    const client = this.store.client();
+    return client?.client?.firstName?.trim() || this.name();
+  });
+
+  /**
+   * The plan the Overview names: the one under way, else a paused or a
+   * waiting one (`currentPlans` is already in that order).
+   */
+  readonly overviewPlan = computed(() => {
+    const row = this.store.currentPlans()[0];
+    if (!row) return null;
+    const paused = row.status === ProgramAssignmentStatus.Paused;
+    const waiting = row.status === ProgramAssignmentStatus.Pending;
+    return {
+      row,
+      paused,
+      showBar: !paused && !waiting,
+      kicker: this._translateService.instant(
+        paused
+          ? 'clients.detail.overview.planPaused'
+          : waiting
+            ? 'clients.detail.overview.planWaiting'
+            : 'clients.detail.overview.planActive',
+      ),
+      line: assignmentSubline(row),
+    };
+  });
+
+  /** Nothing to follow: the Overview's next step is to assign something. */
+  readonly showNoPlan = computed(
+    () => this.store.plansLoaded() && !this.store.currentPlans().length && this.canAssign(),
+  );
+
+  /** "52 min · 18 sets · felt 4/5", the history row's own line. */
+  readonly lastMeta = computed(() => {
+    const last = this.store.lastLog();
+    return last ? logMeta(last) : '';
+  });
+
+  /** Under the name: how long they have been a client, or when an invite runs out. */
+  readonly sinceLine = computed(() => {
+    const client = this.store.client();
+    if (!client) return '';
+    const date = (iso: string) =>
+      new Date(iso).toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' });
+    if (this.isPending()) {
+      return client.expiresAt
+        ? this._translateService.instant('clients.detail.expires', { date: date(client.expiresAt) })
+        : '';
+    }
+    if (!client.startedAt) return '';
     return this._translateService.instant(
-      delta > 0 ? 'clients.detail.week.trend.up' : 'clients.detail.week.trend.down',
-      { count: Math.abs(delta) },
+      this.isActive() ? 'clients.detail.clientSince' : 'clients.detail.since',
+      { date: date(client.startedAt) },
     );
   });
+
+  /** The Training list as a card per week: "Week of 14 Sep". */
+  readonly workoutWeeks = computed(() => logWeeks(this.store.workouts()));
+
+  /** "Wed 23 Oct", the day the list is narrowed to. */
+  readonly dayLabel = computed(() => {
+    const day = this.store.day();
+    return day ? shortDayLabel(day) : '';
+  });
+
+  /** What an empty list says: about the day when one is picked, else the chip. */
+  readonly workoutsEmpty = computed(() =>
+    this._translateService.instant(
+      this.store.day()
+        ? 'clients.detail.training.empty.day'
+        : `clients.detail.training.empty.${this.store.kind()}`,
+    ),
+  );
 
   readonly archiveTitle = computed(() => {
     const name = this.name();
@@ -287,6 +498,23 @@ export class ClientDetail implements ViewWillEnter {
       const clientId = params.get('clientId');
       if (clientId) this.store.load(clientId);
     });
+
+    // The Progress tab reads its numbers each time it is shown.
+    effect(() => {
+      const body = this._progressBody();
+      if (body) untracked(() => body.load());
+    });
+
+    // The bar shows the name once the identity's has scrolled out of view.
+    effect((onCleanup) => {
+      const el = this._nameEl()?.nativeElement;
+      if (!el) return;
+      const observer = new IntersectionObserver(([entry]) =>
+        this.compact.set(!entry.isIntersecting),
+      );
+      observer.observe(el);
+      onCleanup(() => observer.disconnect());
+    });
   }
 
   /**
@@ -296,7 +524,13 @@ export class ClientDetail implements ViewWillEnter {
    * route subscription's job, so it is skipped here.
    */
   ionViewWillEnter(): void {
-    if (this.store.client()) this.store.reload({ silent: true });
+    if (!this.store.client()) return;
+    this.store.reload({ silent: true });
+    this._progressBody()?.load();
+  }
+
+  setTab(value: unknown): void {
+    this._tab.set(clientTabFrom(value));
   }
 
   openActions(): void {
@@ -390,9 +624,9 @@ export class ClientDetail implements ViewWillEnter {
     });
   }
 
-  /** Cross-tab jump: the session opens in its own stack, back returns here. */
+  /** Pushed onto this stack, so back returns to the client, not the agenda. */
   openSession(instance: SessionInstance): void {
-    void this._router.navigate(['/tabs/coach/sessions', instance.id]);
+    void this._router.navigate([this._stack, 'session', instance.id]);
   }
 
   /** Who they are in public — the profile anyone else in the app would see. */
@@ -401,28 +635,55 @@ export class ClientDetail implements ViewWillEnter {
     if (handle) void this._router.navigate([this._stack, 'person', handle]);
   }
 
-  /** Their plan and what they have logged — pushed onto this stack. */
-  openTraining(): void {
-    const clientId = this.store.client()?.clientId;
-    if (clientId) {
-      void this._router.navigate([...clientPath(this._stack, clientId), 'training']);
+  /** The plan itself, pushed onto this stack so back returns to the client. */
+  openPlan(plan: ProgramAssignment): void {
+    if (plan.masterProgramId) {
+      void this._router.navigate([this._stack, 'program', plan.masterProgramId]);
     }
   }
 
-  /** Their numbers and records; the name rides along for the header. */
-  openProgress(): void {
-    const clientId = this.store.client()?.clientId;
-    if (clientId) {
-      void this._router.navigate([...clientPath(this._stack, clientId), 'progress'], {
-        state: { clientName: this.name() },
-      });
-    }
+  /** A logged workout, read in full — pushed onto this stack. A skip has none. */
+  openLog(log: WorkoutLog): void {
+    if (log.status === WorkoutLogStatus.Skipped) return;
+    void this._router.navigate([this._stack, 'log', log.id]);
   }
 
+  setKind(kind: TrainingKind): void {
+    this.store.setKind(kind);
+  }
+
+  toggleCalendar(): void {
+    this.calendarOpen.update((open) => !open);
+  }
+
+  /** A tapped calendar day narrows the list below to it. */
+  onDaySelect(key: string): void {
+    this.store.setDay(key);
+  }
+
+  clearDay(): void {
+    this.store.setDay(null);
+  }
+
+  /** A chip returns from a picked day to its list. */
   setSessionScope(value: unknown): void {
     if (value === SessionScopes.Upcoming || value === SessionScopes.Past) {
       this._sessionScope.set(value);
+      this.store.setSessionDay(null);
     }
+  }
+
+  toggleSessionCalendar(): void {
+    this.sessionCalendarOpen.update((open) => !open);
+  }
+
+  /** A tapped calendar day narrows the Sessions list to it. */
+  onSessionDay(date: Date): void {
+    this.store.setSessionDay(localDayKey(date));
+  }
+
+  clearSessionDay(): void {
+    this.store.setSessionDay(null);
   }
 
   togglePastPlans(): void {

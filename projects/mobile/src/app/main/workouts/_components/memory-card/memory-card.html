@@ -1,0 +1,16 @@
+<button
+  type="button"
+  class="card"
+  [class.with-photo]="photoUrl()"
+  [attr.aria-label]="'workouts.memory.open' | translate: { name: memory().workout.name }"
+  (click)="open.emit()"
+>
+  @if (photoUrl(); as src) {
+    <img class="photo" [src]="src" alt="" />
+  }
+  <span class="when">{{ when() }}</span>
+  <span class="words">
+    <span class="progress">{{ 'workouts.memory.progress' | translate: values() }}</span>
+    <span class="line">{{ 'workouts.memory.line' | translate }}</span>
+  </span>
+</button>

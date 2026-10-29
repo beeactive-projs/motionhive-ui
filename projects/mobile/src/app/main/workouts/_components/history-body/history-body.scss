@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+/* The chips sit in the page's gutter here, not a bar's. */
+.bar {
+  padding: 0 0 0.5rem;
+}
+
+/* "12 workouts with a photo" — a label on the list rather than a row of it.
+   Same as the exercise library's meta line. */
+.meta {
+  padding-inline: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.log-week {
+  margin-top: 0.75rem;
+}
+
+/* The photo filter: three across, the mock's 6px gutter, every photo a 3:4
+   crop so the months line up. */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.show-more {
+  margin-top: 0.25rem;
+}
+
+/* The day pill sits between the chips and the list. */
+.mh-day-chip {
+  margin: 0.25rem 0 0.5rem;
+}

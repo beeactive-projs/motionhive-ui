@@ -32,6 +32,13 @@ export const API_ENDPOINTS = {
     INSTRUCTOR_GROUPS: (id: string) => `/profile/instructors/${id}/groups`,
     INSTRUCTOR_REVIEWS: (id: string) => `/profile/instructors/${id}/reviews`,
     USER_BY_HANDLE: (handle: string) => `/profile/users/by-handle/${handle}`,
+    USER_WORKOUTS_BY_HANDLE: (handle: string) => `/profile/users/by-handle/${handle}/workouts`,
+    USER_WORKOUT_BY_HANDLE: (handle: string, workoutLogId: string) =>
+      `/profile/users/by-handle/${handle}/workouts/${workoutLogId}`,
+    USER_WORKOUT_PHOTO_BY_HANDLE: (handle: string, workoutLogId: string) =>
+      `/profile/users/by-handle/${handle}/workouts/${workoutLogId}/photo`,
+    REPORT_USER_WORKOUT: (handle: string, workoutLogId: string) =>
+      `/profile/users/by-handle/${handle}/workouts/${workoutLogId}/report`,
     PRIVACY: '/profile/privacy',
     HANDLE: '/profile/handle',
     // Public lead-capture endpoint — POSTed from the "Reach out to <Name>"
@@ -264,6 +271,7 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/workout-logs/${id}`,
     COMPLETE: (id: string) => `/workout-logs/${id}/complete`,
     VISIBILITY: (id: string) => `/workout-logs/${id}/visibility`,
+    PHOTO: (id: string) => `/workout-logs/${id}/photo`,
     PAUSE: (id: string) => `/workout-logs/${id}/pause`,
     RESUME: (id: string) => `/workout-logs/${id}/resume`,
     LOG_SET: (id: string, setId: string) =>
@@ -283,9 +291,11 @@ export const API_ENDPOINTS = {
     BY_ASSIGNED_WORKOUT: (assignedWorkoutId: string) =>
       `/workout-logs/by-assigned-workout/${assignedWorkoutId}`,
     IN_PROGRESS: '/workout-logs/in-progress',
+    MEMORY: '/workout-logs/memory',
     COACH_LIST_FOR_CLIENT: (clientId: string) =>
       `/coach/clients/${clientId}/workout-logs`,
     COACH_BY_ID: (id: string) => `/coach/workout-logs/${id}`,
+    COACH_PHOTO: (id: string) => `/coach/workout-logs/${id}/photo`,
     /** Roster-level adherence for the coach. */
     COACH_ROSTER: '/coach/roster',
   },

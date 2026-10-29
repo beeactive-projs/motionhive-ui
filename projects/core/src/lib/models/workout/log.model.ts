@@ -45,6 +45,12 @@ export interface WorkoutLog {
    * whose plan it came from sees it at any level.
    */
   visibility?: ProfilePrivacy;
+  /** Removed from the owner's profile after a report: never public or shared again. */
+  takenDownAt?: string | null;
+  /** The workout has a photo; its bytes come from `WorkoutLogService.getPhoto`. */
+  hasPhoto?: boolean;
+  /** Changes when the photo is replaced, so a cached copy can be told apart. */
+  photoVersion?: number | null;
   /**
    * Future export hooks — activity-type codes written when this log is
    * mirrored *out* to Apple Health / Health Connect. Write-only placeholders
@@ -211,4 +217,21 @@ export interface CompleteWorkoutPayload {
   notes?: string;
   /** The line on the shared card, 80 at most; empty clears it. */
   shareCaption?: string;
+}
+
+/**
+ * History's memory card: a workout from a year, six, three or one month
+ * back, and one lift's progress since (its heaviest completed set then,
+ * and the heaviest since). The API sends one only when there is progress.
+ */
+export interface WorkoutMemory {
+  monthsAgo: number;
+  workout: {
+    id: string;
+    name: string;
+    completedAt: string;
+    hasPhoto: boolean;
+    photoVersion: number | null;
+  };
+  exercise: { id: string; name: string; fromKg: number; toKg: number };
 }

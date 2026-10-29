@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
@@ -71,7 +72,13 @@ export class LogReview implements ViewWillEnter {
   /** Mounted under Clients and Programs; back on a cold load stays in that tab. */
   readonly backHref = coachStackOf(this._router.url);
 
+  private readonly _destroyRef = inject(DestroyRef);
+
   readonly log = signal<WorkoutLog | null>(null);
+  /** The workout's photo as an object URL; the bytes only come through the API. */
+  readonly photoUrl = signal<string | null>(null);
+  /** Which photo `photoUrl` holds, so coming back does not download it again. */
+  private _photoKey: string | null = null;
   readonly loading = signal(false);
   readonly error = signal(false);
 
@@ -96,6 +103,7 @@ export class LogReview implements ViewWillEnter {
 
   constructor() {
     addIcons(PROGRAM_ICONS);
+    this._destroyRef.onDestroy(() => this._dropPhoto());
   }
 
   ionViewWillEnter(): void {
@@ -115,6 +123,7 @@ export class LogReview implements ViewWillEnter {
         next: (log) => {
           this.log.set(log);
           this.loading.set(false);
+          this._loadPhoto(log);
         },
         error: () => {
           this.error.set(true);
@@ -125,5 +134,34 @@ export class LogReview implements ViewWillEnter {
 
   setSummary(exercise: LoggedExercise): string {
     return exerciseSetSummary(exercise);
+  }
+
+  /** Quiet on failure: the workout stands without its picture. */
+  private _loadPhoto(log: WorkoutLog): void {
+    if (!log.hasPhoto) {
+      this._dropPhoto();
+      return;
+    }
+    const key = `${log.id}:${log.photoVersion ?? ''}`;
+    if (key === this._photoKey && this.photoUrl()) return;
+    this._workoutLogService
+      .getPhotoForCoach(log.id)
+      // Landing after the page is gone would make a URL nothing revokes.
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (blob) => {
+          this._dropPhoto();
+          this.photoUrl.set(URL.createObjectURL(blob));
+          this._photoKey = key;
+        },
+        error: () => undefined,
+      });
+  }
+
+  private _dropPhoto(): void {
+    const url = this.photoUrl();
+    if (url) URL.revokeObjectURL(url);
+    this.photoUrl.set(null);
+    this._photoKey = null;
   }
 }

@@ -1,3 +1,10 @@
+/* The client's name over a coach's read, in the kicker's place and inset. */
+.client {
+  padding-inline: var(--mh-row-gutter);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
 /* The estimated 1RM leads the card; its change sits beside it and wraps
    under it when the width runs out. */
 .hero .headline {

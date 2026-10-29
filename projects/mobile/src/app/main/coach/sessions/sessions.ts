@@ -3,19 +3,15 @@ import { Router } from '@angular/router';
 import {
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonFab,
   IonFabButton,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonNote,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -42,6 +38,7 @@ import {
   sessionDayLabel,
   sessionMinutes,
   startOfDay,
+  startOfMonth,
   weekStart,
 } from 'core';
 
@@ -56,7 +53,7 @@ import { DayRail } from './_components/day-rail/day-rail';
 import { SessionRow } from './_components/session-row/session-row';
 import { SessionsEmpty } from './_components/sessions-empty/sessions-empty';
 import { MessageSignupsSheet } from './_sheets/message-signups-sheet/message-signups-sheet';
-import { MonthSheet } from './_sheets/month-sheet/month-sheet';
+import { SessionMonth } from './_components/session-month/session-month';
 import { SessionActionsSheet } from './_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from './_sheets/session-form-sheet/session-form-sheet';
 import { SessionFilterSheet } from './_sheets/session-filter-sheet/session-filter-sheet';
@@ -104,25 +101,21 @@ interface AgendaDay {
     EmptyState,
     IonButton,
     IonButtons,
-    IonChip,
     IonContent,
     IonFab,
     IonFabButton,
     IonHeader,
     IonIcon,
-    IonLabel,
     IonNote,
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonSegment,
-    IonSegmentButton,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
     DayRail,
     MessageSignupsSheet,
-    MonthSheet,
+    SessionMonth,
     NotificationBell,
     SearchbarAutofocusDirective,
     SessionActionsSheet,
@@ -153,7 +146,8 @@ export class Sessions implements ViewWillEnter {
   /** Seeds the create sheet as a copy, when it opens from Duplicate. */
   readonly createPrefill = signal<SessionPrefill | null>(null);
   readonly filterOpen = signal(false);
-  readonly monthOpen = signal(false);
+  /** The month shows when asked for, from the button at the end of the chips. */
+  readonly calendarOpen = signal(false);
   readonly messageOpen = signal(false);
   readonly messageInstanceId = signal<string | null>(null);
   readonly actionsOpen = signal(false);
@@ -178,7 +172,7 @@ export class Sessions implements ViewWillEnter {
   /** 'agenda' is the day-grouped list; 'day' is the hour rail. */
   readonly view = signal<'agenda' | 'day'>('agenda');
 
-  /** Which day the rail shows, and what the month sheet opens on. */
+  /** Which day the rail shows, and the one the month card marks. */
   readonly selectedDay = signal(startOfDay(new Date()));
 
   readonly filters = signal<AgendaFilters>({ ...NO_FILTERS });
@@ -191,7 +185,7 @@ export class Sessions implements ViewWillEnter {
    */
   private readonly _today = signal(startOfDay(new Date()));
 
-  /** Which month the month sheet is parked on, once it has moved off today's. */
+  /** Which month the month card is parked on, once it has moved off today's. */
   private readonly _monthCursor = signal<Date | null>(null);
 
   /** Set while a load is in flight and the requirement moved underneath it. */
@@ -234,7 +228,7 @@ export class Sessions implements ViewWillEnter {
 
     const anchor = dateRange ?? monthRange ?? base;
     const extras = [dateRange, monthRange, base].filter(
-      (window): window is DayWindow => window !== null && window !== anchor
+      (window): window is DayWindow => window !== null && window !== anchor,
     );
 
     return fitWindow(anchor, extras);
@@ -269,7 +263,7 @@ export class Sessions implements ViewWillEnter {
   private readonly _nextUp = computed(() => {
     const now = this._clockService.now();
     const next = this.visibleInstances().find(
-      (instance) => new Date(instance.startAt).getTime() > now
+      (instance) => new Date(instance.startAt).getTime() > now,
     );
     if (!next) return null;
     const note = formatTimeUntil(next.startAt, now);
@@ -280,7 +274,7 @@ export class Sessions implements ViewWillEnter {
   readonly dayInstances = computed(() => {
     const key = localDayKey(this.selectedDay());
     return this.visibleInstances().filter(
-      (instance) => localDayKey(new Date(instance.startAt)) === key
+      (instance) => localDayKey(new Date(instance.startAt)) === key,
     );
   });
 
@@ -309,7 +303,7 @@ export class Sessions implements ViewWillEnter {
         label: sessionDayLabel(new Date(instances[0].startAt)),
         isToday: key === todayKey,
         instances: instances.sort(
-          (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
+          (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime(),
         ),
         conflicts: instances.filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0).length,
         nextNote: nextUp?.key === key ? nextUp.note : null,
@@ -372,11 +366,11 @@ export class Sessions implements ViewWillEnter {
   readonly weekCount = computed(() => this._weekInstances().length);
 
   readonly conflictCount = computed(
-    () => this._weekInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0).length
+    () => this._weekInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0).length,
   );
 
   readonly signupCount = computed(() =>
-    this._weekInstances().reduce((sum, i) => sum + i.confirmedCount + i.pendingApprovalCount, 0)
+    this._weekInstances().reduce((sum, i) => sum + i.confirmedCount + i.pendingApprovalCount, 0),
   );
 
   readonly selectedDayKey = computed(() => localDayKey(this.selectedDay()));
@@ -386,11 +380,15 @@ export class Sessions implements ViewWillEnter {
       weekday: 'long',
       day: 'numeric',
       month: 'short',
-    })
+    }),
   );
 
-  readonly monthLabel = computed(() =>
-    this.selectedDay().toLocaleDateString(appLocale(), { month: 'short', year: 'numeric' })
+  /** The month the calendar shows: where it was moved to, else the selected day's. */
+  readonly calendarMonth = computed(() => startOfMonth(this._monthCursor() ?? this.selectedDay()));
+
+  /** The strip is on another week; Today brings it back. */
+  readonly isCurrentWeek = computed(
+    () => this.weekStartDate().getTime() === weekStart(new Date()).getTime(),
   );
 
   /** "5 sessions · 6h scheduled" — the day view's right-hand summary. */
@@ -420,22 +418,22 @@ export class Sessions implements ViewWillEnter {
 
   /** Filters or a search hid everything, but the window itself is not empty. */
   readonly isFilteredEmpty = computed(
-    () => this.store.rangeInstances().length > 0 && this.visibleInstances().length === 0
+    () => this.store.rangeInstances().length > 0 && this.visibleInstances().length === 0,
   );
 
   readonly showSkeleton = computed(
-    () => this.store.rangeLoading() && this.store.rangeInstances().length === 0
+    () => this.store.rangeLoading() && this.store.rangeInstances().length === 0,
   );
 
   readonly showLoadError = computed(
-    () => !!this.store.rangeError() && this.store.rangeInstances().length === 0
+    () => !!this.store.rangeError() && this.store.rangeInstances().length === 0,
   );
 
   readonly isEmpty = computed(
     () =>
       !this.store.rangeLoading() &&
       !this.store.rangeError() &&
-      this.store.rangeInstances().length === 0
+      this.store.rangeInstances().length === 0,
   );
 
   /** Chrome is hidden on the true-empty and error screens, but not when a
@@ -505,10 +503,11 @@ export class Sessions implements ViewWillEnter {
     this.filterOpen.set(true);
   }
 
-  openMonth(): void {
-    this.monthOpen.set(true);
+  toggleCalendar(): void {
+    this.calendarOpen.update((open) => !open);
   }
 
+  /** Moving the month loads its sessions, so the dots fill in. */
   /** A date filter can point outside the loaded window, so the window follows. */
   onFiltersApplied(filters: AgendaFilters): void {
     this.filters.set(filters);
@@ -526,10 +525,6 @@ export class Sessions implements ViewWillEnter {
     this.filters.update((filters) => ({ ...filters, locationKind: kind }));
   }
 
-  setView(value: string | number | undefined): void {
-    if (value === 'agenda' || value === 'day') this.view.set(value);
-  }
-
   showAgenda(): void {
     this.view.set('agenda');
   }
@@ -545,9 +540,12 @@ export class Sessions implements ViewWillEnter {
     this._syncWindow();
   }
 
+  /** The strip, and the calendar if it is open, back on this week. */
   goToday(): void {
     const today = startOfDay(new Date());
     this.selectedDay.set(today);
+    this._monthCursor.set(null);
+    this._syncWindow();
   }
 
   /** Long-press a row for the verbs that would otherwise need the detail screen. */
@@ -615,12 +613,12 @@ export class Sessions implements ViewWillEnter {
 
     if (outcome === ShareOutcomes.Copied) {
       await this._feedbackService.success(
-        this._translateService.instant('toast.detail.linkCopied')
+        this._translateService.instant('toast.detail.linkCopied'),
       );
     } else if (outcome === ShareOutcomes.Failed) {
       await this._feedbackService.error(
         null,
-        this._translateService.instant('sessions.toast.shareFailed')
+        this._translateService.instant('sessions.toast.shareFailed'),
       );
     }
   }

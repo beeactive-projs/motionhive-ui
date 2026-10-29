@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, model, output, signal } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import {
   IonButton,
   IonCard,
@@ -8,6 +8,14 @@ import {
   IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+
+import { addIcons } from 'ionicons';
+import {
+  chevronBackOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
+  chevronUpOutline,
+} from 'ionicons/icons';
 
 import { appLocale, dayFromKey, localDayKey, weekdayNames } from 'core';
 
@@ -63,13 +71,26 @@ export class HistoryCalendar {
   readonly daySelect = output<string>();
   readonly retry = output<void>();
 
-  readonly legend = LEGEND;
+  /**
+   * The legend's word for a workout of the person's own: "My workout" on
+   * their History, the client's on a coach's page.
+   */
+  readonly selfLabel = input('workouts.history.calendar.legendSelf');
+
+  readonly legend = computed(() =>
+    LEGEND.map((entry) =>
+      entry.state === CalendarDayStates.Self ? { ...entry, label: this.selfLabel() } : entry,
+    ),
+  );
   /** Monday-first single letters in the UI locale. */
   readonly weekdayLabels = weekdayNames('narrow');
 
-  /** The day last tapped; the honey fill follows it, today keeps the ring. */
-  private readonly _selected = signal<string | null>(null);
-  readonly selectedKey = this._selected.asReadonly();
+  /**
+   * The day last tapped; the honey fill follows it, today keeps the ring.
+   * Bindable, so a page that filters by the day can clear it.
+   */
+  readonly selected = model<string | null>(null);
+  readonly selectedKey = this.selected.asReadonly();
 
   readonly monthLabel = computed(() =>
     this.month().toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' }),
@@ -84,7 +105,7 @@ export class HistoryCalendar {
 
   readonly days = computed<CalendarDay[]>(() => {
     const cells = this.collapsed()
-      ? calendarWeek(this.cells(), this._selected() ?? localDayKey(new Date()))
+      ? calendarWeek(this.cells(), this.selected() ?? localDayKey(new Date()))
       : this.cells();
     return cells.map((cell) => ({
       cell,
@@ -95,10 +116,15 @@ export class HistoryCalendar {
 
   readonly skeletonDays = computed(() => Array.from({ length: this.collapsed() ? 7 : 42 }));
 
+  constructor() {
+    // Its own glyphs: the calendar sits on pages that register others.
+    addIcons({ chevronBackOutline, chevronDownOutline, chevronForwardOutline, chevronUpOutline });
+  }
+
   step(months: number): void {
     if (months > 0 && this.isCurrentMonth()) return;
     const month = this.month();
-    this._selected.set(null);
+    this.selected.set(null);
     this.monthChange.emit(new Date(month.getFullYear(), month.getMonth() + months, 1));
   }
 
@@ -108,7 +134,7 @@ export class HistoryCalendar {
 
   pick(cell: CalendarCell): void {
     if (!cell.logIds.length) return;
-    this._selected.set(cell.key);
+    this.selected.set(cell.key);
     this.daySelect.emit(cell.key);
   }
 

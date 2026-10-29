@@ -1438,6 +1438,10 @@
         "groupsRequired": "Pick at least one group."
       }
     },
+    "postWorkout": {
+      "records": "{count, plural, one {# record} other {# records}}",
+      "sets": "{count, plural, one {# set} other {# sets}}"
+    },
     "posts": {
       "createFirst": "Create the first post",
       "empty": {

@@ -1,22 +1,26 @@
-<ion-header [translucent]="true">
+<!-- Opaque: the identity scrolls away under it, and the name takes its
+     place in the bar once it has. -->
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
-    <!-- The name, not "Client": on a phone the header is the orientation cue,
-         and a generic one makes every client's page look like the same page. -->
-    <ion-title>{{ name() || ('clients.clientFallback' | translate) }}</ion-title>
-    @if (store.client()) {
-      <ion-buttons slot="end">
-        <ion-button [attr.aria-label]="'clients.actionsSheet.title' | translate" (click)="openActions()">
-          <ion-icon slot="icon-only" name="ellipsis-vertical-outline" />
-        </ion-button>
-      </ion-buttons>
+    @if (store.client(); as client) {
+      <div class="compact" [class.shown]="compact()" [attr.aria-hidden]="!compact()">
+        <mh-hex-avatar
+          size="xs"
+          aria-hidden="true"
+          [name]="name()"
+          [imageUrl]="client.client?.avatarUrl ?? null"
+          [color]="avatarTone()"
+        />
+        <span class="compact-name">{{ name() }}</span>
+      </div>
     }
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
   @if (store.error(); as error) {
     <mh-empty-state
       icon="alert-circle-outline"
@@ -26,12 +30,12 @@
       (action)="retry()"
     />
   } @else if (store.loading() && !store.client()) {
-    <div class="mh-page">
-      <div class="hero">
-        <mh-hex-avatar size="lg" color="medium" tone="wash" />
-        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.25rem" />
-        <ion-skeleton-text [animated]="true" style="width: 40%" />
-      </div>
+    <!-- The loaded shape: the week card, then the rows. -->
+    <div class="mh-page" aria-busy="true">
+      <ion-skeleton-text
+        [animated]="true"
+        style="height: 8rem; border-radius: var(--mh-radius-card)"
+      />
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
           <ion-item>
@@ -44,10 +48,10 @@
       </ion-list>
     </div>
   } @else if (store.client(); as client) {
-    <div class="mh-page">
-      <!-- Identity: the avatar, the name, the address in mono, and the two
-           chips that say where this relationship stands. -->
-      <div class="hero">
+    <!-- Who this is and how long they have been a client, then the two
+         things to do with them: a message, and the rest under ⋯. -->
+    <div class="identity-block">
+      <div class="identity">
         <mh-hex-avatar
           size="lg"
           aria-hidden="true"
@@ -55,246 +59,559 @@
           [imageUrl]="client.client?.avatarUrl ?? null"
           [color]="avatarTone()"
         />
-        <h2 class="hero-name">{{ name() }}</h2>
-        <p class="hero-email">{{ email() }}</p>
-        @if (handle()) {
-          <!-- Who they are in public, one tap from who they are to you: the
-               same profile a group member or a chat partner would open. -->
-          <ion-button class="profile-link" fill="clear" size="small" (click)="openProfile()">
-            {{ 'clients.detail.viewProfile' | translate }}
-            <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
-          </ion-button>
-        }
-        <div class="hero-badges">
-          <ion-badge [attr.data-tone]="statusTone()">{{ statusLabel() }}</ion-badge>
-          @if (isPending() && client.expiresAt) {
-            <ion-badge data-tone="medium">
-              {{ 'clients.detail.expires' | translate: { date: (client.expiresAt | date: 'd MMM') } }}
-            </ion-badge>
-          } @else if (client.startedAt) {
-            <ion-badge data-tone="medium">
-              {{ 'clients.detail.since' | translate: { date: (client.startedAt | date: 'd MMM yyyy') } }}
-            </ion-badge>
+        <div class="who">
+          <h1 class="name" #nameEl>{{ name() }}</h1>
+          <div class="status">
+            @if (!isActive()) {
+              <ion-badge [attr.data-tone]="statusTone()">{{ statusLabel() }}</ion-badge>
+            }
+            @if (sinceLine()) {
+              <ion-note>{{ sinceLine() }}</ion-note>
+            }
+          </div>
+          @if (handle()) {
+            <ion-button class="profile-link" fill="clear" size="small" (click)="openProfile()">
+              {{ 'clients.detail.viewProfile' | translate }}
+              <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
+            </ion-button>
           }
         </div>
       </div>
 
-      @if (canMessage()) {
-        <ion-button expand="block" class="message" (click)="message()">
-          <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
-          {{ 'clients.actions.message' | translate }}
+      <div class="actions">
+        @if (canMessage() && !isPending()) {
+          <!-- Honey unless the page has a more pressing next step: with no
+               plan, the Assign card holds the one honey button. -->
+          <ion-button
+            class="message"
+            [fill]="showNoPlan() ? 'outline' : 'solid'"
+            [color]="showNoPlan() ? undefined : 'primary'"
+            [class.quiet]="showNoPlan()"
+            (click)="message()"
+          >
+            <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
+            {{ 'clients.actions.message' | translate }}
+          </ion-button>
+        }
+        <ion-button
+          class="more quiet"
+          fill="outline"
+          [attr.aria-label]="'clients.actionsSheet.title' | translate"
+          (click)="openActions()"
+        >
+          <ion-icon slot="icon-only" name="ellipsis-horizontal" />
         </ion-button>
-      }
+      </div>
+    </div>
 
-      @if (store.week(); as week) {
-        <section class="mh-section">
-          <span class="mh-kicker">{{ 'clients.detail.sections.thisWeek' | translate }}</span>
-          <ion-card class="week" [class.flagged]="week.flagged">
-            <div class="week-head">
-              <span class="week-count">
-                {{ 'clients.detail.week.count' | translate: { completed: week.completed, due: week.due } }}
-              </span>
-              <span class="week-label">{{ 'clients.detail.week.label' | translate }}</span>
-              <span class="week-percent">{{ weekPercent() }}</span>
-            </div>
-            <!-- Done, skipped, still to come — in the proportion they happened. -->
-            <div class="bar" aria-hidden="true">
-              <span class="done" [style.flex-grow]="week.completed"></span>
-              <span class="skipped" [style.flex-grow]="week.skipped"></span>
-              <span class="remaining" [style.flex-grow]="week.remaining"></span>
-            </div>
-            <ion-note class="mh-footnote">
-              {{ weekFootnote() }}
-              @if (weekSub(); as sub) {
-                · {{ sub }}
-              }
-            </ion-note>
-            @if (weekTrend(); as trend) {
-              <ion-note class="mh-footnote trend">{{ trend }}</ion-note>
-            }
-          </ion-card>
-        </section>
-      }
+    @if (showTabs()) {
+      <!-- Pinned under the bar once the identity has scrolled away. -->
+      <div class="tabs-bar">
+        <ion-segment
+          class="mh-tabs"
+          mode="md"
+          [scrollable]="true"
+          [value]="tab()"
+          (ionChange)="setTab($event.detail.value)"
+        >
+          <ion-segment-button [value]="Tabs.Overview">
+            <ion-label>{{ 'clients.detail.tabs.overview' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button [value]="Tabs.Sessions">
+            <ion-label>{{ 'clients.detail.tabs.sessions' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button [value]="Tabs.Training">
+            <ion-label>{{ 'clients.detail.tabs.training' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button [value]="Tabs.Progress">
+            <ion-label>{{ 'clients.detail.tabs.progress' | translate }}</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    }
 
-      @if (store.plansLoaded()) {
-        <!-- Plans: what they are on now, with the one verb each allows, and a
-             way to give them another. Finished ones fold away underneath. -->
-        <section class="mh-section">
-          <div class="mh-section-head">
-            <span class="mh-kicker">{{ 'clients.detail.sections.plans' | translate }}</span>
-            @if (store.currentPlans().length) {
-              <ion-note>{{ store.currentPlans().length }}</ion-note>
-            }
-          </div>
-
-          @for (plan of store.currentPlans(); track plan.id) {
-            <mh-assignment-row
-              [assignment]="plan"
-              [subject]="RowSubjects.Program"
-              [busy]="store.isPlanBusy(plan.id)"
-              (pause)="setPlanStatus(plan, PlanStatuses.Paused)"
-              (resume)="setPlanStatus(plan, PlanStatuses.Active)"
+    <div class="mh-page">
+      @switch (tab()) {
+        @case (Tabs.Overview) {
+          @if (isPending()) {
+            <!-- Nothing to tab through yet: say what is coming instead. -->
+            <mh-empty-state
+              icon="hourglass-outline"
+              [heading]="'clients.detail.pending.title' | translate: { name: firstName() }"
+              [message]="'clients.detail.pending.body' | translate"
             />
-          } @empty {
-            <ion-note class="mh-note-block">{{ 'clients.detail.plans.none' | translate }}</ion-note>
-          }
-
-          @if (canAssign()) {
-            <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="openAssign()">
-              <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-              {{ 'clients.detail.plans.assign' | translate }}
-            </ion-button>
-          }
-
-          @if (store.pastPlans().length) {
-            <ion-button
-              class="past-toggle"
-              fill="clear"
-              size="small"
-              [attr.aria-expanded]="pastPlansOpen()"
-              (click)="togglePastPlans()"
-            >
-              {{
-                (pastPlansOpen() ? 'clients.detail.plans.hidePast' : 'clients.detail.plans.showPast')
-                  | translate: { count: store.pastPlans().length }
-              }}
-              <ion-icon slot="end" [name]="pastPlansOpen() ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true" />
-            </ion-button>
-            @if (pastPlansOpen()) {
-              @for (plan of store.pastPlans(); track plan.id) {
-                <mh-assignment-row [assignment]="plan" [subject]="RowSubjects.Program" />
+          } @else {
+            @if (store.week(); as week) {
+              <ion-card class="week" [class.flagged]="week.flagged">
+                @if (attention(); as reason) {
+                  <!-- Flagged: the card becomes the reason, in the roster's words. -->
+                  <div class="flag">
+                    <ion-icon name="trending-down-outline" aria-hidden="true" />
+                    <span>{{ reason.title }}</span>
+                  </div>
+                  @if (reason.detail) {
+                    <p class="flag-detail">{{ reason.detail }}</p>
+                  }
+                } @else {
+                  <div class="week-top">
+                    <span class="mh-kicker">{{
+                      'clients.detail.sections.thisWeek' | translate
+                    }}</span>
+                    @if (weekTrend(); as trend) {
+                      <span class="trend" [attr.data-trend]="trend.direction">
+                        <ion-icon [name]="trend.icon" aria-hidden="true" />
+                        {{ trend.label }}
+                      </span>
+                    }
+                  </div>
+                  <div class="week-head">
+                    <span class="week-count">
+                      {{
+                        'clients.detail.week.count'
+                          | translate: { completed: week.completed, due: week.due }
+                      }}
+                    </span>
+                    <span class="week-label">{{ 'clients.detail.week.label' | translate }}</span>
+                    <span class="week-percent">{{ weekPercent() }}</span>
+                  </div>
+                }
+                <!-- Done, skipped, still to come, in the proportion they happened. -->
+                <div class="bar" aria-hidden="true">
+                  <span class="done" [style.flex-grow]="week.completed"></span>
+                  <span class="skipped" [style.flex-grow]="week.skipped"></span>
+                  <span class="remaining" [style.flex-grow]="week.remaining"></span>
+                </div>
+                <div class="week-foot">
+                  <span>{{ weekFootnote() }}</span>
+                  @if (weekSub(); as sub) {
+                    <span>{{ sub }}</span>
+                  }
+                </div>
+              </ion-card>
+            }
+            @if (nextSession() || overviewPlan() || store.lastLog()) {
+              <!-- A summary and never a copy: each row is a door into its tab. -->
+              <ion-list [inset]="true" class="mh-card-list doors">
+                @if (nextSession(); as next) {
+                  <ion-item button [detail]="true" (click)="setTab(Tabs.Sessions)">
+                    <div slot="start" class="tile dark" aria-hidden="true">
+                      <span class="big">{{ next.time }}</span>
+                      <span class="small">{{ next.weekday }}</span>
+                    </div>
+                    <ion-label>
+                      <p class="kicker">{{ 'clients.detail.overview.nextSession' | translate }}</p>
+                      <h3>{{ next.title }}</h3>
+                      @if (next.meta) {
+                        <p>{{ next.meta }}</p>
+                      }
+                    </ion-label>
+                  </ion-item>
+                }
+                @if (overviewPlan(); as plan) {
+                  <!-- The plan itself, opened in this stack so back returns here.
+                       Paused, Resume is the row's one control: a button inside
+                       a button is two controls a screen reader cannot tell apart. -->
+                  <ion-item
+                    [button]="!!plan.row.masterProgramId && !plan.paused"
+                    [detail]="!!plan.row.masterProgramId && !plan.paused"
+                    (click)="plan.paused || openPlan(plan.row)"
+                  >
+                    <div slot="start" class="tile plain" aria-hidden="true">
+                      <mh-hex-avatar
+                        size="sm"
+                        icon="barbell-outline"
+                        [color]="plan.paused ? 'medium' : 'primary'"
+                        tone="wash"
+                      />
+                    </div>
+                    <ion-label>
+                      <p class="kicker">{{ plan.kicker }}</p>
+                      <h3>{{ plan.row.programNameSnapshot }}</h3>
+                      @if (plan.showBar) {
+                        <span class="plan-bar" aria-hidden="true">
+                          <span [style.width.%]="plan.row.completionPercent"></span>
+                        </span>
+                      }
+                      <p>{{ plan.line }}</p>
+                    </ion-label>
+                    @if (plan.paused) {
+                      <!-- Paused: Resume is the Overview's one honey action. -->
+                      <ion-button
+                        slot="end"
+                        class="resume"
+                        size="small"
+                        [disabled]="store.isPlanBusy(plan.row.id)"
+                        (click)="
+                          setPlanStatus(plan.row, PlanStatuses.Active); $event.stopPropagation()
+                        "
+                      >
+                        {{ 'button.resume' | translate }}
+                      </ion-button>
+                    }
+                  </ion-item>
+                }
+                @if (store.lastLog(); as last) {
+                  <ion-item button [detail]="true" (click)="setTab(Tabs.Training)">
+                    <div slot="start" class="tile" aria-hidden="true">
+                      <span class="big">{{ last.completedAt ?? last.startedAt | date: 'd' }}</span>
+                      <span class="small">{{
+                        last.completedAt ?? last.startedAt | date: 'MMM'
+                      }}</span>
+                    </div>
+                    <ion-label>
+                      <p class="kicker">{{ 'clients.detail.overview.lastWorkout' | translate }}</p>
+                      <h3>{{ last.name }}</h3>
+                      <div class="last-line">
+                        @if (lastMeta()) {
+                          <span>{{ lastMeta() }}</span>
+                        }
+                        @if ((last.prCount ?? 0) > 0) {
+                          <ion-badge data-tone="honey">{{
+                            'workouts.logRow.records' | translate: { count: last.prCount }
+                          }}</ion-badge>
+                        }
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                }
+              </ion-list>
+            }
+            @if (showNoPlan()) {
+              <!-- Nothing to follow: the page's next step, and its only honey button. -->
+              <div class="no-plan">
+                <span class="mh-kicker">{{ 'clients.detail.noPlan.title' | translate }}</span>
+                <p>{{ 'clients.detail.noPlan.body' | translate }}</p>
+                <ion-button (click)="openAssign()">
+                  <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                  {{ 'clients.detail.plans.assign' | translate }}
+                </ion-button>
+              </div>
+            }
+            @if (isActive() || isArchived()) {
+              @if (client.notes) {
+                <!-- Said on the card itself: a coach must never wonder whether
+                     the client reads what they write here. -->
+                <button type="button" class="note" (click)="openNotes()">
+                  <span class="note-head">
+                    <ion-icon name="lock-closed-outline" aria-hidden="true" />
+                    <span class="mh-kicker">{{ 'clients.detail.noteKicker' | translate }}</span>
+                    <ion-icon class="edit" name="create-outline" aria-hidden="true" />
+                  </span>
+                  <span class="note-text">{{ client.notes }}</span>
+                </button>
+              } @else {
+                <ion-button
+                  class="mh-add-dashed"
+                  expand="block"
+                  fill="outline"
+                  (click)="openNotes()"
+                >
+                  <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                  {{ 'clients.detail.addNote' | translate }}
+                </ion-button>
               }
             }
           }
-        </section>
-      }
-
-      @if (showSessions()) {
-        <!-- One section, two directions: what is booked and what happened.
-             A segment rather than two stacked lists, so a phone shows one
-             short list at a time and the page below stays in reach. -->
-        <section class="mh-section">
-          <div class="mh-section-head">
-            <span class="mh-kicker">{{ 'clients.detail.sections.sessions' | translate }}</span>
-            <ion-note>
-              {{
-                (sessionScope() === Scopes.Upcoming ? 'clients.detail.upcomingWindow' : 'clients.detail.pastWindow')
-                  | translate: { count: sessionScope() === Scopes.Upcoming ? upcomingDays : pastDays }
-              }}
-            </ion-note>
-          </div>
-          <ion-segment [value]="sessionScope()" (ionChange)="setSessionScope($event.detail.value)">
-            <ion-segment-button [value]="Scopes.Upcoming">
-              <ion-label>{{ 'clients.detail.sessions.upcoming' | translate }}</ion-label>
-            </ion-segment-button>
-            <ion-segment-button [value]="Scopes.Past">
-              <ion-label>{{ 'clients.detail.sessions.past' | translate }}</ion-label>
-            </ion-segment-button>
-          </ion-segment>
-          <div class="session-list">
-            @for (day of sessionDays(); track day.key) {
-              <div class="mh-day-header">
-                <span class="mh-kicker">{{ day.label }}</span>
-              </div>
-              @for (instance of day.instances; track instance.id) {
-                <mh-session-row [instance]="instance" (select)="openSession(instance)" />
+        }
+        @case (Tabs.Sessions) {
+          <!-- One list, two directions: what is booked and what happened, as
+               chips with the month behind the calendar button at their end,
+               the same as Training. -->
+          <section class="mh-section sessions">
+            <div
+              class="mh-chip-row"
+              role="group"
+              [attr.aria-label]="'clients.detail.sessions.label' | translate"
+            >
+              @for (option of sessionScopes; track option.id) {
+                <ion-button
+                  class="chip"
+                  fill="clear"
+                  shape="round"
+                  size="small"
+                  [class.selected]="!store.sessionDay() && sessionScope() === option.id"
+                  [attr.aria-pressed]="!store.sessionDay() && sessionScope() === option.id"
+                  (click)="setSessionScope(option.id)"
+                >
+                  {{ option.label | translate }}
+                </ion-button>
               }
-            } @empty {
-              <ion-note class="mh-note-block">
+              <ion-button
+                class="filters calendar-toggle"
+                fill="clear"
+                shape="round"
+                size="small"
+                [class.active]="sessionCalendarOpen()"
+                [attr.aria-pressed]="sessionCalendarOpen()"
+                [attr.aria-label]="
+                  (sessionCalendarOpen()
+                    ? 'sessions.agenda.calendar.hide'
+                    : 'sessions.agenda.calendar.show'
+                  ) | translate
+                "
+                (click)="toggleSessionCalendar()"
+              >
+                <ion-icon slot="icon-only" name="calendar-outline" aria-hidden="true" />
+              </ion-button>
+            </div>
+
+            @if (sessionCalendarOpen()) {
+              <!-- Their month at a glance; a tapped day narrows the list to it. -->
+              <mh-session-month
+                [instances]="store.monthSessions()"
+                [month]="store.sessionMonth()"
+                [selected]="store.sessionDay()"
+                (monthChange)="store.setSessionMonth($event)"
+                (daySelect)="onSessionDay($event)"
+              />
+            }
+            @if (store.sessionDay()) {
+              <ion-button
+                class="mh-day-chip"
+                fill="clear"
+                shape="round"
+                size="small"
+                [attr.aria-label]="
+                  'clients.detail.training.clearDay' | translate: { date: sessionDayLabel() }
+                "
+                (click)="clearSessionDay()"
+              >
+                {{ sessionDayLabel() }}
+                <ion-icon slot="end" name="close-circle-outline" aria-hidden="true" />
+              </ion-button>
+            } @else {
+              <ion-note class="mh-footnote window">
                 {{
-                  (sessionScope() === Scopes.Upcoming ? 'clients.detail.sessions.noneUpcoming' : 'clients.detail.sessions.nonePast')
+                  (sessionScope() === Scopes.Upcoming
+                    ? 'clients.detail.upcomingWindow'
+                    : 'clients.detail.pastWindow'
+                  )
                     | translate
+                      : { count: sessionScope() === Scopes.Upcoming ? upcomingDays : pastDays }
                 }}
               </ion-note>
             }
-          </div>
-        </section>
-      }
 
-      @if (client.groupMemberships?.length) {
-        <!-- Only when there are any: "not in any groups" is not news about a
-             person, and a phone has no room for a section that says nothing. -->
-        <section class="mh-section">
-          <div class="mh-section-head">
-            <span class="mh-kicker">{{ 'nav.groups' | translate }}</span>
-          </div>
-          <div class="mh-chip-row">
-            @for (group of client.groupMemberships; track group.groupId) {
-              <!-- A label, not a control: no handler, and nothing that hints
-                   at one. Groups are managed on the web for now. -->
-              <ion-chip>{{ group.groupName }}</ion-chip>
-            }
-          </div>
-        </section>
-      }
-
-      <!-- 7h: training is a section of the client, not an island. It points
-           at the detail rather than duplicating it. -->
-      <section class="mh-section">
-        <div class="mh-section-head">
-          <span class="mh-kicker">{{ 'clients.detail.sections.training' | translate }}</span>
-        </div>
-        <button class="training" type="button" (click)="openTraining()">
-          <ion-icon name="barbell-outline" aria-hidden="true" />
-          <span class="t-label">{{ 'clients.detail.trainingLink' | translate }}</span>
-          <ion-icon class="t-chev" name="chevron-forward-outline" aria-hidden="true" />
-        </button>
-        <!-- Their numbers and records over twelve weeks: the trainee's own
-             Progress screen, read from what they let this coach see. -->
-        <button class="training" type="button" (click)="openProgress()">
-          <ion-icon name="trending-up-outline" aria-hidden="true" />
-          <span class="t-label">{{ 'clients.detail.progressLink' | translate }}</span>
-          <ion-icon class="t-chev" name="chevron-forward-outline" aria-hidden="true" />
-        </button>
-      </section>
-
-      <section class="mh-section">
-        <div class="mh-section-head">
-          <span class="mh-kicker">{{ 'clients.detail.sections.notes' | translate }}</span>
-          <ion-icon name="lock-closed-outline" class="lock" aria-hidden="true" />
-        </div>
-        <ion-list [inset]="true" class="mh-card-list">
-          <ion-item button detail="false" (click)="openNotes()">
-            <ion-label class="ion-text-wrap">
-              @if (client.notes) {
-                <p class="notes">{{ client.notes }}</p>
-              } @else {
-                <p class="notes empty">{{ 'clients.detail.addNote' | translate }}</p>
+            <div class="session-list">
+              @for (day of sessionDays(); track day.key) {
+                <div class="mh-day-header">
+                  <span class="mh-kicker">{{ day.label }}</span>
+                </div>
+                @for (instance of day.instances; track instance.id) {
+                  <mh-session-row [instance]="instance" (select)="openSession(instance)" />
+                }
+              } @empty {
+                <ion-note class="mh-note-block">
+                  {{
+                    (store.sessionDay()
+                      ? 'clients.detail.sessions.noneOnDay'
+                      : sessionScope() === Scopes.Upcoming
+                        ? 'clients.detail.sessions.noneUpcoming'
+                        : 'clients.detail.sessions.nonePast'
+                    ) | translate
+                  }}
+                </ion-note>
               }
-            </ion-label>
-            <ion-icon slot="end" name="create-outline" color="medium" aria-hidden="true" />
-          </ion-item>
-        </ion-list>
-        <!-- Said in words, not just a lock: a coach must never wonder whether
-             the client reads what they write here. -->
-        <ion-note class="mh-footnote">{{ 'clients.notesSheet.helper' | translate }}</ion-note>
-      </section>
+            </div>
 
-      @if (isActive() || isArchived()) {
-        <!-- Last, and the one row in red: the only thing here worth a second thought. -->
-        <ion-list [inset]="true" class="mh-card-list">
-          @if (isActive()) {
-            <!-- The label takes the wash ink rather than Ionic's `color`
-                 slot: danger-500 as text on a white card is 3.76:1, and the
-                 one row here worth a second thought is the last one that
-                 should be hard to read. The glyph keeps the saturated hue —
-                 3:1 is enough for a graphic. -->
-            <ion-item button detail="false" (click)="confirmArchive()">
-              <mh-hex-avatar slot="start" size="sm" icon="archive-outline" color="danger" />
-              <ion-label class="verb danger">{{ 'clients.actions.archiveClientEllipsis' | translate }}</ion-label>
-            </ion-item>
-          } @else {
-            <ion-item
-              button
-              detail="false"
-              [disabled]="store.saving()"
-              (click)="unarchive()"
-            >
-              <mh-hex-avatar slot="start" size="sm" icon="arrow-undo-outline" color="success" />
-              <ion-label class="verb success">{{ 'clients.actions.unarchiveClient' | translate }}</ion-label>
-            </ion-item>
+            @if (hasMoreSessions()) {
+              <ion-button
+                class="show-more"
+                fill="clear"
+                expand="block"
+                [disabled]="moreSessionsLoading()"
+                (click)="store.loadMoreSessions(sessionScope() === Scopes.Past)"
+              >
+                {{ 'button.showMoreItems' | translate }}
+              </ion-button>
+            }
+          </section>
+        }
+        @case (Tabs.Training) {
+          @if (store.plansLoaded()) {
+            <!-- Plans: what they are on now, with the one verb each allows, and a
+                 way to give them another. Finished ones fold away underneath. -->
+            <section class="mh-section">
+              <div class="mh-section-head">
+                <span class="mh-kicker">{{ 'clients.detail.sections.plans' | translate }}</span>
+                @if (store.currentPlans().length) {
+                  <ion-note>{{ store.currentPlans().length }}</ion-note>
+                }
+                @if (canAssign()) {
+                  <ion-button fill="clear" size="small" (click)="openAssign()">
+                    {{ 'clients.detail.plans.assign' | translate }}
+                  </ion-button>
+                }
+              </div>
+
+              @for (plan of store.currentPlans(); track plan.id) {
+                <mh-assignment-row
+                  [assignment]="plan"
+                  [subject]="RowSubjects.Program"
+                  [busy]="store.isPlanBusy(plan.id)"
+                  [tappable]="!!plan.masterProgramId"
+                  (pause)="setPlanStatus(plan, PlanStatuses.Paused)"
+                  (resume)="setPlanStatus(plan, PlanStatuses.Active)"
+                  (select)="openPlan(plan)"
+                />
+              } @empty {
+                <ion-note class="mh-note-block">{{
+                  'clients.detail.plans.none' | translate
+                }}</ion-note>
+              }
+              @if (store.pastPlans().length) {
+                <ion-button
+                  class="past-toggle"
+                  fill="clear"
+                  size="small"
+                  [attr.aria-expanded]="pastPlansOpen()"
+                  (click)="togglePastPlans()"
+                >
+                  {{
+                    (pastPlansOpen()
+                      ? 'clients.detail.plans.hidePast'
+                      : 'clients.detail.plans.showPast'
+                    ) | translate: { count: store.pastPlans().length }
+                  }}
+                  <ion-icon
+                    slot="end"
+                    [name]="pastPlansOpen() ? 'chevron-up-outline' : 'chevron-down-outline'"
+                    aria-hidden="true"
+                  />
+                </ion-button>
+                @if (pastPlansOpen()) {
+                  @for (plan of store.pastPlans(); track plan.id) {
+                    <mh-assignment-row
+                      [assignment]="plan"
+                      [subject]="RowSubjects.Program"
+                      [tappable]="!!plan.masterProgramId"
+                      (select)="openPlan(plan)"
+                    />
+                  }
+                }
+              }
+            </section>
           }
-        </ion-list>
+
+          <section class="mh-section workouts">
+            <span class="mh-kicker">{{ 'clients.detail.training.workouts' | translate }}</span>
+            <div
+              class="mh-chip-row"
+              role="group"
+              [attr.aria-label]="'clients.detail.training.kinds.label' | translate"
+            >
+              @for (option of kinds; track option.id) {
+                <!-- `ion-button`, not `ion-chip`, as on History: a screen
+                     reader says which one is on. -->
+                <ion-button
+                  class="chip"
+                  fill="clear"
+                  shape="round"
+                  size="small"
+                  [class.selected]="store.kind() === option.id"
+                  [attr.aria-pressed]="store.kind() === option.id"
+                  (click)="setKind(option.id)"
+                >
+                  {{ option.label | translate }}
+                </ion-button>
+              }
+              <ion-button
+                class="filters calendar-toggle"
+                fill="clear"
+                shape="round"
+                size="small"
+                [class.active]="calendarOpen()"
+                [attr.aria-pressed]="calendarOpen()"
+                [attr.aria-label]="
+                  (calendarOpen()
+                    ? 'workouts.history.calendar.hide'
+                    : 'workouts.history.calendar.show'
+                  ) | translate
+                "
+                (click)="toggleCalendar()"
+              >
+                <ion-icon slot="icon-only" name="calendar-outline" aria-hidden="true" />
+              </ion-button>
+            </div>
+
+            @if (calendarOpen()) {
+              <!-- The month at a glance, when asked for; a tapped day narrows
+                   the list below to it. -->
+              <mh-history-calendar
+                [cells]="store.calendarCells()"
+                [month]="store.month()"
+                [doneCount]="store.monthDoneCount()"
+                [loading]="store.monthSkeleton()"
+                [error]="store.monthError()"
+                [selected]="store.day()"
+                selfLabel="clients.detail.training.legendOwn"
+                (monthChange)="store.setMonth($event)"
+                (daySelect)="onDaySelect($event)"
+                (retry)="store.refreshMonth()"
+              />
+            }
+            @if (store.day()) {
+              <ion-button
+                class="mh-day-chip"
+                fill="clear"
+                shape="round"
+                size="small"
+                [attr.aria-label]="
+                  'clients.detail.training.clearDay' | translate: { date: dayLabel() }
+                "
+                (click)="clearDay()"
+              >
+                {{ dayLabel() }}
+                <ion-icon slot="end" name="close-circle-outline" aria-hidden="true" />
+              </ion-button>
+            }
+            @for (week of workoutWeeks(); track week.key) {
+              <div class="mh-section-label log-week">{{ week.label }}</div>
+              <div class="mh-row-group">
+                @for (log of week.logs; track log.id) {
+                  <mh-log-row [log]="log" (select)="openLog(log)" />
+                }
+              </div>
+            } @empty {
+              @if (store.workoutsLoaded()) {
+                <ion-note class="mh-note-block">{{ workoutsEmpty() }}</ion-note>
+              }
+            }
+            @if (store.hasMoreWorkouts()) {
+              <ion-button
+                class="show-more"
+                fill="clear"
+                expand="block"
+                [disabled]="store.workoutsLoading()"
+                (click)="store.loadMoreWorkouts()"
+              >
+                {{ 'button.showMoreItems' | translate }}
+              </ion-button>
+            }
+          </section>
+
+          <!-- The boundary, stated rather than implied: a short list otherwise
+               reads as a lazy client rather than as work they chose to keep
+               to themselves. -->
+          <ion-list [inset]="true" class="mh-card-list">
+            <ion-item>
+              <mh-hex-avatar
+                slot="start"
+                size="sm"
+                icon="lock-closed-outline"
+                color="medium"
+                tone="wash"
+                aria-hidden="true"
+              />
+              <ion-label class="ion-text-wrap">
+                <p>{{ 'clients.detail.training.privacyNote' | translate }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        }
+        @case (Tabs.Progress) {
+          <mh-progress-body [clientId]="client.clientId" [clientName]="name()" />
+        }
       }
     </div>
   }

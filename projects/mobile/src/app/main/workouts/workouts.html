@@ -2,15 +2,39 @@
   <ion-toolbar>
     <ion-title>{{ 'nav.workouts' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button
-        class="history"
-        [attr.aria-label]="'workouts.home.openHistory' | translate"
-        (click)="openHistory()"
-      >
-        <ion-icon slot="icon-only" name="time-outline" aria-hidden="true" />
-      </ion-button>
       <mh-notification-bell />
+      <!-- The two ways to begin: an empty workout, a new routine. -->
+      <ion-button
+        [attr.aria-label]="'workouts.home.startActions' | translate"
+        (click)="actionsOpen.set(true)"
+      >
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+      </ion-button>
     </ion-buttons>
+  </ion-toolbar>
+  <!-- What you train from, what you did, how it is going: the page's
+       sections as underlined words, as on a client's page. -->
+  <ion-toolbar class="tabs-bar">
+    <ion-segment
+      class="mh-tabs"
+      mode="md"
+      [scrollable]="true"
+      [value]="tab()"
+      (ionChange)="setTab($event.detail.value)"
+    >
+      <ion-segment-button [value]="Tabs.Routines">
+        <ion-label>{{ 'workouts.common.routines' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Tabs.History">
+        <ion-label>{{ 'workouts.common.history' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Tabs.Progress">
+        <ion-label>{{ 'workouts.common.progress' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Tabs.Exercises">
+        <ion-label>{{ 'workouts.common.exercises' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
@@ -19,185 +43,226 @@
     <ion-refresher-content />
   </ion-refresher>
 
-  @if (store.showError()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      [heading]="'workouts.loadError.training' | translate"
-      [message]="'error.checkConnection' | translate"
-      [actionLabel]="'button.tryAgain' | translate"
-      (action)="retry()"
-    />
-  } @else if (store.showSkeleton()) {
-    <!-- Chrome stays real while content shimmers in its final geometry, so
-         nothing jumps when the data lands. -->
-    <div class="mh-page">
-      <ion-card class="hero-skeleton">
-        <ion-card-content>
-          <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.75rem" />
-          <ion-skeleton-text [animated]="true" style="width: 65%; height: 1.25rem" />
-          <ion-skeleton-text [animated]="true" style="width: 50%" />
-          <ion-skeleton-text [animated]="true" style="width: 100%; height: 2.75rem" />
-        </ion-card-content>
-      </ion-card>
-      <div>
-        @for (_ of skeletonRows; track $index) {
-          <mh-session-row-skeleton [rail]="false" />
-        }
+  @switch (tab()) {
+    @case (Tabs.History) {
+      <div class="mh-page">
+        <mh-history-body />
       </div>
-    </div>
-  } @else {
-    <div class="mh-page">
-      <!-- A session left open outranks everything else on the page. Navy, not
-           honey: resuming is not the same offer as starting. -->
-      @if (store.inProgress(); as log) {
-        <ion-list [inset]="true" class="mh-card-list resume">
-          <ion-item button detail="false" (click)="resume()">
-            @if (isPaused()) {
-              <ion-icon slot="start" name="pause-outline" class="paused-mark" aria-hidden="true" />
-            } @else {
-              <span slot="start" class="live-dot" aria-hidden="true"></span>
+    }
+    @case (Tabs.Progress) {
+      <div class="mh-page">
+        <mh-progress-body />
+      </div>
+    }
+    @case (Tabs.Exercises) {
+      <div class="mh-page">
+        <mh-exercise-library [detailBase]="exerciseBase" />
+      </div>
+    }
+    @default {
+      @if (store.showError()) {
+        <mh-empty-state
+          icon="alert-circle-outline"
+          [heading]="'workouts.loadError.training' | translate"
+          [message]="'error.checkConnection' | translate"
+          [actionLabel]="'button.tryAgain' | translate"
+          (action)="retry()"
+        />
+      } @else if (store.showSkeleton()) {
+        <!-- Chrome stays real while content shimmers in its final geometry, so
+         nothing jumps when the data lands. -->
+        <div class="mh-page">
+          <ion-card class="hero-skeleton">
+            <ion-card-content>
+              <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.75rem" />
+              <ion-skeleton-text [animated]="true" style="width: 65%; height: 1.25rem" />
+              <ion-skeleton-text [animated]="true" style="width: 50%" />
+              <ion-skeleton-text [animated]="true" style="width: 100%; height: 2.75rem" />
+            </ion-card-content>
+          </ion-card>
+          <div>
+            @for (_ of skeletonRows; track $index) {
+              <mh-session-row-skeleton [rail]="false" />
             }
-            <ion-label>
-              <span class="mh-kicker">
-                {{ (isPaused() ? 'workouts.home.paused' : 'workouts.home.inProgress') | translate: { elapsed: elapsed() } }}
-              </span>
-              <h2>{{ log.name }}</h2>
-            </ion-label>
-            <ion-button slot="end" size="small" shape="round" color="primary" (click)="resume()">
-              {{ 'button.resume' | translate }}
-            </ion-button>
-          </ion-item>
-        </ion-list>
-      }
-
-      @if (store.isColdStart()) {
-        <!-- Two real actions and one line of promise — never an empty void. -->
-        <ion-card class="cold-start">
-          <ion-card-content>
-            <mh-hex-avatar size="lg" color="primary" tone="wash" icon="flash-outline" />
-            <h2>{{ 'workouts.home.coldStart.title' | translate }}</h2>
-            <p>{{ 'workouts.home.coldStart.message' | translate }}</p>
-            @if (!store.inProgress()) {
-              <ion-button expand="block" (click)="startEmpty()">
-                {{ 'workouts.home.coldStart.action' | translate }}
-              </ion-button>
-            }
-            <ion-button class="neutral" expand="block" fill="outline" (click)="openStarters()">
-              {{ 'workouts.home.coldStart.browseStarters' | translate }}
-            </ion-button>
-            <!-- Building your own has to be reachable from the state you are in
-                 before you own anything. -->
-            <ion-button class="build-own" fill="clear" size="small" (click)="newRoutine()">
-              {{ 'workouts.home.coldStart.buildOwn' | translate }}
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-
-        @if (store.starterPreview().length) {
-          <section class="mh-section">
-            <div class="mh-section-head">
-              <span class="mh-kicker">{{ 'workouts.common.starterRoutines' | translate }}</span>
-              <ion-button fill="clear" size="small" (click)="openStarters()">
-                {{ 'button.seeAllCount' | translate: { count: store.starterTotal() } }}
-              </ion-button>
-            </div>
-            <ion-list [inset]="true" class="mh-card-list">
-              @for (routine of store.starterPreview(); track routine.id; let i = $index) {
-                <mh-routine-row [routine]="routine" [color]="routineTileColor(i)" (select)="openRoutine(routine)" />
-              }
-            </ion-list>
-          </section>
-        }
+          </div>
+        </div>
       } @else {
-        @if (store.heroWorkout(); as workout) {
-          @if (!store.heroIsOpen()) {
-            <mh-today-hero
-              [workout]="workout"
-              [isToday]="!!store.today()"
-              [blocked]="!!store.inProgress()"
-              (open)="openToday()"
-              (summary)="openTodaySummary()"
-            />
-          }
-        }
-
-        <!-- Never gated behind a plan: this is the on-ramp for anyone who just
-             wants to train without setting something up. Only an open session
-             holds it back, since there can be one at a time. -->
-        @if (!store.inProgress()) {
-          <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="startEmpty()">
-            <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-            {{ 'workouts.home.startEmpty' | translate }}
-          </ion-button>
-        }
-
-        @if (store.activePlans().length) {
-          <section class="mh-section">
-            <div class="mh-section-head">
-              <span class="mh-kicker">{{ 'workouts.home.fromYourCoach' | translate }}</span>
-              @if (hasHiddenPlans()) {
-                <ion-button fill="clear" size="small" (click)="togglePlans()">
-                  {{
-                    (showAllPlans() ? 'button.showLess' : 'button.seeAllCount')
-                      | translate: { count: store.activePlans().length }
-                  }}
+        <div class="mh-page">
+          <!-- A session left open outranks everything else on the page. Navy, not
+           honey: resuming is not the same offer as starting. -->
+          @if (store.inProgress(); as log) {
+            <ion-list [inset]="true" class="mh-card-list resume">
+              <ion-item button detail="false" (click)="resume()">
+                @if (isPaused()) {
+                  <ion-icon
+                    slot="start"
+                    name="pause-outline"
+                    class="paused-mark"
+                    aria-hidden="true"
+                  />
+                } @else {
+                  <span slot="start" class="live-dot" aria-hidden="true"></span>
+                }
+                <ion-label>
+                  <span class="mh-kicker">
+                    {{
+                      (isPaused() ? 'workouts.home.paused' : 'workouts.home.inProgress')
+                        | translate: { elapsed: elapsed() }
+                    }}
+                  </span>
+                  <h2>{{ log.name }}</h2>
+                </ion-label>
+                <ion-button
+                  slot="end"
+                  size="small"
+                  shape="round"
+                  color="primary"
+                  (click)="resume()"
+                >
+                  {{ 'button.resume' | translate }}
                 </ion-button>
-              }
-            </div>
-            <ion-list [inset]="true" class="mh-card-list plans">
-              @for (plan of visiblePlans(); track plan.id) {
-                <ion-item button [detail]="true" (click)="openPlan(plan.id)">
-                  <!-- The coach's face for their plan; a plan you scheduled yourself
-                       has no one to show, so it takes the repeat glyph instead. -->
-                  @if (planCoach(plan); as coach) {
-                    <mh-hex-avatar slot="start" size="md" [name]="coach" [imageUrl]="plan.instructor?.avatarUrl ?? null" />
-                  } @else {
-                    <mh-hex-avatar
-                      slot="start"
-                      size="md"
-                      color="teal"
-                      tone="wash"
-                      icon="repeat-outline"
-                      [name]="plan.programNameSnapshot"
+              </ion-item>
+            </ion-list>
+          }
+          @if (store.isColdStart()) {
+            <!-- Two real actions and one line of promise — never an empty void. -->
+            <ion-card class="cold-start">
+              <ion-card-content>
+                <mh-hex-avatar size="lg" color="primary" tone="wash" icon="flash-outline" />
+                <h2>{{ 'workouts.home.coldStart.title' | translate }}</h2>
+                <p>{{ 'workouts.home.coldStart.message' | translate }}</p>
+                @if (!store.inProgress()) {
+                  <ion-button expand="block" (click)="startEmpty()">
+                    {{ 'workouts.home.coldStart.action' | translate }}
+                  </ion-button>
+                }
+                <ion-button class="neutral" expand="block" fill="outline" (click)="openStarters()">
+                  {{ 'workouts.home.coldStart.browseStarters' | translate }}
+                </ion-button>
+                <!-- Building your own has to be reachable from the state you are in
+                 before you own anything. -->
+                <ion-button class="build-own" fill="clear" size="small" (click)="newRoutine()">
+                  {{ 'workouts.home.coldStart.buildOwn' | translate }}
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+
+            @if (store.starterPreview().length) {
+              <section class="mh-section">
+                <div class="mh-section-head">
+                  <span class="mh-kicker">{{ 'workouts.common.starterRoutines' | translate }}</span>
+                  <ion-button fill="clear" size="small" (click)="openStarters()">
+                    {{ 'button.seeAllCount' | translate: { count: store.starterTotal() } }}
+                  </ion-button>
+                </div>
+                <ion-list [inset]="true" class="mh-card-list">
+                  @for (routine of store.starterPreview(); track routine.id; let i = $index) {
+                    <mh-routine-row
+                      [routine]="routine"
+                      [color]="routineTileColor(i)"
+                      (select)="openRoutine(routine)"
                     />
                   }
-                  <ion-label>
-                    <h2>{{ plan.programNameSnapshot }}</h2>
-                    <p>{{ planSubline(plan) }}</p>
-                    <ion-progress-bar [value]="plan.completionPercent / 100" [attr.aria-label]="planProgressLabel(plan)" />
-                  </ion-label>
-                </ion-item>
-              }
-            </ion-list>
-          </section>
-        }
-
-        <section class="mh-section">
-          <div class="mh-section-head">
-            <span class="mh-kicker">{{ 'workouts.home.yourRoutines' | translate }}</span>
-            <ion-button fill="clear" size="small" (click)="newRoutine()">{{ 'workouts.common.newRoutine' | translate }}</ion-button>
-          </div>
-          @if (store.routines().length) {
-            <ion-list [inset]="true" class="mh-card-list">
-              @for (routine of store.routines(); track routine.id; let i = $index) {
-                <mh-routine-row [routine]="routine" [color]="routineTileColor(i)" (select)="openRoutine(routine)" />
-              }
-            </ion-list>
+                </ion-list>
+              </section>
+            }
           } @else {
-            <ion-note class="mh-note-block">
-              {{ 'workouts.home.noRoutines' | translate }}
-            </ion-note>
-          }
-        </section>
+            @if (store.heroWorkout(); as workout) {
+              @if (!store.heroIsOpen()) {
+                <mh-today-hero
+                  [workout]="workout"
+                  [isToday]="!!store.today()"
+                  [blocked]="!!store.inProgress()"
+                  (open)="openToday()"
+                  (summary)="openTodaySummary()"
+                />
+              }
+            }
+            @if (store.activePlans().length) {
+              <section class="mh-section">
+                <div class="mh-section-head">
+                  <span class="mh-kicker">{{ 'workouts.home.fromYourCoach' | translate }}</span>
+                  @if (hasHiddenPlans()) {
+                    <ion-button fill="clear" size="small" (click)="togglePlans()">
+                      {{
+                        (showAllPlans() ? 'button.showLess' : 'button.seeAllCount')
+                          | translate: { count: store.activePlans().length }
+                      }}
+                    </ion-button>
+                  }
+                </div>
+                <ion-list [inset]="true" class="mh-card-list plans">
+                  @for (plan of visiblePlans(); track plan.id) {
+                    <ion-item button [detail]="true" (click)="openPlan(plan.id)">
+                      <!-- The coach's face for their plan; a plan you scheduled yourself
+                       has no one to show, so it takes the repeat glyph instead. -->
+                      @if (planCoach(plan); as coach) {
+                        <mh-hex-avatar
+                          slot="start"
+                          size="md"
+                          [name]="coach"
+                          [imageUrl]="plan.instructor?.avatarUrl ?? null"
+                        />
+                      } @else {
+                        <mh-hex-avatar
+                          slot="start"
+                          size="md"
+                          color="teal"
+                          tone="wash"
+                          icon="repeat-outline"
+                          [name]="plan.programNameSnapshot"
+                        />
+                      }
+                      <ion-label>
+                        <h2>{{ plan.programNameSnapshot }}</h2>
+                        <p>{{ planSubline(plan) }}</p>
+                        <ion-progress-bar
+                          [value]="plan.completionPercent / 100"
+                          [attr.aria-label]="planProgressLabel(plan)"
+                        />
+                      </ion-label>
+                    </ion-item>
+                  }
+                </ion-list>
+              </section>
+            }
 
-        <!-- The record and the reference, in the menu-row shape: what you have
-             done, how it is going, and the movements everything is built from. -->
-        <ion-list [inset]="true" class="mh-card-list">
-          <mh-settings-row [label]="'workouts.common.history' | translate" icon="time-outline" iconColor="info" iconTone="wash" (select)="openHistory()" />
-          <mh-settings-row [label]="'workouts.common.progress' | translate" icon="trending-up-outline" iconColor="success" iconTone="wash" (select)="openProgress()" />
-          <mh-settings-row [label]="'nav.exercises' | translate" icon="flash-outline" iconColor="coral" iconTone="wash" (select)="openExercises()" />
-        </ion-list>
+            <section class="mh-section">
+              <span class="mh-kicker">
+                {{
+                  'workouts.home.yourRoutinesCount' | translate: { count: store.routines().length }
+                }}
+              </span>
+              @if (store.routines().length) {
+                <ion-list [inset]="true" class="mh-card-list">
+                  @for (routine of store.routines(); track routine.id; let i = $index) {
+                    <!-- Start on each, the quickest way to train, while nothing is open. -->
+                    <mh-routine-row
+                      [routine]="routine"
+                      [color]="routineTileColor(i)"
+                      [startable]="!store.inProgress()"
+                      [starting]="startingId() === routine.id"
+                      (select)="openRoutine(routine)"
+                      (start)="startRoutine(routine)"
+                    />
+                  }
+                </ion-list>
+              } @else {
+                <ion-note class="mh-note-block">
+                  {{ 'workouts.home.noRoutines' | translate }}
+                </ion-note>
+              }
+            </section>
+          }
+        </div>
       }
-    </div>
+    }
   }
 </ion-content>
+
+<mh-action-sheet
+  [(open)]="actionsOpen"
+  [title]="'workouts.home.startActions' | translate"
+  [actions]="startActions()"
+  (chosen)="onStartAction($event)"
+/>

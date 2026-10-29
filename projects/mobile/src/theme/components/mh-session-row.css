@@ -136,3 +136,23 @@ ion-item.mh-session-row ion-label h2 {
   font-family: var(--ion-font-family);
   font-weight: 600;
 }
+
+/* Rows grouped on one card, a client's week of training: one surface with
+   hairlines between, no spine, since the badges carry the status there. The
+   row components drop their own gap inside a group. */
+.mh-row-group {
+  overflow: hidden;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.mh-row-group ion-item.mh-session-row {
+  --background: transparent;
+  --border-radius: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.mh-row-group > * + * ion-item.mh-session-row {
+  border-top: var(--mh-hairline) solid var(--mh-color-divider);
+}

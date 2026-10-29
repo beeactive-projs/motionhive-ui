@@ -19,7 +19,13 @@ import {
 } from '../../models/client/instructor.model';
 import { PaginatedReviews } from '../../models/review/review.model';
 import { InstructorGroupSummary } from '../../models/profile/instructor-group-summary.model';
-import { PublicUserProfile } from '../../models/profile/public-user-profile.model';
+import {
+  ProfilePreviewAs,
+  ProfileWorkout,
+  PublicUserProfile,
+  ReportWorkoutPayload,
+} from '../../models/profile/public-user-profile.model';
+import type { PaginatedResponse } from '../../models/common/pagination.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
@@ -147,9 +153,80 @@ export class ProfileService {
    * The server returns `isInstructor: true` for instructor accounts so
    * callers can fan out to `getInstructorByHandle()` in parallel.
    */
-  getUserByHandle(handle: string): Observable<PublicUserProfile> {
+  getUserByHandle(
+    handle: string,
+    /** Owner only: see your own page as your coaches do. */
+    previewAs?: ProfilePreviewAs,
+  ): Observable<PublicUserProfile> {
     return this._http.get<PublicUserProfile>(
       `${environment.apiUrl}${API_ENDPOINTS.PROFILE.USER_BY_HANDLE(handle)}`,
+      { params: previewAs ? { previewAs } : {} },
+    );
+  }
+
+  /** The workouts on that profile the viewer may see, newest first. */
+  getUserWorkouts(
+    handle: string,
+    page = 1,
+    limit = 10,
+    previewAs?: ProfilePreviewAs,
+  ): Observable<PaginatedResponse<ProfileWorkout>> {
+    return this._http.get<PaginatedResponse<ProfileWorkout>>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.USER_WORKOUTS_BY_HANDLE(handle)}`,
+      { params: { page, limit, ...(previewAs ? { previewAs } : {}) } },
+    );
+  }
+
+  /** One workout on that profile; 404 when the viewer may not see it there. */
+  getUserWorkout(
+    handle: string,
+    workoutLogId: string,
+    previewAs?: ProfilePreviewAs,
+  ): Observable<ProfileWorkout> {
+    return this._http.get<ProfileWorkout>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.USER_WORKOUT_BY_HANDLE(handle, workoutLogId)}`,
+      { params: previewAs ? { previewAs } : {} },
+    );
+  }
+
+  /**
+   * That workout's photo, as bytes: there is no public link to it, and the
+   * API checks the viewer the same way it checks the workout. `version`
+   * (the summary's `photoVersion`) gives a replaced photo a new address.
+   */
+  getUserWorkoutPhoto(
+    handle: string,
+    workoutLogId: string,
+    version: number | null,
+    previewAs?: ProfilePreviewAs,
+  ): Observable<Blob> {
+    return this._http.get(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.USER_WORKOUT_PHOTO_BY_HANDLE(
+        handle,
+        workoutLogId,
+      )}`,
+      {
+        responseType: 'blob',
+        params: {
+          ...(version != null ? { v: version } : {}),
+          ...(previewAs ? { previewAs } : {}),
+        },
+      },
+    );
+  }
+
+  /**
+   * Report a workout on that profile to the MotionHive team. 409 when the
+   * caller already has an open report on it.
+   */
+  reportUserWorkout(
+    handle: string,
+    workoutLogId: string,
+    payload: ReportWorkoutPayload,
+  ): Observable<{ id: string; status: string }> {
+    return this._http.post<{ id: string; status: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.REPORT_USER_WORKOUT(handle, workoutLogId)}`,
+      payload,
     );
   }
 

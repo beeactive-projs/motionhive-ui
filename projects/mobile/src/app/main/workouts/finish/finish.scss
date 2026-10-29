@@ -165,6 +165,55 @@
   text-wrap: balance;
 }
 
+/* With a photo the hero is the cover: the picture fills it, the honeycomb
+   and badge step aside, and the words sit low on a navy fade so they read
+   on any photo. */
+.hero.with-photo {
+  justify-content: flex-end;
+  min-height: 24rem;
+  padding-top: 3rem;
+}
+
+.hero.with-photo::before,
+.hero.with-photo .badge {
+  display: none;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero.with-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--mh-navy-900) 40%, transparent) 0%,
+    transparent 30%,
+    transparent 45%,
+    color-mix(in srgb, var(--mh-navy-900) 92%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.change-photo {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  --background: color-mix(in srgb, var(--mh-navy-900) 55%, transparent);
+  --color: var(--mh-navy-50);
+  --box-shadow: none;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+}
+
 /* ─── Stats ────────────────────────────────────────────────────────
    Big, even numbers: tabular figures so 52:14 and 6.240 line up. */
 .stats {
@@ -271,6 +320,55 @@
 .highlight.honey .highlight-detail {
   color: var(--ion-color-primary-wash-contrast);
   font-weight: 600;
+}
+
+/* The one optional tap for a photo, dashed like a slot waiting to be filled. */
+.add-photo {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  margin: 0 0 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1.5px dashed var(--ion-color-primary);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.add-photo:disabled {
+  opacity: 0.7;
+}
+
+.add-photo-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-primary-wash);
+  color: var(--ion-color-primary-wash-contrast);
+  font-size: 1.5rem;
+}
+
+.add-photo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.add-photo-title {
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+}
+
+.add-photo-hint {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
 }
 
 /* Flush with the cards around it rather than inset again. */

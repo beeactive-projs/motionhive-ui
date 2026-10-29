@@ -1,0 +1,59 @@
+<ion-card>
+  <ion-card-content>
+    <div class="nav">
+      <span class="label">{{ monthLabel() }}</span>
+      <ion-button
+        fill="clear"
+        [attr.aria-label]="'a11y.previousMonth' | translate"
+        (click)="step(-1)"
+      >
+        <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+      </ion-button>
+      <ion-button fill="clear" [attr.aria-label]="'a11y.nextMonth' | translate" (click)="step(1)">
+        <ion-icon slot="icon-only" name="chevron-forward-outline" aria-hidden="true" />
+      </ion-button>
+      @if (!isCurrentMonth()) {
+        <button type="button" class="today" (click)="goToday()">
+          {{ 'time.today' | translate }}
+        </button>
+      }
+    </div>
+
+    <div class="grid heading" aria-hidden="true">
+      @for (label of weekdayLabels; track $index) {
+        <span class="weekday">{{ label }}</span>
+      }
+    </div>
+
+    <div class="grid">
+      @for (cell of cells(); track cell.key) {
+        <button
+          type="button"
+          class="cell"
+          [class.muted]="!cell.inMonth"
+          [class.today]="cell.isToday"
+          [class.selected]="cell.key === selected()"
+          [attr.aria-pressed]="cell.key === selected()"
+          [attr.aria-label]="cell.label"
+          (click)="pick(cell)"
+        >
+          <span class="day">{{ cell.day }}</span>
+          <span class="dots" aria-hidden="true">
+            @for (tone of cell.dots; track $index) {
+              <i [attr.data-tone]="tone"></i>
+            }
+          </span>
+        </button>
+      }
+    </div>
+
+    <div class="legend">
+      @for (entry of legend; track entry.tone) {
+        <span class="entry">
+          <i [attr.data-tone]="entry.tone"></i>
+          {{ entry.label }}
+        </span>
+      }
+    </div>
+  </ion-card-content>
+</ion-card>

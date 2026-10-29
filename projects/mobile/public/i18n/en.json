@@ -309,34 +309,86 @@
     },
     "detail": {
       "addNote": "Add a private note",
+      "attention": {
+        "reason": {
+          "behind": "Behind plan",
+          "dropped": "Dropping off",
+          "neverStarted": "Has not started",
+          "silent": "{days, plural, one {Quiet # day} other {Quiet # days}}"
+        },
+        "detail": {
+          "dropped": "Down from {previous}% to {current}% against the previous window.",
+          "neverStarted": "Assigned a plan but has never logged a workout."
+        }
+      },
+      "clientSince": "Client since {date}",
       "expires": "Expires {date}",
       "loadError": {
         "message": "Couldn't load this client.",
         "title": "Couldn't load this client"
       },
+      "noPlan": {
+        "title": "No plan assigned",
+        "body": "Nothing is assigned, so there is nothing for them to follow."
+      },
+      "noteKicker": "Your note · only you",
+      "overview": {
+        "nextSession": "Next session",
+        "lastWorkout": "Last workout",
+        "planActive": "Active plan",
+        "planPaused": "Plan · paused",
+        "planWaiting": "Plan · waiting"
+      },
       "pastWindow": "Last {count, plural, one {# day} other {# days}}",
+      "pending": {
+        "title": "Waiting for {name}",
+        "body": "Plans, training and progress open up once the invite is accepted."
+      },
       "plans": {
         "assign": "Assign a plan",
         "hidePast": "Hide past plans",
         "none": "No plan assigned yet.",
         "showPast": "{count, plural, one {Show # past plan} other {Show # past plans}}"
       },
-      "progressLink": "Progress & records",
       "sections": {
-        "notes": "Your private notes",
         "plans": "Plans",
-        "sessions": "Sessions",
-        "thisWeek": "This week",
-        "training": "Training"
+        "thisWeek": "This week"
       },
       "sessions": {
+        "label": "Which sessions",
+        "noneOnDay": "No sessions on this day.",
         "nonePast": "No sessions together lately.",
         "noneUpcoming": "Nothing booked yet.",
         "past": "Past",
         "upcoming": "Upcoming"
       },
       "since": "Since {date}",
-      "trainingLink": "Plan & logged workouts",
+      "tabs": {
+        "overview": "Overview",
+        "sessions": "Sessions",
+        "training": "Training",
+        "progress": "Progress"
+      },
+      "training": {
+        "clearDay": "Show every day, not just {date}",
+        "empty": {
+          "all": "Nothing logged yet.",
+          "day": "Nothing on this day.",
+          "own": "Nothing they did on their own is shared with you yet.",
+          "plan": "No workouts from your plans yet.",
+          "skipped": "No skipped workouts."
+        },
+        "kinds": {
+          "all": "All",
+          "label": "Which workouts",
+          "own": "Own",
+          "plan": "From plan",
+          "skipped": "Skipped"
+        },
+        "legendOwn": "Their own",
+        "privacyNote": "Workouts your client does outside their plan stay private unless they share them, so this list may not be everything they did.",
+        "workouts": "Workouts"
+      },
       "upcomingWindow": "Next {count, plural, one {# day} other {# days}}",
       "viewProfile": "View profile",
       "week": {
@@ -344,9 +396,9 @@
         "footnote": "{completed} done · {skipped} skipped · {remaining} remaining",
         "label": "workouts done",
         "trend": {
-          "down": "{count, plural, one {# point down on last week} other {# points down on last week}}",
           "level": "Level with last week",
-          "up": "{count, plural, one {# point up on last week} other {# points up on last week}}"
+          "upFrom": "Up from {previous}%",
+          "downFrom": "Down from {previous}%"
         }
       }
     },
@@ -1149,6 +1201,10 @@
       "DISABLED": "Members can read and comment.",
       "OPEN": "Members post straight to the feed."
     },
+    "postWorkout": {
+      "label": "Workout",
+      "open": "Open {name} on their profile"
+    },
     "preview": {
       "locked": "Posts and members are visible once you join.",
       "notFound": {
@@ -1571,7 +1627,6 @@
     "exercises": "Exercises",
     "group": "Group",
     "groups": "Groups",
-    "history": "History",
     "inviteClient": "Invite client",
     "invoice": "Invoice",
     "manageGroup": "Manage group",
@@ -1593,13 +1648,11 @@
     "profile": "Profile",
     "program": "Program",
     "programs": "Programs",
-    "progress": "Progress",
     "resetPassword": "Reset password",
     "routine": "Routine",
     "session": "Session",
     "signIn": "Sign in",
     "starterRoutines": "Starter routines",
-    "training": "Training",
     "verifyEmail": "Verify email",
     "workout": "Workout",
     "workoutComplete": "Workout complete",
@@ -1806,14 +1859,13 @@
   },
   "person": {
     "about": "About",
-    "coaching": "Coaching",
     "contactShared": "{name} chose to share these.",
     "experience": "{count, plural, one {# year of experience} other {# years of experience}}",
     "groupsInCommon": "Groups in common",
     "memberSince": "On MotionHive since {date}.",
     "message": "Message",
-    "noDetails": "{name} hasn't added any profile details yet.",
-    "noDetailsAnonymous": "They haven't added any profile details yet.",
+    "noDetails": "{name} hasn't shared anything else here.",
+    "noDetailsAnonymous": "They haven't shared anything else here.",
     "rating": "{average} · {count, plural, one {# review} other {# reviews}}",
     "specialisesIn": "Specialises in",
     "unavailable": {
@@ -1822,17 +1874,56 @@
     },
     "viewPublicPage": "View public page",
     "details": "Details",
-    "localTime": "Local time"
-  },
-  "profileView": {
+    "localTime": "Local time",
     "loadFailed": "Couldn't load this profile",
-    "message": "Message",
-    "notFound": {
-      "message": "This person may have changed their handle or left MotionHive.",
-      "title": "Profile not found"
+    "workouts": {
+      "caption": "“{text}”",
+      "menu": "More for “{name}”",
+      "records": "{count, plural, one {# record} other {# records}}",
+      "report": {
+        "action": "Report workout",
+        "category": {
+          "HARASSMENT": "Harassment or hate",
+          "IMPERSONATION": "Pretending to be someone else",
+          "OTHER": "Something else",
+          "SCAM": "Scam or fraud",
+          "SEXUAL": "Nudity or sexual content",
+          "SPAM": "Spam or advertising"
+        },
+        "failed": "Couldn't send the report.",
+        "issue": "Reason",
+        "lead": "Tell the MotionHive team what's wrong with “{workout}”. {name} won't know it was you.",
+        "leadAnonymous": "Tell the MotionHive team what's wrong with “{workout}”. Whoever posted it won't know it was you.",
+        "notes": "Anything else we should know? (optional)",
+        "send": "Send report",
+        "sent": "Thanks. The MotionHive team will look into it.",
+        "title": "Report workout"
+      }
     },
-    "privateNote": "{name} keeps the rest of their profile private.",
-    "privateNoteAnonymous": "This person keeps the rest of their profile private."
+    "tabs": {
+      "activity": "Activity"
+    },
+    "preview": {
+      "anyone": "Anyone",
+      "coaches": "Your coaches",
+      "asAnyone": "Previewing as anyone on MotionHive",
+      "asCoaches": "Previewing as your coaches"
+    },
+    "activity": {
+      "publicHint": "Only workouts you set to Public appear here. You can change it on any workout.",
+      "coachesHint": "Your coaches also see the workouts you set to Coaches only. You can change it on any workout."
+    },
+    "coachSince": "Coaching you since {date}",
+    "editProfile": "Edit profile",
+    "workout": {
+      "title": "Workout",
+      "photoAlt": "Workout photo",
+      "records": "Records",
+      "unavailable": {
+        "title": "Workout not available",
+        "message": "It may have been made private or removed."
+      }
+    }
   },
   "programs": {
     "actions": {
@@ -1915,19 +2006,6 @@
         "weekDeleted": "Week {week} deleted"
       },
       "untitledProgram": "Untitled program"
-    },
-    "clientTraining": {
-      "empty": {
-        "heading": "Nothing yet",
-        "message": "Assign a program and their work will show up here."
-      },
-      "error": "Couldn't load their training",
-      "nothingLogged": "Nothing logged in this window.",
-      "plan": "Plan",
-      "planSubline": "{percent}% done · started {date}",
-      "privacyNote": "Workouts your client does outside their plan stay private unless they share them, so this list may not be everything they did.",
-      "recentWorkouts": "Recent workouts",
-      "titleFallback": "Training"
     },
     "common": {
       "clientFallback": "Client",
@@ -2020,6 +2098,7 @@
       "felt": "Felt {rating} out of 5",
       "howItWent": "How it went",
       "logged": "Logged",
+      "photoAlt": "Their workout photo",
       "quotedNote": "“{note}”",
       "title": "Workout",
       "whatTheyDid": "What they did"
@@ -2101,6 +2180,10 @@
     },
     "agenda": {
       "backToAgenda": "Back to agenda",
+      "calendar": {
+        "hide": "Hide the month",
+        "show": "Show the month"
+      },
       "dayConflicts": "{count, plural, one {# conflict at {time}} other {# conflicts at {time}}}",
       "dayTotal": "{sessions} · {duration} scheduled",
       "loadError": {
@@ -2116,11 +2199,7 @@
         "signups": "{count, plural, one {signup} other {signups}}",
         "thisWeek": "this week"
       },
-      "truncated": "Showing the first 100 sessions in this range. Narrow the dates to see further ahead.",
-      "view": {
-        "agenda": "Agenda",
-        "day": "Day"
-      }
+      "truncated": "Showing the first 100 sessions in this range. Narrow the dates to see further ahead."
     },
     "badge": {
       "pending": "{count} pending"
@@ -2341,11 +2420,6 @@
       },
       "title": "Message signups"
     },
-    "monthSheet": {
-      "jump": "Jump",
-      "jumpTo": "Jump to {date}",
-      "title": "Jump to"
-    },
     "noteSheet": {
       "helper": "Only you can see this. It stays with this person on this session.",
       "placeholder": "Kept favouring the left knee. Check next week.",
@@ -2413,6 +2487,7 @@
       "keepGoing": "Keep going",
       "newRoutine": "New routine",
       "progress": "Progress",
+      "routines": "Routines",
       "startFailed": "Could not start the workout",
       "startWorkout": "Start workout",
       "starterRoutines": "Starter routines",
@@ -2502,10 +2577,12 @@
         "dayLabel": "{date}: {state}",
         "done": "{count, plural, one {# done} other {# done}}",
         "expand": "Show the whole month",
+        "hide": "Hide the calendar",
         "legendCoach": "Coach plan",
         "legendSelf": "My workout",
         "legendSkipped": "Skipped",
         "loadError": "Couldn't load this month",
+        "show": "Show the calendar",
         "state": {
           "coach": "coach plan done",
           "none": "no workout",
@@ -2513,11 +2590,30 @@
           "skipped": "skipped"
         }
       },
-      "count": "{count, plural, one {# workout logged} other {# workouts logged}}",
+      "clearDay": "Show every day, not just {date}",
+      "countPhotos": "{count, plural, one {# workout with a photo} other {# workouts with photos}}",
+      "countRecords": "{count, plural, one {# workout with a record} other {# workouts with records}}",
       "empty": {
         "message": "Finish a workout and it will show up here.",
         "title": "Nothing logged yet"
-      }
+      },
+      "emptyDay": "Nothing on this day.",
+      "emptyPhotos": {
+        "message": "Add one on the summary when you finish a workout.",
+        "title": "No photos yet"
+      },
+      "emptyRecords": {
+        "message": "A workout lands here when you beat your best on an exercise.",
+        "title": "No records yet"
+      },
+      "filters": {
+        "all": "All",
+        "label": "Filter history",
+        "photo": "With photos",
+        "record": "Records"
+      },
+      "openPhoto": "{name}, {day}",
+      "weekOf": "Week of {date}"
     },
     "home": {
       "coldStart": {
@@ -2530,14 +2626,14 @@
       "fromYourCoach": "From your coach",
       "inProgress": "In progress · {elapsed}",
       "noRoutines": "Save a workout as a routine and it will show up here, ready to repeat.",
-      "openHistory": "Open history",
       "paused": "Paused · {elapsed}",
       "percentDone": "{percent}% done",
+      "startActions": "Start or create",
       "startEmpty": "Start empty workout",
       "startsOn": "Starts {date}",
       "weekOf": "Week {week} of {total}",
       "yourCoach": "Your coach",
-      "yourRoutines": "Your routines"
+      "yourRoutinesCount": "Your routines · {count}"
     },
     "keypad": {
       "backspace": "Backspace",
@@ -2561,7 +2657,8 @@
     },
     "logRow": {
       "coach": "Coach",
-      "repeat": "Repeat {name}"
+      "repeat": "Repeat {name}",
+      "records": "{count, plural, one {# record} other {# records}}"
     },
     "logger": {
       "addExercise": "Add exercise",
@@ -2633,6 +2730,19 @@
       "setsDone": "{done} of {total, plural, one {# set} other {# sets}}",
       "week": "Week {number}"
     },
+    "photo": {
+      "actionsTitle": "Workout photo",
+      "add": "Add a photo",
+      "addHint": "A selfie, the gym, the view. Only people who can see this workout see it.",
+      "alt": "Your workout photo",
+      "change": "Change photo",
+      "remove": "Remove photo",
+      "toast": {
+        "removeFailed": "Could not remove the photo",
+        "unreadable": "Could not open that photo",
+        "uploadFailed": "Could not add the photo"
+      }
+    },
     "plan": {
       "allWeeks": "All weeks",
       "doneCount": "{done} / {total} done",
@@ -2674,7 +2784,8 @@
         "title": "Nothing to show yet"
       },
       "last12Weeks": "Last 12 weeks",
-      "records": "Records"
+      "records": "Records",
+      "recordLine": "Est. 1RM · {date}"
     },
     "restAlert": {
       "body": "Time for your next set.",
@@ -2766,6 +2877,19 @@
         "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}"
       },
       "fromNote": "From your note",
+      "group": {
+        "done": "Shared in {group}",
+        "failed": "Could not share it in the group",
+        "hint": "Members see the card and your message. Never your note, weights or photo.",
+        "none": "None of your groups take posts from members yet.",
+        "pending": "Sent to {group}. It shows once the group approves it.",
+        "title": "Or share it in a group"
+      },
+      "look": {
+        "badge": "Full photo",
+        "comb": "Honeycomb",
+        "strip": "Honey band"
+      },
       "message": "Your message",
       "messagePlaceholder": "Say something about it",
       "onCard": "On the card",
@@ -2811,10 +2935,16 @@
       "upNextWithDate": "Up next · {date}"
     },
     "units": {
-      "hours": "{value} h",
       "kg": "{value} kg",
       "kgShort": "kg",
       "meters": "{value} m"
+    },
+    "memory": {
+      "monthsAgo": "{count, plural, one {A month ago} other {# months ago}}",
+      "yearsAgo": "{count, plural, one {A year ago} other {# years ago}}",
+      "progress": "{exercise}: {from} → {to} kg",
+      "line": "Look how far you've come since.",
+      "open": "Open {name}"
     }
   },
   "feedback": {
@@ -2854,7 +2984,8 @@
   "workoutVisibility": {
     "hint": {
       "COACHES_ONLY": "Your active coaches, with your rating and note.",
-      "ONLY_ME": "Just you. A coach still sees workouts from their own plan."
+      "ONLY_ME": "Just you. A coach still sees workouts from their own plan.",
+      "PUBLIC": "Anyone who opens your profile, without your note or weights."
     },
     "newWorkouts": "New workouts",
     "planCoachNote": "{name} always sees workouts from their plan.",
@@ -2862,6 +2993,7 @@
     "section": "Your workouts",
     "sectionNote": "Where each new workout starts. You can change any single one from its summary.",
     "sheetTitle": "Who sees this workout?",
+    "takenDown": "Removed from your profile after a report, so it can't be public or shared.",
     "visibleTo": "Visible to",
     "youAndCoach": "You and {name}"
   }

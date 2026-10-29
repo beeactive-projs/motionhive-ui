@@ -36,6 +36,10 @@ import {
   logTone,
   monthDoneCount,
   oneRepMaxDelta,
+  logMonths,
+  logWeeks,
+  memoryWhen,
+  monthTicks,
   oneRepMaxPoints,
   planPositionLabel,
   planWeekLabel,
@@ -318,6 +322,79 @@ describe('workouts config', () => {
     // A retest can come in lower.
     const lower = [point(90, new Date(2026, 8, 5), OneRepMaxSource.Tested), point(85, new Date(2026, 8, 20), OneRepMaxSource.Manual)];
     expect(oneRepMaxDelta(lower, '12w', now)).toBe(-5);
+  });
+
+  // History's photo grid: the month each was finished in, newest first.
+  it('groups logs by the local month they were finished, newest first', () => {
+    const log = (id: string, completedAt: Date | null, startedAt = new Date(2026, 9, 1)) =>
+      ({
+        id,
+        completedAt: completedAt?.toISOString() ?? null,
+        startedAt: startedAt.toISOString(),
+      }) as never;
+    const months = logMonths([
+      log('sep', new Date(2026, 8, 30, 20)),
+      log('oct-a', new Date(2026, 9, 22, 9)),
+      log('oct-b', new Date(2026, 9, 2, 9)),
+    ]);
+    expect(months.map((m) => [m.key, m.logs.map((l: { id: string }) => l.id)])).toEqual([
+      ['2026-10', ['oct-a', 'oct-b']],
+      ['2026-09', ['sep']],
+    ]);
+  });
+
+  // The coach's Training list: a card per Monday-first week, newest first.
+  it('groups logs by the local week they started in, Monday first', () => {
+    const log = (id: string, startedAt: Date) =>
+      ({ id, startedAt: startedAt.toISOString() }) as never;
+    const weeks = logWeeks([
+      log('sun', new Date(2026, 9, 25, 20)),
+      log('mon', new Date(2026, 9, 26, 7)),
+      log('wed', new Date(2026, 9, 28, 18)),
+      log('prev-mon', new Date(2026, 9, 19, 9)),
+    ]);
+    expect(weeks.map((w) => [w.key, w.logs.map((l: { id: string }) => l.id)])).toEqual([
+      ['2026-10-26', ['mon', 'wed']],
+      ['2026-10-19', ['sun', 'prev-mon']],
+    ]);
+  });
+
+  it('names how far back a memory is, in months or whole years', () => {
+    expect(memoryWhen(1)).toBe('A month ago');
+    expect(memoryWhen(6)).toBe('6 months ago');
+    expect(memoryWhen(12)).toBe('A year ago');
+  });
+
+  // Evenly spaced ticks put two in September and read "Sep Sep"; a month
+  // name sits where its month begins, once.
+  it('ticks each month where it begins, at most a few of them', () => {
+    const from = new Date(2026, 7, 5).getTime();
+    const to = new Date(2026, 9, 28).getTime();
+    expect(monthTicks(from, to, 4).map((at) => new Date(at).getMonth())).toEqual([8, 9]);
+
+    const year = monthTicks(new Date(2025, 9, 28).getTime(), to, 4);
+    expect(year.length).toBeLessThanOrEqual(4);
+    expect(new Set(year.map((at) => new Date(at).getMonth())).size).toBe(year.length);
+    for (const at of year) expect(new Date(at).getDate()).toBe(1);
+  });
+
+  // Two workouts on one day drew a vertical line; when that day is all there
+  // is, it is one dot.
+  it("draws one point per day, the day's best", () => {
+    const now = new Date(2026, 8, 30, 15).getTime();
+    const point = (weightKg: number, when: Date) => ({
+      weightKg,
+      recordedAt: when.toISOString(),
+      source: OneRepMaxSource.EstimatedEpley,
+    });
+    const oneDay = [point(80, new Date(2026, 8, 20, 9)), point(86, new Date(2026, 8, 20, 18))];
+    expect(oneRepMaxPoints(oneDay, '4w', now)).toEqual([
+      { x: new Date(2026, 8, 20, 18).getTime(), y: 86 },
+    ]);
+    expect(oneRepMaxDelta(oneDay, '4w', now)).toBeNull();
+
+    const twoDays = [...oneDay, point(88, new Date(2026, 8, 25, 7))];
+    expect(oneRepMaxPoints(twoDays, '4w', now).map((p) => p.y)).toEqual([86, 88, 88]);
   });
 
   // Ranked by estimated 1RM, not by weight: five reps at 72.5 is the better

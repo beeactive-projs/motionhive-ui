@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" [text]="'button.cancel' | translate" />
+      <ion-back-button [defaultHref]="backHref" [text]="'button.cancel' | translate" />
     </ion-buttons>
     <ion-title>{{ 'groups.compose.title' | translate }}</ion-title>
     <ion-buttons slot="end">
@@ -33,7 +33,6 @@
     @if (groupName(); as name) {
     <p class="destination">{{ 'groups.compose.postingIn' | translate }} <strong>{{ name }}</strong></p>
     }
-
     @if (needsApproval()) {
     <!-- Said before they write, not after: the API returns success either
          way and only `approvalState` tells the two apart. -->

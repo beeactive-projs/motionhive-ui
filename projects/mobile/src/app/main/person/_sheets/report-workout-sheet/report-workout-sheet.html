@@ -1,0 +1,58 @@
+<ng-template #body>
+  <p class="mh-helper lead">
+    @if (ownerName()) {
+      {{
+        'person.workouts.report.lead'
+          | translate: { workout: workout()?.name ?? '', name: ownerName() }
+      }}
+    } @else {
+      {{ 'person.workouts.report.leadAnonymous' | translate: { workout: workout()?.name ?? '' } }}
+    }
+  </p>
+
+  <section class="mh-section">
+    <span class="mh-kicker">{{ 'person.workouts.report.issue' | translate }}</span>
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (option of categories; track option) {
+        <ion-item
+          button
+          [detail]="false"
+          [attr.aria-current]="option === category() ? 'true' : null"
+          (click)="category.set(option)"
+        >
+          <ion-label class="ion-text-wrap">{{
+            'person.workouts.report.category.' + option | translate
+          }}</ion-label>
+          @if (option === category()) {
+            <ion-icon slot="end" name="checkmark-outline" color="primary" aria-hidden="true" />
+          }
+        </ion-item>
+      }
+    </ion-list>
+  </section>
+
+  <ion-textarea
+    mode="md"
+    fill="outline"
+    [autoGrow]="true"
+    [rows]="3"
+    [maxlength]="notesMaxLength"
+    [label]="'person.workouts.report.notes' | translate"
+    labelPlacement="stacked"
+    [value]="notes()"
+    (ionInput)="notes.set($event.detail.value ?? '')"
+  />
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'person.workouts.report.title' | translate"
+  [saveLabel]="'person.workouts.report.send' | translate"
+  [dismissLabel]="'button.cancel' | translate"
+  [body]="body"
+  [canSave]="canSend()"
+  [saving]="sending()"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  (save)="send()"
+/>

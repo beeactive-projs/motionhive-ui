@@ -57,6 +57,26 @@ export function startOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
+/** The bounds a list endpoint takes for a span of local days. */
+export interface DateRange {
+  dateFrom: string;
+  dateTo: string;
+}
+
+/** The local day `key` names, midnight to midnight. */
+export function dayRange(key: string): DateRange {
+  const from = dayFromKey(key);
+  const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
+  return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
+}
+
+/** The month containing `date`, from its first local midnight to the next month's. */
+export function monthRange(date: Date): DateRange {
+  const from = startOfMonth(date);
+  const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+  return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
+}
+
 /**
  * Calendar-relative short time: `08:00` today, `Wed` inside the last week,
  * `9 Aug` before that.

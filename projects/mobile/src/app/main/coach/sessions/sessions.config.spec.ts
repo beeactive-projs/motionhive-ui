@@ -430,7 +430,7 @@ describe('window fitting', () => {
     expect(out.end.getMonth()).toBe(5);
   });
 
-  // The regression this whole helper exists for: paging the month sheet forward
+  // The regression this whole helper exists for: paging the month card forward
   // used to widen one window past the BE's cap, and every request after that
   // 400'd into the error screen.
   it('never exceeds the cap however far the cursor is paged', async () => {

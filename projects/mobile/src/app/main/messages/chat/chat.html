@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/messages" />
+      <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
 
     <ion-title>
@@ -52,11 +52,9 @@
       </ion-button>
     </div>
   }
-
   @if (loading() && !hasLoaded()) {
     <mh-thread-skeleton />
   }
-
   @if (isDraft()) {
     <ion-note class="mh-note-block ion-text-center">
       {{ 'messages.chat.draftStart' | translate: { name: title() } }}
@@ -64,7 +62,6 @@
   } @else if (isEmpty()) {
     <ion-note class="mh-note-block ion-text-center">{{ 'messages.chat.empty' | translate }}</ion-note>
   }
-
   @for (bubble of bubbles(); track bubble.message.id) {
     @if (bubble.startsNewDay) {
       <div class="day mh-day-pill">

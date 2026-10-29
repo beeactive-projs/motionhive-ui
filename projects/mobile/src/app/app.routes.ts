@@ -91,13 +91,11 @@ export const routes: Routes = [
         loadChildren: () => import('./main/groups/groups.routes').then((m) => m.groupsRoutes),
       },
       {
-        // Someone else's profile, by handle — web's `/@<handle>`. Top-level
-        // rather than nested under groups: a name is tappable from members,
-        // posts and comments, and eventually from sessions and messages too.
+        // The old profile address, kept so restored URLs and links from
+        // before the merge land on the one Person screen, in Groups where
+        // they used to come from.
         path: 'u/:handle',
-        loadComponent: () =>
-          import('./main/profile-view/profile-view').then((m) => m.ProfileView),
-        title: 'pageTitle.profile',
+        redirectTo: 'groups/person/:handle',
       },
       {
         path: 'programs',

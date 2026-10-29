@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
@@ -14,6 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthStore, showApiError, type PaginatedResponse } from 'core';
 import { AdminModerationService } from '../../_data/services/admin-moderation.service';
@@ -22,6 +17,7 @@ import { getPath } from '../../_data/cell.util';
 
 type SectionKey =
   | 'reports'
+  | 'workoutReports'
   | 'velocity'
   | 'posts'
   | 'reviews'
@@ -39,7 +35,10 @@ interface Section {
 
 const SECTIONS: Section[] = [
   {
-    key: 'reports', label: 'Reports', access: 'msg', searchable: false,
+    key: 'reports',
+    label: 'Reports',
+    access: 'msg',
+    searchable: false,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'category', label: 'Category' },
@@ -49,7 +48,27 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'velocity', label: 'Velocity alarms', access: 'msg', searchable: false,
+    key: 'workoutReports',
+    label: 'Workout reports',
+    access: 'content',
+    searchable: false,
+    columns: [
+      { path: 'createdAt', label: 'When' },
+      { path: 'category', label: 'Category' },
+      { path: 'status', label: 'Status' },
+      { path: 'owner.email', label: 'Owner' },
+      { path: 'workoutLog.name', label: 'Workout' },
+      { path: 'workoutLog.shareCaption', label: 'Message' },
+      { path: 'workoutLog.hasPhoto', label: 'Photo' },
+      { path: 'notes', label: 'Notes' },
+      { path: 'takenDown', label: 'Taken down' },
+    ],
+  },
+  {
+    key: 'velocity',
+    label: 'Velocity alarms',
+    access: 'msg',
+    searchable: false,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'userId', label: 'User' },
@@ -59,7 +78,10 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'posts', label: 'Posts', access: 'content', searchable: true,
+    key: 'posts',
+    label: 'Posts',
+    access: 'content',
+    searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'author.email', label: 'Author' },
@@ -68,7 +90,10 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'reviews', label: 'Reviews', access: 'content', searchable: true,
+    key: 'reviews',
+    label: 'Reviews',
+    access: 'content',
+    searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'author.email', label: 'Author' },
@@ -77,7 +102,10 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'feedback', label: 'Feedback', access: 'admin', searchable: true,
+    key: 'feedback',
+    label: 'Feedback',
+    access: 'admin',
+    searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'type', label: 'Type' },
@@ -86,7 +114,10 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'waitlist', label: 'Waitlist', access: 'admin', searchable: true,
+    key: 'waitlist',
+    label: 'Waitlist',
+    access: 'admin',
+    searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'email', label: 'Email' },
@@ -111,6 +142,7 @@ const REPORT_CATEGORIES = ['SPAM', 'SCAM', 'HARASSMENT', 'IMPERSONATION', 'SEXUA
     InputTextModule,
     CheckboxModule,
     ConfirmDialogModule,
+    DialogModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './moderation.html',
@@ -122,10 +154,8 @@ export class Moderation {
   private readonly _messages = inject(MessageService);
   private readonly _confirm = inject(ConfirmationService);
 
-  private readonly isMsgStaff =
-    this._authStore.isSuperAdmin() || this._authStore.isSupport();
-  private readonly isAdminPlus =
-    this._authStore.isAdmin() || this._authStore.isSuperAdmin();
+  private readonly isMsgStaff = this._authStore.isSuperAdmin() || this._authStore.isSupport();
+  private readonly isAdminPlus = this._authStore.isAdmin() || this._authStore.isSuperAdmin();
 
   readonly reportStatuses = REPORT_STATUSES;
   readonly reportCategories = REPORT_CATEGORIES;
@@ -150,6 +180,9 @@ export class Moderation {
   reportStatus: string | null = null;
   reportCategory: string | null = null;
   velocityIncludeReviewed = false;
+
+  /** The reported photo on screen, as an object URL revoked on close. */
+  readonly photoUrl = signal<string | null>(null);
 
   constructor() {
     this.reload();
@@ -190,7 +223,14 @@ export class Moderation {
     const q = this.q || undefined;
     switch (this.section) {
       case 'reports':
-        return this._mod.reports(p, l, this.reportStatus ?? undefined, this.reportCategory ?? undefined);
+        return this._mod.reports(
+          p,
+          l,
+          this.reportStatus ?? undefined,
+          this.reportCategory ?? undefined,
+        );
+      case 'workoutReports':
+        return this._mod.workoutReports(p, l, this.reportStatus ?? undefined);
       case 'velocity':
         return this._mod.velocityAlarms(p, l, this.velocityIncludeReviewed);
       case 'posts':
@@ -226,6 +266,64 @@ export class Moderation {
         this.load();
       },
       error: (err) => showApiError(this._messages, 'Report', 'Failed', err),
+    });
+  }
+
+  isOpenReport(row: DbRow): boolean {
+    return row['status'] === 'OPEN' || row['status'] === 'REVIEWING';
+  }
+
+  hasPhoto(row: DbRow): boolean {
+    return (row['workoutLog'] as { hasPhoto?: boolean } | null)?.hasPhoto === true;
+  }
+
+  showPhoto(row: DbRow): void {
+    this._mod.workoutReportPhoto(String(row['id'])).subscribe({
+      next: (blob) => this.photoUrl.set(URL.createObjectURL(blob)),
+      error: (err) => showApiError(this._messages, 'Photo', 'Failed to load', err),
+    });
+  }
+
+  closePhoto(): void {
+    const url = this.photoUrl();
+    if (url) URL.revokeObjectURL(url);
+    this.photoUrl.set(null);
+  }
+
+  /**
+   * Take down: off the profile and every group card, Only me, never Public
+   * again. The owner is told why. Asked first, because it cannot be undone
+   * from here.
+   */
+  takeDown(row: DbRow): void {
+    this._confirm.confirm({
+      header: 'Take down workout',
+      message:
+        'Remove this workout from public view for good? It leaves the profile and group posts, and the owner is told why.',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this._resolveWorkoutReport(row, 'RESOLVED', true),
+    });
+  }
+
+  dismissWorkoutReport(row: DbRow): void {
+    this._resolveWorkoutReport(row, 'DISMISSED', false);
+  }
+
+  private _resolveWorkoutReport(
+    row: DbRow,
+    status: 'RESOLVED' | 'DISMISSED',
+    takeDown: boolean,
+  ): void {
+    this._mod.resolveWorkoutReport(String(row['id']), status, takeDown).subscribe({
+      next: () => {
+        this._messages.add({
+          severity: 'success',
+          summary: 'Workout report',
+          detail: takeDown ? 'Taken down' : status,
+        });
+        this.load();
+      },
+      error: (err) => showApiError(this._messages, 'Workout report', 'Failed', err),
     });
   }
 

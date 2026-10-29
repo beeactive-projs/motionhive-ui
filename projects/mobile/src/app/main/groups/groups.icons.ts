@@ -1,6 +1,7 @@
 import {
   addOutline,
   alertCircleOutline,
+  barbellOutline,
   chatbubbleOutline,
   checkmarkCircleOutline,
   chevronBackOutline,
@@ -41,6 +42,7 @@ import {
 export const GROUP_ICONS = {
   addOutline,
   alertCircleOutline,
+  barbellOutline,
   chatbubbleOutline,
   checkmarkCircleOutline,
   chevronBackOutline,

@@ -39,6 +39,7 @@ import { PostGallery } from './_components/post-gallery/post-gallery';
 import { GROUP_ICONS } from './groups.icons';
 import { GroupsSegments, MIN_SEARCH_LENGTH } from './groups.filters';
 import { GroupsStore } from './groups.store';
+import { PostWorkoutCard } from './_components/post-workout/post-workout';
 
 /**
  * The Groups hub: what's happening, what you could join, what you're in.
@@ -54,6 +55,7 @@ import { GroupsStore } from './groups.store';
 @Component({
   selector: 'mh-groups',
   imports: [
+    PostWorkoutCard,
     EmptyState,
     HexAvatar,
     IonBackButton,

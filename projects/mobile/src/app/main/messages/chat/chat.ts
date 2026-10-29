@@ -44,6 +44,12 @@ import {
 } from 'core';
 
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import {
+  ProfileStacks,
+  chatBase,
+  personBase,
+  stackRootOf,
+} from '../../../_shared/utils/stack-paths';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { ChatComposer } from '../_components/chat-composer/chat-composer';
 import { MessageBubble } from '../_components/message-bubble/message-bubble';
@@ -157,6 +163,10 @@ function clearResizedBody(): void {
 export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  /** The stack this chat was opened in; its links and back stay there. */
+  private readonly _stack = stackRootOf(this._router.url);
+  /** Back on a cold load: the Messages list, or the stack the chat was opened from. */
+  readonly backHref = this._stack ?? ProfileStacks.Messages;
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
   private readonly _translateService = inject(TranslateService);
@@ -655,11 +665,11 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
 
   openProfile(): void {
     const handle = this.handle();
-    if (handle) void this._router.navigate(['/tabs/messages/person', handle]);
+    if (handle) void this._router.navigate([personBase(this._stack), handle]);
   }
 
   openDetails(): void {
     const id = this.conversationId();
-    if (id) void this._router.navigate(['/tabs/messages', id, 'details']);
+    if (id) void this._router.navigate([chatBase(this._stack), id, 'details']);
   }
 }

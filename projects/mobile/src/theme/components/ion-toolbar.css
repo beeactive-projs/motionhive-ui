@@ -61,10 +61,12 @@
   align-self: center;
 }
 
-/* A translucent iOS header sets `--opacity: .8` on its toolbars for the bar's
-   background, and ion-button reads the same name for itself without setting
-   it, so every header button inherited the fade (honey + at 80%). */
-.header-translucent-ios ion-button {
+/* A translucent iOS header or footer sets `--opacity: .8` on its toolbars
+   for the bar's background, and ion-button reads the same name for itself
+   without setting it, so every button in one inherited the fade: honey + at
+   80% in a header, and a pinned footer CTA the page's text showed through. */
+.header-translucent-ios ion-button,
+.footer-translucent-ios ion-button {
   --opacity: 1;
 }
 

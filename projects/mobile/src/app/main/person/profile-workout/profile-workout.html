@@ -1,0 +1,99 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="profileUrl()" />
+    </ion-buttons>
+    <ion-title>{{ 'person.workout.title' | translate }}</ion-title>
+    @if (workout() && !isSelf()) {
+      <ion-buttons slot="end">
+        <ion-button
+          shape="round"
+          [attr.aria-label]="'person.workouts.menu' | translate: { name: workout()?.name }"
+          (click)="menuOpen.set(true)"
+        >
+          <ion-icon slot="icon-only" name="ellipsis-horizontal" />
+        </ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    @if (unavailable()) {
+      <mh-empty-state
+        icon="lock-closed-outline"
+        [heading]="'person.workout.unavailable.title' | translate"
+        [message]="'person.workout.unavailable.message' | translate"
+      />
+    } @else if (loading()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+          <ion-label>
+            <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
+            <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.5rem" />
+    } @else if (workout(); as session) {
+      <!-- Who did it, and the way back to the rest of their page. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="true" (click)="openProfile()">
+          <mh-hex-avatar
+            slot="start"
+            size="md"
+            aria-hidden="true"
+            [name]="name()"
+            [imageUrl]="person()?.avatarUrl ?? null"
+            [color]="tone()"
+          />
+          <ion-label>
+            <h3>{{ name() }}</h3>
+            <p>&#64;{{ person()?.handle }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      @if (photoUrl(); as src) {
+        <img class="photo" [src]="src" [alt]="'person.workout.photoAlt' | translate" />
+      }
+
+      <section class="mh-section">
+        @if (day(); as when) {
+          <span class="mh-kicker">{{ when }}</span>
+        }
+        <h1 class="name">{{ session.name }}</h1>
+        @if (session.shareCaption; as caption) {
+          <p class="caption">{{ caption }}</p>
+        }
+      </section>
+
+      @if (tiles().length > 0) {
+        <div class="mh-tiles">
+          @for (tile of tiles(); track tile.label) {
+            <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+          }
+        </div>
+      }
+    }
+  </div>
+</ion-content>
+
+@if (workout(); as session) {
+  @if (!isSelf()) {
+    <mh-action-sheet
+      [(open)]="menuOpen"
+      [title]="session.name"
+      [actions]="actions"
+      (chosen)="onAction($event)"
+    />
+    <mh-report-workout-sheet
+      [(open)]="reportOpen"
+      [workout]="session"
+      [handle]="person()?.handle ?? ''"
+      [ownerName]="person()?.firstName ?? ''"
+    />
+  }
+}

@@ -56,6 +56,27 @@ export function clientSubline(client: InstructorClient): string {
   return client.client ? clientEmail(client) : translate('clients.row.notOnPlatform');
 }
 
+// ── Client page tabs ────────────────────────────────────────────────────────
+
+/** The client page's four tabs, the web client page's order. */
+export const ClientTabs = {
+  Overview: 'overview',
+  Sessions: 'sessions',
+  Training: 'training',
+  Progress: 'progress',
+} as const;
+
+export type ClientTab = (typeof ClientTabs)[keyof typeof ClientTabs];
+
+const CLIENT_TAB_VALUES = Object.values(ClientTabs) as readonly string[];
+
+/** A tab named in a link (`?tab=training`), or Overview for anything else. */
+export function clientTabFrom(value: unknown): ClientTab {
+  return typeof value === 'string' && CLIENT_TAB_VALUES.includes(value)
+    ? (value as ClientTab)
+    : ClientTabs.Overview;
+}
+
 // ── Client actions ──────────────────────────────────────────────────────────
 
 export const ClientActionIds = {

@@ -1,4 +1,22 @@
 <ng-template #body>
+  @if (templates().length > 1) {
+    <div class="mh-chip-cloud looks">
+      @for (look of templates(); track look) {
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="template() === look"
+          [attr.aria-pressed]="template() === look"
+          (click)="pickTemplate(look)"
+        >
+          {{ 'workouts.share.look.' + look | translate }}
+        </ion-button>
+      }
+    </div>
+  }
+
   <!-- The image that will be sent, redrawn as the choices change. -->
   <div class="preview">
     @if (preview(); as src) {
@@ -52,6 +70,34 @@
       </ion-button>
     }
   </div>
+
+  <!-- The card as a post, in a group of yours that takes one. -->
+  @if (postableGroups(); as groups) {
+    <div class="mh-section-label groups-label">{{ 'workouts.share.group.title' | translate }}</div>
+    @if (groups.length > 0) {
+      <div class="mh-chip-cloud">
+        @for (group of groups; track group.id) {
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [disabled]="!!sharingTo()"
+            (click)="shareToGroup(group)"
+          >
+            @if (sharingTo() === group.id) {
+              <ion-spinner name="crescent" />
+            } @else {
+              {{ group.name }}
+            }
+          </ion-button>
+        }
+      </div>
+      <p class="mh-helper">{{ 'workouts.share.group.hint' | translate }}</p>
+    } @else {
+      <p class="mh-helper">{{ 'workouts.share.group.none' | translate }}</p>
+    }
+  }
 </ng-template>
 
 <mh-sheet-shell

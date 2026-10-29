@@ -28,6 +28,7 @@ import { Exercise, PrescribedExercise, Program, ProgramService, ProgramWorkout }
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { coachStackOf } from '../../clients/client-paths';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../../workouts/_components/exercise-card/exercise-card';
 import { DEFAULT_SETS } from '../../workouts/workouts.config';
@@ -74,6 +75,8 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   private readonly _programService = inject(ProgramService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  /** Programs, or Clients when the plan was opened from a client's page. */
+  private readonly _stack = coachStackOf(this._router.url);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
 
@@ -113,7 +116,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   /** Where back lands when there is no stack to pop — a reload, a deep link. */
   readonly builderUrl = computed(() => {
     const id = this.program()?.id;
-    return id ? `/tabs/programs/program/${id}` : '/tabs/programs';
+    return id ? `${this._stack}/program/${id}` : this._stack;
   });
 
   readonly eyebrow = computed(() => {
@@ -226,7 +229,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   }
 
   openExercise(row: PrescribedExercise): void {
-    void this._router.navigate(['/tabs/programs/exercise', row.exerciseId]);
+    void this._router.navigate([this._stack, 'exercise', row.exerciseId]);
   }
 
   /**
@@ -275,7 +278,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     this.saving.set(false);
     // Back to the week card this came from, not the library — but only
     // with the day saved; leaving on a failed save is how a rename is lost.
-    if (saved) void this._router.navigate(['/tabs/programs/program', programId]);
+    if (saved) void this._router.navigate([this._stack, 'program', programId]);
   }
 
   load(): void {

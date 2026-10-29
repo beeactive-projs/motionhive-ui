@@ -2,10 +2,12 @@ import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { WorkoutLog, translate } from 'core';
+import { WorkoutLog, WorkoutLogStatus, translate } from 'core';
 
 import { BadgeTones } from '../../../exercises/exercises.config';
 import { LogSources, dateRail, logChip, logMeta, logSource, logTone } from '../../workouts.config';
+import { addIcons } from 'ionicons';
+import { chevronForwardOutline, refreshOutline } from 'ionicons/icons';
 
 /**
  * One logged workout: a date rail on the left, the name and what the session
@@ -35,17 +37,37 @@ export class LogRow {
 
   readonly tone = computed(() => logTone(this.log()));
 
+  /** A skipped plan day is a record of a choice, with no log behind it to open. */
+  readonly openable = computed(() => this.log().status !== WorkoutLogStatus.Skipped);
+
   readonly rail = computed(() => dateRail(this.log().startedAt));
 
   readonly meta = computed(() => logMeta(this.log()));
 
   readonly chip = computed(() => logChip(this.log()));
 
+  /** "1 record": beating a previous best, the one thing a row celebrates. */
+  readonly records = computed(() => {
+    const count = this.log().prCount ?? 0;
+    return count > 0
+      ? { label: translate('workouts.logRow.records', { count }), tone: BadgeTones.Honey }
+      : null;
+  });
+
   readonly sourceChip = computed(() =>
     this.showSource() && logSource(this.log()) === LogSources.Coach
       ? { label: translate('workouts.logRow.coach'), tone: BadgeTones.Navy }
       : null,
   );
+
+  constructor() {
+    // Its own glyphs: the row sits on pages that register others.
+    addIcons({ chevronForwardOutline, refreshOutline });
+  }
+
+  onSelect(): void {
+    if (this.openable()) this.select.emit();
+  }
 
   onRepeat(event: Event): void {
     // Inside the row's own tap target; without this Repeat also opens the log.

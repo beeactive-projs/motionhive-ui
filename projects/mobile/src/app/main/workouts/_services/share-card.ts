@@ -134,6 +134,10 @@ export interface CardPalette {
   tag: string;
   tagInk: string;
   sparks: string[];
+  /** Fixed in both themes, for text on honey or on a white badge over a photo. */
+  navy: string;
+  slate: string;
+  wash: string;
 }
 
 /**
@@ -142,6 +146,11 @@ export interface CardPalette {
  */
 export function cardPalette(dark: boolean, token: (name: string) => string): CardPalette {
   const sparks = [token('--mh-teal-400'), token('--mh-coral-400'), token('--mh-violet-400')];
+  const fixed = {
+    navy: token('--mh-navy-900'),
+    slate: token('--mh-slate-600'),
+    wash: token('--mh-primary-50'),
+  };
   return dark
     ? {
         dark,
@@ -160,6 +169,7 @@ export function cardPalette(dark: boolean, token: (name: string) => string): Car
         tag: token('--mh-primary-500'),
         tagInk: token('--mh-navy-900'),
         sparks,
+        ...fixed,
       }
     : {
         dark,
@@ -178,6 +188,7 @@ export function cardPalette(dark: boolean, token: (name: string) => string): Car
         tag: token('--mh-navy-900'),
         tagInk: '#ffffff',
         sparks,
+        ...fixed,
       };
 }
 
@@ -199,6 +210,28 @@ export const CARD_FONTS = [font(800, 92, 'Poppins'), font(700, 60), font(600, 34
 
 const CENTER = CARD_WIDTH / 2;
 const CONTENT_WIDTH = 900;
+
+/**
+ * The card's look. `comb` needs no photo; the other two are built around
+ * one (designs 8d and 8g): the picture is the hero, and the brand sits in
+ * a band or a badge that never covers the middle of it.
+ */
+export type CardTemplate = 'comb' | 'strip' | 'badge';
+
+export const PHOTO_TEMPLATES: readonly CardTemplate[] = ['strip', 'badge'];
+
+/** Draws the card in the chosen look; the photo ones fall back to `comb` without a photo. */
+export function drawCard(
+  ctx: CanvasRenderingContext2D,
+  content: ShareCardContent,
+  palette: CardPalette,
+  template: CardTemplate,
+  photo: CanvasImageSource | null,
+): void {
+  if (template === 'strip' && photo) drawPhotoStrip(ctx, content, palette, photo);
+  else if (template === 'badge' && photo) drawPhotoBadge(ctx, content, palette, photo);
+  else drawShareCard(ctx, content, palette);
+}
 
 /** Draws the whole card onto a 1080 × 1920 context. */
 export function drawShareCard(ctx: CanvasRenderingContext2D, content: ShareCardContent, palette: CardPalette): void {
@@ -245,6 +278,179 @@ export function drawShareCard(ctx: CanvasRenderingContext2D, content: ShareCardC
   }
 
   drawSite(ctx, content.site, palette, Math.max(y + 90, SAFE_BOTTOM - 30));
+}
+
+/** Height of the honey band under the photo on the strip card. */
+const BAND_TOP = 1100;
+
+/**
+ * 8d: the photo above, a honey band below like a signature colour, the
+ * logo's hex breaking out of the band's top edge.
+ */
+function drawPhotoStrip(
+  ctx: CanvasRenderingContext2D,
+  content: ShareCardContent,
+  palette: CardPalette,
+  photo: CanvasImageSource,
+): void {
+  drawCover(ctx, photo, 0, 0, CARD_WIDTH, BAND_TOP);
+  ctx.fillStyle = palette.honey;
+  ctx.fillRect(0, BAND_TOP, CARD_WIDTH, CARD_HEIGHT - BAND_TOP);
+
+  // The logo in a navy hex, half out of the band.
+  const hexWidth = 150;
+  const scale = hexWidth / 100;
+  ctx.save();
+  ctx.translate(CARD_WIDTH - 80 - hexWidth, BAND_TOP - 70 - 6.7 * scale);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = palette.navy;
+  ctx.fill(new Path2D(HEX_PATH));
+  ctx.restore();
+  drawMark(ctx, palette.honey, CARD_WIDTH - 80 - hexWidth / 2, BAND_TOP - 70 + 66, 66);
+
+  const ink = stripInk(palette);
+  ctx.textAlign = 'left';
+  let y = BAND_TOP + 130;
+  ctx.fillStyle = ink;
+  setText(ctx, font(800, 84, 'Poppins'), 0);
+  for (const line of wrap(ctx, content.title, 760, 2)) {
+    ctx.fillText(line, 80, y);
+    y += 92;
+  }
+  setText(ctx, font(700, 40), 2);
+  ctx.fillText(fit(ctx, statsLine(content), 920), 80, y + 4);
+  y += 70;
+  if (content.record) {
+    setText(ctx, font(600, 34), 0);
+    ctx.fillText(fit(ctx, `🏆 ${content.record}`, 920), 80, y);
+    y += 56;
+  }
+  if (content.caption) {
+    setText(ctx, font(600, 36), 0);
+    ctx.fillText(fit(ctx, `“${content.caption}”`, 920), 80, y);
+    y += 56;
+  }
+  setText(ctx, font(600, 28), 6);
+  ctx.globalAlpha = 0.8;
+  ctx.fillText(content.site.toUpperCase(), 80, Math.min(Math.max(y + 30, 1500), SAFE_BOTTOM));
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'center';
+}
+
+/**
+ * 8g: the photo untouched, full bleed, with a small stats badge in the
+ * corner, for people who care about the picture more than the numbers.
+ */
+function drawPhotoBadge(
+  ctx: CanvasRenderingContext2D,
+  content: ShareCardContent,
+  palette: CardPalette,
+  photo: CanvasImageSource,
+): void {
+  drawCover(ctx, photo, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+  const width = 360;
+  const left = CARD_WIDTH - 60 - width;
+  const top = SAFE_TOP + 40;
+  const rows = content.stats.slice(0, 2);
+  const height = 150 + rows.length * 120 + (content.record ? 80 : 0);
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 16;
+  roundRect(ctx, left, top, width, height, 44);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+  ctx.fill();
+  ctx.restore();
+
+  const ink = stripInk(palette);
+  ctx.textAlign = 'left';
+  drawMark(ctx, palette.honey, left + 62, top + 66, 44);
+  ctx.fillStyle = ink;
+  setText(ctx, font(700, 30, 'Poppins'), 0);
+  ctx.fillText('MotionHive', left + 96, top + 77);
+
+  let y = top + 160;
+  for (const stat of rows) {
+    ctx.fillStyle = ink;
+    setText(ctx, font(800, 64), 0);
+    ctx.fillText(fit(ctx, stat.value, width - 80), left + 40, y);
+    ctx.fillStyle = palette.slate;
+    setText(ctx, font(500, 28), 0);
+    ctx.fillText(fit(ctx, stat.label, width - 80), left + 40, y + 40);
+    y += 120;
+  }
+  if (content.record) {
+    setText(ctx, font(600, 28), 0);
+    const label = fit(ctx, `🏆 ${content.record}`, width - 100);
+    const chipWidth = ctx.measureText(label).width + 40;
+    roundRect(ctx, left + 36, y - 30, chipWidth, 52, 26);
+    ctx.fillStyle = palette.wash;
+    ctx.fill();
+    ctx.fillStyle = palette.chipInk;
+    ctx.fillText(label, left + 56, y + 5);
+  }
+
+  if (content.caption) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    drawTag(ctx, content.caption, { ...palette, tag: palette.navy, tagInk: '#ffffff' }, 1300);
+    ctx.restore();
+  }
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 12;
+  setText(ctx, font(600, 30), 6);
+  ctx.fillText(content.site.toUpperCase(), CENTER, SAFE_BOTTOM - 25);
+  ctx.shadowBlur = 0;
+}
+
+/** Ink for text on honey or white: navy in either theme. */
+function stripInk(palette: CardPalette): string {
+  return palette.navy;
+}
+
+/** "52:14 · 18 sets · 6240 kg": the stats on one line, for the band. */
+function statsLine(content: ShareCardContent): string {
+  return content.stats
+    .map((stat, i) => (i === 0 ? stat.value : `${stat.value} ${stat.label.toLocaleLowerCase()}`))
+    .join(' · ');
+}
+
+/** The logo mark, centred on (cx, cy), `height` tall. */
+function drawMark(
+  ctx: CanvasRenderingContext2D,
+  color: string,
+  cx: number,
+  cy: number,
+  height: number,
+): void {
+  const scale = height / 190;
+  ctx.save();
+  ctx.translate(cx - (168 * scale) / 2, cy - height / 2);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = color;
+  for (const d of LOGO_PATHS) ctx.fill(new Path2D(d));
+  ctx.restore();
+}
+
+/** Fills the box with the image, cropped to keep its proportions (CSS `cover`). */
+function drawCover(
+  ctx: CanvasRenderingContext2D,
+  image: CanvasImageSource,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): void {
+  const source = image as { width: number; height: number };
+  const scale = Math.max(w / source.width, h / source.height);
+  const sw = w / scale;
+  const sh = h / scale;
+  ctx.drawImage(image, (source.width - sw) / 2, (source.height - sh) / 2, sw, sh, x, y, w, h);
 }
 
 function drawBackground(ctx: CanvasRenderingContext2D, palette: CardPalette): void {

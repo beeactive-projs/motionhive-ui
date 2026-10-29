@@ -1,6 +1,6 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonBadge,
@@ -37,6 +37,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { groupLinks } from '../../../_shared/utils/stack-paths';
 import { GROUP_ICONS } from '../groups.icons';
 import { GroupManageStore } from './group-manage.store';
 
@@ -90,6 +91,8 @@ export class GroupManage implements ViewWillEnter {
   private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
+  /** Back on a cold load: the Groups list, or the stack the group was opened in. */
+  readonly backHref = groupLinks(inject(Router).url).home;
 
   readonly Tabs = ManageTabs;
   readonly skeletonRows = [1, 2, 3];

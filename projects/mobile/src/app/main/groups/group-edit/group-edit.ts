@@ -17,6 +17,7 @@ import {
   IonNote,
   IonRadio,
   IonRadioGroup,
+  IonRouterOutlet,
   IonSpinner,
   IonTextarea,
   IonTitle,
@@ -40,6 +41,7 @@ import {
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { groupLinks } from '../../../_shared/utils/stack-paths';
 import {
   GROUP_DESCRIPTION_MAX_LENGTH,
   canManageGroup,
@@ -96,6 +98,10 @@ export class GroupEdit implements ViewWillEnter {
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _outlet = inject(IonRouterOutlet);
+  /** The stack the group was opened in: the Groups tab, or a profile's. */
+  private readonly _links = groupLinks(this._router.url);
+  readonly backHref = this._links.home;
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
@@ -237,7 +243,7 @@ export class GroupEdit implements ViewWillEnter {
         // Into the group either way: after a create there is nowhere else
         // sensible to land, and after an edit the changes are what you want
         // to see.
-        void this._router.navigate(['/tabs/groups', group.id], { replaceUrl: true });
+        void this._router.navigate(this._links.group(group.id), { replaceUrl: true });
       },
       error: (error: unknown) => {
         this.saving.set(false);
@@ -270,7 +276,10 @@ export class GroupEdit implements ViewWillEnter {
           void this._feedbackService.success(
             this._translateService.instant('groups.edit.toast.deleted'),
           );
-          void this._router.navigateByUrl('/tabs/groups', { replaceUrl: true });
+          // Past the deleted group: to the list on the Groups tab, and
+          // elsewhere back to whoever opened it.
+          if (!this._links.inGroupsTab && this._outlet.canGoBack(2)) void this._outlet.pop(2);
+          else void this._router.navigateByUrl(this._links.home, { replaceUrl: true });
         },
         error: (error: unknown) => {
           this.deleting.set(false);

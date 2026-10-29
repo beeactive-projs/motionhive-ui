@@ -7,6 +7,11 @@
   margin-bottom: 0.5rem;
 }
 
+/* On a shared card the hairlines do the separating. */
+:host-context(.mh-row-group) {
+  margin-bottom: 0;
+}
+
 /* A record reads quieter across the board, not just in the spine. */
 ion-item[data-tone='muted'] .time,
 ion-item[data-tone='muted'] h2 {

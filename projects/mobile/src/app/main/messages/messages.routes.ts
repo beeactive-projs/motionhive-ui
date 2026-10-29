@@ -1,17 +1,15 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../person/person.routes';
+import { chatPageRoutes } from './chat-pages.routes';
 
 /**
  * The messages area, mounted at `/tabs/messages`.
  *
  * Every path keeps `messages` as the first segment after `/tabs` — that is what
  * `activeTabIdFromUrl` reads, so the Messages tab stays lit through the chat
- * and its details page instead of the bar going blank.
- *
- * `new` is a draft thread: the chat screen with no conversation behind it yet,
- * addressed by a `?to=` recipient. It has to be declared before `:id` or the
- * parameterised route would swallow it and try to load a conversation called
- * "new". Once the first message sends, the draft adopts the new conversation
- * on the same screen; the URL keeps `new?to=`, which resolves to the thread.
+ * and its details page instead of the bar going blank. The chat pages
+ * themselves (`chat-pages.routes.ts`) go last: their `:id` would swallow
+ * "compose" and "person".
  */
 export const messagesRoutes: Routes = [
   {
@@ -21,34 +19,10 @@ export const messagesRoutes: Routes = [
   },
   {
     // Who to write to. Picking replaces it with the thread or the draft below.
-    // Before `:id`, or the parameterised route swallows "compose".
     path: 'compose',
     loadComponent: () => import('./new-message/new-message').then((m) => m.NewMessage),
     title: 'pageTitle.newMessage',
   },
-  {
-    // The composer owns the bottom edge — the keyboard opens straight onto it,
-    // and a tab bar wedged between the two costs a message of visible thread.
-    path: 'new',
-    loadComponent: () => import('./chat/chat').then((m) => m.Chat),
-    title: 'pageTitle.newMessage',
-    data: { hideTabBar: true },
-  },
-  {
-    // Before `:id`, or the parameterised route swallows "person".
-    path: 'person/:handle',
-    loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
-  {
-    path: ':id',
-    loadComponent: () => import('./chat/chat').then((m) => m.Chat),
-    title: 'pageTitle.chat',
-    data: { hideTabBar: true },
-  },
-  {
-    path: ':id/details',
-    loadComponent: () => import('./chat-details/chat-details').then((m) => m.ChatDetails),
-    title: 'pageTitle.details',
-  },
+  ...personRoutes,
+  ...chatPageRoutes,
 ];

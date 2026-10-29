@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+/* The field on the page's gutter, flush with the cards below it. */
+.search {
+  padding: 0 0 0.25rem;
+}
+
+/* The chips sit in the page's gutter here, not a bar's. */
+.bar {
+  padding: 0.25rem 0 0.5rem;
+}
+
+/* "883 exercises · A to Z" — a label on the list, not a row of it. */
+.meta {
+  padding-inline: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.show-more {
+  margin-top: 0.25rem;
+}

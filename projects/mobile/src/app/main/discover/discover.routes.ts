@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { personRoutes } from '../person/person.routes';
 
 /**
  * The trainee's Discover area, mounted at `/tabs/discover`. A coach reaches
@@ -30,11 +31,7 @@ export const discoverRoutes: Routes = [
       import('../groups/group-preview/group-preview').then((m) => m.GroupPreview),
     title: 'pageTitle.group',
   },
-  {
-    path: 'person/:handle',
-    loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'pageTitle.profile',
-  },
+  ...personRoutes,
   {
     path: ':id',
     loadComponent: () =>

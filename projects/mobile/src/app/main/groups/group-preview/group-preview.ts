@@ -26,6 +26,7 @@ import { GroupsRefreshService, SelfJoinResult } from 'core';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ProfileStacks, groupLinks } from '../../../_shared/utils/stack-paths';
 import { JoinActions, joinPolicyLabel, joinPolicyTone } from '../groups.config';
 import { GROUP_ICONS } from '../groups.icons';
 import { GroupPreviewStore } from './group-preview.store';
@@ -69,12 +70,17 @@ export class GroupPreview {
   private readonly _router = inject(Router);
 
   /**
-   * Mounted under Groups and under Discover (its rail and search). Back on a
-   * cold load, and the label beside the arrow, name whichever one this is.
+   * Mounted under Groups, under Discover (its rail and search) and beside a
+   * profile. Back on a cold load, and the label beside the arrow, follow
+   * whichever one this is.
    */
-  private readonly _fromDiscover = this._router.url.startsWith('/tabs/discover');
-  readonly backHref = this._fromDiscover ? '/tabs/discover' : '/tabs/groups';
-  readonly backLabel = this._fromDiscover ? 'nav.discover' : 'nav.groups';
+  private readonly _links = groupLinks(this._router.url);
+  readonly backHref = this._links.home;
+  readonly backLabel = this._router.url.startsWith(ProfileStacks.Discover)
+    ? 'nav.discover'
+    : this._links.inGroupsTab
+      ? 'nav.groups'
+      : 'button.back';
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
@@ -129,7 +135,7 @@ export class GroupPreview {
     // Reached by a stale link, or by going back after joining.
     effect(() => {
       if (!this.store.alreadyMember()) return;
-      void this._router.navigate(['/tabs/groups', this.store.groupId()], {
+      void this._router.navigate(this._links.group(this.store.groupId() ?? ''), {
         replaceUrl: true,
       });
     });
@@ -155,7 +161,7 @@ export class GroupPreview {
           );
           // Straight in: the group's own page works now, and it is what they
           // were trying to reach.
-          void this._router.navigate(['/tabs/groups', this.group()?.id ?? ''], {
+          void this._router.navigate(this._links.group(this.group()?.id ?? ''), {
             replaceUrl: true,
           });
           return;

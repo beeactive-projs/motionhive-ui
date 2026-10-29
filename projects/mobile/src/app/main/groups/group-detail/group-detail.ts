@@ -23,6 +23,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  NavController,
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
@@ -42,6 +43,7 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { groupLinks } from '../../../_shared/utils/stack-paths';
 import { PostGallery } from '../_components/post-gallery/post-gallery';
 import { AddMembersSheet } from '../_sheets/add-members-sheet/add-members-sheet';
 import { JoinLinkSheet } from '../_sheets/join-link-sheet/join-link-sheet';
@@ -59,6 +61,7 @@ import {
 import { GroupTab, GroupTabs } from '../groups.filters';
 import { GROUP_ICONS } from '../groups.icons';
 import { GroupDetailStore } from './group-detail.store';
+import { PostWorkoutCard } from '../_components/post-workout/post-workout';
 
 /**
  * One group: its posts, its members, and what it is.
@@ -71,6 +74,7 @@ import { GroupDetailStore } from './group-detail.store';
 @Component({
   selector: 'mh-group-detail',
   imports: [
+    PostWorkoutCard,
     AddMembersSheet,
     ConfirmSheet,
     EmptyState,
@@ -107,6 +111,12 @@ export class GroupDetail implements ViewWillEnter {
   readonly store = inject(GroupDetailStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _navController = inject(NavController);
+  /** The stack this group was opened in: the Groups tab, or a profile's. */
+  private readonly _links = groupLinks(this._router.url);
+  readonly backHref = this._links.home;
+  /** "Groups" beside the arrow on the Groups tab; elsewhere it returns to a profile. */
+  readonly backLabel = this._links.inGroupsTab ? 'nav.groups' : 'button.back';
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
@@ -239,7 +249,7 @@ export class GroupDetail implements ViewWillEnter {
   openMember(member: GroupMember): void {
     const handle = member.user?.handle;
     if (!handle) return;
-    void this._router.navigate(['/tabs/u', handle]);
+    void this._router.navigate(this._links.person(handle));
   }
 
   hasProfile(member: GroupMember): boolean {
@@ -340,7 +350,9 @@ export class GroupDetail implements ViewWillEnter {
         void this._feedbackService.success(
           this._translateService.instant('groups.detail.toast.left'),
         );
-        void this._router.navigateByUrl('/tabs/groups');
+        // Back to the list on the Groups tab; elsewhere to whoever opened it.
+        if (this._links.inGroupsTab) void this._router.navigateByUrl(this._links.home);
+        else void this._navController.back();
       },
       error: (error: unknown) => {
         this.leaving.set(false);
@@ -353,16 +365,16 @@ export class GroupDetail implements ViewWillEnter {
   }
 
   compose(): void {
-    void this._router.navigate(['/tabs/groups', this.store.group()?.id ?? '', 'compose']);
+    void this._router.navigate(this._links.group(this.store.group()?.id ?? '', 'compose'));
   }
 
   openPost(postId: string): void {
-    void this._router.navigate(['/tabs/groups/post', postId]);
+    void this._router.navigate(this._links.post(postId));
   }
 
   /** Straight to the viewer, skipping the post — the tap was on a photo. */
   openPhoto(post: Post, index: number): void {
-    void this._router.navigate(['/tabs/groups/post', post.id, 'photos'], {
+    void this._router.navigate(this._links.post(post.id, 'photos'), {
       queryParams: { index },
     });
   }
@@ -372,11 +384,11 @@ export class GroupDetail implements ViewWillEnter {
    * kebab would otherwise carry two destinations that read the same.
    */
   manage(): void {
-    void this._router.navigate(['/tabs/groups', this.store.group()?.id ?? '', 'manage']);
+    void this._router.navigate(this._links.group(this.store.group()?.id ?? '', 'manage'));
   }
 
   editGroup(): void {
-    void this._router.navigate(['/tabs/groups', this.store.group()?.id ?? '', 'edit']);
+    void this._router.navigate(this._links.group(this.store.group()?.id ?? '', 'edit'));
   }
 
   onRefresh(event: RefresherCustomEvent): void {

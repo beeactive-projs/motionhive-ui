@@ -1,0 +1,11 @@
+<button
+  type="button"
+  class="tile"
+  [attr.aria-label]="'workouts.history.openPhoto' | translate: { name: log().name, day: day() }"
+  (click)="select.emit()"
+>
+  @if (url(); as src) {
+    <img [src]="src" alt="" />
+  }
+  <span class="day">{{ day() }}</span>
+</button>
