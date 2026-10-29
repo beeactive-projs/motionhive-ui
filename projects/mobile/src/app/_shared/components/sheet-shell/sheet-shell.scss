@@ -83,12 +83,6 @@ ion-footer ion-toolbar {
 // Cancel, or the sheet's own action (Reset) in its place. Ink label on the
 // card hairline rather than the medium palette's own grey: the outline stays
 // quiet next to the filled confirm, and the label still reads.
-.actions .secondary {
-  --border-width: var(--mh-hairline);
-  --border-color: var(--ion-border-color);
-  --color: var(--ion-text-color);
-}
-
 // The confirm takes the rest of the row — one obvious target per sheet.
 .actions .confirm {
   flex: 1;

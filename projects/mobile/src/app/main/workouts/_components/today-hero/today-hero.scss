@@ -80,13 +80,8 @@ ion-button {
   margin-top: 0.625rem;
 }
 
-/* Neutral, not honey: either the open session is the thing to get back to,
-   or the day is already settled. */
-ion-button.neutral {
-  --border-width: 1px;
-  --border-color: var(--ion-border-color);
-  --color: var(--ion-text-color);
-}
+/* Neutral, not honey (`mh-quiet`): either the open session is the thing to
+   get back to, or the day is already settled. */
 
 .blocked-note {
   margin: 0.5rem 0 0;

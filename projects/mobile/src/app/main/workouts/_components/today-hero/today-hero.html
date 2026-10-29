@@ -34,13 +34,13 @@
           <ion-icon name="checkmark-circle" color="success" aria-hidden="true" />
           {{ 'workouts.todayHero.done' | translate }}
         </p>
-        <ion-button class="neutral" expand="block" fill="outline" (click)="summary.emit()">
+        <ion-button class="mh-quiet" expand="block" fill="outline" (click)="summary.emit()">
           {{ 'workouts.todayHero.seeSummary' | translate }}
         </ion-button>
       }
       @case (States.Skipped) {
         <p class="status">{{ 'workouts.todayHero.skipped' | translate }}</p>
-        <ion-button class="neutral" expand="block" fill="outline" (click)="open.emit()">
+        <ion-button class="mh-quiet" expand="block" fill="outline" (click)="open.emit()">
           <ion-icon slot="start" name="eye-outline" aria-hidden="true" />
           {{ 'workouts.todayHero.seeWorkout' | translate }}
         </ion-button>
@@ -49,7 +49,7 @@
            to: honey would be asking for a tap that only bounces. Looking at it
            is still fine. -->
       @case (States.Blocked) {
-        <ion-button class="neutral" expand="block" fill="outline" (click)="open.emit()">
+        <ion-button class="mh-quiet" expand="block" fill="outline" (click)="open.emit()">
           <ion-icon slot="start" name="eye-outline" aria-hidden="true" />
           {{ 'workouts.todayHero.seeWorkout' | translate }}
         </ion-button>

@@ -112,13 +112,7 @@
                   </span>
                   <h2>{{ log.name }}</h2>
                 </ion-label>
-                <ion-button
-                  slot="end"
-                  size="small"
-                  shape="round"
-                  color="primary"
-                  (click)="resume()"
-                >
+                <ion-button slot="end" shape="round" class="mh-row-action" (click)="resume()">
                   {{ 'button.resume' | translate }}
                 </ion-button>
               </ion-item>
@@ -136,7 +130,7 @@
                     {{ 'workouts.home.coldStart.action' | translate }}
                   </ion-button>
                 }
-                <ion-button class="neutral" expand="block" fill="outline" (click)="openStarters()">
+                <ion-button class="mh-quiet" expand="block" fill="outline" (click)="openStarters()">
                   {{ 'workouts.home.coldStart.browseStarters' | translate }}
                 </ion-button>
                 <!-- Building your own has to be reachable from the state you are in

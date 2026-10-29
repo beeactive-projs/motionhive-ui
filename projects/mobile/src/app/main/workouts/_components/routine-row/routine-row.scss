@@ -19,10 +19,3 @@ ion-badge {
   margin-inline-start: 0.5rem;
   border-radius: var(--mh-radius-pill);
 }
-
-// Start in honey, the same small solid button as a paused plan's Resume:
-// starting is the row's one action, and nothing above the list competes
-// for the honey now that a new workout lives in the page's ⋯ menu.
-.start {
-  margin-inline-start: 0.5rem;
-}

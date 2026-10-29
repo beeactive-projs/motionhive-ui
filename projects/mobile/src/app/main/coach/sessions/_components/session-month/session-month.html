@@ -13,9 +13,9 @@
         <ion-icon slot="icon-only" name="chevron-forward-outline" aria-hidden="true" />
       </ion-button>
       @if (!isCurrentMonth()) {
-        <button type="button" class="today" (click)="goToday()">
+        <ion-button class="today mh-text-link" fill="clear" size="small" (click)="goToday()">
           {{ 'time.today' | translate }}
-        </button>
+        </ion-button>
       }
     </div>
 

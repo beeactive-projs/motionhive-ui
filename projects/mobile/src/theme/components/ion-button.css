@@ -227,6 +227,22 @@ ion-button.mh-text-link.inline {
   vertical-align: -0.125rem;
 }
 
+/* The quiet secondary beside the honey one — Cancel next to Save, Share
+   next to Save, ⋯ next to Message: an outline in body ink on a hairline,
+   so the screen keeps one honey action. Use it with `fill="outline"`. */
+ion-button.mh-quiet {
+  --border-width: var(--mh-hairline);
+  --border-color: var(--ion-border-color);
+  --color: var(--ion-text-color);
+}
+
+/* In a toolbar (a sheet's actions, a footer) Ionic paints an uncoloured
+   outline's border in the toolbar's ink, on the inner button where the
+   variable cannot reach; the part keeps the hairline there too. */
+ion-button.mh-quiet::part(native) {
+  border-color: var(--ion-border-color);
+}
+
 /* "Add …" as a dashed outline: reads as "make something", not as a filled
    row that already exists. An outline ion-button with the border restyled —
    Ionic exposes the style and width, so no wrapper is needed. */

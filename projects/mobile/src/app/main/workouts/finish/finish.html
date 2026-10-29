@@ -186,7 +186,7 @@
           </p>
         } @else {
           <ion-button
-            class="save-routine"
+            class="save-routine mh-quiet"
             expand="block"
             fill="outline"
             (click)="openSaveRoutine()"
@@ -219,7 +219,7 @@
       <div class="mh-cta-bar actions">
         @if (!takenDown()) {
           <ion-button
-            class="share"
+            class="share mh-quiet"
             fill="outline"
             [disabled]="saving()"
             (click)="shareOpen.set(true)"

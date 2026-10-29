@@ -88,7 +88,7 @@
           </ion-button>
         }
         <ion-button
-          class="more quiet"
+          class="more mh-quiet"
           fill="outline"
           [attr.aria-label]="'clients.actionsSheet.title' | translate"
           (click)="openActions()"
@@ -232,8 +232,8 @@
                       <!-- Paused: Resume is the Overview's one honey action. -->
                       <ion-button
                         slot="end"
-                        class="resume"
-                        size="small"
+                        shape="round"
+                        class="mh-row-action"
                         [disabled]="store.isPlanBusy(plan.row.id)"
                         (click)="
                           setPlanStatus(plan.row, PlanStatuses.Active); $event.stopPropagation()
@@ -410,7 +410,7 @@
 
             @if (hasMoreSessions()) {
               <ion-button
-                class="show-more"
+                class="show-more mh-text-link"
                 fill="clear"
                 expand="block"
                 [disabled]="moreSessionsLoading()"
@@ -573,7 +573,7 @@
             }
             @if (store.hasMoreWorkouts()) {
               <ion-button
-                class="show-more"
+                class="show-more mh-text-link"
                 fill="clear"
                 expand="block"
                 [disabled]="store.workoutsLoading()"

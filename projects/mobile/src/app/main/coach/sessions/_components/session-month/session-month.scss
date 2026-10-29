@@ -13,6 +13,12 @@ ion-card {
   padding-bottom: 0.25rem;
 }
 
+/* The month's arrows in the deep ink: the honey fill colour is about 2:1
+   on the card, under the 3:1 an icon needs (`mh-text-link`). */
+.nav ion-button {
+  --color: var(--mh-color-honey-deep);
+}
+
 .nav .label {
   flex: 1;
   color: var(--ion-text-color);
@@ -21,15 +27,11 @@ ion-card {
   font-weight: 600;
 }
 
-/* Back to this month, a quiet pill: it moves the grid, it picks no day. */
+/* Back to this month, a text action in the card's head (`mh-text-link`):
+   it moves the grid, it picks no day. */
 .nav .today {
   flex: none;
-  padding: 0.375rem 0.75rem;
-  border: none;
-  border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-divider);
-  color: var(--ion-color-dark);
-  font-size: var(--mh-text-sm);
+  margin: 0;
   font-weight: 600;
 }
 

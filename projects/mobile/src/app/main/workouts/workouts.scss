@@ -42,16 +42,6 @@
   font-weight: 600;
 }
 
-/* The Resume pill grows in the row's end slot; Ionic's small button floor is
-   taller than the row wants. */
-.resume ion-button {
-  height: 2rem;
-  min-height: 0;
-  margin: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-}
-
 /* ─── Cold start ──────────────────────────────────────────────────
    One card holding the promise and both ways in: the empty workout as the
    honey ask, the starters as its quiet neutral alternative. */
@@ -88,12 +78,6 @@
 }
 
 /* Neutral, not honey: honey is the one thing we are asking for. */
-.cold-start ion-button.neutral {
-  --border-width: 1px;
-  --border-color: var(--ion-border-color);
-  --color: var(--ion-text-color);
-}
-
 .cold-start ion-button.build-own {
   align-self: center;
   margin-top: 0.25rem;

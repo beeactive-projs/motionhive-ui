@@ -234,6 +234,9 @@ ion-content.mh-flat-page > .mh-note-block {
    action pushed to the far edge; Ionic's small clear button is taller than
    the kicker, so its box shrinks to the line. */
 .mh-section-head ion-button {
+  /* Deep ink, as on any text action on the page: the honey fill colour is
+     2.05:1 on white (`mh-text-link`). */
+  --color: var(--mh-color-honey-deep);
   --padding-start: 0.25rem;
   --padding-end: 0.25rem;
   height: 1.5rem;
