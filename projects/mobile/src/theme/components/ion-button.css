@@ -228,7 +228,7 @@ ion-button.mh-text-link.inline {
 }
 
 /* The quiet secondary beside the honey one — Cancel next to Save, Share
-   next to Save, ⋯ next to Message: an outline in body ink on a hairline,
+   next to Save: an outline in body ink on a hairline,
    so the screen keeps one honey action. Use it with `fill="outline"`. */
 ion-button.mh-quiet {
   --border-width: var(--mh-hairline);

@@ -4,7 +4,7 @@
       <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
 
-    <ion-title>
+    <ion-title class="mh-person-title">
       <div class="peer">
         @if (showPeerSkeleton()) {
           <ion-skeleton-text [animated]="true" style="width: 1.875rem; height: 1.625rem" />
@@ -23,7 +23,7 @@
           <div class="who">
             <span class="name">{{ title() }}</span>
             @if (handle(); as tag) {
-              <span class="handle">&#64;{{ tag }}</span>
+              <span class="meta">&#64;{{ tag }}</span>
             }
           </div>
         }

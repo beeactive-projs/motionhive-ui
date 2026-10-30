@@ -1,8 +1,7 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import {
   Component,
   DestroyRef,
-  ElementRef,
   computed,
   effect,
   inject,
@@ -29,6 +28,7 @@ import {
   IonSegment,
   IonSegmentButton,
   IonSkeletonText,
+  IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
@@ -44,7 +44,6 @@ import {
   clientDisplayName,
   clientEmail,
   appLocale,
-  clientStatusLabel,
   formatSessionDuration,
   formatSessionTime,
   localDayKey,
@@ -109,8 +108,10 @@ type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
  *
  * Mounted under Clients and under Programs (from a plan's list of who is on
  * it); every link out stays in whichever stack it was opened in, so back
- * always returns here. See `client-paths.ts`. `?tab=` opens a tab, which is
- * where the old training and progress addresses now land.
+ * always returns here. See `client-paths.ts`. The address carries the tab
+ * (`?tab=`): a link opens it, and switching tabs rewrites it in place, so a
+ * refresh or a way back lands on the same one. The old training and progress
+ * addresses land there too.
  *
  * The URL is the source of truth: a refresh, a deep link, or a tap from any
  * list all land here with the client's user id and load from it.
@@ -142,8 +143,10 @@ type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
     IonSegment,
     IonSegmentButton,
     IonSkeletonText,
+    IonTitle,
     IonToolbar,
     LogRow,
+    NgTemplateOutlet,
     ProgressBody,
     SessionMonth,
     SessionRow,
@@ -205,13 +208,10 @@ export class ClientDetail implements ViewWillEnter {
     { id: TrainingKinds.Skipped, label: 'clients.detail.training.kinds.skipped' },
   ];
 
-  /** The name rides the bar once the identity's own has scrolled away. */
-  readonly compact = signal(false);
-  private readonly _nameEl = viewChild<ElementRef<HTMLElement>>('nameEl');
   /** The Training calendar shows when asked for, from the button beside the chips. */
   readonly calendarOpen = signal(false);
 
-  /** The tab a link asked for, until the coach picks another. */
+  /** The tab the address names; Overview when it names none. */
   private readonly _tab = signal<ClientTab>(
     clientTabFrom(this._route.snapshot.queryParamMap.get('tab')),
   );
@@ -233,22 +233,7 @@ export class ClientDetail implements ViewWillEnter {
 
   readonly avatarTone = computed(() => avatarToneFor(this.store.client()?.clientId));
 
-  readonly statusLabel = computed(() => {
-    const client = this.store.client();
-    return client ? clientStatusLabel(client) : '';
-  });
-
-  /** Active is a wash of green; the two that need noticing take warn / neutral. */
-  readonly statusTone = computed(() => {
-    switch (this.store.client()?.status) {
-      case InstructorClientStatuses.Active:
-        return 'success';
-      case InstructorClientStatuses.Archived:
-        return 'medium';
-      default:
-        return 'warning';
-    }
-  });
+  readonly avatarUrl = computed(() => this.store.client()?.client?.avatarUrl ?? null);
 
   readonly isActive = computed(
     () => this.store.client()?.status === InstructorClientStatuses.Active,
@@ -448,7 +433,7 @@ export class ClientDetail implements ViewWillEnter {
     return last ? logMeta(last) : '';
   });
 
-  /** Under the name: how long they have been a client, or when an invite runs out. */
+  /** Under the name in the bar: how long they have been a client, or when an invite runs out. */
   readonly sinceLine = computed(() => {
     const client = this.store.client();
     if (!client) return '';
@@ -499,21 +484,15 @@ export class ClientDetail implements ViewWillEnter {
       if (clientId) this.store.load(clientId);
     });
 
+    // A link to this page while it is still open switches the tab too.
+    this._route.queryParamMap.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params) => {
+      this._tab.set(clientTabFrom(params.get('tab')));
+    });
+
     // The Progress tab reads its numbers each time it is shown.
     effect(() => {
       const body = this._progressBody();
       if (body) untracked(() => body.load());
-    });
-
-    // The bar shows the name once the identity's has scrolled out of view.
-    effect((onCleanup) => {
-      const el = this._nameEl()?.nativeElement;
-      if (!el) return;
-      const observer = new IntersectionObserver(([entry]) =>
-        this.compact.set(!entry.isIntersecting),
-      );
-      observer.observe(el);
-      onCleanup(() => observer.disconnect());
     });
   }
 
@@ -529,8 +508,20 @@ export class ClientDetail implements ViewWillEnter {
     this._progressBody()?.load();
   }
 
+  /**
+   * The strip and the Overview's rows. The address follows without a history
+   * entry, and Overview, the default, leaves it clean.
+   */
   setTab(value: unknown): void {
-    this._tab.set(clientTabFrom(value));
+    const tab = clientTabFrom(value);
+    if (tab === this._tab()) return;
+    this._tab.set(tab);
+    void this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { tab: tab === ClientTabs.Overview ? null : tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   openActions(): void {

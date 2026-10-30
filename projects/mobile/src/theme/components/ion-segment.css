@@ -45,33 +45,74 @@ ion-segment.mh-segment-fit ion-segment-button {
   --padding-end: 6px;
 }
 
-/* Page tabs as underlined words: a client's Overview / Sessions / Training /
-   Progress, a person's Activity / About. Always Material's underline (the
-   segment sets `mode="md"`), on iOS too, since a pill segment reads as a
-   filter rather than a page's sections. Labels sit at their own width from
-   the start edge, the active one in body ink over a honey bar; the row
-   scrolls if a language runs long. */
+/* A page's sections: the strip every section switcher wears (a client's
+   Overview / Sessions / Training / Progress, Workouts, My sessions, Groups,
+   a group, Payments, a person's Activity / About). Equal columns across the
+   width, each an icon over its label, the selected one in body ink over a
+   short honey bar that slides between them. Value pickers (a range, a
+   level, a repeat end) stay pills: they set something, they don't change
+   what the page shows.
+
+   Always Material (the segment sets `mode="md"`), on iOS too: its indicator
+   already sits at the bottom and slides by transform, and its ripple, hover
+   fill, uppercase tracking and 90px minimum are switched off here. The
+   keyboard focus fill stays. 56px tall, a header toolbar's height, so in a
+   header it fills the bar exactly; the hairline is drawn under the buttons,
+   so the bar sits on it. Ionic lays segments out as a grid, so equal columns
+   are its column track. */
 ion-segment.mh-tabs {
-  justify-content: flex-start;
-  gap: 1.25rem;
   --background: transparent;
+  grid-auto-columns: minmax(0, 1fr);
+  padding-inline: 0.375rem;
+  box-shadow: inset 0 calc(-1 * var(--mh-hairline)) 0 var(--ion-border-color);
 }
 
 ion-segment.mh-tabs ion-segment-button {
   --padding-start: 0;
   --padding-end: 0;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
   --color: var(--ion-color-medium);
-  --color-checked: var(--ion-text-color);
+  --color-checked: var(--ion-color-primary);
   --indicator-color: var(--ion-color-primary);
-  --indicator-height: 0.15625rem;
-  flex: 0 0 auto;
+  --indicator-height: var(--mh-spine-width);
+  --indicator-transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition: color 200ms ease;
+  --ripple-color: transparent;
+  --background-hover-opacity: 0;
   min-width: 0;
-  min-height: 2.75rem;
-  font-size: var(--mh-text-base);
-  font-weight: 500;
+  min-height: 3.375rem;
+  font-size: var(--mh-text-xs);
+  /* font-weight: 600; */
   letter-spacing: normal;
+  line-height: var(--mh-leading-heading);
 }
 
-ion-segment.mh-tabs ion-segment-button.segment-button-checked {
-  font-weight: 600;
+ion-segment.mh-tabs ion-segment-button ion-icon {
+  margin: 0;
+  font-size: var(--mh-icon-md);
+}
+
+ion-segment.mh-tabs ion-segment-button ion-label {
+  margin: 0.25rem 0 0;
+  line-height: var(--mh-leading-heading);
+}
+
+/* The bar is a 2.75rem stub centred in its column, rounded on top. */
+ion-segment.mh-tabs ion-segment-button::part(indicator) {
+  display: flex;
+  justify-content: center;
+}
+
+ion-segment.mh-tabs ion-segment-button::part(indicator-background) {
+  width: 2.75rem;
+  border-radius: var(--mh-radius-pill) var(--mh-radius-pill) 0 0;
+}
+
+/* A count on a section (group manage's queues) rides the icon's top end
+   corner, as the tab bar draws its counts, so the label keeps its line. */
+ion-segment.mh-tabs ion-segment-button > ion-badge {
+  position: absolute;
+  top: 0.25rem;
+  inset-inline-start: calc(50% + 0.375rem);
 }

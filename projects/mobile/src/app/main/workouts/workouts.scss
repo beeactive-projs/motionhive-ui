@@ -1,13 +1,3 @@
-/* The tab row under the title: the client page's words, on the bar's
-   gutter. */
-.tabs-bar {
-  --min-height: 0;
-  --padding-top: 0;
-  --padding-bottom: 0;
-  --padding-start: var(--mh-page-gutter);
-  --padding-end: var(--mh-page-gutter);
-}
-
 /* ─── Resume ──────────────────────────────────────────────────────
    Navy, not honey. Resuming an abandoned session and starting a new one are
    different offers, and the design is explicit that these must never be

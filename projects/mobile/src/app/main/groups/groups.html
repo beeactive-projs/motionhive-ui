@@ -39,14 +39,17 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
+    <ion-segment class="mh-tabs" mode="md" [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
       <ion-segment-button [value]="Segments.Feed">
+        <ion-icon name="newspaper-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.list.segments.feed' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Segments.Discover">
+        <ion-icon name="compass-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.list.segments.discover' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Segments.Mine">
+        <ion-icon name="people-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.list.segments.mine' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>

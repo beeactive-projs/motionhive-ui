@@ -350,6 +350,7 @@
         "none": "Niciun plan atribuit încă.",
         "showPast": "{count, plural, one {Arată # plan încheiat} few {Arată # planuri încheiate} other {Arată # de planuri încheiate}}"
       },
+      "profileAria": "{name}, vezi profilul",
       "sections": {
         "plans": "Planuri",
         "thisWeek": "Săptămâna aceasta"
@@ -390,7 +391,6 @@
         "workouts": "Antrenamente"
       },
       "upcomingWindow": "Următoarele {count, plural, one {# zi} few {# zile} other {# de zile}}",
-      "viewProfile": "Vezi profilul",
       "week": {
         "count": "{completed} din {due}",
         "footnote": "{completed, plural, one {# făcut} few {# făcute} other {# făcute}} · {skipped, plural, one {# sărit} few {# sărite} other {# sărite}} · {remaining, plural, one {# rămas} few {# rămase} other {# rămase}}",

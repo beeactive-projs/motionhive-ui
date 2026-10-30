@@ -13,25 +13,28 @@
     </ion-buttons>
   </ion-toolbar>
   <!-- What you train from, what you did, how it is going: the page's
-       sections as underlined words, as on a client's page. -->
-  <ion-toolbar class="tabs-bar">
+       sections, the strip every section switcher wears. -->
+  <ion-toolbar>
     <ion-segment
       class="mh-tabs"
       mode="md"
-      [scrollable]="true"
       [value]="tab()"
       (ionChange)="setTab($event.detail.value)"
     >
       <ion-segment-button [value]="Tabs.Routines">
+        <ion-icon name="list-outline" aria-hidden="true" />
         <ion-label>{{ 'workouts.common.routines' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.History">
+        <ion-icon name="time-outline" aria-hidden="true" />
         <ion-label>{{ 'workouts.common.history' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.Progress">
+        <ion-icon name="bar-chart-outline" aria-hidden="true" />
         <ion-label>{{ 'workouts.common.progress' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.Exercises">
+        <ion-icon name="barbell-outline" aria-hidden="true" />
         <ion-label>{{ 'workouts.common.exercises' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>

@@ -13,6 +13,7 @@ import {
   personOutline,
   receiptOutline,
   refreshOutline,
+  repeatOutline,
   timeOutline,
 } from 'ionicons/icons';
 
@@ -31,6 +32,7 @@ export const PAYMENT_ICONS = {
   personOutline,
   receiptOutline,
   refreshOutline,
+  repeatOutline,
   timeOutline,
 };
 
@@ -93,8 +95,8 @@ export const INVOICE_FILTERS = [
 
 /** Invoices / Memberships, shared by the coach hub and the client's bills. */
 export const PAYMENT_SEGMENTS = [
-  { value: 'invoices', label: 'payments.segment.invoices' },
-  { value: 'memberships', label: 'payments.segment.memberships' },
+  { value: 'invoices', label: 'payments.segment.invoices', icon: 'receipt-outline' },
+  { value: 'memberships', label: 'payments.segment.memberships', icon: 'repeat-outline' },
 ] as const;
 
 export type PaymentSegment = (typeof PAYMENT_SEGMENTS)[number]['value'];

@@ -32,14 +32,17 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-segment [value]="store.tab()" (ionChange)="setTab($event.detail.value)">
+    <ion-segment class="mh-tabs" mode="md" [value]="store.tab()" (ionChange)="setTab($event.detail.value)">
       <ion-segment-button [value]="Tabs.Posts">
+        <ion-icon name="newspaper-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.common.posts' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.Members">
+        <ion-icon name="people-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.common.members' | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.About">
+        <ion-icon name="information-circle-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.common.about' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>

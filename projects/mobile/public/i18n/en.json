@@ -350,6 +350,7 @@
         "none": "No plan assigned yet.",
         "showPast": "{count, plural, one {Show # past plan} other {Show # past plans}}"
       },
+      "profileAria": "{name}, view profile",
       "sections": {
         "plans": "Plans",
         "thisWeek": "This week"
@@ -390,7 +391,6 @@
         "workouts": "Workouts"
       },
       "upcomingWindow": "Next {count, plural, one {# day} other {# days}}",
-      "viewProfile": "View profile",
       "week": {
         "count": "{completed} of {due}",
         "footnote": "{completed} done · {skipped} skipped · {remaining} remaining",

@@ -143,14 +143,15 @@
         <ion-segment
           class="mh-tabs"
           mode="md"
-          [scrollable]="true"
           [value]="tab()"
           (ionChange)="setTab($event.detail.value)"
         >
           <ion-segment-button [value]="Tabs.Activity">
+            <ion-icon name="pulse-outline" aria-hidden="true" />
             <ion-label>{{ 'person.tabs.activity' | translate }}</ion-label>
           </ion-segment-button>
           <ion-segment-button [value]="Tabs.About">
+            <ion-icon name="information-circle-outline" aria-hidden="true" />
             <ion-label>{{ 'person.about' | translate }}</ion-label>
           </ion-segment-button>
         </ion-segment>

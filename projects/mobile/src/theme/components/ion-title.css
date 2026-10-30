@@ -1,0 +1,46 @@
+/* A person as the bar's title, after WhatsApp's chat header: a small avatar
+   close after the back chevron, the name, and one muted line under it. The
+   chat thread and a client's page. Put `mh-person-title` on the `ion-title`
+   and the avatar and lines in a `.peer` inside it.
+
+   The avatar follows the back chevron closely rather than sitting on the
+   title's gutter inset: (0,2,4) beats ion-header.css's (0,1,4). */
+ion-tabs .ion-page > ion-header ion-title.mh-person-title {
+  padding-inline-start: 0;
+}
+
+/* `ion-title` centres a text node; it has no API for an avatar beside the name. */
+.mh-person-title .peer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.mh-person-title .who {
+  display: flex;
+  flex-direction: column;
+  /* A sliver between the two lines: stacked at line-height 1 with nothing
+     between them, the name's descenders ("p", "y") ran into the line under. */
+  gap: 0.125rem;
+  min-width: 0;
+  line-height: var(--mh-leading-none);
+}
+
+.mh-person-title .name {
+  overflow: hidden;
+  /* Room for the descenders inside the name's own line, which the ellipsis
+     clipping would otherwise cut off. */
+  line-height: var(--mh-leading-heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mh-person-title .meta {
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -7,9 +7,15 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-segment [value]="segment()" (ionChange)="onSegmentChange($event)">
+    <ion-segment
+      class="mh-tabs"
+      mode="md"
+      [value]="segment()"
+      (ionChange)="onSegmentChange($event)"
+    >
       @for (option of segments; track option.value) {
         <ion-segment-button [value]="option.value">
+          <ion-icon [name]="option.icon" aria-hidden="true" />
           <ion-label>{{ option.label | translate }}</ion-label>
         </ion-segment-button>
       }
