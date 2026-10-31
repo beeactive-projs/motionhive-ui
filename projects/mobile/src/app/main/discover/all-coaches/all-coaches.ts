@@ -17,25 +17,31 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { InstructorSearchResult } from 'core';
+import { AuthStore, InstructorSearchResult } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { CoachRow } from '../_components/coach-row/coach-row';
 import {
   DISCOVER_ICONS,
+  discoverLinks,
   matchesSpecialization,
   sortCoaches,
   specializationOptions,
+  withoutReader,
 } from '../discover.config';
 import { DiscoverCoachesStore } from '../discover.store';
 
 /**
- * The full coach directory behind Discover's "All coaches": a flat list,
+ * The full coach directory behind Discover's "All": a flat list,
  * accepting-first (the only honest sort the payload offers), narrowed
  * client-side by specialization chips that come from the coaches
- * themselves. A row lands on the public profile in this stack; the coaching
- * request lives there, not here.
+ * themselves, the reader never among them. A row lands on the public
+ * profile in this stack; the coaching request lives there, not here.
+ *
+ * Mounted in Discover (`/tabs/discover/coaches`) and in Home
+ * (`/tabs/home/coaches`, "Find a coach"): back and the rows follow the stack
+ * the URL is in.
  */
 @Component({
   selector: 'mh-all-coaches',
@@ -57,11 +63,17 @@ import { DiscoverCoachesStore } from '../discover.store';
   ],
   templateUrl: './all-coaches.html',
   styleUrl: './all-coaches.scss',
+  host: { class: 'mh-whole-words' },
   providers: [DiscoverCoachesStore],
 })
 export class AllCoaches implements ViewWillEnter {
   readonly store = inject(DiscoverCoachesStore);
+  private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
+
+  private readonly _links = discoverLinks(this._router.url);
+  /** Back on a cold load: the stack's own root. */
+  readonly backHref = this._links.root;
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6];
 
@@ -77,13 +89,16 @@ export class AllCoaches implements ViewWillEnter {
     this.store.load();
   }
 
-  readonly chips = computed(() => specializationOptions(this.store.coaches()));
+  /** Everyone but the reader: a coach is not listed to themselves. */
+  private readonly _coaches = computed(() =>
+    withoutReader(this.store.coaches(), this._authStore.user()?.id),
+  );
+
+  readonly chips = computed(() => specializationOptions(this._coaches()));
 
   readonly filtered = computed(() =>
     sortCoaches(
-      this.store.coaches().filter((coach) =>
-        matchesSpecialization(coach, this.specialization()),
-      ),
+      this._coaches().filter((coach) => matchesSpecialization(coach, this.specialization())),
     ),
   );
 
@@ -96,10 +111,7 @@ export class AllCoaches implements ViewWillEnter {
   );
 
   readonly isEmpty = computed(
-    () =>
-      !this.store.loading() &&
-      !this.store.error() &&
-      this.store.coaches().length === 0,
+    () => !this.store.loading() && !this.store.error() && this._coaches().length === 0,
   );
 
   readonly isFilteredEmpty = computed(
@@ -123,6 +135,6 @@ export class AllCoaches implements ViewWillEnter {
   }
 
   openCoach(coach: InstructorSearchResult): void {
-    if (coach.handle) void this._router.navigate(['/tabs/discover/person', coach.handle]);
+    if (coach.handle) void this._router.navigate(this._links.person(coach.handle));
   }
 }

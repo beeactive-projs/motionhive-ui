@@ -29,6 +29,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { clientUrl, coachStackOf } from '../../clients/client-paths';
+import { workoutLinks } from '../../home/home-stack.config';
 import { BadgeTones } from '../../exercises/exercises.config';
 import { TrendChart, TrendLabel } from '../_components/trend-chart/trend-chart';
 import {
@@ -105,11 +106,16 @@ export class ExerciseProgress implements ViewWillEnter {
    */
   private readonly _clientId = this._activatedRoute.snapshot.paramMap.get('clientId');
   private readonly _stack = coachStackOf(this._router.url);
+  /** The trainee's own pages: in Home's stack (from a record) or the Workouts tab's. */
+  private readonly _workoutLinks = workoutLinks(this._router.url);
 
-  /** Back on a cold load: the Progress this was opened from, a client's tab or your own page. */
+  /**
+   * Back on a cold load: the Progress this was opened from, a client's tab
+   * or your own page; Home, for a record opened from Latest.
+   */
   readonly backHref = this._clientId
     ? `${clientUrl(this._stack, this._clientId)}?tab=progress`
-    : '/tabs/workouts/progress';
+    : this._workoutLinks.progressBack;
 
   readonly ranges = PROGRESS_RANGES;
   readonly Tones = BadgeTones;
@@ -300,13 +306,16 @@ export class ExerciseProgress implements ViewWillEnter {
     if (range) this.range.set(range);
   }
 
-  /** The trainee reopens their own summary; a coach gets the review of that log. */
+  /**
+   * The trainee reopens their own summary, in the stack this page is in; a
+   * coach gets the review of that log.
+   */
   openSession(workoutLogId: string): void {
     if (this._clientId) {
       void this._router.navigate([this._stack, 'log', workoutLogId]);
       return;
     }
-    void this._router.navigate(['/tabs/workouts/finish', workoutLogId]);
+    void this._router.navigate(this._workoutLinks.finish(workoutLogId));
   }
 
   private _rangeLabel(range: ProgressRange): string {

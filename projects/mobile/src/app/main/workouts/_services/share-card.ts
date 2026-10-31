@@ -8,9 +8,12 @@ import {
   StickerCellKinds,
   StickerStyle,
   StickerStyles,
+  faceForWords,
+  fitLine,
   stickerCells,
   toHexColor,
   withAlpha,
+  wrapLines,
 } from './share-card.config';
 
 /** A story is 9:16 at 1080 wide, the size Instagram and Facebook take as is. */
@@ -109,7 +112,9 @@ export function cardPalette(theme: CardTheme, token: (name: string) => string): 
       card: honey,
       border: navy,
       ink: navy,
-      muted: hex('--mh-primary-900'),
+      // The deepest honey step: 7.6:1 on the honey card, where 900 gave the
+    // labels under the numbers 4.2:1.
+    muted: hex('--mh-primary-950'),
       accent: navy,
       cell: withAlpha(navy, 0.16),
       ghost: withAlpha(navy, 0.07),
@@ -347,12 +352,9 @@ function setText(ctx: CanvasRenderingContext2D, value: string, letterSpacing: nu
   }
 }
 
-/** Shortens with an ellipsis until it fits. */
+/** Shortens with an ellipsis until it fits, in the face set on the canvas. */
 function fit(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-  if (ctx.measureText(text).width <= maxWidth) return text;
-  let cut = text;
-  while (cut.length > 1 && ctx.measureText(`${cut}…`).width > maxWidth) cut = cut.slice(0, -1);
-  return `${cut.trimEnd()}…`;
+  return fitLine(text, maxWidth, (value) => ctx.measureText(value).width);
 }
 
 /**
@@ -389,26 +391,32 @@ function fitText(
   return fit(ctx, text, maxWidth);
 }
 
-/** Word-wraps into at most `maxLines`, the last one ellipsised if it overflows. */
+/**
+ * Word-wraps into at most `maxLines` in the face set on the canvas, every
+ * line fitted (`wrapLines`): a word wider than the line is cut, never drawn
+ * past the shape around it.
+ */
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let line = '';
-  for (let i = 0; i < words.length; i++) {
-    const next = line ? `${line} ${words[i]}` : words[i];
-    if (ctx.measureText(next).width <= maxWidth || !line) {
-      line = next;
-      continue;
-    }
-    lines.push(line);
-    line = words[i];
-    if (lines.length === maxLines - 1) {
-      line = words.slice(i).join(' ');
-      break;
-    }
-  }
-  if (line) lines.push(line);
-  return lines.slice(0, maxLines).map((l, i, all) => (i === all.length - 1 ? fit(ctx, l, maxWidth) : l));
+  return wrapLines(text, maxWidth, maxLines, (value) => ctx.measureText(value).width);
+}
+
+/**
+ * The title's face: `size`, or smaller until its longest word fits the
+ * line (`faceForWords`), down to `floor`. Leaves that face set.
+ */
+function titleFace(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  size: number,
+  floor: number,
+): number {
+  const face = faceForWords(text, maxWidth, size, floor, (word, candidate) => {
+    setText(ctx, font(800, candidate, 'Poppins'), 0);
+    return ctx.measureText(word).width;
+  });
+  setText(ctx, font(800, face, 'Poppins'), 0);
+  return face;
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
@@ -563,9 +571,8 @@ function drawBadgeSticker(
   const cellWidth = branded ? 196 : 236;
   const hiveCell = 54;
   const lead = record ? cellWidth * HEX_TALL + 12 + 38 : smallHiveHeight(hiveCell);
-  const titleSize = record ? 60 : 72;
+  const titleSize = titleFace(ctx, content.title, badgeWidthAt(0), record ? 60 : 72, 44);
   const lineHeight = Math.round(titleSize * 1.12);
-  setText(ctx, font(800, titleSize, 'Poppins'), 0);
   const titleLines = wrap(ctx, content.title, badgeWidthAt(0), 2);
   const titleHeight = titleLines.length * lineHeight;
   const statsSize = record ? 50 : 58;
@@ -643,6 +650,11 @@ function drawLinkPill(
 
 const CELL_WIDTH = 250;
 const CELL_GAP = 12;
+/** The middle cell's name: this face, down to the floor for a long word. */
+const TITLE_CELL_FACE = 42;
+const TITLE_CELL_FLOOR = 30;
+/** Between the middle cell's ring and its words. */
+const TITLE_CELL_AIR = 12;
 
 function drawCellsSticker(
   ctx: CanvasRenderingContext2D,
@@ -716,11 +728,18 @@ function drawStickerCell(
   const onFill = cell.kind === StickerCellKinds.Record;
   const ink = onFill ? palette.fillInk : palette.ink;
   if (cell.kind === StickerCellKinds.Title) {
+    // A word wider than the cell ("Antrenament") shrinks the face until it
+    // fits, and a smaller face has room for a third line inside the cell's
+    // upright sides. The lines sit where the ringed face is at its full
+    // width, so they may use it, less a little air inside the ring. The
+    // step follows the face.
     ctx.fillStyle = ink;
-    setText(ctx, font(800, 42, 'Poppins'), 0);
-    const lines = wrap(ctx, cell.value, inner - 6, 2);
-    const first = y + 15 - ((lines.length - 1) * 48) / 2;
-    lines.forEach((line, i) => ctx.fillText(line, x, first + i * 48));
+    const width = CELL_WIDTH - 12 - TITLE_CELL_AIR * 2;
+    const size = titleFace(ctx, cell.value, width, TITLE_CELL_FACE, TITLE_CELL_FLOOR);
+    const step = Math.round(size * 1.14);
+    const lines = wrap(ctx, cell.value, width, size < TITLE_CELL_FACE ? 3 : 2);
+    const first = y + size * 0.36 - ((lines.length - 1) * step) / 2;
+    lines.forEach((line, i) => ctx.fillText(line, x, first + i * step));
     return;
   }
   if (onFill) recordDot(ctx, x, y - height * 0.3, 14, palette.white);
@@ -813,10 +832,10 @@ interface FullText {
 function measureFullText(
   ctx: CanvasRenderingContext2D,
   content: ShareCardContent,
-  titleSize: number,
+  size: number,
   statsSize: number,
 ): FullText {
-  setText(ctx, font(800, titleSize, 'Poppins'), 0);
+  const titleSize = titleFace(ctx, content.title, FULL_TEXT_WIDTH, size, Math.round(size * 0.66));
   const lines = wrap(ctx, content.title, FULL_TEXT_WIDTH, 2);
   const lineHeight = Math.round(titleSize * 1.12);
   const height =

@@ -1,0 +1,210 @@
+<!-- The field with the caret already in it, and Cancel back to whatever
+     opened search. Named, because a searchbar with only a placeholder
+     announces itself as Ionic's default "search text". Its placeholder is a
+     word: beside Cancel the field is too narrow for the band's longer hint
+     in Romanian or at large text, and the line under it says what search
+     finds. Results bring the chips that narrow them, under the field like
+     every list's. -->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-searchbar
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      mhAutofocus="afterEnter"
+      inputmode="search"
+      enterkeyhint="search"
+      [placeholder]="'discover.search.fieldPlaceholder' | translate"
+      [attr.aria-label]="'discover.search.label' | translate"
+      [debounce]="0"
+      [value]="search.query()"
+      (ionInput)="onQueryChange($event.detail.value ?? '')"
+      (keyup.enter)="onSubmit($event)"
+    />
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">{{ 'button.cancel' | translate }}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  @if (showChips()) {
+    <ion-toolbar>
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'discover.search.filterLabel' | translate">
+        @for (option of kindChips(); track option.id) {
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="shownKind() === option.id"
+            [attr.aria-pressed]="shownKind() === option.id"
+            (click)="setKind(option.id)"
+          >
+            {{ option.label | translate }}
+            @if (option.id !== Kinds.All) {
+              <span class="count">{{ counts()[option.id] }}</span>
+            }
+          </ion-button>
+        }
+      </div>
+    </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  @switch (mode()) {
+    @case (Modes.Start) {
+      <!-- Recent: the last searches and the coaches and groups opened from
+           them, kept on this phone. -->
+      @if (hasRecents()) {
+        <div class="mh-section-label recent-head">
+          <span>{{ 'discover.search.recent' | translate }}</span>
+          <ion-button class="clear" fill="clear" color="medium" size="small" (click)="clearRecents()">
+            {{ 'discover.search.clear' | translate }}
+          </ion-button>
+        </div>
+        <ion-list class="mh-flat-list">
+          @for (row of recentRows(); track row.key) {
+            <ion-item button detail="false" (click)="openRecent(row.entry)">
+              @if (row.icon) {
+                <mh-hex-avatar
+                  slot="start"
+                  size="lg"
+                  color="coral"
+                  tone="wash"
+                  aria-hidden="true"
+                  [icon]="row.icon"
+                />
+              } @else {
+                <mh-hex-avatar
+                  slot="start"
+                  size="lg"
+                  aria-hidden="true"
+                  [name]="row.title"
+                  [imageUrl]="row.imageUrl"
+                  [color]="row.tone"
+                />
+              }
+              <ion-label>
+                <h2>{{ row.title }}</h2>
+                <p>{{ row.line }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      }
+
+      <div class="start">
+        <section class="mh-section">
+          <div class="mh-section-label browse-label">{{ 'discover.browse.title' | translate }}</div>
+          <div class="browse">
+            @for (goal of browseGoals; track goal.id) {
+              <ion-card button class="goal" (click)="openGoal(goal.id)">
+                <mh-hex-avatar size="sm" color="primary" tone="wash" aria-hidden="true" [icon]="goal.icon" />
+                <span class="goal-label">{{ goal.card | translate }}</span>
+              </ion-card>
+            }
+          </div>
+        </section>
+
+        <!-- What search finds, said once. -->
+        <p class="privacy">
+          <ion-icon name="lock-closed-outline" aria-hidden="true" />
+          <span>{{ 'discover.search.privacy' | translate }}</span>
+        </p>
+      </div>
+    }
+
+    @case (Modes.Short) {
+      <ion-note class="mh-note-block">{{ 'discover.search.hint' | translate }}</ion-note>
+    }
+
+    @default {
+      @if (mode() === Modes.Goal) {
+        <!-- The goal the results are narrowed to, with the way back to the
+             start: the honey pill a list narrowed from its calendar wears. -->
+        <div class="goal-pill">
+          <ion-button
+            class="mh-day-chip"
+            [attr.aria-label]="'discover.search.clearGoal' | translate: { goal: goalLabel() }"
+            (click)="clearGoal()"
+          >
+            {{ goalLabel() }}
+            <ion-icon slot="end" name="close-outline" aria-hidden="true" />
+          </ion-button>
+        </div>
+      }
+
+      @if (loading()) {
+        <!-- Placeholders only before the first answer; a later keystroke
+             keeps the last results until the next ones replace them. -->
+        <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
+        <ion-list class="mh-flat-list" aria-busy="true">
+          <mh-row-skeleton [index]="0" />
+          <mh-row-skeleton [index]="1" />
+        </ion-list>
+        <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
+        <ion-list class="mh-flat-list" aria-busy="true">
+          <mh-row-skeleton [index]="2" />
+        </ion-list>
+      } @else if (failed()) {
+        <mh-empty-state
+          icon="alert-circle-outline"
+          [heading]="'discover.search.error.heading' | translate"
+          [message]="'discover.search.error.message' | translate"
+          [actionLabel]="'button.tryAgain' | translate"
+          (action)="retry()"
+        />
+      } @else if (empty()) {
+        <mh-empty-state
+          icon="search-outline"
+          [heading]="'empty.noResults' | translate"
+          [message]="(mode() === Modes.Goal ? 'discover.search.goalEmpty' : 'discover.search.empty') | translate"
+          [actionLabel]="'button.clearSearch' | translate"
+          (action)="clearSearch()"
+        />
+      } @else {
+        @if (showKind(Kinds.Coaches) && coaches().length > 0) {
+          <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
+          <ion-list class="mh-flat-list">
+            @for (coach of coaches(); track coach.id) {
+              <mh-coach-row [coach]="coach" [highlight]="term()" (select)="openCoach(coach)" />
+            }
+          </ion-list>
+        }
+        @if (showKind(Kinds.Groups) && groups().length > 0) {
+          <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
+          <ion-list class="mh-flat-list">
+            @for (group of groups(); track group.id) {
+              <mh-discover-group-row
+                [group]="group"
+                [highlight]="term()"
+                [verb]="verbFor(group)"
+                [busy]="busyGroupId() === group.id"
+                (select)="openGroup(group)"
+                (verbPress)="joinGroup(group)"
+              />
+            }
+          </ion-list>
+        }
+        @if (showKind(Kinds.Sessions) && sessions().length > 0) {
+          <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
+          <ion-list class="mh-flat-list">
+            @for (instance of sessions(); track instance.id) {
+              <mh-session-result-row
+                [instance]="instance"
+                [highlight]="term()"
+                [booked]="isBooked(instance)"
+                (select)="openSession(instance)"
+              />
+            }
+          </ion-list>
+        }
+
+        @if (accentVariant(); as variant) {
+          <p class="mh-footnote accents">
+            {{ 'discover.search.accents' | translate: { typed: term(), variant: variant } }}
+          </p>
+        }
+      }
+    }
+  }
+</ion-content>

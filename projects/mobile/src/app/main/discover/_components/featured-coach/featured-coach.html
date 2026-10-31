@@ -1,0 +1,37 @@
+<!-- The coach of the week: a honeycomb band the portrait rides over, the
+     name, what they coach, a line of their own words, then the two ways
+     on. View profile is this card's main action, navy rather than honey:
+     the tab keeps honey for what is picked. -->
+<ion-card class="card">
+  <div class="top" aria-hidden="true">
+    <mh-hex-avatar
+      class="portrait"
+      size="xl"
+      [name]="name()"
+      [imageUrl]="coach().avatarUrl"
+      [color]="tone()"
+    />
+  </div>
+  @if (coach().isAcceptingClients) {
+    <ion-badge class="status" data-tone="success">
+      {{ 'discover.coachRow.takingClients' | translate }}
+    </ion-badge>
+  }
+  <div class="body">
+    <h3 class="name">{{ name() }}</h3>
+    @if (facts()) {
+      <p class="facts">{{ facts() }}</p>
+    }
+    @if (quote(); as quote) {
+      <p class="quote">{{ 'discover.featured.quote' | translate: { text: quote } }}</p>
+    }
+    <div class="actions">
+      <ion-button class="view" [disabled]="!coach().handle" (click)="viewProfile.emit()">
+        {{ 'discover.featured.viewProfile' | translate }}
+      </ion-button>
+      <ion-button class="mh-quiet" fill="outline" (click)="message.emit()">
+        {{ 'discover.featured.message' | translate }}
+      </ion-button>
+    </div>
+  </div>
+</ion-card>

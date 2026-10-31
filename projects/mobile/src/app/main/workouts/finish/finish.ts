@@ -51,6 +51,7 @@ import {
 import { HEX_PATH, HEX_VIEW_BOX } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ThemeService } from '../../../_shared/services/theme.service';
+import { workoutLinks } from '../../home/home-stack.config';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
 import { SaveRoutineService } from '../_services/save-routine.service';
 import { WorkoutPhotoStore, preparePhoto } from '../_services/workout-photo';
@@ -148,6 +149,12 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
   private readonly _themeService = inject(ThemeService);
   private readonly _authStore = inject(AuthStore);
   private readonly _saveRoutineService = inject(SaveRoutineService);
+
+  /**
+   * The stack this summary is in: the Workouts tab's, or Home's (a session
+   * on a record's progress). Its exits and its back follow it.
+   */
+  readonly backHref = workoutLinks(this._router.url).root;
 
   readonly hexPath = HEX_PATH;
   readonly hexViewBox = HEX_VIEW_BOX;
@@ -362,7 +369,7 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
     const snapshot = this._route.snapshot;
     const id = snapshot.paramMap.get('id');
     if (!id) {
-      void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
+      void this._router.navigate([this.backHref], { replaceUrl: true });
       return;
     }
     const firstLook = !this.log() && snapshot.queryParamMap.get('from') === 'logger';
@@ -376,6 +383,7 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
       .subscribe({
         next: (log) => {
           // Still running: a summary of it would be wrong in every number.
+          // The logger is the Workouts tab's, wherever this was opened.
           if (log.status === WorkoutLogStatus.InProgress) {
             this.loading.set(false);
             void this._router.navigate(['/tabs/workouts/log', log.id], { replaceUrl: true });
@@ -555,8 +563,9 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
   }
 
   /**
-   * Back to the Workouts tab. A freestyle session's toast offers to keep it
-   * as a routine; the same offer stays on the workout in History.
+   * Back where it was opened: the Workouts tab, or Home. A freestyle
+   * session's toast offers to keep it as a routine; the same offer stays on
+   * the workout in History.
    */
   private _leave(log: WorkoutLog): void {
     const offer =
@@ -570,7 +579,7 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
               }),
           }
         : undefined;
-    void this._router.navigate(['/tabs/workouts']);
+    void this._router.navigate([this.backHref]);
     void this._feedbackService.success(
       this._translateService.instant('workouts.finish.toast.saved'),
       offer,

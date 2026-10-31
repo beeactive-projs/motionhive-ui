@@ -37,6 +37,7 @@ import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
 
 import {
   activeTabIdFromUrl,
+  litTabId,
   resolveMode,
   TAB_ICONS,
   TAB_SETS,
@@ -181,8 +182,18 @@ export class Tabs {
     resolveMode(this.canSwitchMode(), this._appModeStore.mode()),
   );
 
-  /** The dot on the Menu tab, shared with the menu page's rows. */
-  readonly hasBillDue = this._moreBadgesService.hasBillDue;
+  /**
+   * The dot on the Menu tab, shared with the menu page's rows: a bill due,
+   * or a coach's invitation waiting on the Coaches row (both train mode
+   * only). What it announces, as a key; null for no dot.
+   */
+  readonly menuDot = computed(() => {
+    const bill = this._moreBadgesService.hasBillDue();
+    const invite = this._moreBadgesService.hasCoachInvites();
+    if (bill && invite) return 'shell.tabDot.billAndInvite';
+    if (bill) return 'shell.tabDot.billDue';
+    return invite ? 'shell.tabDot.coachInvite' : null;
+  });
 
   /**
    * Every moment the router has finished moving, successfully or not, plus
@@ -239,6 +250,14 @@ export class Tabs {
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
 
   /**
+   * The button to light: the stack's own tab, or the Menu for every stack
+   * the Menu opens (`litTabId`), in either mode.
+   */
+  readonly litTab = computed(() =>
+    litTabId(this.activeTabId(), this._tabSet().tabs.map((tab) => tab.id)),
+  );
+
+  /**
    * Live counters can't live in a plain const, so they are spliced in here.
    * Unread messages are honey, after WhatsApp; requests waiting on the coach
    * are red, a count of people to answer on the tab where they are answered.
@@ -285,6 +304,19 @@ export class Tabs {
     merge(this._appReturns, fromEvent(window, 'keyboardDidHide'))
       .pipe(takeUntilDestroyed())
       .subscribe(() => this._clearKeyboardHide());
+  }
+
+  /**
+   * `IonTabs` writes the stack it switched to straight onto the bar
+   * (`selectedTab = 'groups'`) after every stack change, behind the binding
+   * above. For a stack with no button of its own that left the bar dark,
+   * and the binding cannot put it back while its value has not changed, so
+   * the lit tab is written again here.
+   */
+  onTabsDidChange(): void {
+    const tabBar = this._tabBar().nativeElement as HTMLIonTabBarElement;
+    const lit = this.litTab();
+    if (tabBar.selectedTab !== lit) tabBar.selectedTab = lit;
   }
 
   /**

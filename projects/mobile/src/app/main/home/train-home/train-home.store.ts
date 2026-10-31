@@ -1,6 +1,6 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, finalize, Observable, of, take } from 'rxjs';
+import { catchError, finalize, map, Observable, of, take } from 'rxjs';
 
 import {
   ClientService,
@@ -39,8 +39,10 @@ const SESSIONS_LIMIT = 5;
  * (`/my/workouts/today`), this week's finished workouts (History's list),
  * the open session, the streak and records (Progress), your coaches and
  * groups, the groups' feed and today's bookings. Each block loads on its own
- * and a failure empties only its block. Bills are not here: the Menu's
- * Billing row carries the dot.
+ * and a failure empties only its block; the week card says so and offers a
+ * retry, as the coach's hive card does. Every read is silent: a dialog over
+ * the whole Home for one block's failure said it twice. Bills are not here:
+ * the Menu's Billing row carries the dot.
  */
 @Injectable()
 export class TrainHomeStore {
@@ -64,7 +66,12 @@ export class TrainHomeStore {
   private readonly _posts = signal<Post[]>([]);
   private readonly _bookings = signal<SessionParticipant[]>([]);
 
-  private readonly _weekLoaded = signal(false);
+  private readonly _weekLoading = signal(true);
+  /** The last load of the week failed (either of its two reads). */
+  private readonly _weekFailed = signal(false);
+  /** A whole week has loaded at least once: a failed reload keeps showing it. */
+  private readonly _weekShown = signal(false);
+  /** Set on an answer only: a failed read is not "nobody". */
   private readonly _coachesLoaded = signal(false);
   private readonly _groupsLoaded = signal(false);
 
@@ -74,7 +81,15 @@ export class TrainHomeStore {
   readonly groups = this._groups.asReadonly();
 
   /** The card shimmers until both the plan and the week's workouts are in. */
-  readonly weekLoaded = this._weekLoaded.asReadonly();
+  readonly showWeekSkeleton = computed(() => this._weekLoading() && !this._weekShown());
+  /** Only when there is no older week on screen to keep showing. */
+  readonly showWeekError = computed(
+    () => !this._weekLoading() && this._weekFailed() && !this._weekShown(),
+  );
+  /**
+   * Both people reads answered. A failure leaves it false, so "Build your
+   * hive" is never offered to someone whose coaches did not load.
+   */
   readonly peopleLoaded = computed(() => this._coachesLoaded() && this._groupsLoaded());
 
   readonly plan = computed<TrainingDayWorkout[]>(() => this._trainingDay()?.week ?? []);
@@ -119,63 +134,97 @@ export class TrainHomeStore {
     this._loadBookings(settle);
   }
 
-  /** Two reads, so `settle` is called twice; the card waits for both. */
+  /**
+   * Two reads, so `settle` is called twice; the card waits for both, and
+   * says it failed when either did (half a week would draw a wrong one).
+   */
   private _loadWeek(settle: () => void): void {
     const today = this._today();
-    const both = countdown(2, () => this._weekLoaded.set(true));
+    let failed = false;
+    this._weekLoading.set(true);
+    const both = countdown(2, () => {
+      this._weekFailed.set(failed);
+      if (!failed) this._weekShown.set(true);
+      this._weekLoading.set(false);
+    });
 
     // Today is the reader's own calendar day, not the server's.
-    this._read(this._programAssignmentService.trainingDay(localDayKey(today)), settle).subscribe(
-      (day) => {
-        if (day) this._trainingDay.set(day);
-        both();
-      },
-    );
+    const day = this._programAssignmentService.trainingDay(localDayKey(today), { silent: true });
+    this._read(day, settle).subscribe((answer) => {
+      if (answer) this._trainingDay.set(answer);
+      else failed = true;
+      both();
+    });
 
-    const logs = this._workoutLogService.list({ ...weekRange(today), limit: WEEK_LOG_LIMIT });
+    const logs = this._workoutLogService.list(
+      { ...weekRange(today), limit: WEEK_LOG_LIMIT },
+      { silent: true },
+    );
     this._read(logs, settle).subscribe((page) => {
       if (page) this._weekLogs.set(page.items);
+      else failed = true;
       both();
     });
   }
 
+  /**
+   * 200 with a null body when nothing is open, so null is an answer here:
+   * a failure keeps whatever was known rather than hiding an open workout.
+   */
   private _loadInProgress(settle: () => void): void {
-    // 200 with a null body when nothing is open.
-    this._read(this._workoutLogService.getInProgress(), settle).subscribe((log) =>
-      this._inProgress.set(log),
-    );
+    this._workoutLogService
+      .getInProgress({ silent: true })
+      .pipe(
+        take(1),
+        map((log): { log: WorkoutLog | null } => ({ log })),
+        catchError(() => of(null)),
+        finalize(settle),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((answer) => {
+        if (answer) this._inProgress.set(answer.log);
+      });
   }
 
   /** The streak and recent records; the shortest range, they are not windowed by it. */
   private _loadProgress(settle: () => void): void {
-    this._read(this._progressService.overview('4w'), settle).subscribe((overview) => {
-      this._streakWeeks.set(overview?.streak.currentWeeks ?? 0);
-      this._records.set(overview?.records ?? []);
-    });
+    this._read(this._progressService.overview('4w', { silent: true }), settle).subscribe(
+      (overview) => {
+        this._streakWeeks.set(overview?.streak.currentWeeks ?? 0);
+        this._records.set(overview?.records ?? []);
+      },
+    );
   }
 
   private _loadCoaches(settle: () => void): void {
-    this._read(this._clientService.getMyInstructors(), settle).subscribe((rows) => {
-      if (rows) this._coaches.set(rows);
-      this._coachesLoaded.set(true);
-    });
+    this._read(this._clientService.getMyInstructors({ silent: true }), settle).subscribe(
+      (rows) => {
+        if (!rows) return;
+        this._coaches.set(rows);
+        this._coachesLoaded.set(true);
+      },
+    );
   }
 
   private _loadGroups(settle: () => void): void {
-    this._read(this._groupService.getMyGroups(), settle).subscribe((groups) => {
-      if (groups) this._groups.set(groups);
+    this._read(this._groupService.getMyGroups({ silent: true }), settle).subscribe((groups) => {
+      if (!groups) return;
+      this._groups.set(groups);
       this._groupsLoaded.set(true);
     });
   }
 
   private _loadFeed(settle: () => void): void {
-    this._read(this._postService.getFeed(1, FEED_LIMIT), settle).subscribe((page) =>
-      this._posts.set(page?.items ?? []),
+    this._read(this._postService.getFeed(1, FEED_LIMIT, { silent: true }), settle).subscribe(
+      (page) => this._posts.set(page?.items ?? []),
     );
   }
 
   private _loadBookings(settle: () => void): void {
-    const bookings = this._sessionService.listMy({ tab: MyTab.Upcoming, limit: SESSIONS_LIMIT });
+    const bookings = this._sessionService.listMy(
+      { tab: MyTab.Upcoming, limit: SESSIONS_LIMIT },
+      { silent: true },
+    );
     this._read(bookings, settle).subscribe((page) => this._bookings.set(page?.items ?? []));
   }
 

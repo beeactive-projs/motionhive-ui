@@ -15,7 +15,10 @@ import {
   ShareSteps,
   StickerCellKinds,
   StickerStyles,
+  faceForWords,
+  fitLine,
   linkLabel,
+  linkParts,
   openingStep,
   saveCopyKeys,
   parseSharePrefs,
@@ -24,6 +27,7 @@ import {
   suggestedMode,
   toHexColor,
   withAlpha,
+  wrapLines,
 } from './share-card.config';
 
 const t = (key: string, params?: Record<string, unknown>) => translate(key, params);
@@ -216,6 +220,65 @@ describe('colours and links', () => {
   it('prints a link without its scheme', () => {
     expect(linkLabel('https://app.motionhive.fit/@anna')).toBe('app.motionhive.fit/@anna');
     expect(linkLabel('https://www.motionhive.fit/')).toBe('motionhive.fit');
+  });
+
+  it('splits a printed link at its slash, so it wraps between host and handle', () => {
+    expect(linkParts('app.motionhive.fit/@annapopescu')).toEqual({
+      host: 'app.motionhive.fit',
+      path: '@annapopescu',
+    });
+    expect(linkParts('localhost:4200/@anna')).toEqual({ host: 'localhost:4200', path: '@anna' });
+    expect(linkParts('motionhive.fit')).toEqual({ host: 'motionhive.fit', path: '' });
+  });
+});
+
+describe('text on a card', () => {
+  // Ten units a character, so widths are easy to read off.
+  const measure = (text: string) => Array.from(text).length * 10;
+
+  it('leaves a line that fits and ellipsises one that does not', () => {
+    expect(fitLine('Upper A', 100, measure)).toBe('Upper A');
+    expect(fitLine('Antrenament', 60, measure)).toBe('Antre…');
+    expect(measure(fitLine('Antrenament', 60, measure))).toBeLessThanOrEqual(60);
+  });
+
+  it('never cuts an emoji in half', () => {
+    expect(fitLine('🏆🏆🏆🏆', 25, measure)).toBe('🏆…');
+  });
+
+  it('wraps by words and ellipsises the last line when words are left over', () => {
+    expect(wrapLines('Full body day', 90, 2, measure)).toEqual(['Full body', 'day']);
+    expect(wrapLines('Antrenament complet pentru spate și umeri', 140, 2, measure)).toEqual([
+      'Antrenament',
+      'complet pentr…',
+    ]);
+    expect(wrapLines('Leg day', 200, 3, measure)).toEqual(['Leg day']);
+    expect(wrapLines('', 200, 2, measure)).toEqual([]);
+  });
+
+  it('fits a first word wider than the line instead of drawing it past the edge', () => {
+    // The bug: "Antrenament" alone on the first line, drawn as is, ran past
+    // the cell's ring.
+    const lines = wrapLines('Antrenament complet', 80, 2, measure);
+    expect(lines).toEqual(['Antrena…', 'complet']);
+    for (const line of lines) expect(measure(line)).toBeLessThanOrEqual(80);
+  });
+
+  it('fits every line when one more line is allowed', () => {
+    const lines = wrapLines('Antrenament complet pentru spate și umeri', 140, 3, measure);
+    expect(lines).toEqual(['Antrenament', 'complet pentru', 'spate și umeri']);
+    for (const line of lines) expect(measure(line)).toBeLessThanOrEqual(140);
+  });
+
+  it('shrinks the face until the longest word fits, never under the floor', () => {
+    // Width = characters × size × 0.6.
+    const at = (text: string, size: number) => Array.from(text).length * size * 0.6;
+    expect(faceForWords('Upper A', 200, 42, 30, at)).toBe(42);
+    // "Antrenament" is 11 characters: 11 × 0.6 × 30 = 198 fits 200, 32 does not.
+    expect(faceForWords('Antrenament complet', 200, 42, 30, at)).toBe(30);
+    expect(faceForWords('Antrenament complet', 220, 42, 30, at)).toBe(32);
+    expect(faceForWords('Supercalifragilistic', 200, 42, 30, at)).toBe(30);
+    expect(faceForWords('Odd', 10, 41, 30, at)).toBe(30);
   });
 });
 

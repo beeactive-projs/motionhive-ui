@@ -61,6 +61,8 @@ interface NeedSection {
   ],
   templateUrl: './needs-you.html',
   styleUrl: './needs-you.scss',
+  // Words wrap whole, never inside one; a line that cannot grow ellipses.
+  host: { class: 'mh-whole-words' },
   providers: [CoachHomeStore],
 })
 export class NeedsYou implements OnInit, ViewWillEnter {

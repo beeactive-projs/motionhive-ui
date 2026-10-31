@@ -63,6 +63,8 @@ interface LatestDay {
   templateUrl: './latest.html',
   styleUrl: './latest.scss',
   providers: [LatestStore],
+  // Words wrap whole, never inside one; a line that cannot grow ellipses.
+  host: { class: 'mh-whole-words' },
 })
 export class Latest implements OnInit, ViewWillEnter {
   private readonly _router = inject(Router);

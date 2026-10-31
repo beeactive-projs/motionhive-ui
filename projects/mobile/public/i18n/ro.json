@@ -482,7 +482,7 @@
       "notOnPlatform": "Nu e încă pe MotionHive",
       "scope": "Apar doar persoanele cu care nu ești deja conectat.",
       "searchLabel": "Caută persoane",
-      "searchPlaceholder": "Caută după nume sau scrie un email",
+      "searchPlaceholder": "Nume sau email",
       "sectionEmail": "Invită prin email",
       "sectionGroups": "Din grupurile tale",
       "sectionPeople": "Persoane",
@@ -632,12 +632,42 @@
       },
       "loadError": "Nu am putut încărca grupurile"
     },
+    "browse": {
+      "beginners": "De la zero",
+      "fatLoss": "Slăbește",
+      "mobility": "Mișcă-te mai bine",
+      "online": "Antrenament online",
+      "running": "Începe să alergi",
+      "strength": "Mai multă forță",
+      "title": "Caută după obiectiv"
+    },
+    "city": {
+      "everywhere": "Peste tot",
+      "footnote": "Sesiunile online apar în orice oraș. Alegerea rămâne pe acest telefon.",
+      "label": "Oraș: {city}. Alege altul",
+      "sheetTitle": "Alege orașul",
+      "showEverywhere": "Arată peste tot"
+    },
     "coach": {
       "experience": "{count, plural, one {# an de experiență} few {# ani de experiență} other {# de ani de experiență}}",
-      "newCoach": "Antrenor nou"
+      "newCoach": "Antrenor nou",
+      "years": "{count, plural, one {# an} few {# ani} other {# de ani}}"
     },
     "coachRow": {
+      "online": "Online",
       "takingClients": "Primește clienți"
+    },
+    "coaches": {
+      "all": "{count, plural, one {Vezi tot} few {Toți cei #} other {Toți cei #}}",
+      "near": "Antrenori din apropiere",
+      "title": "Antrenori"
+    },
+    "featured": {
+      "kicker": "Antrenorul săptămânii",
+      "kickerCity": "Antrenorul săptămânii · {city}",
+      "message": "Mesaj",
+      "quote": "„{text}”",
+      "viewProfile": "Vezi profilul"
     },
     "feed": {
       "dates": "Perioadă",
@@ -647,6 +677,8 @@
       },
       "loadError": "Nu am putut încărca sesiunile",
       "noMatches": "Nicio sesiune viitoare nu se potrivește acestor filtre.",
+      "noneInCity": "Nimic programat în {city}",
+      "noneInCityMessage": "Încearcă alt oraș sau caută peste tot.",
       "title": "Urmează"
     },
     "filterSheet": {
@@ -662,16 +694,17 @@
       "dates": "Perioadă",
       "title": "Filtrează sesiunile"
     },
+    "goals": {
+      "beginners": "Începători",
+      "label": "Obiective",
+      "mobility": "Mobilitate",
+      "online": "Online",
+      "running": "Alergare",
+      "strength": "Forță"
+    },
     "groupsRail": {
-      "all": "Toate grupurile",
+      "all": "Toate",
       "title": "Grupuri în care poți intra"
-    },
-    "hero": {
-      "title": "Găsește-ți locul în stup"
-    },
-    "rail": {
-      "allCoaches": "Toți antrenorii",
-      "title": "Primesc clienți noi"
     },
     "row": {
       "booked": "Rezervat",
@@ -681,16 +714,31 @@
       "spots": "{capacity, plural, one {{confirmed} din # loc} few {{confirmed} din # locuri} other {{confirmed} din # de locuri}}"
     },
     "search": {
+      "accents": "Rezultate pentru „{typed}” și „{variant}”. Diacriticele nu contează.",
+      "clear": "Șterge",
+      "clearGoal": "{goal}, renunță la obiectiv",
       "coaches": "Antrenori",
       "empty": "Nu am găsit antrenori, grupuri sau sesiuni. Încearcă mai puține cuvinte.",
       "error": {
         "heading": "Nu am putut căuta",
         "message": "Verifică-ți conexiunea și încearcă din nou."
       },
+      "fieldPlaceholder": "Caută",
+      "filterLabel": "Filtrează rezultatele",
+      "goalEmpty": "Încă nu sunt antrenori, grupuri sau sesiuni pentru acest obiectiv.",
       "groups": "Grupuri",
       "hint": "Scrie cel puțin două litere ca să cauți antrenori, grupuri și sesiuni.",
-      "placeholder": "Caută antrenori, grupuri și sesiuni",
-      "sessions": "Sesiuni"
+      "join": "Alătură-te",
+      "label": "Caută antrenori, grupuri și sesiuni",
+      "placeholder": "Antrenori, grupuri, sesiuni",
+      "privacy": "Căutarea găsește antrenori, grupuri și sesiuni.",
+      "recent": "Recente",
+      "recentCoach": "Antrenor",
+      "recentGroup": "Grup",
+      "recentSearch": "Căutare",
+      "request": "Cere acces",
+      "sessions": "Sesiuni",
+      "title": "Căutare"
     }
   },
   "exercises": {
@@ -1333,6 +1381,7 @@
       "morning": "Bună dimineața."
     },
     "latest": {
+      "capped": "{count, plural, one {Cel mai recent antrenament} few {Ultimele # antrenamente} other {Ultimele # de antrenamente}}",
       "empty": {
         "coach": "Aici apar antrenamentele terminate de clienții tăi.",
         "title": "Nimic nou încă",
@@ -1348,6 +1397,7 @@
       "sharedWorkout": "A postat un antrenament: {name}",
       "title": "Noutăți"
     },
+    "search": "Caută antrenori, grupuri și sesiuni",
     "switchRole": {
       "comingSoon": "În curând",
       "footnote": "Datele tale rămân într-un singur cont. Schimbarea rolului modifică doar ce vezi.",
@@ -1388,6 +1438,7 @@
         "headlineDays": "{count, plural, one {O zi de antrenament} few {# zile de antrenament} other {# de zile de antrenament}}",
         "headlinePlan": "{done} din {planned, plural, one {# antrenament făcut} few {# antrenamente făcute} other {# de antrenamente făcute}}",
         "kicker": "Săptămâna asta",
+        "loadError": "Nu am putut încărca săptămâna",
         "planDone": "Ai terminat planul pe săptămâna asta.",
         "record": "Record nou {weekday}",
         "streak": "{count, plural, one {# săptămână la rând} few {# săptămâni la rând} other {# de săptămâni la rând}}",
@@ -1755,7 +1806,8 @@
     "deleteAccount": "Șterge contul",
     "accountClosed": "Cont închis",
     "needsYou": "Au nevoie de tine",
-    "latest": "Noutăți"
+    "latest": "Noutăți",
+    "search": "Căutare"
   },
   "payments": {
     "badge": {
@@ -2571,7 +2623,9 @@
       "requestsWaiting": "{count, plural, one {# cerere de la clienți în așteptare} few {# cereri de la clienți în așteptare} other {# de cereri de la clienți în așteptare}}"
     },
     "tabDot": {
-      "billDue": "Ai o factură de plătit"
+      "billAndInvite": "Ai o factură de plătit și un antrenor te-a invitat",
+      "billDue": "Ai o factură de plătit",
+      "coachInvite": "Un antrenor te-a invitat"
     }
   },
   "workouts": {
@@ -2997,11 +3051,13 @@
         "subtitle": "Exact ce văd urmăritorii tăi",
         "title": "Cum vrei să arate?"
       },
+      "downloaded": "Am descărcat imaginea",
       "group": {
         "done": "Postat în {group}",
         "failed": "Nu am putut posta în grup",
         "hint": "Membrii văd un card cu numele antrenamentului și cifrele. Niciodată notița, greutățile sau poza.",
         "pending": "Trimis în {group}. Apare după ce grupul îl aprobă.",
+        "posting": "Se postează în {group}",
         "title": "Sau postează-l într-un grup"
       },
       "guide": {
@@ -3018,7 +3074,7 @@
       "instagram": {
         "missing": "Instagram nu e instalat pe telefon, așa că îți deschidem imaginea în meniul de distribuire.",
         "open": "Deschide în Instagram",
-        "web": "Story-urile se publică doar din aplicația de pe telefon, așa că îți deschidem imaginea în meniul de distribuire."
+        "web": "Story-urile se publică doar din aplicația de pe telefon, așa că am descărcat imaginea."
       },
       "mode": {
         "full": "Complet",
@@ -3036,6 +3092,7 @@
         "weights": "Arată greutățile"
       },
       "preview": "Previzualizarea imaginii pe care o distribui",
+      "previewFailed": "Nu am putut afișa previzualizarea",
       "save": {
         "action": "Salvează în Poze",
         "denied": "MotionHive nu poate adăuga în Poze. Permite accesul din Setări.",

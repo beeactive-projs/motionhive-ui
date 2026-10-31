@@ -14,6 +14,8 @@
             <div class="thumb">
               @if (quickPreview(); as src) {
                 <img [src]="src" [alt]="'workouts.share.choose.quick.preview' | translate" />
+              } @else if (quickFailed()) {
+                <p class="failed">{{ 'workouts.share.previewFailed' | translate }}</p>
               } @else {
                 <ion-spinner name="crescent" />
               }
@@ -47,6 +49,8 @@
             <div class="thumb">
               @if (fullPreview(); as src) {
                 <img [src]="src" [alt]="'workouts.share.choose.full.preview' | translate" />
+              } @else if (fullFailed()) {
+                <p class="failed">{{ 'workouts.share.previewFailed' | translate }}</p>
               } @else {
                 <ion-spinner name="crescent" />
               }
@@ -69,6 +73,13 @@
           </ion-card-content>
         </ion-card>
       </div>
+      <!-- Outside the cards: a button inside a card that is itself a button
+           would be two controls in one. -->
+      @if (quickFailed() || fullFailed()) {
+        <ion-button class="mh-text-link retry" fill="clear" (click)="retryPreview()">
+          {{ 'button.tryAgain' | translate }}
+        </ion-button>
+      }
       <p class="mh-footnote">{{ 'workouts.share.choose.remembered' | translate }}</p>
     </div>
   } @else {
@@ -91,6 +102,13 @@
       <div class="preview">
         @if (preview(); as src) {
           <img [src]="src" [alt]="'workouts.share.preview' | translate" />
+        } @else if (previewFailed()) {
+          <div class="failed">
+            <p>{{ 'workouts.share.previewFailed' | translate }}</p>
+            <ion-button class="mh-text-link" fill="clear" size="small" (click)="retryPreview()">
+              {{ 'button.tryAgain' | translate }}
+            </ion-button>
+          </div>
         } @else {
           <ion-spinner name="crescent" />
         }
@@ -221,26 +239,29 @@
 
         <ion-list [inset]="true" class="mh-card-list">
           @if (planCoach() || mentionableCoach()) {
-            <!-- Off on every share. Only a coach who allows mentions can be named. -->
+            <!-- Off on every share. Only a coach who allows mentions can be
+                 named. The line under it sits outside the toggle, and outside
+                 an ion-label (which an item with a disabled control fades
+                 too): a locked toggle dims, the reason it is locked does not. -->
             <ion-item>
-              <ion-toggle
-                justify="space-between"
-                [checked]="showCoach()"
-                [disabled]="!mentionableCoach()"
-                (ionChange)="showCoach.set($event.detail.checked)"
-              >
-                <ion-label class="ion-text-wrap">
+              <div class="toggle-with-note">
+                <ion-toggle
+                  justify="space-between"
+                  [checked]="showCoach()"
+                  [disabled]="!mentionableCoach()"
+                  (ionChange)="showCoach.set($event.detail.checked)"
+                >
                   {{ 'workouts.share.options.coach' | translate }}
-                  <p>
-                    {{
-                      (mentionableCoach()
-                        ? 'workouts.share.options.coachOff'
-                        : 'workouts.share.options.coachLocked'
-                      ) | translate
-                    }}
-                  </p>
-                </ion-label>
-              </ion-toggle>
+                </ion-toggle>
+                <p class="toggle-note">
+                  {{
+                    (mentionableCoach()
+                      ? 'workouts.share.options.coachOff'
+                      : 'workouts.share.options.coachLocked'
+                    ) | translate
+                  }}
+                </p>
+              </div>
             </ion-item>
           }
           <ion-item>
@@ -261,7 +282,9 @@
               >
                 <ion-label class="ion-text-wrap">
                   {{ 'workouts.share.options.link' | translate }}
-                  <p>{{ link }}</p>
+                  <!-- A break point after the slash: at large text the handle
+                       wraps whole instead of splitting inside the name. -->
+                  <p>{{ link.host }}/<wbr />{{ link.path }}</p>
                 </ion-label>
               </ion-toggle>
             </ion-item>
@@ -291,16 +314,23 @@
             <span class="mh-section-label">{{ 'workouts.share.group.title' | translate }}</span>
             <div class="mh-chip-cloud">
               @for (group of groups; track group.id) {
+                <!-- The spinner stands in for the name while it posts, and the
+                     button keeps a name to announce. -->
                 <ion-button
                   class="chip"
                   fill="clear"
                   shape="round"
                   size="small"
                   [disabled]="!!sharingTo()"
+                  [attr.aria-label]="
+                    sharingTo() === group.id
+                      ? ('workouts.share.group.posting' | translate: { group: group.name })
+                      : null
+                  "
                   (click)="shareToGroup(group)"
                 >
                   @if (sharingTo() === group.id) {
-                    <ion-spinner name="crescent" />
+                    <ion-spinner name="crescent" aria-hidden="true" />
                   } @else {
                     {{ group.name }}
                   }
@@ -323,8 +353,8 @@
   [showFooter]="step() !== Steps.Choose"
   [saveLabel]="saveLabel()"
   [actionLabel]="actionLabel()"
-  [actionDisabled]="!!busy() || !preview()"
-  [canSave]="!!preview() && (!busy() || saving())"
+  [actionDisabled]="!!busy() || !canAct()"
+  [canSave]="canAct() && (!busy() || saving())"
   [saving]="saving()"
   [breakpoints]="[0, 0.95]"
   [initialBreakpoint]="0.95"

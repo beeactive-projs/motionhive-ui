@@ -1,10 +1,10 @@
 <!-- Every public group the reader is not in, as a flat list: the full list
-     behind Discover's "Groups to join", in Discover's own stack so back
-     returns there. -->
+     behind "Groups to join", in the stack that opened it (Discover's or
+     Home's) so back returns there. -->
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/discover" />
+      <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
     <ion-title>{{ 'discover.groupsRail.title' | translate }}</ion-title>
   </ion-toolbar>

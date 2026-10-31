@@ -1,14 +1,6 @@
-/* Layout and type come from the flat-list skin (theme/components/ion-list.css),
-   the line from `.mh-row-line`, and the badge from its tone map
-   (ion-badge.css). */
+/* Layout, type and the one-line ellipses come from the flat-list skin
+   (theme/components/ion-list.css), the line from `.mh-row-line`, and the
+   badge from its tone map (ion-badge.css). */
 :host {
   display: block;
-}
-
-/* One line: the skin's 1.5rem line box would otherwise hide a wrapped
-   second half instead of ending it with an ellipsis. */
-ion-label h2 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

@@ -1,0 +1,107 @@
+/* A card like any other on the page (ion-card.css): its fill is its edge,
+   no outline. Only the band, the portrait's place and the type are set
+   here. */
+:host {
+  display: block;
+}
+
+.card {
+  position: relative;
+  margin: 0;
+}
+
+/* The hive card's honeycomb band, as a mask so its colour stays a token:
+   cream with honey lines in light, the card's navy with honey lines in
+   dark. No glow: see-through honey over navy mixed to a grey patch. */
+.top {
+  position: relative;
+  height: 4.5rem;
+  background: var(--mh-color-hive);
+  isolation: isolate;
+}
+
+.top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--mh-color-hive-pattern);
+  opacity: 0.12;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cpath d='M0 28L16 0h32l16 28-16 28H16zM64 28h32' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E");
+  mask-size: 6rem 3.5rem;
+  pointer-events: none;
+}
+
+/* The portrait rides half over the band, lifted off it by a ring of the
+   card's own fill. */
+.portrait {
+  position: absolute;
+  inset-inline-start: var(--mh-card-pad);
+  inset-block-end: -2.25rem;
+  filter: drop-shadow(0 0 0.125rem var(--ion-card-background));
+}
+
+.status {
+  position: absolute;
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 2.75rem var(--mh-card-pad) var(--mh-card-pad);
+}
+
+.name {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-lg);
+}
+
+.facts {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
+}
+
+/* Their own words, three lines at most. */
+.quote {
+  display: -webkit-box;
+  margin: 0.25rem 0 0;
+  overflow: hidden;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* Side by side while both labels fit, stacked once they would not (a
+   narrow phone at large text, a long Romanian label). */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.actions ion-button {
+  flex: 1 1 8rem;
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* The main action without honey: the page's ink as the fill and the page
+   as the label, navy on the light card, white on the navy one. */
+.view {
+  --background: var(--ion-text-color);
+  --background-activated: var(--ion-text-color);
+  --background-hover: var(--ion-text-color);
+  --color: var(--ion-background-color);
+  --box-shadow: none;
+}

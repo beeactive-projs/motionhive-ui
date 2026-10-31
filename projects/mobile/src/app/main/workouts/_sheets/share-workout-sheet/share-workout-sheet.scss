@@ -1,12 +1,29 @@
-/* The chooser: the two ways side by side, as tall as their longest. */
+/* The chooser: the two ways side by side, as tall as their longest, and
+   lined up row by row (kicker, picture, title, points), so a kicker that
+   wraps in one card ("Salvezi și postezi" at large text) moves both
+   pictures down together. Each level between this grid and the four rows
+   is a subgrid of it: the card, the card's own button (its `native` part,
+   the card being tappable) and the card's content. The card drops Ionic's
+   `contain: content`: layout containment makes a box its own formatting
+   context, and a subgrid inside one silently falls back to plain rows. */
 .ways {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--mh-page-rhythm);
+  grid-template-rows: repeat(4, auto);
+  gap: 0.5rem var(--mh-page-rhythm);
+}
+
+.way,
+.way::part(native),
+.way ion-card-content {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
 }
 
 /* A selectable tile: its border is the selection, honey when picked. */
 .way {
+  contain: none;
   border: var(--mh-ring-width) solid transparent;
 }
 
@@ -15,9 +32,6 @@
 }
 
 .way ion-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
   padding: 0.75rem;
 }
 
@@ -131,4 +145,48 @@
 
 .swatch.selected .swatch-label {
   font-weight: 600;
+}
+
+/* A preview that could not be drawn says so where the picture would be. */
+.failed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.75rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
+  text-align: center;
+}
+
+.failed p {
+  margin: 0;
+}
+
+.failed ion-button {
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}
+
+/* The chooser's Retry, under the two cards. */
+.retry {
+  align-self: center;
+  margin: 0;
+}
+
+/* A toggle with its line under it, both in the item: the line is not part
+   of the toggle, so a locked toggle fades while the line keeps its ink. */
+.toggle-with-note {
+  flex: 1;
+  min-width: 0;
+  padding-block-end: 0.5rem;
+}
+
+.toggle-note {
+  margin: -0.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
 }

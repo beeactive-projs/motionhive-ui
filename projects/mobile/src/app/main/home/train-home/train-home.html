@@ -17,7 +17,7 @@
 -->
 <div class="hive-wrap">
   <div class="hive-card train">
-    @if (!store.weekLoaded()) {
+    @if (store.showWeekSkeleton()) {
       <div class="hive-row">
         <ion-skeleton-text class="comb-skeleton" [animated]="true" />
         <div class="hive-copy">
@@ -26,6 +26,16 @@
           <ion-skeleton-text [animated]="true" style="width: 90%" />
         </div>
       </div>
+    } @else if (store.showWeekError()) {
+      <!-- Said in the card, as the coach's hive card says it: an empty week
+           here would tell someone with a plan that they have none. -->
+      <div class="hive-copy">
+        <h2 class="hive-title">{{ 'home.train.week.loadError' | translate }}</h2>
+        <p class="hive-sub">{{ 'error.checkConnection' | translate }}</p>
+      </div>
+      <ion-button class="hive-link" fill="clear" (click)="retry()">
+        {{ 'button.tryAgain' | translate }}
+      </ion-button>
     } @else {
       <div class="hive-row">
         <mh-hive [cells]="cells()" [label]="weekLabel()" />

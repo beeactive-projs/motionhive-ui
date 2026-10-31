@@ -3,7 +3,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/discover" />
+      <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
     <ion-title>{{ 'discover.allCoaches.title' | translate }}</ion-title>
   </ion-toolbar>

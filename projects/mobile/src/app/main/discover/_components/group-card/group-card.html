@@ -1,0 +1,19 @@
+<!-- One button: the card's text is its accessible name (the group, then how
+     many are in it and where). -->
+<ion-card button class="card" (click)="select.emit()">
+  <mh-hex-avatar
+    size="md"
+    aria-hidden="true"
+    [name]="group().name"
+    [imageUrl]="group().logoUrl"
+    [color]="tone"
+  />
+  <h3 class="name">{{ group().name }}</h3>
+  <!-- Each part kept whole, its separator with it; the line breaks only
+       between them. -->
+  <p class="meta">
+    @for (part of meta(); track $index) {
+      <span class="part">{{ $last ? part : part + ' ·' }}</span>
+    }
+  </p>
+</ion-card>

@@ -20,9 +20,18 @@ ion-label h2 {
   line-clamp: 2;
 }
 
-/* "n of m spots": the quiet third line; the full chip replaces it. */
+/* The third line wraps rather than cutting a badge: "Booked" and "Full"
+   side by side outgrow a narrow card at large text. */
+.tags.status {
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+
+/* "n of m spots": the quiet third line, after "Booked" when the reader has
+   a seat; the full chip replaces it. */
 .spots {
-  margin: 0.25rem 0 0;
+  min-width: 0;
+  margin: 0;
   overflow: hidden;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);

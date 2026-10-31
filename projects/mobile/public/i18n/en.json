@@ -482,7 +482,7 @@
       "notOnPlatform": "Not on MotionHive yet",
       "scope": "Only people you are not already connected to are shown.",
       "searchLabel": "Search people",
-      "searchPlaceholder": "Search by name, or type an email",
+      "searchPlaceholder": "Name or email",
       "sectionEmail": "Invite by email",
       "sectionGroups": "From your groups",
       "sectionPeople": "People",
@@ -632,12 +632,42 @@
       },
       "loadError": "Couldn't load groups"
     },
+    "browse": {
+      "beginners": "Total beginner",
+      "fatLoss": "Lose fat",
+      "mobility": "Move better",
+      "online": "Online coaching",
+      "running": "Start running",
+      "strength": "Get stronger",
+      "title": "Browse by goal"
+    },
+    "city": {
+      "everywhere": "Everywhere",
+      "footnote": "Online sessions show in every city. Your choice stays on this phone.",
+      "label": "City: {city}. Choose another",
+      "sheetTitle": "Choose a city",
+      "showEverywhere": "Show everywhere"
+    },
     "coach": {
       "experience": "{count, plural, one {# yr experience} other {# yrs experience}}",
-      "newCoach": "New coach"
+      "newCoach": "New coach",
+      "years": "{count, plural, one {# yr} other {# yrs}}"
     },
     "coachRow": {
+      "online": "Online",
       "takingClients": "Taking clients"
+    },
+    "coaches": {
+      "all": "{count, plural, one {See all} other {All #}}",
+      "near": "Coaches near you",
+      "title": "Coaches"
+    },
+    "featured": {
+      "kicker": "Coach of the week",
+      "kickerCity": "Coach of the week · {city}",
+      "message": "Message",
+      "quote": "“{text}”",
+      "viewProfile": "View profile"
     },
     "feed": {
       "dates": "Dates",
@@ -647,6 +677,8 @@
       },
       "loadError": "Couldn't load sessions",
       "noMatches": "No upcoming sessions match these filters.",
+      "noneInCity": "Nothing coming up in {city}",
+      "noneInCityMessage": "Try another city, or look everywhere.",
       "title": "Coming up"
     },
     "filterSheet": {
@@ -662,16 +694,17 @@
       "dates": "Dates",
       "title": "Filter sessions"
     },
+    "goals": {
+      "beginners": "Beginners",
+      "label": "Goals",
+      "mobility": "Mobility",
+      "online": "Online",
+      "running": "Running",
+      "strength": "Strength"
+    },
     "groupsRail": {
-      "all": "All groups",
+      "all": "All",
       "title": "Groups to join"
-    },
-    "hero": {
-      "title": "Find your place in the hive"
-    },
-    "rail": {
-      "allCoaches": "All coaches",
-      "title": "Taking new clients"
     },
     "row": {
       "booked": "Booked",
@@ -681,16 +714,31 @@
       "spots": "{confirmed} of {capacity} spots"
     },
     "search": {
+      "accents": "Showing matches for “{typed}” and “{variant}”. Accents don't matter.",
+      "clear": "Clear",
+      "clearGoal": "{goal}, clear this goal",
       "coaches": "Coaches",
       "empty": "No coaches, groups or sessions match that. Try fewer words.",
       "error": {
         "heading": "Couldn't search",
         "message": "Check your connection and try typing again."
       },
+      "fieldPlaceholder": "Search",
+      "filterLabel": "Filter results",
+      "goalEmpty": "No coaches, groups or sessions for this goal yet.",
       "groups": "Groups",
       "hint": "Type at least two letters to search coaches, groups and sessions.",
-      "placeholder": "Search coaches, groups and sessions",
-      "sessions": "Sessions"
+      "join": "Join",
+      "label": "Search coaches, groups and sessions",
+      "placeholder": "Coaches, groups, sessions",
+      "privacy": "Search finds coaches, groups and sessions.",
+      "recent": "Recent",
+      "recentCoach": "Coach",
+      "recentGroup": "Group",
+      "recentSearch": "Search",
+      "request": "Request",
+      "sessions": "Sessions",
+      "title": "Search"
     }
   },
   "exercises": {
@@ -1333,6 +1381,7 @@
       "morning": "Good morning."
     },
     "latest": {
+      "capped": "{count, plural, one {The most recent workout} other {The # most recent workouts}}",
       "empty": {
         "coach": "Workouts your clients finish show up here.",
         "title": "Nothing new yet",
@@ -1348,6 +1397,7 @@
       "sharedWorkout": "Posted a workout: {name}",
       "title": "Latest"
     },
+    "search": "Search coaches, groups and sessions",
     "switchRole": {
       "comingSoon": "Coming soon",
       "footnote": "Your data stays in one account. Switching only changes what you see.",
@@ -1388,6 +1438,7 @@
         "headlineDays": "{count, plural, one {# day trained} other {# days trained}}",
         "headlinePlan": "{done} of {planned, plural, one {# workout} other {# workouts}} done",
         "kicker": "This week",
+        "loadError": "Couldn't load your week",
         "planDone": "Plan done for the week.",
         "record": "Record on {weekday}",
         "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}",
@@ -1755,7 +1806,8 @@
     "deleteAccount": "Delete account",
     "accountClosed": "Account closed",
     "needsYou": "Needs you",
-    "latest": "Latest"
+    "latest": "Latest",
+    "search": "Search"
   },
   "payments": {
     "badge": {
@@ -2571,7 +2623,9 @@
       "requestsWaiting": "{count, plural, one {# client request waiting} other {# client requests waiting}}"
     },
     "tabDot": {
-      "billDue": "You have a bill due"
+      "billAndInvite": "You have a bill due and a coach invited you",
+      "billDue": "You have a bill due",
+      "coachInvite": "A coach invited you"
     }
   },
   "workouts": {
@@ -2997,11 +3051,13 @@
         "subtitle": "Exactly what your followers will see",
         "title": "How should it look?"
       },
+      "downloaded": "Picture downloaded",
       "group": {
         "done": "Posted in {group}",
         "failed": "Could not post it in the group",
         "hint": "Members see a card with the workout's name and the numbers. Never your note, weights or photo.",
         "pending": "Sent to {group}. It shows once the group approves it.",
+        "posting": "Posting in {group}",
         "title": "Or post it in a group"
       },
       "guide": {
@@ -3018,7 +3074,7 @@
       "instagram": {
         "missing": "Instagram isn't installed on this phone, so the picture opens in the share sheet.",
         "open": "Open in Instagram",
-        "web": "Stories only open from the phone app, so the picture opens in the share sheet."
+        "web": "Stories only open from the phone app, so the picture was downloaded instead."
       },
       "mode": {
         "full": "Full",
@@ -3036,6 +3092,7 @@
         "weights": "Show weights"
       },
       "preview": "Preview of the picture you are sharing",
+      "previewFailed": "Could not show the preview",
       "save": {
         "action": "Save to Photos",
         "denied": "MotionHive can't add to Photos. Allow it in Settings.",

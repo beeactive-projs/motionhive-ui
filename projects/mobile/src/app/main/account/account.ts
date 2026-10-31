@@ -167,7 +167,13 @@ export class Account implements OnInit, ViewWillEnter {
   }));
 
   readonly timezone = computed(() => this.account()?.timezone ?? null);
+  /**
+   * The account's place, or "Not set" when the account has none. Nothing
+   * at all while the account is not loaded (a failed load): unknown is not
+   * unset.
+   */
   readonly timezoneLabel = computed(() => {
+    if (!this.account()) return null;
     const timezone = this.timezone();
     return timezone
       ? timezonePlace(timezone)

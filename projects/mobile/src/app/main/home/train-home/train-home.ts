@@ -26,10 +26,10 @@ import {
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor, GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupBase, personBase, ProfileStacks } from '../../../_shared/utils/stack-paths';
-import { GroupsSegments } from '../../groups/groups.filters';
 import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
+import { HOME_STACK, HomePages } from '../home-stack.config';
 import {
   greetingPeriod,
   LatestRow,
@@ -248,6 +248,11 @@ export class TrainHome implements OnInit {
     this.store.load(done);
   }
 
+  /** The week card's Try again, after its reads failed. */
+  retry(): void {
+    this.store.load();
+  }
+
   // ─── Workouts ────────────────────────────────────────────────
 
   resume(): void {
@@ -255,11 +260,14 @@ export class TrainHome implements OnInit {
     if (log) void this._router.navigate(['/tabs/workouts/log', log.id]);
   }
 
-  /** The day's preview, where it is started, as on the Workouts tab. */
+  /**
+   * The day's preview, where it is started, as on the Workouts tab; in
+   * Home's stack, so back returns here. Start opens the logger in Workouts.
+   */
   openNext(): void {
     const workout = this.store.nextWorkout()?.workout;
     if (!workout) return;
-    void this._router.navigate(['/tabs/workouts/preview', workout.programAssignmentId], {
+    void this._router.navigate([HOME_STACK, 'preview', workout.programAssignmentId], {
       queryParams: { workout: workout.assignedWorkoutId },
     });
   }
@@ -270,14 +278,13 @@ export class TrainHome implements OnInit {
 
   // ─── People and posts ────────────────────────────────────────
 
+  /** Discover's lists, in Home's stack so back returns here. */
   findCoach(): void {
-    void this._router.navigateByUrl('/tabs/discover/coaches');
+    void this._router.navigateByUrl(HomePages.Coaches);
   }
 
   findGroup(): void {
-    void this._router.navigate(['/tabs/groups'], {
-      queryParams: { segment: GroupsSegments.Discover },
-    });
+    void this._router.navigateByUrl(HomePages.GroupsToJoin);
   }
 
   addToHive(): void {
@@ -294,18 +301,18 @@ export class TrainHome implements OnInit {
   }
 
   /**
-   * One booking opens itself, in Home's stack so back returns here; several
-   * open the list in the Sessions tab.
+   * One booking opens itself, several open the list of bookings; both in
+   * Home's stack, so back returns here.
    */
   openToday(): void {
     const first = this.todayFirst();
     if (first && this.todayMore() === 0) {
-      void this._router.navigate([ProfileStacks.Home, 'booking', first.instanceId], {
+      void this._router.navigate([HOME_STACK, 'booking', first.instanceId], {
         state: { participant: first },
       });
       return;
     }
-    void this._router.navigateByUrl('/tabs/user/sessions');
+    void this._router.navigateByUrl(HomePages.Bookings);
   }
 
   private _coachMember(coach: MyInstructor): HiveMember {

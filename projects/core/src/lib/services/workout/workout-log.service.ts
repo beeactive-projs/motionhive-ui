@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import type {
   CompleteWorkoutPayload,
   LoggedExercise,
@@ -174,7 +175,10 @@ export class WorkoutLogService {
    * first. BE eager-loads the assignment + lightweight set list so the
    * row metric "18 sets" computes client-side without a follow-up hit.
    */
-  list(query: ListWorkoutLogsQuery = {}): Observable<PaginatedWorkoutLogs> {
+  list(
+    query: ListWorkoutLogsQuery = {},
+    opts?: { silent?: boolean },
+  ): Observable<PaginatedWorkoutLogs> {
     let p = new HttpParams();
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
@@ -183,7 +187,10 @@ export class WorkoutLogService {
     if (query.search?.trim()) p = p.set('search', query.search.trim());
     if (query.has) p = p.set('has', query.has);
     if (query.kind) p = p.set('kind', query.kind);
-    return this._http.get<PaginatedWorkoutLogs>(this._base, { params: p });
+    return this._http.get<PaginatedWorkoutLogs>(this._base, {
+      params: p,
+      ...(opts?.silent ? { context: silentRequest() } : {}),
+    });
   }
 
   /**
@@ -242,9 +249,11 @@ export class WorkoutLogService {
 
   /** Most-recent IN_PROGRESS workout for the signed-in user (or null
    *  if there's nothing to resume). 200 with null body — no 404. */
-  getInProgress(): Observable<WorkoutLog | null> {
+  /** `silent` as on `list`. */
+  getInProgress(opts?: { silent?: boolean }): Observable<WorkoutLog | null> {
     return this._http.get<WorkoutLog | null>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.IN_PROGRESS}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 

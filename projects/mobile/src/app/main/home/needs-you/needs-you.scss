@@ -1,10 +1,3 @@
-// Words wrap whole, never inside one (Ionic's body breaks them; home.scss).
-:host {
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
-}
-
 // The count beside each reason: figures that line up label to label.
 .count {
   font-variant-numeric: tabular-nums;

@@ -1,0 +1,22 @@
+<!-- A flat-list row (ion-list.css), like the coaches and groups above it:
+     a calendar tile, the title with the matched part marked, then when and
+     with whom, and "Booked" trailing that line once the reader has a seat. -->
+<ion-item button detail="false" (click)="select.emit()">
+  <mh-hex-avatar
+    slot="start"
+    size="lg"
+    color="info"
+    tone="wash"
+    icon="calendar-outline"
+    aria-hidden="true"
+  />
+  <ion-label>
+    <h2><mh-highlight [text]="title()" [term]="highlight()" /></h2>
+    <div class="mh-row-line">
+      <p>{{ line() }}</p>
+      @if (booked()) {
+        <ion-badge data-tone="success">{{ 'discover.row.booked' | translate }}</ion-badge>
+      }
+    </div>
+  </ion-label>
+</ion-item>

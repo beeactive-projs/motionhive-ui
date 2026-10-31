@@ -13,6 +13,9 @@
     }
   </div>
 
+  <!-- The meta line holds who and where alone, so at 130% text the coach's
+       name keeps its room; whether you have a seat and how full it is take
+       the third line. -->
   <ion-label>
     <h2>{{ title() }}</h2>
     <div class="tags">
@@ -20,16 +23,18 @@
         <ion-icon class="online" name="videocam-outline" aria-hidden="true" />
       }
       <ion-note>{{ meta() }}</ion-note>
-      @if (booked()) {
-        <ion-badge data-tone="success">{{ 'discover.row.booked' | translate }}</ion-badge>
-      }
     </div>
-    @if (chip(); as chip) {
-      <div class="tags">
-        <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+    @if (booked() || chip() || spots()) {
+      <div class="tags status">
+        @if (booked()) {
+          <ion-badge data-tone="success">{{ 'discover.row.booked' | translate }}</ion-badge>
+        }
+        @if (chip(); as chip) {
+          <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+        } @else if (spots(); as spots) {
+          <p class="spots">{{ spots }}</p>
+        }
       </div>
-    } @else if (spots(); as spots) {
-      <p class="spots">{{ spots }}</p>
     }
   </ion-label>
 

@@ -6,19 +6,58 @@ ion-label {
   min-width: 0;
 }
 
-// The second line keeps to one line, whatever a post says.
-p {
+// The title may take a second line, words whole ("New record: Romanian
+// deadlift" at a large text size), rather than lose the exercise. Each line
+// is one row line, so the row still lands on the grid; the time stays on
+// the first. Specific enough to outrank the flat list's one-line box.
+ion-label > .mh-row-line.title-line {
+  align-items: flex-start;
+  block-size: auto;
+}
+
+.title-line > h2 {
+  display: -webkit-box;
+  max-block-size: calc(2 * var(--mh-row-line));
+  line-height: var(--mh-row-line);
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.title-line > ion-note {
+  line-height: var(--mh-row-line);
+  font-variant-numeric: tabular-nums;
+}
+
+// The second line keeps to one line, and only its words give way: a
+// workout's name, a group's, a post ellipsize, while a record count, a
+// length or a gain stays whole (`LatestPart.whole`). The last of the words
+// takes what the others leave, so a group's name is not cut for a long post.
+.parts {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.parts > span {
+  flex: none;
+  white-space: nowrap;
+}
+
+.parts > .part:not(.whole) {
+  flex: 0 1 auto;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.parts > .part:not(.whole):last-child {
+  flex: 1 1 0;
 }
 
 // A record wears the deep honey, as a record does everywhere.
 .accent {
   color: var(--mh-color-honey-deep);
   font-weight: 600;
-}
-
-ion-note {
-  font-variant-numeric: tabular-nums;
 }

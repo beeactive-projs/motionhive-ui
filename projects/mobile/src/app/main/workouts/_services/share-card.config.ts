@@ -304,6 +304,80 @@ export function linkLabel(url: string): string {
     .replace(/\/+$/, '');
 }
 
+/**
+ * A printed link split where it may break: the host, then the handle
+ * ("app.motionhive.fit" and "@anna"), so a narrow line wraps at the slash
+ * instead of inside the name. A link with no path is all host.
+ */
+export function linkParts(label: string): { host: string; path: string } {
+  const slash = label.indexOf('/');
+  return slash < 0
+    ? { host: label, path: '' }
+    : { host: label.slice(0, slash), path: label.slice(slash + 1) };
+}
+
+// ─── Text on a card ────────────────────────────────────────────────────────
+
+/** How wide a string draws in the face currently set on the canvas. */
+export type MeasureText = (text: string) => number;
+
+/** Shortens with an ellipsis until it fits; a line that fits is left alone. */
+export function fitLine(text: string, maxWidth: number, measure: MeasureText): string {
+  if (measure(text) <= maxWidth) return text;
+  // By character, not code unit: an emoji is two units and half of one
+  // draws as a box.
+  const chars = Array.from(text);
+  while (chars.length > 1 && measure(`${chars.join('')}…`) > maxWidth) chars.pop();
+  return `${chars.join('').trimEnd()}…`;
+}
+
+/**
+ * Word-wraps into at most `maxLines` and fits every line to `maxWidth`:
+ * the last one ellipsised when words are left over, and any line holding
+ * a word wider than the line ellipsised too, so nothing runs past the
+ * shape it is drawn in.
+ */
+export function wrapLines(
+  text: string,
+  maxWidth: number,
+  maxLines: number,
+  measure: MeasureText,
+): string[] {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let next = 0;
+  while (next < words.length && lines.length < maxLines - 1) {
+    let line = words[next++];
+    while (next < words.length && measure(`${line} ${words[next]}`) <= maxWidth) {
+      line = `${line} ${words[next++]}`;
+    }
+    lines.push(line);
+  }
+  if (next < words.length) lines.push(words.slice(next).join(' '));
+  return lines.map((line) => fitLine(line, maxWidth, measure));
+}
+
+/**
+ * The largest face, from `size` down to `floor` in steps of 2, at which the
+ * text's longest word fits `maxWidth` ("Antrenament" in a cell): a title
+ * gets smaller before a word gets cut. The floor when nothing fits; the
+ * ellipsis takes it from there.
+ */
+export function faceForWords(
+  text: string,
+  maxWidth: number,
+  size: number,
+  floor: number,
+  measureAt: (text: string, size: number) => number,
+): number {
+  const words = text.split(/\s+/).filter(Boolean);
+  let current = size;
+  while (current > floor && words.some((word) => measureAt(word, current) > maxWidth)) {
+    current = Math.max(floor, current - 2);
+  }
+  return current;
+}
+
 // ─── The cells sticker ─────────────────────────────────────────────────────
 
 export const StickerCellKinds = {

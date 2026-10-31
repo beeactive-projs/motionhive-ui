@@ -4,32 +4,60 @@ import { describe, expect, it } from 'vitest';
 import type { DiscoverGroup, InstructorSearchResult, PublicSessionInstance } from 'core';
 import { GroupMemberPostPolicies, JoinPolicies, SessionLocationKind, SessionType } from 'core';
 
-import { GROUP_AVATAR_TONE } from '../../_shared/utils/avatar-tone.utils';
 import { bookingPriceLabel } from '../user/sessions/my-sessions.config';
 import {
+  BROWSE_GOALS,
+  DISCOVER_GOALS,
   DISCOVER_ICONS,
   DiscoverDatePresets,
+  DiscoverGoalIds,
+  DiscoverRecent,
   DiscoverTones,
+  EVERYWHERE,
+  GOAL_CHIPS,
+  GroupVerbs,
   NO_SHEET_FILTERS,
   QuickFilterIds,
+  RECENT_LIMIT,
+  RecentKinds,
+  accentVariant,
+  bioQuote,
+  cityKey,
+  coachBadge,
+  coachFacts,
+  coachMatchesGoal,
   coachName,
-  coachStripItem,
+  coachNearLine,
+  coachOfTheWeek,
   coachSubline,
   compileDatePreset,
+  discoverCities,
   discoverGroupMeta,
+  discoverGroupMetaParts,
+  discoverLinks,
   discoverMeta,
   discoverTone,
   fullChip,
-  groupStripItem,
+  groupMatchesGoal,
+  groupVerb,
+  highlightParts,
+  inCity,
   isSessionFull,
+  isoWeek,
   matchesSpecialization,
+  parseRecents,
+  pushRecent,
   quickFilterSelected,
+  resolveCity,
+  sessionInCity,
+  sessionMatchesGoal,
   sessionPriceParts,
   sheetFilterCount,
   sortCoaches,
   specializationOptions,
   spotsLabel,
-  stripItemLabel,
+  textMatchesGoal,
+  withoutReader,
 } from './discover.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -410,9 +438,9 @@ describe('coach helpers', () => {
     expect(coachName(coach())).toBe('Ana Popescu');
   });
 
-  it('coachSubline says where, then what they coach', () => {
+  it('coachSubline says what they coach, then where', () => {
     expect(coachSubline(coach({ specializations: ['Yoga', ' Pilates '] }))).toBe(
-      'Bucharest · Yoga · Pilates',
+      'Yoga · Pilates · Bucharest',
     );
     expect(coachSubline(coach({ city: null }))).toBe('Yoga');
     expect(coachSubline(coach({ specializations: null }))).toBe('Bucharest');
@@ -451,12 +479,16 @@ describe('coach helpers', () => {
   });
 });
 
-// ─── Groups and strips ─────────────────────────────────────────────────────
+// ─── Groups ────────────────────────────────────────────────────────────────
 
 describe('discoverGroupMeta', () => {
   it('reads size, then where', () => {
     expect(discoverGroupMeta(group())).toBe('12 members · Cluj-Napoca');
     expect(discoverGroupMeta(group({ memberCount: 1, city: null }))).toBe('1 member');
+  });
+
+  it('comes in parts, so a card can keep each one whole', () => {
+    expect(discoverGroupMetaParts(group({ city: ' Cluj-Napoca ' }))).toEqual(['12 members', 'Cluj-Napoca']);
   });
 
   it('leads with a pending request, so the row does not read as untouched', () => {
@@ -466,34 +498,280 @@ describe('discoverGroupMeta', () => {
   });
 });
 
-describe('strip items', () => {
-  it('a coach shows the display name over the city, and is inert without a profile', () => {
-    const item = coachStripItem(coach({ displayName: 'Coach Ana' }));
-    expect(item).toMatchObject({ id: 'prof-1', name: 'Coach Ana', meta: 'Bucharest', disabled: false });
-    expect(coachStripItem(coach({ handle: null })).disabled).toBe(true);
-    expect(coachStripItem(coach({ city: '  ' })).meta).toBeNull();
+describe('coach lines and badge', () => {
+  it('coachNearLine shows two specialties, then the years, or the city across cities', () => {
+    const ana = coach({ specializations: ['Forță', 'Alergare', 'Mobilitate'], city: 'Cluj-Napoca', yearsOfExperience: 6 });
+    expect(coachNearLine(ana, false)).toBe('Forță · Alergare · 6 yrs');
+    expect(coachNearLine(ana, true)).toBe('Forță · Alergare · Cluj-Napoca');
+    expect(coachNearLine(coach({ specializations: [], yearsOfExperience: null }), false)).toBe('Bucharest');
   });
 
-  it('a coach keeps the same tone wherever it shows, keyed on the user id', () => {
-    expect(coachStripItem(coach()).tone).toBe(coachStripItem(coach({ id: 'other' })).tone);
+  it('coachFacts is up to three specialties and the years', () => {
+    expect(coachFacts(coach({ specializations: ['A', 'B', 'C', 'D'], yearsOfExperience: 1 }))).toBe('A · B · C · 1 yr');
+    expect(coachFacts(coach({ specializations: null, yearsOfExperience: 0 }))).toBe('');
   });
 
-  it('a group shows its name over the city', () => {
-    expect(groupStripItem(group())).toMatchObject({
-      id: 'grp-1',
-      name: 'Forță pentru începători',
-      meta: 'Cluj-Napoca',
-      disabled: false,
-    });
+  it('coachBadge says Online for an online coach, else Taking clients, else nothing', () => {
+    expect(coachBadge(coach({ specializations: ['Online coaching'] }))).toEqual({ label: 'Online', tone: 'teal' });
+    expect(coachBadge(coach())).toEqual({ label: 'Taking clients', tone: 'success' });
+    expect(coachBadge(coach({ isAcceptingClients: false }))).toBeNull();
   });
 
-  it('every group is violet, whatever its id, as groups are on every screen', () => {
-    expect(groupStripItem(group()).tone).toBe(GROUP_AVATAR_TONE);
-    expect(groupStripItem(group({ id: 'grp-2' })).tone).toBe('violet');
+  it('withoutReader leaves the reader out, and everyone in without one', () => {
+    const list = [coach(), coach({ id: 'p2', userId: 'usr-2' })];
+    expect(withoutReader(list, 'usr-1').map((c) => c.id)).toEqual(['p2']);
+    expect(withoutReader(list, null)).toHaveLength(2);
+  });
+});
+
+describe('bioQuote', () => {
+  it('takes the first sentence, tidied', () => {
+    expect(bioQuote('  I help beginners lift.   Ten years in.')).toBe('I help beginners lift.');
+    expect(bioQuote('No full stop here')).toBe('No full stop here');
+    expect(bioQuote('Ce faci? Hai la sală.')).toBe('Ce faci?');
   });
 
-  it('the accessible name says the whole item', () => {
-    expect(stripItemLabel(groupStripItem(group()))).toBe('Forță pentru începători, Cluj-Napoca');
-    expect(stripItemLabel(groupStripItem(group({ city: null })))).toBe('Forță pentru începători');
+  it('is null without a bio', () => {
+    expect(bioQuote(null)).toBeNull();
+    expect(bioQuote('   ')).toBeNull();
+  });
+
+  it('cuts a long sentence at a word with an ellipsis', () => {
+    const long = `${'word '.repeat(40)}end.`;
+    const quote = bioQuote(long, 40)!;
+    expect(quote.endsWith('word…')).toBe(true);
+    expect(quote.length).toBeLessThanOrEqual(41);
+  });
+});
+
+describe('coach of the week', () => {
+  it('isoWeek follows ISO 8601', () => {
+    expect(isoWeek(new Date(2026, 9, 31))).toBe(44); // Saturday
+    expect(isoWeek(new Date(2026, 10, 2))).toBe(45); // the Monday after
+    expect(isoWeek(new Date(2027, 0, 1))).toBe(53); // 2026 has 53 weeks
+    expect(isoWeek(new Date(2024, 11, 30))).toBe(1); // a Monday in 2025's week 1
+  });
+
+  const pool = [
+    coach({ id: 'c3', userId: 'u3', city: 'Cluj-Napoca' }),
+    coach({ id: 'c1', userId: 'u1', city: 'Cluj-Napoca' }),
+    coach({ id: 'c2', userId: 'u2', city: 'Timișoara' }),
+    coach({ id: 'c4', userId: 'u4', isAcceptingClients: false }),
+  ];
+  const saturday = new Date(2026, 9, 31);
+  const monday = new Date(2026, 10, 2);
+
+  it('picks by the week among coaches taking clients, the same for everyone', () => {
+    // Ordered by id: c1, c2, c3. Week 44 → 44 % 3 = 2 → c3.
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', goal: null, now: saturday })?.id).toBe('c3');
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u8', goal: null, now: saturday })?.id).toBe('c3');
+    // Changes on Monday: week 45 → 0 → c1.
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', goal: null, now: monday })?.id).toBe('c1');
+  });
+
+  it('never picks the reader: their week goes to the next coach', () => {
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u3', goal: null, now: saturday })?.id).toBe('c1');
+    expect(coachOfTheWeek([pool[0]], { cityKey: null, readerId: 'u3', goal: null, now: saturday })).toBeNull();
+  });
+
+  it('keeps to the city, and falls back to every city when it has nobody', () => {
+    const cluj = cityKey('Cluj-Napoca');
+    // Cluj: c1, c3. Week 44 → 0 → c1.
+    expect(coachOfTheWeek(pool, { cityKey: cluj, readerId: null, goal: null, now: saturday })?.id).toBe('c1');
+    const bucharest = cityKey('București');
+    expect(coachOfTheWeek(pool, { cityKey: bucharest, readerId: null, goal: null, now: saturday })?.id).toBe('c3');
+    // Only the reader in the city counts as nobody.
+    const timisoara = cityKey('Timisoara');
+    expect(coachOfTheWeek(pool, { cityKey: timisoara, readerId: 'u2', goal: null, now: saturday })?.id).toBe('c3');
+  });
+
+  it('narrows to the goal, and is null when no coach fits', () => {
+    const runner = coach({ id: 'c5', userId: 'u5', specializations: ['Alergare'] });
+    expect(coachOfTheWeek([...pool, runner], { cityKey: null, readerId: null, goal: DiscoverGoalIds.Running, now: saturday })?.id).toBe('c5');
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: null, goal: DiscoverGoalIds.Online, now: saturday })).toBeNull();
+  });
+});
+
+describe('goals', () => {
+  it('the band shows five chips and search six cards, every one translated', () => {
+    expect(GOAL_CHIPS).toEqual(['strength', 'running', 'beginners', 'online', 'mobility']);
+    expect(BROWSE_GOALS).toHaveLength(6);
+    for (const id of BROWSE_GOALS) expect(DISCOVER_GOALS[id].icon.endsWith('-outline')).toBe(true);
+    for (const id of GOAL_CHIPS) expect(DISCOVER_GOALS[id].chip).not.toBeNull();
+  });
+
+  it('matches the start of a word, accents and case aside, in both languages', () => {
+    expect(textMatchesGoal(['Forță pentru începători'], DiscoverGoalIds.Strength)).toBe(true);
+    expect(textMatchesGoal(['Forță pentru începători'], DiscoverGoalIds.Beginners)).toBe(true);
+    expect(textMatchesGoal(['Alergăm în Cluj'], DiscoverGoalIds.Running)).toBe(true);
+    expect(textMatchesGoal(['1-on-1 Strength'], DiscoverGoalIds.Strength)).toBe(true);
+    expect(textMatchesGoal(['Brunch club'], DiscoverGoalIds.Running)).toBe(false);
+    expect(textMatchesGoal([null, ''], DiscoverGoalIds.Running)).toBe(false);
+  });
+
+  it('a coach by specialties, a group by name and tags, a session by title or online', () => {
+    expect(coachMatchesGoal(coach({ specializations: ['Powerlifting'] }), DiscoverGoalIds.Strength)).toBe(true);
+    expect(coachMatchesGoal(coach(), DiscoverGoalIds.Strength)).toBe(false);
+    expect(coachMatchesGoal(coach(), null)).toBe(true);
+    expect(groupMatchesGoal(group({ name: 'Club', tags: ['mobilitate'] }), DiscoverGoalIds.Mobility)).toBe(true);
+    expect(groupMatchesGoal(group(), DiscoverGoalIds.Running)).toBe(false);
+    expect(sessionMatchesGoal(instance(), DiscoverGoalIds.Online)).toBe(true);
+    expect(sessionMatchesGoal(instance({ locationKind: SessionLocationKind.InPerson }), DiscoverGoalIds.Online)).toBe(false);
+    expect(sessionMatchesGoal(instance(), DiscoverGoalIds.Mobility)).toBe(true); // "Evening yoga flow"
+  });
+});
+
+describe('cities', () => {
+  it('one key per city however it is spelled', () => {
+    expect(cityKey('Timișoara')).toBe(cityKey('Timisoara'));
+    expect(cityKey('  Cluj-Napoca ')).toBe('cluj-napoca');
+    expect(cityKey('Bucharest')).toBe(cityKey('București'));
+    expect(cityKey('  ')).toBeNull();
+    expect(cityKey(null)).toBeNull();
+  });
+
+  it('lists every city once, by name, keeping the spelling with accents', () => {
+    const inPerson = { ...instance({ locationKind: SessionLocationKind.InPerson }) };
+    inPerson.template = { ...inPerson.template!, venue: { id: 'v', name: 'Park', city: 'Iași', kind: 'PARK' } };
+    expect(
+      discoverCities(
+        [coach({ city: 'Bucharest' }), coach({ id: 'p2', city: null })],
+        [group({ city: 'București' }), group({ id: 'g2', city: 'Cluj-Napoca' })],
+        [inPerson, instance()],
+      ),
+    ).toEqual([
+      { key: 'bucuresti', label: 'București' },
+      { key: 'cluj-napoca', label: 'Cluj-Napoca' },
+      { key: 'iasi', label: 'Iași' },
+    ]);
+  });
+
+  const cities = [
+    { key: 'cluj-napoca', label: 'Cluj-Napoca' },
+    { key: 'bucuresti', label: 'București' },
+  ];
+
+  it('shows the picked city, else the reader\'s own, else everywhere', () => {
+    expect(resolveCity('bucuresti', 'Cluj-Napoca', cities)?.label).toBe('București');
+    expect(resolveCity(null, 'Cluj-Napoca', cities)?.label).toBe('Cluj-Napoca');
+    expect(resolveCity(EVERYWHERE, 'Cluj-Napoca', cities)).toBeNull();
+    // Nothing in the reader's city: everywhere, never an empty tab.
+    expect(resolveCity(null, 'Timisoara', cities)).toBeNull();
+    // A pick with nothing in it any more falls back too.
+    expect(resolveCity('iasi', 'Bucharest', cities)?.label).toBe('București');
+  });
+
+  it('filters by the city, with online sessions in every one', () => {
+    expect(inCity('Cluj-Napoca', 'cluj-napoca')).toBe(true);
+    expect(inCity(null, 'cluj-napoca')).toBe(false);
+    expect(inCity(null, null)).toBe(true);
+    expect(sessionInCity(instance(), 'cluj-napoca')).toBe(true);
+    expect(sessionInCity(instance({ locationKind: SessionLocationKind.InPerson }), 'cluj-napoca')).toBe(false);
+  });
+});
+
+describe('group verbs', () => {
+  it('Join an open group, Request one that asks first, nothing once asked', () => {
+    expect(groupVerb(group())).toEqual({ verb: GroupVerbs.Join, label: 'Join' });
+    expect(groupVerb(group({ joinPolicy: JoinPolicies.Approval }))).toEqual({ verb: GroupVerbs.Request, label: 'Request' });
+    expect(groupVerb(group({ myJoinRequestStatus: 'PENDING' }))).toBeNull();
+    expect(groupVerb(group({ joinPolicy: JoinPolicies.InviteOnly }))).toBeNull();
+  });
+});
+
+describe('search highlight', () => {
+  const marked = (text: string, term: string) =>
+    highlightParts(text, term)
+      .map((part) => (part.match ? `[${part.text}]` : part.text))
+      .join('');
+
+  it('marks every match, blind to case and accents', () => {
+    expect(marked('Forță pentru începători', 'forta')).toBe('[Forță] pentru începători');
+    expect(marked('Strength (forță) · forta', 'FORȚA')).toBe('Strength ([forță]) · [forta]');
+    expect(marked('Alergăm în Cluj', 'alergam in')).toBe('[Alergăm în] Cluj');
+  });
+
+  it('keeps a combining accent with its letter', () => {
+    const decomposed = 'Fortă'.normalize('NFD');
+    const parts = highlightParts(decomposed, 'forta');
+    expect(parts).toHaveLength(1);
+    expect(parts[0]).toEqual({ text: decomposed, match: true });
+  });
+
+  it('is the plain text without a term or a match', () => {
+    expect(highlightParts('Yoga', '')).toEqual([{ text: 'Yoga', match: false }]);
+    expect(highlightParts('Yoga', 'run')).toEqual([{ text: 'Yoga', match: false }]);
+  });
+
+  it('accentVariant names the spelling with accents that matched', () => {
+    expect(accentVariant(['Irina Moldovan', 'Forță · Alergare'], 'forta')).toBe('forță');
+    expect(accentVariant(['Forta club'], 'forta')).toBeNull(); // case is not an accent
+    expect(accentVariant(['Forta club'], 'forță')).toBe('forta');
+    expect(accentVariant(['Yoga'], 'forta')).toBeNull();
+  });
+});
+
+describe('recents', () => {
+  const query = (text: string): DiscoverRecent => ({ kind: RecentKinds.Query, text });
+  const irina: DiscoverRecent = {
+    kind: RecentKinds.Coach,
+    id: 'c1',
+    userId: 'u1',
+    handle: 'irina',
+    name: 'Irina Moldovan',
+    avatarUrl: null,
+    city: 'Cluj-Napoca',
+  };
+
+  it('puts the newest first, moves a repeat to the top, keeps five', () => {
+    let list: DiscoverRecent[] = [];
+    for (const text of ['a1', 'b2', 'c3', 'd4', 'e5', 'f6']) list = pushRecent(list, query(text));
+    expect(list).toHaveLength(RECENT_LIMIT);
+    expect(list[0]).toEqual(query('f6'));
+    list = pushRecent(list, query('C3'));
+    expect(list.filter((entry) => entry.kind === RecentKinds.Query && entry.text.toLowerCase() === 'c3')).toHaveLength(1);
+    expect(list[0]).toEqual(query('C3'));
+    list = pushRecent(pushRecent(list, irina), irina);
+    expect(list.filter((entry) => entry.kind === RecentKinds.Coach)).toHaveLength(1);
+  });
+
+  it('a search typed with or without accents is one entry', () => {
+    expect(pushRecent([query('forță')], query('forta'))).toEqual([query('forta')]);
+  });
+
+  it('reads back only well-formed entries', () => {
+    expect(parseRecents('nope')).toEqual([]);
+    expect(parseRecents([query('ok'), { kind: 'query', text: ' ' }, { kind: 'coach', id: 'x' }, irina, null])).toEqual([
+      query('ok'),
+      irina,
+    ]);
+  });
+});
+
+describe('discoverLinks', () => {
+  it('keeps Discover\'s own routes in Discover', () => {
+    const links = discoverLinks('/tabs/discover/search');
+    expect(links.root).toBe('/tabs/discover');
+    expect(links.person('irina')).toEqual(['/tabs/discover/person', 'irina']);
+    expect(links.groupPreview('g1')).toEqual(['/tabs/discover/group', 'g1']);
+    expect(links.group('g1')).toEqual(['/tabs/discover/groups', 'g1']);
+    expect(links.session('s1')).toEqual(['/tabs/discover', 's1']);
+    expect(links.allGroups).toBe('/tabs/discover/groups');
+    expect(links.search).toBe('/tabs/discover/search');
+  });
+
+  it('opens everything in Home\'s stack when mounted there', () => {
+    const links = discoverLinks('/tabs/home/coaches');
+    expect(links.root).toBe('/tabs/home');
+    expect(links.person('irina')).toEqual(['/tabs/home/person', 'irina']);
+    expect(links.groupPreview('g1')).toEqual(['/tabs/home/groups', 'preview', 'g1']);
+    expect(links.group('g1')).toEqual(['/tabs/home/groups', 'g1']);
+    expect(links.session('s1')).toEqual(['/tabs/home', 'booking', 's1']);
+    expect(links.allCoaches).toBe('/tabs/home/coaches');
+    expect(links.allGroups).toBe('/tabs/home/groups-to-join');
+  });
+
+  it('falls back to Discover anywhere else', () => {
+    expect(discoverLinks('/tabs/more').root).toBe('/tabs/discover');
   });
 });

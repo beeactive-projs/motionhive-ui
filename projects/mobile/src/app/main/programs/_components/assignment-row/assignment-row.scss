@@ -5,6 +5,15 @@
 :host {
   display: block;
   margin-bottom: 0.5rem;
+  /* The row measures itself, so a narrow one can move its verb (below). */
+  container-type: inline-size;
+}
+
+/* The title wraps between words only: at Romanian, SE and 130% "Strength
+   Base" broke as "Strengt / h Base" beside the verb. */
+h2 {
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 mh-hex-avatar {
@@ -19,4 +28,28 @@ mh-hex-avatar {
 /* A cancelled row is a record, quieter across the board. */
 ion-item[data-tone='danger'] h2 {
   color: var(--ion-color-medium);
+}
+
+/* Narrower than this (an SE from about 107% text, any phone at 130%) the
+   verb beside the text squeezed the title to a word: it goes under the
+   text instead, on the text's own edge, as a person row's verb does
+   (person-row.scss). The plan tile lines up with the text, not the block. */
+@container (max-width: 22rem) {
+  ion-item::part(inner) {
+    flex-wrap: wrap;
+  }
+
+  ion-item::part(container) {
+    flex: 1 0 100%;
+  }
+
+  ion-item > ion-button.mh-row-action {
+    margin-block: 0.25rem 0.75rem;
+    margin-inline-start: 0;
+  }
+
+  ion-item > mh-hex-avatar[slot='start'] {
+    align-self: flex-start;
+    margin-block-start: 0.75rem;
+  }
 }

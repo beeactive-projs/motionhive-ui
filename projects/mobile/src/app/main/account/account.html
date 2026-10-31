@@ -33,9 +33,10 @@
     } @else {
     <!-- Hero -->
     <div class="hero">
-      <button type="button" class="hero-avatar" [attr.aria-label]="'account.hero.changePhoto' | translate" (click)="photoSheetOpen.set(true)">
+      <ion-button class="hero-avatar" fill="clear" [attr.aria-label]="'account.hero.changePhoto' | translate"
+        (click)="photoSheetOpen.set(true)">
         <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
-      </button>
+      </ion-button>
 
       <h2 class="hero-name">{{ store.fullName() }}</h2>
 

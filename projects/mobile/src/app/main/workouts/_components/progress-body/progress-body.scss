@@ -6,8 +6,10 @@
 }
 
 /* A record's weight — tabular, the way every number in a column is. Held a
-   step off the label, which wraps beside it at large text. */
+   step off the label, and kept whole: the name beside it gives way, not
+   the figure. */
 .value {
+  flex: none;
   margin-inline-start: 0.5rem;
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);
@@ -15,17 +17,41 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A tile is never narrower than its longest word or its figure (kept on one
-   line by `unbreakable`): at large text on a narrow phone the row wraps a
-   tile to the next line instead of breaking "Antrenamente" or a number. */
-.mh-tiles mh-stat-tile {
-  min-width: min-content;
+/* A record's name takes two lines, words whole, then an ellipsis: on one
+   line a long Romanian name ("Îndreptări românești") was cut at the default
+   size, and at 130% "Romanian Deadlift" read "Romania…". */
+.record-name {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: normal;
+  white-space: normal;
+  word-break: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-/* A record's name on one line with an ellipsis: beside the weight, a long
-   Romanian name ("Îndreptări românești") broke inside a word. */
-.record-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* The records card measures itself. Narrower than this (an SE from about
+   120% text, any phone at 130%) the weight beside the name left the name
+   a column too narrow for one long word ("Genuflexiuni"), so the weight
+   moves under the name, in the same ink, and the name takes the width. */
+.records {
+  container-type: inline-size;
+}
+
+.value-under {
+  display: none;
+}
+
+@container (max-width: 19rem) {
+  .records .value {
+    display: none;
+  }
+
+  .records .value-under {
+    display: block;
+    color: var(--ion-text-color);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
 }

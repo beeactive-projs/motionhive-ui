@@ -50,6 +50,7 @@ import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchb
 import { ClockService } from '../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ShareOutcomes, shareOrCopy } from '../../../_shared/utils/share';
+import { agendaLinks } from '../../home/home-stack.config';
 import { DayRail } from './_components/day-rail/day-rail';
 import { SessionRow } from './_components/session-row/session-row';
 import { SessionsEmpty } from './_components/sessions-empty/sessions-empty';
@@ -95,6 +96,10 @@ interface AgendaDay {
  * Reads `SessionsInstructorStore`, shared with web — `loadRange` returns the
  * scheduled occurrences in a window and caches recent windows, so moving
  * between weeks does not refetch.
+ *
+ * Mounted in its own area (from the Menu) and in Home's stack (the Today
+ * row on a busy day); back and a session's page follow the URL, so each
+ * stays where it was opened (`agendaLinks`).
  */
 @Component({
   selector: 'mh-sessions',
@@ -141,6 +146,11 @@ export class Sessions implements ViewWillEnter {
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly locationFilters = LOCATION_QUICK_FILTERS;
+
+  /** The stack this agenda is in: Home's, or its own. */
+  private readonly _links = agendaLinks(this._router.url);
+  /** Back on a cold load: Home, or the Menu it is opened from. */
+  readonly backHref = this._links.back;
 
   readonly createOpen = signal(false);
   /** Seeds the create sheet when it opens from a slot on the day rail. */
@@ -459,7 +469,7 @@ export class Sessions implements ViewWillEnter {
   }
 
   open(instance: SessionInstance): void {
-    void this._router.navigate(['/tabs/coach/sessions', instance.id]);
+    void this._router.navigate(this._links.session(instance.id));
   }
 
   openCreate(): void {

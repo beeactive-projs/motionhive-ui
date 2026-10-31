@@ -1,11 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/more/account" />
+      <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
-    <ion-title>{{ 'account.rows.coachingProfile' | translate }}</ion-title>
+    <ion-title><span class="mh-title-text">{{ 'account.rows.coachingProfile' | translate }}</span></ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="!profile()" (click)="editSheetOpen.set(true)">{{ 'button.edit' | translate }}</ion-button>
+      <ion-button class="edit" [disabled]="!profile()" (click)="editSheetOpen.set(true)">{{ 'button.edit' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

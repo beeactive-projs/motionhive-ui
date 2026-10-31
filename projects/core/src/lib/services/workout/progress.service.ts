@@ -19,9 +19,17 @@ export class ProgressService {
   private readonly _http = inject(HttpClient);
   private readonly _base = `${environment.apiUrl}${BASE}`;
 
-  overview(range: ProgressRange = '12w'): Observable<ProgressOverview> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure or empty state (Home's week line, Latest).
+   */
+  overview(
+    range: ProgressRange = '12w',
+    opts?: { silent?: boolean },
+  ): Observable<ProgressOverview> {
     return this._http.get<ProgressOverview>(`${this._base}/overview`, {
       params: new HttpParams().set('range', range),
+      ...(opts?.silent ? { context: silentRequest() } : {}),
     });
   }
 

@@ -11,11 +11,16 @@
   text-align: center;
 }
 
+/* The photo is the button: an ion-button with no box around it, as tall
+   as the hexagon it holds. */
 .hero-avatar {
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  height: auto;
+  min-height: 0;
+  margin: 0;
 }
 
 .hero-avatar-skeleton {

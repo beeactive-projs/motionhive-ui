@@ -1,15 +1,20 @@
 /* The bottom tab bar.
 
-   The selected tab is the brand honey itself, icon and label alike: the
-   current selection is what honey is reserved for. A product decision over
-   contrast: `--ion-color-primary` is about 2:1 on the white bar, under the
-   3:1 a glyph needs; the selection still reads from every other tab being
-   grey. On the dark bar it clears AA easily.
+   The selected tab's glyph is the brand honey itself: the current selection
+   is what honey is reserved for. A product decision over contrast:
+   `--ion-color-primary` is about 2:1 on the white bar, under the 3:1 a
+   glyph needs; the selection still reads from every other tab being grey.
+   Its label is words, so it takes the deep honey ink (5:1 on white, where
+   the honey was 2.2:1); in dark that token is the honey, 8:1 on the navy.
 
    No edge: like the header, the bar is the page's colour (variables.css). */
 ion-tab-bar {
   --color-selected: var(--ion-color-primary);
   --border: 0;
+}
+
+ion-tab-button.tab-selected ion-label {
+  color: var(--mh-color-honey-deep);
 }
 
 /* Material's tab glyph is 22px, off the icon grid. */

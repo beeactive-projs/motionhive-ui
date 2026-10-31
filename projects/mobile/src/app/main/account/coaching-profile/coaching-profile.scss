@@ -1,3 +1,17 @@
+// The toolbar's Edit keeps Ionic's 32px text button to the eye and takes a
+// finger's 44px: an invisible box past it, inside the toolbar's own height,
+// and never smaller than the button once a larger text size grows it.
+ion-button.edit {
+  position: relative;
+}
+
+ion-button.edit::after {
+  content: '';
+  position: absolute;
+  inset-block: min(0rem, calc((var(--mh-tap-target) - 100%) / -2));
+  inset-inline: min(0rem, calc((var(--mh-tap-target) - 100%) / -2));
+}
+
 // Display name and experience read as a pair, the way the design lays them out.
 .pair-row {
   display: grid;

@@ -16,10 +16,11 @@ import { appLocale, AuthStore, formatRelativeShort, localDayKey, sentenceCase } 
 
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
-import { CLIENT_INVITE_PATH, CoachStacks } from '../../clients/client-paths';
+import { CoachStacks } from '../../clients/client-paths';
 import { CreateChoice, CreateChoices } from '../../programs/programs.config';
 import { CreateSheet } from '../../programs/_sheets/create-sheet/create-sheet';
 import { workoutDuration } from '../../workouts/workouts.config';
+import { HOME_STACK, HomePages } from '../home-stack.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { NeedRowItem } from '../_components/need-row/need-row';
@@ -234,38 +235,45 @@ export class CoachHome implements OnInit {
     void this._router.navigate(row.link, row.state ? { state: row.state } : {});
   }
 
+  /** The coaching profile in Home's stack, so back returns here. */
   openStep(step: FirstStep): void {
     if (step.key === 'program') this.createOpen.set(true);
-    else void this._router.navigateByUrl('/tabs/more/account/coaching');
+    else void this._router.navigateByUrl(HomePages.Coaching);
   }
 
   openClients(): void {
     void this._router.navigateByUrl(CoachStacks.Clients);
   }
 
+  /** The invite page in Home's stack, so back (and Done) return here. */
   invite(): void {
-    void this._router.navigateByUrl(CLIENT_INVITE_PATH);
-  }
-
-  /** Same choices as the Programs tab's "+", so a program starts the same way. */
-  onCreate(choice: CreateChoice): void {
-    if (choice === CreateChoices.Starters) {
-      void this._router.navigateByUrl('/tabs/workouts/starters');
-      return;
-    }
-    void this._router.navigate(['/tabs/programs', choice, 'new']);
+    void this._router.navigateByUrl(HomePages.Invite);
   }
 
   /**
-   * One session opens itself, in Home's stack so back returns here; several
-   * open the day in the Sessions tab.
+   * Same choices as the Programs tab's "+", and every one stays on the
+   * coach's side: a new program or routine opens in Programs, and the
+   * starters are in the library there (a coach with nothing of their own
+   * sees them all), never the trainee's Workouts pages.
+   */
+  onCreate(choice: CreateChoice): void {
+    if (choice === CreateChoices.Starters) {
+      void this._router.navigateByUrl(CoachStacks.Programs);
+      return;
+    }
+    void this._router.navigate([CoachStacks.Programs, choice, 'new']);
+  }
+
+  /**
+   * One session opens itself, several open the day's agenda; both in Home's
+   * stack, so back returns here.
    */
   openToday(): void {
     const first = this.todayFirst();
     if (first && this.todayMore() === 0) {
-      void this._router.navigate([CoachStacks.Home, 'session', first.id]);
+      void this._router.navigate([HOME_STACK, 'session', first.id]);
       return;
     }
-    void this._router.navigateByUrl('/tabs/coach/sessions');
+    void this._router.navigateByUrl(HomePages.Agenda);
   }
 }

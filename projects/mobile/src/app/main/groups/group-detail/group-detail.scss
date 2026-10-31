@@ -1,20 +1,3 @@
-/* ── The title bar ───────────────────────────────────────────────────────
-   The group's name is the title, and at large text on a small phone the
-   "Groups" beside the back arrow left it one letter ("M…"). The bar is a
-   size container, so when it is narrower than 20rem (an SE from about 117%
-   text) the label gives way to the arrow alone and the name keeps the room.
-   The arrow keeps its accessible name: Ionic labels the button with the
-   text, hidden or not. */
-.title-bar {
-  container-type: inline-size;
-}
-
-@container (max-width: 20rem) {
-  .title-bar ion-back-button::part(text) {
-    display: none;
-  }
-}
-
 /* ── The compact header ──────────────────────────────────────────────────
    The name is already in the toolbar above, so this carries only what the
    toolbar cannot: how many people are in, and how you get in. */

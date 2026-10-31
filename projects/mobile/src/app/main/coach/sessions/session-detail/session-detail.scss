@@ -217,20 +217,44 @@ ion-badge[data-tone='danger'] {
 
 /* The private note, as a line under the name. A button because it opens the
    editor, but dressed as text — a second filled control per row would compete
-   with the attendance marks on the right. */
-.note {
-  margin-top: 0.125rem;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--ion-color-medium);
+   with the attendance marks on the right. An ion-button with no box: no
+   padding, as wide as its words and their height, wrapping like the text it
+   is. */
+ion-button.note {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --color: var(--ion-color-medium);
+  /* Square: the control radius on a box this tight clipped the corner
+     letters of a wrapped note (the theme sets it with !important). */
+  --border-radius: 0 !important;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0.125rem 0 0;
   font-size: var(--mh-text-sm);
   font-style: italic;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-align: start;
+  white-space: normal;
+}
+
+/* The words in their own box, so they wrap inside the label's width (the
+   button's own flex row centred them and clipped both ends) at the
+   leading of text, not the button's 1. */
+ion-button.note .note-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: var(--mh-leading-tight);
   text-align: start;
 }
 
-.note.empty {
-  color: var(--mh-color-honey-deep);
+ion-button.note.empty {
+  --color: var(--mh-color-honey-deep);
   font-style: normal;
   font-weight: 600;
 }

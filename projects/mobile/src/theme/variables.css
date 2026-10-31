@@ -652,6 +652,12 @@
      sheet's cards). The deep amber is a light-surface ink: 3.4:1 here. */
   --mh-color-honey-deep: var(--mh-primary-500);
 
+  /* The iOS pill segment's selected fill (ion-segment.css), dark only: Ionic's
+     own step was a grey-blue under the honey label (2.5:1). Navy 500 still
+     lifts off the track on the page and in a sheet, and the honey label on
+     it is 5.4:1. Unset in light, where Ionic's white pill stands. */
+  --mh-color-segment-indicator: var(--mh-navy-500);
+
   /* The hive card is the card step: navy 900 is the page now, so a navy 900
      card would have no edge. Honey on it, as in the light block. The empty
      cells are the design's #1D2E4C, which sits between two steps: a cell

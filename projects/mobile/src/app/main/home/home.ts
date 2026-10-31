@@ -24,6 +24,7 @@ import { Logo } from '../../_shared/components/logo/logo';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { ROLE_ICONS, ROLES } from '../../_shared/config/roles.config';
 import { CoachHome } from './coach-home/coach-home';
+import { HomePages } from './home-stack.config';
 import { HOME_ICONS } from './home.icons';
 import { TrainHome } from './train-home/train-home';
 
@@ -58,6 +59,8 @@ import { TrainHome } from './train-home/train-home';
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
+  // Words wrap whole, header included; a line that cannot grow ellipses.
+  host: { class: 'mh-whole-words' },
 })
 export class Home implements ViewWillEnter {
   private readonly _authStore = inject(AuthStore);
@@ -92,8 +95,14 @@ export class Home implements ViewWillEnter {
     addIcons({ ...ROLE_ICONS, ...HOME_ICONS });
   }
 
+  /** In Home's stack, so back returns here; picking a role lands here too. */
   openRoleSwitch(): void {
-    void this._router.navigateByUrl('/tabs/more/switch-role');
+    void this._router.navigateByUrl(HomePages.SwitchRole);
+  }
+
+  /** Discover's search, the same screen as its tab's, in Home's stack. */
+  openSearch(): void {
+    void this._router.navigateByUrl(HomePages.Search);
   }
 
   /** Coming back to a tab page that stayed alive: the body reloads. */

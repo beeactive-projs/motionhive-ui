@@ -31,9 +31,9 @@ p {
   text-wrap: pretty;
 }
 
-// The brand colour straight from the palette, not the deep ink `mh-text-link`
-// uses: honey on the page surface is a light 2.05:1, so this one is being
-// looked at before it settles.
+// The deep honey ink of every text link (`mh-text-link`): the honey itself
+// was 2.15:1 on the white page, a label you could not read. On navy the
+// token is the honey (8:1).
 ion-button {
   margin: 1.25rem 0 0;
   font-weight: 600;

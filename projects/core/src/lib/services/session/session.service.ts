@@ -115,12 +115,20 @@ export class SessionService {
 
   // ─── Instances (read) ──────────────────────────────────────────────
 
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure or empty state (Home's Today row).
+   */
   listInstances(
     query: ListInstancesQuery = {},
+    opts?: { silent?: boolean },
   ): Observable<PaginatedResponse<SessionInstance>> {
     return this._http.get<PaginatedResponse<SessionInstance>>(
       `${this._base}${API_ENDPOINTS.SESSIONS.INSTANCES}`,
-      { params: this._toParams(query) },
+      {
+        params: this._toParams(query),
+        ...(opts?.silent ? { context: silentRequest() } : {}),
+      },
     );
   }
 
@@ -269,10 +277,17 @@ export class SessionService {
 
   // ─── Client utilities ──────────────────────────────────────────────
 
-  listMy(query: MyQuery = {}): Observable<PaginatedResponse<SessionParticipant>> {
+  /** `silent` as on `listInstances`. */
+  listMy(
+    query: MyQuery = {},
+    opts?: { silent?: boolean },
+  ): Observable<PaginatedResponse<SessionParticipant>> {
     return this._http.get<PaginatedResponse<SessionParticipant>>(
       `${this._base}${API_ENDPOINTS.SESSIONS.MY}`,
-      { params: this._toParams(query) },
+      {
+        params: this._toParams(query),
+        ...(opts?.silent ? { context: silentRequest() } : {}),
+      },
     );
   }
 

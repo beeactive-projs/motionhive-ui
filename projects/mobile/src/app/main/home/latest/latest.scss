@@ -1,6 +1,5 @@
-// Words wrap whole, never inside one (Ionic's body breaks them; home.scss).
-:host {
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
+// The footnote under the whole list, on the rows' gutter like the day
+// labels, a row's breath below the last one.
+ion-content > .mh-footnote {
+  padding: var(--mh-flat-row-pad) var(--mh-row-gutter);
 }

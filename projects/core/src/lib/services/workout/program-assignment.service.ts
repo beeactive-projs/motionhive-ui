@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import type {
   AssignProgramPayload,
   ListAssignmentsQuery,
@@ -35,8 +36,13 @@ export class ProgramAssignmentService {
     return this._http.post<ProgramAssignment>(this._base, payload);
   }
 
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure or empty state (Home's Needs you).
+   */
   listForInstructor(
     query: ListAssignmentsQuery = {},
+    opts?: { silent?: boolean },
   ): Observable<PaginatedAssignments> {
     let p = new HttpParams();
     if (query.page !== undefined) p = p.set('page', String(query.page));
@@ -44,7 +50,10 @@ export class ProgramAssignmentService {
     if (query.status) p = p.set('status', query.status);
     if (query.clientId) p = p.set('clientId', query.clientId);
     if (query.search?.trim()) p = p.set('search', query.search.trim());
-    return this._http.get<PaginatedAssignments>(this._base, { params: p });
+    return this._http.get<PaginatedAssignments>(this._base, {
+      params: p,
+      ...(opts?.silent ? { context: silentRequest() } : {}),
+    });
   }
 
   update(
@@ -96,14 +105,14 @@ export class ProgramAssignmentService {
    * Workouts front door.
    *
    * `date` is the caller's calendar date, because "today" belongs to
-   * the person training, not the server.
+   * the person training, not the server. `silent` as on `listForInstructor`.
    */
-  trainingDay(date?: string): Observable<TrainingDay> {
+  trainingDay(date?: string, opts?: { silent?: boolean }): Observable<TrainingDay> {
     let params = new HttpParams();
     if (date) params = params.set('date', date);
     return this._http.get<TrainingDay>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.MY_TODAY}`,
-      { params },
+      { params, ...(opts?.silent ? { context: silentRequest() } : {}) },
     );
   }
 

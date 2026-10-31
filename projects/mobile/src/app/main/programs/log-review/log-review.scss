@@ -6,8 +6,11 @@
   color: var(--ion-color-success-wash-contrast);
 }
 
+/* Title ink: Ionic gives a card's text its muted grey, which made the
+   workout's name read as secondary. */
 .hero h2 {
   margin: 0.25rem 0 0;
+  color: var(--ion-text-color);
   font-size: var(--mh-text-2xl);
   font-weight: 600;
 }

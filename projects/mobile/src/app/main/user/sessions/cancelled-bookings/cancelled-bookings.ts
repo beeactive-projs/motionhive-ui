@@ -22,6 +22,7 @@ import { take } from 'rxjs';
 import { MyTab, SessionParticipant, SessionService } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
+import { bookingsLinks, HomePages, inHomeStack } from '../../../home/home-stack.config';
 import { SessionRowSkeleton } from '../../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { MySessionRow } from '../_components/my-session-row/my-session-row';
 import { MY_SESSION_ICONS } from '../my-sessions.config';
@@ -61,7 +62,10 @@ const PAGE_SIZE = 50;
 export class CancelledBookings implements ViewWillEnter {
   private readonly _sessionService = inject(SessionService);
   private readonly _router = inject(Router);
+  private readonly _links = bookingsLinks(this._router.url);
 
+  /** Back on a cold load: the bookings list in the stack this page is in. */
+  readonly backHref = inHomeStack(this._router.url) ? HomePages.Bookings : '/tabs/user/sessions';
   readonly skeletonRows = [1, 2, 3];
 
   readonly bookings = signal<SessionParticipant[]>([]);
@@ -84,7 +88,7 @@ export class CancelledBookings implements ViewWillEnter {
   }
 
   open(booking: SessionParticipant): void {
-    void this._router.navigate(['/tabs/user/sessions', booking.instanceId], {
+    void this._router.navigate(this._links.booking(booking.instanceId), {
       state: { participant: booking },
     });
   }

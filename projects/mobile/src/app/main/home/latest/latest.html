@@ -49,5 +49,10 @@
         }
       </ion-list>
     }
+    <!-- The API serves the coach's latest twenty at most: a full list says
+         so rather than quietly stopping. -->
+    @if (isCoach() && store.capped()) {
+      <p class="mh-footnote">{{ 'home.latest.capped' | translate: { count: store.limit } }}</p>
+    }
   }
 </ion-content>

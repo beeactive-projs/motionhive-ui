@@ -9,7 +9,9 @@
   margin: 0;
 }
 
+/* Quiet, but a finger's height: Ionic's small button is 27px tall. */
 .hide {
   --color: var(--ion-color-medium);
   align-self: center;
+  min-height: var(--mh-tap-target);
 }

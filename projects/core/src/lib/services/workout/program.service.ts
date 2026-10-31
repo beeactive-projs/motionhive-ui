@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import type {
   CreatePrescribedExercisePayload,
   CreatePrescribedSetPayload,
@@ -36,14 +37,21 @@ export class ProgramService {
 
   // ── Program ──────────────────────────────────────────────────────
 
-  list(query: ListProgramsQuery = {}): Observable<PaginatedPrograms> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure or empty state (Home's first steps).
+   */
+  list(query: ListProgramsQuery = {}, opts?: { silent?: boolean }): Observable<PaginatedPrograms> {
     let p = new HttpParams();
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.search) p = p.set('search', query.search);
     if (query.status) p = p.set('status', query.status);
     if (query.library) p = p.set('library', query.library);
-    return this._http.get<PaginatedPrograms>(this._baseUrl, { params: p });
+    return this._http.get<PaginatedPrograms>(this._baseUrl, {
+      params: p,
+      ...(opts?.silent ? { context: silentRequest() } : {}),
+    });
   }
 
   /** Full tree — workouts, exercise slots, sets, catalog exercise refs. */

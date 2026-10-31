@@ -1,12 +1,48 @@
-/* Layout and type come from the flat-list skin (theme/components/ion-list.css). */
+/* Layout, type and the one-line ellipses come from the flat-list skin
+   (theme/components/ion-list.css). */
 :host {
+  position: relative;
   display: block;
 }
 
-/* One line: the skin's 1.5rem line box would otherwise hide a wrapped
-   second half instead of ending it with an ellipsis. */
-ion-label p {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* With a verb, the label stops short of it, so a long name ellipses before
+   the button rather than under it. The room is the verb's own width
+   (`verbRoom`), in rem, so it grows with the text size like the button. */
+:host(.has-verb) ion-label {
+  flex: 1 1 0;
+  min-width: 0;
+  margin-inline-end: var(--verb-room);
+}
+
+/* The row verb's capsule (ion-button.css `mh-row-action`), placed over the
+   row's end, centred on its two lines: it lives beside the item, where the
+   theme's in-row rule does not reach. */
+.verb {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --box-shadow: none;
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 50%;
+  inset-inline-end: var(--mh-row-gutter);
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  translate: 0 -50%;
+}
+
+/* A finger's 44px to press it by, past the capsule. */
+.verb::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--mh-tap-target) - 2rem) / -2);
+  inset-inline: min(0rem, calc((var(--mh-tap-target) - 100%) / -2));
+}
+
+.verb ion-spinner {
+  width: var(--mh-icon-sm);
+  height: var(--mh-icon-sm);
 }

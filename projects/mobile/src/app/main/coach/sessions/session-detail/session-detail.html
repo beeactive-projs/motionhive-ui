@@ -107,7 +107,14 @@
                 }
               </ion-label>
               @if (meetingUrl()) {
-                <ion-button slot="end" fill="outline" size="small" (click)="copyMeetingUrl()">
+                <!-- Quiet, like every row verb: the join CTA is the honey. -->
+                <ion-button
+                  slot="end"
+                  class="mh-row-action mh-quiet"
+                  fill="outline"
+                  shape="round"
+                  (click)="copyMeetingUrl()"
+                >
                   {{ 'button.copy' | translate }}
                 </ion-button>
               }
@@ -262,14 +269,16 @@
                     <!-- The design's note card is session-level, which does not
                          exist; `privateNote` is per-participant, owner-only, and
                          already backed — so the note lands here instead. -->
-                    <button
-                      type="button"
+                    <ion-button
                       class="note"
+                      fill="clear"
                       [class.empty]="!noteFor(participant)"
                       (click)="openNote(participant); $event.stopPropagation()"
                     >
-                      {{ noteFor(participant) ?? ('sessions.detail.privateNote' | translate) }}
-                    </button>
+                      <span class="note-text">
+                        {{ noteFor(participant) ?? ('sessions.detail.privateNote' | translate) }}
+                      </span>
+                    </ion-button>
                   }
                 </ion-label>
 

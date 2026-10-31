@@ -41,7 +41,6 @@ import { HEX_PATH } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../../../_shared/components/settings-row/settings-row';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
-import { copyToClipboard } from '../../../../_shared/utils/share';
 import { canPost } from '../../../groups/groups.config';
 import {
   CARD_THEMES,
@@ -62,6 +61,7 @@ import {
   ShareSteps,
   StickerStyle,
   linkLabel,
+  linkParts,
   openingStep,
   parseSharePrefs,
   saveCopyKeys,
@@ -69,6 +69,7 @@ import {
   suggestedMode,
 } from '../../_services/share-card.config';
 import { ShareCardService } from '../../_services/share-card.service';
+import { injectCopyTag } from '../../_services/share-tag';
 import { ShareGuideSheet } from '../share-guide-sheet/share-guide-sheet';
 
 /** The flags each way remembers, by the toggle that changes them. */
@@ -161,6 +162,11 @@ export class ShareWorkoutSheet {
 
   readonly quickPreview = signal<string | null>(null);
   readonly fullPreview = signal<string | null>(null);
+  /** The latest draw of each preview failed: a line and Retry, not a spinner forever. */
+  readonly quickFailed = signal(false);
+  readonly fullFailed = signal(false);
+  /** Bumped by Retry, which the preview effects read, so they draw again. */
+  private readonly _redraw = signal(0);
 
   /** Your groups that take a post from you; loaded the first time the sheet opens. */
   readonly postableGroups = signal<GroupWithMyRole[] | null>(null);
@@ -177,10 +183,13 @@ export class ShareWorkoutSheet {
     const handle = this._authStore.user()?.handle;
     return handle ? publicProfileUrl(handle) : null;
   });
-  /** "app.motionhive.fit/@anna", for the link switch's label. */
+  /**
+   * "app.motionhive.fit" and "@anna", for the link switch's label: printed
+   * with a break point at the slash, so a long handle wraps whole.
+   */
   readonly profileLink = computed(() => {
     const url = this._profileUrl();
-    return url ? linkLabel(url) : null;
+    return url ? linkParts(linkLabel(url)) : null;
   });
 
   readonly suggested = computed(() => suggestedMode(this.prefs()));
@@ -257,6 +266,14 @@ export class ShareWorkoutSheet {
   readonly preview = computed(() =>
     this.step() === ShareSteps.Full ? this.fullPreview() : this.quickPreview(),
   );
+  readonly previewFailed = computed(() =>
+    this.step() === ShareSteps.Full ? this.fullFailed() : this.quickFailed(),
+  );
+  /**
+   * The actions draw their own full size picture, so a preview that failed
+   * does not lock them: they try, and say so if that fails too.
+   */
+  readonly canAct = computed(() => !!this.preview() || this.previewFailed());
   /** The shell's spinner sits on its main button: only for the main action's own work. */
   readonly saving = computed(
     () => this.busy() === BusyStates.Instagram || this.busy() === BusyStates.Save,
@@ -268,6 +285,9 @@ export class ShareWorkoutSheet {
 
   private readonly _t = (key: string, params?: Record<string, unknown>): string =>
     this._translateService.instant(key, params);
+
+  /** The handle to tag, on the clipboard; written straight from the tap. */
+  readonly copyTag = injectCopyTag();
 
   constructor() {
     addIcons(SHARE_ICONS);
@@ -284,31 +304,44 @@ export class ShareWorkoutSheet {
 
     // The previews redraw as the choices change: the same pictures that are
     // sent. Draws can finish out of order; only the latest one is shown.
+    // A draw that fails says so in place of the picture, with Retry.
     effect(() => {
       if (!this.open() || this.step() === ShareSteps.Full) return;
+      this._redraw();
       const content = this.quickContent();
       const { theme, sticker } = this.prefs();
       const usePhoto = this.quickPhoto();
       const scale = this.step() === ShareSteps.Choose ? CHOOSER_SCALE : PREVIEW_SCALE;
       const draw = ++this._quickDraws;
+      this.quickFailed.set(false);
       void this._drawQuick(content, theme, sticker, usePhoto, scale)
         .then((url) => {
           if (draw === this._quickDraws) this.quickPreview.set(url);
         })
-        .catch(() => undefined);
+        .catch(() => {
+          if (draw !== this._quickDraws) return;
+          this.quickPreview.set(null);
+          this.quickFailed.set(true);
+        });
     });
     effect(() => {
       if (!this.open() || this.step() === ShareSteps.Quick) return;
+      this._redraw();
       const content = this.fullContent();
       const theme = this.prefs().theme;
       const usePhoto = this.fullPhoto();
       const scale = this.step() === ShareSteps.Choose ? CHOOSER_SCALE : PREVIEW_SCALE;
       const draw = ++this._fullDraws;
+      this.fullFailed.set(false);
       void this._drawFull(content, theme, usePhoto, scale)
         .then((url) => {
           if (draw === this._fullDraws) this.fullPreview.set(url);
         })
-        .catch(() => undefined);
+        .catch(() => {
+          if (draw !== this._fullDraws) return;
+          this.fullPreview.set(null);
+          this.fullFailed.set(true);
+        });
     });
   }
 
@@ -337,6 +370,11 @@ export class ShareWorkoutSheet {
     this._update({ fullBackground });
   }
 
+  /** Draws the previews again after a failure. */
+  retryPreview(): void {
+    this._redraw.update((count) => count + 1);
+  }
+
   setFlag(flag: PrefFlag, on: boolean): void {
     const change: Partial<SharePrefs> = {};
     change[flag] = on;
@@ -347,8 +385,9 @@ export class ShareWorkoutSheet {
 
   /**
    * Quick: Instagram's Story editor with the sticker on the photo or the
-   * theme's colours. Without Instagram (or in the browser) the same picture
-   * goes to the share sheet, and a note says why.
+   * theme's colours. Without Instagram the same picture goes to the share
+   * sheet, and a note says why; the browser build without Web Share
+   * downloads it, and the note says that instead.
    */
   async openInInstagram(): Promise<void> {
     if (this.busy()) return;
@@ -362,17 +401,15 @@ export class ShareWorkoutSheet {
         this.open.set(false);
         return;
       }
-      void this._feedbackService.info(
-        this._t(
-          Capacitor.isNativePlatform()
-            ? 'workouts.share.instagram.missing'
-            : 'workouts.share.instagram.web',
-        ),
-      );
-      const image = await this._shareCardService.quickStory(content, theme, sticker, photo);
-      if ((await this._shareCardService.share(image, this.log().name)) === 'shared') {
-        this.open.set(false);
+      if (Capacitor.isNativePlatform()) {
+        void this._feedbackService.info(this._t('workouts.share.instagram.missing'));
       }
+      const image = await this._shareCardService.quickStory(content, theme, sticker, photo);
+      const outcome = await this._shareCardService.share(image, this.log().name);
+      if (outcome === 'downloaded') {
+        void this._feedbackService.info(this._t('workouts.share.instagram.web'));
+      }
+      if (outcome !== 'cancelled') this.open.set(false);
     } catch (err) {
       void this._feedbackService.error(err, this._t('workouts.share.toast.failed'));
     } finally {
@@ -412,9 +449,11 @@ export class ShareWorkoutSheet {
     this.busy.set(BusyStates.Send);
     try {
       const image = await this._fullImage();
-      if ((await this._shareCardService.share(image, this.log().name)) === 'shared') {
-        this.open.set(false);
+      const outcome = await this._shareCardService.share(image, this.log().name);
+      if (outcome === 'downloaded') {
+        void this._feedbackService.success(this._t('workouts.share.downloaded'));
       }
+      if (outcome !== 'cancelled') this.open.set(false);
     } catch (err) {
       void this._feedbackService.error(err, this._t('workouts.share.toast.failed'));
     } finally {
@@ -437,20 +476,6 @@ export class ShareWorkoutSheet {
       void this._feedbackService.error(err, this._t('workouts.share.sticker.copyFailed'));
     } finally {
       this.busy.set(null);
-    }
-  }
-
-  /** The handle to tag, on the clipboard; written straight from the tap. */
-  async copyTag(): Promise<void> {
-    if (await copyToClipboard(MOTIONHIVE_TAG)) {
-      void this._feedbackService.success(
-        this._t('workouts.share.tag.copied', { tag: MOTIONHIVE_TAG }),
-      );
-    } else {
-      void this._feedbackService.error(
-        null,
-        this._t('workouts.share.tag.copyFailed', { tag: MOTIONHIVE_TAG }),
-      );
     }
   }
 

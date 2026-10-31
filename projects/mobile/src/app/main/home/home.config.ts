@@ -851,6 +851,16 @@ export function coachLatest(items: readonly CoachActivityItem[], now: Date): Lat
   return newestFirst(withinDays(entries, LATEST_WINDOW_DAYS, now));
 }
 
+/**
+ * Whether the coach's Latest may be missing older workouts: the API sends
+ * at most `limit`, so a full answer whose every workout falls inside the
+ * window stopped short of its start. One older than the window means the
+ * window was read to its end.
+ */
+export function latestCapped(returned: number, shown: number, limit: number): boolean {
+  return returned >= limit && shown >= limit;
+}
+
 /** The trainee's: their groups' posts and their own records, merged by time. */
 export function traineeLatest(
   posts: readonly Post[],
@@ -878,10 +888,16 @@ export function traineeLatest(
   return newestFirst(withinDays(entries, LATEST_WINDOW_DAYS, now));
 }
 
-/** One part of a row's second line; a record count wears the honey ink. */
+/**
+ * One part of a row's second line; a record count wears the honey ink.
+ * `whole` parts (a count, a length, a gain) are never cut: when the line
+ * runs short at a large text size, the words around them (a workout's or
+ * a group's name, a post) ellipsize instead, so "1 record" and "52m" stay.
+ */
 export interface LatestPart {
   text: string;
   accent: boolean;
+  whole: boolean;
 }
 
 /** A Latest row, ready to draw: two lines and where a tap goes. */
@@ -927,14 +943,15 @@ export function latestRow(entry: LatestEntry, copy: LatestCopy): LatestRow {
     case LatestKinds.Workout: {
       const workout = entry.workout;
       const seconds = knownDuration(workout.durationSeconds);
-      const parts: LatestPart[] = [{ text: workout.workoutName, accent: false }];
+      const parts: LatestPart[] = [{ text: workout.workoutName, accent: false, whole: false }];
       if (workout.recordCount) {
         parts.push({
           text: copy.t('home.latest.records', { count: workout.recordCount }),
           accent: true,
+          whole: true,
         });
       }
-      if (seconds) parts.push({ text: copy.duration(seconds), accent: false });
+      if (seconds) parts.push({ text: copy.duration(seconds), accent: false, whole: true });
       return {
         id: entry.id,
         title: workout.name,
@@ -961,8 +978,8 @@ export function latestRow(entry: LatestEntry, copy: LatestCopy): LatestRow {
           ? copy.t('home.latest.sharedWorkout', { name: post.workout.name })
           : copy.t('home.latest.sharedPhoto');
       const parts: LatestPart[] = [];
-      if (post.group) parts.push({ text: post.group.name, accent: false });
-      parts.push({ text, accent: false });
+      if (post.group) parts.push({ text: post.group.name, accent: false, whole: false });
+      parts.push({ text, accent: false, whole: false });
       return {
         id: entry.id,
         title: name || copy.t('home.latest.member'),
@@ -987,11 +1004,13 @@ export function latestRow(entry: LatestEntry, copy: LatestCopy): LatestRow {
         parts.push({
           text: copy.t('home.latest.recordDelta', { delta: kilos(record.deltaKg, copy.locale) }),
           accent: true,
+          whole: true,
         });
       }
       parts.push({
         text: copy.t('home.latest.recordDetail', { weight: kilos(record.weightKg, copy.locale) }),
         accent: false,
+        whole: false,
       });
       return {
         id: entry.id,

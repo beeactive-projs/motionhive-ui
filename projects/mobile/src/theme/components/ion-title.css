@@ -44,3 +44,63 @@ ion-tabs .ion-page > ion-header ion-title.mh-person-title {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ── Narrow bars ──────────────────────────────────────────────────────────
+   At large text on a small phone the title lost to whatever sat beside it:
+   a back label ("Descoperă" left "Alergăm în…"), an end button ("Editează"
+   left "Profil de a…"), a person's two buttons ("Anna …"). Every app
+   header's toolbar measures itself, and when it is narrow the title gets
+   the room first. The width is in rem, so the same bar counts as narrower
+   as the text grows: an SE from about 117% text, any phone at 130%. */
+ion-tabs .ion-page > ion-header ion-toolbar {
+  container-type: inline-size;
+}
+
+/* The back label gives way to the chevron alone (the button keeps its
+   accessible name: Ionic labels it with the text, hidden or not). */
+@container (max-width: 20rem) {
+  ion-tabs .ion-page > ion-header ion-back-button::part(text) {
+    display: none;
+  }
+}
+
+/* The title steps down one size, which is still above the default size's
+   20px at 130%. A person's name steps down too and may take two lines,
+   words whole, over its muted line: beside two buttons and the avatar it
+   had about 90px, room for "Anna" and nothing more. Two lines and the
+   muted one still fit the bar's 3.5rem. */
+@container (max-width: 22rem) {
+  ion-tabs .ion-page > ion-header ion-title {
+    font-size: var(--mh-text-lg);
+  }
+
+  ion-tabs .ion-page > ion-header ion-title.mh-person-title .name {
+    display: -webkit-box;
+    overflow-wrap: normal;
+    white-space: normal;
+    word-break: normal;
+    font-size: var(--mh-text-md);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+/* A title that may need two lines on a narrow bar: Ionic's title box is
+   one line with an ellipsis, and a bare text node in it cannot wrap. Put
+   the words in `<span class="mh-title-text">` and, on a narrow bar, they
+   take two lines, words whole ("Profil de antrenor" beside "Editează").
+   On a wide bar the span is plain inline text and changes nothing. */
+@container (max-width: 22rem) {
+  ion-tabs .ion-page > ion-header ion-title .mh-title-text {
+    display: -webkit-box;
+    overflow: hidden;
+    overflow-wrap: normal;
+    white-space: normal;
+    word-break: normal;
+    line-height: var(--mh-leading-heading);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}

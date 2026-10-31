@@ -222,7 +222,12 @@ ion-content.mh-flat-page > .mh-note-block {
    the page gap between them. A plain flex row rather than `ion-grid` — the
    grid centres itself with auto margins, and inside the page's flex column
    those margins stop it stretching, so it shrinks to the tiles' minimum
-   width and "Volume" wraps mid-word. */
+   width and "Volume" wraps mid-word.
+
+   A tile is never narrower than its longest word or its figure (kept whole
+   by the tile's `unbreakable`): at large text on a narrow phone the row
+   wraps a tile to the next line instead of breaking "Antrenamente" or
+   "32,5 kg × 10". */
 .mh-tiles {
   display: flex;
   flex-wrap: wrap;
@@ -232,7 +237,7 @@ ion-content.mh-flat-page > .mh-note-block {
 .mh-tiles mh-stat-tile {
   display: block;
   flex: 1 1 calc((100% - 1.25rem) / 3);
-  min-width: 0;
+  min-width: min-content;
 }
 
 /* A kicker and a trailing text action on one line over a block — "Your

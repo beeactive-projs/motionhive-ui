@@ -1,7 +1,8 @@
 <!--
-  Logo · role pill · avatar. The pill pushes the switch-role page rather than
-  toggling in place, so the choice is made on a screen that can explain what
-  changes; the menu and account pages carry rows to the same page.
+  Logo · role pill · search, bell, avatar. The pill pushes the switch-role
+  page rather than toggling in place, so the choice is made on a screen that
+  can explain what changes; the menu and account pages carry rows to the
+  same page. Search is Discover's, opened in Home's stack.
 -->
 <ion-header [translucent]="true">
   <ion-toolbar>
@@ -18,13 +19,16 @@
         >
           <!-- Decorative: the button's label already names the role. -->
           <mh-hex-avatar slot="start" size="xs" [icon]="role().icon" [color]="role().color" />
-          {{ role().label }}
+          <span class="role-label">{{ role().label }}</span>
           <ion-icon slot="end" name="chevron-down-outline" aria-hidden="true" />
         </ion-button>
       }
     </ion-buttons>
 
     <ion-buttons slot="end">
+      <ion-button [attr.aria-label]="'home.search' | translate" (click)="openSearch()">
+        <ion-icon slot="icon-only" name="search-outline" aria-hidden="true" />
+      </ion-button>
       <mh-notification-bell />
       <mh-avatar-button />
     </ion-buttons>

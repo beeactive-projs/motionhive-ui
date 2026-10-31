@@ -145,6 +145,7 @@ export class ExerciseDetail implements ViewWillEnter {
    */
   readonly backHref = computed(() => {
     const url = this._router.url;
+    if (url.startsWith('/tabs/home')) return '/tabs/home';
     if (url.startsWith('/tabs/workouts')) return '/tabs/workouts';
     if (url.startsWith('/tabs/programs')) return '/tabs/programs';
     return '/tabs/exercises';

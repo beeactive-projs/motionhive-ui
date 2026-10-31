@@ -1,0 +1,107 @@
+/* A flat screen (`mh-flat-page`): rows, labels, chips and notes come from
+   the shared skins (ion-list.css, layout.css, ion-button.css); the header
+   puts the field and the chips on the row gutter (ion-header.css). Only
+   the start screen's cards and the goal pill are placed here. */
+
+/* "Recent" with its "Clear" at the far end, on the row times' edge. The
+   button keeps a full tap target without making the label taller. */
+.recent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--mh-row-gutter);
+}
+
+.recent-head .clear {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  min-height: var(--mh-tap-target);
+  margin-block: calc((1.25rem - var(--mh-tap-target)) / 2);
+  margin-inline-end: -0.5rem;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+/* Browse by goal and the privacy line, on the row gutter. */
+.start {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mh-page-rhythm);
+  padding: 1rem var(--mh-row-gutter) 2rem;
+}
+
+.browse-label {
+  padding-inline: 0;
+}
+
+/* Two to a row, each as tall as the taller one, one to a row once a narrow
+   phone at large text would leave a label a word a line. */
+.start .mh-section {
+  container-type: inline-size;
+}
+
+.browse {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@container (max-width: 16em) {
+  .browse {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.goal {
+  height: 100%;
+  margin: 0;
+  color: var(--ion-text-color);
+}
+
+/* Ionic centres a button card's content; the tile and the label start at
+   the card's edge, stacked. */
+.goal::part(native) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.75rem;
+  text-align: start;
+}
+
+.goal-label {
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  line-height: var(--mh-leading-tight);
+}
+
+/* What search finds: one quiet line on the card fill, its lock beside it. */
+.privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-card-background);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-body);
+}
+
+.privacy ion-icon {
+  flex: none;
+  font-size: var(--mh-icon-sm);
+}
+
+/* The goal the results are narrowed to, on the row gutter above them. */
+.goal-pill {
+  display: flex;
+  padding: 0.5rem var(--mh-row-gutter) 0;
+}
+
+/* The accents footnote closes the results, on the rows' gutter. */
+.accents {
+  padding: 1rem var(--mh-row-gutter) 2rem;
+}

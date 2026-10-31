@@ -33,6 +33,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { workoutLinks } from '../../home/home-stack.config';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { OverviewExercise, WorkoutOverview } from '../_components/workout-overview/workout-overview';
 import { WORKOUT_ICONS, planPositionLabel, prescriptionLine } from '../workouts.config';
@@ -43,6 +44,10 @@ import { WORKOUT_ICONS, planPositionLabel, prescriptionLine } from '../workouts.
  * Exists so a trainee can see what they are walking into — the coach's note
  * and the exercise list — rather than discovering it one set at a time. The
  * log is only created when they tap Start.
+ *
+ * Mounted in the Workouts tab and in Home's stack (the week card's Start);
+ * back, an exercise and Skip's exit follow the URL (`workoutLinks`). Start
+ * opens the logger in the Workouts tab either way, where a live workout runs.
  */
 @Component({
   selector: 'mh-workout-preview',
@@ -83,6 +88,11 @@ export class Preview implements ViewWillEnter {
   readonly starting = signal(false);
 
   readonly skeletonRows = [1, 2, 3, 4];
+
+  /** The stack this preview is in: Home's, or the Workouts tab's. */
+  private readonly _links = workoutLinks(this._router.url);
+  /** Back on a cold load, and where Skip lands. */
+  readonly backHref = this._links.root;
 
   readonly showSkeleton = computed(() => this.loading() && !this.assignment());
   readonly showError = computed(() => this.error() && !this.assignment());
@@ -197,7 +207,7 @@ export class Preview implements ViewWillEnter {
 
   /** The catalog page, pushed onto this stack so back returns here. */
   openExercise(exerciseId: string): void {
-    void this._router.navigate(['/tabs/workouts/exercise', exerciseId]);
+    void this._router.navigate(this._links.exercise(exerciseId));
   }
 
   start(): void {
@@ -219,6 +229,8 @@ export class Preview implements ViewWillEnter {
       .subscribe({
         next: (log) => {
           this.starting.set(false);
+          // The logger is the Workouts tab's, wherever the preview was. It
+          // replaces the preview, so Home is not left holding a stale one.
           void this._router.navigate(['/tabs/workouts/log', log.id], { replaceUrl: true });
         },
         error: (err) => {
@@ -242,7 +254,7 @@ export class Preview implements ViewWillEnter {
           void this._feedbackService.success(
             this._translateService.instant('workouts.preview.toast.skipped'),
           );
-          void this._router.navigate(['/tabs/workouts']);
+          void this._router.navigate([this.backHref]);
         },
         error: (err) =>
           void this._feedbackService.error(

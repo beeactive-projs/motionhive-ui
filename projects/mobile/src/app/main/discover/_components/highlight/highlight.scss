@@ -1,0 +1,11 @@
+/* The matched part on the honey capsule that is not a selection (see-through
+   honey in light, the honey wash in dark), in the line's own ink. */
+:host {
+  display: inline;
+}
+
+mark {
+  border-radius: 0.125rem;
+  background: var(--mh-color-honey-tint);
+  color: inherit;
+}

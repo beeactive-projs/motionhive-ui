@@ -1,5 +1,6 @@
 import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonBackButton,
@@ -41,6 +42,7 @@ import { InviteResultRow } from '../_components/invite-result-row/invite-result-
 import { ClientsRefreshService } from '../_services/clients-refresh.service';
 import { InviteEmailSheet } from '../_sheets/invite-email-sheet/invite-email-sheet';
 import { InviteLinkSheet } from '../_sheets/invite-link-sheet/invite-link-sheet';
+import { inHomeStack } from '../../home/home-stack.config';
 import { GroupSuggestionsStore } from './group-suggestions.store';
 import { CoachStacks } from '../client-paths';
 import { ClientFilterIds, MIN_SEARCH_LENGTH } from '../clients.filters';
@@ -71,6 +73,9 @@ import {
  * Deliberately store-free: `ClientsStore` is page-scoped to the Clients tab
  * and injecting it here would throw at runtime. What this page changes, it
  * reports through `ClientsRefreshService`.
+ *
+ * Mounted in the Clients tab and in Home's stack (the first week's "Invite
+ * clients"); back and Done return to whichever opened it.
  */
 @Component({
   selector: 'mh-invite-client',
@@ -108,6 +113,12 @@ export class InviteClient implements ViewWillEnter {
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
+  private readonly _router = inject(Router);
+
+  /** Opened from Home's first week rather than the Clients tab. */
+  private readonly _fromHome = inHomeStack(this._router.url);
+  /** Back on a cold load, and where Done lands: Home, or the Clients list. */
+  readonly backHref: string = this._fromHome ? CoachStacks.Home : CoachStacks.Clients;
 
   private readonly _emailSheet = viewChild(InviteEmailSheet);
   private readonly _linkSheet = viewChild(InviteLinkSheet);
@@ -347,11 +358,12 @@ export class InviteClient implements ViewWillEnter {
    * `ClientsRefreshService`, not a `?filter=` on the way back: Ionic keeps the
    * URL a page was entered with and returns to it on every later back, so a
    * chip in it would be re-applied each time the coach came back from a
-   * client. The bare tab root leaves nothing to replay.
+   * client. The bare tab root leaves nothing to replay. From Home, back to
+   * Home: each send already told the list to reload when next shown.
    */
   private async _leave(): Promise<void> {
-    this._clientsRefreshService.invalidateOn(ClientFilterIds.Requests);
-    await this._navController.navigateBack(CoachStacks.Clients);
+    if (!this._fromHome) this._clientsRefreshService.invalidateOn(ClientFilterIds.Requests);
+    await this._navController.navigateBack(this.backHref);
   }
 
   private _settle(userId: string, name: string): void {

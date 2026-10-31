@@ -29,8 +29,15 @@ export class GroupService {
   private readonly baseUrl = `${environment.apiUrl}${API_ENDPOINTS.GROUPS.BASE}`;
 
   /** Your groups, each with your role in it (whether you may post depends on it). */
-  getMyGroups(): Observable<GroupWithMyRole[]> {
-    return this._http.get<GroupWithMyRole[]>(this.baseUrl);
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure or empty state (Home's Your hive).
+   */
+  getMyGroups(opts?: { silent?: boolean }): Observable<GroupWithMyRole[]> {
+    return this._http.get<GroupWithMyRole[]>(
+      this.baseUrl,
+      opts?.silent ? { context: silentRequest() } : {},
+    );
   }
 
   getInstructorsGroups(): Observable<Group[]> {

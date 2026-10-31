@@ -112,10 +112,12 @@
       @if (tags().length > 0) {
       <div class="mh-chip-row" role="group" [attr.aria-label]="'groups.common.groupTags' | translate">
         @for (tag of tags(); track tag) {
-        <ion-chip color="medium" [attr.aria-label]="'groups.edit.removeTag' | translate: { tag }" (click)="removeTag(tag)">
+        <!-- A control, so a button: the whole chip removes the tag. -->
+        <ion-button class="chip" fill="clear" shape="round" size="small"
+          [attr.aria-label]="'groups.edit.removeTag' | translate: { tag }" (click)="removeTag(tag)">
           {{ tag }}
-          <ion-icon name="close-outline" aria-hidden="true" />
-        </ion-chip>
+          <ion-icon slot="end" name="close-outline" aria-hidden="true" />
+        </ion-button>
         }
       </div>
       }

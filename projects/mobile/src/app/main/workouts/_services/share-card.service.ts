@@ -27,8 +27,11 @@ import {
   drawStoryBackground,
 } from './share-card';
 
-/** How a hand-off ended: sent somewhere, or put away by the person. */
-export type ShareOutcome = 'shared' | 'cancelled';
+/**
+ * How a hand-off ended: sent somewhere, put away by the person, or (the
+ * browser build without Web Share) downloaded, which needs saying.
+ */
+export type ShareOutcome = 'shared' | 'cancelled' | 'downloaded';
 
 /** How Open in Instagram ended: the Story editor opened, or Instagram is not there. */
 export type StoryOutcome = 'opened' | 'unavailable';
@@ -185,7 +188,7 @@ export class ShareCardService {
    * The system share sheet. Native: written to the app's cache (the folder
    * Android lets other apps read from) under one name, so shares do not
    * pile up there. Web, in development: the browser's own share where it
-   * can take files, a download where it cannot.
+   * can take files, a download where it cannot (and the caller says so).
    */
   async share(dataUrl: string, title: string): Promise<ShareOutcome> {
     if (Capacitor.isNativePlatform()) {
@@ -221,7 +224,7 @@ export class ShareCardService {
     link.href = dataUrl;
     link.download = file.name;
     link.click();
-    return 'shared';
+    return 'downloaded';
   }
 
   /**

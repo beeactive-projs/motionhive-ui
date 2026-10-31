@@ -13,9 +13,10 @@
 } @else {
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <!-- Opened from the Menu since Discover took the tab, as Groups is. -->
+    <!-- Opened from the Menu since Discover took the tab, as Groups is, or
+         from Home's Today row: back follows the stack it is in. -->
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/more" />
+      <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
     <ion-title>{{ 'nav.sessions' | translate }}</ion-title>
     <ion-buttons slot="end">

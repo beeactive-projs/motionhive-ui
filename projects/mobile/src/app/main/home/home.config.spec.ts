@@ -39,6 +39,7 @@ import {
   greetingPeriod,
   initialsOf,
   knownDuration,
+  latestCapped,
   latestPreview,
   latestRow,
   movedCount,
@@ -628,6 +629,13 @@ describe('coachLatest and traineeLatest', () => {
     return { exerciseId: 'e1', exerciseName: 'Barbell Squat', weightKg: 104.5, recordedAt, deltaKg };
   }
 
+  it('says the coach feed stopped short only when it came back full inside the window', () => {
+    expect(latestCapped(20, 20, 20)).toBe(true);
+    // The twentieth is older than two weeks: the window was read to its start.
+    expect(latestCapped(20, 19, 20)).toBe(false);
+    expect(latestCapped(7, 7, 20)).toBe(false);
+  });
+
   it('keeps the coach feed to the window, newest first', () => {
     const entries = coachLatest(
       [workout('old', '2026-10-10T10:00:00Z'), workout('b', '2026-10-30T10:00:00Z'), workout('a', '2026-10-31T09:00:00Z')],
@@ -662,9 +670,9 @@ describe('coachLatest and traineeLatest', () => {
         title: 'Sarah Mitchell',
         note: '3h',
         parts: [
-          { text: 'Upper A', accent: false },
-          { text: 'home.latest.records {"count":2}', accent: true },
-          { text: '52m', accent: false },
+          { text: 'Upper A', accent: false, whole: false },
+          { text: 'home.latest.records {"count":2}', accent: true, whole: true },
+          { text: '52m', accent: false, whole: true },
         ],
         avatar: { name: 'Sarah Mitchell', imageUrl: null, color: 'teal', icon: null, wash: false },
         link: ['/tabs/home', 'log', 'w1'],
@@ -674,7 +682,9 @@ describe('coachLatest and traineeLatest', () => {
 
     it('drops a workout length nobody can know', () => {
       const [entry] = coachLatest([workout('w1', '2026-10-31T09:00:00Z', { durationSeconds: 3893055 })], now);
-      expect(latestRow(entry!, copy).parts).toEqual([{ text: 'Upper A', accent: false }]);
+      expect(latestRow(entry!, copy).parts).toEqual([
+        { text: 'Upper A', accent: false, whole: false },
+      ]);
     });
 
     it('reads a post as its author, its group and its words, opening in Home', () => {
@@ -682,6 +692,8 @@ describe('coachLatest and traineeLatest', () => {
       const row = latestRow(entry!, copy);
       expect(row.title).toBe('Alex Rivera');
       expect(row.parts.map((p) => p.text)).toEqual(['Morning Crew', 'Good session today']);
+      // A group's name and a post's words give way; nothing here is a count.
+      expect(row.parts.every((p) => !p.whole)).toBe(true);
       expect(row.link).toEqual(['/tabs/home/groups', 'post', 'p1']);
     });
 
@@ -705,8 +717,8 @@ describe('coachLatest and traineeLatest', () => {
       expect(latestRow(entry!, copy)).toMatchObject({
         title: 'home.latest.record {"exercise":"Barbell Squat"}',
         parts: [
-          { text: 'home.latest.recordDelta {"delta":"2.5"}', accent: true },
-          { text: 'home.latest.recordDetail {"weight":"104.5"}', accent: false },
+          { text: 'home.latest.recordDelta {"delta":"2.5"}', accent: true, whole: true },
+          { text: 'home.latest.recordDetail {"weight":"104.5"}', accent: false, whole: false },
         ],
         avatar: { icon: 'trophy-outline', color: 'primary', wash: true },
         link: ['/tabs/home', 'progress', 'e1'],

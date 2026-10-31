@@ -8,9 +8,29 @@
     [color]="tone"
   />
   <ion-label>
-    <h2>{{ group().name }}</h2>
+    <h2><mh-highlight [text]="group().name" [term]="highlight()" /></h2>
     @if (meta()) {
       <p>{{ meta() }}</p>
     }
   </ion-label>
 </ion-item>
+
+<!-- The verb sits beside the row, not inside it: a button in a button is one
+     control to a screen reader, and the inner one is lost. The row opens
+     the group; the verb joins it. -->
+@if (verb(); as verb) {
+  <ion-button
+    class="mh-quiet verb"
+    fill="outline"
+    shape="round"
+    [disabled]="busy()"
+    [attr.aria-label]="verbLabel()"
+    (click)="verbPress.emit(verb.verb)"
+  >
+    @if (busy()) {
+      <ion-spinner aria-hidden="true" />
+    } @else {
+      {{ verb.label }}
+    }
+  </ion-button>
+}

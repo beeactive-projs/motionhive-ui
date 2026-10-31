@@ -8,9 +8,10 @@
 }
 
 /* Tag chips double as their own remove button, so the whole chip is the
-   target rather than a 12px × inside it. */
-.mh-chip-row ion-chip {
-  cursor: pointer;
+   target rather than a 12px × inside it; the × is the chips' small glyph. */
+.mh-chip-row .chip ion-icon {
+  margin-inline: 0.25rem -0.25rem;
+  font-size: var(--mh-icon-sm);
 }
 
 .danger-row {

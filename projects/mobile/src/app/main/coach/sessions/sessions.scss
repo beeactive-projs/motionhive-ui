@@ -66,12 +66,23 @@
   --padding-end: 0;
   --padding-top: 0.5rem;
   --padding-bottom: 0.5rem;
+  position: relative;
   height: auto;
   min-height: var(--mh-tap-target);
   margin: 0;
   font-size: inherit;
   font-weight: inherit;
   letter-spacing: normal;
+}
+
+/* A finger's 44px across: seven cells at SE width and 130% text are 42px,
+   so each one's hit box takes half the gap on either side (the boxes meet,
+   never overlap). The cell itself does not grow. */
+.week .day::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline: -0.125rem;
 }
 
 .week .day-inner {

@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonBackButton,
   IonBadge,
@@ -37,6 +38,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { homeOr } from '../../home/home-stack.config';
 import { SOCIAL_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
 import { CoachingSheet } from '../_sheets/coaching-sheet/coaching-sheet';
@@ -90,8 +92,15 @@ export class CoachingProfile implements OnInit {
   private readonly _venueService = inject(VenueService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _router = inject(Router);
 
   readonly store = inject(AccountStore);
+
+  /**
+   * Back on a cold load: Account, where its row is, or Home, whose first
+   * week's "Add your specialties" opens it in Home's stack.
+   */
+  readonly backHref = homeOr(this._router.url, '/tabs/more/account');
 
   readonly editSheetOpen = signal(false);
   readonly products = signal<Product[]>([]);

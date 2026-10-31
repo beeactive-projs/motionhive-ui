@@ -178,3 +178,16 @@ export function activeTabIdFromUrl(url: string): TabId | undefined {
   const segments = path.split('/').filter(Boolean);
   return segments[0] === 'tabs' ? (segments[1] as TabId | undefined) : undefined;
 }
+
+/**
+ * The tab button to light for a stack. A stack that is one of the bar's
+ * tabs lights its own button. Every other stack under `/tabs` (the coach's
+ * Sessions, Programs, Exercises, Groups, a trainee's Sessions, and the
+ * Workouts stack in coach mode) is reached from the Menu, so the Menu tab
+ * lights: the bar always says where the reader is, and never goes dark.
+ * Nothing outside the shell lights anything.
+ */
+export function litTabId(stackId: TabId | undefined, tabs: readonly TabId[]): TabId | undefined {
+  if (!stackId) return undefined;
+  return tabs.includes(stackId) ? stackId : TabIds.More;
+}

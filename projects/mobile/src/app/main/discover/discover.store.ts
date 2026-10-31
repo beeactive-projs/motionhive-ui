@@ -1,12 +1,20 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
-import { DiscoverGroup, GroupService, InstructorSearchResult, ProfileService } from 'core';
+import {
+  DiscoverGroup,
+  GroupService,
+  InstructorSearchResult,
+  ProfileService,
+  PublicSessionInstance,
+  SessionService,
+} from 'core';
 
 /**
- * The coach directory behind Discover: the "Taking new clients" strip and
- * the pushed all-coaches page. Page-scoped (`providers: [DiscoverCoachesStore]`)
- * so each surface owns its instance and refetch policy.
+ * The coach directory behind Discover: the coach of the week, "Coaches near
+ * you", the all-coaches page and search's goals. Page-scoped
+ * (`providers: [DiscoverCoachesStore]`) so each surface owns its instance
+ * and refetch policy.
  *
  * The endpoint returns the whole directory as one plain array — no paging,
  * no total — so a `loaded` gate plus client-side filtering is the entire
@@ -25,12 +33,6 @@ export class DiscoverCoachesStore {
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly loaded = this._loaded.asReadonly();
-
-  /** The strip's list: only coaches with the door open. API order, not a
-      ranking: no ranking exists and the strip must not imply one. */
-  readonly acceptingCoaches = computed(() =>
-    this._coaches().filter((coach) => coach.isAcceptingClients),
-  );
 
   load(opts: { force?: boolean; done?: () => void } = {}): void {
     if (this._loading() || (this._loaded() && !opts.force)) {
@@ -60,12 +62,14 @@ export class DiscoverCoachesStore {
   }
 }
 
-/** How many groups the strip shows before "All groups" takes over. */
-const GROUP_STRIP_LIMIT = 8;
+/** One request's worth by default: enough for Discover to filter by city
+    and goal on the phone, since the endpoint knows neither. */
+const GROUP_PAGE_LIMIT = 50;
 
 /**
- * Public groups the reader is not in yet: Discover's "Groups to join" strip
- * (one short page) and the all-groups list (paged, `usePageSize`). The
+ * Public groups the reader is not in yet: Discover's "Groups to join" cards
+ * and search's goals (one page) and the all-groups list (paged,
+ * `usePageSize`). The
  * endpoint already leaves out groups the reader is in, so everything here is
  * somewhere they could go. Same load policy as the coaches: once per visit,
  * forced by pull to refresh; a failure does not latch `loaded`, so the next
@@ -75,7 +79,7 @@ const GROUP_STRIP_LIMIT = 8;
 export class DiscoverGroupsStore {
   private readonly _groupService = inject(GroupService);
 
-  private _pageSize = GROUP_STRIP_LIMIT;
+  private _pageSize = GROUP_PAGE_LIMIT;
 
   private readonly _groups = signal<DiscoverGroup[]>([]);
   private readonly _total = signal(0);
@@ -90,7 +94,7 @@ export class DiscoverGroupsStore {
   readonly loaded = this._loaded.asReadonly();
   readonly hasMore = computed(() => this._groups().length < this._total());
 
-  /** Rows per request. The strip keeps the default; a full list asks for more. */
+  /** Rows per request. Discover keeps the default; the full list pages by fewer. */
   usePageSize(size: number): void {
     this._pageSize = size;
   }
@@ -152,6 +156,44 @@ export class DiscoverGroupsStore {
           this._loading.set(false);
           done();
         },
+      });
+  }
+}
+
+/** How many upcoming sessions search's goals look through. */
+const UPCOMING_LIMIT = 50;
+
+/**
+ * One page of upcoming sessions for search's "Browse by goal", which filters
+ * them on the phone (the endpoint has no notion of a goal). Loaded once per
+ * visit, the first time a goal is opened; a failure leaves the list empty
+ * and lets the next goal try again.
+ */
+@Injectable()
+export class DiscoverUpcomingStore {
+  private readonly _sessionService = inject(SessionService);
+
+  private readonly _sessions = signal<PublicSessionInstance[]>([]);
+  private readonly _loading = signal(false);
+  private readonly _loaded = signal(false);
+
+  readonly sessions = this._sessions.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly loaded = this._loaded.asReadonly();
+
+  load(): void {
+    if (this._loading() || this._loaded()) return;
+    this._loading.set(true);
+    this._sessionService
+      .discover({ page: 1, limit: UPCOMING_LIMIT })
+      .pipe(take(1))
+      .subscribe({
+        next: (page) => {
+          this._sessions.set(page.items);
+          this._loaded.set(true);
+          this._loading.set(false);
+        },
+        error: () => this._loading.set(false),
       });
   }
 }

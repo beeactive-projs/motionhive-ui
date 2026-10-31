@@ -9,11 +9,18 @@ import { TestBed } from '@angular/core/testing';
 import { environment } from '../../environments/environment';
 import { API_ENDPOINTS } from '../constants/api-endpoints.const';
 import { isSilentRequest } from '../interceptors/silent-request.context';
+import { GroupService } from './group/group.service';
 import { ClientPaymentService } from './payment/client-payment.service';
 import { EarningsService } from './payment/earnings.service';
 import { ProductService } from './payment/product.service';
+import { PostService } from './post/post.service';
 import { ProfileService } from './profile/profile.service';
+import { SessionService } from './session/session.service';
 import { VenueService } from './venue/venue.service';
+import { ProgramAssignmentService } from './workout/program-assignment.service';
+import { ProgramService } from './workout/program.service';
+import { ProgressService } from './workout/progress.service';
+import { WorkoutLogService } from './workout/workout-log.service';
 
 /**
  * Reads a screen may take over the failure of: silent only when the caller
@@ -71,6 +78,87 @@ describe('silent reads', () => {
       (silent) =>
         TestBed.inject(VenueService)
           .list(silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    // The Homes' blocks: each shows its own failure or empty state.
+    [
+      'ProgramAssignmentService.listForInstructor',
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.BASE}`,
+      (silent) =>
+        TestBed.inject(ProgramAssignmentService)
+          .listForInstructor({}, silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'ProgramAssignmentService.trainingDay',
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.MY_TODAY}`,
+      (silent) =>
+        TestBed.inject(ProgramAssignmentService)
+          .trainingDay(undefined, silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'SessionService.listInstances',
+      `${environment.apiUrl}${API_ENDPOINTS.SESSIONS.INSTANCES}`,
+      (silent) =>
+        TestBed.inject(SessionService)
+          .listInstances({}, silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'SessionService.listMy',
+      `${environment.apiUrl}${API_ENDPOINTS.SESSIONS.MY}`,
+      (silent) =>
+        TestBed.inject(SessionService)
+          .listMy({}, silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'WorkoutLogService.list',
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.BASE}`,
+      (silent) =>
+        TestBed.inject(WorkoutLogService)
+          .list({}, silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'WorkoutLogService.getInProgress',
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.IN_PROGRESS}`,
+      (silent) =>
+        TestBed.inject(WorkoutLogService)
+          .getInProgress(silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'ProgressService.overview',
+      `${environment.apiUrl}/progress/overview?range=4w`,
+      (silent) =>
+        TestBed.inject(ProgressService)
+          .overview('4w', silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'GroupService.getMyGroups',
+      `${environment.apiUrl}${API_ENDPOINTS.GROUPS.BASE}`,
+      (silent) =>
+        TestBed.inject(GroupService)
+          .getMyGroups(silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'PostService.getFeed',
+      `${environment.apiUrl}${API_ENDPOINTS.POSTS.FEED}?page=1&limit=20`,
+      (silent) =>
+        TestBed.inject(PostService)
+          .getFeed(1, 20, silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'ProgramService.list',
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.BASE}`,
+      (silent) =>
+        TestBed.inject(ProgramService)
+          .list({}, silent === undefined ? undefined : { silent })
           .subscribe(),
     ],
   ];

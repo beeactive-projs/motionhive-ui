@@ -151,3 +151,13 @@ h1 {
   font-weight: 600;
   letter-spacing: var(--mh-tracking-kicker);
 }
+
+/* Words wrap whole. Ionic's body sets `word-wrap: break-word`, which splits
+   a word that does not fit its line ("Wednesda/y", a Romanian name at 130%).
+   A page sets this on its host (`host: { class: 'mh-whole-words' }`) and
+   keeps words whole; a line that cannot grow ellipses instead. */
+.mh-whole-words {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}

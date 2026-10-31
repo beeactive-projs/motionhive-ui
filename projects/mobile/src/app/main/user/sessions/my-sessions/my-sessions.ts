@@ -32,6 +32,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { NotificationBell } from '../../../../_shared/components/notification-bell/notification-bell';
 import { SessionRowSkeleton } from '../../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ClockService } from '../../../../_shared/services/clock.service';
+import { bookingsLinks } from '../../../home/home-stack.config';
 import { MySessionRow } from '../_components/my-session-row/my-session-row';
 import { MySessionsEmpty } from '../_components/my-sessions-empty/my-sessions-empty';
 import { MY_SESSION_ICONS, bookingLifecycle } from '../my-sessions.config';
@@ -52,6 +53,10 @@ interface BookingDay {
  *
  * The coach twin at `/tabs/coach/sessions` answers "what am I running";
  * this list answers "do I have a seat".
+ *
+ * Mounted in its own area (from the Menu) and in Home's stack (the Today
+ * row on a day with several bookings); back, a booking and the cancelled
+ * ones follow the URL, so each stays where it was opened (`bookingsLinks`).
  */
 @Component({
   selector: 'mh-my-sessions',
@@ -92,6 +97,11 @@ export class MySessions implements ViewWillEnter {
   private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
+
+  /** The stack this list is in: Home's, or its own. */
+  private readonly _links = bookingsLinks(this._router.url);
+  /** Back on a cold load: Home, or the Menu it is opened from. */
+  readonly backHref = this._links.back;
 
   /**
    * The store's upcoming list re-read against the pulled clock: a lifted
@@ -184,7 +194,7 @@ export class MySessions implements ViewWillEnter {
   }
 
   open(booking: SessionParticipant): void {
-    void this._router.navigate(['/tabs/user/sessions', booking.instanceId], {
+    void this._router.navigate(this._links.booking(booking.instanceId), {
       state: { participant: booking },
     });
   }
@@ -206,7 +216,7 @@ export class MySessions implements ViewWillEnter {
   }
 
   openCancelled(): void {
-    void this._router.navigate(['/tabs/user/sessions/cancelled']);
+    void this._router.navigate(this._links.cancelled);
   }
 
   openDiscover(): void {

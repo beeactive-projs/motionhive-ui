@@ -7,7 +7,6 @@ import { addIcons } from 'ionicons';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
-import { copyToClipboard } from '../../../../_shared/utils/share';
 import {
   MOTIONHIVE_TAG,
   SHARE_ICONS,
@@ -15,6 +14,7 @@ import {
   saveCopyKeys,
 } from '../../_services/share-card.config';
 import { ShareCardService } from '../../_services/share-card.service';
+import { injectCopyTag } from '../../_services/share-tag';
 
 /**
  * After Save to Photos, or to the gallery on Android (design "Share Flow", step 4): the card is saved,
@@ -49,18 +49,7 @@ export class ShareGuideSheet {
   }
 
   /** Written straight from the tap, the way the clipboard wants it. */
-  async copyTag(): Promise<void> {
-    if (await copyToClipboard(MOTIONHIVE_TAG)) {
-      void this._feedbackService.success(
-        this._translateService.instant('workouts.share.tag.copied', { tag: MOTIONHIVE_TAG }),
-      );
-    } else {
-      void this._feedbackService.error(
-        null,
-        this._translateService.instant('workouts.share.tag.copyFailed', { tag: MOTIONHIVE_TAG }),
-      );
-    }
-  }
+  readonly copyTag = injectCopyTag();
 
   /** Instagram itself (the website without the app); the steps are done here. */
   async openInstagram(): Promise<void> {

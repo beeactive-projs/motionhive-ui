@@ -58,10 +58,3 @@
   font-size: var(--mh-text-sm);
   font-variant-numeric: tabular-nums;
 }
-
-/* A tile is never narrower than its longest word or its figure (kept whole
-   by `unbreakable`): at large text the row wraps a tile to the next line
-   rather than breaking "32,5 kg × 10" across lines. */
-.mh-tiles mh-stat-tile {
-  min-width: min-content;
-}

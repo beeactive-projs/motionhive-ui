@@ -39,7 +39,7 @@
   @if (records().length) {
     <section class="mh-section">
       <span class="mh-kicker">{{ 'workouts.progress.records' | translate }}</span>
-      <ion-list [inset]="true" class="mh-card-list">
+      <ion-list [inset]="true" class="mh-card-list records">
         @for (record of records(); track record.exerciseId) {
           <ion-item button [detail]="true" (click)="openExercise(record)">
             <!-- Decorative: the exercise's name is the very next thing in the row. -->
@@ -51,11 +51,13 @@
               icon="trophy-outline"
               aria-hidden="true"
             />
-            <!-- The name on one line with an ellipsis: beside the weight a
-                 long Romanian name otherwise broke inside a word. -->
+            <!-- The name may take two lines, words whole, beside a weight
+                 that never shrinks. On a narrow card the weight moves under
+                 the name instead (one of the two is shown; progress-body.scss). -->
             <ion-label>
               <h2 class="record-name">{{ record.exerciseName }}</h2>
               <p>{{ recordLine(record) }}</p>
+              <p class="value-under">{{ recordWeight(record.weightKg) }}</p>
             </ion-label>
             <ion-note slot="end" class="value">{{ recordWeight(record.weightKg) }}</ion-note>
           </ion-item>

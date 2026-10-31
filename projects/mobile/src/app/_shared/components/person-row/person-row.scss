@@ -6,6 +6,21 @@
   container-type: inline-size;
 }
 
+// Beside a verb the title may take a second line, words whole, at every
+// width: what got cut was the reason ("Strength Base se termi…" in
+// Romanian at the default size). Each line stays one row line, so the row
+// still lands on the grid; the line under it keeps to one.
+:host(.has-verb) ion-item > ion-label > h2 {
+  display: -webkit-box;
+  block-size: auto;
+  max-block-size: calc(2 * var(--mh-row-line));
+  line-height: var(--mh-row-line);
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 // Narrower than this (an iPhone SE from about 107% text, any phone at 130%)
 // the verb beside the text squeezed the title to a word or two: it goes
 // under the text instead, on the text's own edge, and the row leaves the
@@ -22,20 +37,6 @@
   :host(.has-verb) ion-item > ion-button.mh-row-action {
     margin-block-start: 0.5rem;
     margin-inline-start: 0;
-  }
-
-  // The title may take a second line, words whole: what got cut at this
-  // size was the reason ("…ends Friday"). Each line stays one row line, so
-  // the row still lands on the grid; the line under it keeps to one.
-  :host(.has-verb) ion-item > ion-label > h2 {
-    display: -webkit-box;
-    block-size: auto;
-    max-block-size: calc(2 * var(--mh-row-line));
-    line-height: var(--mh-row-line);
-    white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
   }
 
   // The avatar lines up with the text, not with the taller block, so it

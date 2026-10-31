@@ -38,8 +38,10 @@ const ASSIGNMENT_LIMIT = 100;
  * you are the roster (`/coach/roster`, last 7 days); Latest is
  * `/coach/activity`; plans ending come from the coach's active
  * assignments; requests from the pending count; today from the session
- * instances. Each loads on its own and a failure empties only its block.
- * Money is not here: it is the Menu's Payments row.
+ * instances. Each loads on its own and a failure empties only its block:
+ * the hive card says so with a retry, the other blocks simply stay away.
+ * Every read is silent, so no dialog lands over the whole Home for one
+ * block. Money is not here: it is the Menu's Payments row.
  */
 @Injectable()
 export class CoachHomeStore {
@@ -127,16 +129,18 @@ export class CoachHomeStore {
     );
   }
 
+  /** Silent: a plan ending soon is one reason among Needs you's; the rest still show. */
   private _loadAssignments(settle: () => void): void {
     this._read(
-      this._programAssignmentService.listForInstructor({
-        status: ProgramAssignmentStatus.Active,
-        limit: ASSIGNMENT_LIMIT,
-      }),
+      this._programAssignmentService.listForInstructor(
+        { status: ProgramAssignmentStatus.Active, limit: ASSIGNMENT_LIMIT },
+        { silent: true },
+      ),
       settle,
     ).subscribe((page) => this._assignments.set(page?.items ?? []));
   }
 
+  /** Silent: the Today row only shows on a day with sessions, so a failure leaves it away. */
   private _loadAgenda(settle: () => void): void {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -144,12 +148,15 @@ export class CoachHomeStore {
     endOfDay.setDate(endOfDay.getDate() + 1);
 
     this._read(
-      this._sessionService.listInstances({
-        dateFrom: startOfDay.toISOString(),
-        dateTo: endOfDay.toISOString(),
-        status: SessionInstanceStatus.Scheduled,
-        limit: AGENDA_LIMIT,
-      }),
+      this._sessionService.listInstances(
+        {
+          dateFrom: startOfDay.toISOString(),
+          dateTo: endOfDay.toISOString(),
+          status: SessionInstanceStatus.Scheduled,
+          limit: AGENDA_LIMIT,
+        },
+        { silent: true },
+      ),
       settle,
     ).subscribe((response) => this._agenda.set(response?.items ?? []));
   }
@@ -164,13 +171,14 @@ export class CoachHomeStore {
   /**
    * Read only for a coach with no clients: whether there is a program to
    * assign once one joins, and whether Discover has specialties to show.
+   * Silent: a step that cannot be decided is left out.
    */
   private _loadFirstSteps(): void {
-    this._read(this._programService.list({ library: ProgramLibrary.Mine, limit: 1 })).subscribe(
-      (page) => this._hasPrograms.set(page ? page.total > 0 : null),
-    );
+    this._read(
+      this._programService.list({ library: ProgramLibrary.Mine, limit: 1 }, { silent: true }),
+    ).subscribe((page) => this._hasPrograms.set(page ? page.total > 0 : null));
 
-    this._read(this._profileService.getMyProfile()).subscribe((profile) =>
+    this._read(this._profileService.getMyProfile({ silent: true })).subscribe((profile) =>
       this._hasSpecialties.set(
         profile ? (profile.instructorProfile?.specializations?.length ?? 0) > 0 : null,
       ),

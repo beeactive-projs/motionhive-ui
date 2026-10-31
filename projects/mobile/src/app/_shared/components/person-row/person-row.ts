@@ -17,15 +17,18 @@ import { avatarToneFor } from '../../utils/avatar-tone.utils';
  * - `icon`: a tile in place of the avatar, for a row about several people.
  * - `verb`: the row's one action, a quiet button at the end (`lists.md`, the
  *   row verb). The row then takes no taps itself and emits `act`, not
- *   `select`. Where the text would be squeezed (a small phone, a large text
- *   size, a long Romanian verb) the verb moves under the text.
+ *   `select`. Its title may take two lines, words whole, so the reason is
+ *   not cut ("Strength Base ends Friday"); where the text would still be
+ *   squeezed (a small phone, a large text size, a long Romanian verb) the
+ *   verb moves under the text.
  */
 @Component({
   selector: 'mh-person-row',
   imports: [HexAvatar, IonButton, IonItem, IonLabel],
   templateUrl: './person-row.html',
   styleUrl: './person-row.scss',
-  host: { '[class.has-verb]': '!!verb()' },
+  // Words wrap whole wherever the row is: a title never breaks inside one.
+  host: { class: 'mh-whole-words', '[class.has-verb]': '!!verb()' },
 })
 export class PersonRow {
   readonly person = input.required<RecentPerson>();

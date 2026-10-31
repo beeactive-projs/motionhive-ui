@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import {
   CreateCommentPayload,
   CreatePostPayload,
@@ -61,13 +62,17 @@ export class PostService {
    * Aggregated feed across every group the current user is a member of.
    * Each item is enriched with `group: { id, name, logoUrl }`.
    */
-  getFeed(page = 1, limit = 20): Observable<PostListResponse> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure or empty state (Home's and the Latest page's feed).
+   */
+  getFeed(page = 1, limit = 20, opts?: { silent?: boolean }): Observable<PostListResponse> {
     const params = new HttpParams()
       .set('page', String(page))
       .set('limit', String(limit));
     return this._http.get<PostListResponse>(
       `${this._api}${API_ENDPOINTS.POSTS.FEED}`,
-      { params },
+      { params, ...(opts?.silent ? { context: silentRequest() } : {}) },
     );
   }
 

@@ -3,7 +3,7 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (isReview()) {
-        <ion-back-button defaultHref="/tabs/workouts" />
+        <ion-back-button [defaultHref]="backHref" />
       } @else {
         <!-- Closing keeps what was picked or typed, like Save. -->
         <ion-button

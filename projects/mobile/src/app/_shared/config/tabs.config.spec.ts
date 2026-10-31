@@ -4,6 +4,7 @@ import { NavModes } from 'core';
 import {
   activeTabIdFromUrl,
   COACH_TAB_SET,
+  litTabId,
   resolveMode,
   TAB_ICONS,
   TAB_SETS,
@@ -47,6 +48,41 @@ describe('activeTabIdFromUrl', () => {
     expect(activeTabIdFromUrl('/auth/login')).toBeUndefined();
     expect(activeTabIdFromUrl('/tabs')).toBeUndefined();
     expect(activeTabIdFromUrl('/')).toBeUndefined();
+  });
+});
+
+describe('litTabId', () => {
+  const coachTabs = COACH_TAB_SET.tabs.map((tab) => tab.id);
+  const trainTabs = TRAIN_TAB_SET.tabs.map((tab) => tab.id);
+
+  it("lights a real tab's own button", () => {
+    for (const tab of coachTabs) expect(litTabId(tab, coachTabs)).toBe(tab);
+    for (const tab of trainTabs) expect(litTabId(tab, trainTabs)).toBe(tab);
+    expect(litTabId(TabIds.More, coachTabs)).toBe(TabIds.More);
+  });
+
+  it('lights the Menu for every stack the Menu opens, in both modes', () => {
+    // The audit: coach Sessions / Programs / Exercises / Groups lit nothing,
+    // and a trainee's Sessions lit nothing.
+    const fromMenu = (set: typeof COACH_TAB_SET) =>
+      set.more
+        .flatMap((section) => section.items)
+        .map((tile) => activeTabIdFromUrl(tile.route));
+    for (const stack of fromMenu(COACH_TAB_SET)) {
+      expect(litTabId(stack, coachTabs)).toBe(TabIds.More);
+    }
+    for (const stack of fromMenu(TRAIN_TAB_SET)) {
+      expect(litTabId(stack, trainTabs)).toBe(TabIds.More);
+    }
+  });
+
+  it("lights the Menu for a stack that is a tab only in the other mode", () => {
+    expect(litTabId(TabIds.Workouts, coachTabs)).toBe(TabIds.More);
+    expect(litTabId(TabIds.Clients, trainTabs)).toBe(TabIds.More);
+  });
+
+  it('lights nothing outside the shell', () => {
+    expect(litTabId(undefined, coachTabs)).toBeUndefined();
   });
 });
 
