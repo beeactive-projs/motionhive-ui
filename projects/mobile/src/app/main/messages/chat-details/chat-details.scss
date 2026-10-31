@@ -16,3 +16,9 @@
   font-size: var(--mh-text-sm);
   font-weight: 600;
 }
+
+/* The mute hint says what muting does, so it wraps instead of being cut off
+   at the toggle (it stopped mid-word at large text). */
+ion-toggle::part(label) {
+  white-space: normal;
+}

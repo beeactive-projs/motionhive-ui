@@ -1,0 +1,49 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" color="success" tone="shade" [icon]="icons.yes" />
+        <ion-label class="ion-text-wrap">
+          {{ savedKey | translate }}
+          <p>{{ 'workouts.share.guide.savedHint' | translate }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" color="primary" tone="wash" name="2" />
+        <ion-label class="ion-text-wrap">
+          {{ 'workouts.share.guide.open' | translate }}
+          <p>{{ 'workouts.share.guide.openHint' | translate }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <mh-hex-avatar slot="start" size="sm" color="primary" tone="wash" name="3" />
+        <ion-label class="ion-text-wrap">
+          {{ 'workouts.share.guide.tag' | translate }}
+          <p>{{ 'workouts.share.guide.tagHint' | translate: { tag } }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <!-- Stacked full width, as in the design: the handle is too long to
+         share a row with the main action. -->
+    <div class="actions">
+      <ion-button class="mh-quiet" expand="block" fill="outline" (click)="copyTag()">
+        {{ 'workouts.share.tag.copy' | translate: { tag } }}
+      </ion-button>
+      <ion-button expand="block" (click)="openInstagram()">
+        {{ 'workouts.share.guide.openInstagram' | translate }}
+      </ion-button>
+      <ion-button class="hide" fill="clear" size="small" (click)="hideSteps()">
+        {{ 'workouts.share.guide.hide' | translate }}
+      </ion-button>
+    </div>
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="savedKey | translate"
+  [subtitle]="'workouts.share.guide.subtitle' | translate"
+  [body]="body"
+  [fit]="true"
+  [showFooter]="false"
+/>

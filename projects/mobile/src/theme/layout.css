@@ -81,6 +81,9 @@
   display: flex;
   flex-wrap: nowrap;
   gap: var(--mh-section-gap);
+  /* Only used where a page lets the strip wrap: two rows' 44px hit boxes
+     (ion-button.css) meet without overlapping. */
+  row-gap: calc(var(--mh-tap-target) - 2rem);
   overflow-x: auto;
   padding: 0.625rem var(--mh-bar-gutter);
   scrollbar-width: none;
@@ -98,6 +101,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--mh-section-gap);
+  /* Rows far enough apart that their chips' 44px hit boxes (ion-button.css)
+     meet without overlapping. */
+  row-gap: calc(var(--mh-tap-target) - 2rem);
 }
 
 /* A kicker and its note on one baseline over a block of rows — "This week ·
@@ -239,11 +245,22 @@ ion-content.mh-flat-page > .mh-note-block {
   --color: var(--mh-color-honey-deep);
   --padding-start: 0.25rem;
   --padding-end: 0.25rem;
+  position: relative;
   height: 1.5rem;
   min-height: 0;
   margin: 0 0 0 auto;
   font-size: var(--mh-text-sm);
   font-weight: 600;
+}
+
+/* The action keeps the line's height to the eye but takes a finger's 44px:
+   an invisible box spills into the gaps around the head (and under the
+   list's first row, which paints over it, so the row keeps its own taps). */
+.mh-section-head ion-button::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--mh-tap-target) - 1.5rem) / -2);
+  inset-inline: min(0rem, calc((var(--mh-tap-target) - 100%) / -2));
 }
 
 /* Only the first action is pushed to the far edge; a second sits beside it

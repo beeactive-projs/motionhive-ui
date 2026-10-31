@@ -80,7 +80,14 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>MotionHive saves your workout card to Photos when you choose Save Image.</string>
+	<string>MotionHive saves your workout card to Photos only when you ask it to.</string>
+	<!-- Instagram Stories (Quick share) and Open Instagram (after Save to
+	     Photos). Without these, canOpenURL says Instagram is never there. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram-stories</string>
+		<string>instagram</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>MotionHive uses the camera when you take a photo for a workout or a post.</string>
 </dict>

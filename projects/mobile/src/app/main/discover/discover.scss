@@ -1,10 +1,25 @@
-/* Layout only — row cards, chips and day headers come from the shared
-   skins (.mh-session-row, .mh-chip-row, .mh-day-header). */
+/* Layout only. Rows, chips and day headers come from the shared skins
+   (.mh-session-row, .mh-chip-row, .mh-day-header, the flat list), sections
+   from layout.css. Sizes follow the calm Home (HOME_CALM_SPEC): the fluid
+   tokens where the page breathes, rem everywhere else, so the phone's text
+   size carries through. */
 
-/* ── Brand hero ─────────────────────────────────────────────────────── */
+@use 'discover-shared';
+
+/* The calm Home's spacing between blocks: 20 on a small phone, 28 on a
+   large one. */
+.mh-page.discover {
+  gap: var(--mh-block-gap);
+  padding-bottom: 2rem;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────── */
 
 .lead {
-  padding: 0.75rem 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  container-type: inline-size;
 }
 
 .hero {
@@ -14,12 +29,22 @@
   gap: 0.75rem;
 }
 
+/* The tab's greeting: 22 to 26, two lines at most whatever the language or
+   text size. */
 .hero h1 {
-  max-width: 15rem;
-  line-height: var(--mh-leading-heading);
+  display: -webkit-box;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--mh-text-greeting);
+  text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-/* The decorative hex cluster — offsets stagger the three marks the way the
+/* The decorative hex cluster: offsets stagger the three marks the way the
    logo's honeycomb does. Purely ornamental, hidden from the tree. */
 .hero-hexes {
   display: flex;
@@ -36,11 +61,20 @@
   margin-top: 0.625rem;
 }
 
-/* The field-look search entry. A real field would imply typing happens
-   here; the tap hands over to the search header instead. */
+/* With large text on a small phone the ornament would push the headline to
+   a third line; the words win. em, so it answers the text size as well as
+   the width. */
+@container (max-width: 18em) {
+  .hero-hexes {
+    display: none;
+  }
+}
+
+/* The field-look search entry: a tap target tall, its words on one line. */
 .search-entry {
-  height: var(--mh-tap-target);
-  margin: 0.75rem 0 0;
+  height: auto;
+  min-height: var(--mh-tap-target);
+  margin: 0;
   font-size: var(--mh-text-base);
   font-weight: 400;
   letter-spacing: normal;
@@ -59,130 +93,83 @@
 }
 
 .search-entry ion-icon {
+  flex: none;
   margin-inline-end: 0.5rem;
   font-size: var(--mh-icon-sm);
 }
 
-/* ── "Taking new clients" rail ──────────────────────────────────────── */
-
-.rail-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem 0.25rem;
-}
-
-.rail-head .mh-kicker {
-  color: var(--ion-color-medium);
-}
-
-.rail-head .rail-link {
-  height: auto;
-  margin: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
-  --color: var(--mh-color-honey-deep);
-  --padding-start: 0.25rem;
-  --padding-end: 0;
-}
-
-.rail {
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding: 0.25rem 1.25rem;
-  scrollbar-width: none;
-}
-
-.rail::-webkit-scrollbar {
-  display: none;
-}
-
-/* A stacked avatar tile. A plain button on purpose: `ion-button` owns its
-   inner layout and fights a column of avatar + two labels. */
-.rail-item {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  width: 4.75rem;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--ion-text-color);
-  font-family: var(--ion-font-family);
-}
-
-.rail-name {
-  max-width: 100%;
+.search-entry-label {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
 }
 
-.rail-name.muted {
-  color: var(--ion-color-medium);
+/* ── Section heads ──────────────────────────────────────────────────── */
+
+/* Over strips, chips and cards rather than a card list, so the label sits
+   on the page gutter with the hero, not on the rows' inset. A long label
+   (Romanian, large text) ellipses before it pushes the action off. */
+.discover .mh-section-head {
+  position: relative;
+  /* Over the strip's top padding, which the action's taller hit box
+     reaches into. */
+  z-index: 1;
+  padding-inline: 0;
 }
 
-.rail-city {
-  max-width: 100%;
+.discover .mh-section-head .mh-kicker {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
-  color: var(--ion-color-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--mh-text-xs);
+}
+
+/* ── Strips ─────────────────────────────────────────────────────────── */
+
+/* Edge to edge, so an avatar cut off at the side says there is more; the
+   strip pads back to the gutter itself. */
+mh-discover-strip {
+  margin-inline: calc(-1 * var(--mh-page-gutter));
 }
 
 /* ── Feed ───────────────────────────────────────────────────────────── */
 
-.feed-head {
-  padding: 1rem 1.25rem 0;
-}
-
-.feed-head .mh-kicker {
-  color: var(--ion-color-medium);
+/* The chips start on the page gutter and scroll to the screen's edges. The
+   block padding is the chips' tap-target overhang (ion-button.css), so the
+   sideways scroll does not clip it. */
+.feed .mh-chip-row {
+  margin-inline: calc(-1 * var(--mh-page-gutter));
+  padding: 0.375rem var(--mh-page-gutter);
 }
 
 .agenda {
-  padding: 0 1.25rem 3rem;
-}
-
-/* ── Search takeover ────────────────────────────────────────────────── */
-
-.search-hint {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 3rem 2.5rem;
-  text-align: center;
 }
 
-.search-hint ion-icon {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-icon-xl);
+/* Above the rows when it sticks: an `ion-item` paints its inner box at
+   z-index 1 without a stacking context of its own, so the day header's
+   z-index 1 lost to every row after it and the cards slid over it. */
+.agenda .mh-day-header {
+  z-index: 2;
 }
 
-.search-hint p {
-  margin: 0;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-  line-height: var(--mh-leading-body);
+/* ── Search ─────────────────────────────────────────────────────────── */
+
+/* The start note hugs the field, on the rows' gutter (the flat page's
+   placement, layout.css). */
+.search-note {
+  padding: 0.75rem var(--mh-row-gutter) 0.375rem;
 }
 
-.search-results {
-  padding: 0.25rem 1.25rem 3rem;
+/* Sessions keep their cards, on the page gutter; their label lines up with
+   the flat lists' labels above. */
+.mh-section-label:has(+ .search-sessions) {
+  padding-inline: var(--mh-row-gutter);
 }
 
-/* The coach result's loading twin — card look, no tone. */
-.coach-skeleton {
-  margin-bottom: 0.5rem;
-  --background: var(--ion-card-background);
-  --border-radius: var(--mh-radius-card);
-  border-radius: var(--mh-radius-card);
+.search-sessions {
+  padding: 0 var(--mh-page-gutter) 3rem;
 }

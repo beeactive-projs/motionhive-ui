@@ -252,12 +252,9 @@
   (picked)="onVisibilityPicked($event)"
 />
 
+<!-- A workout taken down after a report has no way out of the app. -->
 @if (log(); as log) {
-  <mh-share-workout-sheet
-    [(open)]="shareOpen"
-    [log]="log"
-    [note]="note()"
-    [photoUrl]="photoUrl()"
-    (captionSaved)="onCaptionSaved($event)"
-  />
+  @if (!takenDown()) {
+    <mh-share-workout-sheet [(open)]="shareOpen" [log]="log" [photoUrl]="photoUrl()" />
+  }
 }

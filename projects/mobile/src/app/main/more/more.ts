@@ -56,6 +56,7 @@ import { FeedbackSheet } from './_sheets/feedback-sheet/feedback-sheet';
     TranslatePipe,
   ],
   templateUrl: './more.html',
+  styleUrl: './more.scss',
 })
 export class More implements ViewWillEnter {
   private readonly _router = inject(Router);
@@ -82,6 +83,7 @@ export class More implements ViewWillEnter {
    */
   private readonly _dots = new Map<string, Signal<boolean>>([
     ['/tabs/more/billing', this._moreBadgesService.hasBillDue],
+    ['/tabs/more/payments', this._moreBadgesService.hasOverdueInvoices],
     ['/tabs/more/coaches', this._moreBadgesService.hasCoachInvites],
   ]);
 

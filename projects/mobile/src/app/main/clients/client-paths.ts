@@ -4,16 +4,19 @@ import { RedirectFunction, Router } from '@angular/router';
 /**
  * Where the client screens live.
  *
- * A client is reached from two tabs: Clients, from the person, and Programs,
- * from a plan's list of who is on it. Back returns to origin, so the client
- * page and everything it opens (an exercise's progress, a logged workout,
- * the public profile) are mounted in both stacks, and every link out of
- * them stays in whichever one the URL is in. Pushing onto the other tab left
- * back with nothing to pop.
+ * A client is reached from three tabs: Clients, from the person; Programs,
+ * from a plan's list of who is on it; and Home, from Needs you. Back returns
+ * to origin, so the client page and everything it opens (an exercise's
+ * progress, a logged workout, a session, a plan, the public profile) are
+ * mounted in every one of those stacks, and every link out of them stays in
+ * whichever one the URL is in. Pushing onto the other tab left back with
+ * nothing to pop.
  *
  *   Clients:  /tabs/clients/:clientId          ?tab=, …/progress/:exerciseId
  *   Programs: /tabs/programs/client/:clientId  ?tab=, …/progress/:exerciseId
- *   Both:     <stack>/log/:id, <stack>/person/:handle
+ *   Home:     /tabs/home/client/:clientId      ?tab=, …/progress/:exerciseId
+ *   All:      <stack>/log/:id, <stack>/session/:id, <stack>/program/:id,
+ *             <stack>/person/:handle
  *
  * Training and Progress used to be pages of their own (…/training,
  * …/progress); they are tabs of the client page now, and those addresses
@@ -22,6 +25,7 @@ import { RedirectFunction, Router } from '@angular/router';
 export const CoachStacks = {
   Clients: '/tabs/clients',
   Programs: '/tabs/programs',
+  Home: '/tabs/home',
 } as const;
 
 export type CoachStack = (typeof CoachStacks)[keyof typeof CoachStacks];
@@ -29,8 +33,17 @@ export type CoachStack = (typeof CoachStacks)[keyof typeof CoachStacks];
 /** The two tabs that were pages, as their old addresses name them. */
 export type FormerClientPage = 'training' | 'progress';
 
+/** True when the URL is the stack's root or a page pushed onto it. */
+function isIn(url: string, stack: CoachStack): boolean {
+  const path = url.split(/[?#]/)[0];
+  return path === stack || path.startsWith(`${stack}/`);
+}
+
+/** The stack a URL is in; anywhere else (a cold load) is the Clients tab. */
 export function coachStackOf(url: string): CoachStack {
-  return url.startsWith(CoachStacks.Programs) ? CoachStacks.Programs : CoachStacks.Clients;
+  if (isIn(url, CoachStacks.Programs)) return CoachStacks.Programs;
+  if (isIn(url, CoachStacks.Home)) return CoachStacks.Home;
+  return CoachStacks.Clients;
 }
 
 /**
@@ -40,9 +53,12 @@ export function coachStackOf(url: string): CoachStack {
  */
 export const CLIENT_INVITE_PATH = `${CoachStacks.Clients}/invite`;
 
-/** The client page's own path, as router commands. */
+/**
+ * The client page's own path, as router commands. The Clients tab mounts it
+ * at its root; the other stacks under `client/`, beside their own pages.
+ */
 export function clientPath(stack: CoachStack, clientId: string): string[] {
-  return stack === CoachStacks.Programs ? [stack, 'client', clientId] : [stack, clientId];
+  return stack === CoachStacks.Clients ? [stack, clientId] : [stack, 'client', clientId];
 }
 
 /** The same path as one string, for an `ion-back-button` fallback. */

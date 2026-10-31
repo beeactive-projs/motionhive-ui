@@ -10,5 +10,5 @@ ion-popover.mh-select-popover {
   --width: 14rem;
   --max-height: 60vh;
   --border-radius: var(--mh-radius-card);
-  --box-shadow: 0 0.5rem 2rem rgb(var(--ion-text-color-rgb) / 0.2);
+  --box-shadow: var(--mh-shadow-overlay);
 }

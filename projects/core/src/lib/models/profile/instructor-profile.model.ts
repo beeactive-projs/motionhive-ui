@@ -28,6 +28,11 @@ export interface InstructorProfile {
   showEmail: boolean;
   showPhone: boolean;
   isPublic: boolean;
+  /**
+   * Whether a client may name this coach on a workout they share outside
+   * the app (the Full share card's coach line). Off until the coach says so.
+   */
+  allowClientMentions?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +54,7 @@ export interface UpdateInstructorProfilePayload {
   showSocialLinks?: boolean;
   showEmail?: boolean;
   showPhone?: boolean;
+  allowClientMentions?: boolean;
 }
 
 export interface CreateInstructorProfilePayload {

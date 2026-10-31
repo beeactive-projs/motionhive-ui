@@ -1,0 +1,210 @@
+// What both Homes share, `@use`d by coach-home and train-home (component
+// styles are scoped, so one file is how two bodies get the same card).
+
+// ─── The page ────────────────────────────────────────────────────
+// Calm: the greeting, then at most three blocks, separated by space alone.
+// The greeting and the hive card sit on the row gutter, in line with the
+// header's logo and the avatars of the rows below; the lists run edge to
+// edge as flat lists (`lists.md`), straight on the white page.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mh-block-gap);
+  padding-block: var(--mh-page-rhythm) var(--mh-block-gap);
+}
+
+.greeting,
+.hive-wrap {
+  padding-inline: var(--mh-row-gutter);
+}
+
+.greeting h1 {
+  font-size: var(--mh-text-greeting);
+}
+
+// Section heads over the flat lists come from the theme: the head is the
+// seam above the list (ion-list.css) and its text action takes a 44px
+// target (layout.css). That target reaches past the section gap into the
+// first row's top padding; the head sits above the row so the row does not
+// cut it to 40px there (the row keeps the rest of its height).
+.mh-section-head {
+  position: relative;
+  z-index: 2;
+}
+
+// ─── The hive card ───────────────────────────────────────────────
+// Cream in light, navy in dark (the hive tokens), with a faint honeycomb
+// behind. No outline: the fill is the edge. A size container, so the comb
+// sizes its cells from the card (`--cell` in `cqi`), not from the screen.
+.hive-card {
+  container-type: inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: var(--mh-card-pad);
+  overflow: hidden;
+  border-radius: var(--mh-radius-card);
+  background: var(--mh-color-hive);
+  color: var(--mh-color-hive-ink);
+  isolation: isolate;
+}
+
+// The honeycomb behind, as a mask so its colour stays a token; a honey
+// glow where the hive sits.
+.hive-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--mh-color-hive-pattern);
+  opacity: 0.07;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cpath d='M0 28L16 0h32l16 28-16 28H16zM64 28h32' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E");
+  mask-size: 6rem 3.5rem;
+  pointer-events: none;
+}
+
+.hive-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 30%),
+    rgba(var(--ion-color-primary-rgb), 0.2),
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+.hive-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.hive-card .hive-kicker {
+  margin: 0;
+  color: var(--mh-color-hive-kicker);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+}
+
+// The one headline: two lines at most, figures that do not shift.
+.hive-card .hive-title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--mh-color-hive-ink);
+  font-size: var(--mh-text-hero);
+  font-variant-numeric: tabular-nums;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.hive-card .hive-sub {
+  margin: 0;
+  color: var(--mh-color-hive-muted);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+// The card's one text link ("See clients"): its own token, deep honey on
+// the cream and honey on the navy. A 44px target that takes the space of
+// one line of text.
+.hive-card ion-button.hive-link {
+  --color: var(--mh-color-hive-link);
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  align-self: flex-start;
+  height: var(--mh-tap-target);
+  min-height: 0;
+  margin: calc((1.5rem - var(--mh-tap-target)) / 2) 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.hive-card ion-button.hive-link ion-icon {
+  font-size: var(--mh-icon-sm);
+}
+
+// The card's one honey button (Start a workout, Invite clients), full width.
+.hive-card > ion-button {
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}
+
+.hive-card ion-skeleton-text {
+  --background: var(--mh-color-hive-ghost);
+  --background-rgb: var(--ion-background-color-rgb);
+  margin: 0;
+}
+
+// The glow sits behind the comb, on the left.
+.hive-card {
+  --glow-x: 22%;
+  --glow-y: 40%;
+}
+
+// While loading, the comb's footprint: three cells wide, three rows tall.
+.hive-card .comb-skeleton {
+  flex: none;
+  width: calc(var(--cell) * 3.16);
+  height: calc(var(--cell) * 3.03);
+  border-radius: var(--mh-radius-card);
+}
+
+// The comb beside what it adds up to, until the card is too narrow for
+// both or the text too large: then the comb goes on top. In `em`, so a
+// larger text size stacks it as well as a narrower phone. 18em keeps an
+// iPhone SE side by side at the default size (the card is about 19.5em
+// wide there) and stacks it at 130%.
+.hive-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hive-row .hive-copy {
+  flex: 1;
+}
+
+@container (max-width: 18em) {
+  .hive-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  // The words take the card's width, not their own: sized to their content,
+  // a one-line status set the width and pushed the headline off the card.
+  .hive-row .hive-copy {
+    align-self: stretch;
+  }
+}
+
+// ─── Flat rows on Home ───────────────────────────────────────────
+// A Today row stands alone between blocks, so it draws no hairline.
+.today-row ion-item:first-child::before {
+  display: none;
+}
+
+// The label takes the row's width, so the time ends on the row's edge.
+.today-row ion-label {
+  flex: 1;
+  min-width: 0;
+}
+
+// "Today" warms to the honey ink, as the agenda's day header does.
+.today-label {
+  color: var(--mh-color-honey-deep);
+}
+
+.today-row ion-note {
+  font-variant-numeric: tabular-nums;
+}

@@ -38,11 +38,11 @@
   } @else if (group(); as group) {
   <div class="mh-page">
     <section class="hero">
-      <mh-hex-avatar size="2xl" [name]="group.name" [imageUrl]="group.logoUrl" />
+      <mh-hex-avatar size="2xl" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
       <h2 class="name">{{ group.name }}</h2>
       <div class="meta">
         <span class="count">{{ memberCountLabel() }}</span>
-        <ion-chip [color]="policyTone()" class="policy">{{ policyLabel() }}</ion-chip>
+        <ion-badge class="policy" [attr.data-tone]="policyTone()">{{ policyLabel() }}</ion-badge>
       </div>
     </section>
 
@@ -113,7 +113,7 @@
       </ion-button>
     </div>
     } @else {
-    <ion-button expand="block" [disabled]="!cta.enabled || joining()" (click)="join()">
+    <ion-button expand="block" color="primary" [disabled]="!cta.enabled || joining()" (click)="join()">
       @if (joining()) {
       <ion-spinner name="crescent" slot="start" />
       }

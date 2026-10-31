@@ -1,0 +1,53 @@
+<!-- Shared by every cell: the honey's gradient and the hexagon to clip it
+     to. Each cell's svg has the same viewBox, so one clip fits them all.
+     The path is the avatars' flat-top hexagon turned a quarter round. -->
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient [attr.id]="honeyId" x1="0" y1="0" x2="0" y2="1">
+      <stop class="honey-top" offset="0" />
+      <stop class="honey-base" offset="0.12" />
+      <stop class="honey-base" offset="1" />
+    </linearGradient>
+    <clipPath [attr.id]="clipId">
+      <path [attr.d]="path" transform="rotate(90 50 50)" />
+    </clipPath>
+  </defs>
+</svg>
+
+@for (cell of cells(); track cell.key; let i = $index) {
+  <div
+    class="cell"
+    aria-hidden="true"
+    [attr.data-kind]="cell.kind"
+    [attr.data-ring]="cell.ring"
+    [attr.data-fill]="cell.fill"
+    [style.--x]="cell.x"
+    [style.--y]="cell.y"
+    [style.--i]="i"
+  >
+    <svg viewBox="6.7 0 86.6 100" preserveAspectRatio="xMidYMid meet">
+      <path class="base" [attr.d]="path" transform="rotate(90 50 50)" />
+      @if (cell.fill) {
+        <g [attr.clip-path]="clipUrl">
+          <rect
+            class="honey"
+            x="0"
+            y="0"
+            width="100"
+            height="100"
+            [attr.fill]="cell.fill === Fills.Honey ? honeyUrl : null"
+          />
+        </g>
+      }
+      @if (cell.ring || cell.kind === Kinds.Centre) {
+        <path class="ring" [attr.d]="path" transform="rotate(90 50 50)" />
+      }
+    </svg>
+    @if (cell.label) {
+      <span class="label">{{ cell.label }}</span>
+    }
+    @if (cell.dot) {
+      <span class="dot"></span>
+    }
+  </div>
+}

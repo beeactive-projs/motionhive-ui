@@ -122,19 +122,14 @@
         <section class="mh-section">
           <div class="mh-section-label">{{ 'person.groupsInCommon' | translate }}</div>
           <!-- One line that scrolls sideways. Each opens the group in this
-               stack, so back returns here. -->
-          <div class="groups">
+               stack, so back returns here. Chips you tap are
+               `ion-button.chip` (ion-button.css): `ion-chip` has no role
+               and no tab stop of its own. -->
+          <div class="mh-chip-row groups">
             @for (group of sharedGroups(); track group.id) {
-              <ion-chip
-                [outline]="true"
-                color="medium"
-                role="link"
-                tabindex="0"
-                (click)="openGroup(group)"
-                (keydown.enter)="openGroup(group)"
-              >
+              <ion-button class="chip" fill="clear" shape="round" size="small" (click)="openGroup(group)">
                 {{ group.name }}
-              </ion-chip>
+              </ion-button>
             }
           </div>
         </section>
@@ -304,12 +299,12 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       @if (isSelf()) {
-        <ion-button expand="block" class="cta" (click)="editProfile()">
+        <ion-button expand="block" class="cta" color="primary" (click)="editProfile()">
           <ion-icon slot="start" name="create-outline" aria-hidden="true" />
           {{ 'person.editProfile' | translate }}
         </ion-button>
       } @else {
-        <ion-button expand="block" class="cta" (click)="message()">
+        <ion-button expand="block" class="cta" color="primary" (click)="message()">
           <ion-icon slot="start" name="chatbubble-ellipses-outline" aria-hidden="true" />
           {{ 'person.message' | translate }}
         </ion-button>

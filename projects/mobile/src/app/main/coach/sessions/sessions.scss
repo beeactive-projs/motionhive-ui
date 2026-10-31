@@ -48,19 +48,37 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 0.25rem;
   padding: 0 1.25rem 0.625rem;
-  border-bottom: 1px solid var(--ion-border-color);
+  border-bottom: var(--mh-hairline) solid var(--ion-border-color);
 }
 
+/* Each day is an `ion-button` (a control, so it can be reached and pressed
+   by anything), dressed as the strip's flat cell: no chrome, the theme ink,
+   a finger's height, and its three lines stacked inside. */
 .week .day {
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: var(--mh-color-selected-background);
+  --background-focused: var(--mh-color-selected-background);
+  --border-radius: var(--mh-radius-control);
+  --box-shadow: none;
+  --color: var(--ion-text-color);
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  height: auto;
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
+
+.week .day-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.5rem 0;
-  border: none;
-  border-radius: var(--mh-radius-control);
-  background: transparent;
-  color: var(--ion-color-primary-contrast);
 }
 
 /* Selected and today are different questions — "what am I looking at" and
@@ -69,7 +87,8 @@
    anywhere. Today takes the wash, the selection takes the solid honey, and a
    day that is both — the common case — resolves to the solid one below. */
 .week .day.today {
-  background: var(--mh-color-selected-background);
+  --background: var(--mh-color-selected-background);
+  --background-hover: var(--mh-color-selected-background);
 }
 
 .week .day.today .initial,
@@ -78,7 +97,10 @@
 }
 
 .week .day.selected {
-  background: var(--ion-color-primary);
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --background-focused: var(--ion-color-primary-shade);
 }
 
 .week .initial {

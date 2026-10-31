@@ -1,3 +1,20 @@
+/* ── The title bar ───────────────────────────────────────────────────────
+   The group's name is the title, and at large text on a small phone the
+   "Groups" beside the back arrow left it one letter ("M…"). The bar is a
+   size container, so when it is narrower than 20rem (an SE from about 117%
+   text) the label gives way to the arrow alone and the name keeps the room.
+   The arrow keeps its accessible name: Ionic labels the button with the
+   text, hidden or not. */
+.title-bar {
+  container-type: inline-size;
+}
+
+@container (max-width: 20rem) {
+  .title-bar ion-back-button::part(text) {
+    display: none;
+  }
+}
+
 /* ── The compact header ──────────────────────────────────────────────────
    The name is already in the toolbar above, so this carries only what the
    toolbar cannot: how many people are in, and how you get in. */
@@ -27,9 +44,14 @@
   font-weight: 600;
 }
 
-/* Sized to the line it sits on rather than Ionic's default chip block. */
+/* The policy and role badges take their tone and type from ion-badge.css
+   (`data-tone`); they only keep whole beside the text they sit with. */
 .policy,
-.role,
+.role {
+  flex: none;
+}
+
+/* Sized to the line it sits on rather than Ionic's default chip block. */
 .tag {
   height: 1.5rem;
   margin: 0;
@@ -49,7 +71,7 @@
   gap: 0.625rem;
   padding: 0.5rem 0.875rem;
   /* Legacy rgba(): the -rgb slots are comma-separated triplets. */
-  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.25);
+  border: var(--mh-hairline) solid rgba(var(--ion-color-danger-rgb), 0.25);
   border-radius: var(--mh-radius-card);
   background: var(--ion-color-danger-wash);
   color: var(--ion-color-danger-wash-contrast);

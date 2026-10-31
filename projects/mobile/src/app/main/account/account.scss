@@ -71,14 +71,20 @@
   --color: var(--ion-color-success-wash-contrast);
 }
 
+// Side by side and equal while both labels fit on one line, each on its own
+// row when they do not (Romanian at 130% text on an SE): a button never wraps
+// its label to two lines. The halves start from nothing and grow equally,
+// and the floor at the label's own width is what wraps the row.
 .hero-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   align-self: stretch;
   margin-top: 0.25rem;
 
   ion-button {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: max-content;
   }
 
   // The secondary action is a quiet button with the page's border and ink,

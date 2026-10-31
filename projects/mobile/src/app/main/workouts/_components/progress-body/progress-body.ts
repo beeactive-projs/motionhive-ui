@@ -19,7 +19,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { StatTile } from '../../../../_shared/components/stat-tile/stat-tile';
 import { clientPath, coachStackOf } from '../../../clients/client-paths';
-import { formatMeasure } from '../../workouts.config';
+import { formatMeasure, unbreakable } from '../../workouts.config';
 
 /** The window the page reads — twelve weeks is a training block. */
 const RANGE: ProgressRange = '12w';
@@ -85,13 +85,15 @@ export class ProgressBody {
       },
       {
         label: this._translateService.instant('workouts.tiles.volume'),
-        value: this._translateService.instant('workouts.units.kg', {
-          value: groupedVolume(overview.totals.volumeKg),
-        }),
+        value: unbreakable(
+          this._translateService.instant('workouts.units.kg', {
+            value: groupedVolume(overview.totals.volumeKg),
+          }),
+        ),
       },
       {
         label: this._translateService.instant('workouts.tiles.time'),
-        value: formatTotalDuration(totalMinutes(overview.totals.trainingSeconds)),
+        value: unbreakable(formatTotalDuration(totalMinutes(overview.totals.trainingSeconds))),
       },
     ];
   });

@@ -137,7 +137,7 @@
 @if (!loadError() && !notAllowed()) {
 <ion-footer [translucent]="true">
   <ion-toolbar class="save-bar">
-    <ion-button expand="block" [disabled]="!canSave()" (click)="save()">
+    <ion-button expand="block" color="primary" [disabled]="!canSave()" (click)="save()">
       @if (saving()) {
       <ion-spinner name="crescent" slot="start" />
       }

@@ -29,17 +29,19 @@
           <div class="pair-row">
             <div>
               <ion-note class="mh-kicker" color="medium">{{ 'form.label.displayName' | translate }}</ion-note>
-              <p class="fact">{{ coach.displayName || '—' }}</p>
+              @if (coach.displayName) {
+                <p class="fact">{{ coach.displayName }}</p>
+              } @else {
+                <p class="fact empty">{{ 'form.placeholder.notProvided' | translate }}</p>
+              }
             </div>
             <div>
               <ion-note class="mh-kicker" color="medium">{{ 'account.coachingProfile.experience' | translate }}</ion-note>
-              <p class="fact">
-                @if (coach.yearsOfExperience !== null) {
-                  {{ 'count.years' | translate: { count: coach.yearsOfExperience } }}
-                } @else {
-                  —
-                }
-              </p>
+              @if (coach.yearsOfExperience !== null) {
+                <p class="fact">{{ 'count.years' | translate: { count: coach.yearsOfExperience } }}</p>
+              } @else {
+                <p class="fact empty">{{ 'form.placeholder.notProvided' | translate }}</p>
+              }
             </div>
           </div>
 
@@ -52,7 +54,7 @@
             </ion-note>
             <div class="chips">
               @for (item of specializations(); track item) {
-                <ion-chip color="info" [outline]="true">{{ item }}</ion-chip>
+                <ion-chip color="medium" [outline]="true">{{ item }}</ion-chip>
               }
             </div>
           }
@@ -75,7 +77,27 @@
       </ion-card>
 
       <section class="mh-section">
-        <mh-section-header [title]="'account.coachingProfile.services.title' | translate" />
+        <div class="mh-section-label">{{ 'account.coachingProfile.mentions.section' | translate }}</div>
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item>
+            <ion-toggle
+              class="mentions"
+              justify="space-between"
+              [checked]="allowMentions()"
+              [disabled]="savingMentions()"
+              (ionChange)="setMentions($event.detail.checked)"
+            >
+              <ion-label class="ion-text-wrap">
+                <h3>{{ 'account.coachingProfile.mentions.label' | translate }}</h3>
+                <p>{{ 'account.coachingProfile.mentions.hint' | translate }}</p>
+              </ion-label>
+            </ion-toggle>
+          </ion-item>
+        </ion-list>
+      </section>
+
+      <section class="mh-section">
+        <div class="mh-section-label">{{ 'account.coachingProfile.services.title' | translate }}</div>
         @if (loadingProducts()) {
           <ion-list [inset]="true" class="mh-card-list">
             @for (_ of [1, 2]; track $index) {
@@ -87,6 +109,10 @@
               </ion-item>
             }
           </ion-list>
+        } @else if (productsFailed()) {
+          <ion-note class="mh-footnote" color="medium">
+            {{ 'account.coachingProfile.services.loadFailed' | translate }}
+          </ion-note>
         } @else if (products().length === 0) {
           <ion-note class="mh-footnote" color="medium">
             {{ 'account.coachingProfile.services.empty' | translate }}
@@ -97,9 +123,7 @@
               <ion-item>
                 <ion-label class="ion-text-wrap">
                   <h3>{{ product.name }}</h3>
-                  <p>
-                    {{ product.amountCents | currencyRon: product.currency }} · {{ billingLabel(product) }}
-                  </p>
+                  <p>{{ priceLine((product.amountCents | currencyRon: product.currency), product) }}</p>
                 </ion-label>
                 <ion-badge slot="end" [color]="product.showOnProfile ? 'success' : 'medium'">
                   {{ (product.showOnProfile ? 'account.coachingProfile.services.visible' : 'account.coachingProfile.services.hidden') | translate }}
@@ -112,7 +136,7 @@
       </section>
 
       <section class="mh-section">
-        <mh-section-header [title]="'account.coachingProfile.venues.title' | translate" />
+        <div class="mh-section-label">{{ 'account.coachingProfile.venues.title' | translate }}</div>
         @if (loadingVenues()) {
           <ion-list [inset]="true" class="mh-card-list">
             <ion-item>
@@ -121,24 +145,26 @@
               </ion-label>
             </ion-item>
           </ion-list>
-        } @else if (venues().length === 0) {
+        } @else if (venuesFailed()) {
+          <ion-note class="mh-footnote" color="medium">
+            {{ 'account.coachingProfile.venues.loadFailed' | translate }}
+          </ion-note>
+        } @else if (venueRows().length === 0) {
           <ion-note class="mh-footnote" color="medium">
             {{ 'account.coachingProfile.venues.empty' | translate }}
           </ion-note>
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
-            @for (venue of venues(); track venue.id) {
+            @for (venue of venueRows(); track venue.id) {
               <ion-item>
-                <mh-hex-avatar
-                  slot="start"
-                  size="sm"
-                  [name]="venue.name"
-                  icon="location-outline"
-                  color="teal"
-                />
+                <mh-hex-avatar slot="start" size="sm" [icon]="venue.icon" color="teal" />
                 <ion-label class="ion-text-wrap">
                   <h3>{{ venue.name }}</h3>
-                  <p>{{ venue.city ?? ('account.coachingProfile.venues.online' | translate) }}</p>
+                  @if (venue.key) {
+                    <p>{{ venue.key | translate }}</p>
+                  } @else if (venue.city) {
+                    <p>{{ venue.city }}</p>
+                  }
                 </ion-label>
               </ion-item>
             }
@@ -146,8 +172,14 @@
           <ion-note class="mh-footnote" color="medium">{{ 'account.coachingProfile.venues.managedOnWeb' | translate }}</ion-note>
         }
       </section>
-
-      <mh-coaching-sheet [(open)]="editSheetOpen" />
+    } @else if (store.loadFailed() && !store.loading()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'account.coachingProfile.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="retry()"
+      />
     } @else {
       <ion-card>
         <ion-card-content>
@@ -159,3 +191,5 @@
     }
   </div>
 </ion-content>
+
+<mh-coaching-sheet [(open)]="editSheetOpen" />

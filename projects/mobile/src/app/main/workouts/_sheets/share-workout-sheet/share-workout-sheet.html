@@ -1,113 +1,335 @@
 <ng-template #body>
-  @if (templates().length > 1) {
-    <div class="mh-chip-cloud looks">
-      @for (look of templates(); track look) {
-        <ion-button
-          class="chip"
-          fill="clear"
-          shape="round"
-          size="small"
-          [class.selected]="template() === look"
-          [attr.aria-pressed]="template() === look"
-          (click)="pickTemplate(look)"
+  @if (step() === Steps.Choose) {
+    <!-- The first time: both ways side by side, each with a real preview. -->
+    <div class="mh-stack">
+      <div class="ways">
+        <ion-card
+          class="way"
+          [button]="true"
+          [class.selected]="suggested() === Modes.Quick"
+          (click)="pickMode(Modes.Quick)"
         >
-          {{ 'workouts.share.look.' + look | translate }}
-        </ion-button>
-      }
+          <ion-card-content>
+            <span class="mh-kicker">{{ 'workouts.share.choose.quick.kicker' | translate }}</span>
+            <div class="thumb">
+              @if (quickPreview(); as src) {
+                <img [src]="src" [alt]="'workouts.share.choose.quick.preview' | translate" />
+              } @else {
+                <ion-spinner name="crescent" />
+              }
+            </div>
+            <h2 class="way-title">{{ 'workouts.share.mode.quick' | translate }}</h2>
+            <ul class="points">
+              <li>
+                <ion-icon [name]="icons.yes" aria-hidden="true" />
+                {{ 'workouts.share.choose.quick.photo' | translate }}
+              </li>
+              <li>
+                <ion-icon [name]="icons.yes" aria-hidden="true" />
+                {{ 'workouts.share.choose.quick.direct' | translate }}
+              </li>
+              <li class="no">
+                <ion-icon [name]="icons.no" aria-hidden="true" />
+                {{ 'workouts.share.choose.quick.clean' | translate }}
+              </li>
+            </ul>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card
+          class="way"
+          [button]="true"
+          [class.selected]="suggested() === Modes.Full"
+          (click)="pickMode(Modes.Full)"
+        >
+          <ion-card-content>
+            <span class="mh-kicker">{{ 'workouts.share.choose.full.kicker' | translate }}</span>
+            <div class="thumb">
+              @if (fullPreview(); as src) {
+                <img [src]="src" [alt]="'workouts.share.choose.full.preview' | translate" />
+              } @else {
+                <ion-spinner name="crescent" />
+              }
+            </div>
+            <h2 class="way-title">{{ 'workouts.share.mode.full' | translate }}</h2>
+            <ul class="points">
+              <li>
+                <ion-icon [name]="icons.yes" aria-hidden="true" />
+                {{ 'workouts.share.choose.full.coach' | translate }}
+              </li>
+              <li>
+                <ion-icon [name]="icons.yes" aria-hidden="true" />
+                {{ 'workouts.share.choose.full.brand' | translate }}
+              </li>
+              <li>
+                <ion-icon [name]="icons.yes" aria-hidden="true" />
+                {{ 'workouts.share.choose.full.anywhere' | translate }}
+              </li>
+            </ul>
+          </ion-card-content>
+        </ion-card>
+      </div>
+      <p class="mh-footnote">{{ 'workouts.share.choose.remembered' | translate }}</p>
     </div>
-  }
+  } @else {
+    <div class="mh-stack">
+      <!-- The way, switchable here at any time; the switch is remembered. -->
+      <ion-segment
+        class="mh-segment-fit"
+        [value]="step()"
+        (ionChange)="onModeChange($event.detail.value)"
+      >
+        <ion-segment-button [value]="Modes.Quick">
+          <ion-label>{{ 'workouts.share.mode.quick' | translate }}</ion-label>
+        </ion-segment-button>
+        <ion-segment-button [value]="Modes.Full">
+          <ion-label>{{ 'workouts.share.mode.full' | translate }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
 
-  <!-- The image that will be sent, redrawn as the choices change. -->
-  <div class="preview">
-    @if (preview(); as src) {
-      <img [src]="src" [alt]="'workouts.share.preview' | translate" />
-    } @else {
-      <ion-spinner name="crescent" />
-    }
-  </div>
-
-  <div class="mh-section-label">{{ 'workouts.share.onCard' | translate }}</div>
-  <div class="mh-chip-cloud">
-    <ion-button class="chip" fill="clear" shape="round" size="small"
-      [class.selected]="showKg()" [attr.aria-pressed]="showKg()" (click)="toggleKg()">
-      {{ 'workouts.share.show.kg' | translate }}
-    </ion-button>
-    @if (hasRecord()) {
-      <ion-button class="chip" fill="clear" shape="round" size="small"
-        [class.selected]="showRecord()" [attr.aria-pressed]="showRecord()" (click)="toggleRecord()">
-        {{ 'workouts.share.show.record' | translate }}
-      </ion-button>
-    }
-    @if (hasCoach()) {
-      <ion-button class="chip" fill="clear" shape="round" size="small"
-        [class.selected]="showCoach()" [attr.aria-pressed]="showCoach()" (click)="toggleCoach()">
-        {{ 'workouts.share.show.coach' | translate }}
-      </ion-button>
-    }
-  </div>
-
-  <ion-input mode="md"
-    class="message"
-    fill="outline"
-    [label]="'workouts.share.message' | translate"
-    labelPlacement="stacked"
-    [placeholder]="'workouts.share.messagePlaceholder' | translate"
-    [maxlength]="captionMaxLength"
-    [counter]="true"
-    [value]="caption()"
-    (ionInput)="caption.set($any($event).detail.value ?? '')"
-  />
-
-  <div class="mh-chip-cloud">
-    @if (noteLine()) {
-      <ion-button class="chip" fill="clear" shape="round" size="small" (click)="useNote()">
-        {{ 'workouts.share.fromNote' | translate }}
-      </ion-button>
-    }
-    @for (key of suggestions; track key) {
-      <ion-button class="chip" fill="clear" shape="round" size="small" (click)="useSuggestion(key)">
-        {{ key | translate }}
-      </ion-button>
-    }
-  </div>
-
-  <!-- The card as a post, in a group of yours that takes one. -->
-  @if (postableGroups(); as groups) {
-    <div class="mh-section-label groups-label">{{ 'workouts.share.group.title' | translate }}</div>
-    @if (groups.length > 0) {
-      <div class="mh-chip-cloud">
-        @for (group of groups; track group.id) {
-          <ion-button
-            class="chip"
-            fill="clear"
-            shape="round"
-            size="small"
-            [disabled]="!!sharingTo()"
-            (click)="shareToGroup(group)"
-          >
-            @if (sharingTo() === group.id) {
-              <ion-spinner name="crescent" />
-            } @else {
-              {{ group.name }}
-            }
-          </ion-button>
+      <!-- The picture that will be sent, redrawn as the choices change. -->
+      <div class="preview">
+        @if (preview(); as src) {
+          <img [src]="src" [alt]="'workouts.share.preview' | translate" />
+        } @else {
+          <ion-spinner name="crescent" />
         }
       </div>
-      <p class="mh-helper">{{ 'workouts.share.group.hint' | translate }}</p>
-    } @else {
-      <p class="mh-helper">{{ 'workouts.share.group.none' | translate }}</p>
-    }
+
+      <section class="mh-section">
+        <span class="mh-section-label">{{ 'workouts.share.theme.label' | translate }}</span>
+        <div class="swatches">
+          @for (swatch of swatches(); track swatch.theme) {
+            <ion-button
+              class="swatch"
+              fill="clear"
+              [class.selected]="prefs().theme === swatch.theme"
+              [attr.aria-pressed]="prefs().theme === swatch.theme"
+              (click)="pickTheme(swatch.theme)"
+            >
+              <span class="swatch-body">
+                <svg viewBox="-4 -4 108 108" aria-hidden="true" focusable="false">
+                  @if (prefs().theme === swatch.theme) {
+                    <path class="ring" [attr.d]="hexPath" transform="rotate(90 50 50)" />
+                  }
+                  <path
+                    [attr.d]="hexPath"
+                    [attr.fill]="swatch.fill"
+                    [attr.stroke]="swatch.stroke"
+                    stroke-width="6"
+                    transform="translate(50 50) scale(0.72) translate(-50 -50) rotate(90 50 50)"
+                  />
+                </svg>
+                <span class="swatch-label">
+                  {{ 'workouts.share.theme.' + swatch.theme | translate }}
+                </span>
+              </span>
+            </ion-button>
+          }
+        </div>
+      </section>
+
+      @if (step() === Steps.Quick) {
+        <section class="mh-section">
+          <span class="mh-section-label">{{ 'workouts.share.sticker.label' | translate }}</span>
+          <div class="mh-chip-cloud">
+            @for (style of stickers; track style) {
+              <ion-button
+                class="chip"
+                fill="clear"
+                shape="round"
+                size="small"
+                [class.selected]="prefs().sticker === style"
+                [attr.aria-pressed]="prefs().sticker === style"
+                (click)="pickSticker(style)"
+              >
+                {{ 'workouts.share.sticker.' + style | translate }}
+              </ion-button>
+            }
+          </div>
+        </section>
+
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="prefs().quickKg"
+              (ionChange)="setFlag('quickKg', $event.detail.checked)"
+            >
+              {{ 'workouts.share.options.weights' | translate }}
+            </ion-toggle>
+          </ion-item>
+          @if (hasRecord()) {
+            <ion-item>
+              <ion-toggle
+                justify="space-between"
+                [checked]="prefs().quickRecord"
+                (ionChange)="setFlag('quickRecord', $event.detail.checked)"
+              >
+                {{ 'workouts.share.options.record' | translate }}
+              </ion-toggle>
+            </ion-item>
+          }
+          @if (hasPhoto()) {
+            <ion-item>
+              <ion-toggle
+                justify="space-between"
+                [checked]="prefs().quickPhoto"
+                (ionChange)="setFlag('quickPhoto', $event.detail.checked)"
+              >
+                {{ 'workouts.share.options.photo' | translate }}
+              </ion-toggle>
+            </ion-item>
+          }
+        </ion-list>
+
+        <!-- Tagging us is the person's call; the handle is one tap away. -->
+        <ion-list [inset]="true" class="mh-card-list">
+          <mh-settings-row
+            [label]="'workouts.share.tag.copy' | translate: { tag }"
+            [note]="'workouts.share.tag.tip' | translate: { tag }"
+            [icon]="icons.instagram"
+            iconColor="info"
+            iconTone="shade"
+            [detail]="false"
+            (select)="copyTag()"
+          />
+        </ion-list>
+      } @else {
+        @if (hasPhoto()) {
+          <section class="mh-section">
+            <span class="mh-section-label">
+              {{ 'workouts.share.background.label' | translate }}
+            </span>
+            <div class="mh-chip-cloud">
+              @for (option of backgrounds; track option) {
+                <ion-button
+                  class="chip"
+                  fill="clear"
+                  shape="round"
+                  size="small"
+                  [class.selected]="background() === option"
+                  [attr.aria-pressed]="background() === option"
+                  (click)="pickBackground(option)"
+                >
+                  {{ 'workouts.share.background.' + option | translate }}
+                </ion-button>
+              }
+            </div>
+          </section>
+        }
+
+        <ion-list [inset]="true" class="mh-card-list">
+          @if (planCoach() || mentionableCoach()) {
+            <!-- Off on every share. Only a coach who allows mentions can be named. -->
+            <ion-item>
+              <ion-toggle
+                justify="space-between"
+                [checked]="showCoach()"
+                [disabled]="!mentionableCoach()"
+                (ionChange)="showCoach.set($event.detail.checked)"
+              >
+                <ion-label class="ion-text-wrap">
+                  {{ 'workouts.share.options.coach' | translate }}
+                  <p>
+                    {{
+                      (mentionableCoach()
+                        ? 'workouts.share.options.coachOff'
+                        : 'workouts.share.options.coachLocked'
+                      ) | translate
+                    }}
+                  </p>
+                </ion-label>
+              </ion-toggle>
+            </ion-item>
+          }
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="prefs().fullKg"
+              (ionChange)="setFlag('fullKg', $event.detail.checked)"
+            >
+              {{ 'workouts.share.options.weights' | translate }}
+            </ion-toggle>
+          </ion-item>
+          @if (profileLink(); as link) {
+            <ion-item>
+              <ion-toggle
+                justify="space-between"
+                [checked]="prefs().fullLink"
+                (ionChange)="setFlag('fullLink', $event.detail.checked)"
+              >
+                <ion-label class="ion-text-wrap">
+                  {{ 'workouts.share.options.link' | translate }}
+                  <p>{{ link }}</p>
+                </ion-label>
+              </ion-toggle>
+            </ion-item>
+          }
+        </ion-list>
+
+        @if (canCopySticker) {
+          <ion-list [inset]="true" class="mh-card-list">
+            <mh-settings-row
+              [label]="'workouts.share.sticker.copyAction' | translate"
+              [note]="'workouts.share.sticker.copyHint' | translate"
+              [icon]="icons.copy"
+              iconColor="info"
+              iconTone="shade"
+              [detail]="false"
+              [disabled]="!!busy()"
+              (select)="copySticker()"
+            />
+          </ion-list>
+        }
+      }
+
+      <!-- Inside the app: the card as a post, in a group of yours that takes one. -->
+      @if (postableGroups(); as groups) {
+        @if (groups.length > 0) {
+          <section class="mh-section">
+            <span class="mh-section-label">{{ 'workouts.share.group.title' | translate }}</span>
+            <div class="mh-chip-cloud">
+              @for (group of groups; track group.id) {
+                <ion-button
+                  class="chip"
+                  fill="clear"
+                  shape="round"
+                  size="small"
+                  [disabled]="!!sharingTo()"
+                  (click)="shareToGroup(group)"
+                >
+                  @if (sharingTo() === group.id) {
+                    <ion-spinner name="crescent" />
+                  } @else {
+                    {{ group.name }}
+                  }
+                </ion-button>
+              }
+            </div>
+            <p class="mh-footnote">{{ 'workouts.share.group.hint' | translate }}</p>
+          </section>
+        }
+      }
+    </div>
   }
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  [title]="'workouts.share.title' | translate"
-  [saveLabel]="'workouts.share.action' | translate"
+  [title]="title()"
+  [subtitle]="subtitle()"
   [body]="body"
-  [canSave]="!!preview()"
-  [saving]="sharing()"
+  [showFooter]="step() !== Steps.Choose"
+  [saveLabel]="saveLabel()"
+  [actionLabel]="actionLabel()"
+  [actionDisabled]="!!busy() || !preview()"
+  [canSave]="!!preview() && (!busy() || saving())"
+  [saving]="saving()"
   [breakpoints]="[0, 0.95]"
   [initialBreakpoint]="0.95"
-  (save)="share()"
+  (save)="step() === Steps.Full ? saveToPhotos() : openInInstagram()"
+  (action)="send()"
 />
+
+<mh-share-guide-sheet [(open)]="guideOpen" (hide)="hideGuide()" />

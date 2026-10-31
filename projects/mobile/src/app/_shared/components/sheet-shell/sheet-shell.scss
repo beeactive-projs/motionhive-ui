@@ -62,30 +62,53 @@ ion-footer ion-toolbar {
   --padding-bottom: 0.625rem;
 }
 
+// Side by side while both labels fit on one line each; when they do not
+// (Romanian at 130% text on an SE: "Deschide în Instagram" came out as three
+// one-word lines), the pair stacks, the commit on top as iOS and Material
+// stack a dialog's buttons. `wrap-reverse` puts the second line, the commit,
+// above the first.
 .actions {
   display: flex;
+  flex-wrap: wrap-reverse;
   gap: 0.625rem;
 }
 
 // Ionic sizes buttons for a toolbar here — small, tight, and shadowed on md.
-// A sheet's commit is a 44px tap target, so the pair is sized deliberately.
+// A sheet's commit is a 44px tap target, so the pair is sized deliberately:
+// at least a tap target tall, and taller when the label needs a second line
+// (Romanian at 130% text on an SE: "Deschide în Instagram" spilled out of a
+// fixed height). The vertical padding is what a wrapped label sits in.
 .actions ion-button {
   --padding-start: 1.125rem;
   --padding-end: 1.125rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
   --box-shadow: none;
-  height: var(--mh-tap-target);
+  flex: 1 1 auto;
+  height: auto;
+  min-height: var(--mh-tap-target);
   margin: 0;
   font-size: var(--mh-text-md);
   font-weight: 600;
   letter-spacing: normal;
 }
 
+// A label too long for the whole row on its own wraps inside the button
+// instead of overflowing it; Ionic's native button sets `line-height: 1`,
+// which would pack two lines into one.
+.actions ion-button::part(native) {
+  white-space: normal;
+  line-height: var(--mh-leading-tight);
+}
+
 // Cancel, or the sheet's own action (Reset) in its place. Ink label on the
 // card hairline rather than the medium palette's own grey: the outline stays
 // quiet next to the filled confirm, and the label still reads.
-// The confirm takes the rest of the row — one obvious target per sheet.
+// The confirm takes the rest of the row — one obvious target per sheet: it
+// gets a hundred times Cancel's share of the spare room, which leaves Cancel
+// at its label's width beside it and full width on a line of its own.
 .actions .confirm {
-  flex: 1;
+  flex-grow: 100;
   font-weight: 600;
 }
 

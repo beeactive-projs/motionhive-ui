@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { personRoutes } from '../person/person.routes';
 
 /**
- * The trainee's Discover area, mounted at `/tabs/discover`. A coach reaches
- * the same pages from the menu page — the surface is role-agnostic.
+ * The Discover tab, mounted at `/tabs/discover` in both modes: the surface
+ * is role-agnostic.
  *
  * Every path keeps `discover` as the first segment after `/tabs` so the tab
  * stays lit on the pushed screens; session detail reuses the trainee
@@ -23,9 +23,18 @@ export const discoverRoutes: Routes = [
     title: 'pageTitle.coaches',
   },
   {
+    // Every group to join. Exact, and before the profile routes, whose
+    // `groups/` children (a group opened from a profile) start with the same
+    // word but never match it alone.
+    path: 'groups',
+    pathMatch: 'full',
+    loadComponent: () => import('./all-groups/all-groups').then((m) => m.AllGroups),
+    title: 'pageTitle.groups',
+  },
+  {
     // A group seen from outside, pushed onto this stack so back returns to
-    // the rail or the search it was opened from. Before `:id`, which would
-    // otherwise read "group" as a session id.
+    // the strip, the list or the search it was opened from. Before `:id`,
+    // which would otherwise read "group" as a session id.
     path: 'group/:groupId',
     loadComponent: () =>
       import('../groups/group-preview/group-preview').then((m) => m.GroupPreview),

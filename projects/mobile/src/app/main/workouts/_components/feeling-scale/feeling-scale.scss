@@ -38,13 +38,16 @@
   overflow: visible;
 }
 
-/* The empty comb follows the text colour, so it reads on light and dark. */
+/* The empty comb is the neutral wash: a step off the card in both themes,
+   and a navy in dark rather than the grey a see-through ink mixed to. */
 .comb {
-  fill: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+  fill: var(--ion-color-medium-wash);
 }
 
+/* The honey a cell holds before it is picked: amber's light step (the
+   primary ramp's 400 is orange), the same in both themes. */
 .honey {
-  fill: var(--mh-warning-300);
+  fill: var(--ion-color-warning-tint);
   transform-box: fill-box;
   transform-origin: bottom;
   transition: transform 200ms ease-out;
@@ -62,7 +65,7 @@
   display: grid;
   place-items: center;
   font-size: 1.375rem;
-  line-height: 1;
+  line-height: var(--mh-leading-none);
 }
 
 .label {
@@ -108,7 +111,15 @@
   }
 }
 
-/* A past workout: the answer given is the point; the rest step back. */
-:host(.readonly) .cell:not(.on) {
-  opacity: 0.4;
+/* A past workout: the answer given is the point; the rest step back. They
+   go empty and their faces grey, not see-through: a faded honey or a faded
+   yellow face over navy read as an olive smear. The labels keep the muted
+   ink, already a step back from the picked one's honey. */
+:host(.readonly) .cell:not(.on) .honey {
+  visibility: hidden;
+}
+
+:host(.readonly) .cell:not(.on) .glyph {
+  filter: grayscale(1);
+  opacity: 0.5;
 }

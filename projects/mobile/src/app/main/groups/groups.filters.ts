@@ -1,4 +1,4 @@
-import { DiscoverGroup, Group, GroupMember, displayName } from 'core';
+import { GroupMember, displayName, foldedIncludes } from 'core';
 
 /**
  * What the Groups hub is looking at, and how each list narrows.
@@ -36,27 +36,12 @@ export type GroupTab = (typeof GroupTabs)[keyof typeof GroupTabs];
  */
 export const MIN_SEARCH_LENGTH = 2;
 
-/** Discover search over loaded rows: name, description or a tag. */
-export function matchesGroupQuery(group: Group | DiscoverGroup, query: string): boolean {
-  const term = query.trim().toLowerCase();
-  if (!term) return true;
-  return (
-    group.name.toLowerCase().includes(term) ||
-    (group.description?.toLowerCase().includes(term) ?? false) ||
-    (group.tags ?? []).some((tag) => tag.toLowerCase().includes(term))
-  );
-}
-
 /**
  * Member search. Email is owner-only on screen but searched for everyone who
  * can see it — a term that matches a hidden field and returns nothing looks
  * broken, and a non-owner never has the email to type in the first place.
  */
 export function matchesMemberQuery(member: GroupMember, query: string): boolean {
-  const term = query.trim().toLowerCase();
-  if (!term) return true;
-  return (
-    displayName(member.user, '').toLowerCase().includes(term) ||
-    (member.user?.email?.toLowerCase().includes(term) ?? false)
-  );
+  if (!query.trim()) return true;
+  return foldedIncludes(displayName(member.user, ''), query) || foldedIncludes(member.user?.email, query);
 }

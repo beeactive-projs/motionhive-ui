@@ -13,9 +13,21 @@ p {
   font-size: var(--mh-text-sm);
 }
 
-// The level never squeezes the name: it keeps its one line and the label wraps.
+// The count and the level on one line, the level kept whole and wrapping
+// under the count when the line runs out.
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.125rem;
+
+  p {
+    margin: 0;
+  }
+}
+
 ion-badge {
   flex: none;
-  margin-inline-start: 0.5rem;
   border-radius: var(--mh-radius-pill);
 }

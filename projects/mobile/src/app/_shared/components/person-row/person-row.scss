@@ -1,0 +1,48 @@
+// A row with a verb measures itself, so the verb can leave the text room.
+// Only then: a plain person row stays an ordinary inline host, and none of
+// the rules below can reach it.
+:host(.has-verb) {
+  display: block;
+  container-type: inline-size;
+}
+
+// Narrower than this (an iPhone SE from about 107% text, any phone at 130%)
+// the verb beside the text squeezed the title to a word or two: it goes
+// under the text instead, on the text's own edge, and the row leaves the
+// flat list's 4.5rem grid for that.
+@container (max-width: 22rem) {
+  :host(.has-verb) ion-item::part(inner) {
+    flex-wrap: wrap;
+  }
+
+  :host(.has-verb) ion-item::part(container) {
+    flex: 1 0 100%;
+  }
+
+  :host(.has-verb) ion-item > ion-button.mh-row-action {
+    margin-block-start: 0.5rem;
+    margin-inline-start: 0;
+  }
+
+  // The title may take a second line, words whole: what got cut at this
+  // size was the reason ("…ends Friday"). Each line stays one row line, so
+  // the row still lands on the grid; the line under it keeps to one.
+  :host(.has-verb) ion-item > ion-label > h2 {
+    display: -webkit-box;
+    block-size: auto;
+    max-block-size: calc(2 * var(--mh-row-line));
+    line-height: var(--mh-row-line);
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  // The avatar lines up with the text, not with the taller block, so it
+  // still reads as the face beside the words. The hexagon is 2.8rem tall
+  // against two lines' 3rem; the nearest grid step down centres it there.
+  :host(.has-verb) ion-item > mh-hex-avatar[slot='start'] {
+    align-self: flex-start;
+    margin-block-start: 0.125rem;
+  }
+}

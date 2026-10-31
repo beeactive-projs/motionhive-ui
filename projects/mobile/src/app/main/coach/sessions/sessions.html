@@ -13,6 +13,10 @@
 } @else {
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <!-- Opened from the Menu since Discover took the tab, as Groups is. -->
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/more" />
+    </ion-buttons>
     <ion-title>{{ 'nav.sessions' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell class="round" />
@@ -52,16 +56,18 @@
          month is behind the calendar button at the end of the chips. -->
     <div class="week">
       @for (day of weekDays(); track day.key) {
-      <button type="button" class="day" [class.today]="day.isToday" [class.selected]="day.key === selectedDayKey()"
+      <ion-button class="day" fill="clear" [class.today]="day.isToday" [class.selected]="day.key === selectedDayKey()"
         [attr.aria-pressed]="day.key === selectedDayKey()" (click)="pickDay(day.date)">
-        <span class="initial">{{ day.initial }}</span>
-        <span class="date">{{ day.dayOfMonth }}</span>
-        <span class="dots">
-          @for (tone of day.dots; track $index) {
-          <i [attr.data-tone]="tone"></i>
-          }
+        <span class="day-inner">
+          <span class="initial">{{ day.initial }}</span>
+          <span class="date">{{ day.dayOfMonth }}</span>
+          <span class="dots">
+            @for (tone of day.dots; track $index) {
+            <i [attr.data-tone]="tone"></i>
+            }
+          </span>
         </span>
-      </button>
+      </ion-button>
       }
     </div>
 

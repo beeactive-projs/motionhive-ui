@@ -16,10 +16,22 @@
     },
     "coachingProfile": {
       "experience": "Experience",
+      "loadError": "Could not load your coaching profile",
+      "mentions": {
+        "hint": "They can add your name to workouts they share outside MotionHive.",
+        "label": "Clients can mention me",
+        "section": "Sharing",
+        "toast": {
+          "failed": "Could not save that setting.",
+          "off": "Clients can no longer mention you",
+          "on": "Clients can now mention you"
+        }
+      },
       "noBio": "No bio yet.",
       "services": {
         "empty": "No services yet. Pricing is managed on the web app.",
         "hidden": "Hidden",
+        "loadFailed": "Could not load your services.",
         "managedOnWeb": "Pricing is managed on the web app.",
         "title": "Services on your public profile",
         "visible": "Visible"
@@ -33,7 +45,9 @@
         "notAccepting": "Not accepting clients"
       },
       "venues": {
+        "clientHome": "At the client's home",
         "empty": "No venues yet. Venues are managed on the web app.",
+        "loadFailed": "Could not load your venues.",
         "managedOnWeb": "Venues are managed on the web app.",
         "online": "Online",
         "title": "Venues"
@@ -44,6 +58,7 @@
       "copyLink": "Copy profile link",
       "verified": "Verified"
     },
+    "loadError": "Couldn't load your profile",
     "memberSince": "Member since {date}",
     "notifications": {
       "channels": {
@@ -603,11 +618,19 @@
     "allCoaches": {
       "empty": {
         "heading": "No coaches to show",
-        "message": "When coaches publish a public profile, they show up here."
+        "message": "When a coach makes their profile public, it shows up here."
       },
+      "filterLabel": "Filter by specialization",
       "loadError": "Couldn't load coaches",
-      "noMatches": "No coaches list that specialization.",
+      "noMatches": "No coach lists that specialization.",
       "title": "Coaches"
+    },
+    "allGroups": {
+      "empty": {
+        "heading": "No public groups yet",
+        "message": "When a coach opens a public group, it shows up here."
+      },
+      "loadError": "Couldn't load groups"
     },
     "coach": {
       "experience": "{count, plural, one {# yr experience} other {# yrs experience}}",
@@ -644,7 +667,7 @@
       "title": "Groups to join"
     },
     "hero": {
-      "title": "Find your people in the hive"
+      "title": "Find your place in the hive"
     },
     "rail": {
       "allCoaches": "All coaches",
@@ -665,7 +688,7 @@
         "message": "Check your connection and try typing again."
       },
       "groups": "Groups",
-      "hint": "Keep typing. Search starts at two letters and looks across coaches, groups and sessions.",
+      "hint": "Type at least two letters to search coaches, groups and sessions.",
       "placeholder": "Search coaches, groups and sessions",
       "sessions": "Sessions"
     }
@@ -1223,27 +1246,107 @@
   },
   "home": {
     "coach": {
-      "activeClients": {
-        "hint": "Currently training with you",
-        "label": "Active clients"
+      "firstWeek": {
+        "invite": "Invite clients",
+        "program": {
+          "detail": "Ready to assign when your first client joins.",
+          "title": "Create your first program"
+        },
+        "specialties": {
+          "detail": "They help people find you in Discover.",
+          "title": "Add your specializations"
+        },
+        "steps": "Next steps",
+        "sub": "The first ring has room for six.",
+        "title": "Every client you invite gets a cell."
       },
-      "agenda": {
-        "calendar": "Calendar",
-        "empty": "No sessions scheduled today.",
-        "kicker": "Agenda · {date}",
-        "new": "New"
+      "hive": {
+        "a11y": "Your hive, last 7 days: {moved, plural, =0 {no clients trained} one {# of {total, plural, one {# client} other {# clients}} trained} other {# of {total, plural, one {# client} other {# clients}} trained}}",
+        "kicker": "Your hive · last 7 days",
+        "kickerFirst": "Your hive",
+        "loadError": "Couldn't load your hive",
+        "seeClients": "See clients",
+        "title": "{moved, plural, =0 {No clients trained} one {# of {total, plural, one {# client} other {# clients}} trained} other {# of {total, plural, one {# client} other {# clients}} trained}}"
       },
-      "outstanding": {
-        "label": "Outstanding",
-        "nothingOverdue": "Nothing overdue",
-        "overdue": "{count, plural, one {# overdue invoice} other {# overdue invoices}}"
+      "needs": {
+        "behind": {
+          "detail": "{completed} of {due} in 7 days",
+          "title": "{name} is behind on the plan"
+        },
+        "dropped": {
+          "detail": "{now}% now, {before}% before",
+          "title": "{name} is training less"
+        },
+        "empty": {
+          "message": "Nobody is waiting on you right now.",
+          "title": "All caught up"
+        },
+        "groups": {
+          "noPlan": "No plan",
+          "notStarted": "Haven't started",
+          "planEnding": "Plans ending soon",
+          "quiet": "Gone quiet",
+          "requests": "Requests",
+          "slipping": "Falling behind"
+        },
+        "loadError": "Couldn't load who needs you",
+        "noPlan": {
+          "title": "{name} has no plan"
+        },
+        "notStarted": {
+          "detail": "Nothing logged yet",
+          "title": "{name} hasn't started yet"
+        },
+        "planEnds": {
+          "detail": "{name} · {percent}% done",
+          "title": "{plan} ends {when}"
+        },
+        "quiet": {
+          "detail": "Last workout {date}",
+          "title": "{name} has been quiet for {days, plural, one {# day} other {# days}}"
+        },
+        "requests": {
+          "detail": "Waiting for your answer",
+          "title": "{count, plural, one {# person wants to train with you} other {# people want to train with you}}"
+        },
+        "showMore": "Show {count} more",
+        "title": "Needs you",
+        "verb": {
+          "assign": "Assign",
+          "message": "Message",
+          "review": "Review"
+        },
+        "when": {
+          "today": "today",
+          "tomorrow": "tomorrow"
+        }
+      }
+    },
+    "greeting": {
+      "afternoon": "Good afternoon, {name}.",
+      "evening": "Good evening, {name}.",
+      "morning": "Good morning, {name}."
+    },
+    "greetingNoName": {
+      "afternoon": "Good afternoon.",
+      "evening": "Good evening.",
+      "morning": "Good morning."
+    },
+    "latest": {
+      "empty": {
+        "coach": "Workouts your clients finish show up here.",
+        "title": "Nothing new yet",
+        "train": "Posts from your groups and your records show up here."
       },
-      "requests": {
-        "hint": "Waiting for your approval.",
-        "review": "Review",
-        "summary": "{count, plural, one {# client request waiting} other {# client requests waiting}}"
-      },
-      "title": "Your coaching day"
+      "loadError": "Couldn't load the latest",
+      "member": "A member",
+      "record": "New record: {exercise}",
+      "recordDelta": "+{delta} kg",
+      "recordDetail": "{weight} kg estimated 1RM",
+      "records": "{count, plural, one {# record} other {# records}}",
+      "sharedPhoto": "Posted a photo",
+      "sharedWorkout": "Posted a workout: {name}",
+      "title": "Latest"
     },
     "switchRole": {
       "comingSoon": "Coming soon",
@@ -1251,53 +1354,44 @@
       "intro": "Changes your home, tabs and notifications."
     },
     "switchRoleLabel": "Switch role, currently {role}",
+    "today": {
+      "more": "{count} more"
+    },
     "train": {
-      "billDue": {
-        "hint": "Tap to see what's owed and settle it.",
-        "title": "{count, plural, one {You have an invoice to pay} other {# invoices to pay}}"
-      },
-      "coaches": {
-        "discoverMore": "Discover more",
-        "empty": {
-          "heading": "No coaches to show yet",
-          "message": "Once coaches join, they'll show up here."
-        },
-        "moreSoon": "More joining soon.",
-        "openToClients": "Open to new clients",
-        "titleOwn": "Your coaches",
-        "titleSuggested": "Some of our coaches"
-      },
-      "greeting": "Good to see you, {name}.",
-      "greetingNoName": "Good to see you, there.",
-      "intro": "A calm place to settle in and pick up where you left off.",
-      "posts": {
-        "byline": "{author} · {minutes} min read",
-        "empty": "No posts yet. Check back soon, our first reads are landing.",
-        "eyebrow": "From the journal",
-        "readAll": "Read all",
-        "title": "Reads from the hive"
-      },
-      "resume": {
-        "button": "Resume workout",
-        "kicker": "Pick up where you left off"
-      },
-      "sessions": {
-        "booked": "{count, plural, one {# session booked} other {# sessions booked}}",
-        "hintBrowse": "Browse what else is open to join.",
-        "hintNone": "Find a coach and book your first one.",
-        "none": "No sessions booked"
-      },
-      "steps": {
+      "build": {
         "coach": {
-          "sub": "Book time with someone you rate.",
-          "title": "Find a coach for yourself"
+          "detail": "See who is taking new clients",
+          "title": "Find a coach"
         },
-        "eyebrow": "Start here",
-        "profile": {
-          "sub": "So coaches and clients know who you are.",
-          "title": "Finish your profile"
+        "group": {
+          "detail": "Train alongside other people",
+          "title": "Join a group"
         },
-        "title": "Get set up"
+        "title": "Build your hive"
+      },
+      "hive": {
+        "coach": "Coach",
+        "group": "Group",
+        "title": "Your hive"
+      },
+      "today": {
+        "from": "From {name}",
+        "inProgress": "In progress",
+        "startWorkout": "Start a workout",
+        "upNext": "Up next · {weekday}"
+      },
+      "week": {
+        "a11yDays": "This week: {count, plural, =0 {no workouts yet} one {trained # day} other {trained # days}}",
+        "a11yPlan": "This week: {done} of {planned, plural, one {# planned workout} other {# planned workouts}} done",
+        "emptySub": "Gym, run or home, anything you log counts.",
+        "emptyTitle": "Every workout lights a cell.",
+        "headlineDays": "{count, plural, one {# day trained} other {# days trained}}",
+        "headlinePlan": "{done} of {planned, plural, one {# workout} other {# workouts}} done",
+        "kicker": "This week",
+        "planDone": "Plan done for the week.",
+        "record": "Record on {weekday}",
+        "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}",
+        "todayMakes": "Today would make it {count}."
       }
     }
   },
@@ -1659,7 +1753,9 @@
     "workouts": "Workouts",
     "privacy": "Who can see my details",
     "deleteAccount": "Delete account",
-    "accountClosed": "Account closed"
+    "accountClosed": "Account closed",
+    "needsYou": "Needs you",
+    "latest": "Latest"
   },
   "payments": {
     "badge": {
@@ -1708,6 +1804,7 @@
         "message": "Bill a client for a session or a block of coaching.",
         "title": "No invoices yet"
       },
+      "filtersLabel": "Filter invoices by status",
       "memberships": {
         "message": "Recurring plans you sell are managed there for now.",
         "title": "Memberships live on the web"
@@ -2871,38 +2968,106 @@
     },
     "share": {
       "action": "Share",
+      "background": {
+        "hive": "Hive",
+        "label": "Background",
+        "photo": "My photo"
+      },
       "card": {
         "coach": "Program by {name}",
-        "kicker": "Workout #{number} · {date}",
-        "record": "Record · {detail}",
-        "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}"
+        "records": "{count, plural, one {# record} other {# records}}",
+        "streak": "{count, plural, one {week in a row} other {weeks in a row}}"
       },
-      "fromNote": "From your note",
+      "choose": {
+        "full": {
+          "anywhere": "Works anywhere: WhatsApp, Facebook",
+          "brand": "Logo and your link",
+          "coach": "Your coach, only if you want",
+          "kicker": "Save and post",
+          "preview": "Preview of the Full card"
+        },
+        "quick": {
+          "clean": "No logo, no coach",
+          "direct": "Straight to Instagram",
+          "kicker": "One tap",
+          "photo": "Your photo and stats",
+          "preview": "Preview of the Quick Story"
+        },
+        "remembered": "Your choice stays for next time. You can change it here anytime.",
+        "subtitle": "Exactly what your followers will see",
+        "title": "How should it look?"
+      },
       "group": {
-        "done": "Shared in {group}",
-        "failed": "Could not share it in the group",
-        "hint": "Members see the card and your message. Never your note, weights or photo.",
-        "none": "None of your groups take posts from members yet.",
+        "done": "Posted in {group}",
+        "failed": "Could not post it in the group",
+        "hint": "Members see a card with the workout's name and the numbers. Never your note, weights or photo.",
         "pending": "Sent to {group}. It shows once the group approves it.",
-        "title": "Or share it in a group"
+        "title": "Or post it in a group"
       },
-      "look": {
-        "badge": "Full photo",
-        "comb": "Honeycomb",
-        "strip": "Honey band"
+      "guide": {
+        "hide": "Don't show the steps again",
+        "open": "Open Instagram and pick it from the gallery",
+        "openFailed": "Could not open Instagram",
+        "openHint": "Story, post or message, as you like",
+        "openInstagram": "Open Instagram",
+        "savedHint": "The full card, 1080 × 1920",
+        "subtitle": "Now, in 3 steps:",
+        "tag": "Tag us",
+        "tagHint": "Copy {tag} and paste it in the Story"
       },
-      "message": "Your message",
-      "messagePlaceholder": "Say something about it",
-      "onCard": "On the card",
-      "preview": "Preview of the card you are sharing",
-      "show": {
+      "instagram": {
+        "missing": "Instagram isn't installed on this phone, so the picture opens in the share sheet.",
+        "open": "Open in Instagram",
+        "web": "Stories only open from the phone app, so the picture opens in the share sheet."
+      },
+      "mode": {
+        "full": "Full",
+        "fullHint": "With the logo and your link",
+        "quick": "Quick",
+        "quickHint": "No logo, straight to your Story"
+      },
+      "options": {
         "coach": "Coach's name",
-        "kg": "Weights (kg)",
-        "record": "Record"
+        "coachLocked": "Shows only if your coach allows mentions",
+        "coachOff": "Off by default. You choose each time you share.",
+        "link": "My link",
+        "photo": "Use my photo",
+        "record": "Show record",
+        "weights": "Show weights"
       },
-      "suggestions": {
-        "done": "Another workout done ✅",
-        "hive": "The hive never sleeps 🐝"
+      "preview": "Preview of the picture you are sharing",
+      "save": {
+        "action": "Save to Photos",
+        "denied": "MotionHive can't add to Photos. Allow it in Settings.",
+        "done": "Saved to Photos",
+        "failed": "Could not save the card",
+        "gallery": {
+          "action": "Save to gallery",
+          "done": "Saved to gallery",
+          "denied": "MotionHive can't save to the gallery. Allow it in Settings."
+        }
+      },
+      "send": "Send…",
+      "sticker": {
+        "badge": "Badge",
+        "cells": "Cells",
+        "copied": "Sticker copied. Paste it on your Story in Instagram.",
+        "copyAction": "Copy sticker only",
+        "copyFailed": "Could not copy the sticker",
+        "copyHint": "With the logo, to paste on your own Story",
+        "label": "Sticker style"
+      },
+      "tag": {
+        "copied": "{tag} copied",
+        "copy": "Copy {tag}",
+        "copyFailed": "Could not copy. Type {tag} in Instagram.",
+        "tip": "So you can tag us in your Story"
+      },
+      "theme": {
+        "dark": "Dark",
+        "honey": "Honey",
+        "label": "Theme",
+        "light": "Light"
       },
       "title": "Share workout",
       "toast": {

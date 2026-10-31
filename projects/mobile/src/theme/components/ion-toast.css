@@ -1,6 +1,6 @@
 /* Toasts — the "Saved", "Program assigned" and error messages.
 
-   The app runs Ionic in Material mode, whose toast is a 4px slab: a different
+   Material's toast is a 4px slab and iOS's a 14px one, each a different
    design language next to the 12px buttons and fields beside it. Same radius
    as the controls and as `mh-notice`, the in-page way of saying how something
    went. */

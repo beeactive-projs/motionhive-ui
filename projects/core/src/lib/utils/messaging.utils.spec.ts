@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { MessageView } from '../models/messaging';
 import {
   dayDividerLabel,
+  dayInSentence,
+  dayShortLabel,
   displayName,
   formatRelativeShort,
   groupMessages,
@@ -105,6 +107,51 @@ describe('day keys are local, not UTC', () => {
   it('renders an older key as its own local date', () => {
     // Not the day before, which is what UTC-midnight parsing would give.
     expect(dayDividerLabel('2026-08-10')).toContain('10');
+  });
+
+  it('is a label in sentence case, Romanian included', () => {
+    // Romanian Intl writes "miercuri, 28 octombrie"; as a day heading it
+    // must start with a capital, like "Azi" and "Ieri" above it.
+    expect(dayDividerLabel('2026-10-28', 'ro-RO')).toBe('Miercuri, 28 octombrie');
+    expect(dayDividerLabel('2026-08-10', 'en-US')).toBe('Monday, August 10');
+  });
+});
+
+describe('dayInSentence', () => {
+  const key = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+  it('lowers today and yesterday for the middle of a sentence', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    expect(dayInSentence(key(new Date()))).toBe('today');
+    expect(dayInSentence(key(yesterday))).toBe('yesterday');
+  });
+
+  it('keeps the date in running-text case for each language', () => {
+    expect(dayInSentence('2026-10-28', 'ro-RO')).toBe('miercuri, 28 octombrie');
+    expect(dayInSentence('2026-08-10', 'en-US')).toBe('Monday, August 10');
+  });
+});
+
+describe('dayShortLabel', () => {
+  it('says today by name and an older day as day and short month', () => {
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    expect(dayShortLabel(today)).toBe('Today');
+
+    // Day 1 of this year's January: never today or yesterday unless the
+    // test runs on 1 or 2 January, when it is one of those by name.
+    const jan = `${now.getFullYear()}-01-01`;
+    const label = dayShortLabel(jan, 'en-GB');
+    if (!['Today', 'Yesterday'].includes(label)) expect(label).toBe('1 Jan');
+    if (!['Today', 'Yesterday'].includes(label)) {
+      expect(dayShortLabel(jan, 'ro-RO')).toBe('1 ian.');
+    }
+  });
+
+  it('adds the year only for another year', () => {
+    expect(dayShortLabel('2019-10-28', 'en-GB')).toBe('28 Oct 2019');
   });
 });
 

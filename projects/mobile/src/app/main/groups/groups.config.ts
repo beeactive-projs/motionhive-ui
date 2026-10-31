@@ -11,6 +11,8 @@ import {
   translate,
 } from 'core';
 
+import { ProfileStacks, groupLinks, stackRootOf } from '../../_shared/utils/stack-paths';
+
 /**
  * Every decision the Groups screens branch on, as pure functions.
  *
@@ -177,7 +179,11 @@ export function joinPolicyLabel(policy: JoinPolicy): string {
   return translate(`groups.joinPolicy.${policy}`);
 }
 
-/** Ionic colour slot for the policy chip. */
+/**
+ * The tone of the policy badge (`data-tone`, ion-badge.css): a wash, which
+ * clears AA where a coloured chip did not. `medium` names no tone of its
+ * own, so it takes the badge's neutral default.
+ */
 export function joinPolicyTone(policy: JoinPolicy): string {
   switch (policy) {
     case JoinPolicies.Open:
@@ -189,11 +195,11 @@ export function joinPolicyTone(policy: JoinPolicy): string {
   }
 }
 
-/** Ionic colour slot for the role chip on a member row. */
+/** The tone of the role badge on a member row (`data-tone`, ion-badge.css). */
 export function memberRoleTone(role: GroupMemberRole): string {
   switch (role) {
     case GroupMemberRoles.Owner:
-      return 'primary';
+      return 'honey';
     case GroupMemberRoles.Moderator:
       return 'info';
     case GroupMemberRoles.Member:
@@ -203,6 +209,31 @@ export function memberRoleTone(role: GroupMemberRole): string {
 
 export function memberRoleLabel(role: GroupMemberRole): string {
   return enumLabel('groupMemberRole', role);
+}
+
+/**
+ * The label beside a group preview's back arrow: the screen back returns to.
+ *
+ * Discover opens a preview from two screens with one URL (its strip and its
+ * "All groups" list both push `/tabs/discover/group/:id`), so the URL alone
+ * cannot say which; the page that was open before can. It counts only when
+ * it is in the same stack, since back never crosses a tab. Without it (a
+ * cold load, or an arrival from another tab) back goes to the stack's root,
+ * and the label names that.
+ */
+export function previewBackLabel(url: string, previousUrl: string | null): string {
+  const path = (value: string) => value.split(/[?#]/)[0];
+  const root = stackRootOf(url);
+  if (previousUrl && root && stackRootOf(previousUrl) === root) {
+    const from = path(previousUrl);
+    if (from === ProfileStacks.Groups || from === `${ProfileStacks.Discover}/groups`) {
+      return 'nav.groups';
+    }
+    if (from === ProfileStacks.Discover) return 'nav.discover';
+    return 'button.back';
+  }
+  if (root === ProfileStacks.Discover) return 'nav.discover';
+  return groupLinks(url).inGroupsTab ? 'nav.groups' : 'button.back';
 }
 
 // ── Form options ─────────────────────────────────────────────────────────

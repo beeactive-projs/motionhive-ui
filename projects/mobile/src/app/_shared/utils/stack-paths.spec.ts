@@ -7,12 +7,14 @@ describe('stack paths', () => {
     expect(stackRootOf('/tabs/clients/abc?tab=training')).toBe('/tabs/clients');
     expect(stackRootOf('/tabs/more/account/person/anna')).toBe('/tabs/more/account');
     expect(stackRootOf('/tabs/coach/sessions/123')).toBe('/tabs/coach/sessions');
-    expect(stackRootOf('/tabs/home')).toBeNull();
+    expect(stackRootOf('/tabs/home/person/anna')).toBe('/tabs/home');
+    expect(stackRootOf('/tabs/workouts')).toBeNull();
   });
 
   it('opens a chat on the Messages tab there, and under chat/ anywhere else', () => {
     expect(chatBase('/tabs/messages')).toBe('/tabs/messages');
     expect(chatBase('/tabs/clients')).toBe('/tabs/clients/chat');
+    expect(chatBase('/tabs/home')).toBe('/tabs/home/chat');
     expect(chatBase(null)).toBe('/tabs/messages');
   });
 

@@ -412,7 +412,7 @@
               {{ (editingAttendance() ? 'sessions.detail.doneMarking' : 'sessions.detail.editAttendance') | translate }}
             </ion-button>
           }
-          <ion-button expand="block" class="action" (click)="duplicateThis()">
+          <ion-button expand="block" class="action" color="primary" (click)="duplicateThis()">
             {{ 'sessions.detail.duplicate' | translate }}
           </ion-button>
         } @else {
@@ -426,6 +426,7 @@
             <ion-button
               expand="block"
               class="action"
+              color="primary"
               [href]="url"
               target="_blank"
               rel="noopener"
@@ -433,7 +434,7 @@
               {{ joinLabel() }}
             </ion-button>
           } @else {
-            <ion-button expand="block" class="action" (click)="messageSignups()">
+            <ion-button expand="block" class="action" color="primary" (click)="messageSignups()">
               {{ 'sessions.detail.messageSignups' | translate }}
             </ion-button>
           }

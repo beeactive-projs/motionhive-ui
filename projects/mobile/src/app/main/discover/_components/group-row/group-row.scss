@@ -1,0 +1,12 @@
+/* Layout and type come from the flat-list skin (theme/components/ion-list.css). */
+:host {
+  display: block;
+}
+
+/* One line: the skin's 1.5rem line box would otherwise hide a wrapped
+   second half instead of ending it with an ellipsis. */
+ion-label p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

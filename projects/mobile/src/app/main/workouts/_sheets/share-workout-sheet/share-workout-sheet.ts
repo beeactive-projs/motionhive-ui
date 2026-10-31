@@ -1,135 +1,499 @@
-import { Component, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
-import { IonButton, IonInput, IonSpinner } from '@ionic/angular/standalone';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonSegment,
+  IonSegmentButton,
+  IonSpinner,
+  IonToggle,
+} from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { firstValueFrom, take } from 'rxjs';
+import { addIcons } from 'ionicons';
+import { take } from 'rxjs';
 
 import {
+  AuthStore,
   GroupService,
   GroupWithMyRole,
   PostApprovalStates,
   PostService,
   WorkoutLog,
-  WorkoutLogService,
-  appLocale,
+  publicProfileUrl,
 } from 'core';
 
+import { HEX_PATH } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { SettingsRow } from '../../../../_shared/components/settings-row/settings-row';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
-import { ThemeService } from '../../../../_shared/services/theme.service';
-import {
-  CAPTION_MAX_LENGTH,
-  CardTemplate,
-  PHOTO_TEMPLATES,
-  ShareCardOptions,
-  oneLine,
-  shareCardContent,
-} from '../../_services/share-card';
-import { ShareCardService } from '../../_services/share-card.service';
+import { copyToClipboard } from '../../../../_shared/utils/share';
 import { canPost } from '../../../groups/groups.config';
+import {
+  CARD_THEMES,
+  CardTheme,
+  FULL_BACKGROUNDS,
+  FullBackground,
+  FullBackgrounds,
+  MOTIONHIVE_TAG,
+  SHARE_ICONS,
+  SHARE_ICON_NAMES,
+  SHARE_PREFS_KEY,
+  STICKER_STYLES,
+  ShareCardContent,
+  ShareMode,
+  ShareModes,
+  SharePrefs,
+  ShareStep,
+  ShareSteps,
+  StickerStyle,
+  linkLabel,
+  openingStep,
+  parseSharePrefs,
+  saveCopyKeys,
+  shareCardContent,
+  suggestedMode,
+} from '../../_services/share-card.config';
+import { ShareCardService } from '../../_services/share-card.service';
+import { ShareGuideSheet } from '../share-guide-sheet/share-guide-sheet';
 
-/** Message ideas offered as one tap; the person's own note comes first when there is one. */
-const SUGGESTIONS = ['workouts.share.suggestions.done', 'workouts.share.suggestions.hive'];
+/** The flags each way remembers, by the toggle that changes them. */
+type PrefFlag = 'quickKg' | 'quickRecord' | 'quickPhoto' | 'fullKg' | 'fullLink';
+
+/** What is running, so one tap does not start a second. */
+const BusyStates = {
+  Instagram: 'instagram',
+  Save: 'save',
+  Send: 'send',
+  Copy: 'copy',
+} as const;
+type Busy = (typeof BusyStates)[keyof typeof BusyStates];
+
+/** The chooser draws its two previews small; the way's own preview a little larger. */
+const CHOOSER_SCALE = 0.3;
+const PREVIEW_SCALE = 0.45;
 
 /**
- * Share a finished workout as a story card: a live preview, what to show
- * on it, one line of message, then the phone's own share sheet.
+ * Share a finished workout, two ways (design "Share Flow", t3).
  *
- * The private note is never put on the card by itself. "From your note" is
- * a chip the person taps; the field starts with the message they used last
- * time, or empty.
+ * Quick: a clean sticker (no logo, no coach) over the workout's photo or
+ * the theme's colours, straight into an Instagram Story through
+ * Instagram's own Stories API; the share sheet takes the same picture
+ * when Instagram is not there. Full: the card with the logo and the
+ * person's link, saved to Photos (then a three step guide) or sent.
+ *
+ * The first opening asks which way, with a real preview of each; the
+ * answer, the theme and the switches are remembered on the device. The
+ * coach's name is the exception: it starts off on every share, and only a
+ * coach who allows mentions can be named at all.
+ *
+ * Posting the workout into one of the person's groups stays at the end
+ * of either way: it is the only door to it.
  */
 @Component({
   selector: 'mh-share-workout-sheet',
-  imports: [IonButton, IonInput, IonSpinner, SheetShell, TranslatePipe],
+  imports: [
+    IonButton,
+    IonCard,
+    IonCardContent,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonSegment,
+    IonSegmentButton,
+    IonSpinner,
+    IonToggle,
+    SettingsRow,
+    ShareGuideSheet,
+    SheetShell,
+    TranslatePipe,
+  ],
   templateUrl: './share-workout-sheet.html',
   styleUrl: './share-workout-sheet.scss',
 })
 export class ShareWorkoutSheet {
   private readonly _shareCardService = inject(ShareCardService);
-  private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
-  private readonly _themeService = inject(ThemeService);
+  private readonly _authStore = inject(AuthStore);
   private readonly _groupService = inject(GroupService);
   private readonly _postService = inject(PostService);
+  private readonly _sheet = viewChild(SheetShell);
+
+  readonly open = model(false);
+  readonly log = input.required<WorkoutLog>();
+  /** The workout's photo (an object URL), for the Story background and the photo card. */
+  readonly photoUrl = input<string | null>(null);
+
+  readonly Steps = ShareSteps;
+  readonly Modes = ShareModes;
+  readonly Backgrounds = FullBackgrounds;
+  readonly icons = SHARE_ICON_NAMES;
+  readonly stickers = STICKER_STYLES;
+  readonly backgrounds = FULL_BACKGROUNDS;
+  readonly tag = MOTIONHIVE_TAG;
+  readonly hexPath = HEX_PATH;
+  /** The image clipboard is an iOS idea; the browser build keeps it for testing. */
+  readonly canCopySticker = ['ios', 'web'].includes(Capacitor.getPlatform());
+  private readonly _saveKeys = saveCopyKeys(Capacitor.getPlatform());
+
+  readonly prefs = signal<SharePrefs>(readPrefs());
+  readonly step = signal<ShareStep>(ShareSteps.Choose);
+  readonly busy = signal<Busy | null>(null);
+  /** Off on every share: naming a coach is chosen each time. */
+  readonly showCoach = signal(false);
+  readonly guideOpen = signal(false);
+
+  readonly quickPreview = signal<string | null>(null);
+  readonly fullPreview = signal<string | null>(null);
 
   /** Your groups that take a post from you; loaded the first time the sheet opens. */
   readonly postableGroups = signal<GroupWithMyRole[] | null>(null);
   /** The group a share is on its way to; one at a time. */
   readonly sharingTo = signal<string | null>(null);
 
-  readonly open = model(false);
-  readonly log = input.required<WorkoutLog>();
-  /** What the person wrote privately, offered as a chip and nothing more. */
-  readonly note = input('');
-  /** The workout's photo (an object URL), for the photo cards. */
-  readonly photoUrl = input<string | null>(null);
-  /** The message as saved, so the screen that opened this stays in step. */
-  readonly captionSaved = output<string | null>();
-
-  readonly captionMaxLength = CAPTION_MAX_LENGTH;
-  readonly suggestions = SUGGESTIONS;
-
-  readonly showKg = signal(true);
-  readonly showRecord = signal(true);
-  readonly showCoach = signal(false);
-  readonly caption = signal('');
-  readonly preview = signal<string | null>(null);
-  readonly sharing = signal(false);
-
-  /** The looks on offer: the photo ones only when there is a photo. */
-  readonly templates = computed<readonly CardTemplate[]>(() =>
-    this.photoUrl() ? [...PHOTO_TEMPLATES, 'comb'] : ['comb'],
-  );
-  private readonly _template = signal<CardTemplate | null>(null);
-  /** A photo, once there is one, is the point of the card: it leads. */
-  readonly template = computed<CardTemplate>(() => {
-    const picked = this._template();
-    return picked && this.templates().includes(picked) ? picked : this.templates()[0];
-  });
-  private _photo: { url: string; image: Promise<HTMLImageElement> } | null = null;
-
+  readonly hasPhoto = computed(() => !!this.photoUrl());
   readonly hasRecord = computed(() => (this.log().personalRecords?.length ?? 0) > 0);
-  readonly hasCoach = computed(() => !!this.log().summary?.coachName);
-  readonly noteLine = computed(() => oneLine(this.note()).slice(0, CAPTION_MAX_LENGTH));
+  /** A coach's plan at all: the coach row shows, locked when they do not allow it. */
+  readonly planCoach = computed(() => this.log().summary?.coachName ?? null);
+  readonly mentionableCoach = computed(() => this.log().summary?.mentionableCoach ?? null);
+
+  private readonly _profileUrl = computed(() => {
+    const handle = this._authStore.user()?.handle;
+    return handle ? publicProfileUrl(handle) : null;
+  });
+  /** "app.motionhive.fit/@anna", for the link switch's label. */
+  readonly profileLink = computed(() => {
+    const url = this._profileUrl();
+    return url ? linkLabel(url) : null;
+  });
+
+  readonly suggested = computed(() => suggestedMode(this.prefs()));
+  /** Each theme's swatch in its own colours, from the same paint the card uses. */
+  readonly swatches = computed(() =>
+    CARD_THEMES.map((theme) => {
+      const palette = this._shareCardService.palette(theme);
+      return { theme, fill: palette.card, stroke: palette.border };
+    }),
+  );
+  readonly quickPhoto = computed(() => this.hasPhoto() && this.prefs().quickPhoto);
+  readonly fullPhoto = computed(
+    () => this.hasPhoto() && this.prefs().fullBackground === FullBackgrounds.Photo,
+  );
+  readonly background = computed<FullBackground>(() =>
+    this.fullPhoto() ? FullBackgrounds.Photo : FullBackgrounds.Hive,
+  );
+
+  readonly quickContent = computed(() =>
+    shareCardContent(
+      this.log(),
+      {
+        showKg: this.prefs().quickKg,
+        showRecord: this.prefs().quickRecord,
+        showCoach: false,
+        showLink: false,
+      },
+      this._t,
+      null,
+    ),
+  );
+
+  readonly fullContent = computed(() =>
+    shareCardContent(
+      this.log(),
+      {
+        showKg: this.prefs().fullKg,
+        showRecord: true,
+        showCoach: this.showCoach() && !!this.mentionableCoach(),
+        showLink: this.prefs().fullLink,
+      },
+      this._t,
+      this._profileUrl(),
+    ),
+  );
+
+  readonly title = computed(() =>
+    this._t(
+      this.step() === ShareSteps.Choose ? 'workouts.share.choose.title' : 'workouts.share.title',
+    ),
+  );
+
+  readonly subtitle = computed(() => {
+    switch (this.step()) {
+      case ShareSteps.Quick:
+        return this._t('workouts.share.mode.quickHint');
+      case ShareSteps.Full:
+        return this._t('workouts.share.mode.fullHint');
+      default:
+        return this._t('workouts.share.choose.subtitle');
+    }
+  });
+
+  readonly saveLabel = computed(() =>
+    this._t(
+      this.step() === ShareSteps.Full
+        ? this._saveKeys.action
+        : 'workouts.share.instagram.open',
+    ),
+  );
+  readonly actionLabel = computed(() =>
+    this.step() === ShareSteps.Full ? this._t('workouts.share.send') : '',
+  );
+  readonly preview = computed(() =>
+    this.step() === ShareSteps.Full ? this.fullPreview() : this.quickPreview(),
+  );
+  /** The shell's spinner sits on its main button: only for the main action's own work. */
+  readonly saving = computed(
+    () => this.busy() === BusyStates.Instagram || this.busy() === BusyStates.Save,
+  );
+
+  private _photo: { url: string; image: Promise<HTMLImageElement> } | null = null;
+  private _quickDraws = 0;
+  private _fullDraws = 0;
+
+  private readonly _t = (key: string, params?: Record<string, unknown>): string =>
+    this._translateService.instant(key, params);
+
+  constructor() {
+    addIcons(SHARE_ICONS);
+
+    // Each opening starts from the remembered way, with the coach off.
+    effect(() => {
+      if (!this.open()) return;
+      untracked(() => {
+        this.step.set(openingStep(this.prefs()));
+        this.showCoach.set(false);
+        this._loadGroups();
+      });
+    });
+
+    // The previews redraw as the choices change: the same pictures that are
+    // sent. Draws can finish out of order; only the latest one is shown.
+    effect(() => {
+      if (!this.open() || this.step() === ShareSteps.Full) return;
+      const content = this.quickContent();
+      const { theme, sticker } = this.prefs();
+      const usePhoto = this.quickPhoto();
+      const scale = this.step() === ShareSteps.Choose ? CHOOSER_SCALE : PREVIEW_SCALE;
+      const draw = ++this._quickDraws;
+      void this._drawQuick(content, theme, sticker, usePhoto, scale)
+        .then((url) => {
+          if (draw === this._quickDraws) this.quickPreview.set(url);
+        })
+        .catch(() => undefined);
+    });
+    effect(() => {
+      if (!this.open() || this.step() === ShareSteps.Quick) return;
+      const content = this.fullContent();
+      const theme = this.prefs().theme;
+      const usePhoto = this.fullPhoto();
+      const scale = this.step() === ShareSteps.Choose ? CHOOSER_SCALE : PREVIEW_SCALE;
+      const draw = ++this._fullDraws;
+      void this._drawFull(content, theme, usePhoto, scale)
+        .then((url) => {
+          if (draw === this._fullDraws) this.fullPreview.set(url);
+        })
+        .catch(() => undefined);
+    });
+  }
+
+  // ─── Choices ─────────────────────────────────────────────────────────────
+
+  /** Picked in the chooser or on the switch; remembered for next time. */
+  pickMode(mode: ShareMode): void {
+    this._update({ mode });
+    this.step.set(mode);
+  }
+
+  onModeChange(value: unknown): void {
+    const mode = [ShareModes.Quick, ShareModes.Full].find((candidate) => candidate === value);
+    if (mode) this.pickMode(mode);
+  }
+
+  pickTheme(theme: CardTheme): void {
+    this._update({ theme });
+  }
+
+  pickSticker(sticker: StickerStyle): void {
+    this._update({ sticker });
+  }
+
+  pickBackground(fullBackground: FullBackground): void {
+    this._update({ fullBackground });
+  }
+
+  setFlag(flag: PrefFlag, on: boolean): void {
+    const change: Partial<SharePrefs> = {};
+    change[flag] = on;
+    this._update(change);
+  }
+
+  // ─── Actions ─────────────────────────────────────────────────────────────
 
   /**
-   * Posts the workout into the group as a card, with the message as the
-   * post's text. The card is the safe summary, so the group never gets the
-   * note, the weights or the photo. A group that reviews member posts holds
-   * it until someone approves it, and the toast says so.
+   * Quick: Instagram's Story editor with the sticker on the photo or the
+   * theme's colours. Without Instagram (or in the browser) the same picture
+   * goes to the share sheet, and a note says why.
+   */
+  async openInInstagram(): Promise<void> {
+    if (this.busy()) return;
+    this.busy.set(BusyStates.Instagram);
+    try {
+      const content = this.quickContent();
+      const { theme, sticker } = this.prefs();
+      const photo = this.quickPhoto() ? await this._photoImage() : null;
+      const parts = await this._shareCardService.storyParts(content, theme, sticker, photo);
+      if ((await this._shareCardService.toInstagramStory(parts)) === 'opened') {
+        this.open.set(false);
+        return;
+      }
+      void this._feedbackService.info(
+        this._t(
+          Capacitor.isNativePlatform()
+            ? 'workouts.share.instagram.missing'
+            : 'workouts.share.instagram.web',
+        ),
+      );
+      const image = await this._shareCardService.quickStory(content, theme, sticker, photo);
+      if ((await this._shareCardService.share(image, this.log().name)) === 'shared') {
+        this.open.set(false);
+      }
+    } catch (err) {
+      void this._feedbackService.error(err, this._t('workouts.share.toast.failed'));
+    } finally {
+      this.busy.set(null);
+    }
+  }
+
+  /** Full: into Photos (the gallery on Android), then the three steps to post it (unless they are turned off). */
+  async saveToPhotos(): Promise<void> {
+    if (this.busy()) return;
+    this.busy.set(BusyStates.Save);
+    try {
+      const image = await this._fullImage();
+      const outcome = await this._shareCardService.saveToPhotos(image);
+      if (outcome === 'denied') {
+        void this._feedbackService.error(null, this._t(this._saveKeys.denied));
+        return;
+      }
+      if (this.prefs().guideHidden) {
+        this.open.set(false);
+        void this._feedbackService.success(this._t(this._saveKeys.done));
+        return;
+      }
+      this.busy.set(null);
+      await this._sheet()?.close();
+      this.guideOpen.set(true);
+    } catch (err) {
+      void this._feedbackService.error(err, this._t('workouts.share.save.failed'));
+    } finally {
+      this.busy.set(null);
+    }
+  }
+
+  /** Full: the system share sheet, for WhatsApp, Facebook, messages. */
+  async send(): Promise<void> {
+    if (this.busy()) return;
+    this.busy.set(BusyStates.Send);
+    try {
+      const image = await this._fullImage();
+      if ((await this._shareCardService.share(image, this.log().name)) === 'shared') {
+        this.open.set(false);
+      }
+    } catch (err) {
+      void this._feedbackService.error(err, this._t('workouts.share.toast.failed'));
+    } finally {
+      this.busy.set(null);
+    }
+  }
+
+  /** Full: only the sticker with the logo, to paste on a Story of their own. */
+  async copySticker(): Promise<void> {
+    if (this.busy()) return;
+    this.busy.set(BusyStates.Copy);
+    try {
+      const image = await this._shareCardService.brandedSticker(
+        this.fullContent(),
+        this.prefs().theme,
+      );
+      await this._shareCardService.copyImage(image);
+      void this._feedbackService.success(this._t('workouts.share.sticker.copied'));
+    } catch (err) {
+      void this._feedbackService.error(err, this._t('workouts.share.sticker.copyFailed'));
+    } finally {
+      this.busy.set(null);
+    }
+  }
+
+  /** The handle to tag, on the clipboard; written straight from the tap. */
+  async copyTag(): Promise<void> {
+    if (await copyToClipboard(MOTIONHIVE_TAG)) {
+      void this._feedbackService.success(
+        this._t('workouts.share.tag.copied', { tag: MOTIONHIVE_TAG }),
+      );
+    } else {
+      void this._feedbackService.error(
+        null,
+        this._t('workouts.share.tag.copyFailed', { tag: MOTIONHIVE_TAG }),
+      );
+    }
+  }
+
+  /** "Don't show the steps again", from the guide. */
+  hideGuide(): void {
+    this._update({ guideHidden: true });
+  }
+
+  /**
+   * Posts the workout into the group as a card. The card is the safe
+   * summary, so the group never gets the note, the weights or the photo.
+   * A group that reviews member posts holds it until someone approves
+   * it, and the toast says so.
    */
   shareToGroup(group: GroupWithMyRole): void {
-    const log = this.log();
     if (this.sharingTo()) return;
     this.sharingTo.set(group.id);
     this._postService
-      .createPost({
-        content: oneLine(this.caption()),
-        groupIds: [group.id],
-        workoutLogId: log.id,
-      })
+      .createPost({ content: '', groupIds: [group.id], workoutLogId: this.log().id })
       .pipe(take(1))
       .subscribe({
         next: ({ posts }) => {
           this.sharingTo.set(null);
           const pending = posts[0]?.approvalState === PostApprovalStates.Pending;
           void this._feedbackService.success(
-            this._translateService.instant(
-              pending ? 'workouts.share.group.pending' : 'workouts.share.group.done',
-              { group: group.name },
-            ),
+            this._t(pending ? 'workouts.share.group.pending' : 'workouts.share.group.done', {
+              group: group.name,
+            }),
           );
           this.open.set(false);
         },
         error: (err) => {
           this.sharingTo.set(null);
-          void this._feedbackService.error(
-            err,
-            this._translateService.instant('workouts.share.group.failed'),
-          );
+          void this._feedbackService.error(err, this._t('workouts.share.group.failed'));
         },
       });
+  }
+
+  // ─── Internals ───────────────────────────────────────────────────────────
+
+  private _update(change: Partial<SharePrefs>): void {
+    this.prefs.update((prefs) => ({ ...prefs, ...change }));
+    writePrefs(this.prefs());
   }
 
   private _loadGroups(): void {
@@ -144,101 +508,29 @@ export class ShareWorkoutSheet {
       });
   }
 
-  pickTemplate(template: CardTemplate): void {
-    this._template.set(template);
+  private async _drawQuick(
+    content: ShareCardContent,
+    theme: CardTheme,
+    sticker: StickerStyle,
+    usePhoto: boolean,
+    scale: number,
+  ): Promise<string> {
+    const photo = usePhoto ? await this._photoImage() : null;
+    return this._shareCardService.quickStory(content, theme, sticker, photo, scale);
   }
 
-  private readonly _options = computed<ShareCardOptions>(() => ({
-    showKg: this.showKg(),
-    showRecord: this.showRecord(),
-    showCoach: this.showCoach(),
-    caption: this.caption(),
-  }));
-
-  constructor() {
-    // Each opening starts from what was last shared, not from the last edit.
-    effect(() => {
-      if (!this.open()) return;
-      const log = untracked(this.log);
-      this.caption.set(log.shareCaption ?? '');
-      untracked(() => this._loadGroups());
-    });
-    // The preview redraws as the choices change, the same card that is sent.
-    // Draws can finish out of order; only the latest one is shown.
-    effect(() => {
-      if (!this.open()) return;
-      const options = this._options();
-      const log = this.log();
-      this.template();
-      this.photoUrl();
-      const draw = ++this._draws;
-      void this._draw(log, options).then((url) => {
-        if (draw === this._draws) this.preview.set(url);
-      });
-    });
+  private async _drawFull(
+    content: ShareCardContent,
+    theme: CardTheme,
+    usePhoto: boolean,
+    scale: number,
+  ): Promise<string> {
+    const photo = usePhoto ? await this._photoImage() : null;
+    return this._shareCardService.fullCard(content, theme, photo, scale);
   }
 
-  private _draws = 0;
-
-  toggleKg(): void {
-    this.showKg.update((on) => !on);
-  }
-
-  toggleRecord(): void {
-    this.showRecord.update((on) => !on);
-  }
-
-  toggleCoach(): void {
-    this.showCoach.update((on) => !on);
-  }
-
-  useSuggestion(key: string): void {
-    this.caption.set(this._translateService.instant(key));
-  }
-
-  useNote(): void {
-    this.caption.set(this.noteLine());
-  }
-
-  /**
-   * Keeps the message with the workout first, so sharing again reuses it,
-   * then hands the card to the phone. A message that failed to save still
-   * goes out on the card: the share is what the person asked for.
-   */
-  async share(): Promise<void> {
-    if (this.sharing()) return;
-    const log = this.log();
-    this.sharing.set(true);
-    try {
-      const caption = oneLine(this.caption());
-      if (caption !== (log.shareCaption ?? '')) {
-        try {
-          await firstValueFrom(this._workoutLogService.complete(log.id, { shareCaption: caption }));
-          this.captionSaved.emit(caption || null);
-        } catch {
-          // Kept on the card regardless; saving it is a convenience.
-        }
-      }
-      const image = await this._draw(log, this._options());
-      const outcome = await this._shareCardService.share(image, log.name);
-      if (outcome === 'shared') this.open.set(false);
-    } catch (err) {
-      void this._feedbackService.error(err, this._translateService.instant('workouts.share.toast.failed'));
-    } finally {
-      this.sharing.set(false);
-    }
-  }
-
-  private async _draw(log: WorkoutLog, options: ShareCardOptions): Promise<string> {
-    const content = shareCardContent(
-      log,
-      options,
-      (key, params) => this._translateService.instant(key, params),
-      appLocale(),
-    );
-    const template = this.template();
-    const photo = template === 'comb' ? null : await this._photoImage();
-    return this._shareCardService.render(content, this._themeService.isDark(), template, photo);
+  private async _fullImage(): Promise<string> {
+    return this._drawFull(this.fullContent(), this.prefs().theme, this.fullPhoto(), 1);
   }
 
   /**
@@ -254,5 +546,22 @@ export class ShareWorkoutSheet {
       this._photo = { url, image: image.decode().then(() => image) };
     }
     return this._photo.image.catch(() => null);
+  }
+}
+
+/** The remembered choices; private browsing or blocked storage starts from the defaults. */
+function readPrefs(): SharePrefs {
+  try {
+    return parseSharePrefs(localStorage.getItem(SHARE_PREFS_KEY));
+  } catch {
+    return parseSharePrefs(null);
+  }
+}
+
+function writePrefs(prefs: SharePrefs): void {
+  try {
+    localStorage.setItem(SHARE_PREFS_KEY, JSON.stringify(prefs));
+  } catch {
+    // Not remembered this time; the share itself is unaffected.
   }
 }

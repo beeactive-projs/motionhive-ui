@@ -1,140 +1,198 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, of, take } from 'rxjs';
+import { catchError, finalize, Observable, of, take } from 'rxjs';
 
 import {
   ClientService,
-  EarningsService,
-  EarningsSummary,
-  InstructorClientStatuses,
+  CoachActivityItem,
+  ProfileService,
+  ProgramAssignment,
+  ProgramAssignmentService,
+  ProgramAssignmentStatus,
+  ProgramLibrary,
+  ProgramService,
+  RosterService,
+  RosterSummary,
   SessionInstance,
   SessionInstanceStatus,
   SessionService,
+  localDayKey,
 } from 'core';
 
+import { needItems, plansEndingSoon } from '../home.config';
+
 const AGENDA_LIMIT = 10;
+/**
+ * The feed's own cap: Latest shows every workout of the last 24 hours (up
+ * to ten), so Home reads the whole window the API serves.
+ */
+const ACTIVITY_LIMIT = 20;
+/** Active plans read to find the ones ending soon: the API's page cap. */
+const ASSIGNMENT_LIMIT = 100;
 
 /**
- * Data behind the coach home.
+ * Data behind the coach Home and its Needs you page: the hive, what needs
+ * the coach, the latest workouts and today.
  *
- * Unlike the trainee home this has no web equivalent to port — `/coaching/overview`
- * is placeholder data — so the cards are assembled from the coach services
- * directly. Same discipline as the trainee side: independent loaders, per-card
- * loading signals, errors swallowed into empty states.
- *
- * Four calls, one per block the design shows: agenda, requests banner, and the
- * two stat tiles. Nothing loads for a block that isn't on screen.
+ * Every block reads something the app already serves. The hive and Needs
+ * you are the roster (`/coach/roster`, last 7 days); Latest is
+ * `/coach/activity`; plans ending come from the coach's active
+ * assignments; requests from the pending count; today from the session
+ * instances. Each loads on its own and a failure empties only its block.
+ * Money is not here: it is the Menu's Payments row.
  */
 @Injectable()
 export class CoachHomeStore {
+  private readonly _rosterService = inject(RosterService);
+  private readonly _programAssignmentService = inject(ProgramAssignmentService);
   private readonly _sessionService = inject(SessionService);
   private readonly _clientService = inject(ClientService);
-  private readonly _earningsService = inject(EarningsService);
+  private readonly _programService = inject(ProgramService);
+  private readonly _profileService = inject(ProfileService);
   private readonly _destroyRef = inject(DestroyRef);
 
+  private readonly _roster = signal<RosterSummary | null>(null);
+  private readonly _rosterFailed = signal(false);
+  private readonly _assignments = signal<ProgramAssignment[]>([]);
   private readonly _agenda = signal<SessionInstance[]>([]);
+  private readonly _activity = signal<CoachActivityItem[]>([]);
   private readonly _pendingRequests = signal(0);
-  private readonly _earnings = signal<EarningsSummary | null>(null);
-  private readonly _activeClients = signal(0);
+  private readonly _hasPrograms = signal<boolean | null>(null);
+  private readonly _hasSpecialties = signal<boolean | null>(null);
+  private readonly _todayKey = signal(localDayKey(new Date()));
 
+  readonly roster = this._roster.asReadonly();
   readonly agenda = this._agenda.asReadonly();
-  readonly pendingRequests = this._pendingRequests.asReadonly();
-  readonly earnings = this._earnings.asReadonly();
-  readonly activeClients = this._activeClients.asReadonly();
+  readonly activity = this._activity.asReadonly();
+  readonly hasPrograms = this._hasPrograms.asReadonly();
+  readonly hasSpecialties = this._hasSpecialties.asReadonly();
 
-  readonly agendaLoading = signal(true);
-  readonly requestsLoading = signal(true);
-  readonly earningsLoading = signal(true);
-  readonly clientsLoading = signal(true);
+  readonly rosterLoading = signal(true);
 
-  readonly hasAgenda = computed(() => this._agenda().length > 0);
-  readonly showRequestsBanner = computed(() => this._pendingRequests() > 0);
+  readonly clients = computed(() => this._roster()?.clients ?? []);
 
-  load(): void {
-    this._loadAgenda();
-    this._loadPendingRequests();
-    this._loadEarnings();
-    this._loadActiveClients();
+  /** No active clients yet: the Home becomes the coach's first steps. */
+  readonly isFirstWeek = computed(() => this._roster()?.clients.length === 0);
+
+  /** Only when there is nothing older on screen to keep showing. */
+  readonly showRosterError = computed(() => this._rosterFailed() && !this._roster());
+
+  /** Everything that needs the coach, most pressing first (`needItems`). */
+  readonly needs = computed(() =>
+    needItems(
+      this.clients(),
+      this._pendingRequests(),
+      plansEndingSoon(this._assignments(), this._todayKey()),
+    ),
+  );
+
+  /** Home: every block. `done` runs once all of them have answered. */
+  load(done?: () => void): void {
+    this._todayKey.set(localDayKey(new Date()));
+    const settle = countdown(5, done);
+    this._loadRoster(settle);
+    this._loadActivity(settle);
+    this._loadAssignments(settle);
+    this._loadAgenda(settle);
+    this._loadPendingRequests(settle);
   }
 
-  refresh(done?: () => void): void {
-    this.load();
-    done?.();
+  /** The Needs you page: only what decides who needs the coach. */
+  loadNeeds(done?: () => void): void {
+    this._todayKey.set(localDayKey(new Date()));
+    const settle = countdown(3, done);
+    this._loadRoster(settle);
+    this._loadAssignments(settle);
+    this._loadPendingRequests(settle);
   }
 
-  private _loadAgenda(): void {
-    this.agendaLoading.set(true);
+  private _loadRoster(settle: () => void): void {
+    this.rosterLoading.set(true);
+    // Silent: the card says it failed and offers a retry, which beats a
+    // dialog over the whole Home.
+    this._read(this._rosterService.roster('1w', { silent: true }), settle).subscribe((roster) => {
+      if (roster) this._roster.set(roster);
+      this._rosterFailed.set(roster === null);
+      this.rosterLoading.set(false);
+      if (roster?.clients.length === 0) this._loadFirstSteps();
+    });
+  }
 
+  /** Silent: an empty feed is a fine thing for Home to show on a failure. */
+  private _loadActivity(settle: () => void): void {
+    this._read(this._rosterService.activity(ACTIVITY_LIMIT, { silent: true }), settle).subscribe(
+      (items) => {
+        if (items) this._activity.set(items);
+      },
+    );
+  }
+
+  private _loadAssignments(settle: () => void): void {
+    this._read(
+      this._programAssignmentService.listForInstructor({
+        status: ProgramAssignmentStatus.Active,
+        limit: ASSIGNMENT_LIMIT,
+      }),
+      settle,
+    ).subscribe((page) => this._assignments.set(page?.items ?? []));
+  }
+
+  private _loadAgenda(settle: () => void): void {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfDay = new Date(startOfDay);
     endOfDay.setDate(endOfDay.getDate() + 1);
 
-    this._sessionService
-      .listInstances({
+    this._read(
+      this._sessionService.listInstances({
         dateFrom: startOfDay.toISOString(),
         dateTo: endOfDay.toISOString(),
         status: SessionInstanceStatus.Scheduled,
         limit: AGENDA_LIMIT,
-      })
-      .pipe(
-        take(1),
-        catchError(() => of(null)),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((response) => {
-        this._agenda.set(response?.items ?? []);
-        this.agendaLoading.set(false);
-      });
+      }),
+      settle,
+    ).subscribe((response) => this._agenda.set(response?.items ?? []));
   }
 
-  private _loadPendingRequests(): void {
-    this.requestsLoading.set(true);
-    // Purpose-built count endpoint — cheaper than fetching the request list.
-    // `incoming` only: the banner says they are waiting for the coach's
-    // approval, which the invitations the coach sent are not.
-    this._clientService
-      .getPendingRequestsCount()
-      .pipe(
-        take(1),
-        catchError(() => of(null)),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((response) => {
-        this._pendingRequests.set(response?.incoming ?? 0);
-        this.requestsLoading.set(false);
-      });
+  private _loadPendingRequests(settle: () => void): void {
+    // `incoming` only: an invitation the coach sent waits on someone else.
+    this._read(this._clientService.getPendingRequestsCount(), settle).subscribe((response) =>
+      this._pendingRequests.set(response?.incoming ?? 0),
+    );
   }
 
-  private _loadEarnings(): void {
-    this.earningsLoading.set(true);
-    this._earningsService
-      .getSummary()
-      .pipe(
-        take(1),
-        catchError(() => of(null)),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((summary) => {
-        this._earnings.set(summary);
-        this.earningsLoading.set(false);
-      });
+  /**
+   * Read only for a coach with no clients: whether there is a program to
+   * assign once one joins, and whether Discover has specialties to show.
+   */
+  private _loadFirstSteps(): void {
+    this._read(this._programService.list({ library: ProgramLibrary.Mine, limit: 1 })).subscribe(
+      (page) => this._hasPrograms.set(page ? page.total > 0 : null),
+    );
+
+    this._read(this._profileService.getMyProfile()).subscribe((profile) =>
+      this._hasSpecialties.set(
+        profile ? (profile.instructorProfile?.specializations?.length ?? 0) > 0 : null,
+      ),
+    );
   }
 
-  private _loadActiveClients(): void {
-    this.clientsLoading.set(true);
-    // There is no /clients/count endpoint; limit 1 makes the list call cheap
-    // enough to read `total` from. Worth replacing with a real count later.
-    this._clientService
-      .getClients({ status: InstructorClientStatuses.Active, page: 1, limit: 1 })
-      .pipe(
-        take(1),
-        catchError(() => of(null)),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((response) => {
-        this._activeClients.set(response?.total ?? 0);
-        this.clientsLoading.set(false);
-      });
+  /** One answer or null on a failure; `settle` runs either way. */
+  private _read<T>(source: Observable<T>, settle?: () => void): Observable<T | null> {
+    return source.pipe(
+      take(1),
+      catchError(() => of(null)),
+      finalize(() => settle?.()),
+      takeUntilDestroyed(this._destroyRef),
+    );
   }
+}
+
+/** A callback that runs `done` on its `count`th call: "all of them answered". */
+function countdown(count: number, done?: () => void): () => void {
+  let left = count;
+  return () => {
+    left -= 1;
+    if (left === 0) done?.();
+  };
 }

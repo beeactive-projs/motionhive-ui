@@ -119,10 +119,15 @@ export class AccountStore {
     });
   }
 
+  /**
+   * Silent: every screen that reads this store shows its own failure state
+   * (`loadFailed`) with a retry, so the global "Something went wrong" dialog
+   * on top of it said the same thing twice.
+   */
   private _load(done?: () => void): void {
     this._loading.set(true);
     this._profileService
-      .getMyProfile()
+      .getMyProfile({ silent: true })
       .pipe(
         take(1),
         catchError(() => of(null)),

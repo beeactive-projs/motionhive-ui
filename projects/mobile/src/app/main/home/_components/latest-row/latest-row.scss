@@ -1,0 +1,24 @@
+// The label takes the row's whole width, so the time ends on the row's
+// edge however short the title is (a short name left it shrunk to its words
+// and the time short of the edge, out of line with the rows below).
+ion-label {
+  flex: 1;
+  min-width: 0;
+}
+
+// The second line keeps to one line, whatever a post says.
+p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// A record wears the deep honey, as a record does everywhere.
+.accent {
+  color: var(--mh-color-honey-deep);
+  font-weight: 600;
+}
+
+ion-note {
+  font-variant-numeric: tabular-nums;
+}

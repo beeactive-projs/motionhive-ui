@@ -187,6 +187,12 @@ export function workoutTabRedirect(tab: WorkoutTab): RedirectFunction {
  */
 export const DEFAULT_SETS = 3;
 
+/**
+ * A streak shorter than this is just training, not yet a streak: Home's
+ * week line, the finish summary and the share card all hold back below it.
+ */
+export const STREAK_WORTH_SAYING = 2;
+
 // ─── Spine tones ──────────────────────────────────────────────────────────
 
 /**
@@ -216,6 +222,21 @@ export function logTone(log: WorkoutLog): SpineTone {
     default:
       return SpineTones.Muted;
   }
+}
+
+/**
+ * Where the logger sends a log it was asked to open: null to log it here,
+ * or the summary's route for any workout that is no longer running.
+ *
+ * The logger is reachable for a finished workout more ways than one: a
+ * Resume on a list that had not reloaded since the workout was finished on
+ * another device or closed by the overnight sweep, a logger page left in the
+ * tab's stack and entered again, a saved address. Shown there it offered
+ * Finish and Discard on a workout that was already over; its summary is the
+ * read-only view of the same log.
+ */
+export function loggerRedirect(log: Pick<WorkoutLog, 'id' | 'status'>): string[] | null {
+  return log.status === WorkoutLogStatus.InProgress ? null : ['/tabs/workouts/finish', log.id];
 }
 
 /** A planned day's spine: done, skipped, or still to do. */
@@ -1068,6 +1089,16 @@ export function formatMeasure(value: number, maxFractionDigits = 2): string {
     maximumFractionDigits: maxFractionDigits,
     useGrouping: false,
   }).format(value);
+}
+
+/**
+ * A figure kept on one line: its spaces become no-break spaces, so "53.665
+ * kg" or "1 h 30 min" never splits between number and unit. A stat tile at
+ * large text broke "53.66" from "5 kg"; with this, a row of tiles that has
+ * no room wraps a whole tile to the next row instead.
+ */
+export function unbreakable(text: string): string {
+  return text.replace(/ /g, '\u00a0');
 }
 
 /**

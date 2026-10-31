@@ -18,3 +18,9 @@ ion-item[data-tone='muted'] h2 {
   font-size: var(--mh-text-xs);
   white-space: nowrap;
 }
+
+/* Badges are kept whole: when the tags do not fit beside the trailing value
+   they wrap to a second line rather than run under it. */
+.tags {
+  flex-wrap: wrap;
+}

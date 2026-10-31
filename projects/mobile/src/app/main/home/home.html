@@ -36,7 +36,7 @@
   title: condensed headers are iOS-only, so on Android the heading would
   silently disappear.
 -->
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="mh-flat-page">
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
@@ -47,34 +47,13 @@
     trainee home at a coach on every cold start.
   -->
   @if (!roleKnown()) {
-    <div class="mh-page">
+    <!-- Both bodies open the same way: a greeting, then the hive card. -->
+    <div class="body-skeleton">
       <div>
         <ion-skeleton-text [animated]="true" style="width: 6.875rem; height: 0.5rem" />
-        <ion-skeleton-text [animated]="true" style="width: 12.5rem; height: 1rem" />
+        <ion-skeleton-text [animated]="true" style="width: 12.5rem; height: 1.5rem" />
       </div>
-
-      <ion-card>
-        <ion-item lines="none">
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 35%" /></p>
-          </ion-label>
-        </ion-item>
-      </ion-card>
-
-      <div class="tiles">
-        @for (_ of [1, 2]; track $index) {
-          <ion-card>
-            <ion-item lines="none">
-              <ion-label>
-                <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
-                <h2><ion-skeleton-text [animated]="true" style="width: 90%" /></h2>
-                <p><ion-skeleton-text [animated]="true" style="width: 100%" /></p>
-              </ion-label>
-            </ion-item>
-          </ion-card>
-        }
-      </div>
+      <ion-skeleton-text class="card-skeleton" [animated]="true" />
     </div>
   } @else if (mode() === NavModes.Coach) {
     <mh-coach-home />

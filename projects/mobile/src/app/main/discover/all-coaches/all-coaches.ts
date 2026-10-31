@@ -2,15 +2,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonHeader,
-  IonItem,
-  IonLabel,
+  IonList,
   IonRefresher,
   IonRefresherContent,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
@@ -22,7 +20,7 @@ import { addIcons } from 'ionicons';
 import { InstructorSearchResult } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { CoachRow } from '../_components/coach-row/coach-row';
 import {
   DISCOVER_ICONS,
@@ -33,30 +31,28 @@ import {
 import { DiscoverCoachesStore } from '../discover.store';
 
 /**
- * The full coach directory behind the rail's "All coaches" link:
+ * The full coach directory behind Discover's "All coaches": a flat list,
  * accepting-first (the only honest sort the payload offers), narrowed
  * client-side by specialization chips that come from the coaches
- * themselves. A row lands on the public profile — the coaching request
- * lives there, not here.
+ * themselves. A row lands on the public profile in this stack; the coaching
+ * request lives there, not here.
  */
 @Component({
   selector: 'mh-all-coaches',
   imports: [
     CoachRow,
     EmptyState,
-    HexAvatar,
     IonBackButton,
+    IonButton,
     IonButtons,
-    IonChip,
     IonContent,
     IonHeader,
-    IonItem,
-    IonLabel,
+    IonList,
     IonRefresher,
     IonRefresherContent,
-    IonSkeletonText,
     IonTitle,
     IonToolbar,
+    RowSkeleton,
     TranslatePipe,
   ],
   templateUrl: './all-coaches.html',
@@ -67,7 +63,7 @@ export class AllCoaches implements ViewWillEnter {
   readonly store = inject(DiscoverCoachesStore);
   private readonly _router = inject(Router);
 
-  readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6];
 
   readonly specialization = signal<string | null>(null);
 

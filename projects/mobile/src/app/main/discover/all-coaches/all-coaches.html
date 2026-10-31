@@ -1,3 +1,5 @@
+<!-- A flat list of people, like the Clients tab: title, then the
+     specialization pills in the header, then the rows edge to edge. -->
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -5,9 +7,44 @@
     </ion-buttons>
     <ion-title>{{ 'discover.allCoaches.title' | translate }}</ion-title>
   </ion-toolbar>
+
+  @if (chips().length > 0 && !showLoadError()) {
+    <ion-toolbar>
+      <div
+        class="mh-chip-row"
+        role="group"
+        [attr.aria-label]="'discover.allCoaches.filterLabel' | translate"
+      >
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="specialization() === null"
+          [attr.aria-pressed]="specialization() === null"
+          (click)="clearFilter()"
+        >
+          {{ 'common.all' | translate }}
+        </ion-button>
+        @for (chip of chips(); track chip) {
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="specialization() === chip"
+            [attr.aria-pressed]="specialization() === chip"
+            (click)="toggleSpecialization(chip)"
+          >
+            {{ chip }}
+          </ion-button>
+        }
+      </div>
+    </ion-toolbar>
+  }
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="mh-flat-page">
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
@@ -21,60 +58,31 @@
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
-    <!-- Mirrors the coach row shape so nothing shifts when data lands. -->
-    <div class="list">
+    <!-- The real rows' geometry, so nothing shifts when data lands. -->
+    <ion-list class="mh-flat-list" aria-busy="true">
       @for (_ of skeletonRows; track $index) {
-        <ion-item lines="none" class="coach-skeleton mh-list-row">
-          <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-          </ion-label>
-        </ion-item>
+        <mh-row-skeleton [index]="$index" />
       }
-    </div>
+    </ion-list>
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="people-outline"
       [heading]="'discover.allCoaches.empty.heading' | translate"
       [message]="'discover.allCoaches.empty.message' | translate"
     />
+  } @else if (isFilteredEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      [heading]="'empty.nothingMatches' | translate"
+      [message]="'discover.allCoaches.noMatches' | translate"
+      [actionLabel]="'button.clearFilter' | translate"
+      (action)="clearFilter()"
+    />
   } @else {
-    @if (chips().length > 0) {
-      <div class="mh-chip-row">
-        <ion-chip
-          [class.selected]="specialization() === null"
-          [attr.aria-pressed]="specialization() === null"
-          (click)="clearFilter()"
-        >
-          {{ 'common.all' | translate }}
-        </ion-chip>
-        @for (chip of chips(); track chip) {
-          <ion-chip
-            [class.selected]="specialization() === chip"
-            [attr.aria-pressed]="specialization() === chip"
-            (click)="toggleSpecialization(chip)"
-          >
-            {{ chip }}
-          </ion-chip>
-        }
-      </div>
-    }
-
-    @if (isFilteredEmpty()) {
-      <mh-empty-state
-        icon="people-outline"
-        [heading]="'empty.nothingMatches' | translate"
-        [message]="'discover.allCoaches.noMatches' | translate"
-        [actionLabel]="'button.clearFilter' | translate"
-        (action)="clearFilter()"
-      />
-    } @else {
-      <div class="list">
-        @for (coach of filtered(); track coach.id) {
-          <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
-        }
-      </div>
-    }
+    <ion-list class="mh-flat-list">
+      @for (coach of filtered(); track coach.id) {
+        <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
+      }
+    </ion-list>
   }
 </ion-content>

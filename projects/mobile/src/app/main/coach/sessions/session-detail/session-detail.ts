@@ -107,10 +107,12 @@ interface DetailRow {
 
 const SESSIONS_STACK = ProfileStacks.CoachSessions;
 
-/** Sessions' own stack, or the Clients or Programs one a client page opened it in. */
+/** Sessions' own stack, or the Clients, Programs or Home one that opened it. */
 function sessionStackOf(url: string): string {
   const root = stackRootOf(url);
-  return root === ProfileStacks.Clients || root === ProfileStacks.Programs ? root : SESSIONS_STACK;
+  return root === ProfileStacks.Clients || root === ProfileStacks.Programs || root === ProfileStacks.Home
+    ? root
+    : SESSIONS_STACK;
 }
 
 /**

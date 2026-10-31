@@ -1,3 +1,12 @@
+// Words wrap whole: Ionic's body breaks a word that does not fit its line
+// ("Wednesda/y"), so Home's text, header included, turns that off. A line
+// that cannot grow ellipses instead.
+:host {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
 // The role pill, per the design: honey-tinted capsule with a hairline, the
 // role's hexagon tile, plain sentence-case label, a small chevron. Every value
 // comes from the palette, not a literal.
@@ -8,15 +17,18 @@
 // ignored. The clear variant leaves the background to `--background` and honours
 // `--color`, which is what the pill needs.
 .role-pill {
-  --background: rgba(var(--ion-color-primary-rgb), 0.12);
-  --background-hover: rgba(var(--ion-color-primary-rgb), 0.2);
-  --background-activated: rgba(var(--ion-color-primary-rgb), 0.24);
+  // The honey capsule token: see-through honey in light, the opaque honey
+  // wash in dark, where see-through honey over navy read as grey. Pressed,
+  // Ionic fades a clear button, so the fill stays the same.
+  --background: var(--mh-color-honey-tint);
+  --background-hover: var(--mh-color-honey-tint);
+  --background-activated: var(--mh-color-honey-tint);
   // Text colour, not amber: amber on an amber tint fails AA, and it flips with
   // the palette so the pill still reads in dark mode.
   --color: var(--ion-text-color);
   // Reads as tappable: a hairline in the accent ink, through the button's own
   // border variables — the same treatment as the active filter chip.
-  --border-width: 1px;
+  --border-width: var(--mh-hairline);
   --border-style: solid;
   --border-color: var(--mh-color-honey-deep);
   // The tile hugs the start cap like a chip's avatar; the text keeps its inset.
@@ -49,14 +61,17 @@
   }
 }
 
-// The two skeleton stat tiles, side by side — same row the real dashboard
-// builds (see coach-home).
-.tiles {
+// The bodies' own opening (greeting, then the hive card), on the same
+// gutter and gap, while the session says which body to show.
+.body-skeleton {
   display: flex;
-  gap: 0.625rem;
+  flex-direction: column;
+  gap: var(--mh-block-gap);
+  padding: var(--mh-page-rhythm) var(--mh-row-gutter);
+}
 
-  ion-card {
-    flex: 1 1 0;
-    min-width: 0;
-  }
+.card-skeleton {
+  height: 12.5rem;
+  margin: 0;
+  border-radius: var(--mh-radius-card);
 }

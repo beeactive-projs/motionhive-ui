@@ -7,20 +7,39 @@
   margin-bottom: 0.5rem;
 }
 
-/* "n of m spots" — the quiet third line; the full chip replaces it. */
+/* Two lines for the title at most, words whole: kept to one, a Romanian
+   title at 130% text came down to its first word ("Alergare u..."). The
+   meta line ellipses in the shared skin. */
+ion-label h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* "n of m spots": the quiet third line; the full chip replaces it. */
 .spots {
   margin: 0.25rem 0 0;
+  overflow: hidden;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* The two-line mono price block where other rows keep their chevron:
-   amount over the currency code, "Free" in emerald. */
+/* The two-line price block where other rows keep their chevron: amount
+   over the currency code, "Free" in the success ink. */
 .price {
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: flex-end;
+  margin-inline-start: 0.5rem;
 }
 
 .price .amount {
@@ -30,7 +49,9 @@
 }
 
 .price .amount.free {
-  color: var(--ion-color-success);
+  /* The wash's ink, not the slot: emerald 500 on the slate card was 2.3:1,
+     emerald 700 is over 4.5:1 there (and emerald 200 on the navy card). */
+  color: var(--ion-color-success-wash-contrast);
 }
 
 .price .currency {

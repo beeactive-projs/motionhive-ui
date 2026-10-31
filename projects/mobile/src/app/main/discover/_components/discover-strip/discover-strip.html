@@ -1,0 +1,36 @@
+<div class="strip" role="group" [attr.aria-label]="label()" [attr.aria-busy]="loading()">
+  @if (loading()) {
+    @for (_ of placeholders; track $index) {
+      <div class="item placeholder" aria-hidden="true">
+        <span class="inner">
+          <mh-hex-avatar size="lg" color="medium" tone="wash" />
+          <ion-skeleton-text [animated]="true" style="width: 3.5rem; height: 0.75rem" />
+        </span>
+      </div>
+    }
+  } @else {
+    @for (item of items(); track item.id) {
+      <ion-button
+        class="item"
+        fill="clear"
+        [disabled]="item.disabled"
+        [attr.aria-label]="itemLabel(item)"
+        (click)="select.emit(item.id)"
+      >
+        <span class="inner">
+          <mh-hex-avatar
+            size="lg"
+            aria-hidden="true"
+            [name]="item.name"
+            [imageUrl]="item.imageUrl"
+            [color]="item.tone"
+          />
+          <span class="name">{{ item.name }}</span>
+          @if (item.meta) {
+            <span class="meta">{{ item.meta }}</span>
+          }
+        </span>
+      </ion-button>
+    }
+  }
+</div>

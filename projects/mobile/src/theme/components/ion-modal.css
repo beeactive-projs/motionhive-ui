@@ -9,7 +9,7 @@ ion-modal.mh-picker-modal {
   --max-width: calc(100% - 2rem);
   --border-radius: var(--mh-radius-card);
   --background: var(--ion-card-background);
-  --box-shadow: 0 0.5rem 2.5rem rgb(var(--ion-text-color-rgb) / 0.25);
+  --box-shadow: var(--mh-shadow-overlay);
   align-items: center;
   justify-content: center;
 }
@@ -30,6 +30,22 @@ ion-modal.mh-sheet-fit {
 
 ion-modal.mh-sheet-fit .ion-page {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  /* Never past the screen: at 130% text a long fit sheet (Discover's
+     filters, in Romanian, on a 640px phone) put its header above the top.
+     It stops under the top safe area; the header, the pinned strip and the
+     footer keep their height and the body between them scrolls (it already
+     scrolls itself, sheet-shell's `.fit-body`). */
+  max-height: calc(100dvh - var(--ion-safe-area-top, 0rem) - 0.75rem);
   contain: none;
+}
+
+ion-modal.mh-sheet-fit .ion-page > * {
+  flex: none;
+}
+
+ion-modal.mh-sheet-fit .ion-page > .fit-body {
+  flex: 0 1 auto;
+  min-height: 0;
 }

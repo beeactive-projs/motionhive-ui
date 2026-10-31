@@ -99,7 +99,7 @@
       <ion-button fill="outline" expand="block" [disabled]="!canSave() || saving()" (click)="save(false)">
         {{ 'payments.create.saveDraft' | translate }}
       </ion-button>
-      <ion-button expand="block" [disabled]="!canSave() || saving()" (click)="save(true)">
+      <ion-button expand="block" color="primary" [disabled]="!canSave() || saving()" (click)="save(true)">
         {{ 'payments.create.createAndSend' | translate }}
       </ion-button>
     </div>

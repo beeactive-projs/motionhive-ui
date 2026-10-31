@@ -1,31 +1,134 @@
-.looks {
-  justify-content: center;
-  margin-bottom: 0.75rem;
+/* The chooser: the two ways side by side, as tall as their longest. */
+.ways {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mh-page-rhythm);
 }
 
-/* The card at a size you can judge it by, 9:16 like the story it becomes. */
+/* A selectable tile: its border is the selection, honey when picked. */
+.way {
+  border: var(--mh-ring-width) solid transparent;
+}
+
+.way.selected {
+  border-color: var(--ion-color-primary);
+}
+
+.way ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.way-title {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+}
+
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-tight);
+}
+
+.points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.points ion-icon {
+  flex: none;
+  color: var(--ion-color-success-shade);
+  font-size: var(--mh-icon-sm);
+}
+
+.points .no ion-icon {
+  color: var(--ion-color-medium);
+}
+
+/* The pictures at the shape they will be: 9:16, like the Story. */
+.thumb,
 .preview {
   display: grid;
   place-items: center;
-  width: 9.5rem;
-  aspect-ratio: 9 / 16;
-  margin: 0 auto 1rem;
   overflow: hidden;
+  aspect-ratio: 9 / 16;
   border-radius: var(--mh-radius-control);
-  box-shadow: 0 0 0 3px var(--ion-color-primary);
-  background: var(--mh-color-chip-idle);
+  background: var(--mh-color-divider);
 }
 
+.thumb {
+  width: 100%;
+}
+
+/* Large enough to judge, small enough to leave the choices in view. */
+.preview {
+  height: min(16rem, 36dvh);
+  margin-inline: auto;
+}
+
+.thumb img,
 .preview img {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.groups-label {
-  margin-top: 1.25rem;
+/* The three themes, each its own colour on the app's hexagon. */
+.swatches {
+  display: flex;
+  justify-content: space-around;
 }
 
-.message {
-  margin: 1rem 0 0.5rem;
+.swatch {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  --padding-top: 0.25rem;
+  --padding-bottom: 0.25rem;
+  height: auto;
+  margin: 0;
+  min-height: var(--mh-tap-target);
+  color: var(--ion-color-medium);
+}
+
+.swatch.selected {
+  color: var(--ion-text-color);
+}
+
+.swatch-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.swatch svg {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.swatch .ring {
+  fill: none;
+  stroke: var(--ion-color-primary);
+  stroke-width: 5;
+}
+
+.swatch-label {
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
+}
+
+.swatch.selected .swatch-label {
+  font-weight: 600;
 }

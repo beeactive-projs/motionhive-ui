@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -99,6 +100,7 @@ interface AgendaDay {
   selector: 'mh-sessions',
   imports: [
     EmptyState,
+    IonBackButton,
     IonButton,
     IonButtons,
     IonContent,

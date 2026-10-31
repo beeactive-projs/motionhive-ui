@@ -31,6 +31,7 @@ import {
   inRange,
   lastDoneLabel,
   logChip,
+  loggerRedirect,
   logMeta,
   logSource,
   logTone,
@@ -49,6 +50,7 @@ import {
   routineTileColor,
   secondsToClock,
   trendGeometry,
+  unbreakable,
   volumeGainPercent,
   workoutClock,
   workoutDuration,
@@ -702,5 +704,32 @@ describe('the finish summary', () => {
     expect(volumeGainPercent(5000, null)).toBeNull();
     // Under half a percent rounds to nothing worth saying.
     expect(volumeGainPercent(5020, 5000)).toBeNull();
+  });
+});
+
+describe('loggerRedirect', () => {
+  it('logs a workout that is still running', () => {
+    expect(loggerRedirect({ id: 'wl-1', status: WorkoutLogStatus.InProgress })).toBeNull();
+  });
+
+  it('sends a finished workout to its summary instead of the live logger', () => {
+    expect(loggerRedirect({ id: 'wl-1', status: WorkoutLogStatus.Completed })).toEqual([
+      '/tabs/workouts/finish',
+      'wl-1',
+    ]);
+  });
+
+  it('never offers Finish or Discard on a skipped or abandoned one either', () => {
+    for (const status of [WorkoutLogStatus.Skipped, WorkoutLogStatus.Abandoned]) {
+      expect(loggerRedirect({ id: 'wl-2', status })).toEqual(['/tabs/workouts/finish', 'wl-2']);
+    }
+  });
+});
+
+describe('unbreakable', () => {
+  it('joins a number to its unit with no-break spaces', () => {
+    expect(unbreakable('53.665 kg')).toBe('53.665\u00a0kg');
+    expect(unbreakable('1 h 30 min')).toBe('1\u00a0h\u00a030\u00a0min');
+    expect(unbreakable('18')).toBe('18');
   });
 });

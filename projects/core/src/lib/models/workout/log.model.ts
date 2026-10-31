@@ -110,6 +110,12 @@ export interface WorkoutSummary {
   previousVolumeKg: number | null;
   /** The coach whose plan it came from; null for your own training. */
   coachName?: string | null;
+  /**
+   * That coach, only when they let clients name them on a shared workout
+   * (`allowClientMentions`); null otherwise. What the Full share card's
+   * optional coach line may show.
+   */
+  mentionableCoach?: { name: string } | null;
 }
 
 export interface LoggedExercise {

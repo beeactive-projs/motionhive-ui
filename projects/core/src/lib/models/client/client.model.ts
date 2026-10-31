@@ -66,14 +66,18 @@ export interface ClientRequest {
 }
 
 /**
- * `GET /clients/requests/pending/count`. `count` is both directions;
- * `incoming` is the requests waiting on the coach's answer, `outgoing` the
- * invitations they sent. Anything that says "waiting for you" reads `incoming`.
+ * `GET /clients/requests/pending/count`, open to every account and scoped to
+ * the caller. `incoming` is trainees' requests waiting on the coach's answer,
+ * `outgoing` the invitations the coach sent, `count` those two together.
+ * `invitations` is the trainee's side: coaches inviting the caller, answered
+ * on My coaches. A coach who is also someone's client has both, which is why
+ * they are separate numbers.
  */
 export interface PendingRequestsCount {
   count: number;
   incoming: number;
   outgoing: number;
+  invitations: number;
 }
 
 export type CreateClientInvitation =

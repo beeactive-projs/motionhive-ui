@@ -1,160 +1,188 @@
-<div class="ion-padding-horizontal ion-padding-top">
+<!--
+  Calm: the greeting, then three blocks at most (the week, Your hive,
+  Latest). Lists are flat rows on the page, no grey cards around them; the
+  week card is the one card. A small Today row joins only on a day with a
+  booking.
+-->
+<div class="greeting">
+  <ion-note class="mh-kicker" color="medium">{{ dateLine() }}</ion-note>
   <h1>{{ greeting() }}</h1>
-  <ion-text color="medium">
-    <p>{{ 'home.train.intro' | translate }}</p>
-  </ion-text>
 </div>
 
 <!--
-  Today's workout — absent entirely when nothing is in progress, no placeholder.
-  Navy card so the one thing you came here to do is the darkest object on the
-  screen, with the honey button as its single action.
+  The week: a cell per day, honey where you trained, a fuller cell where the
+  plan asks for one, today ringed, a light for a record. One headline, one
+  line under it, and the day's workout in the same card with the screen's
+  one honey button, because it is the one thing you came here to do.
 -->
-@if (store.resume(); as log) {
-  <ion-card color="secondary">
-    <ion-card-header>
-      <ion-card-subtitle color="primary">{{ 'home.train.resume.kicker' | translate }}</ion-card-subtitle>
-      <ion-card-title>{{ log.name }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-button expand="block" (click)="resumeWorkout()">
-        {{ 'home.train.resume.button' | translate }}
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-}
+<div class="hive-wrap">
+  <div class="hive-card train">
+    @if (!store.weekLoaded()) {
+      <div class="hive-row">
+        <ion-skeleton-text class="comb-skeleton" [animated]="true" />
+        <div class="hive-copy">
+          <ion-skeleton-text [animated]="true" style="width: 50%; height: 0.625rem" />
+          <ion-skeleton-text [animated]="true" style="width: 80%; height: 1.25rem" />
+          <ion-skeleton-text [animated]="true" style="width: 90%" />
+        </div>
+      </div>
+    } @else {
+      <div class="hive-row">
+        <mh-hive [cells]="cells()" [label]="weekLabel()" />
+        <div class="hive-copy">
+          <p class="hive-kicker">{{ 'home.train.week.kicker' | translate }}</p>
+          <h2 class="hive-title">{{ weekTitle() }}</h2>
+          @if (weekSub(); as sub) {
+            <p class="hive-sub" [class.one-line]="weekSubIsStatus()">{{ sub }}</p>
+          }
+        </div>
+      </div>
 
-<!-- 4a: present only while a bill is open. When nothing is due, payments
-     vanish from Home rather than sitting here saying zero. -->
-@if (store.hasBillDue()) {
-  <ion-list>
-    <ion-item button [detail]="true" class="bill-due" (click)="openBilling()">
-      <ion-icon slot="start" name="card-outline" color="primary" aria-hidden="true" />
-      <ion-label class="ion-text-wrap">
-        <h2>{{ 'home.train.billDue.title' | translate: { count: store.openInvoices() } }}</h2>
-        <p>{{ 'home.train.billDue.hint' | translate }}</p>
+      <!-- An open session outranks the plan; then the plan's next day; with
+           nothing left on the plan this week, a workout of your own. -->
+      @if (store.inProgress(); as log) {
+        <div class="next">
+          <div class="next-copy">
+            <p class="hive-kicker">{{ 'home.train.today.inProgress' | translate }}</p>
+            <h3>{{ log.name }}</h3>
+          </div>
+          <ion-button shape="round" (click)="resume()">
+            {{ 'button.continue' | translate }}
+          </ion-button>
+        </div>
+      } @else if (store.nextWorkout(); as next) {
+        <div class="next">
+          <div class="next-copy">
+            <p class="hive-kicker">{{ nextKicker() }}</p>
+            <h3>{{ next.workout.name }}</h3>
+            @if (nextMeta(); as meta) {
+              <p class="hive-sub">{{ meta }}</p>
+            }
+          </div>
+          <ion-button shape="round" (click)="openNext()">
+            {{ 'button.start' | translate }}
+          </ion-button>
+        </div>
+      } @else {
+        <ion-button expand="block" (click)="startEmpty()">
+          <ion-icon slot="start" name="play-outline" aria-hidden="true" />
+          {{ 'home.train.today.startWorkout' | translate }}
+        </ion-button>
+      }
+    }
+  </div>
+</div>
+
+<!-- A session booked for today, only on a day that has one: one small row. -->
+@if (todayFirst(); as first) {
+  <ion-list class="mh-flat-list today-row">
+    <ion-item button detail="false" (click)="openToday()">
+      <mh-hex-avatar slot="start" size="sm" color="info" tone="shade" icon="calendar-outline" />
+      <ion-label>
+        <div class="mh-row-line">
+          <h2>
+            <span class="today-label">{{ 'time.today' | translate }}</span>
+            · {{ first.instance?.template?.title }}
+          </h2>
+          <ion-note>
+            {{ first.instance?.startAt | date: 'HH:mm' }}
+            @if (todayMore()) {
+              · {{ 'home.today.more' | translate: { count: todayMore() } }}
+            }
+          </ion-note>
+        </div>
       </ion-label>
     </ion-item>
   </ion-list>
 }
 
-<ion-list>
-  <ion-item button [detail]="true" (click)="openSessions()">
-    <ion-icon slot="start" name="calendar-outline" color="primary" aria-hidden="true" />
-    @if (store.sessionsLoading()) {
-      <ion-label>
-        <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
-        <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
-      </ion-label>
-    } @else {
-      <ion-label class="ion-text-wrap">
-        <h2>{{ sessionsSummary() }}</h2>
-        <p>{{ sessionsHint() }}</p>
-      </ion-label>
-    }
-  </ion-item>
-</ion-list>
-
-@if (store.showSteps()) {
-  <ion-list>
-    <mh-section-header
-      [eyebrow]="'home.train.steps.eyebrow' | translate"
-      [title]="'home.train.steps.title' | translate"
-    />
-    @for (step of store.steps(); track step.id) {
-      <ion-item
-        [button]="!step.done"
-        [detail]="!step.done"
-        [disabled]="step.done"
-        (click)="openStep(step)"
-      >
-        @if (step.done) {
-          <ion-icon slot="start" name="checkmark-circle" color="success" aria-hidden="true" />
-        } @else {
-          <ion-icon slot="start" name="sparkles-outline" color="primary" aria-hidden="true" />
-        }
+<!-- The people who notice you show up: your coaches and your groups. -->
+@if (members().length) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.train.hive.title' | translate }}</h2>
+    </div>
+    <div class="members" role="group" [attr.aria-label]="'home.train.hive.title' | translate">
+      @for (member of members(); track member.key) {
+        <ion-button
+          class="member"
+          fill="clear"
+          [attr.aria-label]="member.name + ', ' + member.caption"
+          (click)="member.open()"
+        >
+          <span class="member-inner">
+            <mh-hex-avatar
+              size="lg"
+              aria-hidden="true"
+              [name]="member.name"
+              [imageUrl]="member.imageUrl"
+              [color]="member.color"
+            />
+            <span class="member-name">{{ member.shortName }}</span>
+          </span>
+        </ion-button>
+      }
+      <ion-button class="member" fill="clear" (click)="addToHive()">
+        <span class="member-inner">
+          <mh-hex-avatar
+            size="lg"
+            color="medium"
+            tone="wash"
+            icon="add-outline"
+            aria-hidden="true"
+          />
+          <span class="member-name">{{ 'button.add' | translate }}</span>
+        </span>
+      </ion-button>
+    </div>
+  </section>
+} @else if (showBuildHive()) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.train.build.title' | translate }}</h2>
+    </div>
+    <ion-list class="mh-flat-list">
+      <ion-item button detail="false" (click)="findCoach()">
+        <mh-hex-avatar
+          slot="start"
+          size="lg"
+          color="violet"
+          tone="wash"
+          icon="person-add-outline"
+        />
         <ion-label>
-          <h2>{{ step.title }}</h2>
-          <p>{{ step.sub }}</p>
+          <h2>{{ 'home.train.build.coach.title' | translate }}</h2>
+          <p>{{ 'home.train.build.coach.detail' | translate }}</p>
         </ion-label>
       </ion-item>
-    }
-  </ion-list>
+      <ion-item button detail="false" (click)="findGroup()">
+        <mh-hex-avatar slot="start" size="lg" color="teal" tone="wash" icon="people-outline" />
+        <ion-label>
+          <h2>{{ 'home.train.build.group.title' | translate }}</h2>
+          <p>{{ 'home.train.build.group.detail' | translate }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </section>
 }
 
-<ion-list>
-  <mh-section-header
-    [title]="(store.hasOwnCoaches() ? 'home.train.coaches.titleOwn' : 'home.train.coaches.titleSuggested') | translate"
-    [linkLabel]="(store.hasOwnCoaches() ? 'button.seeAll' : 'home.train.coaches.discoverMore') | translate"
-    (linkClick)="openCoaches()"
-  />
-
-  @if (store.coachesLoading()) {
-    @for (_ of [1, 2, 3]; track $index) {
-      <ion-item>
-        <ion-skeleton-text slot="start" [animated]="true" style="width: 2.5rem; height: 2.25rem" />
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 65%" /></p>
-        </ion-label>
-      </ion-item>
-    }
-  } @else if (store.coaches().length === 0) {
-    <mh-empty-state
-      icon="sparkles-outline"
-      [heading]="'home.train.coaches.empty.heading' | translate"
-      [message]="'home.train.coaches.empty.message' | translate"
-    />
-  } @else {
-    @for (coach of store.coaches(); track coach.key) {
-      <ion-item button [detail]="true" (click)="openCoaches()">
-        <mh-hex-avatar slot="start" [name]="coach.name" [imageUrl]="coach.avatarUrl" />
-        <ion-label>
-          <h2>{{ coach.name }}</h2>
-          <p>{{ coach.tag }}</p>
-        </ion-label>
-      </ion-item>
-    }
-    @if (!store.hasOwnCoaches()) {
-      <ion-item lines="none">
-        <ion-note>{{ 'home.train.coaches.moreSoon' | translate }}</ion-note>
-      </ion-item>
-    }
-  }
-</ion-list>
-
-<ion-list>
-  <mh-section-header
-    [eyebrow]="'home.train.posts.eyebrow' | translate"
-    [title]="'home.train.posts.title' | translate"
-    [linkLabel]="'home.train.posts.readAll' | translate"
-    (linkClick)="openBlog()"
-  />
-
-  @if (store.postsLoading()) {
-    @for (_ of [1, 2, 3]; track $index) {
-      <ion-item>
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 80%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 50%" /></p>
-        </ion-label>
-      </ion-item>
-    }
-  } @else if (store.posts().length === 0) {
-    <ion-card>
-      <ion-card-content>
-        {{ 'home.train.posts.empty' | translate }}
-      </ion-card-content>
-    </ion-card>
-  } @else {
-    @for (post of store.posts(); track post.id) {
-      <ion-item button [detail]="true" (click)="openPost(post)">
-        <ion-label class="ion-text-wrap">
-          <ion-note color="primary">{{ post.category }}</ion-note>
-          <h2>{{ post.title }}</h2>
-          <p>{{ 'home.train.posts.byline' | translate: { author: post.authorName, minutes: post.readTime } }}</p>
-        </ion-label>
-      </ion-item>
-    }
-  }
-</ion-list>
+<!--
+  What happened: your groups' posts and your own records, everything from
+  the last 24 hours (up to ten) or the latest three on a quiet day. Each
+  opens in this stack.
+-->
+@if (latest().length) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.latest.title' | translate }}</h2>
+      <ion-button fill="clear" (click)="openLatest()">
+        {{ 'button.seeAll' | translate }}
+      </ion-button>
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (row of latest(); track row.id) {
+        <mh-latest-row [row]="row" (select)="openRow(row)" />
+      }
+    </ion-list>
+  </section>
+}

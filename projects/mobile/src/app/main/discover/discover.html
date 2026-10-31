@@ -1,6 +1,7 @@
 @if (searchOpen()) {
   <!-- Search owns the toolbar: the page header yields entirely, exactly the
-       Messages pattern. -->
+       Messages pattern. Named, because a searchbar with only a placeholder
+       announces itself as Ionic's default "search text". -->
   <ion-header [translucent]="true">
     <ion-toolbar>
       <ion-searchbar
@@ -8,6 +9,7 @@
         clearIcon="close-outline"
         mhAutofocus
         [placeholder]="'discover.search.placeholder' | translate"
+        [attr.aria-label]="'discover.search.placeholder' | translate"
         inputmode="search"
         [debounce]="0"
         [value]="search.query()"
@@ -19,11 +21,9 @@
     </ion-toolbar>
   </ion-header>
 } @else {
+  <!-- A tab root: no back button. -->
   <ion-header [translucent]="true">
     <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/more" />
-      </ion-buttons>
       <ion-title>{{ 'nav.discover' | translate }}</ion-title>
       <ion-buttons slot="end">
         <ion-button [attr.aria-label]="'discover.search.placeholder' | translate" (click)="openSearch()">
@@ -42,222 +42,192 @@
       <ion-refresher-content />
     </ion-refresher>
 
-    <!-- Brand hero — scrolls away with the content; the page name stays
-         in the toolbar like every other tab root. -->
-    <div class="lead">
-      <div class="hero">
-        <h1>{{ 'discover.hero.title' | translate }}</h1>
-        <div class="hero-hexes" aria-hidden="true">
-          <mh-hex-avatar size="dot" color="coral" />
-          <mh-hex-avatar size="sm" color="primary" />
-          <mh-hex-avatar size="dot" color="teal" />
-        </div>
-      </div>
-      <ion-button class="search-entry" expand="block" (click)="openSearch()">
-        <ion-icon slot="start" name="search-outline" aria-hidden="true" />
-        {{ 'discover.search.placeholder' | translate }}
-      </ion-button>
-    </div>
-
-    <!-- "Taking new clients" rail. Hidden entirely on error or when nobody
-         has the door open — an empty rail is a claim about the catalogue. -->
-    @if (coachesStore.loading() && !coachesStore.loaded()) {
-      <div class="rail-head">
-        <span class="mh-kicker">{{ 'discover.rail.title' | translate }}</span>
-      </div>
-      <div class="rail">
-        @for (_ of railSkeleton; track $index) {
-          <div class="rail-item">
-            <mh-hex-avatar size="lg" color="medium" tone="wash" />
-            <ion-skeleton-text
-              [animated]="true"
-              style="width: 3rem; height: 0.625rem"
-            />
+    <div class="mh-page discover">
+      <!-- The greeting of this tab: scrolls away with the content, the page
+           name stays in the toolbar like every other tab root. -->
+      <div class="lead">
+        <div class="hero">
+          <h1>{{ 'discover.hero.title' | translate }}</h1>
+          <div class="hero-hexes" aria-hidden="true">
+            <mh-hex-avatar size="dot" color="coral" />
+            <mh-hex-avatar size="sm" color="primary" />
+            <mh-hex-avatar size="dot" color="teal" />
           </div>
-        }
-      </div>
-    } @else if (coachesStore.acceptingCoaches().length > 0) {
-      <div class="rail-head">
-        <span class="mh-kicker">{{ 'discover.rail.title' | translate }}</span>
-        <ion-button class="rail-link" fill="clear" size="small" (click)="openAllCoaches()">
-          {{ 'discover.rail.allCoaches' | translate }}
+        </div>
+        <!-- The field-look entry. A real field would imply typing happens
+             here; the tap hands over to the search header instead. -->
+        <ion-button class="search-entry" expand="block" (click)="openSearch()">
+          <ion-icon slot="start" name="search-outline" aria-hidden="true" />
+          <span class="search-entry-label">{{ 'discover.search.placeholder' | translate }}</span>
         </ion-button>
       </div>
-      <div class="rail">
-        @for (coach of coachesStore.acceptingCoaches(); track coach.id) {
-          <button
-            type="button"
-            class="rail-item"
-            [disabled]="!coach.handle"
-            (click)="openCoach(coach)"
+
+      <!-- Coaches taking clients. Hidden on error or when nobody has the
+           door open: an empty strip is a claim about the catalogue. -->
+      @if (coachesStore.loading() && !coachesStore.loaded()) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <h2 class="mh-kicker">{{ 'discover.rail.title' | translate }}</h2>
+          </div>
+          <mh-discover-strip [label]="'discover.rail.title' | translate" [loading]="true" />
+        </section>
+      } @else if (coachItems().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <h2 class="mh-kicker">{{ 'discover.rail.title' | translate }}</h2>
+            <ion-button fill="clear" size="small" (click)="openAllCoaches()">
+              {{ 'discover.rail.allCoaches' | translate }}
+            </ion-button>
+          </div>
+          <mh-discover-strip
+            [label]="'discover.rail.title' | translate"
+            [items]="coachItems()"
+            (select)="openCoachById($event)"
+          />
+        </section>
+      }
+
+      <!-- Groups to join: public groups the reader is not in yet, so there
+           is somewhere to go besides a coach. Hidden while empty or failing,
+           like the coaches. -->
+      @if (groupsStore.loading() && !groupsStore.loaded()) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <h2 class="mh-kicker">{{ 'discover.groupsRail.title' | translate }}</h2>
+          </div>
+          <mh-discover-strip [label]="'discover.groupsRail.title' | translate" [loading]="true" />
+        </section>
+      } @else if (groupItems().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <h2 class="mh-kicker">{{ 'discover.groupsRail.title' | translate }}</h2>
+            <ion-button fill="clear" size="small" (click)="openAllGroups()">
+              {{ 'discover.groupsRail.all' | translate }}
+            </ion-button>
+          </div>
+          <mh-discover-strip
+            [label]="'discover.groupsRail.title' | translate"
+            [items]="groupItems()"
+            (select)="openGroup($event)"
+          />
+        </section>
+      }
+
+      <!-- What is coming up: quick filters, then the sessions by day. -->
+      <section class="mh-section feed">
+        <div class="mh-section-head">
+          <h2 class="mh-kicker">{{ 'discover.feed.title' | translate }}</h2>
+        </div>
+        <div class="mh-chip-row" role="group" [attr.aria-label]="'discover.filterSheet.title' | translate">
+          @for (chip of quickFilters; track chip.id) {
+            <!-- `ion-button`, not `ion-chip`: the chip has no role, so a
+                 screen reader reads it as text and never says which is on. -->
+            <ion-button
+              class="chip"
+              fill="clear"
+              shape="round"
+              size="small"
+              [class.selected]="isQuickSelected(chip.id)"
+              [attr.aria-pressed]="isQuickSelected(chip.id)"
+              (click)="onQuickFilter(chip.id)"
+            >
+              {{ chip.label }}
+            </ion-button>
+          }
+          <ion-button
+            class="filters"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.active]="datesActive()"
+            (click)="openFilters()"
           >
-            <mh-hex-avatar
-              size="lg"
-              [name]="railName(coach)"
-              [imageUrl]="coach.avatarUrl"
-              [color]="railTone(coach)"
-            />
-            <span class="rail-name">{{ railName(coach) }}</span>
-            @if (coach.city) {
-              <span class="rail-city">{{ coach.city }}</span>
-            }
-          </button>
-        }
-        <button type="button" class="rail-item" (click)="openAllCoaches()">
-          <mh-hex-avatar size="lg" icon="chevron-forward-outline" color="medium" tone="wash" />
-          <span class="rail-name muted">{{ 'discover.rail.allCoaches' | translate }}</span>
-        </button>
-      </div>
-    }
-
-    <!-- Groups to join: public groups the reader is not in yet, so there is
-         somewhere to go besides a coach. Hidden while empty or failing, like
-         the coaches rail; the full list is Groups' own Discover lens. -->
-    @if (groupsStore.groups().length > 0) {
-      <div class="rail-head">
-        <span class="mh-kicker">{{ 'discover.groupsRail.title' | translate }}</span>
-        <ion-button class="rail-link" fill="clear" size="small" (click)="openAllGroups()">
-          {{ 'discover.groupsRail.all' | translate }}
-        </ion-button>
-      </div>
-      <div class="rail">
-        @for (group of groupsStore.groups(); track group.id) {
-          <button type="button" class="rail-item" (click)="openGroup(group)">
-            <mh-hex-avatar
-              size="lg"
-              [name]="group.name"
-              [imageUrl]="group.logoUrl"
-              [color]="groupTone(group)"
-            />
-            <span class="rail-name">{{ group.name }}</span>
-            @if (group.city) {
-              <span class="rail-city">{{ group.city }}</span>
-            }
-          </button>
-        }
-        <button type="button" class="rail-item" (click)="openAllGroups()">
-          <mh-hex-avatar size="lg" icon="chevron-forward-outline" color="medium" tone="wash" />
-          <span class="rail-name muted">{{ 'discover.groupsRail.all' | translate }}</span>
-        </button>
-      </div>
-    }
-
-    <!-- The feed: quick filters, then chronological buckets. -->
-    <div class="feed-head">
-      <span class="mh-kicker">{{ 'discover.feed.title' | translate }}</span>
-    </div>
-    <div class="mh-chip-row">
-      @for (chip of quickFilters; track chip.id) {
-        <ion-chip
-          [class.selected]="isQuickSelected(chip.id)"
-          [attr.aria-pressed]="isQuickSelected(chip.id)"
-          (click)="onQuickFilter(chip.id)"
-        >
-          {{ chip.label }}
-        </ion-chip>
-      }
-      <ion-button
-        class="filters"
-        fill="clear"
-        shape="round"
-        size="small"
-        [class.active]="datesActive()"
-        (click)="openFilters()"
-      >
-        <ion-icon slot="start" name="calendar-outline" aria-hidden="true" />
-        {{ 'discover.feed.dates' | translate }}
-      </ion-button>
-    </div>
-
-    @if (showLoadError()) {
-      <mh-empty-state
-        icon="alert-circle-outline"
-        [heading]="'discover.feed.loadError' | translate"
-        [message]="'error.checkConnection' | translate"
-        [actionLabel]="'button.tryAgain' | translate"
-        (action)="retry()"
-      />
-    } @else if (showSkeleton()) {
-      <!-- Mirrors the discover row shape so nothing shifts when data lands. -->
-      <div class="agenda">
-        <div class="mh-day-header">
-          <span class="mh-kicker">
-            <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
-          </span>
+            <ion-icon slot="start" name="calendar-outline" aria-hidden="true" />
+            {{ 'discover.feed.dates' | translate }}
+          </ion-button>
         </div>
-        @for (_ of skeletonRows; track $index) {
-          <mh-session-row-skeleton />
-        }
-      </div>
-    } @else if (isEmpty()) {
-      @if (hasActiveFilters()) {
-        <mh-empty-state
-          icon="calendar-outline"
-          [heading]="'empty.nothingMatches' | translate"
-          [message]="'discover.feed.noMatches' | translate"
-          [actionLabel]="'button.clearFilters' | translate"
-          (action)="clearFilters()"
-        />
-      } @else {
-        <mh-empty-state
-          icon="compass-outline"
-          [heading]="'discover.feed.empty.heading' | translate"
-          [message]="'discover.feed.empty.message' | translate"
-        />
-      }
-    } @else {
-      <div class="agenda">
-        @for (day of days(); track day.bucket.key) {
-          <div class="mh-day-header" [class.today]="isToday(day)">
-            <span class="mh-kicker">{{ day.bucket.label }}</span>
+
+        @if (showLoadError()) {
+          <mh-empty-state
+            icon="alert-circle-outline"
+            [heading]="'discover.feed.loadError' | translate"
+            [message]="'error.checkConnection' | translate"
+            [actionLabel]="'button.tryAgain' | translate"
+            (action)="retry()"
+          />
+        } @else if (showSkeleton()) {
+          <!-- Mirrors the discover row shape so nothing shifts when data lands. -->
+          <div class="agenda" aria-busy="true">
+            <div class="mh-day-header">
+              <span class="mh-kicker">
+                <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
+              </span>
+            </div>
+            @for (_ of skeletonRows; track $index) {
+              <mh-session-row-skeleton />
+            }
           </div>
-          @for (instance of day.items; track instance.id) {
-            <mh-discover-session-row
-              [instance]="instance"
-              [booked]="isBooked(instance)"
-              (select)="openSession(instance)"
+        } @else if (isEmpty()) {
+          @if (hasActiveFilters()) {
+            <mh-empty-state
+              icon="calendar-outline"
+              [heading]="'empty.nothingMatches' | translate"
+              [message]="'discover.feed.noMatches' | translate"
+              [actionLabel]="'button.clearFilters' | translate"
+              (action)="clearFilters()"
+            />
+          } @else {
+            <mh-empty-state
+              icon="compass-outline"
+              [heading]="'discover.feed.empty.heading' | translate"
+              [message]="'discover.feed.empty.message' | translate"
             />
           }
-        }
+        } @else {
+          <div class="agenda">
+            @for (day of days(); track day.bucket.key) {
+              <!-- One block per day, so its header lets go when the day ends. -->
+              <div class="day">
+                <div class="mh-day-header" [class.today]="isToday(day)">
+                  <span class="mh-kicker">{{ day.bucket.label }}</span>
+                </div>
+                @for (instance of day.items; track instance.id) {
+                  <mh-discover-session-row
+                    [instance]="instance"
+                    [booked]="isBooked(instance)"
+                    (select)="openSession(instance)"
+                  />
+                }
+              </div>
+            }
+          </div>
 
-        <ion-infinite-scroll [disabled]="!sessionsStore.hasMore()" (ionInfinite)="onLoadMore($event)">
-          <ion-infinite-scroll-content />
-        </ion-infinite-scroll>
-      </div>
-    }
-  } @else {
-    <!-- Search takeover states: too short → searching → error → empty → results. -->
-    @if (!search.isActive()) {
-      <div class="search-hint">
-        <ion-icon name="search-outline" aria-hidden="true" />
-        <p>{{ 'discover.search.hint' | translate }}</p>
-      </div>
-    } @else if (search.isSearching()) {
-      <!-- Skeletons mirror the real row geometry — the frame of the answer
-           arrives before the answer. -->
-      <div class="search-results">
-        <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
-        <ion-item lines="none" class="coach-skeleton mh-list-row">
-          <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-          </ion-label>
-        </ion-item>
-        <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
-        <ion-list [inset]="true" class="mh-card-list">
-          <ion-item>
-            <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-            <ion-label>
-              <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
-              <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-        <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
-        @for (_ of [1, 2]; track $index) {
-          <mh-session-row-skeleton />
+          <ion-infinite-scroll [disabled]="!sessionsStore.hasMore()" (ionInfinite)="onLoadMore($event)">
+            <ion-infinite-scroll-content />
+          </ion-infinite-scroll>
         }
+      </section>
+    </div>
+  } @else {
+    <!-- Search: a note before the first answer is possible, placeholders until
+         it arrives, then grouped flat lists (a later keystroke keeps the last
+         answer up until the next one replaces it). -->
+    @if (!search.isActive()) {
+      <p class="mh-note-block search-note">{{ 'discover.search.hint' | translate }}</p>
+    } @else if (search.isSearching() && !hasSearchHits()) {
+      <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
+      <ion-list class="mh-flat-list" aria-busy="true">
+        <mh-row-skeleton [index]="0" />
+        <mh-row-skeleton [index]="1" />
+      </ion-list>
+      <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
+      <ion-list class="mh-flat-list" aria-busy="true">
+        <mh-row-skeleton [index]="2" />
+      </ion-list>
+      <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
+      <div class="search-sessions" aria-busy="true">
+        <mh-session-row-skeleton />
+        <mh-session-row-skeleton />
       </div>
     } @else if (search.hasError()) {
       <mh-empty-state
@@ -274,36 +244,25 @@
         (action)="clearSearch()"
       />
     } @else {
-      <div class="search-results">
-        @if (search.coaches().length > 0) {
-          <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
+      @if (search.coaches().length > 0) {
+        <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
+        <ion-list class="mh-flat-list">
           @for (coach of search.coaches(); track coach.id) {
             <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
           }
-        }
-        @if (search.groups().length > 0) {
-          <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
-          <ion-list [inset]="true" class="mh-card-list">
-            @for (group of search.groups(); track group.id) {
-              <ion-item button [detail]="true" (click)="openGroup(group)">
-                <mh-hex-avatar
-                  slot="start"
-                  size="md"
-                  aria-hidden="true"
-                  [name]="group.name"
-                  [imageUrl]="group.logoUrl"
-                  [color]="groupTone(group)"
-                />
-                <ion-label>
-                  <h2>{{ group.name }}</h2>
-                  <p>{{ groupMeta(group) }}</p>
-                </ion-label>
-              </ion-item>
-            }
-          </ion-list>
-        }
-        @if (search.sessions().length > 0) {
-          <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
+        </ion-list>
+      }
+      @if (search.groups().length > 0) {
+        <div class="mh-section-label">{{ 'discover.search.groups' | translate }}</div>
+        <ion-list class="mh-flat-list">
+          @for (group of search.groups(); track group.id) {
+            <mh-discover-group-row [group]="group" (select)="openGroup(group.id)" />
+          }
+        </ion-list>
+      }
+      @if (search.sessions().length > 0) {
+        <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
+        <div class="search-sessions">
           @for (instance of search.sessions(); track instance.id) {
             <mh-discover-session-row
               [instance]="instance"
@@ -311,8 +270,8 @@
               (select)="openSession(instance)"
             />
           }
-        }
-      </div>
+        </div>
+      }
     }
   }
 </ion-content>

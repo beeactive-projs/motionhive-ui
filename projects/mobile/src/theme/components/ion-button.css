@@ -61,7 +61,7 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
    label. It must stay `fill="clear"` — a solid button in a toolbar is styled
    as an inverted chip and would ignore `--color`. */
 .mh-chip-row .filters {
-  --background: rgba(var(--ion-color-primary-rgb), 0.12);
+  --background: var(--mh-color-honey-tint);
   --background-hover: rgba(var(--ion-color-primary-rgb), 0.2);
   --background-activated: rgba(var(--ion-color-primary-rgb), 0.24);
   /* Text colour, not amber: amber on an amber tint fails AA, and it flips
@@ -152,6 +152,23 @@ ion-button.mh-day-chip ion-icon {
   text-transform: none;
 }
 
+/* Every button in a chip strip or cloud (the chips, the Filters trigger, the
+   calendar and Today pills) stays a 2rem pill to the eye but takes a
+   finger's 44px: an invisible box grows past the pill, never the pill. The
+   strip's own block padding (0.625rem, layout.css) is wider than the
+   overhang, so its sideways scroll does not clip it; wrapped rows are spaced
+   so two rows' boxes meet without overlapping (layout.css). */
+:is(.mh-chip-row, .mh-chip-cloud) ion-button {
+  position: relative;
+  min-width: var(--mh-tap-target);
+}
+
+:is(.mh-chip-row, .mh-chip-cloud) ion-button::after {
+  content: '';
+  position: absolute;
+  inset: calc((2rem - var(--mh-tap-target)) / 2) 0;
+}
+
 /* A class, not `[aria-pressed='true']`: Ionic moves aria attributes off the
    host onto its shadow `<button>`, where no selector out here can reach them
    — so styling on the attribute left the selected chip with no fill at all.
@@ -191,6 +208,7 @@ ion-item ion-button.mh-row-action {
   --padding-start: 1rem;
   --padding-end: 1rem;
   --box-shadow: none;
+  position: relative;
   height: 2rem;
   min-height: 0;
   margin: 0;
@@ -198,6 +216,16 @@ ion-item ion-button.mh-row-action {
   font-size: var(--mh-text-sm);
   font-weight: 600;
   letter-spacing: normal;
+}
+
+/* …and a finger's 44px to press it by: an invisible box past the capsule,
+   inside the row's own padding (a 3rem row has 0.5rem to spare above and
+   below). Wider too, should a short verb make the capsule narrower. */
+ion-item ion-button.mh-row-action::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--mh-tap-target) - 2rem) / -2);
+  inset-inline: min(0rem, calc((var(--mh-tap-target) - 100%) / -2));
 }
 
 /* The same fix for a clear button used as a text link on a page ("Forgot

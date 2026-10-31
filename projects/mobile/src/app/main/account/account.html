@@ -20,6 +20,17 @@
       <ion-skeleton-text [animated]="true" style="width: 35%" />
     </div>
     } @else {
+    <!-- A failed load says so in place of the hero, with a retry, and the
+         settings stay: sign out must never depend on the profile loading. -->
+    @if (store.loadFailed() && !account()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'account.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="store.refresh()"
+    />
+    } @else {
     <!-- Hero -->
     <div class="hero">
       <button type="button" class="hero-avatar" [attr.aria-label]="'account.hero.changePhoto' | translate" (click)="photoSheetOpen.set(true)">
@@ -59,6 +70,7 @@
         </ion-button>
       </div>
     </div>
+    }
 
     <!-- Profile -->
     <section class="mh-section">

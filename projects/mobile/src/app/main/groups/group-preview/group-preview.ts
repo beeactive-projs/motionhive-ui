@@ -1,8 +1,9 @@
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonChip,
@@ -26,8 +27,9 @@ import { GroupsRefreshService, SelfJoinResult } from 'core';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { ProfileStacks, groupLinks } from '../../../_shared/utils/stack-paths';
-import { JoinActions, joinPolicyLabel, joinPolicyTone } from '../groups.config';
+import { GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
+import { groupLinks } from '../../../_shared/utils/stack-paths';
+import { JoinActions, joinPolicyLabel, joinPolicyTone, previewBackLabel } from '../groups.config';
 import { GROUP_ICONS } from '../groups.icons';
 import { GroupPreviewStore } from './group-preview.store';
 
@@ -44,6 +46,7 @@ import { GroupPreviewStore } from './group-preview.store';
     EmptyState,
     HexAvatar,
     IonBackButton,
+    IonBadge,
     IonButton,
     IonButtons,
     IonChip,
@@ -70,17 +73,17 @@ export class GroupPreview {
   private readonly _router = inject(Router);
 
   /**
-   * Mounted under Groups, under Discover (its rail and search) and beside a
-   * profile. Back on a cold load, and the label beside the arrow, follow
-   * whichever one this is.
+   * Mounted under Groups, under Discover (its rail, its search and its list
+   * of every group) and beside a profile. Back on a cold load follows the
+   * stack; the label beside the arrow names the screen back returns to,
+   * read off the page that was open before (`previewBackLabel`).
    */
   private readonly _links = groupLinks(this._router.url);
   readonly backHref = this._links.home;
-  readonly backLabel = this._router.url.startsWith(ProfileStacks.Discover)
-    ? 'nav.discover'
-    : this._links.inGroupsTab
-      ? 'nav.groups'
-      : 'button.back';
+  readonly backLabel = previewBackLabel(
+    this._router.url,
+    untracked(() => this._router.currentNavigation()?.previousNavigation?.finalUrl?.toString() ?? null),
+  );
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
@@ -88,6 +91,7 @@ export class GroupPreview {
 
   readonly Actions = JoinActions;
   readonly skeletonRows = [1, 2, 3];
+  readonly groupTone = GROUP_AVATAR_TONE;
 
   readonly joining = signal(false);
 

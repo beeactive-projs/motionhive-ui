@@ -11,6 +11,8 @@ import { JoinCta, joinCta } from '../groups.config';
  *
  * It reads `GET /groups/:id/public`, not `GET /groups/:id` — the latter is
  * members-only and 403s, which is exactly what a Discover tap used to hit.
+ * Whether the reader is already in comes from their own groups (`GET
+ * /groups`), so a non-member never sends the members-only read at all.
  *
  * Whether there is already a request pending is a second call, because the
  * public profile does not carry it. The two go out together so the Join
@@ -32,8 +34,8 @@ export class GroupPreviewStore {
   private readonly _notFound = signal(false);
 
   /**
-   * True once we know this viewer is already in the group — the members-only
-   * read succeeded. The page sends them to the real group rather than
+   * True once we know this viewer is already in the group — it is among
+   * their own groups. The page sends them to the real group rather than
    * offering a Join that the API answers with "already a member".
    */
   private readonly _alreadyMember = signal(false);
@@ -76,17 +78,15 @@ export class GroupPreviewStore {
     this._error.set(false);
     this._notFound.set(false);
 
-    // Silent: this page reports a failed load itself, inline and with a
-    // retry. The global dialog on top of that is the same failure twice.
-    // The members-only read comes along for the ride: a 200 from it means
-    // they are already in, which changes the whole screen.
+    // Their own groups come along for the ride: this one among them means
+    // they are already in, which changes the whole screen. Asked of the list
+    // rather than of `GET /groups/:id`, which answers a non-member (the
+    // person this page is for) with a 403 and a console error.
+    const groupId = this._groupId;
     this._groupService
-      .getById(this._groupId, { silent: true })
-      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: () => this._alreadyMember.set(true),
-        error: () => this._alreadyMember.set(false),
-      });
+      .getMyGroups()
+      .pipe(take(1), catchToNull(), takeUntilDestroyed(this._destroyRef))
+      .subscribe((groups) => this._alreadyMember.set(!!groups?.some((group) => group.id === groupId)));
 
     forkJoin({
       profile: this._groupService.getPublicProfile(this._groupId),

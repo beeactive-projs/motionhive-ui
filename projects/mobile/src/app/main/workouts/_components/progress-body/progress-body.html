@@ -51,8 +51,10 @@
               icon="trophy-outline"
               aria-hidden="true"
             />
+            <!-- The name on one line with an ellipsis: beside the weight a
+                 long Romanian name otherwise broke inside a word. -->
             <ion-label>
-              <h2>{{ record.exerciseName }}</h2>
+              <h2 class="record-name">{{ record.exerciseName }}</h2>
               <p>{{ recordLine(record) }}</p>
             </ion-label>
             <ion-note slot="end" class="value">{{ recordWeight(record.weightKg) }}</ion-note>

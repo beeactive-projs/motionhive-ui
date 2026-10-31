@@ -28,6 +28,7 @@ import {
 import type { PaginatedResponse } from '../../models/common/pagination.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 
 export interface ListReviewsParams {
   cursor?: string;
@@ -68,9 +69,16 @@ export class ProfileService {
   private readonly _http = inject(HttpClient);
   private readonly _baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PROFILE.BASE}`;
 
-  getMyProfile(): Observable<MyProfile> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure state (see `RosterService.roster`).
+   */
+  getMyProfile(opts?: { silent?: boolean }): Observable<MyProfile> {
     // GET returns the canonical MyProfile shape directly — no transform.
-    return this._http.get<MyProfile>(`${this._baseUrl}/me`);
+    return this._http.get<MyProfile>(
+      `${this._baseUrl}/me`,
+      opts?.silent ? { context: silentRequest() } : {},
+    );
   }
 
   updateMyProfile(payload: UpdateMyProfilePayload): Observable<MyProfile> {

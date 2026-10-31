@@ -24,6 +24,7 @@ import {
   resolveFieldPrivacy,
 } from 'core';
 
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ChoiceOption, ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
@@ -80,6 +81,7 @@ export const WORKOUTS_PRIVACY_ROW: PrivacyRow = {
   selector: 'mh-account-privacy',
   imports: [
     ChoiceSheet,
+    EmptyState,
     IonBackButton,
     IonButtons,
     IonContent,

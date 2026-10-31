@@ -1,0 +1,15 @@
+// What Discover's screens share, `@use`d by discover, all-coaches,
+// all-groups and the filter sheet (component styles are scoped, so one file
+// is how several components get the rule).
+//
+// The chips' and the section heads' 44px tap targets come from the theme
+// (ion-button.css, layout.css), so nothing restates them here.
+
+// Words wrap whole: Ionic's body breaks a word that does not fit its line,
+// so a Romanian group name or headline at 130% split mid-word. A line that
+// cannot grow ellipses instead.
+:host {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}

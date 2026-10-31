@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { ChoiceOption, foldForSearch, matchChoices } from './choice-sheet';
+import { foldForSearch } from 'core';
+
+import { ChoiceOption, matchChoices } from './choice-sheet';
 
 const zones: ChoiceOption[] = [
   { value: 'America/Sao_Paulo', label: '(UTC-03:00) America/São Paulo' },

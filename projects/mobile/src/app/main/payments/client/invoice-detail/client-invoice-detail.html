@@ -17,113 +17,119 @@
       (action)="retry()"
     />
   } @else if (loading()) {
-    <div class="amount-block">
-      <ion-skeleton-text [animated]="true" style="width: 35%; height: 0.7rem" />
-      <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.8rem" />
+    <div class="mh-page">
+      <div class="amount-block">
+        <ion-skeleton-text [animated]="true" style="width: 35%; height: 0.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.75rem" />
+      </div>
     </div>
   } @else if (invoice(); as inv) {
-    <!-- 4i: a band, not a takeover. The invoice stays readable while we ask. -->
-    @if (checking()) {
-      <div class="band checking">
-        <ion-spinner name="crescent" />
-        <span>{{ 'payments.client.detail.checking' | translate }}</span>
-      </div>
-    }
-
-    <!-- 4j: only once the API says PAID, so the words can be absolute. -->
-    @if (outcome() === 'paid') {
-      <div class="band paid">
-        <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
-        <div>
-          <strong>{{ 'payments.client.detail.paidTitle' | translate }}</strong>
-          <span>{{ 'payments.client.detail.paidBody' | translate: { name: coachName() } }}</span>
+    <div class="mh-page">
+      <!-- 4i: a band, not a takeover. The invoice stays readable while we ask. -->
+      @if (checking()) {
+        <div class="band checking">
+          <ion-spinner name="crescent" />
+          <span>{{ 'payments.client.detail.checking' | translate }}</span>
         </div>
-      </div>
-    }
-
-    <!-- 4k: two truths, neither an accusation. -->
-    @if (outcome() === 'unfinished') {
-      <div class="band unfinished">
-        <ion-icon name="time-outline" aria-hidden="true" />
-        <div>
-          <strong>{{ 'payments.client.detail.unfinishedTitle' | translate }}</strong>
-          <span>{{ 'payments.client.detail.unfinishedBody' | translate }}</span>
-        </div>
-        <ion-button fill="clear" size="small" (click)="dismissOutcome()">{{ 'button.dismiss' | translate }}</ion-button>
-      </div>
-    }
-
-    <div class="amount-block">
-      <div class="mh-kicker">{{ (isPaid() ? 'payments.detail.kicker.paid' : 'payments.detail.kicker.amountDue') | translate }}</div>
-      <div class="total">{{ inv.amountDueCents | currencyRon: inv.currency : 'code' }}</div>
-
-      <div class="badges">
-        @if (isPaid()) {
-          <ion-badge color="success">{{ Statuses.Paid | enumLabel: 'invoiceStatus' }}</ion-badge>
-        } @else if (overdue()) {
-          <ion-badge color="danger">{{ 'payments.badge.overdue' | translate }}</ion-badge>
-        }
-        @if (inv.number) {
-          <ion-note>{{ inv.number }}</ion-note>
-        }
-      </div>
-    </div>
-
-    <ion-list [inset]="true" class="mh-card-list">
-      <ion-item>
-        <mh-hex-avatar
-          slot="start"
-          size="sm"
-          [name]="coachName()"
-          [imageUrl]="inv.instructor?.avatarUrl ?? null"
-          [color]="coachTone()"
-        />
-        <ion-label>
-          <p>{{ 'payments.detail.from' | translate }}</p>
-          <h3>{{ coachName() }}</h3>
-        </ion-label>
-      </ion-item>
-
-      @if (dueLabel(); as when) {
-        <ion-item>
-          <mh-hex-avatar slot="start" size="sm" icon="time-outline" color="coral" />
-          <ion-label>
-            <p>{{ (isPaid() ? 'payments.detail.paidOn' : 'payments.detail.due') | translate }}</p>
-            <h3>{{ when }}</h3>
-          </ion-label>
-        </ion-item>
       }
 
-      @if (inv.invoicePdf) {
-        <ion-item button detail="false" (click)="openPdf()">
-          <mh-hex-avatar slot="start" size="sm" icon="document-text-outline" color="info" />
-          <ion-label>
-            <p>{{ 'payments.detail.document' | translate }}</p>
-            <h3>{{ (isPaid() ? 'payments.detail.receiptPdf' : 'payments.detail.invoicePdf') | translate }}</h3>
-          </ion-label>
-          <ion-icon slot="end" name="open-outline" color="medium" aria-hidden="true" />
-        </ion-item>
+      <!-- 4j: only once the API says PAID, so the words can be absolute. -->
+      @if (outcome() === 'paid') {
+        <div class="band paid">
+          <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
+          <div>
+            <strong>{{ 'payments.client.detail.paidTitle' | translate }}</strong>
+            <span>{{ 'payments.client.detail.paidBody' | translate: { name: coachName() } }}</span>
+          </div>
+        </div>
       }
-    </ion-list>
 
-    @if (items().length > 0) {
-      <div class="mh-section-label">{{ 'payments.detail.items' | translate }}</div>
+      <!-- 4k: two truths, neither an accusation. -->
+      @if (outcome() === 'unfinished') {
+        <div class="band unfinished">
+          <ion-icon name="time-outline" aria-hidden="true" />
+          <div>
+            <strong>{{ 'payments.client.detail.unfinishedTitle' | translate }}</strong>
+            <span>{{ 'payments.client.detail.unfinishedBody' | translate }}</span>
+          </div>
+          <ion-button fill="clear" size="small" (click)="dismissOutcome()">{{ 'button.dismiss' | translate }}</ion-button>
+        </div>
+      }
+
+      <div class="amount-block">
+        <div class="mh-kicker">{{ (isPaid() ? 'payments.detail.kicker.paid' : 'payments.detail.kicker.amountDue') | translate }}</div>
+        <div class="total">{{ inv.amountDueCents | currencyRon: inv.currency : 'code' }}</div>
+
+        <div class="badges">
+          @if (isPaid()) {
+            <ion-badge data-tone="success">{{ Statuses.Paid | enumLabel: 'invoiceStatus' }}</ion-badge>
+          } @else if (overdue()) {
+            <ion-badge data-tone="danger">{{ 'payments.badge.overdue' | translate }}</ion-badge>
+          }
+          @if (inv.number) {
+            <ion-note>{{ inv.number }}</ion-note>
+          }
+        </div>
+      </div>
+
       <ion-list [inset]="true" class="mh-card-list">
-        @for (item of items(); track item.id) {
+        <ion-item>
+          <mh-hex-avatar
+            slot="start"
+            size="sm"
+            [name]="coachName()"
+            [imageUrl]="inv.instructor?.avatarUrl ?? null"
+            [color]="coachTone()"
+          />
+          <ion-label>
+            <p>{{ 'payments.detail.from' | translate }}</p>
+            <h3>{{ coachName() }}</h3>
+          </ion-label>
+        </ion-item>
+
+        @if (dueLabel(); as when) {
           <ion-item>
-            <ion-label class="ion-text-wrap">
-              <h3>{{ item.description || ('payments.fallback.item' | translate) }}</h3>
-              @if (item.quantity > 1) {
-                <p>{{ item.quantity }} × {{ item.unitAmountCents | currencyRon: item.currency : 'code' }}</p>
-              }
+            <mh-hex-avatar slot="start" size="sm" icon="time-outline" color="coral" />
+            <ion-label>
+              <p>{{ (isPaid() ? 'payments.detail.paidOn' : 'payments.detail.due') | translate }}</p>
+              <h3>{{ when }}</h3>
             </ion-label>
-            <ion-note slot="end" class="line-amount">
-              {{ item.amountCents | currencyRon: item.currency : 'code' }}
-            </ion-note>
+          </ion-item>
+        }
+
+        @if (inv.invoicePdf) {
+          <ion-item button detail="false" (click)="openPdf()">
+            <mh-hex-avatar slot="start" size="sm" icon="document-text-outline" color="info" />
+            <ion-label>
+              <p>{{ 'payments.detail.document' | translate }}</p>
+              <h3>{{ (isPaid() ? 'payments.detail.receiptPdf' : 'payments.detail.invoicePdf') | translate }}</h3>
+            </ion-label>
+            <ion-icon slot="end" name="open-outline" color="medium" aria-hidden="true" />
           </ion-item>
         }
       </ion-list>
-    }
+
+      @if (items().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-label">{{ 'payments.detail.items' | translate }}</div>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (item of items(); track item.id) {
+              <ion-item>
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ item.description || ('payments.fallback.item' | translate) }}</h3>
+                  @if (item.quantity > 1) {
+                    <p>{{ item.quantity }} × {{ item.unitAmountCents | currencyRon: item.currency : 'code' }}</p>
+                  }
+                </ion-label>
+                <ion-note slot="end" class="line-amount">
+                  {{ item.amountCents | currencyRon: item.currency : 'code' }}
+                </ion-note>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+    </div>
   }
 </ion-content>
 
@@ -132,7 +138,7 @@
     <ion-toolbar>
       <!-- 4h: the button names the destination, and the line under it sets
            the return expectation *before* they leave. -->
-      <ion-button expand="block" [disabled]="paying()" (click)="pay()">
+      <ion-button expand="block" color="primary" [disabled]="paying()" (click)="pay()">
         {{ payLabel() }}
         <ion-icon slot="end" name="open-outline" />
       </ion-button>

@@ -9,65 +9,77 @@
 
 <ion-content [fullscreen]="true">
   <div class="mh-page">
-    <div class="portrait">
-      <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
-      <ion-button fill="clear" size="small" (click)="photoSheetOpen.set(true)">
-        {{ 'account.profile.editPhoto' | translate }}
-      </ion-button>
-    </div>
-
-    <ion-list [inset]="true" class="mh-card-list">
-      <mh-settings-row
-        [label]="'form.label.name' | translate"
-        [value]="store.fullName() || null"
-        [valuePlaceholder]="'form.placeholder.notProvided' | translate"
-        (select)="nameSheetOpen.set(true)"
+    <!-- Not the rows with "Not provided" in every value: that reads as an
+         empty profile and invites editing one that never loaded. -->
+    @if (store.loadFailed() && !account()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'account.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="store.refresh()"
       />
+    } @else {
+      <div class="portrait">
+        <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
+        <ion-button fill="clear" size="small" (click)="photoSheetOpen.set(true)">
+          {{ 'account.profile.editPhoto' | translate }}
+        </ion-button>
+      </div>
 
-      @if (isInstructor()) {
+      <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row
-          [label]="'account.profile.about' | translate"
-          [value]="aboutValue()"
+          [label]="'form.label.name' | translate"
+          [value]="store.fullName() || null"
           [valuePlaceholder]="'form.placeholder.notProvided' | translate"
-          (select)="aboutSheetOpen.set(true)"
+          (select)="nameSheetOpen.set(true)"
         />
-      }
 
-      <mh-settings-row
-        [label]="'form.label.handle' | translate"
-        [value]="handleValue()"
-        [valuePlaceholder]="'form.placeholder.notSet' | translate"
-        [valueMono]="true"
-        (select)="handleSheetOpen.set(true)"
-      />
+        @if (isInstructor()) {
+          <mh-settings-row
+            [label]="'account.profile.about' | translate"
+            [value]="aboutValue()"
+            [valuePlaceholder]="'form.placeholder.notProvided' | translate"
+            (select)="aboutSheetOpen.set(true)"
+          />
+        }
 
-      <mh-settings-row
-        [label]="'form.label.phone' | translate"
-        [value]="account()?.phone ?? null"
-        [valuePlaceholder]="'form.placeholder.notProvided' | translate"
-        (select)="phoneSheetOpen.set(true)"
-      />
-
-      <mh-settings-row
-        [label]="'form.label.location' | translate"
-        [value]="locationValue()"
-        [valuePlaceholder]="'form.placeholder.notProvided' | translate"
-        (select)="locationSheetOpen.set(true)"
-      />
-
-      @if (isInstructor()) {
         <mh-settings-row
-          [label]="'account.profile.links' | translate"
-          [value]="linksValue()"
-          [valuePlaceholder]="'account.profile.noneAdded' | translate"
-          (select)="linksSheetOpen.set(true)"
+          [label]="'form.label.handle' | translate"
+          [value]="handleValue()"
+          [valuePlaceholder]="'form.placeholder.notSet' | translate"
+          [valueMono]="true"
+          (select)="handleSheetOpen.set(true)"
         />
-      }
-    </ion-list>
 
-    <ion-note class="mh-footnote" color="medium">
-      {{ (isInstructor() ? 'account.profile.footnoteCoach' : 'account.profile.footnoteTrainee') | translate }}
-    </ion-note>
+        <mh-settings-row
+          [label]="'form.label.phone' | translate"
+          [value]="account()?.phone ?? null"
+          [valuePlaceholder]="'form.placeholder.notProvided' | translate"
+          (select)="phoneSheetOpen.set(true)"
+        />
+
+        <mh-settings-row
+          [label]="'form.label.location' | translate"
+          [value]="locationValue()"
+          [valuePlaceholder]="'form.placeholder.notProvided' | translate"
+          (select)="locationSheetOpen.set(true)"
+        />
+
+        @if (isInstructor()) {
+          <mh-settings-row
+            [label]="'account.profile.links' | translate"
+            [value]="linksValue()"
+            [valuePlaceholder]="'account.profile.noneAdded' | translate"
+            (select)="linksSheetOpen.set(true)"
+          />
+        }
+      </ion-list>
+
+      <ion-note class="mh-footnote" color="medium">
+        {{ (isInstructor() ? 'account.profile.footnoteCoach' : 'account.profile.footnoteTrainee') | translate }}
+      </ion-note>
+    }
   </div>
 
   <mh-photo-sheet [(open)]="photoSheetOpen" />

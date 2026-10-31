@@ -36,6 +36,7 @@ import {
   timezonePlace,
 } from 'core';
 
+import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../_shared/services/feedback.service';
@@ -67,6 +68,7 @@ export const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
 @Component({
   selector: 'mh-account',
   imports: [
+    EmptyState,
     HexAvatar,
     IonBackButton,
     IonBadge,
@@ -197,8 +199,18 @@ export class Account implements OnInit, ViewWillEnter {
     this.store.ensureLoaded();
   }
 
+  /**
+   * The load is silent (the store's note), so a pull that fails over a
+   * profile already on screen says so here; with nothing on screen the
+   * failure state in place of the hero says it.
+   */
   onRefresh(event: RefresherCustomEvent): void {
-    this.store.refresh(() => void event.target.complete());
+    this.store.refresh(() => {
+      void event.target.complete();
+      if (this.store.loadFailed() && this.account()) {
+        void this._feedbackService.error(null, this._translateService.instant('error.staleData'));
+      }
+    });
   }
 
   go(path: string): void {

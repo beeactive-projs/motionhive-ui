@@ -1,15 +1,16 @@
-/* A navy sheet docked under the grid, rounded where it meets the content. */
+/* A navy sheet docked under the grid, rounded where it meets the content.
+   The navy card set: navy on the light page, the card step on the navy one. */
 :host {
   display: block;
   overflow: hidden;
   border-radius: var(--mh-radius-card) var(--mh-radius-card) 0 0;
-  background: var(--mh-navy-900);
-  color: var(--ion-color-secondary-contrast);
+  background: var(--mh-color-navy-card);
+  color: var(--mh-color-navy-card-ink);
 }
 
 .elapsed {
   height: 0.25rem;
-  background: var(--mh-navy-700);
+  background: var(--mh-color-navy-card-raised);
 }
 
 .elapsed span {
@@ -27,7 +28,7 @@
 }
 
 .mh-kicker {
-  color: var(--mh-navy-300);
+  color: var(--mh-color-navy-card-muted);
 }
 
 .count {
@@ -67,7 +68,7 @@
 
 .next .detail {
   margin-top: 0.125rem;
-  color: var(--mh-navy-300);
+  color: var(--mh-color-navy-card-muted);
   font-size: var(--mh-text-sm);
 }
 
@@ -80,10 +81,10 @@
 
 .actions button {
   height: 3rem;
-  border: 1px solid transparent;
+  border: var(--mh-hairline) solid transparent;
   border-radius: var(--mh-radius-control);
-  background: var(--mh-navy-700);
-  color: var(--ion-color-secondary-contrast);
+  background: var(--mh-color-navy-card-raised);
+  color: var(--mh-color-navy-card-ink);
   font-size: var(--mh-text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -92,7 +93,7 @@
 
 /* Skip is the way back to work: outlined, so it reads apart from the nudges. */
 .actions button.skip {
-  border-color: var(--mh-navy-400);
+  border-color: var(--mh-color-navy-card-muted);
   background: transparent;
   font-family: var(--ion-font-family);
   font-weight: 600;

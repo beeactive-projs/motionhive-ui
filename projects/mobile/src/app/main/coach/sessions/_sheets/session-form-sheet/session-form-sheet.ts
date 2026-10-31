@@ -802,7 +802,7 @@ export class SessionFormSheet {
     if (this._venuesLoaded) return;
     this._venuesLoaded = true;
     this._venueService
-      .list()
+      .list({ silent: true })
       .pipe(take(1))
       .subscribe({
         next: (venues) => this.venues.set(venues),

@@ -14,6 +14,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline } from 'ionicons/icons';
 
+import { foldForSearch } from 'core';
+
 import { SheetShell } from '../sheet-shell/sheet-shell';
 
 export interface ChoiceOption {
@@ -27,10 +29,6 @@ export interface ChoiceOption {
 /** Rows drawn per page of a long list; scrolling draws the next page, as the exercise picker does. */
 export const CHOICE_PAGE_SIZE = 40;
 
-/** Case and accents fold away, so "sao" finds "São Paulo". */
-export function foldForSearch(text: string): string {
-  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-}
 
 /**
  * The options `query` matches. With nothing typed, `pinned` (the current

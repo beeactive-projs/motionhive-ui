@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import {
   CreateVenuePayload,
   UpdateVenuePayload,
@@ -18,8 +19,15 @@ export class VenueService {
   private readonly _http = inject(HttpClient);
   private readonly _baseUrl = `${environment.apiUrl}/venues`;
 
-  list(): Observable<Venue[]> {
-    return this._http.get<Venue[]>(this._baseUrl);
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure state (see `RosterService.roster`).
+   */
+  list(opts?: { silent?: boolean }): Observable<Venue[]> {
+    return this._http.get<Venue[]>(
+      this._baseUrl,
+      opts?.silent ? { context: silentRequest() } : {},
+    );
   }
 
   get(id: string): Observable<Venue> {

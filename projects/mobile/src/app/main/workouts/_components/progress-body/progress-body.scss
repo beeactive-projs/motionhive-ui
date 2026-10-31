@@ -5,10 +5,27 @@
   gap: var(--mh-page-rhythm);
 }
 
-/* A record's weight — tabular, the way every number in a column is. */
+/* A record's weight — tabular, the way every number in a column is. Held a
+   step off the label, which wraps beside it at large text. */
 .value {
+  margin-inline-start: 0.5rem;
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* A tile is never narrower than its longest word or its figure (kept on one
+   line by `unbreakable`): at large text on a narrow phone the row wraps a
+   tile to the next line instead of breaking "Antrenamente" or a number. */
+.mh-tiles mh-stat-tile {
+  min-width: min-content;
+}
+
+/* A record's name on one line with an ellipsis: beside the weight, a long
+   Romanian name ("Îndreptări românești") broke inside a word. */
+.record-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

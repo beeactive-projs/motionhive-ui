@@ -17,6 +17,13 @@
   font-weight: 600;
 }
 
+// Nothing filled in: the muted italics the settings rows use for "Not provided".
+.fact.empty {
+  color: var(--ion-color-medium);
+  font-weight: 400;
+  font-style: italic;
+}
+
 .bio {
   margin: 0.25rem 0 0;
   font-size: var(--mh-text-sm);

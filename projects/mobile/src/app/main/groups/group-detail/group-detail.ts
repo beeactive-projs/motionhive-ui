@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonChip,
@@ -43,6 +44,7 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
 import { PostGallery } from '../_components/post-gallery/post-gallery';
 import { AddMembersSheet } from '../_sheets/add-members-sheet/add-members-sheet';
@@ -81,6 +83,7 @@ import { PostWorkoutCard } from '../_components/post-workout/post-workout';
     JoinLinkSheet,
     HexAvatar,
     IonBackButton,
+    IonBadge,
     IonButton,
     IonButtons,
     IonChip,
@@ -125,6 +128,7 @@ export class GroupDetail implements ViewWillEnter {
 
   readonly Tabs = GroupTabs;
   readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly groupTone = GROUP_AVATAR_TONE;
 
   readonly addMembersOpen = signal(false);
   readonly joinLinkOpen = signal(false);

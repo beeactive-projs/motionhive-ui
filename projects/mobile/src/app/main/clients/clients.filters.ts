@@ -4,6 +4,7 @@ import {
   InstructorClientStatuses,
   clientDisplayName,
   clientEmail,
+  foldedIncludes,
 } from 'core';
 
 /**
@@ -89,12 +90,7 @@ export function filterFromUrl(url: string): ClientFilterId | null {
  */
 export const MIN_SEARCH_LENGTH = 2;
 
-/** Header search over the loaded rows: name or email, case-insensitive. */
+/** Header search over the loaded rows: name or email, blind to case and accents. */
 export function matchesClientQuery(client: InstructorClient, query: string): boolean {
-  const term = query.trim().toLowerCase();
-  if (!term) return true;
-  return (
-    clientDisplayName(client).toLowerCase().includes(term) ||
-    clientEmail(client).toLowerCase().includes(term)
-  );
+  return foldedIncludes(clientDisplayName(client), query) || foldedIncludes(clientEmail(client), query);
 }

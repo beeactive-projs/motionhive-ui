@@ -1,0 +1,56 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>{{ 'home.coach.needs.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!--
+  A grouped flat list, as the notifications are grouped by day: one label
+  per reason with its count, the rows under it. The loading, empty and
+  error states sit on the same page.
+-->
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (loading()) {
+    <div class="mh-section-label" aria-hidden="true">
+      <ion-skeleton-text [animated]="true" style="width: 8rem; height: 0.75rem" />
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (i of skeletonRows; track i) {
+        <mh-row-skeleton [index]="i" />
+      }
+    </ion-list>
+  } @else if (store.showRosterError()) {
+    <mh-empty-state
+      icon="cloud-offline-outline"
+      [heading]="'home.coach.needs.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (!sections().length) {
+    <mh-empty-state
+      icon="checkmark-done-outline"
+      [heading]="'home.coach.needs.empty.title' | translate"
+      [message]="'home.coach.needs.empty.message' | translate"
+    />
+  } @else {
+    @for (section of sections(); track section.reason) {
+      <div class="mh-section-label" role="heading" aria-level="2">
+        {{ section.label }}
+        <span class="count">· {{ section.count }}</span>
+      </div>
+      <ion-list class="mh-flat-list">
+        @for (row of section.rows; track row.key) {
+          <mh-need-row [row]="row" (act)="act(row)" />
+        }
+      </ion-list>
+    }
+  }
+</ion-content>

@@ -2,14 +2,20 @@
   <!-- Decorative: the name it would announce is the very next thing in the row. -->
   <mh-hex-avatar slot="start" size="md" tone="wash" icon="flash-outline" [color]="color()" />
 
+  <!-- The level rides the meta line rather than the row's end, so the name
+       has the row's width: beside an end badge, at large text, a long
+       Romanian name broke inside a word ("echipamen/t"). -->
   <ion-label class="ion-text-wrap">
     <h2>{{ routine().name }}</h2>
-    <p>{{ meta() }}</p>
+    @if (level(); as value) {
+      <div class="meta">
+        <p>{{ meta() }}</p>
+        <ion-badge [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
+      </div>
+    } @else {
+      <p>{{ meta() }}</p>
+    }
   </ion-label>
-
-  @if (level(); as value) {
-    <ion-badge slot="end" [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
-  }
   @if (startable()) {
     <ion-button
       slot="end"

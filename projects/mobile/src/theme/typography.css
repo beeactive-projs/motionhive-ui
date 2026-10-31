@@ -21,7 +21,7 @@ ion-label[class] :is(h1, h2, h3) {
 
 /* A label's second line is the muted ink. Ionic's iOS default is a 60% step
    of the text colour, about 3:1 on the dark card and under AA; medium is
-   6.9:1 on the light card and about 5.4:1 on the dark one. It also reaches
+   6.9:1 on the light card and 7.3:1 on the dark one. It also reaches
    a `p` nested in a wrapper (`.mh-row-line`), which Ionic leaves in the body
    ink. A coloured item's label (`.in-item-color`) still inherits its colour:
    Ionic's rule for it outranks this one. */
@@ -82,11 +82,13 @@ h1 {
 /* The sticky day divider over a session list — a kicker that stays pinned
    while you scroll the day it labels. Shared by the coach agenda, the
    trainee bookings list, and Discover; `.today` warms the label to the
-   honey accent ink. */
+   honey accent ink. `z-index: 2`, not 1: an `ion-item` paints its row at 1
+   without a stacking context of its own, so at 1 the cards slid over the
+   pinned header. */
 .mh-day-header {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: baseline;
   gap: 0.375rem;

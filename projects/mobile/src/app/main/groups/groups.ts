@@ -35,6 +35,7 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
+import { GROUP_AVATAR_TONE } from '../../_shared/utils/avatar-tone.utils';
 import { PostGallery } from './_components/post-gallery/post-gallery';
 import { GROUP_ICONS } from './groups.icons';
 import { GroupsSegments, MIN_SEARCH_LENGTH } from './groups.filters';
@@ -97,6 +98,7 @@ export class Groups implements ViewWillEnter {
   readonly Segments = GroupsSegments;
   readonly minSearchLength = MIN_SEARCH_LENGTH;
   readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly groupTone = GROUP_AVATAR_TONE;
 
   /**
    * Search owns the whole toolbar while it is open — a title, two actions

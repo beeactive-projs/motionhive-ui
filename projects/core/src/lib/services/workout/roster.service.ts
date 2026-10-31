@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { silentRequest } from '../../interceptors/silent-request.context';
 import type {
+  CoachActivityItem,
   RosterSummary,
   RosterWindow,
 } from '../../models/workout/roster.model';
@@ -34,6 +35,20 @@ export class RosterService {
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_ROSTER}`,
       {
         params,
+        ...(opts?.silent ? { context: silentRequest() } : {}),
+      },
+    );
+  }
+
+  /**
+   * The coach Home's activity feed: clients' latest finished workouts,
+   * newest first, each with the records it set. `silent` as on `roster`.
+   */
+  activity(limit = 5, opts?: { silent?: boolean }): Observable<CoachActivityItem[]> {
+    return this._http.get<CoachActivityItem[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_ACTIVITY}`,
+      {
+        params: new HttpParams().set('limit', String(limit)),
         ...(opts?.silent ? { context: silentRequest() } : {}),
       },
     );

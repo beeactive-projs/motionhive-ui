@@ -10,17 +10,19 @@ paths:
 
 Every surface reads one of two Ionic tokens: the page and its bars (header, footer, tab bar) `--ion-background-color`, a card, a bubble or a raised box `--ion-card-background`. A context redefines them in `variables.css`; nothing else does (user decision, 2026-10-27).
 
-Light mirrors dark (user decision, 2026-10-27): one page colour for every screen, cards one step off it, a sheet one step further.
+Light mirrors dark (user decision, 2026-10-27): one page colour for every screen, cards one step off it, a sheet one step further. Dark is navy (user decision, 2026-10-31): the navy ramp's dark half, never a grey.
 
 | Context | Page and bars (light / dark) | Card (light / dark) |
 |---|---|---|
-| Every page, flat or grouped | white / #1f1f1f | slate-100 / #2c2c2e |
-| A sheet (`mh-sheet`) | slate-100 / #2c2c2e | slate-200 / #3a3a3c |
+| Every page, flat or grouped | white / navy-900 | slate-100 / navy-800 |
+| A sheet (`mh-sheet`) | slate-100 / navy-800 | slate-200 / navy-700 |
 
-- A soft fill on a card (`--mh-color-divider`, the neutral wash) is the next step again: slate-200 in light, #3a3a3c in dark.
-- `--ion-border-color` is one step above that: slate-300 in light, #48484a in dark, so an outline still shows on a sheet's cards.
+- A soft fill on a card (`--mh-color-divider`) is the sheet's card step: slate-200 in light, navy-700 in dark. The neutral washes (`--ion-color-medium-wash` and friends) sit a step past it in dark, navy-600.
+- `--ion-border-color` is slate-300 in light and navy-500 in dark, so an outline still shows on a sheet's cards (navy-600 vanished there, 1.1:1).
 - Every context sets `--ion-item-background` to the same value as `--ion-card-background`. A card list and its rows paint through Ionic's own item background and set none of their own.
-- Muted text is `--ion-color-medium`: slate-600 in light, because slate-500 is under AA on the slate cards (4.3:1). In dark it is slate-400, and slate-300 inside a sheet, where slate-400 is 4.4:1 on the sheet's cards. Never set a muted grey per component; read the token.
+- Muted text is `--ion-color-medium`: slate-600 in light, because slate-500 is under AA on the slate cards (4.3:1). In dark it is navy-300, the design's secondary text: 8:1 on the page, 7.3:1 on a card, 6.6:1 on a sheet's cards, so a sheet needs no step up. Never set a muted grey per component; read the token.
+- Ink in dark is white (17.2:1 on the page) and accents are the honey itself (`--mh-color-honey-deep` flips to it). Ionic's own neutral steps (`--ion-background-color-step-*`, `--ion-text-color-step-*`) are navy mixes in dark, and its idle tab and card text read the muted ink, so nothing Ionic draws falls back to a grey.
+- A navy box on a light page (a next-session tile, the rest timer, a memory card) reads `--mh-color-navy-card` and its set, never `--mh-navy-900`: navy 900 is the dark page, and a box in it vanishes.
 - A bar is the page it sits on: never give a header or footer toolbar or the tab bar its own `--background`.
 - No app bar has a shadow or a hairline: headers (`ion-header.css`), footers (`ion-footer.css`) and the tab bar (`ion-tab-bar.css`). Don't add `ion-no-border` or a `--border-*` to one. Sheets keep the shell's footer hairline.
 - Don't mint a token for a surface in one context. Redefine the Ionic token in the context instead.
@@ -40,7 +42,7 @@ Light mirrors dark (user decision, 2026-10-27): one page colour for every screen
 
 - Every bottom sheet is built on `mh-sheet-shell` (or `mh-action-sheet`, `mh-confirm-sheet`, `mh-choice-sheet`, which use it). Don't use `ActionSheetController` or a bare `ion-modal`.
 - A sheet is one surface: header, body and footer all on `--ion-background-color`, with cards (`mh-card-list`, boxes on `--ion-card-background`) on top. Never paint the header, body or a box the page colour to make a band or a well.
-- A sheet is raised one step above the page in both themes, as iOS does for raised surfaces: the shell's `mh-sheet` class redefines the surface tokens inside the modal (light slate-100 / slate-200, dark `#2c2c2e` / `#3a3a3c`, in `variables.css`), and the dark scrim is `--ion-backdrop-opacity: 0.6`. Keep reading the tokens in sheets; never hardcode the raised colours in a sheet's `.scss`.
+- A sheet is raised one step above the page in both themes, as iOS does for raised surfaces: the shell's `mh-sheet` class redefines the surface tokens inside the modal (light slate-100 / slate-200, dark navy-800 / navy-700, in `variables.css`), and the dark scrim is `--ion-backdrop-opacity: 0.6`. Keep reading the tokens in sheets; never hardcode the raised colours in a sheet's `.scss`.
 - The shell's header is fixed: title, optional subtitle, close X. Don't add header customisation.
 - Options inside a sheet are a grouped list (see `lists.md`), not loose `ion-item`s on the sheet background.
 - A sheet body made of several cards stacks them in `.mh-stack` (`layout.css`, the page rhythm without the page gutter). Never hand-roll a `flex-direction: column` + gap wrapper for it. A form sheet's labels and helpers keep their own spacing.

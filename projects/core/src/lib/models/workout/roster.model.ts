@@ -48,5 +48,30 @@ export interface RosterSummary {
     needsAttention: number;
     /** Mean across clients who had work due. */
     adherencePercent: number | null;
+    /**
+     * Finished workouts the coach may read, in the window and in the one
+     * before it, planned or the client's own.
+     */
+    workouts: number;
+    previousWorkouts: number;
+    /** Records set in the window's workouts. */
+    records: number;
   };
+}
+
+/**
+ * One finished workout in the coach's activity feed (`GET /coach/activity`):
+ * the last two weeks across every active client, only what the coach may
+ * read, newest first.
+ */
+export interface CoachActivityItem {
+  workoutLogId: string;
+  clientId: string;
+  name: string;
+  avatarUrl: string | null;
+  handle: string | null;
+  workoutName: string;
+  completedAt: string;
+  durationSeconds: number | null;
+  recordCount: number;
 }

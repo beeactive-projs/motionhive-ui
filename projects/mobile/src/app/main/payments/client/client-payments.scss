@@ -25,11 +25,11 @@
 }
 
 .chip {
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: var(--mh-radius-pill);
   background: var(--ion-color-primary-wash);
   color: var(--ion-color-primary-wash-contrast);
-  font-size: 0.72rem;
+  font-size: var(--mh-text-xs);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -49,22 +49,28 @@
 }
 
 .membership .name {
+  min-width: 0;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: var(--mh-text-base);
 }
 
 .membership .status {
   font-size: var(--mh-text-xs);
 }
 
+/* Overdue is a real failure: the red ink that clears AA on the card. */
+.membership .status {
+  flex: none;
+}
+
 .membership .status.warn {
-  color: var(--ion-color-warning-shade);
+  color: var(--mh-color-danger-deep);
   font-weight: 600;
 }
 
 .membership .price {
   margin-top: 0.25rem;
-  font-size: 1rem;
+  font-size: var(--mh-text-md);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -72,14 +78,14 @@
 .membership .interval {
   color: var(--ion-color-medium);
   font-family: var(--ion-font-family);
-  font-size: 0.75rem;
+  font-size: var(--mh-text-sm);
   font-weight: 500;
 }
 
 .membership .renews {
-  margin-top: 0.15rem;
+  margin-top: 0.125rem;
   color: var(--ion-color-medium);
-  font-size: 0.75rem;
+  font-size: var(--mh-text-sm);
 }
 
 .membership ion-button {

@@ -1,94 +1,152 @@
-<div class="mh-page">
-  <div>
-    <ion-note class="mh-kicker" color="medium">
-      {{ today() | date: 'EEEE, d MMM' }}
-    </ion-note>
-    <h1>{{ 'home.coach.title' | translate }}</h1>
-  </div>
+<!--
+  Calm: the greeting, then three blocks at most (the hive, Needs you,
+  Latest). Lists are flat rows on the page, no grey cards around them; the
+  hive card is the one card. A small Today row joins only on a day with
+  sessions.
+-->
+<div class="greeting">
+  <ion-note class="mh-kicker" color="medium">{{ dateLine() }}</ion-note>
+  <h1>{{ greeting() }}</h1>
+</div>
 
-  <!--
-    Agenda card. The kicker row is an `ion-item`, not `ion-card-header`: the
-    header stacks its children, and the design puts the kicker and the Calendar
-    link on one line.
-  -->
-  <ion-card>
-    <ion-item lines="none">
-      <ion-label>
-        <ion-note class="mh-kicker" color="medium">
-          {{ 'home.coach.agenda.kicker' | translate: { date: (today() | date: 'd MMM') } }}
-        </ion-note>
-      </ion-label>
-      <ion-button slot="end" fill="clear" size="small" (click)="openSessions()">
-        {{ 'home.coach.agenda.calendar' | translate }}
+<!--
+  The hive: the coach in the middle, each client a cell around them,
+  filled by how their last 7 days went. One picture with a summary for a
+  screen reader, one headline, one link; the clients themselves are a tap
+  away on the Clients tab.
+-->
+<div class="hive-wrap">
+  <div class="hive-card coach" [class.two-rings]="twoRings()">
+    @if (store.rosterLoading() && !store.roster()) {
+      <div class="hive-row">
+        <ion-skeleton-text class="comb-skeleton" [animated]="true" />
+        <div class="hive-copy">
+          <ion-skeleton-text [animated]="true" style="width: 50%; height: 0.625rem" />
+          <ion-skeleton-text [animated]="true" style="width: 80%; height: 1.125rem" />
+          <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.75rem" />
+        </div>
+      </div>
+    } @else if (store.showRosterError()) {
+      <div class="hive-copy">
+        <h2 class="hive-title">{{ 'home.coach.hive.loadError' | translate }}</h2>
+        <p class="hive-sub">{{ 'error.checkConnection' | translate }}</p>
+      </div>
+      <ion-button class="hive-link" fill="clear" (click)="retry()">
+        {{ 'button.tryAgain' | translate }}
       </ion-button>
-    </ion-item>
+    } @else if (store.isFirstWeek()) {
+      <div class="hive-row">
+        <mh-hive [cells]="cells()" [label]="hiveLabel()" />
+        <div class="hive-copy">
+          <p class="hive-kicker">{{ 'home.coach.hive.kickerFirst' | translate }}</p>
+          <h2 class="hive-title">{{ 'home.coach.firstWeek.title' | translate }}</h2>
+          <p class="hive-sub">{{ 'home.coach.firstWeek.sub' | translate }}</p>
+        </div>
+      </div>
+      <ion-button expand="block" (click)="invite()">
+        <ion-icon slot="start" name="person-add-outline" aria-hidden="true" />
+        {{ 'home.coach.firstWeek.invite' | translate }}
+      </ion-button>
+    } @else {
+      <div class="hive-row">
+        <mh-hive [cells]="cells()" [label]="hiveLabel()" />
+        <div class="hive-copy">
+          <p class="hive-kicker">{{ 'home.coach.hive.kicker' | translate }}</p>
+          <h2 class="hive-title">{{ hiveTitle() }}</h2>
+          <ion-button class="hive-link" fill="clear" (click)="openClients()">
+            {{ 'home.coach.hive.seeClients' | translate }}
+            <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
+          </ion-button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
 
-    @if (store.agendaLoading()) {
-      @for (_ of [1, 2]; track $index) {
-        <ion-item class="agenda-row" lines="none">
-          <ion-skeleton-text slot="start" [animated]="true" style="width: 2.125rem" />
+<!-- Today's sessions, only on a day that has some: one small row. -->
+@if (todayFirst(); as first) {
+  <ion-list class="mh-flat-list today-row">
+    <ion-item button detail="false" (click)="openToday()">
+      <mh-hex-avatar slot="start" size="sm" color="info" tone="shade" icon="calendar-outline" />
+      <ion-label>
+        <div class="mh-row-line">
+          <h2>
+            <span class="today-label">{{ 'time.today' | translate }}</span>
+            · {{ first.template?.title }}
+          </h2>
+          <ion-note>
+            {{ first.startAt | date: 'HH:mm' }}
+            @if (todayMore()) {
+              · {{ 'home.today.more' | translate: { count: todayMore() } }}
+            }
+          </ion-note>
+        </div>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+}
+
+<!--
+  Who needs the coach, only when someone does: three rows at most, one per
+  person, each with its one verb. The rest, grouped by reason, is a page in
+  this stack.
+-->
+@if (needs().length) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.coach.needs.title' | translate }}</h2>
+      @if (moreNeeds() > 0) {
+        <ion-button fill="clear" (click)="openNeeds()">
+          {{ 'home.coach.needs.showMore' | translate: { count: moreNeeds() } }}
+        </ion-button>
+      }
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (need of needs(); track need.key) {
+        <mh-need-row [row]="need" (act)="act(need)" />
+      }
+    </ion-list>
+  </section>
+}
+
+<!--
+  What clients finished: everything from the last 24 hours (up to ten), or
+  the latest three on a quiet day. Each opens the workout in this stack.
+-->
+@if (latest().length) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.latest.title' | translate }}</h2>
+      <ion-button fill="clear" (click)="openLatest()">
+        {{ 'button.seeAll' | translate }}
+      </ion-button>
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (row of latest(); track row.id) {
+        <mh-latest-row [row]="row" (select)="openRow(row)" />
+      }
+    </ion-list>
+  </section>
+}
+
+<!-- A coach with no clients yet: what is worth doing before the first one. -->
+@if (store.isFirstWeek() && firstSteps().length) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.coach.firstWeek.steps' | translate }}</h2>
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (step of firstSteps(); track step.key) {
+        <ion-item button detail="false" (click)="openStep(step)">
+          <mh-hex-avatar slot="start" size="lg" color="primary" tone="wash" [icon]="step.icon" />
           <ion-label>
-            <ion-skeleton-text [animated]="true" style="width: 55%" />
+            <h2>{{ step.title }}</h2>
+            <p>{{ step.detail }}</p>
           </ion-label>
         </ion-item>
       }
-    } @else if (!store.hasAgenda()) {
-      <!--
-        An inset row on the page colour, per the design: an empty day is the
-        common case for a coach who schedules weekly, and it sits above the cards
-        that actually need the room.
-      -->
-      <ion-item class="agenda-row" lines="none">
-        <ion-note slot="start" aria-hidden="true">—</ion-note>
-        <ion-label color="medium" class="ion-text-wrap">
-          {{ 'home.coach.agenda.empty' | translate }}
-        </ion-label>
-        <ion-button slot="end" size="small" (click)="openSessions()">
-          <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-          {{ 'home.coach.agenda.new' | translate }}
-        </ion-button>
-      </ion-item>
-    } @else {
-      <!-- Time in the start slot, title beside it — the design's agenda row. -->
-      @for (instance of store.agenda(); track instance.id) {
-        <ion-item class="agenda-row" lines="none" button [detail]="true" (click)="openSessions()">
-          <ion-note slot="start">{{ instance.startAt | date: 'HH:mm' }}</ion-note>
-          <ion-label class="ion-text-wrap">{{ instance.template?.title }}</ion-label>
-        </ion-item>
-      }
-    }
-  </ion-card>
+    </ion-list>
+  </section>
+}
 
-  <!--
-    Requests banner — honey-tinted per the design. The tint comes from the
-    palette's own rgb triplet through `ion-card`'s documented `--background`, so
-    it follows a theme change instead of pinning a hex.
-  -->
-  @if (store.showRequestsBanner()) {
-    <ion-card class="requests" [button]="true" (click)="openRequests()">
-      <ion-item lines="none">
-        <ion-label class="ion-text-wrap">
-          <h2>{{ requestsSummary() }}</h2>
-          <p>{{ 'home.coach.requests.hint' | translate }}</p>
-        </ion-label>
-        <ion-note slot="end">{{ 'home.coach.requests.review' | translate }}</ion-note>
-      </ion-item>
-    </ion-card>
-  }
-
-  <div class="tiles">
-    <mh-stat-tile
-      [label]="'home.coach.outstanding.label' | translate"
-      [value]="outstanding()"
-      [hint]="outstandingHint()"
-      [hintColor]="hasOverdue() ? 'danger' : null"
-      [loading]="store.earningsLoading()"
-    />
-    <mh-stat-tile
-      [label]="'home.coach.activeClients.label' | translate"
-      [value]="'' + store.activeClients()"
-      [hint]="'home.coach.activeClients.hint' | translate"
-      [loading]="store.clientsLoading()"
-    />
-  </div>
-</div>
+<mh-create-sheet [(open)]="createOpen" (choose)="onCreate($event)" />

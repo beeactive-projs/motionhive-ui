@@ -298,6 +298,8 @@ export const API_ENDPOINTS = {
     COACH_PHOTO: (id: string) => `/coach/workout-logs/${id}/photo`,
     /** Roster-level adherence for the coach. */
     COACH_ROSTER: '/coach/roster',
+    /** The coach Home's feed: clients' latest workouts the coach may read. */
+    COACH_ACTIVITY: '/coach/activity',
   },
   ONE_REP_MAXES: {
     BASE: '/one-rep-maxes',

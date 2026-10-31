@@ -57,35 +57,40 @@ describe('tab set configuration', () => {
     }
   });
 
-  it('shares home and messages so their stacks survive a mode swap', () => {
-    // These two are tracked by id across the swap, so their buttons are never
+  it('shares home, discover and messages so their stacks survive a mode swap', () => {
+    // These are tracked by id across the swap, so their buttons are never
     // recreated and never lose their selected state.
-    for (const shared of [TabIds.Home, TabIds.Messages]) {
+    for (const shared of [TabIds.Home, TabIds.Discover, TabIds.Messages]) {
       expect(COACH_TAB_SET.tabs.some((tab) => tab.id === shared)).toBe(true);
       expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === shared)).toBe(true);
     }
   });
 
-  it('gives each mode its own role-segmented sessions tab', () => {
-    // The two sessions surfaces live under /tabs/coach/sessions and
-    // /tabs/user/sessions — separate stacks, separate deep-link addresses —
-    // so each set carries its role segment as the tab id, never the other's.
-    expect(COACH_TAB_SET.tabs.some((tab) => tab.id === TabIds.Coach)).toBe(true);
-    expect(COACH_TAB_SET.tabs.some((tab) => tab.id === TabIds.User)).toBe(false);
-    expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.User)).toBe(true);
-    expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.Coach)).toBe(false);
+  it("keeps each mode's own sessions in its menu after Discover took the tab", () => {
+    // The two sessions surfaces still live under /tabs/coach/sessions and
+    // /tabs/user/sessions, separate stacks and deep-link addresses; whatever
+    // gives up a tab slot has to stay reachable, and only the mode's own.
+    const routes = (set: typeof COACH_TAB_SET) =>
+      set.more.flatMap((section) => section.items).map((tile) => tile.route);
+    expect(routes(COACH_TAB_SET)).toContain('/tabs/coach/sessions');
+    expect(routes(COACH_TAB_SET)).not.toContain('/tabs/user/sessions');
+    expect(routes(TRAIN_TAB_SET)).toContain('/tabs/user/sessions');
+    expect(routes(TRAIN_TAB_SET)).not.toContain('/tabs/coach/sessions');
+    for (const set of Object.values(TAB_SETS)) {
+      expect(set.tabs.some((tab) => tab.id === TabIds.Coach || tab.id === TabIds.User)).toBe(false);
+    }
   });
 
   it('gives the trainee a workouts tab, training being the daily surface', () => {
     expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.Workouts)).toBe(true);
   });
 
-  it('keeps discover reachable from the menu after losing its tab slot', () => {
-    // Whatever gives up a tab slot has to stay reachable somewhere — this is
-    // the rule that stopped workouts disappearing when sessions took its slot,
-    // and it now guards discover, which gave its slot to workouts.
-    const tiles = TRAIN_TAB_SET.more.flatMap((section) => section.items);
-    expect(tiles.some((tile) => tile.route === '/tabs/discover')).toBe(true);
+  it('puts discover in the tab bar of both modes, and not again in the menu', () => {
+    for (const set of Object.values(TAB_SETS)) {
+      expect(set.tabs.some((tab) => tab.id === TabIds.Discover)).toBe(true);
+      const tiles = set.more.flatMap((section) => section.items);
+      expect(tiles.some((tile) => tile.route === '/tabs/discover')).toBe(false);
+    }
   });
 
   it('offers groups in both modes, mirroring the web shared nav block', () => {

@@ -7,24 +7,27 @@
     [color]="personTone()"
   />
 
+  <!-- Two lines, each with its trailing value inside it (the flat-list
+       pattern): who and how much, then the status, the reference and when.
+       When the second line has no room, the date drops under it rather
+       than squeezing the name or the badge. -->
   <ion-label>
-    <h2>{{ personName() }}</h2>
-    <div class="tags">
+    <div class="head">
+      <h2>{{ personName() }}</h2>
+      <span class="value">{{ invoice().amountDueCents | currencyRon: invoice().currency : 'code' }}</span>
+    </div>
+    <div class="meta">
       @if (overdue()) {
-        <ion-badge color="danger">{{ 'payments.badge.overdue' | translate }}</ion-badge>
+        <ion-badge data-tone="danger">{{ 'payments.badge.overdue' | translate }}</ion-badge>
       } @else if (style().chip; as chip) {
-        <ion-badge color="medium">{{ chip }}</ion-badge>
+        <ion-badge data-tone="medium">{{ chip }}</ion-badge>
       }
-      <ion-note>{{ reference() }}</ion-note>
+      <ion-note class="reference">{{ reference() }}</ion-note>
+      @if (dueLabel(); as due) {
+        <span class="due">{{ due }}</span>
+      }
     </div>
   </ion-label>
-
-  <div class="amount" slot="end">
-    <span class="value">{{ invoice().amountDueCents | currencyRon: invoice().currency : 'code' }}</span>
-    @if (dueLabel(); as due) {
-      <span class="due">{{ due }}</span>
-    }
-  </div>
 
   <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
 </ion-item>

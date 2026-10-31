@@ -15,6 +15,7 @@ import { addIcons } from 'ionicons';
 
 import { SOCIAL_PLATFORMS } from 'core';
 
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { ACCOUNT_ICONS } from '../account.config';
@@ -39,6 +40,7 @@ import { PhotoSheet } from '../_sheets/photo-sheet/photo-sheet';
   selector: 'mh-profile',
   imports: [
     AboutSheet,
+    EmptyState,
     HandleSheet,
     HexAvatar,
     IonBackButton,

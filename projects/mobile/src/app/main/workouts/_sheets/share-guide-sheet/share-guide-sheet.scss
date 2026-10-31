@@ -1,0 +1,15 @@
+/* The two things to do, then a quiet way out under them. */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.actions ion-button {
+  margin: 0;
+}
+
+.hide {
+  --color: var(--ion-color-medium);
+  align-self: center;
+}

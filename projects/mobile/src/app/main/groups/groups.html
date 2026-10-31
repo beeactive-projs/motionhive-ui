@@ -200,7 +200,7 @@
       @for (group of store.discover(); track group.id) {
       <ion-item button [detail]="false"
         (click)="openDiscovered(group.id)">
-        <mh-hex-avatar slot="start" size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
+        <mh-hex-avatar slot="start" size="md" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
         <ion-label>
           <h2>{{ group.name }}</h2>
           <p>
@@ -238,7 +238,7 @@
     <ion-list [inset]="true" class="mh-card-list">
       @for (group of store.mine(); track group.id) {
       <ion-item button [detail]="true" (click)="openGroup(group.id)">
-        <mh-hex-avatar slot="start" size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
+        <mh-hex-avatar slot="start" size="md" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
         <ion-label>
           <h2>{{ group.name }}</h2>
           <p>

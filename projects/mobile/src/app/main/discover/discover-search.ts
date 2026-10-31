@@ -4,7 +4,6 @@ import {
   Subject,
   catchError,
   debounceTime,
-  distinctUntilChanged,
   forkJoin,
   map,
   of,
@@ -80,7 +79,9 @@ export function injectDiscoverSearch(): DiscoverSearch {
     input.pipe(
       map((value) => value.trim()),
       debounceTime(DEBOUNCE_MS),
-      distinctUntilChanged(),
+      // No distinctUntilChanged: clearing and retyping the same term inside
+      // the debounce would be dropped as a repeat while `setQuery` had
+      // already raised `isSearching`, and the placeholders never left.
       switchMap((term) => {
         if (term.length < MIN_LENGTH) {
           isSearching.set(false);

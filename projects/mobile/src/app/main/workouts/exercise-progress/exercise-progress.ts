@@ -46,6 +46,7 @@ import {
   shortDayLabel,
   monthTicks,
   trendTicks,
+  unbreakable,
 } from '../workouts.config';
 
 const DEFAULT_RANGE: ProgressRange = '12w';
@@ -226,10 +227,12 @@ export class ExerciseProgress implements ViewWillEnter {
     if (topSet) {
       const best = {
         label: this._translateService.instant('workouts.exerciseProgress.bestSet'),
-        value: this._translateService.instant('workouts.exerciseProgress.setValue', {
-          weight: formatMeasure(topSet.weightKg),
-          reps: topSet.reps,
-        }),
+        value: unbreakable(
+          this._translateService.instant('workouts.exerciseProgress.setValue', {
+            weight: formatMeasure(topSet.weightKg),
+            reps: topSet.reps,
+          }),
+        ),
       };
       return [best, count, sets];
     }
@@ -238,7 +241,10 @@ export class ExerciseProgress implements ViewWillEnter {
       ? [
           count,
           sets,
-          { label: this._translateService.instant('workouts.exerciseProgress.best'), value: best },
+          {
+            label: this._translateService.instant('workouts.exerciseProgress.best'),
+            value: unbreakable(best),
+          },
         ]
       : [count, sets];
   });

@@ -33,7 +33,7 @@ import {
   Routine,
   RoutineService,
   RoutineSources,
-  dayDividerLabel,
+  dayInSentence,
   localDayKey,
 } from 'core';
 
@@ -270,7 +270,8 @@ export class RoutineBuilder implements ViewWillEnter {
     if (this.readOnly()) return this._translateService.instant('workouts.routineView.starter');
     return routine.lastPerformedAt
       ? this._translateService.instant('workouts.routineRow.lastDone', {
-          day: dayDividerLabel(localDayKey(new Date(routine.lastPerformedAt))),
+          // Inside a sentence: "today", and Romanian's weekday in lower case.
+          day: dayInSentence(localDayKey(new Date(routine.lastPerformedAt))),
         })
       : this._translateService.instant('workouts.routineView.yours');
   });

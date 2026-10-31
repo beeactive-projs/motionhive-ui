@@ -2,17 +2,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonRefresher,
   IonRefresherContent,
@@ -27,26 +23,27 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
-  DiscoverGroup,
+  AuthStore,
   InstructorSearchResult,
   MyBookingsIndexStore,
   PublicSessionInstance,
   SessionGroup,
   SessionsDiscoverStore,
   groupSessionsByBucket,
-  translate,
 } from 'core';
 
 import { AvatarButton } from '../../_shared/components/avatar-button/avatar-button';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { ClockService } from '../../_shared/services/clock.service';
-import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { CoachRow } from './_components/coach-row/coach-row';
 import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
+import { DiscoverStrip } from './_components/discover-strip/discover-strip';
+import { DiscoverGroupRow } from './_components/group-row/group-row';
 import { DiscoverFilterSheet } from './_sheets/discover-filter-sheet/discover-filter-sheet';
 import { injectDiscoverSearch } from './discover-search';
 import {
@@ -56,21 +53,21 @@ import {
   NO_SHEET_FILTERS,
   QUICK_FILTERS,
   QuickFilterId,
-  coachName,
+  coachStripItem,
   compileDatePreset,
+  groupStripItem,
   quickFilterSelected,
 } from './discover.config';
-import { GroupsSegments } from '../groups/groups.filters';
 import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
 
 /**
- * Discover — the trainee's front door to the catalogue: brand hero, one
- * cross-type search, the "Taking new clients" coach rail, and the session
- * feed in chronological buckets. A coach lands here too (via More), so the
- * page carries no role branches.
+ * Discover, a tab in both modes: the hero, one cross-type search, the
+ * coaches taking clients, the groups to join, and the sessions coming up in
+ * chronological buckets. Coach and trainee see the same page, so it carries
+ * no role branches.
  *
  * Search is a header takeover (the Messages pattern) and is fully isolated
- * from the browse feed — Cancel restores the exact list and chips without
+ * from the browse feed: Cancel restores the exact list and chips without
  * a refetch.
  */
 @Component({
@@ -79,20 +76,18 @@ import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
     AvatarButton,
     CoachRow,
     DiscoverFilterSheet,
+    DiscoverGroupRow,
     DiscoverSessionRow,
+    DiscoverStrip,
     EmptyState,
     HexAvatar,
-    IonBackButton,
     IonButton,
     IonButtons,
-    IonChip,
     IonContent,
     IonHeader,
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
-    IonLabel,
     IonList,
     IonRefresher,
     IonRefresherContent,
@@ -101,6 +96,7 @@ import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
     IonTitle,
     IonToolbar,
     NotificationBell,
+    RowSkeleton,
     SearchbarAutofocusDirective,
     SessionRowSkeleton,
     TranslatePipe,
@@ -113,6 +109,7 @@ export class Discover implements ViewWillEnter {
   readonly sessionsStore = inject(SessionsDiscoverStore);
   readonly coachesStore = inject(DiscoverCoachesStore);
   readonly groupsStore = inject(DiscoverGroupsStore);
+  private readonly _authStore = inject(AuthStore);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
   private readonly _clockService = inject(ClockService);
   private readonly _router = inject(Router);
@@ -121,7 +118,6 @@ export class Discover implements ViewWillEnter {
 
   readonly quickFilters = QUICK_FILTERS;
   readonly skeletonRows = [1, 2, 3, 4, 5];
-  readonly railSkeleton = [1, 2, 3, 4];
 
   readonly searchOpen = signal(false);
   readonly filterSheetOpen = signal(false);
@@ -224,15 +220,19 @@ export class Discover implements ViewWillEnter {
     this.sessionsStore.reload();
   }
 
-  // ─── Rail ─────────────────────────────────────────────────────────────────
+  // ─── Strips ───────────────────────────────────────────────────────────────
 
-  railName(coach: InstructorSearchResult): string {
-    return coachName(coach);
-  }
+  /** A coach browsing is not pitched to themselves: their own profile stays
+      in the full list and in search, not in this strip. */
+  readonly coachItems = computed(() => {
+    const me = this._authStore.user()?.id;
+    return this.coachesStore
+      .acceptingCoaches()
+      .filter((coach) => coach.userId !== me)
+      .map(coachStripItem);
+  });
 
-  railTone(coach: InstructorSearchResult): string {
-    return avatarToneFor(coach.userId);
-  }
+  readonly groupItems = computed(() => this.groupsStore.groups().map(groupStripItem));
 
   // ─── Search takeover ──────────────────────────────────────────────────────
 
@@ -252,6 +252,14 @@ export class Discover implements ViewWillEnter {
   clearSearch(): void {
     this.search.clear();
   }
+
+  /** Whether an earlier answer is on screen, so a new keystroke keeps it up
+      instead of flashing placeholders. */
+  readonly hasSearchHits = computed(
+    () =>
+      this.search.coaches().length + this.search.groups().length + this.search.sessions().length >
+      0,
+  );
 
   // ─── Loading / navigation ─────────────────────────────────────────────────
 
@@ -276,29 +284,23 @@ export class Discover implements ViewWillEnter {
     if (coach.handle) void this._router.navigate(['/tabs/discover/person', coach.handle]);
   }
 
+  openCoachById(id: string): void {
+    const coach = this.coachesStore.coaches().find((c) => c.id === id);
+    if (coach) this.openCoach(coach);
+  }
+
   openAllCoaches(): void {
     void this._router.navigate(['/tabs/discover/coaches']);
   }
 
   /** A group seen from outside, pushed onto this stack so back returns here. */
-  openGroup(group: DiscoverGroup): void {
-    void this._router.navigate(['/tabs/discover/group', group.id]);
+  openGroup(groupId: string): void {
+    void this._router.navigate(['/tabs/discover/group', groupId]);
   }
 
-  /** The full list lives in Groups' own Discover lens. */
+  /** The full list, in this stack too, so back comes here and not to the
+      Menu the Groups page sits under. */
   openAllGroups(): void {
-    void this._router.navigate(['/tabs/groups'], {
-      queryParams: { segment: GroupsSegments.Discover },
-    });
-  }
-
-  groupTone(group: DiscoverGroup): string {
-    return avatarToneFor(group.id);
-  }
-
-  /** "12 members · Cluj-Napoca" — size first, then where. */
-  groupMeta(group: DiscoverGroup): string {
-    const members = translate('count.members', { count: group.memberCount });
-    return [members, group.city].filter(Boolean).join(' · ');
+    void this._router.navigate(['/tabs/discover/groups']);
   }
 }

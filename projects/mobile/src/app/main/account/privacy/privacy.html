@@ -42,6 +42,14 @@
       <ion-note class="mh-note-block" color="medium">
         {{ 'workoutVisibility.sectionNote' | translate }}
       </ion-note>
+    } @else if (store.loadFailed() && !store.loading()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'account.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="store.refresh()"
+      />
     } @else {
       <ion-list [inset]="true" class="mh-card-list">
         @for (row of rows; track row.field) {

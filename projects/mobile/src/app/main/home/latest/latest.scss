@@ -1,0 +1,6 @@
+// Words wrap whole, never inside one (Ionic's body breaks them; home.scss).
+:host {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}

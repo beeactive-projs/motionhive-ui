@@ -1,8 +1,9 @@
 import { Component, model, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { addIcons } from 'ionicons';
 
 import { ActionSheet } from '../../../../_shared/components/action-sheet/action-sheet';
-import { CREATE_OPTIONS, CreateChoice } from '../../programs.config';
+import { CREATE_OPTIONS, CreateChoice, PROGRAM_ICONS } from '../../programs.config';
 
 /**
  * The one place anything gets created in the library.
@@ -22,4 +23,10 @@ export class CreateSheet {
   readonly choose = output<CreateChoice>();
 
   readonly options = CREATE_OPTIONS;
+
+  constructor() {
+    // Home opens this sheet too, so it registers the glyphs its options
+    // name rather than relying on the Programs page having done it.
+    addIcons(PROGRAM_ICONS);
+  }
 }

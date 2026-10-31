@@ -73,6 +73,8 @@
   </div>
 </ng-template>
 
+<!-- As tall as its three chip groups: a fixed set, so a half-height stop
+     only hid the last date preset below the fold. -->
 <mh-sheet-shell
   [(open)]="open"
   [title]="'discover.filterSheet.title' | translate"
@@ -80,8 +82,7 @@
   [actionDisabled]="count() === 0"
   [saveLabel]="applyLabel()"
   [body]="body"
-  [breakpoints]="[0, 0.6, 0.95]"
-  [initialBreakpoint]="0.6"
+  [fit]="true"
   (action)="reset()"
   (save)="apply()"
 />

@@ -38,10 +38,10 @@ function setup(
       of({ status: 'JOINED', message: 'ok', member: {} as never } as SelfJoinResult),
   );
   const cancelMyJoinRequest = vi.fn(() => of({ message: 'ok' }));
-  // The members-only read: a 200 means they are already in.
-  const getById = vi.fn(() =>
-    options.member ? of({ id: GROUP_ID } as never) : throwError(() => ({ status: 403 })),
-  );
+  // The reader's own groups: this one among them means they are already in.
+  const getMyGroups = vi.fn(() => of(options.member ? [{ id: GROUP_ID } as never] : []));
+  // The members-only read 403s for a non-member: the preview must never send it.
+  const getById = vi.fn(() => throwError(() => ({ status: 403 })));
 
   TestBed.configureTestingModule({
     providers: [
@@ -54,6 +54,7 @@ function setup(
           selfJoin,
           cancelMyJoinRequest,
           getById,
+          getMyGroups,
         },
       },
     ],
@@ -65,6 +66,8 @@ function setup(
     getMyJoinRequest,
     selfJoin,
     cancelMyJoinRequest,
+    getById,
+    getMyGroups,
   };
 }
 
@@ -154,6 +157,26 @@ describe('GroupPreviewStore — already inside', () => {
 
     expect(store.alreadyMember()).toBe(false);
     expect(store.cta()?.action).toBe(JoinActions.Join);
+  });
+
+  it('learns it from their own groups, never from the members-only read', () => {
+    // `GET /groups/:id` answers a non-member with a 403 and a console error.
+    const { store, getById, getMyGroups } = setup();
+
+    store.init(GROUP_ID);
+
+    expect(getMyGroups).toHaveBeenCalled();
+    expect(getById).not.toHaveBeenCalled();
+  });
+
+  it('stays a preview when their groups cannot be read', () => {
+    const { store, getMyGroups } = setup();
+    getMyGroups.mockReturnValueOnce(throwError(() => ({ status: 500 })));
+
+    store.init(GROUP_ID);
+
+    expect(store.alreadyMember()).toBe(false);
+    expect(store.profile()).not.toBeNull();
   });
 });
 

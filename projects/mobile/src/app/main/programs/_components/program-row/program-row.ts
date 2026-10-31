@@ -6,7 +6,7 @@ import {
   Program,
   ProgramSource,
   ProgramStatus,
-  dayDividerLabel,
+  dayShortLabel,
   localDayKey,
 } from 'core';
 
@@ -59,7 +59,9 @@ export class ProgramRow {
         ? this._translateService.instant('programs.row.noClients')
         : this._translateService.instant('count.clients', { count });
     }
+    // The short form ("29 Oct"): the long one ("Wednesday 21 October") took
+    // half the row and wrapped the title word by word.
     const at = this.program().updatedAt;
-    return at ? dayDividerLabel(localDayKey(new Date(at))) : '';
+    return at ? dayShortLabel(localDayKey(new Date(at))) : '';
   });
 }

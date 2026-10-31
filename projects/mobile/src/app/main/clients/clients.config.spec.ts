@@ -296,6 +296,17 @@ describe('client rows', () => {
       ),
     ).toBe(true);
   });
+
+  // Phones mostly type without diacritics; the server search folds too.
+  it('searches blind to accents, either way round', () => {
+    const stefan = client({
+      client: { ...client().client!, firstName: 'Ștefan', lastName: 'Brașoveanu' },
+    });
+    // Stored with accents, typed without.
+    expect(matchesClientQuery(stefan, 'stefan bras')).toBe(true);
+    // Stored without, typed with.
+    expect(matchesClientQuery(client(), 'Măria Ioneșcu')).toBe(true);
+  });
 });
 
 describe('invite page', () => {

@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
+  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -56,6 +57,7 @@ interface BookingDay {
   selector: 'mh-my-sessions',
   imports: [
     EmptyState,
+    IonBackButton,
     IonButton,
     IonButtons,
     IonContent,

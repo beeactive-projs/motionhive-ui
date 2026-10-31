@@ -28,3 +28,10 @@ export function avatarToneFor(id: string | null | undefined): AvatarTone {
 
   return AVATAR_TONES[(hash >>> 0) % AVATAR_TONES.length];
 }
+
+/**
+ * A group's hexagon without a logo: violet, the colour of people and
+ * members on every screen (`lists.md`), so a group reads the same in the
+ * strip, the list, the search and Home's Your hive.
+ */
+export const GROUP_AVATAR_TONE = 'violet';

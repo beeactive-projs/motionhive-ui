@@ -139,7 +139,7 @@ ion-list:is(.mh-card-list, .mh-flat-list) ion-item:has(> mh-hex-avatar[slot='sta
    above: it starts where the text starts, so it never cuts under the
    avatar, and stops at the gutter, under the end of the time.
    It lives only on a flat page (`ion-content.mh-flat-page`), whose surface
-   is the page colour: white in light, the page grey in dark (variables.css).
+   is the page colour: white in light, the page navy in dark (variables.css).
    Specificity: Ionic's `.list-md` (0,1,0) paints its own background and an
    8px band; this (0,1,1) replaces both. */
 ion-list.mh-flat-list {
@@ -196,6 +196,14 @@ ion-list.mh-flat-list ion-label > :is(.mh-row-line, h2, h3, p) {
   block-size: var(--mh-row-line);
 }
 
+/* A bare title or preview is one line that ellipsizes. Left to wrap, its
+   second line fell outside the fixed line box and was cut in half. */
+ion-list.mh-flat-list ion-label > :is(h2, h3, p) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* The title is Inter, not the heading face the global h2 rule puts on it:
    a flat list has dozens of these and Poppins at body size reads as shouting. */
 ion-list.mh-flat-list ion-label :is(h2, h3) {
@@ -242,9 +250,10 @@ ion-list.mh-flat-list ion-label p {
 
 /* Under a label the label is the seam, so the first row drops its top
    hairline; a run of labelled day groups would otherwise draw a line under
-   every heading. */
-.mh-section-label + ion-list.mh-flat-list > ion-item:first-child::before,
-.mh-section-label + ion-list.mh-flat-list > :first-child ion-item::before {
+   every heading. A section head (a kicker with its note or action) is a
+   label too. */
+:is(.mh-section-label, .mh-section-head) + ion-list.mh-flat-list > ion-item:first-child::before,
+:is(.mh-section-label, .mh-section-head) + ion-list.mh-flat-list > :first-child ion-item::before {
   display: none;
 }
 

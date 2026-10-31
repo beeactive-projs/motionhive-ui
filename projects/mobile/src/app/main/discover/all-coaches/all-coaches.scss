@@ -1,11 +1,4 @@
-.list {
-  padding: 0.25rem 1.25rem 3rem;
-}
+/* Rows, pills and the header come from the shared skins (the flat list,
+   `.chip`, ion-header.css); only Discover's word wrapping is added. */
 
-/* The coach row's loading twin — card look, no tone. */
-.coach-skeleton {
-  margin-bottom: 0.5rem;
-  --background: var(--ion-card-background);
-  --border-radius: var(--mh-radius-card);
-  border-radius: var(--mh-radius-card);
-}
+@use '../discover-shared';

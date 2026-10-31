@@ -8,6 +8,7 @@ import { chevronBackOutline, chevronDownOutline, closeOutline, searchOutline } f
 
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { ThemeService } from './_shared/services/theme.service';
+import { TextSizeService } from './_shared/services/text-size.service';
 import { PushRegistrationService } from './_shared/services/push-registration.service';
 import { AppLinkService } from './_shared/services/app-link.service';
 import { AppBadgeService } from './_shared/services/app-badge.service';
@@ -21,6 +22,8 @@ import { AppBadgeService } from './_shared/services/app-badge.service';
 export class App {
   // Instantiated here so the stored theme preference applies before first paint.
   private readonly _themeService = inject(ThemeService);
+  // The same for the phone's text size, which sets the root font size.
+  private readonly _textSizeService = inject(TextSizeService);
   private readonly _destroyRef = inject(DestroyRef);
 
   /**

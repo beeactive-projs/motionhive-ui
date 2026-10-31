@@ -1,30 +1,25 @@
-<ion-item
-  class="mh-list-row"
-  lines="none"
-  [button]="hasProfile()"
-  [detail]="hasProfile()"
-  (click)="onSelect()"
->
+<!-- A flat-list row (ion-list.css): the avatar, the name on its own line,
+     then the city and specializations with the "Taking clients" badge
+     trailing them, where WhatsApp keeps a row's badges. The name keeps the
+     width: in Romanian the badge alone would leave it four letters. A coach
+     with no public profile has nowhere to open, so the row stays inert
+     rather than pretending. -->
+<ion-item [button]="hasProfile()" detail="false" (click)="onSelect()">
   <mh-hex-avatar
     slot="start"
-    size="md"
+    size="lg"
+    aria-hidden="true"
     [name]="name()"
     [imageUrl]="coach().avatarUrl"
     [color]="tone()"
   />
-
   <ion-label>
-    <div class="name-line">
-      <h2>{{ name() }}</h2>
+    <h2>{{ name() }}</h2>
+    <div class="mh-row-line">
+      <p>{{ subline() }}</p>
       @if (coach().isAcceptingClients) {
-        <ion-badge class="accepting">{{ 'discover.coachRow.takingClients' | translate }}</ion-badge>
+        <ion-badge data-tone="success">{{ 'discover.coachRow.takingClients' | translate }}</ion-badge>
       }
     </div>
-    @if (specializations()) {
-      <ion-note class="specs">{{ specializations() }}</ion-note>
-    }
-    @if (meta()) {
-      <p class="meta">{{ meta() }}</p>
-    }
   </ion-label>
 </ion-item>

@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import { EarningsSummary } from '../../models/payment/earnings.model';
 import {
   PaymentListParams,
@@ -13,9 +14,14 @@ import {
 export class EarningsService {
   private readonly _http = inject(HttpClient);
 
-  getSummary(): Observable<EarningsSummary> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a caller that
+   * only feeds a badge with it (the Menu's overdue dot).
+   */
+  getSummary(opts?: { silent?: boolean }): Observable<EarningsSummary> {
     return this._http.get<EarningsSummary>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.EARNINGS}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 

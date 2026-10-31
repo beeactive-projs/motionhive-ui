@@ -154,5 +154,5 @@ ion-item.mh-session-row ion-label h2 {
 }
 
 .mh-row-group > * + * ion-item.mh-session-row {
-  border-top: var(--mh-hairline) solid var(--mh-color-divider);
+  border-top: var(--mh-hairline) solid var(--mh-color-separator);
 }

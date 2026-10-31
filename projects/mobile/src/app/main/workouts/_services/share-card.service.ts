@@ -3,69 +3,195 @@ import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
+import { environment } from 'core';
+
+import { StoryShare } from '../../../_shared/native/story-share';
+import {
+  StoryShareErrors,
+  base64Of,
+  storyShareErrorCode,
+} from '../../../_shared/native/story-share.config';
+import { CardTheme, ShareCardContent, StickerStyle } from './share-card.config';
 import {
   CARD_FONTS,
   CARD_HEIGHT,
   CARD_WIDTH,
-  CardTemplate,
-  ShareCardContent,
+  CardPalette,
+  STICKER_HEIGHT,
+  STICKER_WIDTH,
   cardPalette,
-  drawCard,
+  drawBrandedSticker,
+  drawFullCard,
+  drawQuickStory,
+  drawSticker,
+  drawStoryBackground,
 } from './share-card';
 
-/** How a share ended: sent somewhere, or put away by the person. */
+/** How a hand-off ended: sent somewhere, or put away by the person. */
 export type ShareOutcome = 'shared' | 'cancelled';
 
+/** How Open in Instagram ended: the Story editor opened, or Instagram is not there. */
+export type StoryOutcome = 'opened' | 'unavailable';
+
+/** How Save to Photos ended. */
+export type SaveOutcome = 'saved' | 'denied';
+
+/** Everything Instagram's Stories API takes: a sticker over a photo or two colours. */
+export interface StoryParts {
+  /** PNG data URL, transparent around the sticker. */
+  sticker: string;
+  /** JPEG data URL of the photo at Story size, or null for the colours. */
+  background: string | null;
+  top: string;
+  bottom: string;
+}
+
 /**
- * Draws a workout's story card on the phone and hands it to the system
- * share sheet, which is where Instagram, Facebook, messages and "Save
- * image" already live. Nothing leaves the device until the person picks
- * where it goes, and no server ever sees the image.
+ * Draws a workout's share images on the phone and hands them on: to an
+ * Instagram Story, to Photos, to the clipboard or to the system share
+ * sheet. Nothing leaves the device until the person picks where it goes,
+ * and no server ever sees the image.
  */
 @Service()
 export class ShareCardService {
   private readonly _document = inject(DOCUMENT);
   private _fontsReady: Promise<unknown> | null = null;
 
-  /** The card as a PNG data URL, for the preview and for sharing. */
-  async render(
-    content: ShareCardContent,
-    dark: boolean,
-    template: CardTemplate = 'comb',
-    photo: CanvasImageSource | null = null,
-  ): Promise<string> {
-    // The faces are bundled, but a face is only loaded once text asks for
-    // it; a canvas would otherwise draw the first card in a fallback.
-    this._fontsReady ??= Promise.all(CARD_FONTS.map((face) => this._document.fonts.load(face)));
-    await this._fontsReady.catch(() => undefined);
-
-    const canvas = this._document.createElement('canvas');
-    canvas.width = CARD_WIDTH;
-    canvas.height = CARD_HEIGHT;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Canvas 2D is not available');
-
+  /** The theme's paint, read from the app's colour ramps. */
+  palette(theme: CardTheme): CardPalette {
     const styles = getComputedStyle(this._document.documentElement);
-    drawCard(
-      ctx,
-      content,
-      cardPalette(dark, (name) => styles.getPropertyValue(name).trim()),
-      template,
-      photo,
-    );
+    return cardPalette(theme, (name) => styles.getPropertyValue(name).trim());
+  }
+
+  /** The Quick sticker, transparent around it. `scale` below 1 for a preview. */
+  async sticker(
+    content: ShareCardContent,
+    theme: CardTheme,
+    style: StickerStyle,
+    scale = 1,
+  ): Promise<HTMLCanvasElement> {
+    const { canvas, ctx } = await this._canvas(STICKER_WIDTH, STICKER_HEIGHT, scale);
+    drawSticker(ctx, content, this.palette(theme), style);
+    return canvas;
+  }
+
+  /** The Full way's sticker with the logo and the link, as a PNG data URL. */
+  async brandedSticker(content: ShareCardContent, theme: CardTheme): Promise<string> {
+    const { canvas, ctx } = await this._canvas(STICKER_WIDTH, STICKER_HEIGHT, 1);
+    drawBrandedSticker(ctx, content, this.palette(theme));
     return canvas.toDataURL('image/png');
   }
 
+  /** The Quick Story as it will look: a PNG, or a JPEG over a photo. */
+  async quickStory(
+    content: ShareCardContent,
+    theme: CardTheme,
+    style: StickerStyle,
+    photo: CanvasImageSource | null,
+    scale = 1,
+  ): Promise<string> {
+    const sticker = await this.sticker(content, theme, style, scale);
+    const { canvas, ctx } = await this._canvas(CARD_WIDTH, CARD_HEIGHT, scale);
+    drawQuickStory(ctx, sticker, this.palette(theme), photo);
+    return canvas.toDataURL(photo ? 'image/jpeg' : 'image/png', 0.92);
+  }
+
   /**
-   * Native: write to the app's cache (the folder Android lets other apps
-   * read from) and open the share sheet. Web, in development: the browser's
-   * own share where it can take files, a download where it cannot.
+   * The Full card as a data URL: a PNG, or a JPEG when it carries a photo
+   * (the photo fills the card edge to edge, and a lossless photo is several
+   * MB to hand across the bridge twice).
+   */
+  async fullCard(
+    content: ShareCardContent,
+    theme: CardTheme,
+    photo: CanvasImageSource | null,
+    scale = 1,
+  ): Promise<string> {
+    const { canvas, ctx } = await this._canvas(CARD_WIDTH, CARD_HEIGHT, scale);
+    drawFullCard(ctx, content, this.palette(theme), photo);
+    return canvas.toDataURL(photo ? 'image/jpeg' : 'image/png', 0.92);
+  }
+
+  /** The pieces Instagram's Stories API takes, at full size. */
+  async storyParts(
+    content: ShareCardContent,
+    theme: CardTheme,
+    style: StickerStyle,
+    photo: CanvasImageSource | null,
+  ): Promise<StoryParts> {
+    const palette = this.palette(theme);
+    const sticker = (await this.sticker(content, theme, style)).toDataURL('image/png');
+    let background: string | null = null;
+    if (photo) {
+      const { canvas, ctx } = await this._canvas(CARD_WIDTH, CARD_HEIGHT, 1);
+      drawStoryBackground(ctx, palette, photo);
+      background = canvas.toDataURL('image/jpeg', 0.9);
+    }
+    return { sticker, background, top: palette.storyTop, bottom: palette.storyBottom };
+  }
+
+  /** Whether Instagram can take a Story from this app (never in the browser). */
+  async instagramAvailable(): Promise<boolean> {
+    try {
+      return (await StoryShare.isInstagramAvailable()).available;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Opens Instagram's Story editor with the sticker on the photo or the colours. */
+  async toInstagramStory(parts: StoryParts): Promise<StoryOutcome> {
+    if (!(await this.instagramAvailable())) return 'unavailable';
+    try {
+      await StoryShare.shareToStory({
+        sourceApplication: environment.facebookAppId,
+        stickerImage: base64Of(parts.sticker),
+        ...(parts.background
+          ? { backgroundImage: base64Of(parts.background) }
+          : { backgroundTopColor: parts.top, backgroundBottomColor: parts.bottom }),
+      });
+      return 'opened';
+    } catch (err) {
+      if (storyShareErrorCode(err) === StoryShareErrors.Unavailable) return 'unavailable';
+      throw err;
+    }
+  }
+
+  /** Adds the card to Photos (a download in the browser). */
+  async saveToPhotos(dataUrl: string): Promise<SaveOutcome> {
+    try {
+      await StoryShare.saveToPhotos({ image: base64Of(dataUrl) });
+      return 'saved';
+    } catch (err) {
+      if (storyShareErrorCode(err) === StoryShareErrors.Denied) return 'denied';
+      throw err;
+    }
+  }
+
+  /** Puts the image on the clipboard, transparency kept. */
+  async copyImage(dataUrl: string): Promise<void> {
+    await StoryShare.copyImage({ image: base64Of(dataUrl) });
+  }
+
+  /** Opens Instagram; the website when the app is not there. */
+  async openInstagram(): Promise<void> {
+    const { opened } = await StoryShare.openInstagram();
+    if (!opened) {
+      this._document.defaultView?.open('https://www.instagram.com/', '_blank', 'noopener');
+    }
+  }
+
+  /**
+   * The system share sheet. Native: written to the app's cache (the folder
+   * Android lets other apps read from) under one name, so shares do not
+   * pile up there. Web, in development: the browser's own share where it
+   * can take files, a download where it cannot.
    */
   async share(dataUrl: string, title: string): Promise<ShareOutcome> {
     if (Capacitor.isNativePlatform()) {
       const { uri } = await Filesystem.writeFile({
-        path: `motionhive-workout-${Date.now()}.png`,
-        data: dataUrl.split(',')[1],
+        path: dataUrl.startsWith('data:image/jpeg') ? SHARE_FILE_JPEG : SHARE_FILE_PNG,
+        data: base64Of(dataUrl),
         directory: Directory.Cache,
       });
       try {
@@ -78,7 +204,9 @@ export class ShareCardService {
     }
 
     const blob = await (await fetch(dataUrl)).blob();
-    const file = new File([blob], 'motionhive-workout.png', { type: 'image/png' });
+    const file = new File([blob], blob.type === 'image/jpeg' ? SHARE_FILE_JPEG : SHARE_FILE_PNG, {
+      type: blob.type,
+    });
     const nav = this._document.defaultView?.navigator;
     if (nav?.canShare?.({ files: [file] })) {
       try {
@@ -95,7 +223,32 @@ export class ShareCardService {
     link.click();
     return 'shared';
   }
+
+  /**
+   * A blank canvas, after the faces are in: they are bundled, but a face
+   * is only loaded once text asks for it, and a canvas would otherwise
+   * draw the first card in a fallback. `scale` draws a smaller copy for a
+   * preview with the same coordinates.
+   */
+  private async _canvas(
+    width: number,
+    height: number,
+    scale: number,
+  ): Promise<{ canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }> {
+    this._fontsReady ??= Promise.all(CARD_FONTS.map((face) => this._document.fonts.load(face)));
+    await this._fontsReady.catch(() => undefined);
+    const canvas = this._document.createElement('canvas');
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas 2D is not available');
+    ctx.scale(scale, scale);
+    return { canvas, ctx };
+  }
 }
+
+const SHARE_FILE_PNG = 'motionhive-workout.png';
+const SHARE_FILE_JPEG = 'motionhive-workout.jpg';
 
 /** Closing the share sheet is a choice, not a failure. */
 function isCancel(err: unknown): boolean {

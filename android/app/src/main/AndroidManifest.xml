@@ -78,4 +78,20 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Save to Photos on Android 9 and older. From 10 the gallery takes a
+         new picture through MediaStore with no permission at all. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!-- Package visibility (Android 11+): without these the app cannot see
+         that Instagram is installed, so Quick share would always fall back
+         to the share sheet and Open Instagram would open the website. -->
+    <queries>
+        <package android:name="com.instagram.android" />
+        <intent>
+            <action android:name="com.instagram.share.ADD_TO_STORY" />
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
 </manifest>

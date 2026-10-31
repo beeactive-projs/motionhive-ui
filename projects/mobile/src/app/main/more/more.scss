@@ -1,0 +1,8 @@
+// The identity card's name and address: one line each, ending in an
+// ellipsis. An address has nowhere to break, and at large text it split
+// mid-word ("motionhive/.fit").
+.identity :is(h2, p) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

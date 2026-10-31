@@ -1,7 +1,6 @@
 import {
   alertCircleOutline,
   calendarOutline,
-  chevronForwardOutline,
   compassOutline,
   peopleOutline,
   searchOutline,
@@ -10,6 +9,7 @@ import {
 
 import {
   DiscoverFilters,
+  DiscoverGroup,
   InstructorSearchResult,
   PublicSessionInstance,
   SESSION_LOCATION_KINDS,
@@ -26,10 +26,12 @@ import {
   translate,
 } from 'core';
 
+import { avatarToneFor, GROUP_AVATAR_TONE } from '../../_shared/utils/avatar-tone.utils';
+
 /**
  * The Discover surface's pure brain: spine tones, price parts, spots and
  * full/waitlist chips, the date-preset compiler, the quick-filter chip
- * model, and the coach-list helpers.
+ * model, the strip items, and the coach and group row lines.
  *
  * Everything derives from a `PublicSessionInstance` / `InstructorSearchResult`
  * and a clock — no signals, no Ionic — so the design's invariants ("the spine
@@ -41,7 +43,6 @@ import {
 export const DISCOVER_ICONS = {
   alertCircleOutline,
   calendarOutline,
-  chevronForwardOutline,
   compassOutline,
   peopleOutline,
   searchOutline,
@@ -372,20 +373,20 @@ export function coachName(c: InstructorSearchResult): string {
   );
 }
 
-/** "Bucharest, RO · 8 yrs experience" — location silently absent when the
-    profile has none; a missing or zero experience reads "New coach". */
-export function coachMeta(c: InstructorSearchResult): string {
-  const location = [c.city, c.country].filter(Boolean).join(', ');
+/**
+ * A coach row's second line: where they are, then what they coach
+ * ("Cluj-Napoca · Running · Mobility"). With neither on the profile, the
+ * experience stands in; a missing or zero experience reads "New coach".
+ */
+export function coachSubline(c: InstructorSearchResult): string {
+  const parts = [c.city, ...(c.specializations ?? [])]
+    .map((part) => part?.trim())
+    .filter((part): part is string => !!part);
+  if (parts.length > 0) return parts.join(' · ');
   const years = c.yearsOfExperience;
-  const experience =
-    years && years > 0
-      ? translate('discover.coach.experience', { count: years })
-      : translate('discover.coach.newCoach');
-  return [location, experience].filter(Boolean).join(' · ');
-}
-
-export function coachSpecializations(c: InstructorSearchResult): string {
-  return (c.specializations ?? []).join(' · ');
+  return years && years > 0
+    ? translate('discover.coach.experience', { count: years })
+    : translate('discover.coach.newCoach');
 }
 
 /** Accepting-first, then by name — the only honest sort the payload offers. */
@@ -425,4 +426,63 @@ export function matchesSpecialization(
   if (!spec) return true;
   const needle = spec.trim().toLowerCase();
   return (c.specializations ?? []).some((s) => s.trim().toLowerCase() === needle);
+}
+
+// ─── Groups ────────────────────────────────────────────────────────────────
+
+/** "12 members · Cluj-Napoca", led by "Request pending" once the reader has
+    asked to join, so the row does not read as untouched. */
+export function discoverGroupMeta(g: DiscoverGroup): string {
+  return [
+    g.myJoinRequestStatus === 'PENDING' ? translate('groups.join.pending') : null,
+    translate('count.members', { count: g.memberCount }),
+    g.city?.trim(),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+// ─── Strips ────────────────────────────────────────────────────────────────
+
+/** One avatar in a Discover strip: a coach taking clients, a group to join. */
+export interface DiscoverStripItem {
+  id: string;
+  name: string;
+  /** The one line under the name (the city), or null. */
+  meta: string | null;
+  imageUrl: string | null;
+  /**
+   * Ionic palette name for the hexagon: a coach's keyed on the id so it
+   * never shifts, a group's `GROUP_AVATAR_TONE`.
+   */
+  tone: string;
+  /** Nothing to open: a coach with no public profile. */
+  disabled: boolean;
+}
+
+/** What a screen reader says for an item: "Irina Moldovan, Cluj-Napoca". */
+export function stripItemLabel(item: DiscoverStripItem): string {
+  return [item.name, item.meta].filter(Boolean).join(', ');
+}
+
+export function coachStripItem(c: InstructorSearchResult): DiscoverStripItem {
+  return {
+    id: c.id,
+    name: coachName(c),
+    meta: c.city?.trim() || null,
+    imageUrl: c.avatarUrl ?? null,
+    tone: avatarToneFor(c.userId),
+    disabled: !c.handle,
+  };
+}
+
+export function groupStripItem(g: DiscoverGroup): DiscoverStripItem {
+  return {
+    id: g.id,
+    name: g.name,
+    meta: g.city?.trim() || null,
+    imageUrl: g.logoUrl ?? null,
+    tone: GROUP_AVATAR_TONE,
+    disabled: false,
+  };
 }

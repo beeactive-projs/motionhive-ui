@@ -4,3 +4,11 @@
 ion-datetime-button::part(native) {
   border-radius: var(--mh-radius-control);
 }
+
+/* The weekday letters over the calendar. Ionic draws them in a faint step of
+   the ink (#b3b3b3 on white, 1.9:1; a navy mix at 2.2:1 in dark), which is
+   under the 4.5:1 text needs at their size; the muted ink clears it in both
+   themes. */
+ion-datetime::part(calendar-days-of-week) {
+  color: var(--ion-color-medium);
+}

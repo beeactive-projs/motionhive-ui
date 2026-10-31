@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import {
   Invoice,
   InvoiceLineItemDetail,
@@ -114,11 +115,13 @@ export class ClientPaymentService {
   /**
    * Lightweight count-only lookup used by the profile tabs to decide
    * which tabs to render and what badge values to show. Never loads
-   * the full lists — one call returns all counts.
+   * the full lists — one call returns all counts. `silent` for a caller
+   * that only feeds a badge with it (the Menu's Billing dot).
    */
-  getMyCounts(): Observable<MyBillingCounts> {
+  getMyCounts(opts?: { silent?: boolean }): Observable<MyBillingCounts> {
     return this._http.get<MyBillingCounts>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_COUNTS}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 }

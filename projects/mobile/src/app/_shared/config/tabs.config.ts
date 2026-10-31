@@ -37,6 +37,14 @@ export const TAB_ICONS = {
 
 // Tabs shared by both modes — same id, so Ionic keeps one stack across a swap.
 const HOME: TabItem = { id: TabIds.Home, label: 'nav.home', icon: 'home-outline' };
+// Finding coaches, groups and sessions is where the hive grows, for a coach
+// as much as a trainee, so it holds a tab in both modes (user decision,
+// 2026-10-31). Sessions gave up the slot and moved into the Menu.
+const DISCOVER_TAB: TabItem = {
+  id: TabIds.Discover,
+  label: 'nav.discover',
+  icon: 'compass-outline',
+};
 const MESSAGES: TabItem = {
   id: TabIds.Messages,
   label: 'nav.messages',
@@ -52,22 +60,13 @@ const GROUPS: MoreTile = {
   route: '/tabs/groups',
 };
 
-const DISCOVER: MoreTile = {
-  label: 'nav.discover',
-  icon: 'compass-outline',
-  iconColor: 'teal',
-  route: '/tabs/discover',
-};
-
 export const COACH_TAB_SET: TabSet = {
   mode: NavModes.Coach,
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
     { id: TabIds.Clients, label: 'nav.clients', icon: 'people-outline' },
-    // Role segment as the id: the coach sessions area lives under
-    // `/tabs/coach/sessions` (see tab.model.ts).
-    { id: TabIds.Coach, label: 'nav.sessions', icon: 'calendar-outline' },
+    DISCOVER_TAB,
     MESSAGES,
   ],
   // Grouped by intent, mirroring web's rail: the coaching workspace first,
@@ -79,6 +78,14 @@ export const COACH_TAB_SET: TabSet = {
       items: [
         // Requests have no row: they are the Clients tab's Requests chip, and
         // the dot for them sits on that tab.
+        // The coach's calendar, in its own stack at `/tabs/coach/sessions`
+        // since Discover took its tab.
+        {
+          label: 'nav.sessions',
+          icon: 'calendar-outline',
+          iconColor: 'info',
+          route: '/tabs/coach/sessions',
+        },
         { label: 'nav.programs', icon: 'albums-outline', iconColor: 'violet', route: '/tabs/programs' },
         { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
         {
@@ -91,7 +98,7 @@ export const COACH_TAB_SET: TabSet = {
     },
     {
       label: 'nav.community',
-      items: [DISCOVER, GROUPS],
+      items: [GROUPS],
     },
   ],
 };
@@ -101,10 +108,8 @@ export const TRAIN_TAB_SET: TabSet = {
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
-    // The trainee's bookings — `/tabs/user/sessions`.
-    { id: TabIds.User, label: 'nav.sessions', icon: 'calendar-outline' },
-    // Training is the thing a trainee opens daily; finding a coach is
-    // something they do once. Discover gave up the slot for it.
+    DISCOVER_TAB,
+    // Training is the thing a trainee opens daily.
     { id: TabIds.Workouts, label: 'nav.workouts', icon: 'barbell-outline' },
     MESSAGES,
   ],
@@ -118,6 +123,14 @@ export const TRAIN_TAB_SET: TabSet = {
         // Who coaches this reader — and the only screen on mobile where a
         // coach's invitation can be accepted, so it carries the dot for one.
         { label: 'nav.coaches', icon: 'people-outline', iconColor: 'violet', route: '/tabs/more/coaches' },
+        // The trainee's bookings, in their own stack at `/tabs/user/sessions`
+        // since Discover took the tab.
+        {
+          label: 'nav.sessions',
+          icon: 'calendar-outline',
+          iconColor: 'info',
+          route: '/tabs/user/sessions',
+        },
         // The same library the coach side gets, read-only: a trainee looking
         // up a movement their plan names should not have to ask for it.
         { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
@@ -133,7 +146,7 @@ export const TRAIN_TAB_SET: TabSet = {
     },
     {
       label: 'nav.community',
-      items: [DISCOVER, GROUPS],
+      items: [GROUPS],
     },
   ],
 };

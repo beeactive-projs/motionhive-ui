@@ -234,6 +234,9 @@
     @if (showNoPlan()) {
     <!-- Nothing to follow: the page's next step, and its only honey button. -->
     <div class="no-plan">
+      <svg class="no-plan-mark" [attr.viewBox]="hexViewBox" aria-hidden="true">
+        <path [attr.d]="hexPath" />
+      </svg>
       <span class="mh-kicker">{{ 'clients.detail.noPlan.title' | translate }}</span>
       <p>{{ 'clients.detail.noPlan.body' | translate }}</p>
       <ion-button (click)="openAssign()">
@@ -246,14 +249,14 @@
     @if (client.notes) {
     <!-- Said on the card itself: a coach must never wonder whether
                      the client reads what they write here. -->
-    <button type="button" class="note" (click)="openNotes()">
+    <ion-card class="note" [button]="true" (click)="openNotes()">
       <span class="note-head">
         <ion-icon name="lock-closed-outline" aria-hidden="true" />
         <span class="mh-kicker">{{ 'clients.detail.noteKicker' | translate }}</span>
         <ion-icon class="edit" name="create-outline" aria-hidden="true" />
       </span>
       <span class="note-text">{{ client.notes }}</span>
-    </button>
+    </ion-card>
     } @else {
     <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="openNotes()">
       <ion-icon slot="start" name="add-outline" aria-hidden="true" />

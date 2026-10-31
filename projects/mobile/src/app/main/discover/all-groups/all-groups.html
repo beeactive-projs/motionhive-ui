@@ -1,0 +1,50 @@
+<!-- Every public group the reader is not in, as a flat list: the full list
+     behind Discover's "Groups to join", in Discover's own stack so back
+     returns there. -->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/discover" />
+    </ion-buttons>
+    <ion-title>{{ 'discover.groupsRail.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'discover.allGroups.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
+    <!-- The real rows' geometry, so nothing shifts when data lands. -->
+    <ion-list class="mh-flat-list" aria-busy="true">
+      @for (_ of skeletonRows; track $index) {
+        <mh-row-skeleton [index]="$index" />
+      }
+    </ion-list>
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      [heading]="'discover.allGroups.empty.heading' | translate"
+      [message]="'discover.allGroups.empty.message' | translate"
+    />
+  } @else {
+    <ion-list class="mh-flat-list">
+      @for (group of store.groups(); track group.id) {
+        <mh-discover-group-row [group]="group" (select)="openGroup(group.id)" />
+      }
+    </ion-list>
+
+    <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
+</ion-content>

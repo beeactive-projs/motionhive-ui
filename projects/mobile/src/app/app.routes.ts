@@ -42,7 +42,7 @@ export const routes: Routes = [
       ...notificationRoutes,
       {
         path: 'home',
-        loadComponent: () => import('./main/home/home').then((m) => m.Home),
+        loadChildren: () => import('./main/home/home.routes').then((m) => m.homeRoutes),
       },
       {
         path: 'messages',

@@ -1,0 +1,16 @@
+<ion-item button detail="false" (click)="select.emit()">
+  <mh-hex-avatar
+    slot="start"
+    size="lg"
+    aria-hidden="true"
+    [name]="group().name"
+    [imageUrl]="group().logoUrl"
+    [color]="tone"
+  />
+  <ion-label>
+    <h2>{{ group().name }}</h2>
+    @if (meta()) {
+      <p>{{ meta() }}</p>
+    }
+  </ion-label>
+</ion-item>

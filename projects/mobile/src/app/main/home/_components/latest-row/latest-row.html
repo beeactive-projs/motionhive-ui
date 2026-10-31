@@ -1,0 +1,26 @@
+<ion-item button detail="false" (click)="select.emit()">
+  <mh-hex-avatar
+    slot="start"
+    size="lg"
+    aria-hidden="true"
+    [name]="row().avatar.name"
+    [imageUrl]="row().avatar.imageUrl"
+    [icon]="row().avatar.icon"
+    [color]="row().avatar.color"
+    [tone]="row().avatar.wash ? 'wash' : 'base'"
+  />
+  <ion-label>
+    <div class="mh-row-line">
+      <h2>{{ row().title }}</h2>
+      <ion-note>{{ row().note }}</ion-note>
+    </div>
+    <p>
+      @for (part of row().parts; track $index) {
+        @if (!$first) {
+          <span aria-hidden="true"> · </span>
+        }
+        <span [class.accent]="part.accent">{{ part.text }}</span>
+      }
+    </p>
+  </ion-label>
+</ion-item>

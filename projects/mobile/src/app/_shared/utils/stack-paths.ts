@@ -12,9 +12,10 @@
  *   Groups:    /tabs/groups/:groupId       the tab's own group pages
  *   elsewhere: <stack>/groups/:groupId     (`group/` is Discover's preview)
  *
- * A screen whose stack mounts none of them (Home) falls back to the tabs.
+ * A screen whose stack mounts none of them falls back to the tabs.
  */
 export const ProfileStacks = {
+  Home: '/tabs/home',
   Messages: '/tabs/messages',
   Groups: '/tabs/groups',
   Clients: '/tabs/clients',

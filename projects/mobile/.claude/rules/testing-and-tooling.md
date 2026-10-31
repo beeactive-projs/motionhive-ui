@@ -19,6 +19,6 @@ paths:
 
 ## Verifying UI
 
-- Check a visual change in the running app (`npm run start:mobile`, http://localhost:8100) in **both** light and dark mode. Dark mode is the `ion-palette-dark` class, persisted as `localStorage['mh-mobile-theme']` (`light` / `dark` / `system`).
+- Check a visual change in the running app (`npm run start:mobile`, http://localhost:8100) in **both** light and dark mode, and at 130% text on an iPhone SE viewport (`document.documentElement.style.fontSize = '130%'`). Dark mode is the `ion-palette-dark` class, persisted as `localStorage['mh-mobile-theme']` (`light` / `dark` / `system`).
 - The dev build talks to a local API on `:3800` (no `/api` prefix). Lists only show their real layout with data in them; an empty account hides row-level problems.
 - For alignment, measure instead of eyeballing: in a card list, the leading item's vertical centre and the label's should match the row's to within about 1px.

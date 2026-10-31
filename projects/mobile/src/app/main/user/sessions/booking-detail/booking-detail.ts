@@ -125,16 +125,18 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   readonly Views = DetailViews;
 
   /**
-   * The stack this page was pushed onto. It is mounted under two tabs —
-   * the trainee sessions area and Discover (`discover/:id`) — and the
-   * settled rule is that back returns to origin, so the back fallback and
-   * both in-page navigations follow whichever stack the URL is in.
+   * The stack this page was pushed onto. It is mounted in three stacks —
+   * the trainee sessions area, Discover (`discover/:id`) and Home
+   * (`home/booking/:id`) — and the settled rule is that back returns to
+   * origin, so the back fallback and both in-page navigations follow
+   * whichever stack the URL is in.
    */
-  readonly stackBase = computed(() =>
-    this._router.url.startsWith('/tabs/discover')
-      ? '/tabs/discover'
-      : '/tabs/user/sessions',
-  );
+  readonly stackBase = computed(() => {
+    const url = this._router.url;
+    if (url.startsWith('/tabs/discover')) return '/tabs/discover';
+    if (url.startsWith('/tabs/home')) return '/tabs/home';
+    return '/tabs/user/sessions';
+  });
 
   readonly skeletonRows = [1, 2, 3];
 

@@ -57,6 +57,7 @@ import { WorkoutPhotoStore, preparePhoto } from '../_services/workout-photo';
 import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
 import {
   NOTE_MAX_LENGTH,
+  STREAK_WORTH_SAYING,
   WORKOUT_ICONS,
   cheerKey,
   durationClock,
@@ -76,8 +77,6 @@ const VISIBILITY_ICONS: Record<ProfilePrivacy, string> = {
   [ProfilePrivacy.Public]: 'globe-outline',
 };
 
-/** A streak shorter than this is just training, not yet a streak. */
-const STREAK_WORTH_SAYING = 2;
 /** The highlights row holds two; past that it stops being a highlight. */
 const MAX_HIGHLIGHTS = 2;
 
@@ -543,11 +542,6 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
           );
         },
       });
-  }
-
-  /** The message is kept with the workout; sharing again starts from it. */
-  onCaptionSaved(caption: string | null): void {
-    this.log.update((log) => (log ? { ...log, shareCaption: caption } : log));
   }
 
   openSaveRoutine(): void {

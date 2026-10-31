@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import {
   CreateProductPayload,
   Product,
@@ -16,13 +17,23 @@ export class ProductService {
   private readonly _http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.PRODUCTS}`;
 
-  list(params: ProductListParams = {}): Observable<ProductListResponse> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure state (see `RosterService.roster`).
+   */
+  list(
+    params: ProductListParams = {},
+    opts?: { silent?: boolean },
+  ): Observable<ProductListResponse> {
     let httpParams = new HttpParams();
     if (params.type) httpParams = httpParams.set('type', params.type);
     if (params.isActive != null) httpParams = httpParams.set('isActive', String(params.isActive));
     if (params.page) httpParams = httpParams.set('page', params.page.toString());
     if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    return this._http.get<ProductListResponse>(this.baseUrl, { params: httpParams });
+    return this._http.get<ProductListResponse>(this.baseUrl, {
+      params: httpParams,
+      ...(opts?.silent ? { context: silentRequest() } : {}),
+    });
   }
 
   get(id: string): Observable<Product> {

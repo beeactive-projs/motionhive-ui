@@ -1,0 +1,36 @@
+import {
+  addOutline,
+  calendarOutline,
+  checkmarkDoneOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
+  cloudOfflineOutline,
+  createOutline,
+  peopleOutline,
+  personAddOutline,
+  playOutline,
+  sparklesOutline,
+  trophyOutline,
+} from 'ionicons/icons';
+
+/**
+ * Every icon both Homes and their pages (Needs you, Latest) render. Home
+ * and each page call `addIcons(HOME_ICONS)`, so a page opened straight
+ * from a link has its icons too. The role pill's tiles come from
+ * `ROLE_ICONS`, registered beside it. `home.icons.spec.ts` fails when this
+ * and the templates disagree.
+ */
+export const HOME_ICONS = {
+  addOutline,
+  calendarOutline,
+  checkmarkDoneOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
+  cloudOfflineOutline,
+  createOutline,
+  peopleOutline,
+  personAddOutline,
+  playOutline,
+  sparklesOutline,
+  trophyOutline,
+};

@@ -47,16 +47,16 @@ ion-searchbar.mh-search-pill .searchbar-input-container {
 }
 
 /* iOS sets the glyph 5px in and the text 30px in at 17px; this app's field
-   is md's: glyph 16px in, text after 55px, at 16px. `!important` for the
-   scoped-CSS reason above, and because iOS also positions the placeholder
-   with inline styles. */
+   is md's: glyph 16px in, text after 56px (md's 55 on the grid), at 16px.
+   `!important` for the scoped-CSS reason above, and because iOS also
+   positions the placeholder with inline styles. */
 .ios ion-searchbar .searchbar-search-icon {
   inset-inline-start: 1rem !important;
   margin-inline-start: 0 !important;
 }
 
 .ios ion-searchbar .searchbar-input {
-  padding-inline-start: 3.4375rem !important;
+  padding-inline-start: 3.5rem !important;
   font-size: var(--mh-text-md) !important;
 }
 
@@ -66,4 +66,35 @@ ion-searchbar.mh-search-pill .searchbar-input-container {
 ion-searchbar .searchbar-search-icon {
   top: 50% !important;
   transform: translateY(-50%);
+}
+
+/* One line, always, ending in an ellipsis: at 130% text a Romanian
+   placeholder either wrapped to two lines (Discover: iOS WebKit wraps a
+   placeholder under `white-space: normal`, which the input inherits from the
+   host) or was cut off at the end of the pill (Messages). `white-space`
+   inherits, so the host carries it; `text-overflow` does not, and Ionic's
+   `inherit` on the input only reaches its plain container, so the input
+   gets it here (two classes and an element, above Ionic's rule). The
+   placeholder repeats both, since it is laid out apart from the value. */
+ion-searchbar {
+  white-space: nowrap;
+}
+
+ion-searchbar .searchbar-input-container .searchbar-input {
+  text-overflow: ellipsis;
+}
+
+ion-searchbar .searchbar-input::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* iOS leaves the text no room at the end until there is a value to clear
+   (then its own clear-button rule, which outranks this one, takes over), so
+   the ellipsis landed flush on the pill's edge. Two classes and an element:
+   above Ionic's base `.searchbar-input` padding, below the clear-button
+   state. */
+.ios ion-searchbar .searchbar-input-container .searchbar-input {
+  padding-inline-end: 1rem;
 }

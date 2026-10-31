@@ -2,7 +2,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  DiscoverGroup,
   Group,
   GroupMember,
   GroupMemberPostPolicies,
@@ -26,10 +25,10 @@ import {
   joinPolicyLabel,
   memberRoleLabel,
   postNeedsApproval,
+  previewBackLabel,
 } from './groups.config';
 import {
   MIN_SEARCH_LENGTH,
-  matchesGroupQuery,
   matchesMemberQuery,
 } from './groups.filters';
 
@@ -192,31 +191,6 @@ describe('groups.config — error matching', () => {
 });
 
 describe('groups.filters — search', () => {
-  function discover(overrides: Partial<DiscoverGroup> = {}): DiscoverGroup {
-    return {
-      name: 'Morning Crew',
-      description: 'Small in-person strength crew',
-      tags: ['strength', 'demo'],
-      ...overrides,
-    } as DiscoverGroup;
-  }
-
-  it('matches a group on name, description or tag', () => {
-    expect(matchesGroupQuery(discover(), 'morning')).toBe(true);
-    expect(matchesGroupQuery(discover(), 'strength')).toBe(true);
-    expect(matchesGroupQuery(discover(), 'demo')).toBe(true);
-    expect(matchesGroupQuery(discover(), 'yoga')).toBe(false);
-  });
-
-  it('treats an empty term as matching everything', () => {
-    expect(matchesGroupQuery(discover(), '   ')).toBe(true);
-  });
-
-  it('survives a group with no description or tags', () => {
-    expect(matchesGroupQuery(discover({ description: null, tags: null }), 'morning')).toBe(true);
-    expect(matchesGroupQuery(discover({ description: null, tags: null }), 'strength')).toBe(false);
-  });
-
   it('matches a member on name or email', () => {
     const member = {
       user: { firstName: 'Anna', lastName: 'Popescu', email: 'anna@motionhive.fit' },
@@ -234,5 +208,39 @@ describe('groups.filters — search', () => {
 
   it('has a search floor', () => {
     expect(MIN_SEARCH_LENGTH).toBeGreaterThan(1);
+  });
+});
+
+describe('previewBackLabel: the screen back returns to', () => {
+  const fromDiscover = '/tabs/discover/group/g-1';
+
+  it('says Groups when the preview was opened from Discover\'s list of every group', () => {
+    expect(previewBackLabel(fromDiscover, '/tabs/discover/groups')).toBe('nav.groups');
+  });
+
+  it('says Discover when it was opened from the strip or its search', () => {
+    expect(previewBackLabel(fromDiscover, '/tabs/discover')).toBe('nav.discover');
+    expect(previewBackLabel(fromDiscover, '/tabs/discover?q=run')).toBe('nav.discover');
+  });
+
+  it('says Groups in the Groups tab', () => {
+    expect(previewBackLabel('/tabs/groups/preview/g-1', '/tabs/groups')).toBe('nav.groups');
+  });
+
+  it('says Back when it returns to a profile', () => {
+    expect(
+      previewBackLabel('/tabs/discover/groups/preview/g-1', '/tabs/discover/person/anna'),
+    ).toBe('button.back');
+  });
+
+  it('ignores a page in another tab, which back never returns to', () => {
+    expect(previewBackLabel(fromDiscover, '/tabs/home')).toBe('nav.discover');
+    expect(previewBackLabel('/tabs/groups/preview/g-1', '/tabs/home')).toBe('nav.groups');
+  });
+
+  it('names the stack root on a cold load', () => {
+    expect(previewBackLabel(fromDiscover, null)).toBe('nav.discover');
+    expect(previewBackLabel('/tabs/groups/preview/g-1', null)).toBe('nav.groups');
+    expect(previewBackLabel('/tabs/clients/groups/preview/g-1', null)).toBe('button.back');
   });
 });

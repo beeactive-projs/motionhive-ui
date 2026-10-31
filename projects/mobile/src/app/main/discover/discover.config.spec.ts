@@ -1,9 +1,10 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import type { InstructorSearchResult, PublicSessionInstance } from 'core';
-import { SessionLocationKind, SessionType } from 'core';
+import type { DiscoverGroup, InstructorSearchResult, PublicSessionInstance } from 'core';
+import { GroupMemberPostPolicies, JoinPolicies, SessionLocationKind, SessionType } from 'core';
 
+import { GROUP_AVATAR_TONE } from '../../_shared/utils/avatar-tone.utils';
 import { bookingPriceLabel } from '../user/sessions/my-sessions.config';
 import {
   DISCOVER_ICONS,
@@ -11,12 +12,15 @@ import {
   DiscoverTones,
   NO_SHEET_FILTERS,
   QuickFilterIds,
-  coachMeta,
   coachName,
+  coachStripItem,
+  coachSubline,
   compileDatePreset,
+  discoverGroupMeta,
   discoverMeta,
   discoverTone,
   fullChip,
+  groupStripItem,
   isSessionFull,
   matchesSpecialization,
   quickFilterSelected,
@@ -25,6 +29,7 @@ import {
   sortCoaches,
   specializationOptions,
   spotsLabel,
+  stripItemLabel,
 } from './discover.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -158,6 +163,35 @@ function coach(
     city: 'Bucharest',
     country: 'RO',
     socialLinks: null,
+    ...overrides,
+  };
+}
+
+function group(overrides: Partial<DiscoverGroup> = {}): DiscoverGroup {
+  return {
+    id: 'grp-1',
+    instructorId: 'prof-1',
+    name: 'Forță pentru începători',
+    slug: 'forta',
+    description: null,
+    logoUrl: null,
+    timezone: 'Europe/Bucharest',
+    isActive: true,
+    isPublic: true,
+    joinPolicy: JoinPolicies.Open,
+    memberPostPolicy: GroupMemberPostPolicies.Open,
+    tags: null,
+    contactEmail: null,
+    contactPhone: null,
+    address: null,
+    city: 'Cluj-Napoca',
+    country: 'RO',
+    memberCount: 12,
+    joinToken: null,
+    joinTokenExpiresAt: null,
+    createdAt: '2026-10-01T10:00:00Z',
+    updatedAt: '2026-10-01T10:00:00Z',
+    myJoinRequestStatus: null,
     ...overrides,
   };
 }
@@ -376,14 +410,20 @@ describe('coach helpers', () => {
     expect(coachName(coach())).toBe('Ana Popescu');
   });
 
-  it('coachMeta renders location · experience, "New coach" without years', () => {
-    expect(coachMeta(coach())).toBe('Bucharest, RO · 8 yrs experience');
-    expect(coachMeta(coach({ yearsOfExperience: null }))).toBe(
-      'Bucharest, RO · New coach',
+  it('coachSubline says where, then what they coach', () => {
+    expect(coachSubline(coach({ specializations: ['Yoga', ' Pilates '] }))).toBe(
+      'Bucharest · Yoga · Pilates',
     );
-    expect(coachMeta(coach({ city: null, country: null }))).toBe(
-      '8 yrs experience',
-    );
+    expect(coachSubline(coach({ city: null }))).toBe('Yoga');
+    expect(coachSubline(coach({ specializations: null }))).toBe('Bucharest');
+  });
+
+  it('coachSubline falls back to experience, "New coach" without years', () => {
+    const bare = { city: null, specializations: [] };
+    expect(coachSubline(coach(bare))).toBe('8 yrs experience');
+    expect(coachSubline(coach({ ...bare, yearsOfExperience: 1 }))).toBe('1 yr experience');
+    expect(coachSubline(coach({ ...bare, yearsOfExperience: 0 }))).toBe('New coach');
+    expect(coachSubline(coach({ ...bare, yearsOfExperience: null }))).toBe('New coach');
   });
 
   it('sortCoaches puts accepting coaches first, then names', () => {
@@ -408,5 +448,52 @@ describe('coach helpers', () => {
     expect(matchesSpecialization(coach(), 'yoga')).toBe(true);
     expect(matchesSpecialization(coach(), 'yog')).toBe(false);
     expect(matchesSpecialization(coach(), null)).toBe(true);
+  });
+});
+
+// ─── Groups and strips ─────────────────────────────────────────────────────
+
+describe('discoverGroupMeta', () => {
+  it('reads size, then where', () => {
+    expect(discoverGroupMeta(group())).toBe('12 members · Cluj-Napoca');
+    expect(discoverGroupMeta(group({ memberCount: 1, city: null }))).toBe('1 member');
+  });
+
+  it('leads with a pending request, so the row does not read as untouched', () => {
+    expect(discoverGroupMeta(group({ myJoinRequestStatus: 'PENDING' }))).toBe(
+      'Request pending · 12 members · Cluj-Napoca',
+    );
+  });
+});
+
+describe('strip items', () => {
+  it('a coach shows the display name over the city, and is inert without a profile', () => {
+    const item = coachStripItem(coach({ displayName: 'Coach Ana' }));
+    expect(item).toMatchObject({ id: 'prof-1', name: 'Coach Ana', meta: 'Bucharest', disabled: false });
+    expect(coachStripItem(coach({ handle: null })).disabled).toBe(true);
+    expect(coachStripItem(coach({ city: '  ' })).meta).toBeNull();
+  });
+
+  it('a coach keeps the same tone wherever it shows, keyed on the user id', () => {
+    expect(coachStripItem(coach()).tone).toBe(coachStripItem(coach({ id: 'other' })).tone);
+  });
+
+  it('a group shows its name over the city', () => {
+    expect(groupStripItem(group())).toMatchObject({
+      id: 'grp-1',
+      name: 'Forță pentru începători',
+      meta: 'Cluj-Napoca',
+      disabled: false,
+    });
+  });
+
+  it('every group is violet, whatever its id, as groups are on every screen', () => {
+    expect(groupStripItem(group()).tone).toBe(GROUP_AVATAR_TONE);
+    expect(groupStripItem(group({ id: 'grp-2' })).tone).toBe('violet');
+  });
+
+  it('the accessible name says the whole item', () => {
+    expect(stripItemLabel(groupStripItem(group()))).toBe('Forță pentru începători, Cluj-Napoca');
+    expect(stripItemLabel(groupStripItem(group({ city: null })))).toBe('Forță pentru începători');
   });
 });

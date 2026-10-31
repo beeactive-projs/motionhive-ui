@@ -1,0 +1,7 @@
+<mh-person-row
+  [person]="person()"
+  [title]="row().title"
+  [icon]="row().person ? null : 'people-outline'"
+  [verb]="row().verb"
+  (act)="act.emit()"
+/>

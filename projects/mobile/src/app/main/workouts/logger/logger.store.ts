@@ -64,7 +64,12 @@ export class LoggerStore {
     return total > 0 && done === total;
   });
 
-  load(id: string, done?: () => void): void {
+  /**
+   * `divert` sees the log before it is shown and returns true when it has
+   * taken the user elsewhere: a finished workout is never put on screen in
+   * the live logger. The skeleton stays up while the page goes.
+   */
+  load(id: string, done?: () => void, divert?: (log: WorkoutLog) => boolean): void {
     this._loading.set(true);
     this._error.set(false);
     this._workoutLogService
@@ -72,6 +77,7 @@ export class LoggerStore {
       .pipe(take(1))
       .subscribe({
         next: (log) => {
+          if (divert?.(log)) return;
           this._log.set(log);
           this._loading.set(false);
           done?.();

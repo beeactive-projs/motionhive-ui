@@ -31,6 +31,7 @@ import {
   LoggedSet,
   SetField,
   SetFields,
+  WorkoutLog,
   WorkoutLogService,
   appLocale,
   setFieldsFor,
@@ -63,6 +64,7 @@ import {
   exerciseSetSummary,
   isExerciseDone,
   lastTimeSummary,
+  loggerRedirect,
   workoutClock,
 } from '../workouts.config';
 import { LoggerStore } from './logger.store';
@@ -378,11 +380,26 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
     if (id === 'new') this._startFreestyle();
     else
-      this.store.load(id, () => {
-        // Back at the workout is back to work: a paused clock starts again.
-        this.store.resumeClock();
-        this._loadLastTimes();
-      });
+      this.store.load(
+        id,
+        () => {
+          // Back at the workout is back to work: a paused clock starts again.
+          this.store.resumeClock();
+          this._loadLastTimes();
+        },
+        (log) => this._toSummaryIfClosed(log),
+      );
+  }
+
+  /**
+   * A workout that is no longer running opens on its summary, replacing this
+   * page, so back returns to wherever it was opened from (`loggerRedirect`).
+   */
+  private _toSummaryIfClosed(log: WorkoutLog): boolean {
+    const route = loggerRedirect(log);
+    if (!route) return false;
+    void this._router.navigate(route, { replaceUrl: true });
+    return true;
   }
 
   ionViewWillLeave(): void {
@@ -874,7 +891,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
               ),
           }),
       {
-        onBlocked: (open) => this.store.load(open.id, () => this._loadLastTimes()),
+        onBlocked: (open) =>
+          this.store.load(
+            open.id,
+            () => this._loadLastTimes(),
+            (log) => this._toSummaryIfClosed(log),
+          ),
         replaceUrl: true,
       },
     );

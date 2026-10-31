@@ -1,0 +1,5 @@
+/* Shown when someone picks "Save to Photos" on a shared workout card. */
+"NSPhotoLibraryAddUsageDescription" = "MotionHive saves your workout card to Photos only when you ask it to.";
+
+/* Shown the first time someone takes a photo for a workout or a post. */
+"NSCameraUsageDescription" = "MotionHive uses the camera when you take a photo for a workout or a post.";

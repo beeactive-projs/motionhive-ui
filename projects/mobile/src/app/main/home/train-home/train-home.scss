@@ -1,6 +1,113 @@
-// This screen is a full-bleed list page (plain ion-lists with their own row
-// padding); the two cards it shows are placed by the page, inset to the list
-// rows' gutter.
-ion-card {
-  margin: 0.25rem 1rem 0.75rem;
+@use '../home-shared';
+
+// The week's cells come from the card's width, 24 to 34px.
+.hive-card.train {
+  --cell: clamp(1.5rem, 8.5cqi, 2.125rem);
+}
+
+// A status under the headline ("20 weeks in a row") is one line: beside
+// the comb on a narrow card it stacked into three short ones. It ellipses
+// instead; the card stacks the comb on top long before it would have to.
+// The empty week's invitation is a sentence and wraps as one.
+.hive-card.train .hive-sub.one-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// The day's workout, a panel inside the card a step off its fill, with the
+// screen's one honey button.
+.next {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--mh-color-hive-ghost);
+}
+
+.next-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.next-copy h3 {
+  margin: 0.125rem 0 0;
+  overflow: hidden;
+  color: var(--mh-color-hive-ink);
+  font-size: var(--mh-text-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.next-copy .hive-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Stays a full tap target at every size: it is the main action.
+.next ion-button {
+  --padding-start: 1.25rem;
+  --padding-end: 1.25rem;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  flex: none;
+  height: var(--mh-tap-target);
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+// ─── Your hive ───────────────────────────────────────────────────
+// Coaches and groups in a row that scrolls sideways, each an avatar over a
+// name, straight on the page. A group's name may take two lines.
+.members {
+  display: flex;
+  // Avatars on one line, whether a name under them takes one line or two.
+  align-items: flex-start;
+  padding-inline: calc(var(--mh-row-gutter) - 0.5rem);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.members::-webkit-scrollbar {
+  display: none;
+}
+
+.member {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  --padding-top: 0.375rem;
+  --padding-bottom: 0.375rem;
+  --color: var(--ion-text-color);
+  flex: none;
+  height: auto;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.member-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  inline-size: 4.5rem;
+}
+
+.member-name {
+  display: -webkit-box;
+  max-inline-size: 100%;
+  overflow: hidden;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  line-height: var(--mh-leading-tight);
+  text-align: center;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }

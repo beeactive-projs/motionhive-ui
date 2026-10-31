@@ -1,0 +1,53 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>{{ 'home.latest.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!--
+  A grouped flat list, one label per day as the notifications are: Today,
+  Yesterday, then the weekday and date. The loading, empty and error states
+  sit on the same page.
+-->
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (!store.loaded()) {
+    <div class="mh-section-label" aria-hidden="true">
+      <ion-skeleton-text [animated]="true" style="width: 5rem; height: 0.75rem" />
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (i of skeletonRows; track i) {
+        <mh-row-skeleton [index]="i" [time]="true" />
+      }
+    </ion-list>
+  } @else if (store.failed()) {
+    <mh-empty-state
+      icon="cloud-offline-outline"
+      [heading]="'home.latest.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (!days().length) {
+    <mh-empty-state
+      icon="sparkles-outline"
+      [heading]="'home.latest.empty.title' | translate"
+      [message]="(isCoach() ? 'home.latest.empty.coach' : 'home.latest.empty.train') | translate"
+    />
+  } @else {
+    @for (day of days(); track day.key) {
+      <div class="mh-section-label" role="heading" aria-level="2">{{ day.label }}</div>
+      <ion-list class="mh-flat-list">
+        @for (row of day.rows; track row.id) {
+          <mh-latest-row [row]="row" (select)="open(row)" />
+        }
+      </ion-list>
+    }
+  }
+</ion-content>

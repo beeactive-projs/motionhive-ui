@@ -1,42 +1,11 @@
-// Rows inside the agenda card sit on the page colour, inset from the card edge
-// — the design's dashed/filled inner row. `--background` and `--border-radius`
-// are both documented ion-item variables.
-.agenda-row {
-  --background: var(--ion-background-color);
-  --border-radius: var(--mh-radius-control);
-  --min-height: 3rem;
+@use '../home-shared';
 
-  margin: 0 0.75rem 0.75rem;
+// The coach's cells come from the card's width: 26 to 36px for one ring, a
+// step smaller once two rings must fit beside the words.
+.hive-card.coach {
+  --cell: clamp(1.625rem, 9cqi, 2.25rem);
 }
 
-// Honey-tinted banner, through the documented card/item background variables.
-// The nested item paints its own surface, so it has to opt out of it.
-.requests {
-  --background: rgba(var(--ion-color-primary-rgb), 0.08);
-
-  border-color: rgba(var(--ion-color-primary-rgb), 0.24);
-
-  ion-item {
-    --background: transparent;
-  }
-
-  // Honey on a honey tint is unreadable; the deep amber is the design's own
-  // answer for text on this surface.
-  ion-note {
-    color: var(--mh-color-honey-deep);
-    font-weight: 600;
-  }
-}
-
-// Two stat tiles on one row; `.mh-page` supplies the gutter, this row only the
-// gap between them.
-.tiles {
-  display: flex;
-  gap: 0.625rem;
-
-  mh-stat-tile {
-    display: block;
-    flex: 1 1 0;
-    min-width: 0;
-  }
+.hive-card.coach.two-rings {
+  --cell: clamp(1.5rem, 6.5cqi, 2rem);
 }

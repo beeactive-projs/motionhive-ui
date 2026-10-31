@@ -1,12 +1,17 @@
 import { CoachStacks, clientPath, clientUrl, coachStackOf } from './client-paths';
 
 describe('client paths', () => {
-  it('stays in Programs when opened from a plan, Clients otherwise', () => {
+  it('stays in Programs from a plan, in Home from Needs you, Clients otherwise', () => {
     expect(coachStackOf('/tabs/programs/program/p-1/assignments')).toBe(CoachStacks.Programs);
     expect(coachStackOf('/tabs/programs/client/user-1/progress')).toBe(CoachStacks.Programs);
+    expect(coachStackOf('/tabs/home/client/user-1?tab=progress')).toBe(CoachStacks.Home);
+    expect(coachStackOf('/tabs/home/needs-you')).toBe(CoachStacks.Home);
+    expect(coachStackOf('/tabs/home')).toBe(CoachStacks.Home);
     expect(coachStackOf('/tabs/clients/user-1')).toBe(CoachStacks.Clients);
-    // A cold load from anywhere else lands on the client's home tab.
-    expect(coachStackOf('/tabs/home')).toBe(CoachStacks.Clients);
+    // A cold load from anywhere else lands on the client's own tab.
+    expect(coachStackOf('/tabs/messages/c-1')).toBe(CoachStacks.Clients);
+    // A prefix is not a stack.
+    expect(coachStackOf('/tabs/homework')).toBe(CoachStacks.Clients);
   });
 
   it('builds the client page path each stack mounts', () => {
@@ -16,7 +21,9 @@ describe('client paths', () => {
       'client',
       'user-1',
     ]);
+    expect(clientPath(CoachStacks.Home, 'user-1')).toEqual(['/tabs/home', 'client', 'user-1']);
     expect(clientUrl(CoachStacks.Clients, 'user-1')).toBe('/tabs/clients/user-1');
     expect(clientUrl(CoachStacks.Programs, 'user-1')).toBe('/tabs/programs/client/user-1');
+    expect(clientUrl(CoachStacks.Home, 'user-1')).toBe('/tabs/home/client/user-1');
   });
 });

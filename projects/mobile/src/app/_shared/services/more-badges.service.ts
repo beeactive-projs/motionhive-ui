@@ -6,6 +6,7 @@ import {
   AuthStore,
   ClientPaymentService,
   ClientService,
+  EarningsService,
   NavModes,
 } from 'core';
 
@@ -20,8 +21,9 @@ const PENDING_FRESH_MS = 5000;
 
 /**
  * The attention state behind the tab bar: the bill dot on the Menu tab
- * (shared with the menu page's row, so the two can never disagree) and the
- * request count on the Clients tab.
+ * (shared with the menu page's row, so the two can never disagree), the
+ * request count on the Clients tab, and the overdue dot on the coach's
+ * Payments row.
  */
 @Service()
 export class MoreBadgesService {
@@ -29,9 +31,12 @@ export class MoreBadgesService {
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _clientService = inject(ClientService);
+  private readonly _earningsService = inject(EarningsService);
 
   private readonly _openInvoices = signal(0);
+  private readonly _overdueInvoices = signal(0);
   private readonly _pendingRequests = signal(0);
+  private readonly _coachInvites = signal(0);
 
   /**
    * The tab shell asks for the request count when the app starts and the
@@ -61,6 +66,15 @@ export class MoreBadgesService {
   );
 
   /**
+   * Whether a client's invoice is past its due date — the dot on the coach's
+   * Payments row in the Menu, now that Home no longer shows money. The row
+   * only, never the tab: the coach looks for it when they go to chase it.
+   */
+  readonly hasOverdueInvoices = computed(
+    () => this._mode() === NavModes.Coach && this._overdueInvoices() > 0,
+  );
+
+  /**
    * How many client requests are waiting on the coach's answer — the badge on
    * the Clients tab, where they are answered. Incoming only: an invitation
    * the coach sent is waiting on someone else, and counting it lit the badge
@@ -75,23 +89,37 @@ export class MoreBadgesService {
    * Menu's Coaches row, which is the only place on mobile an invitation can
    * be answered.
    *
-   * Same number as `pendingRequests`, read in the other mode: `incoming` is
-   * whatever is waiting on whoever is asking, which in train mode is a
-   * coach's invitation and in coach mode a trainee's request. A dot rather
-   * than a count — the point is only that something is waiting.
+   * The count's `invitations`, not `incoming`: `incoming` is trainees asking
+   * a coach, so it is always zero for a trainee, and for a coach who is also
+   * someone's client the two are different people waiting on different
+   * screens. Train mode only. A dot rather than a count — the point is only
+   * that something is waiting.
    */
   readonly hasCoachInvites = computed(
-    () => this._mode() === NavModes.Train && this._pendingRequests() > 0,
+    () => this._mode() === NavModes.Train && this._coachInvites() > 0,
   );
 
   refresh(): void {
     this.refreshOpenInvoices();
+    this.refreshOverdueInvoices();
     this.refreshPendingRequests();
+  }
+
+  /** Coach mode only: the summary is a coach's read, and only they see the row. */
+  refreshOverdueInvoices(): void {
+    if (this._mode() !== NavModes.Coach) return;
+    this._earningsService
+      .getSummary({ silent: true })
+      .pipe(take(1))
+      .subscribe({
+        next: (summary) => this._overdueInvoices.set(summary.overdueInvoiceCount),
+        error: () => this._overdueInvoices.set(0),
+      });
   }
 
   refreshOpenInvoices(): void {
     this._clientPaymentService
-      .getMyCounts()
+      .getMyCounts({ silent: true })
       .pipe(take(1))
       .subscribe({
         next: (counts) => this._openInvoices.set(counts.invoices.open),
@@ -101,10 +129,9 @@ export class MoreBadgesService {
 
   /**
    * Both roles have requests waiting on them: a coach has trainees asking,
-   * a trainee has coaches inviting. This used to return early for anyone
-   * without the INSTRUCTOR role, which left a trainee with no way to learn
-   * an invitation had arrived — the reason one could not be answered on a
-   * phone at all. The mode gates live on the two computeds above instead.
+   * a trainee has coaches inviting. One read answers both (the API opened the
+   * route to every account and scopes it to the caller), and the mode gates
+   * live on the two computeds above, so switching mode needs no new request.
    */
   refreshPendingRequests(force = false): void {
     if (this._pendingInFlight) return;
@@ -117,6 +144,8 @@ export class MoreBadgesService {
       .subscribe({
         next: (response) => {
           this._pendingRequests.set(response.incoming);
+          // Absent from an API older than the field: no dot, not a broken one.
+          this._coachInvites.set(response.invitations ?? 0);
           this._pendingFetchedAt = Date.now();
           this._pendingInFlight = false;
         },
@@ -124,6 +153,7 @@ export class MoreBadgesService {
         // should be allowed to try rather than reuse a zero.
         error: () => {
           this._pendingRequests.set(0);
+          this._coachInvites.set(0);
           this._pendingInFlight = false;
         },
       });

@@ -41,7 +41,7 @@ Grouped lists are described first; the flat list has its own section at the end.
   - `--detail-icon-color` / `--detail-icon-opacity`
   - a `margin-inline-end` on the leading item
 - Rows are 3rem at least, padded by `--mh-row-gutter`. Use `[detail]="true"` for the chevron, never a hand-placed `chevron-forward` icon in `slot="end"`.
-- Everything in a row sits on its centre line: tile, label, notes in either slot, trailing controls. Never `align-self: flex-start` or a `margin-top` nudge on a leading item.
+- Everything in a row sits on its centre line: tile, label, notes in either slot, trailing controls. Never `align-self: flex-start` or a `margin-top` nudge on a leading item. One exception: an `mh-person-row` with a verb on a narrow row (under 22rem, an SE from about 107% text) stacks the verb under the text, and its avatar then lines up with the two text lines instead of the whole block's centre, which would leave it floating between the title and the button (`person-row.scss`).
 
 ## Separators
 
@@ -141,7 +141,7 @@ The bell's list is a grouped flat list, after Apple Mail's inbox: one label per 
 
 ### Clients
 
-The coach's Clients tab is one flat list off `/clients`, laid out like the Messages inbox: title, bell and the honey "+" (invite) in the header, the search field always there under them, then the All / Active / Requests / Archived chips. There are no segments and no "Needs attention" lens: the roster (`/coach/roster`) is not read here (user decision, 2026-10-19). Requests are the Requests chip (PENDING); there is no header button, menu row or page for them (user decision, 2026-10-19). A pending row opens the request sheet ([`request-sheet`](../../src/app/main/clients/_sheets/request-sheet/request-sheet.html), an `mh-action-sheet`): who, how long it has waited, their message, then Accept / Decline for an incoming request or Resend / Withdraw for a sent invitation. Home's banner and a request notification open the tab on the chip with `?filter=requests`, and the Clients tab carries a red count of the requests waiting on the coach (`incoming` from `/clients/requests/pending/count`, never `count`, which includes the invitations the coach sent).
+The coach's Clients tab is one flat list off `/clients`, laid out like the Messages inbox: title, bell and the honey "+" (invite) in the header, the search field always there under them, then the All / Active / Requests / Archived chips. There are no segments and no "Needs attention" lens: the roster (`/coach/roster`) is not read here (user decision, 2026-10-19). Requests are the Requests chip (PENDING); there is no header button, menu row or page for them (user decision, 2026-10-19). A pending row opens the request sheet ([`request-sheet`](../../src/app/main/clients/_sheets/request-sheet/request-sheet.html), an `mh-action-sheet`): who, how long it has waited, their message, then Accept / Decline for an incoming request or Resend / Withdraw for a sent invitation. Home's Needs you "Review" and a request notification open the tab on the chip with `?filter=requests`, and the Clients tab carries a red count of the requests waiting on the coach (`incoming` from `/clients/requests/pending/count`, never `count`, which includes the invitations the coach sent).
 
 - Inviting is the header's honey "+", not a floating button. It opens the invite page below, not a sheet.
 - Opening search resets the chip to All: the pills fold away with the title, so a chip left on would narrow the results with nothing on screen saying so. A term under the API's floor gets a note under the header.
@@ -185,7 +185,7 @@ The trainee's side of a coaching relationship, [`coaches`](../../src/app/main/co
 - A grouped flat list, two sections: **Invitations** first (the only thing on the screen waiting on the reader), then **Your coaches**. Rows are `mh-person-row`; the line under the name is "Invited you today" or "Coaching you since March 2026".
 - A tap opens the verbs in an `mh-action-sheet`, as a pending client row does on the coach's side, so a request reads the same from either end: Accept / View profile / Decline for an invitation, Message / View profile / End coaching for a coach. Declining fires on the tap (the coach can invite again); ending a coaching asks first.
 - `GET /clients/requests/pending` returns **incoming** requests only — verified against the API: with three outgoing requests on the account it answered `[]`. So there is no "requests you sent" section; a trainee's own request to a coach has no endpoint to read it back from. Don't add the section back without one.
-- The Menu row carries a dot, not a count (`MoreBadgesService.hasCoachInvites`, train mode only). Its `incoming` number is role-agnostic: the same field feeds the Clients tab's red count in coach mode.
+- The Menu row carries a dot, not a count (`MoreBadgesService.hasCoachInvites`, train mode only). It reads the count's `invitations` (coaches inviting the reader); `incoming` is trainees asking a coach and feeds the Clients tab's red count in coach mode.
 
 
 ## Empty states

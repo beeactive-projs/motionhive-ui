@@ -1,6 +1,11 @@
 import { ConversationListItem, MessageView } from '../models/messaging';
 import { appLocale } from '../i18n/app-language';
 import { translate } from '../i18n/translator';
+// `dayFromKey` parses as local midnight; `new Date('2026-08-10')` would be
+// UTC midnight and print the day before west of Greenwich.
+import { dayFromKey } from './date.utils';
+import { foldedIncludes } from './search.utils';
+import { inSentenceCase, sentenceCase } from './text.utils';
 
 /**
  * Presentation helpers shared by every messaging surface — pure functions over
@@ -46,7 +51,8 @@ export function conversationMatches(conversation: ConversationListItem, query: s
     conversation.type === 'GROUP'
       ? (conversation.name ?? '')
       : displayName(conversation.otherUser, '');
-  return `${name} ${conversation.lastMessagePreview ?? ''}`.toLowerCase().includes(query);
+  // Folded, as the server's people search is: "stefan" finds "Ștefan".
+  return foldedIncludes(`${name} ${conversation.lastMessagePreview ?? ''}`, query);
 }
 
 /**
@@ -142,26 +148,65 @@ function gapMs(a: MessageView, b: MessageView): number {
 }
 
 /**
- * Human label for a day divider: "Today", "Yesterday", or the weekday + month
- * + day for older.
+ * Human label for a day divider or a day heading: "Today", "Yesterday", or
+ * the weekday, month and day for older. A label, so sentence case in every
+ * language: Romanian `Intl` writes the weekday in lower case ("miercuri, 28
+ * octombrie"), which is right inside a sentence and wrong at the head of a
+ * group. For the middle of a sentence use `dayInSentence`.
+ *
+ * `locale` is for specs; the app reads the UI language.
  */
-export function dayDividerLabel(dayKey: string): string {
-  const today = isoDay(new Date().toISOString());
-  if (dayKey === today) return translate('time.today');
+export function dayDividerLabel(dayKey: string, locale: string = appLocale()): string {
+  const relative = relativeDay(dayKey);
+  if (relative) return relative;
+  return sentenceCase(
+    dayFromKey(dayKey).toLocaleDateString(locale, {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    }),
+    locale,
+  );
+}
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (dayKey === isoDay(yesterday.toISOString())) return translate('time.yesterday');
-
-  // Parsed as local midnight; `new Date('2026-08-10')` would be UTC midnight
-  // and print the day before west of Greenwich.
-  const [year, month, day] = dayKey.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString(appLocale(), {
+/**
+ * The same day said inside a sentence ("Last done {day}"): "today",
+ * "yesterday", or the date in running-text case, which `Intl` already gives
+ * (English capitalises its weekdays, Romanian does not).
+ */
+export function dayInSentence(dayKey: string, locale: string = appLocale()): string {
+  const relative = relativeDay(dayKey);
+  if (relative) return inSentenceCase(relative, locale);
+  return dayFromKey(dayKey).toLocaleDateString(locale, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
+}
+
+/**
+ * A day as a row's trailing value, where the long form wraps the row:
+ * "Today", "Yesterday", else "28 Oct" ("28 oct." in Romanian), with the year
+ * only when it is not this one.
+ */
+export function dayShortLabel(dayKey: string, locale: string = appLocale()): string {
+  const relative = relativeDay(dayKey);
+  if (relative) return relative;
+  const date = dayFromKey(dayKey);
+  return date.toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+    ...(date.getFullYear() === new Date().getFullYear() ? {} : { year: 'numeric' }),
+  });
+}
+
+/** "Today" / "Yesterday" for those two local days, null for any other. */
+function relativeDay(dayKey: string): string | null {
+  if (dayKey === isoDay(new Date().toISOString())) return translate('time.today');
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (dayKey === isoDay(yesterday.toISOString())) return translate('time.yesterday');
+  return null;
 }
 
 // ─── Inbox timestamps ─────────────────────────────────────────────

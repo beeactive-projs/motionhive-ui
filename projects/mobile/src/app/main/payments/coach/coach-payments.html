@@ -100,15 +100,21 @@
       </div>
     }
 
-    <div class="filters">
+    <!-- Filters you tap: `ion-button.chip` (ion-button.css), not `ion-chip`,
+         which has no role or tab stop. -->
+    <div class="mh-chip-row status-chips" role="group" [attr.aria-label]="'payments.coach.filtersLabel' | translate">
       @for (option of filters; track option.label) {
-        <ion-chip
-          [outline]="status() !== option.value"
-          [class.on]="status() === option.value"
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="status() === option.value"
+          [attr.aria-pressed]="status() === option.value"
           (click)="setStatus(option.value)"
         >
           {{ option.label | translate }}
-        </ion-chip>
+        </ion-button>
       }
     </div>
 

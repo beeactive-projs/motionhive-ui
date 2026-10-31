@@ -4,17 +4,15 @@ import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonButton,
   IonButtons,
-  IonCard,
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonRefresher,
   IonRefresherContent,
   IonSkeletonText,
   IonToolbar,
   RefresherCustomEvent,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
@@ -26,12 +24,17 @@ import { Logo } from '../../_shared/components/logo/logo';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { ROLE_ICONS, ROLES } from '../../_shared/config/roles.config';
 import { CoachHome } from './coach-home/coach-home';
+import { HOME_ICONS } from './home.icons';
 import { TrainHome } from './train-home/train-home';
 
 /**
- * Mode-adaptive landing page. The host owns the chrome — header, role pill,
- * pull-to-refresh — and delegates the body to whichever child matches the
+ * Mode-adaptive landing page. The host owns the chrome (header, role pill,
+ * pull-to-refresh) and delegates the body to whichever child matches the
  * active mode, so neither child has to know the other exists.
+ *
+ * It also owns Ionic's page lifecycle: `ionViewWillEnter` reaches the routed
+ * component only, never a child, so the host tells the body when Home is
+ * shown again.
  */
 @Component({
   selector: 'mh-home',
@@ -41,12 +44,9 @@ import { TrainHome } from './train-home/train-home';
     HexAvatar,
     IonButton,
     IonButtons,
-    IonCard,
     IonContent,
     IonHeader,
     IonIcon,
-    IonItem,
-    IonLabel,
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
@@ -59,7 +59,7 @@ import { TrainHome } from './train-home/train-home';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
+export class Home implements ViewWillEnter {
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _router = inject(Router);
@@ -85,19 +85,33 @@ export class Home {
 
   readonly role = computed(() => ROLES[this.mode()]);
 
+  /** The first entry is the body's own first load (`ngOnInit`). */
+  private _entered = false;
+
   constructor() {
-    addIcons(ROLE_ICONS);
+    addIcons({ ...ROLE_ICONS, ...HOME_ICONS });
   }
 
   openRoleSwitch(): void {
     void this._router.navigateByUrl('/tabs/more/switch-role');
   }
 
-  /** Only one child is ever mounted, so this reaches whichever it is. */
+  /** Coming back to a tab page that stayed alive: the body reloads. */
+  ionViewWillEnter(): void {
+    if (this._entered) this._active()?.reenter();
+    this._entered = true;
+  }
+
+  /** The spinner stays until every block of the body has answered. */
   onRefresh(event: RefresherCustomEvent): void {
     const done = () => void event.target.complete();
-    const active = this._coachHome() ?? this._trainHome();
-    if (active) active.store.refresh(done);
+    const active = this._active();
+    if (active) active.refresh(done);
     else done();
+  }
+
+  /** Only one child is ever mounted, so this reaches whichever it is. */
+  private _active(): CoachHome | TrainHome | undefined {
+    return this._coachHome() ?? this._trainHome();
   }
 }

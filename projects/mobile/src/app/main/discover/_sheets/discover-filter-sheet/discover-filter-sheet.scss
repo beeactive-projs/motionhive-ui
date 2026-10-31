@@ -1,2 +1,5 @@
 /* The chip groups are `.mh-chip-cloud` (layout.css, ion-button.css), the same
-   treatment as the coach agenda's filter sheet. */
+   treatment as the coach agenda's filter sheet, tap targets included; only
+   Discover's word wrapping is added. */
+
+@use '../../discover-shared';

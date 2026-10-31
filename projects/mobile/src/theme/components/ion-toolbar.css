@@ -14,19 +14,21 @@
 }
 
 /* Height: md's 56px bar, not iOS's 44px plus 3px padding, which left the
-   header's round buttons sitting on the field below. */
+   header's round buttons sitting on the field below. In rem, so the bar
+   grows with the text size along with the 3rem buttons in it. */
 .ios ion-toolbar {
-  --min-height: 56px;
+  --min-height: 3.5rem;
   --padding-top: 0;
   --padding-bottom: 0;
 }
 
-/* iOS pads a searchbar in a toolbar 1px above and 15px below; md, 3px each
-   side, so the field sits evenly between the title and the pills. */
+/* iOS pads a searchbar in a toolbar 1px above and 15px below; this is md's
+   3px each side on the grid, so the field sits evenly between the title and
+   the pills. */
 .ios ion-toolbar ion-searchbar {
   min-height: 0;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 /* Icon buttons: md's 48px hit circle with the glyph 12px in, which is what
@@ -68,6 +70,14 @@
 .header-translucent-ios ion-button,
 .footer-translucent-ios ion-button {
   --opacity: 1;
+}
+
+/* A solid button in a toolbar with no `color` of its own takes the bar's
+   background for its label (Ionic's in-toolbar rule), so every honey footer
+   CTA read white on honey in light and ignored its own `--color`. The part
+   gives it back its own ink. */
+ion-toolbar ion-button.button-solid:not(.ion-color)::part(native) {
+  color: var(--color);
 }
 
 /* Title: iOS centres it absolutely between 90px insets at 17px semibold;

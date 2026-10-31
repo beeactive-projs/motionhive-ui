@@ -220,7 +220,7 @@
       <ion-textarea class="composer-input" [autoGrow]="true" [rows]="1" [maxlength]="maxLength"
         [placeholder]="composerPlaceholder()" [attr.aria-label]="composerPlaceholder()"
         [value]="draft()" (ionInput)="onDraft($event.detail.value ?? '')" />
-      <ion-button shape="round" class="send" [disabled]="!canSend()"
+      <ion-button shape="round" class="send" color="primary" [disabled]="!canSend()"
         [attr.aria-label]="'groups.post.a11y.postComment' | translate"
         (click)="send()">
         <ion-icon slot="icon-only" name="send-outline" />

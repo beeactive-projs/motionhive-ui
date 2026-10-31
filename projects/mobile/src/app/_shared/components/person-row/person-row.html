@@ -1,16 +1,34 @@
-<ion-item button detail="false" (click)="select.emit()">
-  <mh-hex-avatar
-    slot="start"
-    size="lg"
-    aria-hidden="true"
-    [name]="person().name"
-    [imageUrl]="person().avatarUrl"
-    [color]="tone()"
-  />
+<!-- A row with a verb never takes taps itself: each person is one control. -->
+<ion-item [button]="!verb()" detail="false" (click)="onRowClick()">
+  @if (icon(); as icon) {
+    <!-- Several people behind one row (requests waiting): violet, as people are. -->
+    <mh-hex-avatar slot="start" size="lg" color="violet" tone="wash" [icon]="icon" />
+  } @else {
+    <mh-hex-avatar
+      slot="start"
+      size="lg"
+      aria-hidden="true"
+      [name]="person().name"
+      [imageUrl]="person().avatarUrl"
+      [color]="tone()"
+    />
+  }
   <ion-label>
-    <h2>{{ person().name }}</h2>
+    <h2>{{ title() ?? person().name }}</h2>
     @if (person().subline; as subline) {
       <p>{{ subline }}</p>
     }
   </ion-label>
+  @if (verb(); as verb) {
+    <!-- Quiet, not honey: the screen's one honey action is elsewhere. -->
+    <ion-button
+      slot="end"
+      class="mh-row-action mh-quiet"
+      fill="outline"
+      shape="round"
+      (click)="act.emit()"
+    >
+      {{ verb }}
+    </ion-button>
+  }
 </ion-item>
