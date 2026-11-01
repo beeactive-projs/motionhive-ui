@@ -284,6 +284,13 @@
   --mh-color-honey-deep: var(--mh-primary-700);
 
   /*
+   * The selected tab's label (the tab bar, the `mh-tabs` section strips):
+   * words, so the deep honey ink on light surfaces, where the honey itself
+   * is 2.2:1. Its glyph stays the honey.
+   */
+  --mh-color-tab-label-selected: var(--mh-color-honey-deep);
+
+  /*
    * The danger slot (red 500) is 3.76:1 on white: enough for an outline,
    * short of AA for text. Field errors and invalid labels use this step,
    * 4.83:1 on the white page and 4.4:1 on slate-100 (a card, a sheet).
@@ -639,31 +646,38 @@
 }
 
 /*
- * Dark palette — navy, the brand's own dark (the design's colour sheet:
- * page #0E1B31, cards #16253F, empty cells #1D2E4C, white text, #9FB3C8
- * secondary text, honey for accents). Every design hex maps to a navy ramp
- * step: page 900 (exact), card 800 (#12233d, the nearest step to #16253F),
- * an empty cell 700, secondary text 300 (exact). Only tokens flip here; the
- * ramps stay absolute. The surfaces themselves are in the two-class block
- * after this one, where they outrank Ionic's own dark palette.
+ * Dark palette — grey surfaces, as iOS draws them (user decision,
+ * 2026-11-01: the navy page of 2026-10-31 is undone). Backgrounds are greys
+ * (block at the end); text = navy 50; honey for accents. Only tokens flip
+ * here — the ramps stay absolute. Ionic's own stepped colours come from
+ * palettes/dark.class.css, which are greys too.
+ *
+ * Navy stays where it is a box rather than the page: the hive card and the
+ * navy card set (a next-session tile, the rest timer, a memory card).
  */
 .ion-palette-dark {
-  /* Accent ink is the honey itself on navy (8:1 on the page, 6.6:1 on a
-     sheet's cards). The deep amber is a light-surface ink: 3.4:1 here. */
-  --mh-color-honey-deep: var(--mh-primary-500);
+  /* On a dark surface the deep amber goes unread — the design's dark-surface
+     accent is the light honey tint instead. */
+  --mh-color-honey-deep: var(--mh-warning-300);
+  /* The selected tab's label stays the honey itself, beside its glyph
+     (7.7:1 on the bar). */
+  --mh-color-tab-label-selected: var(--ion-color-primary);
+  /* On a dark page the step goes the other way: red 400 is 6.22:1 on it. */
+  --mh-color-danger-deep: var(--mh-danger-400);
 
-  /* The iOS pill segment's selected fill (ion-segment.css), dark only: Ionic's
-     own step was a grey-blue under the honey label (2.5:1). Navy 500 still
-     lifts off the track on the page and in a sheet, and the honey label on
-     it is 5.4:1. Unset in light, where Ionic's white pill stands. */
-  --mh-color-segment-indicator: var(--mh-navy-500);
+  /* Selection inverts like the washes: deep honey fill, light ink. */
+  --mh-color-selected-background: var(--mh-warning-950);
 
-  /* The hive card is the card step: navy 900 is the page now, so a navy 900
-     card would have no edge. Honey on it, as in the light block. The empty
-     cells are the design's #1D2E4C, which sits between two steps: a cell
-     waiting for something takes the brighter (navy 600, 1.2:1 on the card),
-     a ghost the fainter (navy 700, 1.1:1). Both opaque: a translucent white
-     over the card's honey glow read as a grey patch. */
+  /* The honey capsule takes the honey wash's fill, opaque, so it stays warm
+     on the grey. Honey ink on it is 7:1. */
+  --mh-color-honey-tint: var(--ion-color-primary-wash);
+
+  /* The hive card is a navy box on the grey page, honey on it, as in the
+     light block. The empty cells are the design's #1D2E4C, which sits
+     between two steps: a cell waiting for something takes the brighter
+     (navy 600, 1.2:1 on the card), a ghost the fainter (navy 700, 1.1:1).
+     Both opaque: a translucent white over the card's honey glow read as a
+     grey patch. */
   --mh-color-hive: var(--mh-navy-800);
   --mh-color-hive-ink: var(--ion-text-color);
   --mh-color-hive-muted: var(--mh-navy-300);
@@ -673,41 +687,27 @@
   --mh-color-hive-ghost: var(--mh-navy-700);
   --mh-color-hive-pattern: var(--ion-color-primary);
 
-  /* The navy card becomes a card like any other, with its track a step up
-     (navy 600, 1.2:1 on it, as navy 700 is on navy 900 in light), white ink
-     and the honey accent. */
+  /* The navy card matches the hive card's step, with its track a step up
+     (navy 600, 1.2:1 on it), light ink and the honey accent. */
   --mh-color-navy-card: var(--mh-navy-800);
   --mh-color-navy-card-raised: var(--mh-navy-600);
   --mh-color-navy-card-ink: var(--ion-text-color);
   --mh-color-navy-card-muted: var(--mh-navy-300);
   --mh-color-navy-card-accent: var(--ion-color-primary);
 
-  /* On navy the step goes the other way: red 400 is 6.2:1 on the page and
-     5.2:1 on a sheet's cards. */
-  --mh-color-danger-deep: var(--mh-danger-400);
-
-  /* Selection inverts like the washes: deep honey fill, honey ink (7:1). */
-  --mh-color-selected-background: var(--mh-warning-950);
-
-  /* The honey capsule takes the honey wash's fill: see-through honey over
-     navy mixed to a grey. Honey ink on it is 7:1. */
-  --mh-color-honey-tint: var(--ion-color-primary-wash);
-
   /* The coach day lifts off the navy card: light navy fill, deep navy ink
-     (5.9:1); the fill is 5.4:1 on the card. */
+     (5.9:1). */
   --mh-color-calendar-coach: var(--mh-navy-400);
   --mh-color-calendar-coach-contrast: var(--mh-navy-900);
 
-  /* The idle filter chip is a true navy a few steps off the page (1.5:1 on
-     it, 1.4:1 on a card). Navy 100 ink on navy 500 is 8.8:1. */
+  /* The idle filter chip lifts off the grey page as a true navy, a step
+     brighter than the slate wash it replaced. Navy 100 ink on navy 500 is
+     8.8:1. */
   --mh-color-chip-idle: var(--mh-navy-500);
   --mh-color-chip-idle-contrast: var(--mh-navy-100);
 
   /* Wash inverts: deep fill (step 900; honey 950), light ink (step 200;
-     honey 300). Every pair clears 6.9:1. The neutral washes are navy, a step
-     past the sheet's cards (navy 600, 1.2:1 on a card), with the muted ink
-     (5.9:1) or the light navy one (9.8:1): a slate wash on navy read as a
-     grey patch. */
+     honey 300). */
   --ion-color-primary-wash: var(--mh-warning-950);
   --ion-color-primary-wash-contrast: var(--mh-warning-300);
   --ion-color-warning-wash: var(--mh-warning-950);
@@ -724,139 +724,83 @@
   --ion-color-teal-wash-contrast: var(--mh-teal-200);
   --ion-color-coral-wash: var(--mh-coral-900);
   --ion-color-coral-wash-contrast: var(--mh-coral-200);
-  --ion-color-medium-wash: var(--mh-navy-600);
-  --ion-color-medium-wash-contrast: var(--mh-navy-300);
-  --ion-color-dark-wash: var(--mh-navy-600);
-  --ion-color-dark-wash-contrast: var(--mh-navy-100);
-  --ion-color-secondary-wash: var(--mh-navy-600);
-  --ion-color-secondary-wash-contrast: var(--mh-navy-100);
+  --ion-color-medium-wash: var(--mh-slate-800);
+  --ion-color-medium-wash-contrast: var(--mh-slate-300);
+  --ion-color-dark-wash: var(--mh-slate-800);
+  --ion-color-dark-wash-contrast: var(--mh-slate-200);
+  --ion-color-secondary-wash: var(--mh-slate-800);
+  --ion-color-secondary-wash-contrast: var(--mh-slate-200);
 
   /* The tile extension: a hex tile's solid fill where the slot colour itself
-     disappears on the dark card (navy 500 is 1.4:1 on it). Same lift as the
-     coach day: light navy fill, deep navy ink (5.9:1); the tile is 5.4:1 on
+     disappears on the dark card (navy 500 is 1.2:1 on it). Same lift as the
+     coach day: light navy fill, deep navy ink (5.9:1); the tile is 4.8:1 on
      the card. Only slots that need it define it; hex-avatar falls back to
      the slot colour. */
   --ion-color-secondary-tile: var(--mh-navy-400);
   --ion-color-secondary-tile-contrast: var(--mh-navy-900);
 
   /*
-   * The saturated hues hold up on navy, so only the neutrals shift.
-   *
-   * Medium, the muted ink, is the design's secondary text, navy 300: 8:1 on
-   * the page, 7.3:1 on a card, 6.6:1 on a sheet's cards, so one value serves
-   * every surface.
-   *
-   * Dark and light swap ends, as in Ionic's own dark palette: dark is the
-   * strong neutral (in light a dark slate, here a pale navy, 13:1 on the
-   * page), light the quiet fill (a sheet card's navy, where Ionic's own is
-   * a grey #222428).
+   * The saturated hues hold up on the grey, so only the neutrals shift:
+   * Slate 500 and 700 are too close to the card background to read as
+   * tiles, so both step up two rungs.
    */
-  --ion-color-medium: var(--mh-navy-300);
-  --ion-color-medium-rgb: 159, 179, 200;
+  --ion-color-medium: var(--mh-slate-400);
+  --ion-color-medium-rgb: 148, 163, 184;
   --ion-color-medium-contrast: var(--mh-navy-900);
   --ion-color-medium-contrast-rgb: 14, 27, 49;
-  --ion-color-medium-shade: var(--mh-navy-400);
-  --ion-color-medium-tint: var(--mh-navy-200);
+  --ion-color-medium-shade: var(--mh-slate-500);
+  --ion-color-medium-tint: var(--mh-slate-300);
 
-  --ion-color-dark: var(--mh-navy-100);
-  --ion-color-dark-rgb: 217, 226, 236;
-  --ion-color-dark-contrast: var(--mh-navy-900);
-  --ion-color-dark-contrast-rgb: 14, 27, 49;
-  --ion-color-dark-shade: var(--mh-navy-200);
-  --ion-color-dark-tint: var(--mh-navy-50);
+  --ion-color-dark: var(--mh-slate-500);
+  --ion-color-dark-rgb: 100, 116, 139;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: var(--mh-slate-600);
+  --ion-color-dark-tint: var(--mh-slate-400);
 
-  --ion-color-light: var(--mh-navy-700);
-  --ion-color-light-rgb: 22, 43, 72;
-  --ion-color-light-contrast: #ffffff;
-  --ion-color-light-contrast-rgb: 255, 255, 255;
-  --ion-color-light-shade: var(--mh-navy-800);
-  --ion-color-light-tint: var(--mh-navy-600);
+  --ion-text-color: var(--mh-navy-50);
+  --ion-text-color-rgb: 240, 244, 248;
 
-  /* White ink, the design's primary text: 17.2:1 on the page. */
-  --ion-text-color: #ffffff;
-  --ion-text-color-rgb: 255, 255, 255;
-
+  /* A shadow under a floating overlay: black, never mixed from the light
+     ink, which would glow. */
   --mh-shadow-overlay: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
+
+  /* Surfaces, borders and the divider are set in the two-class block at the
+     end of this file: Ionic's `.ion-palette-dark.ios` / `.md`
+     (palettes/dark.class.css) outrank this one. */
 }
 
 /*
  * Dark surfaces, the same on both platforms, at the specificity Ionic uses
  * for its own (`.ion-palette-dark.ios` / `.md`), later in the cascade.
  *
- * One navy page for every screen, flat or grouped, and its bars on the same
- * colour, so header, page and tab bar are one surface. Cards and items one
- * step lighter (navy 800); a sheet one step further (its block below).
+ * The bars take md's dark grey; Ionic's iOS palette names no toolbar or tab
+ * bar colour, so they fell to a near-black step that read as the page.
+ *
+ * The page and the flat screens take the bars' grey too, so the header, the
+ * page and the tab bar are one surface, not iOS's black, which read as a
+ * hole between them. Cards and items step up to iOS's elevated grouped grey
+ * so they still lift off it, as iOS draws grouped lists in a sheet.
  */
 .ion-palette-dark.ios,
 .ion-palette-dark.md {
-  --ion-background-color: var(--mh-navy-900);
-  --ion-background-color-rgb: 14, 27, 49;
-  --ion-card-background: var(--mh-navy-800);
-  --ion-item-background: var(--mh-navy-800);
+  --ion-background-color: #1f1f1f;
+  --ion-background-color-rgb: 31, 31, 31;
+  --ion-card-background: #2c2c2e;
+  --ion-item-background: #2c2c2e;
   --ion-toolbar-background: var(--ion-background-color);
   --ion-tab-bar-background: var(--ion-background-color);
-  --ion-tab-bar-background-focused: var(--mh-navy-800);
 
-  /* Lines are navy like the surfaces. The divider, a soft fill as much as a
-     line, is the sheet's card step (as slate-200 is in light). The border
-     goes two steps past it, to navy 500: one step (600) is 1.1:1 on a
-     sheet's cards and the outline vanished there; 500 is 1.2:1 on them and
-     1.5:1 on the page. The bars draw no line at all
-     (ion-header/footer/tab-bar.css). */
-  --ion-border-color: var(--mh-navy-500);
-  --mh-color-divider: var(--mh-navy-700);
+  /* Lines are neutral grey like the surfaces. The border is iOS's dark
+     grey, visible on the card as well as the page; the divider, a soft fill
+     as much as a line, is the step between it and the card. The bars draw
+     no line at all (ion-header/footer/tab-bar.css). */
+  --ion-border-color: #48484a;
+  --mh-color-divider: #3a3a3c;
 
-  /* Ionic's 0.32 / 0.4 scrim barely darkens a dark page, and a sheet scales
-     the scrim by how far it is open. */
+  /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
+     and a sheet scales the scrim by how far it is open. */
   --ion-backdrop-opacity: 0.6;
-
-  /*
-   * The stepped colours Ionic's components read for their own fills and
-   * lines (a toggle's track, the date picker, the searchbar ring): linear
-   * mixes of the page and the ink, per Ionic's theming guide. Without them
-   * Ionic's grey steps (#0d0d0d…, #1e1e1e…) showed through on the navy.
-   * Raw hex because they are computed mixes, not ramp steps: page navy 900
-   * towards white in 5% steps, and the reverse.
-   */
-  --ion-background-color-step-50: #1a263b;
-  --ion-background-color-step-100: #263246;
-  --ion-background-color-step-150: #323d50;
-  --ion-background-color-step-200: #3e495a;
-  --ion-background-color-step-250: #4a5465;
-  --ion-background-color-step-300: #565f6f;
-  --ion-background-color-step-350: #626b79;
-  --ion-background-color-step-400: #6e7683;
-  --ion-background-color-step-450: #7a828e;
-  --ion-background-color-step-500: #878d98;
-  --ion-background-color-step-550: #9398a2;
-  --ion-background-color-step-600: #9fa4ad;
-  --ion-background-color-step-650: #abafb7;
-  --ion-background-color-step-700: #b7bbc1;
-  --ion-background-color-step-750: #c3c6cc;
-  --ion-background-color-step-800: #cfd1d6;
-  --ion-background-color-step-850: #dbdde0;
-  --ion-background-color-step-900: #e7e8ea;
-  --ion-background-color-step-950: #f3f4f5;
-
-  --ion-text-color-step-50: #f3f4f5;
-  --ion-text-color-step-100: #e7e8ea;
-  --ion-text-color-step-150: #dbdde0;
-  --ion-text-color-step-200: #cfd1d6;
-  --ion-text-color-step-250: #c3c6cc;
-  --ion-text-color-step-300: #b7bbc1;
-  --ion-text-color-step-350: #abafb7;
-  --ion-text-color-step-400: #9fa4ad;
-  --ion-text-color-step-450: #9398a2;
-  --ion-text-color-step-500: #878d98;
-  --ion-text-color-step-550: #7a828e;
-  --ion-text-color-step-600: #6e7683;
-  --ion-text-color-step-650: #626b79;
-  --ion-text-color-step-700: #565f6f;
-  --ion-text-color-step-750: #4a5465;
-  --ion-text-color-step-800: #3e495a;
-  --ion-text-color-step-850: #323d50;
-  --ion-text-color-step-900: #263246;
-  --ion-text-color-step-950: #1a263b;
 }
 
 /*
@@ -873,11 +817,17 @@ ion-modal.mh-sheet {
   --ion-toolbar-background: var(--mh-slate-100);
 }
 
-/* The muted ink needs no step up here: navy 300 is 6.6:1 on these cards. */
 .ion-palette-dark ion-modal.mh-sheet {
-  --ion-background-color: var(--mh-navy-800);
-  --ion-background-color-rgb: 18, 35, 61;
-  --ion-card-background: var(--mh-navy-700);
-  --ion-item-background: var(--mh-navy-700);
-  --ion-toolbar-background: var(--mh-navy-800);
+  --ion-background-color: #2c2c2e;
+  --ion-background-color-rgb: 44, 44, 46;
+  --ion-card-background: #3a3a3c;
+  --ion-item-background: #3a3a3c;
+  --ion-toolbar-background: #2c2c2e;
+
+  /* The muted ink steps up with the surface: slate-400 is 4.4:1 on these
+     cards, under AA; slate-300 is 7.6:1. */
+  --ion-color-medium: var(--mh-slate-300);
+  --ion-color-medium-rgb: 203, 213, 225;
+  --ion-color-medium-shade: var(--mh-slate-400);
+  --ion-color-medium-tint: var(--mh-slate-200);
 }

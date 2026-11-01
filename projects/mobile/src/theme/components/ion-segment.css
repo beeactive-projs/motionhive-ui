@@ -21,20 +21,6 @@ ion-segment-button {
   --color-checked: var(--mh-color-honey-deep);
 }
 
-/* The iOS pill's selected fill. Ionic paints it its 35% step, which in dark
-   is a grey-blue #626b79: the honey label on it was 2.5:1. In dark the
-   token is navy 500, a step lighter than every surface it sits on (the
-   track over the page or a sheet), with the honey label at 5.4:1; in light
-   it is unset and Ionic's own chain (the page colour, white) stands, under
-   the deep honey label at 5:1. `ion-segment-button.ios` is the button's
-   own mode, so the Material section strips (`mh-tabs`) are not touched. */
-ion-segment-button.ios {
-  --indicator-color: var(
-    --mh-color-segment-indicator,
-    var(--ion-background-color-step-350, var(--ion-background-color, #fff))
-  );
-}
-
 /* A segment whose labels nearly fill their buttons, like the range
    "12 săptămâni". Full width with plain letter spacing, then sides per
    mode: Material needs none; iOS sizes its buttons to their labels, so
@@ -70,7 +56,7 @@ ion-segment.mh-segment-fit ion-segment-button {
    label, over a short honey bar that slides between them: the tab bar's
    selection, with its split (ion-tab-bar.css): the icon and the bar are the
    honey itself, the label the deep honey ink, 5:1 on white where honey was
-   2.2:1 (the same token is the honey in dark). Value
+   2.2:1 (`--mh-color-tab-label-selected`, the honey in dark). Value
    pickers (a range, a level, a repeat end) stay pills: they set something,
    they don't change what the page shows.
 
@@ -94,7 +80,7 @@ ion-segment.mh-tabs ion-segment-button {
   --padding-top: 0.5rem;
   --padding-bottom: 0.5rem;
   --color: var(--ion-color-medium);
-  --color-checked: var(--mh-color-honey-deep);
+  --color-checked: var(--mh-color-tab-label-selected);
   --indicator-color: var(--ion-color-primary);
   --indicator-height: var(--mh-spine-width);
   --indicator-transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);

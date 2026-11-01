@@ -139,7 +139,7 @@ ion-list:is(.mh-card-list, .mh-flat-list) ion-item:has(> mh-hex-avatar[slot='sta
    above: it starts where the text starts, so it never cuts under the
    avatar, and stops at the gutter, under the end of the time.
    It lives only on a flat page (`ion-content.mh-flat-page`), whose surface
-   is the page colour: white in light, the page navy in dark (variables.css).
+   is the page colour: white in light, the page grey in dark (variables.css).
    Specificity: Ionic's `.list-md` (0,1,0) paints its own background and an
    8px band; this (0,1,1) replaces both. */
 ion-list.mh-flat-list {

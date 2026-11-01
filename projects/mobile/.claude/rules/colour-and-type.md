@@ -19,8 +19,8 @@ The token tiers and the type scale are in `projects/mobile/CLAUDE.md`. These are
 - Status colours are neutral or semantic. Soft status chips use the wash pair: `background: var(--ion-color-<name>-wash); color: var(--ion-color-<name>-wash-contrast)`.
 - A white glyph needs 3:1 on its tile. Sky 500 and Emerald 500 miss it; use `tone="shade"` for those where the glyph carries meaning.
 - Hairlines between rows use `--mh-color-separator`. `--mh-color-divider` is a soft fill (pills), not a line on a card. The chat composer and the other side's bubble take `--ion-card-background` (slate on the white flat page).
-- Dark mode is Ionic's palette class on `<html>`, and it is navy (surfaces table in `surfaces-and-sheets.md`). A colour that must differ in dark mode is a token with its override in `variables.css`. Use a component-level `:host-context(.ion-palette-dark)` rule only for what no token expresses (the auth pages' honeycomb flips navy to honey and changes its opacity).
-- On navy, see-through honey (`rgba(honey, 0.12)`) mixes to a grey and a see-through white reads as a grey patch. A tint that must stay warm in dark is a token whose dark value is opaque (`--mh-color-honey-tint` takes the honey wash there).
+- Dark mode is Ionic's palette class on `<html>`, and it is grey (surfaces table in `surfaces-and-sheets.md`). A colour that must differ in dark mode is a token with its override in `variables.css`. Use a component-level `:host-context(.ion-palette-dark)` rule only for what no token expresses (the auth pages' honeycomb flips navy to honey and changes its opacity).
+- On a navy box (the hive card), see-through honey (`rgba(honey, 0.12)`) mixes to a grey and a see-through white reads as a grey patch. A tint that must stay warm in dark is a token whose dark value is opaque (`--mh-color-honey-tint` takes the honey wash there).
 - A shadow is never mixed from `--ion-text-color`: in dark the ink is white and the shadow glows. Floating overlays read `--mh-shadow-overlay`. And a `-rgb` slot is a comma triplet, so `rgb(var(--x-rgb) / 0.2)` is invalid and paints nothing; write `rgba(var(--x-rgb), 0.2)`.
 
 ## Type

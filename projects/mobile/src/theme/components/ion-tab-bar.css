@@ -5,7 +5,8 @@
    `--ion-color-primary` is about 2:1 on the white bar, under the 3:1 a
    glyph needs; the selection still reads from every other tab being grey.
    Its label is words, so it takes the deep honey ink (5:1 on white, where
-   the honey was 2.2:1); in dark that token is the honey, 8:1 on the navy.
+   the honey was 2.2:1); in dark it stays the honey, 7.7:1 on the grey bar
+   (`--mh-color-tab-label-selected`).
 
    No edge: like the header, the bar is the page's colour (variables.css). */
 ion-tab-bar {
@@ -14,7 +15,7 @@ ion-tab-bar {
 }
 
 ion-tab-button.tab-selected ion-label {
-  color: var(--mh-color-honey-deep);
+  color: var(--mh-color-tab-label-selected);
 }
 
 /* Material's tab glyph is 22px, off the icon grid. */
