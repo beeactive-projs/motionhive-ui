@@ -699,6 +699,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!exercise) return;
 
     switch (id) {
+      case ExerciseActionIds.History:
+        this.openHistory(exercise);
+        return;
       case ExerciseActionIds.Swap:
         this.swapTarget.set(exercise);
         this.pickerOpen.set(true);
@@ -775,6 +778,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       picked.map((e) => e.id),
       () => this._loadLastTimes(),
     );
+  }
+
+  /**
+   * The exercise's history, pushed onto the workouts stack over the running
+   * workout, so back returns to it. A value still on the keypad is kept first.
+   */
+  openHistory(exercise: LoggedExercise): void {
+    if (!exercise.exerciseId) return;
+    this._keepTyped();
+    this.editing.set(null);
+    void this._router.navigate(['/tabs/workouts/progress', exercise.exerciseId]);
   }
 
   /** The catalog page for this movement, pushed onto the workouts stack. */

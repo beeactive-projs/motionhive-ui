@@ -12,12 +12,14 @@ import {
   WorkoutLogStatus,
 } from 'core';
 
+import { HexShape, HexShapes } from '../../_shared/config/hexagon.config';
 import {
   COACH_SHORTCUTS,
   ClientHiveStates,
   EndDays,
   GreetingPeriods,
   HIVE_BUILD,
+  HIVE_GAP,
   HiveCellKinds,
   HiveFills,
   HiveRings,
@@ -45,6 +47,7 @@ import {
   endDay,
   firstNameOf,
   greetingPeriod,
+  hiveLayout,
   initialsOf,
   isBuilding,
   knownDuration,
@@ -143,6 +146,17 @@ describe('initialsOf', () => {
   });
 });
 
+/** Where a place's cell sits on screen, in cell widths, for a shape. */
+function drawnAt(place: { x: number; y: number }, shape: HexShape): { x: number; y: number } {
+  return { x: place.x, y: place.y * hiveLayout([place], shape).rowStep };
+}
+
+/** How far each cell of a ring is from the centre, drawn in a shape. */
+function ringDistances(places: { x: number; y: number }[], shape: HexShape): number[] {
+  const [centre, ...ring] = places.map((place) => drawnAt(place, shape));
+  return ring.map((p) => Math.hypot(p.x - centre!.x, p.y - centre!.y));
+}
+
 describe('honeycomb geometry', () => {
   const distinct = (places: { x: number; y: number }[]) =>
     new Set(places.map((p) => `${p.x},${p.y}`)).size;
@@ -152,10 +166,36 @@ describe('honeycomb geometry', () => {
     expect(places).toHaveLength(1 + RING_ONE_SIZE);
     expect(distinct(places)).toBe(places.length);
 
-    // Every cell of the ring is the same distance from the centre.
-    const [centre, ...ring] = places;
-    const distances = ring.map((p) => Math.hypot(p.x - centre!.x, p.y - centre!.y));
+    // Drawn in the classic (regular) shape, every cell of the ring is the
+    // same distance from the centre.
+    const distances = ringDistances(places, HexShapes.Classic);
     for (const distance of distances) expect(distance).toBeCloseTo(distances[0]!, 2);
+  });
+
+  // The logo's cell is a touch wider for its height than a regular one, so
+  // its rows sit closer: the side neighbours stay one cell and the gap away,
+  // the slanted ones come in a little (`combStep` keeps the gap even).
+  it('tucks the logo rows closer than the classic ones', () => {
+    const places = ringPlaces(RING_ONE_SIZE);
+    const logo = ringDistances(places, HexShapes.Logo);
+    expect(Math.max(...logo)).toBeCloseTo(1 + HIVE_GAP, 6);
+    expect(Math.min(...logo)).toBeLessThan(1 + HIVE_GAP);
+    expect(Math.min(...logo)).toBeGreaterThan(1);
+  });
+
+  it('turns rows into lengths for the shape on screen', () => {
+    const places = weekPlaces();
+    const classic = hiveLayout(places, HexShapes.Classic);
+    const logo = hiveLayout(places, HexShapes.Logo);
+    // The classic comb as it was drawn: a 1 / cos 30° cell, rows 0.866 × 1.08 apart.
+    expect(classic.cellHeight).toBeCloseTo(1.155, 3);
+    expect(classic.rowStep).toBeCloseTo(0.866 * 1.08, 3);
+    expect(logo.cellHeight).toBe(1.125);
+    expect(logo.rowStep).toBeLessThan(classic.rowStep);
+    // Three cells and two gaps across in both; two rows and a cell down.
+    expect(classic.width).toBeCloseTo(3 + 2 * HIVE_GAP, 3);
+    expect(logo.width).toBe(classic.width);
+    expect(logo.height).toBeCloseTo(2 * logo.rowStep + 1.125, 3);
   });
 
   it('opens the second ring for the seventh person', () => {
@@ -239,8 +279,7 @@ describe('the building comb', () => {
     expect(new Set(cells.map(key))).toEqual(new Set(weekPlaces().map(key)));
 
     // The first cell is the centre: the same distance from every other.
-    const [centre, ...ring] = cells;
-    const distances = ring.map((p) => Math.hypot(p.x - centre!.x, p.y - centre!.y));
+    const distances = ringDistances(cells, HexShapes.Classic);
     for (const distance of distances) expect(distance).toBeCloseTo(distances[0]!, 2);
   });
 

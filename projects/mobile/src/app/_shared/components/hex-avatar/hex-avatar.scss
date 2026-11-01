@@ -1,10 +1,11 @@
 // The hexagon itself — no Ionic primitive produces this shape. Drawn as SVG
 // rather than clip-path because the corners are rounded (clip-path can't).
+// The width is the size step; the frame's proportion (`TILE_FRAME`) comes
+// from the component, so no hexagon number lives here.
 :host {
   display: inline-flex;
   position: relative;
   width: 2.5rem;
-  aspect-ratio: 100 / 86.6;
   flex: none;
   color: var(--hex-ink);
   font-weight: 600;
@@ -44,6 +45,8 @@
   display: block;
   width: 100%;
   height: 100%;
+  // The logo's points reach past the frame, above and below.
+  overflow: visible;
 }
 
 .hex path {

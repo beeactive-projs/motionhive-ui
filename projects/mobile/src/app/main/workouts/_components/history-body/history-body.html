@@ -1,3 +1,18 @@
+<!-- Search by a workout's name or anything done in it ("bench"). On screen
+     from the start, so no `mhAutofocus`; debounced, since every term is a
+     request. Named, as a placeholder alone announces Ionic's "search text". -->
+<ion-searchbar
+  class="mh-search-pill search"
+  searchIcon="search-outline"
+  clearIcon="close-outline"
+  inputmode="search"
+  [placeholder]="'workouts.history.search' | translate"
+  [attr.aria-label]="'workouts.history.search' | translate"
+  [debounce]="300"
+  [value]="store.query()"
+  (ionInput)="store.setQuery($event.detail.value ?? '')"
+/>
+
 <!-- The chips, and at their end the way to the calendar: it stays out of
      the way until asked for. -->
 <div
@@ -82,7 +97,11 @@
     }
   </div>
 } @else if (store.isEmpty()) {
-  @if (store.day()) {
+  @if (store.query().trim()) {
+    <ion-note class="mh-note-block">
+      {{ 'workouts.history.noMatch' | translate: { query: store.query().trim() } }}
+    </ion-note>
+  } @else if (store.day()) {
     <ion-note class="mh-note-block">{{ 'workouts.history.emptyDay' | translate }}</ion-note>
   } @else {
     @switch (store.filter()) {
@@ -110,7 +129,7 @@
     }
   }
 } @else {
-  @if (store.filter() === Filters.All && !store.day()) {
+  @if (store.filter() === Filters.All && !store.day() && !store.query().trim()) {
     @if (store.memory(); as memory) {
       <!-- A workout from a while back next to real progress since: the
            reason to come back here, only when it is true. -->

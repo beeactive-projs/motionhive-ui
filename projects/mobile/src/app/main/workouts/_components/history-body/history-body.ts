@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonNote, IonSearchbar } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { WorkoutLog } from 'core';
@@ -39,6 +39,7 @@ import { PhotoTile } from '../photo-tile/photo-tile';
     IonButton,
     IonIcon,
     IonNote,
+    IonSearchbar,
     LogRow,
     MemoryCard,
     PhotoTile,

@@ -2756,7 +2756,8 @@
       "skip": "Sari peste exercițiu",
       "swap": "Schimbă exercițiul",
       "title": "Acțiuni pentru exercițiu",
-      "unskip": "Reia exercițiul"
+      "unskip": "Reia exercițiul",
+      "history": "Istoricul exercițiului"
     },
     "exerciseCard": {
       "actionsFor": "Acțiuni pentru {name}"
@@ -2871,7 +2872,10 @@
         "record": "Recorduri"
       },
       "openPhoto": "{name}, {day}",
-      "weekOf": "Săptămâna din {date}"
+      "weekOf": "Săptămâna din {date}",
+      "search": "Caută antrenamente sau exerciții",
+      "noMatch": "Niciun antrenament nu se potrivește cu „{query}”",
+      "countSearch": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
     },
     "home": {
       "coldStart": {
@@ -3042,8 +3046,18 @@
         "title": "Nimic de arătat încă"
       },
       "last12Weeks": "Ultimele 12 săptămâni",
-      "records": "Recorduri",
-      "recordLine": "1RM estimat · {date}"
+      "exercises": "Exercițiile tale",
+      "clientExercises": "Exerciții",
+      "exerciseLine": "{value} · {date}",
+      "exercisesError": "Nu am putut încărca exercițiile",
+      "sessions": "{count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}}",
+      "trend": {
+        "up": "În creștere",
+        "steady": "Constant",
+        "down": "În scădere"
+      },
+      "search": "Caută exerciții",
+      "noMatch": "Niciun exercițiu nu se potrivește cu „{query}”"
     },
     "restAlert": {
       "body": "E timpul pentru următoarea serie.",
@@ -3128,36 +3142,60 @@
     },
     "share": {
       "action": "Distribuie",
-      "background": {
-        "hive": "Fagure",
-        "label": "Fundal",
-        "photo": "Poza mea"
-      },
       "card": {
-        "coach": "Program de la {name}",
-        "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
-        "streak": "{count, plural, one {săptămână la rând} few {săptămâni la rând} other {de săptămâni la rând}}"
+        "hours": "h",
+        "km": "km",
+        "meters": "m",
+        "minutes": "min",
+        "number": "{count, selectordinal, one {Primul antrenament} other {Al #-lea antrenament}}",
+        "numberLabel": "antrenament",
+        "numberValue": "{count}",
+        "pace": "min/km",
+        "pr": "PR",
+        "record": "Record nou",
+        "reps": "{count, plural, one {repetare} few {repetări} other {de repetări}}",
+        "sets": "{count, plural, one {serie} few {serii} other {de serii}}",
+        "streak": "{count, plural, one {săptămână la rând} few {săptămâni la rând} other {de săptămâni la rând}}",
+        "streakShort": "{count, plural, one {săpt. la rând} few {săpt. la rând} other {de săpt. la rând}}",
+        "volume": "kg volum",
+        "with": "cu {name}"
       },
-      "choose": {
-        "full": {
-          "anywhere": "Merge oriunde: WhatsApp, Facebook",
-          "brand": "Logo și linkul tău",
-          "coach": "Antrenorul, doar dacă vrei",
-          "kicker": "Salvezi și postezi",
-          "preview": "Previzualizarea cardului complet"
-        },
-        "quick": {
-          "clean": "Fără logo, fără antrenor",
-          "direct": "Direct în Instagram",
-          "kicker": "O atingere",
-          "photo": "Poza ta și statisticile",
-          "preview": "Previzualizarea Story-ului rapid"
-        },
-        "remembered": "Alegerea ta rămâne pentru data viitoare. O poți schimba oricând de aici.",
-        "subtitle": "Exact ce văd urmăritorii tăi",
-        "title": "Cum vrei să arate?"
+      "details": {
+        "adjust": "Ajustează",
+        "coach": "Antrenorul",
+        "coachAllowed": "{name} permite mențiuni. Rămâne oprit până îl pornești.",
+        "coachLocked": "{name} nu a permis mențiuni",
+        "date": "Data și ora",
+        "duration": "Durata",
+        "exercises": "Exerciții",
+        "exercisesHint": "Primele 3, cu cea mai bună serie",
+        "feeling": "Cum te-ai simțit",
+        "link": "Linkul meu",
+        "location": "Locația",
+        "locationOff": "Oprit: fără loc pe imagine",
+        "name": "Numele",
+        "number": "Al câtelea antrenament",
+        "photo": "Fotografia mea ca fundal",
+        "place": "Locul",
+        "placePlaceholder": "Sala, parcul, orașul",
+        "places": "Locuri folosite înainte",
+        "record": "Record",
+        "stats": "Statistici",
+        "weights": "Arată greutățile",
+        "weightsHint": "Oprit: dispar toate kg"
       },
       "downloaded": "Am descărcat imaginea",
+      "duration": {
+        "failed": "Nu am putut schimba durata",
+        "hours": "h",
+        "minutes": "min",
+        "note": "Corectezi antrenamentul, nu doar imaginea. Istoricul, Progresul și cardul vor arăta {next}.",
+        "recorded": "Înregistrat: {recorded}.",
+        "recordedUnknown": "Înregistrat: necunoscut, cronometrul a trecut de 6 ore.",
+        "saved": "Durata este acum {duration}",
+        "title": "Ajustează durata",
+        "unknown": "Necunoscută"
+      },
       "group": {
         "done": "Postat în {group}",
         "failed": "Nu am putut posta în grup",
@@ -3165,6 +3203,11 @@
         "pending": "Trimis în {group}. Apare după ce grupul îl aprobă.",
         "posting": "Se postează în {group}",
         "title": "Sau postează-l într-un grup"
+      },
+      "groups": {
+        "image": "Imagine",
+        "workout": "Antrenamentul",
+        "you": "Despre tine"
       },
       "guide": {
         "hide": "Nu mai arăta pașii",
@@ -3188,17 +3231,9 @@
         "quick": "Rapid",
         "quickHint": "Fără logo, direct în Story"
       },
-      "options": {
-        "coach": "Numele antrenorului",
-        "coachLocked": "Apare doar dacă antrenorul a permis mențiuni",
-        "coachOff": "Oprit implicit. Alegi de fiecare dată când distribui.",
-        "link": "Linkul meu",
-        "photo": "Folosește poza mea",
-        "record": "Arată recordul",
-        "weights": "Arată greutățile"
-      },
       "preview": "Previzualizarea imaginii pe care o distribui",
       "previewFailed": "Nu am putut afișa previzualizarea",
+      "previewHint": "Previzualizarea se schimbă pe loc când pornești sau oprești un detaliu.",
       "save": {
         "action": "Salvează în Poze",
         "denied": "MotionHive nu poate adăuga în Poze. Permite accesul din Setări.",
@@ -3217,9 +3252,9 @@
         "copied": "Am copiat stickerul. Lipește-l pe Story în Instagram.",
         "copyAction": "Copiază doar stickerul",
         "copyFailed": "Nu am putut copia stickerul",
-        "copyHint": "Cu logo, ca să-l lipești pe Story-ul tău",
-        "label": "Stilul stickerului"
+        "copyHint": "Cu logo, ca să-l lipești pe Story-ul tău"
       },
+      "style": "Stil",
       "tag": {
         "copied": "Am copiat {tag}",
         "copy": "Copiază {tag}",
@@ -3228,9 +3263,10 @@
       },
       "theme": {
         "dark": "Închis",
-        "honey": "Miere",
+        "dusk": "Amurg",
         "label": "Temă",
-        "light": "Deschis"
+        "light": "Deschis",
+        "teal": "Turcoaz"
       },
       "title": "Distribuie antrenamentul",
       "toast": {
@@ -3274,6 +3310,22 @@
       "progress": "{exercise}: {from} → {to} kg",
       "line": "Uite cât ai crescut de atunci.",
       "open": "Deschide {name}"
+    },
+    "loggedSets": {
+      "set": "Seria {number}",
+      "notDone": "Nefăcută",
+      "history": "Istoricul exercițiului",
+      "lastTime": "Data trecută, {date}: {value}",
+      "compare": {
+        "heavier": "+{weight} kg față de data trecută",
+        "lighter": "Cu {weight} kg mai puțin decât data trecută",
+        "moreReps": "{count, plural, one {+# repetare} few {+# repetări} other {+# de repetări}} față de data trecută",
+        "fewerReps": "{count, plural, one {Cu # repetare} few {Cu # repetări} other {Cu # de repetări}} mai puțin decât data trecută",
+        "more": "+{value} față de data trecută",
+        "less": "Cu {value} mai puțin decât data trecută",
+        "same": "La fel ca data trecută",
+        "first": "Prima dată la acest exercițiu"
+      }
     }
   },
   "feedback": {

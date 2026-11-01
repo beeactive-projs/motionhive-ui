@@ -9,6 +9,7 @@ import {
   OneRepMaxSource,
   ProgramAssignmentKind,
   ProgressRange,
+  SessionTopSet,
   SetField,
   SetFields,
   TrainingDayPlan,
@@ -60,6 +61,7 @@ import {
   refreshOutline,
   removeOutline,
   repeatOutline,
+  searchOutline,
   shareOutline,
   timeOutline,
   trashOutline,
@@ -111,6 +113,7 @@ export const WORKOUT_ICONS = {
   refreshOutline,
   removeOutline,
   repeatOutline,
+  searchOutline,
   shareOutline,
   timeOutline,
   trashOutline,
@@ -851,6 +854,24 @@ export function sessionBestValue(session: ExerciseSession): string | null {
   return null;
 }
 
+/**
+ * A session's top set as one figure, units included: "62.5 kg × 7", "400 m",
+ * "1:30" or "15 reps". Empty when the session holds none of them.
+ */
+export function sessionTopValue(top: SessionTopSet): string {
+  if (top.topWeightKg != null && top.topWeightKg > 0 && top.topReps != null) {
+    return translate('workouts.exerciseProgress.setValue', {
+      weight: translate('workouts.units.kg', { value: formatMeasure(top.topWeightKg) }),
+      reps: top.topReps,
+    });
+  }
+  if (top.bestDistanceMeters) {
+    return translate('workouts.units.meters', { value: formatMeasure(top.bestDistanceMeters) });
+  }
+  if (top.bestDurationSeconds) return secondsToClock(top.bestDurationSeconds);
+  return top.topReps ? translate('count.reps', { count: top.topReps }) : '';
+}
+
 /** "3 sets · top 72.5 × 5", or "3 sets · best 1:30" for a hold. */
 export function exerciseSessionLine(session: ExerciseSession): string {
   const sets = translate('count.sets', { count: session.setCount });
@@ -1382,6 +1403,7 @@ export const LEAVE_OPTIONS: readonly LeaveOption[] = [
 
 /** The verbs for one exercise mid-workout, in priority order, destructive last. */
 export const ExerciseActionIds = {
+  History: 'history',
   Swap: 'swap',
   Skip: 'skip',
   Remove: 'remove',
@@ -1392,12 +1414,25 @@ export type ExerciseActionId = (typeof ExerciseActionIds)[keyof typeof ExerciseA
 export type ExerciseAction = SheetAction<ExerciseActionId>;
 
 /**
- * Skip flips to unskip on an exercise already skipped; the other two verbs
- * are the same either way. Removing loses whatever was logged against the
+ * History first: what you did last time is the question mid-set, and it
+ * leaves the workout untouched. It needs a catalog exercise (`hasHistory`).
+ * Skip flips to unskip on an exercise already skipped; the other verbs are
+ * the same either way. Removing loses whatever was logged against the
  * exercise, so it reads as the destructive option it is.
  */
-export function exerciseActions(skipped: boolean): ExerciseAction[] {
+export function exerciseActions(skipped: boolean, hasHistory = true): ExerciseAction[] {
+  const history: ExerciseAction[] = hasHistory
+    ? [
+        {
+          id: ExerciseActionIds.History,
+          label: 'workouts.exerciseActions.history',
+          icon: 'trending-up-outline',
+          color: 'medium',
+        },
+      ]
+    : [];
   return [
+    ...history,
     {
       id: ExerciseActionIds.Swap,
       label: 'workouts.exerciseActions.swap',

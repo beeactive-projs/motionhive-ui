@@ -1,6 +1,5 @@
 <!-- Shared by every cell: the honey's gradient and the hexagon to clip it
-     to. Each cell's svg has the same viewBox, so one clip fits them all.
-     The path is the avatars' flat-top hexagon turned a quarter round. -->
+     to. Each cell's svg has the same viewBox, so one clip fits them all. -->
 <svg class="defs" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient [attr.id]="honeyId" x1="0" y1="0" x2="0" y2="1">
@@ -9,7 +8,7 @@
       <stop class="honey-base" offset="1" />
     </linearGradient>
     <clipPath [attr.id]="clipId">
-      <path [attr.d]="path" transform="rotate(90 50 50)" />
+      <path [attr.d]="hex().d" />
     </clipPath>
   </defs>
 </svg>
@@ -25,8 +24,8 @@
     [style.--y]="cell.y"
     [style.--i]="i"
   >
-    <svg viewBox="6.7 0 86.6 100" preserveAspectRatio="xMidYMid meet">
-      <path class="base" [attr.d]="path" transform="rotate(90 50 50)" />
+    <svg [attr.viewBox]="hex().viewBox" preserveAspectRatio="xMidYMid meet">
+      <path class="base" [attr.d]="hex().d" />
       @if (cell.fill) {
         <g [attr.clip-path]="clipUrl">
           <rect
@@ -40,7 +39,7 @@
         </g>
       }
       @if (cell.ring || cell.kind === Kinds.Centre) {
-        <path class="ring" [attr.d]="path" transform="rotate(90 50 50)" />
+        <path class="ring" [attr.d]="hex().d" />
       }
     </svg>
     <!-- The first load's honey, in its own box so its halo (a CSS filter)
@@ -50,10 +49,8 @@
          WebKit). -->
     @if (building()) {
       <span class="glow">
-        <svg viewBox="6.7 0 86.6 100" preserveAspectRatio="xMidYMid meet">
-          <g transform="rotate(90 50 50)">
-            <path #glow class="glow-honey" [attr.d]="path" />
-          </g>
+        <svg [attr.viewBox]="hex().viewBox" preserveAspectRatio="xMidYMid meet">
+          <path #glow class="glow-honey" [attr.d]="hex().d" />
         </svg>
       </span>
     }

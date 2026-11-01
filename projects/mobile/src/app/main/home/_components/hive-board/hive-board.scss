@@ -59,13 +59,15 @@
   height: calc(var(--_cell) * var(--h));
 }
 
-// A box one cell wide and 1 / cos 30° tall, the hexagon's own proportion.
+// A box one cell wide and as tall as the shape's hexagon on its point, its
+// row turned into a length by the shape's row step (`boardLayout`, set on
+// the frame).
 .cell {
   position: absolute;
   left: calc(var(--_cell) * var(--x));
-  top: calc(var(--_cell) * var(--y));
+  top: calc(var(--_cell) * var(--y) * var(--row));
   width: var(--_cell);
-  height: calc(var(--_cell) * 1.155);
+  height: calc(var(--_cell) * var(--cell-h));
   animation: board-pop 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
   animation-delay: calc(var(--i) * 18ms);
 }

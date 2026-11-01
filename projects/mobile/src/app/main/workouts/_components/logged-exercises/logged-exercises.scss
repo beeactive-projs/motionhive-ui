@@ -1,0 +1,109 @@
+/* The list sits in a card like every grouped list (`mh-card-list`); the
+   accordion group adds no box of its own. */
+ion-accordion-group {
+  display: block;
+}
+
+ion-accordion {
+  background: var(--ion-item-background);
+}
+
+/* A skipped exercise stays in the record, quieter. */
+ion-item.skipped h2 {
+  color: var(--ion-color-medium);
+  text-decoration: line-through;
+}
+
+/* The opened sets, inset to the row's text so they read as its detail. */
+.content {
+  padding: 0 var(--mh-row-gutter) 0.75rem;
+}
+
+.sets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.set {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.25rem;
+}
+
+/* The set's number, on the soft fill, the shape the logger's rows use. */
+.number {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.value {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--ion-text-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.state {
+  flex: none;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* A set that was not ticked: still shown, so the coach sees what was planned
+   and left. */
+.set.undone .value {
+  color: var(--ion-color-medium);
+}
+
+.set ion-badge {
+  flex: none;
+}
+
+.comparison {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: var(--mh-hairline) solid var(--mh-color-separator);
+
+  p {
+    margin: 0;
+  }
+}
+
+.verdict {
+  color: var(--ion-text-color);
+  font-weight: 600;
+}
+
+.last {
+  margin-top: 0.125rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.line-verdict {
+  width: 45%;
+}
+
+.line-last {
+  width: 65%;
+}
+
+/* "Exercise history": the row's way out, at the text's start. */
+ion-button.history {
+  margin: 0.25rem 0 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  min-height: var(--mh-tap-target);
+}

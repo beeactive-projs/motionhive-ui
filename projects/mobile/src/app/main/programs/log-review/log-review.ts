@@ -11,7 +11,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonNote,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -21,16 +20,16 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { LoggedExercise, WorkoutLog, WorkoutLogService } from 'core';
+import { WorkoutLog, WorkoutLogService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import {
-  exerciseSetSummary,
   workoutDuration,
   workoutTiles,
 } from '../../workouts/workouts.config';
 import { coachStackOf } from '../../clients/client-paths';
+import { LoggedExercises } from '../../workouts/_components/logged-exercises/logged-exercises';
 import { PROGRAM_ICONS } from '../programs.config';
 
 /**
@@ -54,10 +53,10 @@ import { PROGRAM_ICONS } from '../programs.config';
     IonItem,
     IonLabel,
     IonList,
-    IonNote,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    LoggedExercises,
     StatTile,
     TranslatePipe,
   ],
@@ -90,8 +89,6 @@ export class LogReview implements ViewWillEnter {
   readonly durationLabel = computed(
     () => workoutDuration(this.log()?.durationSeconds) || '—',
   );
-
-  readonly exercises = computed<LoggedExercise[]>(() => this.log()?.exercises ?? []);
 
   /** Only the modalities this session actually contained. */
   readonly tiles = computed(() => {
@@ -130,10 +127,6 @@ export class LogReview implements ViewWillEnter {
           this.loading.set(false);
         },
       });
-  }
-
-  setSummary(exercise: LoggedExercise): string {
-    return exerciseSetSummary(exercise);
   }
 
   /** Quiet on failure: the workout stands without its picture. */

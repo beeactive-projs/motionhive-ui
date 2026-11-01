@@ -1,104 +1,22 @@
 <ng-template #body>
-  @if (step() === Steps.Choose) {
-    <!-- The first time: both ways side by side, each with a real preview. -->
-    <div class="mh-stack">
-      <div class="ways">
-        <ion-card
-          class="way"
-          [button]="true"
-          [class.selected]="suggested() === Modes.Quick"
-          (click)="pickMode(Modes.Quick)"
-        >
-          <ion-card-content>
-            <span class="mh-kicker">{{ 'workouts.share.choose.quick.kicker' | translate }}</span>
-            <div class="thumb">
-              @if (quickPreview(); as src) {
-                <img [src]="src" [alt]="'workouts.share.choose.quick.preview' | translate" />
-              } @else if (quickFailed()) {
-                <p class="failed">{{ 'workouts.share.previewFailed' | translate }}</p>
-              } @else {
-                <ion-spinner name="crescent" />
-              }
-            </div>
-            <h2 class="way-title">{{ 'workouts.share.mode.quick' | translate }}</h2>
-            <ul class="points">
-              <li>
-                <ion-icon [name]="icons.yes" aria-hidden="true" />
-                {{ 'workouts.share.choose.quick.photo' | translate }}
-              </li>
-              <li>
-                <ion-icon [name]="icons.yes" aria-hidden="true" />
-                {{ 'workouts.share.choose.quick.direct' | translate }}
-              </li>
-              <li class="no">
-                <ion-icon [name]="icons.no" aria-hidden="true" />
-                {{ 'workouts.share.choose.quick.clean' | translate }}
-              </li>
-            </ul>
-          </ion-card-content>
-        </ion-card>
+  <div class="mh-stack">
+    <!-- The way, switchable here at any time; the switch is remembered. -->
+    <ion-segment
+      class="mh-segment-fit"
+      [value]="mode()"
+      (ionChange)="onModeChange($event.detail.value)"
+    >
+      <ion-segment-button [value]="Modes.Quick">
+        <ion-label>{{ 'workouts.share.mode.quick' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Modes.Full">
+        <ion-label>{{ 'workouts.share.mode.full' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-        <ion-card
-          class="way"
-          [button]="true"
-          [class.selected]="suggested() === Modes.Full"
-          (click)="pickMode(Modes.Full)"
-        >
-          <ion-card-content>
-            <span class="mh-kicker">{{ 'workouts.share.choose.full.kicker' | translate }}</span>
-            <div class="thumb">
-              @if (fullPreview(); as src) {
-                <img [src]="src" [alt]="'workouts.share.choose.full.preview' | translate" />
-              } @else if (fullFailed()) {
-                <p class="failed">{{ 'workouts.share.previewFailed' | translate }}</p>
-              } @else {
-                <ion-spinner name="crescent" />
-              }
-            </div>
-            <h2 class="way-title">{{ 'workouts.share.mode.full' | translate }}</h2>
-            <ul class="points">
-              <li>
-                <ion-icon [name]="icons.yes" aria-hidden="true" />
-                {{ 'workouts.share.choose.full.coach' | translate }}
-              </li>
-              <li>
-                <ion-icon [name]="icons.yes" aria-hidden="true" />
-                {{ 'workouts.share.choose.full.brand' | translate }}
-              </li>
-              <li>
-                <ion-icon [name]="icons.yes" aria-hidden="true" />
-                {{ 'workouts.share.choose.full.anywhere' | translate }}
-              </li>
-            </ul>
-          </ion-card-content>
-        </ion-card>
-      </div>
-      <!-- Outside the cards: a button inside a card that is itself a button
-           would be two controls in one. -->
-      @if (quickFailed() || fullFailed()) {
-        <ion-button class="mh-text-link retry" fill="clear" (click)="retryPreview()">
-          {{ 'button.tryAgain' | translate }}
-        </ion-button>
-      }
-      <p class="mh-footnote">{{ 'workouts.share.choose.remembered' | translate }}</p>
-    </div>
-  } @else {
-    <div class="mh-stack">
-      <!-- The way, switchable here at any time; the switch is remembered. -->
-      <ion-segment
-        class="mh-segment-fit"
-        [value]="step()"
-        (ionChange)="onModeChange($event.detail.value)"
-      >
-        <ion-segment-button [value]="Modes.Quick">
-          <ion-label>{{ 'workouts.share.mode.quick' | translate }}</ion-label>
-        </ion-segment-button>
-        <ion-segment-button [value]="Modes.Full">
-          <ion-label>{{ 'workouts.share.mode.full' | translate }}</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-
-      <!-- The picture that will be sent, redrawn as the choices change. -->
+    <!-- The picture that will be sent, redrawn as the choices change, with
+         the sticker's style beside it. -->
+    <div class="look">
       <div class="preview">
         @if (preview(); as src) {
           <img [src]="src" [alt]="'workouts.share.preview' | translate" />
@@ -113,43 +31,9 @@
           <ion-spinner name="crescent" />
         }
       </div>
-
-      <section class="mh-section">
-        <span class="mh-section-label">{{ 'workouts.share.theme.label' | translate }}</span>
-        <div class="swatches">
-          @for (swatch of swatches(); track swatch.theme) {
-            <ion-button
-              class="swatch"
-              fill="clear"
-              [class.selected]="prefs().theme === swatch.theme"
-              [attr.aria-pressed]="prefs().theme === swatch.theme"
-              (click)="pickTheme(swatch.theme)"
-            >
-              <span class="swatch-body">
-                <svg viewBox="-4 -4 108 108" aria-hidden="true" focusable="false">
-                  @if (prefs().theme === swatch.theme) {
-                    <path class="ring" [attr.d]="hexPath" transform="rotate(90 50 50)" />
-                  }
-                  <path
-                    [attr.d]="hexPath"
-                    [attr.fill]="swatch.fill"
-                    [attr.stroke]="swatch.stroke"
-                    stroke-width="6"
-                    transform="translate(50 50) scale(0.72) translate(-50 -50) rotate(90 50 50)"
-                  />
-                </svg>
-                <span class="swatch-label">
-                  {{ 'workouts.share.theme.' + swatch.theme | translate }}
-                </span>
-              </span>
-            </ion-button>
-          }
-        </div>
-      </section>
-
-      @if (step() === Steps.Quick) {
-        <section class="mh-section">
-          <span class="mh-section-label">{{ 'workouts.share.sticker.label' | translate }}</span>
+      <div class="look-side">
+        @if (mode() === Modes.Quick) {
+          <span class="mh-section-label">{{ 'workouts.share.style' | translate }}</span>
           <div class="mh-chip-cloud">
             @for (style of stickers; track style) {
               <ion-button
@@ -165,192 +49,388 @@
               </ion-button>
             }
           </div>
-        </section>
+        }
+        <p class="mh-helper">{{ 'workouts.share.previewHint' | translate }}</p>
+      </div>
+    </div>
 
-        <ion-list [inset]="true" class="mh-card-list">
+    <!-- The four themes, each its own colours on the person's hexagon. -->
+    <div class="swatches" role="group" [attr.aria-label]="'workouts.share.theme.label' | translate">
+      @for (swatch of swatches(); track swatch.theme) {
+        <ion-button
+          class="swatch"
+          fill="clear"
+          [class.selected]="prefs().theme === swatch.theme"
+          [attr.aria-pressed]="prefs().theme === swatch.theme"
+          (click)="pickTheme(swatch.theme)"
+        >
+          <span class="swatch-body">
+            <svg [attr.viewBox]="swatch.viewBox" aria-hidden="true" focusable="false">
+              @if (swatch.gradient) {
+                <defs>
+                  <linearGradient
+                    [attr.id]="'mh-swatch-' + swatch.theme"
+                    x1="0.3"
+                    y1="0"
+                    x2="0.7"
+                    y2="1"
+                  >
+                    @for (stop of swatch.stops; track $index) {
+                      <stop
+                        [attr.offset]="$index / (swatch.stops.length - 1)"
+                        [attr.stop-color]="stop"
+                      />
+                    }
+                  </linearGradient>
+                </defs>
+              }
+              @if (prefs().theme === swatch.theme) {
+                <path class="ring" [attr.d]="swatch.ring" />
+              }
+              <path
+                [attr.d]="swatch.face"
+                [attr.fill]="swatch.fill"
+                [attr.stroke]="swatch.edge"
+                stroke-width="1.5"
+              />
+              <path [attr.d]="swatch.dot" [attr.fill]="swatch.honey" />
+            </svg>
+            <span class="swatch-label">
+              {{ 'workouts.share.theme.' + swatch.theme | translate }}
+            </span>
+          </span>
+        </ion-button>
+      }
+    </div>
+
+    <!-- What to show, in three groups (design "Share v3", 2). -->
+    <section class="mh-section">
+      <span class="mh-section-label">{{ 'workouts.share.groups.workout' | translate }}</span>
+      <ion-list [inset]="true" class="mh-card-list">
+        <!-- Always on: an image without the workout's name says nothing.
+             The line under it stays outside the locked toggle, so it keeps
+             its ink. -->
+        <ion-item>
+          <div class="toggle-with-note">
+            <ion-toggle justify="space-between" [checked]="true" [disabled]="true">
+              {{ 'workouts.share.details.name' | translate }}
+            </ion-toggle>
+            <p class="toggle-note">{{ log().name }}</p>
+          </div>
+        </ion-item>
+        <ion-item>
+          <ion-toggle
+            justify="space-between"
+            [checked]="isOn(Details.Date)"
+            (ionChange)="setDetail(Details.Date, $event.detail.checked)"
+          >
+            <ion-label class="ion-text-wrap">
+              {{ 'workouts.share.details.date' | translate }}
+              <p>{{ everything().date }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+        <!-- Adjust sits beside the switch: two controls, each with its name. -->
+        <ion-item class="with-action">
+          <ion-label class="ion-text-wrap">
+            {{ 'workouts.share.details.duration' | translate }}
+            <p>{{ rows().duration }}</p>
+          </ion-label>
+          <ion-button
+            slot="end"
+            class="mh-text-link adjust"
+            fill="clear"
+            size="small"
+            [attr.aria-label]="'workouts.share.duration.title' | translate"
+            (click)="adjustOpen.set(true)"
+          >
+            {{ 'workouts.share.details.adjust' | translate }}
+          </ion-button>
+          <ion-toggle
+            slot="end"
+            [attr.aria-label]="'workouts.share.details.duration' | translate"
+            [checked]="isOn(Details.Duration)"
+            (ionChange)="setDetail(Details.Duration, $event.detail.checked)"
+          />
+        </ion-item>
+        @if (rows().stats) {
           <ion-item>
             <ion-toggle
               justify="space-between"
-              [checked]="prefs().quickKg"
-              (ionChange)="setFlag('quickKg', $event.detail.checked)"
+              [checked]="isOn(Details.Stats)"
+              (ionChange)="setDetail(Details.Stats, $event.detail.checked)"
             >
-              {{ 'workouts.share.options.weights' | translate }}
+              <ion-label class="ion-text-wrap">
+                {{ 'workouts.share.details.stats' | translate }}
+                <p>{{ rows().stats }}</p>
+              </ion-label>
             </ion-toggle>
           </ion-item>
-          @if (hasRecord()) {
-            <ion-item>
+        }
+        @if (rows().exercises) {
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="isOn(Details.Exercises)"
+              (ionChange)="setDetail(Details.Exercises, $event.detail.checked)"
+            >
+              <ion-label class="ion-text-wrap">
+                {{ 'workouts.share.details.exercises' | translate }}
+                <p>{{ 'workouts.share.details.exercisesHint' | translate }}</p>
+              </ion-label>
+            </ion-toggle>
+          </ion-item>
+        }
+        @if (hasRecord()) {
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="isOn(Details.Record)"
+              (ionChange)="setDetail(Details.Record, $event.detail.checked)"
+            >
+              <ion-label class="ion-text-wrap">
+                {{ 'workouts.share.details.record' | translate }}
+                <p>{{ rows().record }}</p>
+              </ion-label>
+            </ion-toggle>
+          </ion-item>
+        }
+      </ion-list>
+    </section>
+
+    <section class="mh-section">
+      <span class="mh-section-label">{{ 'workouts.share.groups.you' | translate }}</span>
+      <ion-list [inset]="true" class="mh-card-list">
+        @if (rows().number) {
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="isOn(Details.Number)"
+              (ionChange)="setDetail(Details.Number, $event.detail.checked)"
+            >
+              <ion-label class="ion-text-wrap">
+                {{ 'workouts.share.details.number' | translate }}
+                <p>{{ rows().number }}</p>
+              </ion-label>
+            </ion-toggle>
+          </ion-item>
+        }
+        @if (rated()) {
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="isOn(Details.Feeling)"
+              (ionChange)="setDetail(Details.Feeling, $event.detail.checked)"
+            >
+              <ion-label class="ion-text-wrap">
+                {{ 'workouts.share.details.feeling' | translate }}
+                <p>{{ rows().feeling }}</p>
+              </ion-label>
+            </ion-toggle>
+          </ion-item>
+        }
+        <ion-item>
+          <ion-toggle
+            justify="space-between"
+            [checked]="isOn(Details.Location)"
+            (ionChange)="setDetail(Details.Location, $event.detail.checked)"
+          >
+            <ion-label class="ion-text-wrap">
+              {{ 'workouts.share.details.location' | translate }}
+              @if (!isOn(Details.Location)) {
+                <p>{{ 'workouts.share.details.locationOff' | translate }}</p>
+              }
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+        @if (isOn(Details.Location)) {
+          <!-- Typed, or picked from the places used before and the profile's
+               city. No map and no GPS: only what the person writes. -->
+          <ion-item class="place">
+            <div class="place-body">
+              <ion-input
+                labelPlacement="stacked"
+                [label]="'workouts.share.details.place' | translate"
+                [placeholder]="'workouts.share.details.placePlaceholder' | translate"
+                [maxlength]="locationMax"
+                [counter]="true"
+                [clearInput]="true"
+                [value]="location()"
+                (ionInput)="setLocation($event.detail.value)"
+              />
+              @if (chips().length) {
+                <div
+                  class="mh-chip-cloud places"
+                  role="group"
+                  [attr.aria-label]="'workouts.share.details.places' | translate"
+                >
+                  @for (place of chips(); track place) {
+                    <ion-button
+                      class="chip"
+                      fill="clear"
+                      shape="round"
+                      size="small"
+                      [class.selected]="isPlace(place)"
+                      [attr.aria-pressed]="isPlace(place)"
+                      (click)="pickPlace(place)"
+                    >
+                      {{ place }}
+                    </ion-button>
+                  }
+                </div>
+              }
+            </div>
+          </ion-item>
+        }
+        @if (planCoach() || mentionableCoach()) {
+          <!-- Off on every share, and only a coach who allows mentions can
+               be named. The reason it is locked keeps its ink. -->
+          <ion-item>
+            <div class="toggle-with-note">
               <ion-toggle
                 justify="space-between"
-                [checked]="prefs().quickRecord"
-                (ionChange)="setFlag('quickRecord', $event.detail.checked)"
+                [checked]="coachOn()"
+                [disabled]="!mentionableCoach()"
+                (ionChange)="coachOn.set($event.detail.checked)"
               >
-                {{ 'workouts.share.options.record' | translate }}
+                {{ 'workouts.share.details.coach' | translate }}
               </ion-toggle>
-            </ion-item>
-          }
+              <p class="toggle-note">
+                @if (mentionableCoach(); as coach) {
+                  {{ 'workouts.share.details.coachAllowed' | translate: { name: coach.name } }}
+                } @else {
+                  {{
+                    'workouts.share.details.coachLocked' | translate: { name: coachLockedName() }
+                  }}
+                }
+              </p>
+            </div>
+          </ion-item>
+        }
+      </ion-list>
+    </section>
+
+    @if (imageRows()) {
+      <section class="mh-section">
+        <span class="mh-section-label">{{ 'workouts.share.groups.image' | translate }}</span>
+        <ion-list [inset]="true" class="mh-card-list">
           @if (hasPhoto()) {
             <ion-item>
               <ion-toggle
                 justify="space-between"
-                [checked]="prefs().quickPhoto"
-                (ionChange)="setFlag('quickPhoto', $event.detail.checked)"
+                [checked]="isOn(Details.Photo)"
+                (ionChange)="setDetail(Details.Photo, $event.detail.checked)"
               >
-                {{ 'workouts.share.options.photo' | translate }}
+                {{ 'workouts.share.details.photo' | translate }}
               </ion-toggle>
             </ion-item>
           }
-        </ion-list>
-
-        <!-- Tagging us is the person's call; the handle is one tap away. -->
-        <ion-list [inset]="true" class="mh-card-list">
-          <mh-settings-row
-            [label]="'workouts.share.tag.copy' | translate: { tag }"
-            [note]="'workouts.share.tag.tip' | translate: { tag }"
-            [icon]="icons.instagram"
-            iconColor="info"
-            iconTone="shade"
-            [detail]="false"
-            (select)="copyTag()"
-          />
-        </ion-list>
-      } @else {
-        @if (hasPhoto()) {
-          <section class="mh-section">
-            <span class="mh-section-label">
-              {{ 'workouts.share.background.label' | translate }}
-            </span>
-            <div class="mh-chip-cloud">
-              @for (option of backgrounds; track option) {
-                <ion-button
-                  class="chip"
-                  fill="clear"
-                  shape="round"
-                  size="small"
-                  [class.selected]="background() === option"
-                  [attr.aria-pressed]="background() === option"
-                  (click)="pickBackground(option)"
-                >
-                  {{ 'workouts.share.background.' + option | translate }}
-                </ion-button>
-              }
-            </div>
-          </section>
-        }
-
-        <ion-list [inset]="true" class="mh-card-list">
-          @if (planCoach() || mentionableCoach()) {
-            <!-- Off on every share. Only a coach who allows mentions can be
-                 named. The line under it sits outside the toggle, and outside
-                 an ion-label (which an item with a disabled control fades
-                 too): a locked toggle dims, the reason it is locked does not. -->
-            <ion-item>
-              <div class="toggle-with-note">
-                <ion-toggle
-                  justify="space-between"
-                  [checked]="showCoach()"
-                  [disabled]="!mentionableCoach()"
-                  (ionChange)="showCoach.set($event.detail.checked)"
-                >
-                  {{ 'workouts.share.options.coach' | translate }}
-                </ion-toggle>
-                <p class="toggle-note">
-                  {{
-                    (mentionableCoach()
-                      ? 'workouts.share.options.coachOff'
-                      : 'workouts.share.options.coachLocked'
-                    ) | translate
-                  }}
-                </p>
-              </div>
-            </ion-item>
-          }
-          <ion-item>
-            <ion-toggle
-              justify="space-between"
-              [checked]="prefs().fullKg"
-              (ionChange)="setFlag('fullKg', $event.detail.checked)"
-            >
-              {{ 'workouts.share.options.weights' | translate }}
-            </ion-toggle>
-          </ion-item>
-          @if (profileLink(); as link) {
+          @if (weightsRow()) {
             <ion-item>
               <ion-toggle
                 justify="space-between"
-                [checked]="prefs().fullLink"
-                (ionChange)="setFlag('fullLink', $event.detail.checked)"
+                [checked]="isOn(Details.Weights)"
+                (ionChange)="setDetail(Details.Weights, $event.detail.checked)"
               >
                 <ion-label class="ion-text-wrap">
-                  {{ 'workouts.share.options.link' | translate }}
-                  <!-- A break point after the slash: at large text the handle
-                       wraps whole instead of splitting inside the name. -->
-                  <p>{{ link.host }}/<wbr />{{ link.path }}</p>
+                  {{ 'workouts.share.details.weights' | translate }}
+                  <p>{{ 'workouts.share.details.weightsHint' | translate }}</p>
                 </ion-label>
               </ion-toggle>
             </ion-item>
           }
-        </ion-list>
-
-        @if (canCopySticker) {
-          <ion-list [inset]="true" class="mh-card-list">
-            <mh-settings-row
-              [label]="'workouts.share.sticker.copyAction' | translate"
-              [note]="'workouts.share.sticker.copyHint' | translate"
-              [icon]="icons.copy"
-              iconColor="info"
-              iconTone="shade"
-              [detail]="false"
-              [disabled]="!!busy()"
-              (select)="copySticker()"
-            />
-          </ion-list>
-        }
-      }
-
-      <!-- Inside the app: the card as a post, in a group of yours that takes one. -->
-      @if (postableGroups(); as groups) {
-        @if (groups.length > 0) {
-          <section class="mh-section">
-            <span class="mh-section-label">{{ 'workouts.share.group.title' | translate }}</span>
-            <div class="mh-chip-cloud">
-              @for (group of groups; track group.id) {
-                <!-- The spinner stands in for the name while it posts, and the
-                     button keeps a name to announce. -->
-                <ion-button
-                  class="chip"
-                  fill="clear"
-                  shape="round"
-                  size="small"
-                  [disabled]="!!sharingTo()"
-                  [attr.aria-label]="
-                    sharingTo() === group.id
-                      ? ('workouts.share.group.posting' | translate: { group: group.name })
-                      : null
-                  "
-                  (click)="shareToGroup(group)"
+          @if (mode() === Modes.Full) {
+            @if (profileLink(); as link) {
+              <ion-item>
+                <ion-toggle
+                  justify="space-between"
+                  [checked]="isOn(Details.Link)"
+                  (ionChange)="setDetail(Details.Link, $event.detail.checked)"
                 >
-                  @if (sharingTo() === group.id) {
-                    <ion-spinner name="crescent" aria-hidden="true" />
-                  } @else {
-                    {{ group.name }}
-                  }
-                </ion-button>
-              }
-            </div>
-            <p class="mh-footnote">{{ 'workouts.share.group.hint' | translate }}</p>
-          </section>
-        }
+                  <ion-label class="ion-text-wrap">
+                    {{ 'workouts.share.details.link' | translate }}
+                    <!-- A break point after the slash: at large text the handle
+                         wraps whole instead of splitting inside the name. -->
+                    <p>{{ link.host }}/<wbr />{{ link.path }}</p>
+                  </ion-label>
+                </ion-toggle>
+              </ion-item>
+            }
+          }
+        </ion-list>
+      </section>
+    }
+
+    @if (mode() === Modes.Quick) {
+      <!-- Tagging us is the person's call; the handle is one tap away, never on the image. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        <mh-settings-row
+          [label]="'workouts.share.tag.copy' | translate: { tag }"
+          [note]="'workouts.share.tag.tip' | translate: { tag }"
+          [icon]="icons.instagram"
+          iconColor="info"
+          iconTone="shade"
+          [detail]="false"
+          (select)="copyTag()"
+        />
+      </ion-list>
+    } @else if (canCopySticker) {
+      <ion-list [inset]="true" class="mh-card-list">
+        <mh-settings-row
+          [label]="'workouts.share.sticker.copyAction' | translate"
+          [note]="'workouts.share.sticker.copyHint' | translate"
+          [icon]="icons.copy"
+          iconColor="info"
+          iconTone="shade"
+          [detail]="false"
+          [disabled]="!!busy()"
+          (select)="copySticker()"
+        />
+      </ion-list>
+    }
+
+    <!-- Inside the app: the card as a post, in a group of yours that takes one. -->
+    @if (postableGroups(); as groups) {
+      @if (groups.length > 0) {
+        <section class="mh-section">
+          <span class="mh-section-label">{{ 'workouts.share.group.title' | translate }}</span>
+          <div class="mh-chip-cloud">
+            @for (group of groups; track group.id) {
+              <!-- The spinner stands in for the name while it posts, and the
+                   button keeps a name to announce. -->
+              <ion-button
+                class="chip"
+                fill="clear"
+                shape="round"
+                size="small"
+                [disabled]="!!sharingTo()"
+                [attr.aria-label]="
+                  sharingTo() === group.id
+                    ? ('workouts.share.group.posting' | translate: { group: group.name })
+                    : null
+                "
+                (click)="shareToGroup(group)"
+              >
+                @if (sharingTo() === group.id) {
+                  <ion-spinner name="crescent" aria-hidden="true" />
+                } @else {
+                  {{ group.name }}
+                }
+              </ion-button>
+            }
+          </div>
+          <p class="mh-footnote">{{ 'workouts.share.group.hint' | translate }}</p>
+        </section>
       }
-    </div>
-  }
+    }
+  </div>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  [title]="title()"
+  [title]="'workouts.share.title' | translate"
   [subtitle]="subtitle()"
   [body]="body"
-  [showFooter]="step() !== Steps.Choose"
   [saveLabel]="saveLabel()"
   [actionLabel]="actionLabel()"
   [actionDisabled]="!!busy() || !canAct()"
@@ -358,8 +438,10 @@
   [saving]="saving()"
   [breakpoints]="[0, 0.95]"
   [initialBreakpoint]="0.95"
-  (save)="step() === Steps.Full ? saveToPhotos() : openInInstagram()"
+  (save)="mode() === Modes.Full ? saveToPhotos() : openInInstagram()"
   (action)="send()"
 />
+
+<mh-adjust-duration-sheet [(open)]="adjustOpen" [log]="workout()" (saved)="durationSaved($event)" />
 
 <mh-share-guide-sheet [(open)]="guideOpen" (hide)="hideGuide()" />

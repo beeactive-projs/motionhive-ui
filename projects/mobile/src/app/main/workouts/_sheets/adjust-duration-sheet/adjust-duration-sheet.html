@@ -1,0 +1,37 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <ion-picker>
+      <ion-picker-column [value]="hours()" (ionChange)="setHours($event.detail.value)">
+        @for (hour of hourChoices; track hour) {
+          <ion-picker-column-option [value]="hour">{{ hour }}</ion-picker-column-option>
+        }
+        <div slot="suffix">{{ 'workouts.share.duration.hours' | translate }}</div>
+      </ion-picker-column>
+      <ion-picker-column [value]="minutes()" (ionChange)="setMinutes($event.detail.value)">
+        @for (minute of minuteChoices; track minute) {
+          <ion-picker-column-option [value]="minute">{{ minute }}</ion-picker-column-option>
+        }
+        <div slot="suffix">{{ 'workouts.share.duration.minutes' | translate }}</div>
+      </ion-picker-column>
+    </ion-picker>
+
+    <!-- It changes the workout, not only the picture: said before Save. -->
+    <div class="note" aria-live="polite">
+      <ion-icon [name]="icons.info" aria-hidden="true" />
+      <p>
+        {{ 'workouts.share.duration.note' | translate: { next: next() } }}
+        {{ recordedLine() }}
+      </p>
+    </div>
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'workouts.share.duration.title' | translate"
+  [body]="body"
+  [fit]="true"
+  [canSave]="!saving()"
+  [saving]="saving()"
+  (save)="save()"
+/>

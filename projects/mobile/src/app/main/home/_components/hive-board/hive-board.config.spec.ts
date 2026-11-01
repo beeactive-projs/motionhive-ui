@@ -2,14 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { WorkoutLogStatus } from 'core';
 
-import { HEX_HEIGHT } from '../../home.config';
+import { HexShapes } from '../../../../_shared/config/hexagon.config';
 import {
   BoardLooks,
-  ROW_STEP,
   avatarFill,
   avatarInk,
   boardCell,
-  boardSize,
+  boardLayout,
   planFill,
   ringAxial,
   ringPlaces,
@@ -73,7 +72,7 @@ describe('ringPlaces', () => {
     expect(Math.min(...one.map((p) => p.x))).toBe(0);
     expect(Math.min(...one.map((p) => p.y))).toBe(0);
     // The centre sits in the middle row, one box in.
-    expect(one[0]).toEqual({ x: 1, y: ROW_STEP });
+    expect(one[0]).toEqual({ x: 1, y: 1 });
     expect(ringPlaces(7)).toHaveLength(19);
     expect(ringPlaces(20)).toHaveLength(37);
   });
@@ -93,8 +92,8 @@ describe('weekRowPlaces', () => {
     expect(places).toHaveLength(14);
     expect(places[0]).toEqual({ x: 0, y: 0 });
     expect(places[6]).toEqual({ x: 6, y: 0 });
-    expect(places[7]).toEqual({ x: 0.5, y: ROW_STEP });
-    expect(places[13]).toEqual({ x: 6.5, y: ROW_STEP });
+    expect(places[7]).toEqual({ x: 0.5, y: 1 });
+    expect(places[13]).toEqual({ x: 6.5, y: 1 });
   });
 });
 
@@ -108,14 +107,21 @@ describe('stripPlaces', () => {
   });
 });
 
-describe('boardSize', () => {
-  it('spans the places plus one box', () => {
-    expect(boardSize(weekRowPlaces(5))).toEqual({
-      width: 7.5,
-      height: Math.round((4 * ROW_STEP + HEX_HEIGHT) * 1000) / 1000,
-    });
-    expect(boardSize(stripPlaces(7))).toEqual({ width: 7, height: HEX_HEIGHT });
-    expect(boardSize([])).toEqual({ width: 0, height: 0 });
+describe('boardLayout', () => {
+  it('spans the places plus one box, in the shape on screen', () => {
+    const logo = boardLayout(weekRowPlaces(5), HexShapes.Logo);
+    // Boxes touch: a row tucks a quarter of a box into the one above.
+    expect(logo).toEqual({ rowStep: 0.8438, cellHeight: 1.125, width: 7.5, height: 4.5 });
+    expect(boardLayout(stripPlaces(7), HexShapes.Logo)).toMatchObject({ width: 7, height: 1.125 });
+    expect(boardLayout([], HexShapes.Logo)).toMatchObject({ width: 0, height: 0 });
+  });
+
+  // The classic board as it was drawn: 1 / cos 30° boxes, rows 0.866 apart.
+  it('keeps the classic board where it was', () => {
+    const classic = boardLayout(weekRowPlaces(5), HexShapes.Classic);
+    expect(classic.cellHeight).toBeCloseTo(1.155, 3);
+    expect(classic.rowStep).toBeCloseTo(0.866, 3);
+    expect(classic.height).toBeCloseTo(4 * 0.866 + 1.155, 2);
   });
 });
 

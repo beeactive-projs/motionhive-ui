@@ -36,32 +36,87 @@
     </div>
   </section>
 
-  @if (records().length) {
+  <!-- Every exercise trained, most recent first: what it was last time, and
+       where it is heading over its latest sessions. A row opens the
+       exercise's own page. -->
+  @if (exercises().length) {
     <section class="mh-section">
-      <span class="mh-kicker">{{ 'workouts.progress.records' | translate }}</span>
-      <ion-list [inset]="true" class="mh-card-list records">
-        @for (record of records(); track record.exerciseId) {
-          <ion-item button [detail]="true" (click)="openExercise(record)">
+      <span class="mh-kicker">
+        {{ (clientId() ? 'workouts.progress.clientExercises' : 'workouts.progress.exercises') | translate }}
+      </span>
+      <!-- By name, on the phone: the whole list is already here. On screen
+           from the start, so no `mhAutofocus`; named, as a placeholder alone
+           announces Ionic's "search text". -->
+      <ion-searchbar
+        class="mh-search-pill search"
+        searchIcon="search-outline"
+        clearIcon="close-outline"
+        inputmode="search"
+        [placeholder]="'workouts.progress.search' | translate"
+        [attr.aria-label]="'workouts.progress.search' | translate"
+        [debounce]="150"
+        [value]="query()"
+        (ionInput)="query.set($event.detail.value ?? '')"
+      />
+      @if (noMatch()) {
+        <ion-note class="mh-note-block">
+          {{ 'workouts.progress.noMatch' | translate: { query: query().trim() } }}
+        </ion-note>
+      }
+      <ion-list [inset]="true" class="mh-card-list exercises" [class.ion-hide]="noMatch()">
+        @for (row of exerciseRows(); track row.id) {
+          <ion-item button [detail]="true" (click)="openExercise(row.id, row.name)">
             <!-- Decorative: the exercise's name is the very next thing in the row. -->
             <mh-hex-avatar
               slot="start"
               size="md"
               tone="wash"
-              color="primary"
-              icon="trophy-outline"
+              [color]="row.tone"
+              [icon]="row.icon"
               aria-hidden="true"
             />
-            <!-- The name may take two lines, words whole, beside a weight
-                 that never shrinks. On a narrow card the weight moves under
-                 the name instead (one of the two is shown; progress-body.scss). -->
             <ion-label>
-              <h2 class="record-name">{{ record.exerciseName }}</h2>
-              <p>{{ recordLine(record) }}</p>
-              <p class="value-under">{{ recordWeight(record.weightKg) }}</p>
+              <h2 class="exercise-name">{{ row.name }}</h2>
+              <p class="line">
+                @if (row.record) {
+                  <ion-badge [attr.data-tone]="Tones.Honey">
+                    {{ 'workouts.exerciseProgress.record' | translate }}
+                  </ion-badge>
+                }
+                {{ row.line }}
+              </p>
+              <!-- On a narrow card the trend moves under the line (progress-body.scss). -->
+              <p class="trend-under" [attr.data-trend]="row.trend">{{ row.trendLabel }}</p>
             </ion-label>
-            <ion-note slot="end" class="value">{{ recordWeight(record.weightKg) }}</ion-note>
+            <div slot="end" class="trend" [attr.data-trend]="row.trend">
+              @if (row.spark; as points) {
+                <svg class="spark" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+                  <polyline [attr.points]="points" />
+                </svg>
+              }
+              <span class="trend-label">{{ row.trendLabel }}</span>
+            </div>
           </ion-item>
         }
+      </ion-list>
+      @if (hasMoreExercises()) {
+        <ion-button class="show-more mh-text-link" fill="clear" expand="block" (click)="showMoreExercises()">
+          {{ 'button.showMoreItems' | translate }}
+        </ion-button>
+      }
+    </section>
+  } @else if (exercisesError()) {
+    <section class="mh-section">
+      <span class="mh-kicker">
+        {{ (clientId() ? 'workouts.progress.clientExercises' : 'workouts.progress.exercises') | translate }}
+      </span>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="false" (click)="loadExercises()">
+          <ion-label class="ion-text-wrap">
+            <h2>{{ 'workouts.progress.exercisesError' | translate }}</h2>
+            <p>{{ 'button.tryAgain' | translate }}</p>
+          </ion-label>
+        </ion-item>
       </ion-list>
     </section>
   }

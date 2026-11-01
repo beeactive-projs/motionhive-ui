@@ -1,113 +1,73 @@
-/* The chooser: the two ways side by side, as tall as their longest, and
-   lined up row by row (kicker, picture, title, points), so a kicker that
-   wraps in one card ("Salvezi și postezi" at large text) moves both
-   pictures down together. Each level between this grid and the four rows
-   is a subgrid of it: the card, the card's own button (its `native` part,
-   the card being tappable) and the card's content. The card drops Ionic's
-   `contain: content`: layout containment makes a box its own formatting
-   context, and a subgrid inside one silently falls back to plain rows. */
-.ways {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(4, auto);
-  gap: 0.5rem var(--mh-page-rhythm);
-}
-
-.way,
-.way::part(native),
-.way ion-card-content {
-  display: grid;
-  grid-row: span 4;
-  grid-template-rows: subgrid;
-}
-
-/* A selectable tile: its border is the selection, honey when picked. */
-.way {
-  contain: none;
-  border: var(--mh-ring-width) solid transparent;
-}
-
-.way.selected {
-  border-color: var(--ion-color-primary);
-}
-
-.way ion-card-content {
-  padding: 0.75rem;
-}
-
-.way-title {
-  margin: 0;
-  color: var(--ion-text-color);
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-md);
-  font-weight: 600;
-}
-
-.points {
+/* The preview beside the sticker's style: the picture at the shape it will
+   be (9:16, like the Story), small enough to leave the switches in view. */
+.look {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  line-height: var(--mh-leading-tight);
+  align-items: center;
+  gap: var(--mh-page-rhythm);
 }
 
-.points li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.25rem;
-}
-
-.points ion-icon {
-  flex: none;
-  color: var(--ion-color-success-shade);
-  font-size: var(--mh-icon-sm);
-}
-
-.points .no ion-icon {
-  color: var(--ion-color-medium);
-}
-
-/* The pictures at the shape they will be: 9:16, like the Story. */
-.thumb,
 .preview {
   display: grid;
+  flex: none;
   place-items: center;
   overflow: hidden;
+  width: 8.25rem;
   aspect-ratio: 9 / 16;
   border-radius: var(--mh-radius-control);
   background: var(--mh-color-divider);
 }
 
-.thumb {
-  width: 100%;
-}
-
-/* Large enough to judge, small enough to leave the choices in view. */
-.preview {
-  height: min(16rem, 36dvh);
-  margin-inline: auto;
-}
-
-.thumb img,
 .preview img {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/* The three themes, each its own colour on the app's hexagon. */
+.look-side {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.look-side .mh-section-label,
+.look-side .mh-helper {
+  margin: 0;
+  padding: 0;
+}
+
+/* A preview that could not be drawn says so where the picture would be. */
+.failed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
+  text-align: center;
+}
+
+.failed p {
+  margin: 0;
+}
+
+.failed ion-button {
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}
+
+/* The four themes, each its own colours on the person's hexagon. */
 .swatches {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 
 .swatch {
-  --padding-start: 0.5rem;
-  --padding-end: 0.5rem;
+  --padding-start: 0.25rem;
+  --padding-end: 0.25rem;
   --padding-top: 0.25rem;
   --padding-bottom: 0.25rem;
   height: auto;
@@ -129,13 +89,14 @@
 
 .swatch svg {
   width: 2.75rem;
-  height: 2.75rem;
+  height: 3rem;
+  overflow: visible;
 }
 
 .swatch .ring {
   fill: none;
   stroke: var(--ion-color-primary);
-  stroke-width: 5;
+  stroke-width: 3;
 }
 
 .swatch-label {
@@ -147,33 +108,20 @@
   font-weight: 600;
 }
 
-/* A preview that could not be drawn says so where the picture would be. */
-.failed {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0.75rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-  line-height: var(--mh-leading-tight);
-  text-align: center;
-}
-
-.failed p {
-  margin: 0;
-}
-
-.failed ion-button {
+/* Duration: Adjust and the switch side by side at the row's end. */
+.with-action .adjust {
   min-height: var(--mh-tap-target);
   margin: 0;
 }
 
-/* The chooser's Retry, under the two cards. */
-.retry {
-  align-self: center;
-  margin: 0;
+/* The place field and the chips under it, in one row of the card. */
+.place-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  padding-block: 0.25rem 0.75rem;
 }
 
 /* A toggle with its line under it, both in the item: the line is not part

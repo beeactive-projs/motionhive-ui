@@ -11,21 +11,27 @@ import {
   base64Of,
   storyShareErrorCode,
 } from '../../../_shared/native/story-share.config';
-import { CardTheme, ShareCardContent, StickerStyle } from './share-card.config';
+import { HexShape } from '../../../_shared/config/hexagon.config';
+import { CardTheme, ShareCardContent, StickerStyle, StickerStyles } from './share-card.config';
 import {
-  CARD_FONTS,
+  CardPalette,
+  canvasMeasure,
+  cardPalette,
+  drawQuickStory,
+  drawStoryBackground,
+  fontString,
+  paintLayout,
+} from './share-card';
+import {
   CARD_HEIGHT,
   CARD_WIDTH,
-  CardPalette,
-  STICKER_HEIGHT,
-  STICKER_WIDTH,
-  cardPalette,
-  drawBrandedSticker,
-  drawFullCard,
-  drawQuickStory,
-  drawSticker,
-  drawStoryBackground,
-} from './share-card';
+  Measure,
+  SHARE_FONTS,
+  ShareLayout,
+  badgeLayout,
+  cellsLayout,
+  fullLayout,
+} from './share-layout.config';
 
 /**
  * How a hand-off ended: sent somewhere, put away by the person, or (the
@@ -66,22 +72,33 @@ export class ShareCardService {
     return cardPalette(theme, (name) => styles.getPropertyValue(name).trim());
   }
 
-  /** The Quick sticker, transparent around it. `scale` below 1 for a preview. */
+  /**
+   * The Quick sticker, transparent around it, in the person's hexagon.
+   * `scale` below 1 for a preview: the same layout, drawn smaller.
+   */
   async sticker(
     content: ShareCardContent,
     theme: CardTheme,
     style: StickerStyle,
+    shape: HexShape,
     scale = 1,
   ): Promise<HTMLCanvasElement> {
-    const { canvas, ctx } = await this._canvas(STICKER_WIDTH, STICKER_HEIGHT, scale);
-    drawSticker(ctx, content, this.palette(theme), style);
-    return canvas;
+    return this._draw(theme, shape, scale, null, (measure) =>
+      style === StickerStyles.Cells
+        ? cellsLayout(content, measure, shape)
+        : badgeLayout(content, measure, shape),
+    );
   }
 
   /** The Full way's sticker with the logo and the link, as a PNG data URL. */
-  async brandedSticker(content: ShareCardContent, theme: CardTheme): Promise<string> {
-    const { canvas, ctx } = await this._canvas(STICKER_WIDTH, STICKER_HEIGHT, 1);
-    drawBrandedSticker(ctx, content, this.palette(theme));
+  async brandedSticker(
+    content: ShareCardContent,
+    theme: CardTheme,
+    shape: HexShape,
+  ): Promise<string> {
+    const canvas = await this._draw(theme, shape, 1, null, (measure) =>
+      badgeLayout(content, measure, shape, true),
+    );
     return canvas.toDataURL('image/png');
   }
 
@@ -90,10 +107,11 @@ export class ShareCardService {
     content: ShareCardContent,
     theme: CardTheme,
     style: StickerStyle,
+    shape: HexShape,
     photo: CanvasImageSource | null,
     scale = 1,
   ): Promise<string> {
-    const sticker = await this.sticker(content, theme, style, scale);
+    const sticker = await this.sticker(content, theme, style, shape, scale);
     const { canvas, ctx } = await this._canvas(CARD_WIDTH, CARD_HEIGHT, scale);
     drawQuickStory(ctx, sticker, this.palette(theme), photo);
     return canvas.toDataURL(photo ? 'image/jpeg' : 'image/png', 0.92);
@@ -107,11 +125,13 @@ export class ShareCardService {
   async fullCard(
     content: ShareCardContent,
     theme: CardTheme,
+    shape: HexShape,
     photo: CanvasImageSource | null,
     scale = 1,
   ): Promise<string> {
-    const { canvas, ctx } = await this._canvas(CARD_WIDTH, CARD_HEIGHT, scale);
-    drawFullCard(ctx, content, this.palette(theme), photo);
+    const canvas = await this._draw(theme, shape, scale, photo, (measure) =>
+      fullLayout(content, measure, shape, !!photo),
+    );
     return canvas.toDataURL(photo ? 'image/jpeg' : 'image/png', 0.92);
   }
 
@@ -120,10 +140,11 @@ export class ShareCardService {
     content: ShareCardContent,
     theme: CardTheme,
     style: StickerStyle,
+    shape: HexShape,
     photo: CanvasImageSource | null,
   ): Promise<StoryParts> {
     const palette = this.palette(theme);
-    const sticker = (await this.sticker(content, theme, style)).toDataURL('image/png');
+    const sticker = (await this.sticker(content, theme, style, shape)).toDataURL('image/png');
     let background: string | null = null;
     if (photo) {
       const { canvas, ctx } = await this._canvas(CARD_WIDTH, CARD_HEIGHT, 1);
@@ -228,17 +249,37 @@ export class ShareCardService {
   }
 
   /**
+   * Lays out with widths measured in the real faces, on a canvas the
+   * layout's size, and paints it.
+   */
+  private async _draw(
+    theme: CardTheme,
+    shape: HexShape,
+    scale: number,
+    photo: CanvasImageSource | null,
+    layout: (measure: Measure) => ShareLayout,
+  ): Promise<HTMLCanvasElement> {
+    const probe = await this._canvas(1, 1, 1);
+    const laid = layout(canvasMeasure(probe.ctx));
+    const { canvas, ctx } = await this._canvas(laid.width, laid.height, scale);
+    paintLayout(ctx, laid, this.palette(theme), shape, photo);
+    return canvas;
+  }
+
+  /**
    * A blank canvas, after the faces are in: they are bundled, but a face
    * is only loaded once text asks for it, and a canvas would otherwise
-   * draw the first card in a fallback. `scale` draws a smaller copy for a
-   * preview with the same coordinates.
+   * measure and draw the first image in a fallback. `scale` draws a
+   * smaller copy for a preview with the same coordinates.
    */
   private async _canvas(
     width: number,
     height: number,
     scale: number,
   ): Promise<{ canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }> {
-    this._fontsReady ??= Promise.all(CARD_FONTS.map((face) => this._document.fonts.load(face)));
+    this._fontsReady ??= Promise.all(
+      SHARE_FONTS.map((face) => this._document.fonts.load(fontString(face))),
+    );
     await this._fontsReady.catch(() => undefined);
     const canvas = this._document.createElement('canvas');
     canvas.width = Math.round(width * scale);

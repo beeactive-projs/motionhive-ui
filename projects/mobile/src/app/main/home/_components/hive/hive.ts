@@ -1,8 +1,27 @@
-import { Component, computed, effect, ElementRef, input, viewChildren } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  viewChildren,
+} from '@angular/core';
 
-import { HEX_PATH } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import {
+  APP_HEX_SHAPE,
+  HexShape,
+  cellFigure,
+} from '../../../../_shared/config/hexagon.config';
 import { prefersReducedMotion } from '../../../../_shared/utils/motion';
-import { buildFrames, HEX_HEIGHT, HIVE_BUILD, HiveCell, HiveCellKinds, HiveFills } from '../../home.config';
+import {
+  buildFrames,
+  HIVE_BUILD,
+  HiveCell,
+  HiveCellKinds,
+  HiveFills,
+  hiveLayout,
+} from '../../home.config';
 
 /** Gradient and clip ids are document-wide, so every instance needs its own. */
 let seq = 0;
@@ -10,8 +29,9 @@ let seq = 0;
 /**
  * A honeycomb: the coach's hive of clients and the trainee's week.
  *
- * Draws the app's own hexagon (`HEX_PATH`, the avatars' shape) stood on its
- * point, at the places `home.config.ts` computes, so the geometry is tested
+ * Draws a hexagon on its point (`cellFigure`: the app's unless `shape`
+ * says otherwise), at the places `home.config.ts` computes and with
+ * the row step `hiveLayout` gives for that shape, so the geometry is tested
  * and this only paints. A filled cell's honey rises from the bottom once,
  * when the cell first appears; reduced motion shows it already poured.
  *
@@ -32,8 +52,10 @@ let seq = 0;
     role: 'img',
     '[attr.aria-label]': 'label()',
     '[class.building]': 'building()',
-    '[style.--w]': 'width()',
-    '[style.--h]': 'height()',
+    '[style.--w]': 'layout().width',
+    '[style.--h]': 'layout().height',
+    '[style.--row]': 'layout().rowStep',
+    '[style.--cell-h]': 'layout().cellHeight',
   },
 })
 export class Hive {
@@ -41,9 +63,12 @@ export class Hive {
   readonly label = input.required<string>();
   readonly building = input(false);
 
+  /** Classic, the app's hexagon; `logo` for the brand's own. */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
+
   readonly Kinds = HiveCellKinds;
   readonly Fills = HiveFills;
-  readonly path = HEX_PATH;
+  readonly hex = computed(() => cellFigure(this.shape()));
 
   private readonly _id = seq++;
   readonly clipId = `mh-hive-clip-${this._id}`;
@@ -51,8 +76,7 @@ export class Hive {
   readonly clipUrl = `url(#${this.clipId})`;
   readonly honeyUrl = `url(#${this.honeyId})`;
 
-  readonly width = computed(() => Math.max(0, ...this.cells().map((cell) => cell.x)) + 1);
-  readonly height = computed(() => Math.max(0, ...this.cells().map((cell) => cell.y)) + HEX_HEIGHT);
+  readonly layout = computed(() => hiveLayout(this.cells(), this.shape()));
 
   private readonly _glows = viewChildren<ElementRef<SVGPathElement>>('glow');
 

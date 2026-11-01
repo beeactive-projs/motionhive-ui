@@ -10,25 +10,25 @@
       [disabled]="!editable()"
       (click)="pick(feeling)"
     >
-      <span class="hex">
-        <svg [attr.viewBox]="viewBox" aria-hidden="true">
+      <span class="hex" [style.aspect-ratio]="frame.aspect">
+        <svg [attr.viewBox]="frame.viewBox" aria-hidden="true">
           <defs>
             <clipPath [attr.id]="clipId(feeling)">
-              <path [attr.d]="path" />
+              <path [attr.d]="hex().d" />
             </clipPath>
           </defs>
-          <path class="comb" [attr.d]="path" />
+          <path class="comb" [attr.d]="hex().d" />
           <g [attr.clip-path]="'url(#' + clipId(feeling) + ')'">
             <rect
               class="honey"
               x="0"
               width="100"
-              [attr.y]="hexTop"
-              [attr.height]="hexHeight"
+              [attr.y]="hex().y"
+              [attr.height]="hex().height"
               [style.transform]="honeyScale(feeling)"
             />
           </g>
-          <path class="rim" [attr.d]="path" />
+          <path class="rim" [attr.d]="hex().d" />
         </svg>
         <span class="glyph" aria-hidden="true">{{ feeling.glyph }}</span>
       </span>

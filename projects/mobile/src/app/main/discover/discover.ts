@@ -35,10 +35,10 @@ import {
 import { AvatarButton } from '../../_shared/components/avatar-button/avatar-button';
 import { ChoiceOption, ChoiceSheet } from '../../_shared/components/choice-sheet/choice-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
-import { HEX_PATH } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { APP_HEX_SHAPE, combFigure } from '../../_shared/config/hexagon.config';
 import { ClockService } from '../../_shared/services/clock.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { CoachRow } from './_components/coach-row/coach-row';
@@ -82,20 +82,21 @@ const NEAR_LIMIT = 3;
 const GROUP_CARD_LIMIT = 4;
 
 /**
- * The band's honeycomb: seven of the app's hexagons (`HEX_PATH`) stood on
- * their points, two over three over two. Each transform places one cell's
- * box (86.6 wide, 100 tall once turned) on a step of 94.6 across and 82
- * down, the cells 8 apart.
+ * The band's honeycomb: seven of the app's hexagons on their points, two
+ * over three over two, as `[column, row]` (a half column shifts a row).
+ * `combFigure` draws them in the app's shape, the cells `COMB_GAP` apart
+ * in units where a cell is 100 from point to point.
  */
-const COMB_CELLS: readonly string[] = [
-  [47.3, 0],
-  [141.9, 0],
-  [0, 82],
-  [94.6, 82],
-  [189.2, 82],
-  [47.3, 164],
-  [141.9, 164],
-].map(([x, y]) => `translate(${x - 6.7} ${y}) rotate(90 50 50)`);
+const COMB_PLACES: readonly (readonly [number, number])[] = [
+  [0.5, 0],
+  [1.5, 0],
+  [0, 1],
+  [1, 1],
+  [2, 1],
+  [0.5, 2],
+  [1.5, 2],
+];
+const COMB_GAP = 8;
 
 /**
  * Discover, a tab in both modes, after the canvas design: a band at the top
@@ -157,8 +158,7 @@ export class Discover implements ViewWillEnter {
   /** This page lives only in Discover's own stack. */
   private readonly _links = discoverLinks('/tabs/discover');
 
-  readonly hexPath = HEX_PATH;
-  readonly combCells = COMB_CELLS;
+  readonly comb = combFigure(APP_HEX_SHAPE, COMB_PLACES, COMB_GAP);
   readonly goalChips = GOAL_CHIPS.map((id) => DISCOVER_GOALS[id]);
   readonly quickFilters = QUICK_FILTERS;
   readonly skeletonRows = [1, 2, 3, 4, 5];

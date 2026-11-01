@@ -1,13 +1,14 @@
-import { Component, input, model } from '@angular/core';
+import { Component, computed, input, model } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
-import { HEX_PATH, HEX_VIEW_BOX } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import {
+  APP_HEX_SHAPE,
+  HexShape,
+  TILE_FRAME,
+  tileFigure,
+} from '../../../../_shared/config/hexagon.config';
 import { FEELINGS, Feeling } from '../../workouts.config';
-
-/** Top and height of the path's bounds inside its 100-unit box. */
-const HEX_TOP = 6.7;
-const HEX_HEIGHT = 86.6;
 
 /** Clip paths are referenced by id, so every instance needs its own. */
 let seq = 0;
@@ -33,17 +34,21 @@ export class FeelingScale {
   /** Names the group for a screen reader; the visible heading sits outside. */
   readonly label = input.required<string>();
 
+  /** Classic, the app's hexagon; `logo` for the brand's own. */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
+
   readonly feelings = FEELINGS;
-  readonly path = HEX_PATH;
-  readonly viewBox = HEX_VIEW_BOX;
+  /**
+   * The tile's hexagon, laid out in the tiles' frame like an avatar (the
+   * logo's points reach a little past it).
+   */
+  readonly hex = computed(() => tileFigure(this.shape()));
+  readonly frame = TILE_FRAME;
   private readonly _id = `mh-feeling-${++seq}`;
 
   clipId(feeling: Feeling): string {
     return `${this._id}-${feeling.value}`;
   }
-
-  readonly hexTop = HEX_TOP;
-  readonly hexHeight = HEX_HEIGHT;
 
   /**
    * How much of the cell is honey, all of it once picked, as a scale from

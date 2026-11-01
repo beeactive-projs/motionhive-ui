@@ -19,10 +19,8 @@
   <div class="discover">
     <!-- The band: where, the way into search, and what for. -->
     <section class="band">
-      <svg class="comb" viewBox="0 0 276 264" aria-hidden="true" focusable="false">
-        @for (cell of combCells; track $index) {
-          <path [attr.d]="hexPath" [attr.transform]="cell" />
-        }
+      <svg class="comb" [attr.viewBox]="comb.viewBox" aria-hidden="true" focusable="false">
+        <path [attr.d]="comb.d" />
       </svg>
 
       @if (cityReady()) {

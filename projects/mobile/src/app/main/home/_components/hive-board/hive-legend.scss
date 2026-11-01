@@ -17,10 +17,10 @@
   white-space: nowrap;
 }
 
+// As wide in either shape; the height follows the cell's viewBox.
 .swatch {
   flex: none;
   width: 0.75rem;
-  height: 0.875rem;
   overflow: visible;
 }
 

@@ -296,15 +296,14 @@
   }
 }
 
-/* The corner hex: the app's own shape (HEX_PATH), stood on its point. */
+/* The corner hex: the app's hexagon on its point (its height follows the
+   viewBox). */
 .no-plan-mark {
   position: absolute;
-  top: -0.5rem;
-  right: -1.75rem;
+  top: -1rem;
+  right: -1.25rem;
   z-index: -1;
-  width: 8.375rem;
-  height: 7.25rem;
-  rotate: 90deg;
+  width: 7.25rem;
   fill: var(--mh-color-navy-card-ink);
   opacity: 0.08;
   pointer-events: none;

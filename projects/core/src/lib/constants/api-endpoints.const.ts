@@ -271,6 +271,7 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/workout-logs/${id}`,
     COMPLETE: (id: string) => `/workout-logs/${id}/complete`,
     VISIBILITY: (id: string) => `/workout-logs/${id}/visibility`,
+    DURATION: (id: string) => `/workout-logs/${id}/duration`,
     PHOTO: (id: string) => `/workout-logs/${id}/photo`,
     PAUSE: (id: string) => `/workout-logs/${id}/pause`,
     RESUME: (id: string) => `/workout-logs/${id}/resume`,

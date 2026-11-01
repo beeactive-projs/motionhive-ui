@@ -14,6 +14,7 @@ import {
   weekStart,
 } from 'core';
 
+import { CombLayout, HexShape, combLayout } from '../../_shared/config/hexagon.config';
 import { ProfileStacks, groupBase } from '../../_shared/utils/stack-paths';
 import { STREAK_WORTH_SAYING } from '../workouts/workouts.config';
 
@@ -50,18 +51,22 @@ export function greetingPeriod(date: Date): GreetingPeriod {
 // ─── Honeycomb geometry ──────────────────────────────────────────
 
 /**
- * A cell is the app's hexagon (`HEX_PATH`) stood on its point, so the
- * honeycomb runs in rows as the design draws it: one unit wide and
- * 1 / cos 30° tall. Rows overlap by a quarter of a cell and every other one
- * shifts half a cell sideways, which is what makes them tessellate. The
- * spacing leaves a sliver of navy between neighbours.
+ * A cell is a hexagon on its point (the hive's `shape`, the app's by
+ * default), so the honeycomb runs in rows as the design draws it:
+ * one unit wide, every other row shifted half a cell sideways and tucked
+ * into the one above, which is what makes them tessellate. `HIVE_GAP`
+ * leaves a sliver of the card between neighbours.
+ *
+ * A place says where a cell sits across, in cell widths, and in which row;
+ * how far apart the rows are depends on the shape (a logo cell is a little
+ * shorter than a classic one), so `hiveLayout` turns rows into lengths for
+ * the shape on screen.
  */
-export const HEX_HEIGHT = 1.155;
-const SPACING = 1.08;
-const COL_STEP = SPACING;
-const ROW_STEP = 0.866 * SPACING;
+export const HIVE_GAP = 0.08;
+/** One cell and the gap across: `combStep`'s `dx`, the same in both shapes. */
+const COL_STEP = 1 + HIVE_GAP;
 
-/** Where a cell's top-left corner sits, in cell widths from the grid's. */
+/** Where a cell's top-left corner sits: `x` in cell widths, `y` in rows. */
 export interface HivePlace {
   x: number;
   y: number;
@@ -69,7 +74,7 @@ export interface HivePlace {
 
 /** Axial coordinates (q, r) to a place, before the grid is shifted to 0. */
 function axial(q: number, r: number): HivePlace {
-  return { x: (q + r / 2) * COL_STEP, y: r * ROW_STEP };
+  return { x: (q + r / 2) * COL_STEP, y: r };
 }
 
 /** Moves a set of places so the top-left one is at 0, 0. */
@@ -136,7 +141,15 @@ export function weekPlaces(): HivePlace[] {
     [0.5, 2],
     [1.5, 2],
   ];
-  return shifted(rows.map(([col, row]) => ({ x: col * COL_STEP, y: row * ROW_STEP })));
+  return shifted(rows.map(([col, row]) => ({ x: col * COL_STEP, y: row })));
+}
+
+/**
+ * The hive's cells in the shape on screen: the step between rows, a cell's
+ * height and the comb's size, all in cell widths (`combStep` spaces them).
+ */
+export function hiveLayout(places: readonly HivePlace[], shape: HexShape): CombLayout {
+  return combLayout(shape, places, HIVE_GAP);
 }
 
 // ─── Cells ───────────────────────────────────────────────────────

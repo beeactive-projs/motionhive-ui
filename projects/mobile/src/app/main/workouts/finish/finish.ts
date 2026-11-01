@@ -1,4 +1,4 @@
-import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
@@ -10,10 +10,7 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonList,
-  IonNote,
   IonSkeletonText,
   IonSpinner,
   IonTextarea,
@@ -29,7 +26,6 @@ import { take } from 'rxjs/operators';
 
 import {
   AuthStore,
-  LoggedExercise,
   PersonalRecord,
   ProfilePrivacy,
   ProfilePrivacyLabels,
@@ -48,11 +44,12 @@ import {
   WORKOUT_VISIBILITY_LEVELS,
   workoutVisibilityHint,
 } from '../../../_shared/config/workout-visibility.config';
-import { HEX_PATH, HEX_VIEW_BOX } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { APP_HEX_SHAPE, TILE_FRAME, tileFigure } from '../../../_shared/config/hexagon.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ThemeService } from '../../../_shared/services/theme.service';
 import { workoutLinks } from '../../home/home-stack.config';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
+import { LoggedExercises } from '../_components/logged-exercises/logged-exercises';
 import { SaveRoutineService } from '../_services/save-routine.service';
 import { WorkoutPhotoStore, preparePhoto } from '../_services/workout-photo';
 import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
@@ -62,7 +59,6 @@ import {
   WORKOUT_ICONS,
   cheerKey,
   durationClock,
-  exerciseSetSummary,
   formatMeasure,
   volumeGainPercent,
   workoutTiles,
@@ -124,15 +120,13 @@ interface Highlight {
     IonFooter,
     IonHeader,
     IonIcon,
-    IonItem,
-    IonLabel,
     IonList,
-    IonNote,
     IonSkeletonText,
     IonSpinner,
     IonTextarea,
     IonTitle,
     IonToolbar,
+    LoggedExercises,
     SettingsRow,
     ShareWorkoutSheet,
     TranslatePipe,
@@ -156,8 +150,9 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
    */
   readonly backHref = workoutLinks(this._router.url).root;
 
-  readonly hexPath = HEX_PATH;
-  readonly hexViewBox = HEX_VIEW_BOX;
+  /** The badge's hexagon, the app's, laid out in the tiles' frame. */
+  readonly hex = tileFigure(APP_HEX_SHAPE);
+  readonly hexFrame = TILE_FRAME;
   /** The four small hexes thrown around the tick; each has its own place and colour. */
   readonly sparks = [1, 2, 3, 4];
   readonly skeletonStats = [1, 2, 3];
@@ -350,19 +345,23 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
     return log ? this._saveRoutineService.savedName(log.id) : null;
   });
 
-  readonly exercises = computed<LoggedExercise[]>(() => this.log()?.exercises ?? []);
+  /** Showing, so the status bar follows the top while it is on screen. */
+  private readonly _shown = signal(false);
 
   constructor() {
     addIcons(WORKOUT_ICONS);
+    // Light status icons only over the photo cover's dark fade; the cream
+    // top keeps the theme's own.
+    effect(() => this._themeService.setDarkTop(this._shown() && !!this.photoUrl()));
   }
 
   ionViewWillEnter(): void {
-    this._themeService.setDarkTop(true);
+    this._shown.set(true);
     this.load();
   }
 
   ionViewWillLeave(): void {
-    this._themeService.setDarkTop(false);
+    this._shown.set(false);
   }
 
   load(): void {
@@ -403,8 +402,9 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
       });
   }
 
-  setSummary(exercise: LoggedExercise): string {
-    return exerciseSetSummary(exercise);
+  /** The share sheet's Adjust duration corrected the workout: the hero shows it at once. */
+  onLogChange(next: WorkoutLog): void {
+    this.log.set(next);
   }
 
   /**

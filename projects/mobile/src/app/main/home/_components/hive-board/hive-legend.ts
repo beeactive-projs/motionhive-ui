@@ -1,6 +1,10 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
-import { HEX_PATH } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import {
+  APP_HEX_SHAPE,
+  HexShape,
+  cellFigure,
+} from '../../../../_shared/config/hexagon.config';
 
 export const LegendSwatches = {
   /** A cell full of honey: trained, done. */
@@ -38,7 +42,10 @@ export interface LegendItem {
 })
 export class HiveLegend {
   readonly items = input.required<readonly LegendItem[]>();
+  /** The board's shape, so the key's cells match it. */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
 
   readonly Swatches = LegendSwatches;
-  readonly path = HEX_PATH;
+  /** The board's own cell. */
+  readonly hex = computed(() => cellFigure(this.shape()));
 }

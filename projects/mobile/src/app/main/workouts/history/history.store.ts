@@ -53,6 +53,8 @@ export class HistoryStore {
   private readonly _translateService = inject(TranslateService);
 
   private readonly _filter = signal<HistoryFilter>(HistoryFilters.All);
+  /** The search field's words; the API matches the workout's name or any exercise in it. */
+  private readonly _query = signal('');
   private readonly _memory = signal<WorkoutMemory | null>(null);
   private readonly _day = signal<string | null>(null);
   private readonly _calendarOpen = signal(false);
@@ -60,16 +62,20 @@ export class HistoryStore {
   private readonly _list = new PagedList<WorkoutLog>(PAGE_SIZE, (page, limit) => {
     const filter = this._filter();
     const day = this._day();
+    const search = this._query().trim();
     return this._workoutLogService.list({
       page,
       limit,
       ...(filter === HistoryFilters.All ? { kind: 'all' as const } : { has: filter }),
       ...(day ? dayRange(day) : {}),
+      // Beside a search the API lists finished workouts only (no skipped days).
+      ...(search ? { search } : {}),
     });
   });
 
   readonly items = this._list.items;
   readonly filter = this._filter.asReadonly();
+  readonly query = this._query.asReadonly();
   /** A workout from a while back next to real progress since; null when there is none. */
   readonly memory = this._memory.asReadonly();
   readonly total = this._list.total;
@@ -99,6 +105,11 @@ export class HistoryStore {
    * rows count skipped days too.
    */
   readonly countLabel = computed(() => {
+    if (this._query().trim() && this._filter() === HistoryFilters.All) {
+      return this._translateService.instant('workouts.history.countSearch', {
+        count: this._list.total(),
+      });
+    }
     if (this._filter() === HistoryFilters.All) return '';
     const key =
       this._filter() === HistoryFilters.Photos
@@ -148,6 +159,13 @@ export class HistoryStore {
   setFilter(filter: HistoryFilter): void {
     if (filter === this._filter()) return;
     this._filter.set(filter);
+    this._restart();
+  }
+
+  /** The search field, already debounced by the searchbar. */
+  setQuery(query: string): void {
+    if (query.trim() === this._query().trim()) return;
+    this._query.set(query);
     this._restart();
   }
 

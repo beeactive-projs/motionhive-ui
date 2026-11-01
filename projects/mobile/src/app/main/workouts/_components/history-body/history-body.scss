@@ -2,7 +2,13 @@
   display: block;
 }
 
-/* The chips sit in the page's gutter here, not a bar's. */
+/* The search field and the chips sit in the page's gutter here, not a
+   bar's: Ionic's own searchbar padding would indent the field past the
+   chips under it. */
+.search {
+  padding: 0 0 0.5rem;
+}
+
 .bar {
   padding: 0 0 0.5rem;
 }

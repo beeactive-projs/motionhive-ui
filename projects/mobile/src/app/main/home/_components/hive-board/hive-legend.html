@@ -3,8 +3,8 @@
     @if (item.swatch === Swatches.Dot) {
       <span class="dot"></span>
     } @else {
-      <svg class="swatch" [attr.data-swatch]="item.swatch" viewBox="6.7 0 86.6 100">
-        <path [attr.d]="path" transform="rotate(90 50 50)" />
+      <svg class="swatch" [attr.data-swatch]="item.swatch" [attr.viewBox]="hex().viewBox">
+        <path [attr.d]="hex().d" />
       </svg>
     }
     {{ item.label }}

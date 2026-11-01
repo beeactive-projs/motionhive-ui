@@ -2756,7 +2756,8 @@
       "skip": "Skip exercise",
       "swap": "Swap exercise",
       "title": "Exercise actions",
-      "unskip": "Unskip exercise"
+      "unskip": "Unskip exercise",
+      "history": "Exercise history"
     },
     "exerciseCard": {
       "actionsFor": "Actions for {name}"
@@ -2871,7 +2872,10 @@
         "record": "Records"
       },
       "openPhoto": "{name}, {day}",
-      "weekOf": "Week of {date}"
+      "weekOf": "Week of {date}",
+      "search": "Search workouts or exercises",
+      "noMatch": "No workout matches “{query}”",
+      "countSearch": "{count, plural, one {# workout} other {# workouts}}"
     },
     "home": {
       "coldStart": {
@@ -3042,8 +3046,18 @@
         "title": "Nothing to show yet"
       },
       "last12Weeks": "Last 12 weeks",
-      "records": "Records",
-      "recordLine": "Est. 1RM · {date}"
+      "exercises": "Your exercises",
+      "clientExercises": "Exercises",
+      "exerciseLine": "{value} · {date}",
+      "exercisesError": "Couldn't load the exercises",
+      "sessions": "{count, plural, one {# session} other {# sessions}}",
+      "trend": {
+        "up": "Going up",
+        "steady": "Steady",
+        "down": "Going down"
+      },
+      "search": "Search exercises",
+      "noMatch": "No exercise matches “{query}”"
     },
     "restAlert": {
       "body": "Time for your next set.",
@@ -3128,36 +3142,60 @@
     },
     "share": {
       "action": "Share",
-      "background": {
-        "hive": "Hive",
-        "label": "Background",
-        "photo": "My photo"
-      },
       "card": {
-        "coach": "Program by {name}",
-        "records": "{count, plural, one {# record} other {# records}}",
-        "streak": "{count, plural, one {week in a row} other {weeks in a row}}"
+        "hours": "h",
+        "km": "km",
+        "meters": "m",
+        "minutes": "min",
+        "number": "{count, selectordinal, one {#st workout} two {#nd workout} few {#rd workout} other {#th workout}}",
+        "numberLabel": "workout",
+        "numberValue": "{count, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+        "pace": "min/km",
+        "pr": "PR",
+        "record": "New record",
+        "reps": "{count, plural, one {rep} other {reps}}",
+        "sets": "{count, plural, one {set} other {sets}}",
+        "streak": "{count, plural, one {week in a row} other {weeks in a row}}",
+        "streakShort": "{count, plural, one {wk in a row} other {wks in a row}}",
+        "volume": "kg volume",
+        "with": "with {name}"
       },
-      "choose": {
-        "full": {
-          "anywhere": "Works anywhere: WhatsApp, Facebook",
-          "brand": "Logo and your link",
-          "coach": "Your coach, only if you want",
-          "kicker": "Save and post",
-          "preview": "Preview of the Full card"
-        },
-        "quick": {
-          "clean": "No logo, no coach",
-          "direct": "Straight to Instagram",
-          "kicker": "One tap",
-          "photo": "Your photo and stats",
-          "preview": "Preview of the Quick Story"
-        },
-        "remembered": "Your choice stays for next time. You can change it here anytime.",
-        "subtitle": "Exactly what your followers will see",
-        "title": "How should it look?"
+      "details": {
+        "adjust": "Adjust",
+        "coach": "Coach",
+        "coachAllowed": "{name} allows mentions. Off until you turn it on.",
+        "coachLocked": "{name} hasn't allowed mentions",
+        "date": "Date and time",
+        "duration": "Duration",
+        "exercises": "Exercises",
+        "exercisesHint": "The first 3, with the best set",
+        "feeling": "How you felt",
+        "link": "My link",
+        "location": "Location",
+        "locationOff": "Off: no place on the image",
+        "name": "Name",
+        "number": "Workout number",
+        "photo": "My photo as the background",
+        "place": "Place",
+        "placePlaceholder": "Gym, park, city",
+        "places": "Places you used before",
+        "record": "Record",
+        "stats": "Stats",
+        "weights": "Show weights",
+        "weightsHint": "Off: every kg disappears"
       },
       "downloaded": "Picture downloaded",
+      "duration": {
+        "failed": "Couldn't change the duration",
+        "hours": "h",
+        "minutes": "min",
+        "note": "This corrects the workout, not just the picture. History, Progress and the card will show {next}.",
+        "recorded": "Recorded: {recorded}.",
+        "recordedUnknown": "Recorded: unknown, the clock ran past 6 hours.",
+        "saved": "Duration is now {duration}",
+        "title": "Adjust duration",
+        "unknown": "Unknown"
+      },
       "group": {
         "done": "Posted in {group}",
         "failed": "Could not post it in the group",
@@ -3165,6 +3203,11 @@
         "pending": "Sent to {group}. It shows once the group approves it.",
         "posting": "Posting in {group}",
         "title": "Or post it in a group"
+      },
+      "groups": {
+        "image": "Image",
+        "workout": "The workout",
+        "you": "About you"
       },
       "guide": {
         "hide": "Don't show the steps again",
@@ -3188,17 +3231,9 @@
         "quick": "Quick",
         "quickHint": "No logo, straight to your Story"
       },
-      "options": {
-        "coach": "Coach's name",
-        "coachLocked": "Shows only if your coach allows mentions",
-        "coachOff": "Off by default. You choose each time you share.",
-        "link": "My link",
-        "photo": "Use my photo",
-        "record": "Show record",
-        "weights": "Show weights"
-      },
       "preview": "Preview of the picture you are sharing",
       "previewFailed": "Could not show the preview",
+      "previewHint": "The preview changes as you turn a detail on or off.",
       "save": {
         "action": "Save to Photos",
         "denied": "MotionHive can't add to Photos. Allow it in Settings.",
@@ -3217,9 +3252,9 @@
         "copied": "Sticker copied. Paste it on your Story in Instagram.",
         "copyAction": "Copy sticker only",
         "copyFailed": "Could not copy the sticker",
-        "copyHint": "With the logo, to paste on your own Story",
-        "label": "Sticker style"
+        "copyHint": "With the logo, to paste on your own Story"
       },
+      "style": "Style",
       "tag": {
         "copied": "{tag} copied",
         "copy": "Copy {tag}",
@@ -3228,9 +3263,10 @@
       },
       "theme": {
         "dark": "Dark",
-        "honey": "Honey",
+        "dusk": "Dusk",
         "label": "Theme",
-        "light": "Light"
+        "light": "Light",
+        "teal": "Teal"
       },
       "title": "Share workout",
       "toast": {
@@ -3274,6 +3310,22 @@
       "progress": "{exercise}: {from} → {to} kg",
       "line": "Look how far you've come since.",
       "open": "Open {name}"
+    },
+    "loggedSets": {
+      "set": "Set {number}",
+      "notDone": "Not done",
+      "history": "Exercise history",
+      "lastTime": "Last time, {date}: {value}",
+      "compare": {
+        "heavier": "+{weight} kg vs last time",
+        "lighter": "{weight} kg lighter than last time",
+        "moreReps": "{count, plural, one {+# rep} other {+# reps}} vs last time",
+        "fewerReps": "{count, plural, one {# rep fewer} other {# reps fewer}} than last time",
+        "more": "+{value} vs last time",
+        "less": "{value} less than last time",
+        "same": "Same as last time",
+        "first": "First time on this exercise"
+      }
     }
   },
   "feedback": {

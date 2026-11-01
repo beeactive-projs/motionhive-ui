@@ -53,7 +53,8 @@ import {
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { HEX_PATH, HEX_VIEW_BOX, HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { APP_HEX_SHAPE, cellFigure } from '../../../_shared/config/hexagon.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
@@ -171,8 +172,8 @@ export class ClientDetail implements ViewWillEnter {
   readonly Scopes = SessionScopes;
   readonly Tabs = ClientTabs;
   readonly skeletonRows = [1, 2, 3];
-  readonly hexPath = HEX_PATH;
-  readonly hexViewBox = HEX_VIEW_BOX;
+  /** The corner mark: the app's hexagon on its point. */
+  readonly hex = cellFigure(APP_HEX_SHAPE);
   /** The Upcoming sessions window, named beside its kicker. */
   readonly upcomingDays = UPCOMING_DAYS;
   readonly pastDays = PAST_DAYS;

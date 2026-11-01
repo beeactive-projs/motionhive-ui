@@ -234,8 +234,8 @@
     @if (showNoPlan()) {
     <!-- Nothing to follow: the page's next step, and its only honey button. -->
     <div class="no-plan">
-      <svg class="no-plan-mark" [attr.viewBox]="hexViewBox" aria-hidden="true">
-        <path [attr.d]="hexPath" />
+      <svg class="no-plan-mark" [attr.viewBox]="hex.viewBox" aria-hidden="true">
+        <path [attr.d]="hex.d" />
       </svg>
       <span class="mh-kicker">{{ 'clients.detail.noPlan.title' | translate }}</span>
       <p>{{ 'clients.detail.noPlan.body' | translate }}</p>

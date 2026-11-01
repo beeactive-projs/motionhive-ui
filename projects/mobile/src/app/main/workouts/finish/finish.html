@@ -1,5 +1,6 @@
-<!-- Navy from the top: the toolbar is part of the hero, not a bar above it. -->
-<ion-header class="ion-no-border hero-header">
+<!-- The hero from the top: the toolbar is part of it, not a bar above it.
+     Over a photo cover it turns dark with the cover's fade. -->
+<ion-header class="ion-no-border hero-header" [class.on-photo]="!!photoUrl()">
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (isReview()) {
@@ -66,14 +67,14 @@
         </ion-button>
       }
       <!-- The brand cell with a tick, and a few hexes thrown in the air. -->
-      <div class="badge" aria-hidden="true">
+      <div class="badge" aria-hidden="true" [style.aspect-ratio]="hexFrame.aspect">
         @for (spark of sparks; track spark) {
-          <svg [class]="'spark spark-' + spark" [attr.viewBox]="hexViewBox">
-            <path [attr.d]="hexPath" />
+          <svg [class]="'spark spark-' + spark" [attr.viewBox]="hexFrame.viewBox">
+            <path [attr.d]="hex.d" />
           </svg>
         }
-        <svg class="cell" [attr.viewBox]="hexViewBox">
-          <path [attr.d]="hexPath" />
+        <svg class="cell" [attr.viewBox]="hexFrame.viewBox">
+          <path [attr.d]="hex.d" />
         </svg>
         <ion-icon class="tick" name="checkmark-outline" />
       </div>
@@ -198,16 +199,7 @@
 
       <section class="mh-section">
         <span class="mh-kicker">{{ 'workouts.finish.whatYouDid' | translate }}</span>
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (exercise of exercises(); track exercise.id) {
-            <ion-item [class.skipped]="exercise.isSkipped">
-              <ion-label>
-                <h2>{{ exercise.exerciseNameSnapshot }}</h2>
-              </ion-label>
-              <ion-note slot="end">{{ setSummary(exercise) }}</ion-note>
-            </ion-item>
-          }
-        </ion-list>
+        <mh-logged-exercises [log]="log" />
       </section>
     </div>
   }
@@ -255,6 +247,11 @@
 <!-- A workout taken down after a report has no way out of the app. -->
 @if (log(); as log) {
   @if (!takenDown()) {
-    <mh-share-workout-sheet [(open)]="shareOpen" [log]="log" [photoUrl]="photoUrl()" />
+    <mh-share-workout-sheet
+      [(open)]="shareOpen"
+      [log]="log"
+      [photoUrl]="photoUrl()"
+      (logChange)="onLogChange($event)"
+    />
   }
 }

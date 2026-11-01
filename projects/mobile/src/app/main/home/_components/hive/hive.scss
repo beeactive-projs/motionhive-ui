@@ -32,12 +32,14 @@
   stop-color: var(--ion-color-primary);
 }
 
+// A cell's box: one cell wide, as tall as the shape's cell, its row turned
+// into a length by the shape's row step (`hiveLayout`, set on the host).
 .cell {
   position: absolute;
   left: calc(var(--_cell) * var(--x));
-  top: calc(var(--_cell) * var(--y));
+  top: calc(var(--_cell) * var(--y) * var(--row));
   width: var(--_cell);
-  aspect-ratio: 86.6 / 100;
+  height: calc(var(--_cell) * var(--cell-h));
   animation: hive-pop 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
   animation-delay: calc(var(--i) * 30ms);
 }

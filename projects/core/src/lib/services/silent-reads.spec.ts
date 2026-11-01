@@ -138,6 +138,22 @@ describe('silent reads', () => {
           .subscribe(),
     ],
     [
+      'ProgressService.trainedExercises',
+      `${environment.apiUrl}/progress/exercises`,
+      (silent) =>
+        TestBed.inject(ProgressService)
+          .trainedExercises(silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
+      'ProgressService.forExercise',
+      `${environment.apiUrl}/progress/exercises/ex-1`,
+      (silent) =>
+        TestBed.inject(ProgressService)
+          .forExercise('ex-1', silent === undefined ? undefined : { silent })
+          .subscribe(),
+    ],
+    [
       'GroupService.getMyGroups',
       `${environment.apiUrl}${API_ENDPOINTS.GROUPS.BASE}`,
       (silent) =>

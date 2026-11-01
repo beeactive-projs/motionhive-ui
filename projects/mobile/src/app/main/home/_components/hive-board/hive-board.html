@@ -1,7 +1,6 @@
 <!-- Shared by every cell: the honey's gradient and the hexagon to clip to.
      Each cell's svg has the same viewBox, so one clip fits them all; a
-     clip inside a scaled group scales with it. The path is the avatars'
-     flat-top hexagon turned a quarter round. -->
+     clip inside a scaled group scales with it. -->
 <svg class="defs" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient [attr.id]="honeyId" x1="0" y1="0" x2="0" y2="1">
@@ -10,12 +9,18 @@
       <stop class="honey-base" offset="1" />
     </linearGradient>
     <clipPath [attr.id]="clipId">
-      <path [attr.d]="path" transform="rotate(90 50 50)" />
+      <path [attr.d]="hex().d" />
     </clipPath>
   </defs>
 </svg>
 
-<div class="frame" [style.--w]="size().width" [style.--h]="size().height">
+<div
+  class="frame"
+  [style.--w]="layout().width"
+  [style.--h]="layout().height"
+  [style.--row]="layout().rowStep"
+  [style.--cell-h]="layout().cellHeight"
+>
   @if (headers().length) {
     <div class="heads" aria-hidden="true">
       @for (head of headers(); track $index) {
@@ -66,13 +71,13 @@
 <!-- One cell's picture, the same for a button and for decoration. -->
 <ng-template #face let-cell>
   <span class="face">
-    <svg viewBox="6.7 0 86.6 100" preserveAspectRatio="xMidYMid meet" focusable="false">
+    <svg [attr.viewBox]="hex().viewBox" preserveAspectRatio="xMidYMid meet" focusable="false">
       @if (cell.name) {
         <!-- The tap target: the whole hexagon, sliver included. -->
-        <path class="hit" [attr.d]="path" transform="rotate(90 50 50)" />
+        <path class="hit" [attr.d]="hex().d" />
       }
-      <g [attr.transform]="shape">
-        <path class="base" [attr.d]="path" transform="rotate(90 50 50)" />
+      <g [attr.transform]="cellScale">
+        <path class="base" [attr.d]="hex().d" />
         @if (cell.fill > 0) {
           <g [attr.clip-path]="clipUrl">
             <rect
@@ -89,10 +94,10 @@
           <image
             class="photo"
             [attr.href]="cell.photoUrl"
-            x="6.7"
-            y="0"
-            width="86.6"
-            height="100"
+            [attr.x]="hex().x"
+            [attr.y]="hex().y"
+            [attr.width]="hex().width"
+            [attr.height]="hex().height"
             preserveAspectRatio="xMidYMid slice"
             [attr.clip-path]="clipUrl"
           />
@@ -101,17 +106,17 @@
       @if (cell.avatar; as person) {
         <g
           class="avatar"
-          [attr.transform]="cell.look === Looks.Bare ? shape : inset"
+          [attr.transform]="cell.look === Looks.Bare ? cellScale : inset"
           [style.--tone-fill]="fill(person.tone, cell.look !== Looks.Bare)"
         >
-          <path class="tone" [attr.d]="path" transform="rotate(90 50 50)" />
+          <path class="tone" [attr.d]="hex().d" />
           @if (person.imageUrl) {
             <image
               [attr.href]="person.imageUrl"
-              x="6.7"
-              y="0"
-              width="86.6"
-              height="100"
+              [attr.x]="hex().x"
+              [attr.y]="hex().y"
+              [attr.width]="hex().width"
+              [attr.height]="hex().height"
               preserveAspectRatio="xMidYMid slice"
               [attr.clip-path]="clipUrl"
             />
@@ -120,11 +125,11 @@
       }
       <g [attr.transform]="ring">
         @if (cell.ring) {
-          <path class="ring" [attr.d]="path" transform="rotate(90 50 50)" />
+          <path class="ring" [attr.d]="hex().d" />
         }
         @if (cell.name) {
           <!-- The open sheet's cell and keyboard focus, shown by the skin. -->
-          <path class="mark" [attr.d]="path" transform="rotate(90 50 50)" />
+          <path class="mark" [attr.d]="hex().d" />
         }
       </g>
     </svg>

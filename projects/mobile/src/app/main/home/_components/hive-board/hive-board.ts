@@ -2,21 +2,27 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
 
-import { HEX_PATH } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import {
+  APP_HEX_SHAPE,
+  HexShape,
+  cellFigure,
+} from '../../../../_shared/config/hexagon.config';
 import { initialsOf } from '../../home.config';
 import {
   BoardCell,
   BoardLooks,
   avatarFill,
   avatarInk,
-  boardSize,
+  boardLayout,
 } from './hive-board.config';
 
 /** Gradient and clip ids are document-wide, so every instance needs its own. */
 let seq = 0;
 
+// Every figure is centred on (50, 50) in both shapes (`HexFigure`), so
+// these scale it about its own centre.
 /** Where the hexagon sits inside its box: a sliver of the page around it. */
-const SHAPE = 'translate(50 50) scale(0.92) translate(-50 -50)';
+const CELL_SCALE = 'translate(50 50) scale(0.92) translate(-50 -50)';
 /** A person inside a cell's honey band. */
 const INSET = 'translate(50 50) scale(0.68) translate(-50 -50)';
 /** A ring just outside the hexagon, in the sliver between neighbours. */
@@ -26,9 +32,10 @@ const RING = 'translate(50 50) scale(0.985) translate(-50 -50)';
  * A honeycomb you can tap: the coach's clients around them, a trainee's
  * month, a client's week.
  *
- * Draws the app's own hexagon (`HEX_PATH`, the avatars' shape) stood on its
- * point, as the Home hive does, at the places `hive-board.config.ts`
- * computes. A cell with a `name` is an `ion-button`; the rest are pictures,
+ * Draws a hexagon on its point (`cellFigure`: the app's unless `shape`
+ * says otherwise), as the Home hive does, at the places
+ * `hive-board.config.ts` computes and with the row step `boardLayout` gives
+ * for that shape. A cell with a `name` is an `ion-button`; the rest are pictures,
  * hidden from a screen reader. A cell can hold honey rising from the
  * bottom, a person (their photo, or their initials in their avatar tone,
  * as `mh-hex-avatar` draws them), a photo filling it, a day's number, a
@@ -64,9 +71,12 @@ export class HiveBoard {
 
   readonly select = output<string>();
 
+  /** Classic, the app's hexagon; `logo` for the brand's own. */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
+
   readonly Looks = BoardLooks;
-  readonly path = HEX_PATH;
-  readonly shape = SHAPE;
+  readonly hex = computed(() => cellFigure(this.shape()));
+  readonly cellScale = CELL_SCALE;
   readonly inset = INSET;
   readonly ring = RING;
   readonly fill = avatarFill;
@@ -79,6 +89,6 @@ export class HiveBoard {
   readonly clipUrl = `url(#${this.clipId})`;
   readonly honeyUrl = `url(#${this.honeyId})`;
 
-  readonly size = computed(() => boardSize(this.cells()));
+  readonly layout = computed(() => boardLayout(this.cells(), this.shape()));
   readonly interactive = computed(() => this.cells().some((cell) => !!cell.name));
 }

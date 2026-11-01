@@ -1,6 +1,8 @@
 import { Component, computed, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 
+import { APP_HEX_SHAPE, HexShape, TILE_FRAME, tileFigure } from '../../config/hexagon.config';
+
 export const HexAvatarSizes = {
   /** Bare brand dot — too small for initials or a glyph, used as an ornament. */
   Dot: 'dot',
@@ -25,21 +27,6 @@ export const HexAvatarTones = {
 
 export type HexAvatarTone = (typeof HexAvatarTones)[keyof typeof HexAvatarTones];
 
-/**
- * The rounded flat-top hexagon from core's `mh-hex`, generated once for the one
- * variant this app needs (regular hexagon on R=50, corner radius 11) instead of
- * porting that component's geometry code. Same shape as web — change it there
- * and here together.
- */
-export const HEX_PATH =
-  'M 94.50 40.47 Q 100.00 50.00 94.50 59.53 L 80.50 83.77 Q 75.00 93.30 64.00 93.30 ' +
-  'L 36.00 93.30 Q 25.00 93.30 19.50 83.77 L 5.50 59.53 Q 0.00 50.00 5.50 40.47 ' +
-  'L 19.50 16.23 Q 25.00 6.70 36.00 6.70 L 64.00 6.70 Q 75.00 6.70 80.50 16.23 ' +
-  'L 94.50 40.47 Z';
-
-/** Tight bounds of the path above — width:height is 1 : cos 30°. */
-export const HEX_VIEW_BOX = '0 6.7 100 86.6';
-
 /** Clip paths are referenced by id, so every instance needs its own. */
 let seq = 0;
 
@@ -51,6 +38,12 @@ let seq = 0;
  * with no variable to override it, so the hexagon cannot be expressed through
  * a documented Ionic API. Everything else here still goes through the theme:
  * the fill is an `--ion-color-*` variable, never a literal.
+ *
+ * The shape is the app's classic hexagon on its side unless `shape` asks for
+ * the logo's, on its point (the share sheet). Either way the size is the hexagon's
+ * point to point length, and the avatar is laid out in the same frame
+ * (`TILE_FRAME`), so a row is as tall in both; the logo's points reach a
+ * little past the frame, above and below.
  */
 @Component({
   selector: 'mh-hex-avatar',
@@ -59,6 +52,7 @@ let seq = 0;
   styleUrl: './hex-avatar.scss',
   host: {
     '[attr.data-size]': 'size()',
+    '[style.aspect-ratio]': 'frame.aspect',
     '[style.--hex-fill]': 'fillVariable()',
     '[style.--hex-ink]': 'inkVariable()',
   },
@@ -89,8 +83,11 @@ export class HexAvatar {
    */
   readonly tone = input<HexAvatarTone>(HexAvatarTones.Base);
 
-  readonly path = HEX_PATH;
-  readonly viewBox = HEX_VIEW_BOX;
+  /** Classic, the app's hexagon; `logo` for the brand's own (the share sheet). */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
+
+  readonly hex = computed(() => tileFigure(this.shape()));
+  readonly frame = TILE_FRAME;
   readonly clipId = `mh-hex-${seq++}`;
   readonly clipUrl = `url(#${this.clipId})`;
 

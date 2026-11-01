@@ -8,6 +8,7 @@ import type {
   ExerciseProgress,
   ProgressOverview,
   ProgressRange,
+  TrainedExercise,
 } from '../../models/workout/progress.model';
 
 const BASE = '/progress';
@@ -33,10 +34,18 @@ export class ProgressService {
     });
   }
 
-  forExercise(exerciseId: string): Observable<ExerciseProgress> {
-    return this._http.get<ExerciseProgress>(
-      `${this._base}/exercises/${exerciseId}`,
-    );
+  /** Every exercise the caller has trained, most recent first (the Progress list). */
+  trainedExercises(opts?: { silent?: boolean }): Observable<TrainedExercise[]> {
+    return this._http.get<TrainedExercise[]>(`${this._base}/exercises`, {
+      ...(opts?.silent ? { context: silentRequest() } : {}),
+    });
+  }
+
+  /** `silent` for a read whose screen copes without it (a workout's "vs last time"). */
+  forExercise(exerciseId: string, opts?: { silent?: boolean }): Observable<ExerciseProgress> {
+    return this._http.get<ExerciseProgress>(`${this._base}/exercises/${exerciseId}`, {
+      ...(opts?.silent ? { context: silentRequest() } : {}),
+    });
   }
 
   /**
@@ -54,6 +63,14 @@ export class ProgressService {
     return this._http.get<ProgressOverview>(
       `${environment.apiUrl}${COACH_BASE(clientId)}/overview`,
       { params: new HttpParams().set('range', range), context: silentRequest() },
+    );
+  }
+
+  /** Every exercise a client has trained, under the same visibility rule. */
+  trainedExercisesForClient(clientId: string): Observable<TrainedExercise[]> {
+    return this._http.get<TrainedExercise[]>(
+      `${environment.apiUrl}${COACH_BASE(clientId)}/exercises`,
+      { context: silentRequest() },
     );
   }
 

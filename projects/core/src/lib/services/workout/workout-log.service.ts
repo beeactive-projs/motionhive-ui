@@ -171,6 +171,21 @@ export class WorkoutLogService {
   }
 
   /**
+   * Corrects how long a finished workout took (a clock started late, or
+   * left running). Owner only, a minute to six hours; History, Progress
+   * and the share card all read the corrected length afterwards.
+   */
+  setDuration(
+    id: string,
+    durationSeconds: number,
+  ): Observable<{ id: string; durationSeconds: number }> {
+    return this._http.patch<{ id: string; durationSeconds: number }>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.DURATION(id)}`,
+      { durationSeconds },
+    );
+  }
+
+  /**
    * History — completed workout logs for the signed-in user, newest
    * first. BE eager-loads the assignment + lightweight set list so the
    * row metric "18 sets" computes client-side without a follow-up hit.

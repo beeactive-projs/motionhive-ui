@@ -1,22 +1,23 @@
 import { WorkoutLog, WorkoutLogStatus, localDayKey } from 'core';
 
-import { HEX_HEIGHT, HivePlace } from '../../home.config';
+import { CombLayout, HexShape, combLayout } from '../../../../_shared/config/hexagon.config';
+import { HivePlace } from '../../home.config';
 
 /**
  * The pure half of `mh-hive-board`, the honeycomb you can tap: where each
  * cell goes, how big the comb is, and the colours a person's cell reads.
  * Tested in `hive-board.config.spec.ts`; the component only paints.
  *
- * A cell is a box one unit wide and `HEX_HEIGHT` tall, holding the app's
- * hexagon (`HEX_PATH`) stood on its point, as the Home hive draws it. The
- * boxes tessellate with no spacing, so each box is as big a tap target as
- * the comb allows; the hexagon is drawn a little inside its box, which
- * leaves the sliver between neighbours. Rows overlap by a quarter of a box
- * and every other one shifts half a box sideways.
+ * A cell is a box one unit wide and as tall as the shape's hexagon on its
+ * point (the board's shape, as the Home hive draws it). The boxes
+ * tessellate with no spacing, so each box is as big a tap target as the
+ * comb allows; the hexagon is drawn a little inside its box, which leaves
+ * the sliver between neighbours. Rows tuck a quarter of a box into each
+ * other and every other one shifts half a box sideways.
+ *
+ * A place is `x` in boxes across and `y` in rows; `boardLayout` turns rows
+ * into lengths for the shape on screen.
  */
-
-/** A row of boxes sits three quarters of a box below the one above. */
-export const ROW_STEP = round(HEX_HEIGHT * 0.75);
 
 export const BoardLooks = {
   /** An empty place: barely there, never a button. */
@@ -102,7 +103,7 @@ function round(value: number): number {
 
 /** Axial coordinates (q, r) to a place, before the comb is shifted to 0. */
 function axial(q: number, r: number): HivePlace {
-  return { x: q + r / 2, y: r * ROW_STEP };
+  return { x: q + r / 2, y: r };
 }
 
 /** Moves a set of places so the top-left one is at 0, 0. */
@@ -170,7 +171,7 @@ export function weekRowPlaces(weeks: number): HivePlace[] {
   return Array.from({ length: Math.max(0, weeks) * 7 }, (_, i) => {
     const row = Math.floor(i / 7);
     const col = i % 7;
-    return { x: round(col + (row % 2 ? 0.5 : 0)), y: round(row * ROW_STEP) };
+    return { x: round(col + (row % 2 ? 0.5 : 0)), y: row };
   });
 }
 
@@ -179,13 +180,13 @@ export function stripPlaces(count: number): HivePlace[] {
   return Array.from({ length: Math.max(0, count) }, (_, i) => ({ x: i, y: 0 }));
 }
 
-/** The comb's size in cell widths: what the places span, plus one box. */
-export function boardSize(places: readonly HivePlace[]): { width: number; height: number } {
-  if (!places.length) return { width: 0, height: 0 };
-  return {
-    width: round(Math.max(...places.map((p) => p.x)) + 1),
-    height: round(Math.max(...places.map((p) => p.y)) + HEX_HEIGHT),
-  };
+/**
+ * The comb in the shape on screen, in cell widths: the step between rows, a
+ * box's height, and the size of the whole comb (what the places span, plus
+ * one box). The boxes touch, so the gap is none.
+ */
+export function boardLayout(places: readonly HivePlace[], shape: HexShape): CombLayout {
+  return combLayout(shape, places, 0);
 }
 
 /** How much of a plan is done, 0 to 1; null when nothing was due. */

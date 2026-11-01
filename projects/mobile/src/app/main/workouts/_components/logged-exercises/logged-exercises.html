@@ -1,0 +1,70 @@
+<ion-list [inset]="true" class="mh-card-list">
+  <ion-accordion-group [multiple]="true" (ionChange)="onChange($event)">
+    @for (row of rows(); track row.exercise.id) {
+      @if (row.openable) {
+        <ion-accordion [value]="row.exercise.id">
+          <ion-item slot="header">
+            <ion-label>
+              <h2>{{ row.exercise.exerciseNameSnapshot }}</h2>
+              <p>{{ row.line }}</p>
+            </ion-label>
+            @if (row.record) {
+              <ion-badge slot="end" [attr.data-tone]="Tones.Honey">
+                {{ 'workouts.exerciseProgress.record' | translate }}
+              </ion-badge>
+            }
+          </ion-item>
+
+          <div slot="content" class="content">
+            <ol class="sets">
+              @for (set of row.sets; track set.key) {
+                <li class="set" [class.undone]="!set.done">
+                  <span class="number" aria-hidden="true">{{ set.number }}</span>
+                  <span class="mh-visually-hidden">{{ 'workouts.loggedSets.set' | translate: { number: set.number } }}</span>
+                  <span class="value">
+                    {{ set.value || ('workouts.loggedSets.notDone' | translate) }}
+                  </span>
+                  @if (!set.done && set.value) {
+                    <span class="state">{{ 'workouts.loggedSets.notDone' | translate }}</span>
+                  }
+                  @if (set.record) {
+                    <ion-badge [attr.data-tone]="Tones.Honey">
+                      {{ 'workouts.exerciseProgress.record' | translate }}
+                    </ion-badge>
+                  }
+                </li>
+              }
+            </ol>
+
+            @if (row.comparing) {
+              <div class="comparison" aria-hidden="true">
+                <ion-skeleton-text [animated]="true" class="line-verdict" />
+                <ion-skeleton-text [animated]="true" class="line-last" />
+              </div>
+            } @else if (row.comparison; as comparison) {
+              <div class="comparison" role="status">
+                <p class="verdict">{{ comparison.verdict }}</p>
+                @if (comparison.lastTime) {
+                  <p class="last">{{ comparison.lastTime }}</p>
+                }
+              </div>
+            }
+
+            @if (row.exercise.exerciseId) {
+              <ion-button class="mh-text-link history" fill="clear" (click)="openHistory(row.exercise)">
+                {{ 'workouts.loggedSets.history' | translate }}
+              </ion-button>
+            }
+          </div>
+        </ion-accordion>
+      } @else {
+        <ion-item [class.skipped]="row.exercise.isSkipped">
+          <ion-label>
+            <h2>{{ row.exercise.exerciseNameSnapshot }}</h2>
+            <p>{{ row.line }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    }
+  </ion-accordion-group>
+</ion-list>

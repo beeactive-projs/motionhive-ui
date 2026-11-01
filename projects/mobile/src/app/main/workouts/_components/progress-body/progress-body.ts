@@ -1,16 +1,38 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
+import {
+  IonBadge,
+  IonButton,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonSearchbar,
+} from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline, lockClosedOutline, trendingUpOutline, trophyOutline } from 'ionicons/icons';
+import {
+  alertCircleOutline,
+  bodyOutline,
+  closeOutline,
+  flashOutline,
+  heartOutline,
+  lockClosedOutline,
+  mapOutline,
+  searchOutline,
+  syncOutline,
+  timeOutline,
+  trendingUpOutline,
+  trophyOutline,
+} from 'ionicons/icons';
 import { take } from 'rxjs/operators';
 
 import {
   ProgressOverview,
+  ExerciseKind,
   ProgressRange,
-  ProgressRecord,
   ProgressService,
+  TrainedExercise,
   appLocale,
   formatTotalDuration,
 } from 'core';
@@ -19,7 +41,17 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { StatTile } from '../../../../_shared/components/stat-tile/stat-tile';
 import { clientPath, coachStackOf } from '../../../clients/client-paths';
+import { BadgeTones, KIND_META } from '../../../exercises/exercises.config';
 import { formatMeasure, unbreakable } from '../../workouts.config';
+import {
+  EXERCISES_PAGE,
+  latestSetRecord,
+  matchingExercises,
+  sparkOf,
+  trainedExerciseLine,
+  trendLabel,
+  trendOf,
+} from './progress-exercises.config';
 
 /** The window the page reads — twelve weeks is a training block. */
 const RANGE: ProgressRange = '12w';
@@ -47,7 +79,19 @@ function groupedVolume(volumeKg: number): string {
  */
 @Component({
   selector: 'mh-progress-body',
-  imports: [EmptyState, HexAvatar, IonItem, IonLabel, IonList, IonNote, StatTile, TranslatePipe],
+  imports: [
+    EmptyState,
+    HexAvatar,
+    IonBadge,
+    IonButton,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
+    IonSearchbar,
+    StatTile,
+    TranslatePipe,
+  ],
   templateUrl: './progress-body.html',
   styleUrl: './progress-body.scss',
 })
@@ -98,51 +142,87 @@ export class ProgressBody {
     ];
   });
 
-  readonly records = computed(() => this.overview()?.records ?? []);
+  readonly Tones = BadgeTones;
+
+  /**
+   * Every exercise trained, most recent first: lifts, holds and runs alike
+   * (the records only ever had the ones with a weight). Read beside the
+   * overview; its failure is the list's own, the numbers above still stand.
+   */
+  readonly exercises = signal<TrainedExercise[]>([]);
+  readonly exercisesError = signal(false);
+  private readonly _shownExercises = signal(EXERCISES_PAGE);
+  /** The search field's words. */
+  readonly query = signal('');
+
+  /** A search shows every match; without one, a page at a time. */
+  private readonly _matches = computed(() => matchingExercises(this.exercises(), this.query()));
+
+  readonly noMatch = computed(() => !!this.query().trim() && this._matches().length === 0);
+
+  readonly exerciseRows = computed(() => {
+    const records = this.overview()?.records ?? [];
+    const matches = this._matches();
+    return (this.query().trim() ? matches : matches.slice(0, this._shownExercises()))
+      .map((exercise) => {
+        const trend = trendOf(exercise.recent);
+        const meta = KIND_META[exercise.kind as ExerciseKind] ?? KIND_META[ExerciseKind.Strength];
+        return {
+          id: exercise.exerciseId,
+          name: exercise.exerciseName,
+          icon: meta.icon,
+          tone: meta.tone,
+          line: trainedExerciseLine(exercise),
+          record: latestSetRecord(exercise, records),
+          trend,
+          trendLabel: trendLabel(trend, exercise.sessionCount),
+          spark: sparkOf(exercise.recent),
+        };
+      });
+  });
+
+  readonly hasMoreExercises = computed(
+    () => !this.query().trim() && this.exercises().length > this._shownExercises(),
+  );
 
   constructor() {
     // Its own, since it also sits on a client's page that registers others.
-    addIcons({ alertCircleOutline, lockClosedOutline, trendingUpOutline, trophyOutline });
+    addIcons({
+      alertCircleOutline,
+      bodyOutline,
+      closeOutline,
+      flashOutline,
+      heartOutline,
+      lockClosedOutline,
+      mapOutline,
+      searchOutline,
+      syncOutline,
+      timeOutline,
+      trendingUpOutline,
+      trophyOutline,
+    });
+  }
+
+  showMoreExercises(): void {
+    this._shownExercises.update((shown) => shown + EXERCISES_PAGE);
   }
 
   /** The name rides along so the next page can title itself before it loads. */
-  openExercise(record: ProgressRecord): void {
-    const state = { exerciseName: record.exerciseName, clientName: this.clientName() };
+  openExercise(exerciseId: string, exerciseName: string): void {
+    const state = { exerciseName, clientName: this.clientName() };
     const clientId = this.clientId();
     if (clientId) {
       const stack = coachStackOf(this._router.url);
-      void this._router.navigate([...clientPath(stack, clientId), 'progress', record.exerciseId], {
+      void this._router.navigate([...clientPath(stack, clientId), 'progress', exerciseId], {
         state,
       });
       return;
     }
-    void this._router.navigate(['/tabs/workouts/progress', record.exerciseId], { state });
-  }
-
-  /**
-   * "119.6 kg": an estimate, so one decimal, the same figure the exercise's
-   * own page leads with.
-   */
-  recordWeight(weightKg: number): string {
-    return this._translateService.instant('workouts.units.kg', {
-      value: formatMeasure(weightKg, 1),
-    });
-  }
-
-  /**
-   * "Est. 1RM · 27 Oct": what the number is and when it was set, so a
-   * 105 kg record beside a best set of 90 × 5 reads as an estimate rather
-   * than a contradiction.
-   */
-  recordLine(record: ProgressRecord): string {
-    const date = new Date(record.recordedAt).toLocaleDateString(appLocale(), {
-      day: 'numeric',
-      month: 'short',
-    });
-    return this._translateService.instant('workouts.progress.recordLine', { date });
+    void this._router.navigate(['/tabs/workouts/progress', exerciseId], { state });
   }
 
   load(): void {
+    this.loadExercises();
     this.loading.set(true);
     this.error.set(false);
     const clientId = this.clientId();
@@ -160,6 +240,18 @@ export class ProgressBody {
         this.loaded.set(true);
         this.loading.set(false);
       },
+    });
+  }
+
+  loadExercises(): void {
+    this.exercisesError.set(false);
+    const clientId = this.clientId();
+    const request = clientId
+      ? this._progressService.trainedExercisesForClient(clientId)
+      : this._progressService.trainedExercises({ silent: true });
+    request.pipe(take(1)).subscribe({
+      next: (exercises) => this.exercises.set(exercises),
+      error: () => this.exercisesError.set(true),
     });
   }
 }

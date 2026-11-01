@@ -51,6 +51,28 @@ export interface ProgressRecord {
   deltaKg: number;
 }
 
+/** A session's top set, as the history page names it. */
+export interface SessionTopSet {
+  topWeightKg: number | null;
+  topReps: number | null;
+  bestDurationSeconds: number | null;
+  bestDistanceMeters: number | null;
+}
+
+/**
+ * One exercise the person has trained, for the Progress list: most recently
+ * trained first, with the top set of its latest sessions (newest first, up
+ * to six) to draw its trend.
+ */
+export interface TrainedExercise {
+  exerciseId: string;
+  exerciseName: string;
+  kind: string;
+  sessionCount: number;
+  lastPerformedAt: string;
+  recent: Array<SessionTopSet & { workoutLogId: string; performedAt: string }>;
+}
+
 export interface ExerciseProgress {
   exercise: {
     id: string;

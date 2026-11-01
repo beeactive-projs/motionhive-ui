@@ -5,22 +5,10 @@
   gap: var(--mh-page-rhythm);
 }
 
-/* A record's weight — tabular, the way every number in a column is. Held a
-   step off the label, and kept whole: the name beside it gives way, not
-   the figure. */
-.value {
-  flex: none;
-  margin-inline-start: 0.5rem;
-  color: var(--ion-text-color);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-/* A record's name takes two lines, words whole, then an ellipsis: on one
+/* An exercise's name takes two lines, words whole, then an ellipsis: on one
    line a long Romanian name ("Îndreptări românești") was cut at the default
    size, and at 130% "Romanian Deadlift" read "Romania…". */
-.record-name {
+.exercise-name {
   display: -webkit-box;
   overflow: hidden;
   overflow-wrap: normal;
@@ -31,27 +19,83 @@
   line-clamp: 2;
 }
 
-/* The records card measures itself. Narrower than this (an SE from about
-   120% text, any phone at 130%) the weight beside the name left the name
-   a column too narrow for one long word ("Genuflexiuni"), so the weight
-   moves under the name, in the same ink, and the name takes the width. */
-.records {
+.line {
+  font-variant-numeric: tabular-nums;
+}
+
+.line ion-badge {
+  margin-inline-end: 0.25rem;
+  vertical-align: baseline;
+}
+
+/* Where the exercise is heading: its latest sessions as a bare line over
+   the word for it. Kept whole beside the name; the name gives way. */
+.trend {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  margin-inline-start: 0.5rem;
+}
+
+.spark {
+  width: 3rem;
+  height: 1.25rem;
+  overflow: visible;
+
+  polyline {
+    fill: none;
+    stroke: var(--ion-color-medium);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+.trend-label {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  white-space: nowrap;
+}
+
+/* Going up reads in the ink, line and word alike; steady and down stay
+   muted. No green or red: a dip is part of training, not an alarm. */
+[data-trend='up'] .spark polyline {
+  stroke: var(--ion-text-color);
+}
+
+[data-trend='up'] .trend-label,
+.trend-under[data-trend='up'] {
+  color: var(--ion-text-color);
+  font-weight: 600;
+}
+
+/* The search field in the page's gutter, flush with the list under it:
+   Ionic's own searchbar padding would indent it. */
+.search {
+  padding: 0;
+}
+
+/* The list measures itself. Narrower than this (an SE from about 120% text,
+   any phone at 130%) the trend beside the name left the name a column too
+   narrow for one long word ("Genuflexiuni"), so the word moves under the
+   line, the line drawing goes, and the name takes the width. */
+.exercises {
   container-type: inline-size;
 }
 
-.value-under {
+.trend-under {
   display: none;
 }
 
 @container (max-width: 19rem) {
-  .records .value {
+  .exercises .trend {
     display: none;
   }
 
-  .records .value-under {
+  .exercises .trend-under {
     display: block;
-    color: var(--ion-text-color);
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
   }
 }

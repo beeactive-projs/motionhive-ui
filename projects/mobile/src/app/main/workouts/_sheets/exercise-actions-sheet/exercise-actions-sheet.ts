@@ -23,5 +23,8 @@ export class ExerciseActionsSheet {
 
   readonly name = computed(() => this.exercise()?.exerciseNameSnapshot ?? '');
 
-  readonly actions = computed(() => exerciseActions(this.exercise()?.isSkipped ?? false));
+  readonly actions = computed(() => {
+    const exercise = this.exercise();
+    return exerciseActions(exercise?.isSkipped ?? false, !!exercise?.exerciseId);
+  });
 }
