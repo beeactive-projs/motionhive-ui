@@ -194,7 +194,8 @@ describe('Quick · Badge', () => {
     const layout = badgeLayout(content(), measure, HexShapes.Logo);
     expect(layout.fits).toBe(true);
     expect(layout.dropped).toEqual([]);
-    expect([layout.width, layout.height]).toEqual([STICKER_WIDTH, STICKER_HEIGHT]);
+    expect(layout.width).toBe(STICKER_WIDTH);
+    expect(layout.height).toBeLessThanOrEqual(STICKER_HEIGHT);
     const edge = ofKind(layout, 'brandEdge');
     expect(edge).toHaveLength(1);
     expect(edge[0].dash).toHaveLength(5);
@@ -229,6 +230,18 @@ describe('Quick · Badge', () => {
     expect(ofKind(layout, 'fill').some((paint) => paint.role === 'detailsCard')).toBe(false);
     expect(ofKind(layout, 'shadow')[0].shapes).toHaveLength(1);
     expect(said(layout)).toEqual(['Upper body', '52', 'min']);
+  });
+
+  // A detail switched off takes its room with it: the sticker is only as
+  // tall as what is on it, the medal alone the shortest, with room for the
+  // shadow and nothing more.
+  it('hugs what is on it', () => {
+    const all = badgeLayout(content(), measure, HexShapes.Logo);
+    const fewer = badgeLayout(content({ exercises: [] }), measure, HexShapes.Logo);
+    const alone = badgeLayout(content(NOTHING_ELSE), measure, HexShapes.Logo);
+    expect(fewer.height).toBeLessThan(all.height);
+    expect(alone.height).toBeLessThan(fewer.height);
+    expect(alone.height).toBeCloseTo(hexSize(HexShapes.Logo, 577).height + 100, 5);
   });
 
   it('keeps the name in the medal: a step smaller, at most three lines', () => {
@@ -374,7 +387,13 @@ describe('Full card', () => {
     expect(layout.fits).toBe(true);
     const band = ofKind(layout, 'comb')[0];
     expect(band.h).toBeGreaterThanOrEqual(420);
-    expect(band.h).toBeLessThanOrEqual(Math.round(CARD_HEIGHT * 0.36));
+    // The band reaches down to the block: the plain colour is the block's own.
+    // The block's lines start at the left margin (the duration's unit sits in its hexagon).
+    const firstLine = Math.min(
+      ...texts(layout).filter((paint) => paint.y > band.h && paint.x === 64).map((p) => p.y),
+    );
+    expect(firstLine - band.h).toBeGreaterThan(72);
+    expect(firstLine - band.h).toBeLessThan(72 + 40);
     expect(ofKind(layout, 'mark')).toHaveLength(1);
     expect(said(layout)).toContain('MotionHive');
     const hex = ofKind(layout, 'fill').find(
@@ -396,14 +415,16 @@ describe('Full card', () => {
     expect(bottomLine(full)).toBeLessThanOrEqual(CARD_HEIGHT - 176);
     expect(bottomLine(short)).toBeLessThanOrEqual(CARD_HEIGHT - 176);
     expect(bottomLine(short)).toBeGreaterThan(CARD_HEIGHT - 176 - 60);
-    // A short block leaves the band at its full height; a long one shrinks it.
-    expect(ofKind(short, 'comb')[0].h).toBe(Math.round(CARD_HEIGHT * 0.36));
+    // A short block leaves the band more room; a long one shrinks it.
     expect(ofKind(full, 'comb')[0].h).toBeLessThan(ofKind(short, 'comb')[0].h);
   });
 
   it('goes edge to edge over the photo, with no band and the duration in the tiles', () => {
     const layout = fullLayout(content(), measure, HexShapes.Logo, true);
     expect(ofKind(layout, 'photo')).toHaveLength(1);
+    // The photo fades into the theme just above the block, wherever it starts.
+    const short = fullLayout(content(NOTHING_ELSE), measure, HexShapes.Logo, true);
+    expect(ofKind(short, 'photo')[0].fadeTop).toBeGreaterThan(ofKind(layout, 'photo')[0].fadeTop);
     expect(ofKind(layout, 'comb')).toHaveLength(0);
     expect(
       ofKind(layout, 'fill').some((paint) => paint.shape.kind === 'hex' && paint.shape.w === 216),
@@ -414,8 +435,12 @@ describe('Full card', () => {
   it('lets a long place take a second line, then cuts it', () => {
     const place = 'Bazinul Olimpic Universitatea, Cluj-Napo';
     const layout = fullLayout(content({ location: place }), measure, HexShapes.Logo, false);
+    // The kicker: the muted lines above the name.
+    const nameTop = Math.min(
+      ...texts(layout).filter((paint) => paint.role === 'ink' && paint.font.size >= 52).map((p) => p.y),
+    );
     const kicker = texts(layout).filter(
-      (paint) => paint.font.size === 32 && paint.role === 'muted' && paint.y < 1000,
+      (paint) => paint.role === 'muted' && paint.font.size === 28 && paint.y < nameTop,
     );
     expect(kicker.length).toBeLessThanOrEqual(2);
     expect(kicker.map((paint) => paint.text).join(' ')).toContain('Bazinul');

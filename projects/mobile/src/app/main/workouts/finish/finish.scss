@@ -1,9 +1,9 @@
 /* ─── Hero ─────────────────────────────────────────────────────────
    The hive card's surface from the top of the screen, the toolbar and the
-   hero one surface: cream with honey lines in light, the hive card's box in
-   dark, as on Home (user, 2026-11-01: no navy top in light). Over a photo
-   cover it is the navy fade instead, so white words read on any photo, and
-   the status bar flips to light icons then (ThemeService.setDarkTop). */
+   hero one surface: cream with honey lines in light (the hive card's), the
+   dark theme's grey in dark (user, 2026-11-01: no navy top in either). Over a photo
+   cover the picture fades into that same surface, in the app's light or
+   dark, never a fixed navy (user, 2026-11-01). */
 :host {
   --hero: var(--mh-color-hive);
   --hero-ink: var(--mh-color-hive-ink);
@@ -12,12 +12,16 @@
   --hero-pattern: var(--mh-color-hive-pattern);
 }
 
-.hero-header.on-photo,
-.hero.with-photo {
-  --hero: var(--mh-color-navy-card);
-  --hero-ink: var(--mh-color-navy-card-ink);
-  --hero-muted: var(--mh-color-navy-card-muted);
-  --hero-tile: var(--mh-color-navy-card-raised);
+/* Dark: the dark theme's own grey, not the hive card's navy box. The top is
+   the page here, and the dark page is grey (user, 2026-11-01). No token
+   holds cream in light and this grey in dark, so the pair is named here, as
+   Discover's band does. */
+:host-context(.ion-palette-dark) {
+  --hero: var(--ion-card-background);
+  --hero-ink: var(--ion-text-color);
+  --hero-muted: var(--ion-color-medium);
+  --hero-tile: var(--mh-color-divider);
+  --hero-pattern: var(--ion-color-primary);
 }
 
 .hero-header ion-toolbar {
@@ -186,8 +190,8 @@
 }
 
 /* With a photo the hero is the cover: the picture fills it, the honeycomb
-   and badge step aside, and the words sit low on a navy fade so they read
-   on any photo. */
+   and badge step aside, and the words sit low on a fade into the hero's
+   surface so they read on any photo. */
 .hero.with-photo {
   justify-content: flex-end;
   min-height: 24rem;
@@ -215,10 +219,10 @@
   z-index: -1;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--mh-color-navy-card) 40%, transparent) 0%,
+    color-mix(in srgb, var(--hero) 40%, transparent) 0%,
     transparent 30%,
     transparent 45%,
-    color-mix(in srgb, var(--mh-color-navy-card) 92%, transparent) 100%
+    color-mix(in srgb, var(--hero) 92%, transparent) 100%
   );
   pointer-events: none;
 }
@@ -227,8 +231,8 @@
   position: absolute;
   top: 0.5rem;
   right: 0.75rem;
-  --background: color-mix(in srgb, var(--mh-color-navy-card) 55%, transparent);
-  --color: var(--mh-color-navy-card-ink);
+  --background: color-mix(in srgb, var(--hero) 70%, transparent);
+  --color: var(--hero-ink);
   --box-shadow: none;
   margin: 0;
   font-size: var(--mh-text-sm);

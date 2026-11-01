@@ -139,7 +139,7 @@ export type Paint =
   /** The Full card's background: the theme's colour and its light. */
   | { kind: 'backdrop'; w: number; h: number }
   /** The Full card's photo, edge to edge, darkening to the theme's colour. */
-  | { kind: 'photo'; w: number; h: number }
+  | { kind: 'photo'; w: number; h: number; fadeTop: number }
   /** The band of honeycomb at the top of a Full card without a photo. */
   | { kind: 'comb'; x: number; y: number; w: number; h: number };
 
@@ -460,8 +460,11 @@ function buildBadge(c: ShareCardContent, kit: Kit, branded: boolean): ShareLayou
     medalHeight +
     (card ? card.height - BADGE.overlap : 0) +
     (link ? 24 + link.height : 0);
-  // A little above the middle: the shadow falls below.
-  const top = Math.max(0, (canvasHeight - total) / 2 - 10);
+  // The canvas hugs what is on it, so a detail switched off takes its room
+  // with it; the tallest is the canvas with everything on. A little above
+  // the middle: the shadow falls below.
+  const height = Math.min(canvasHeight, total + BADGE.margin * 2);
+  const top = Math.max(0, (height - total) / 2 - 10);
   const medalTop = top + (brand ? brand.height + 24 : 0);
   const medal: HexBox = { kind: 'hex', x: cx - BADGE.medal / 2, y: medalTop, w: BADGE.medal };
   const cardTop = medalTop + medalHeight - BADGE.overlap;
@@ -500,7 +503,7 @@ function buildBadge(c: ShareCardContent, kit: Kit, branded: boolean): ShareLayou
 
   return {
     width: STICKER_WIDTH,
-    height: canvasHeight,
+    height,
     paints,
     fits: total <= canvasHeight - BADGE.margin * 2 && !inMedal.overflow,
     dropped: [],
@@ -928,7 +931,9 @@ function buildCells(c: ShareCardContent, kit: Kit): ShareLayout {
     pill.height +
     (cells.length ? CELLS.stack + flowerHeight : 0) +
     (chips.rows.length ? CELLS.stack + chips.height : 0);
-  const top = Math.max(0, (STICKER_HEIGHT - total) / 2 - 10);
+  // Hugs what is on it, as the Badge does.
+  const height = Math.min(STICKER_HEIGHT, total + CELLS.margin * 2);
+  const top = Math.max(0, (height - total) / 2 - 10);
   const pillShape: Shape = {
     kind: 'box',
     x: cx - pill.width / 2,
@@ -958,7 +963,7 @@ function buildCells(c: ShareCardContent, kit: Kit): ShareLayout {
 
   return {
     width: STICKER_WIDTH,
-    height: STICKER_HEIGHT,
+    height,
     paints,
     fits: total <= STICKER_HEIGHT - CELLS.margin * 2,
     dropped: [],
@@ -1139,8 +1144,7 @@ const FULL = {
   padX: 64,
   /** Instagram's own controls cover the bottom of a Story. */
   bottom: 176,
-  gap: 36,
-  band: Math.round(CARD_HEIGHT * 0.36),
+  gap: 28,
   bandMin: 420,
   /** Between the band and the first line. */
   air: 72,
@@ -1156,16 +1160,18 @@ const FULL = {
 } as const;
 
 const FULL_INNER = CARD_WIDTH - FULL.padX * 2;
-const FULL_KICKER = inter(600, 32);
-const TILE_VALUE = display(60);
-const TILE_LABEL = inter(500, 32);
-const BAR = inter(600, 36);
-const FULL_ROW = inter(500, 36);
-const FULL_ROW_BEST = inter(600, 36);
-const WEEK_LINE = inter(600, 32);
-const WEEK_SUB = inter(500, 32);
-const FOOTER = inter(600, 32);
-const HEX_UNIT = inter(600, 28);
+// A step smaller than the design (user, 2026-11-01): the block in the
+// theme's colour stays short and the band, or the photo, keeps the room.
+const FULL_KICKER = inter(600, 28);
+const TILE_VALUE = display(52);
+const TILE_LABEL = inter(500, 28);
+const BAR = inter(600, 32);
+const FULL_ROW = inter(500, 32);
+const FULL_ROW_BEST = inter(600, 32);
+const WEEK_LINE = inter(600, 28);
+const WEEK_SUB = inter(500, 28);
+const FOOTER = inter(600, 28);
+const HEX_UNIT = inter(600, 26);
 
 /**
  * The Full card (design "Share v3", 5): a band at the top (a band of
@@ -1198,7 +1204,9 @@ function buildFull(
   const place = (narrow: number) => {
     const blocks = fullBlocks(c, kit, narrow, kickerLines);
     const top = CARD_HEIGHT - FULL.bottom - stack(blocks, FULL.gap);
-    const band = photo ? 0 : clamp(top - FULL.air, FULL.bandMin, FULL.band);
+    // The band reaches down to the block, so the plain colour is only ever
+    // the block's own.
+    const band = photo ? 0 : Math.max(FULL.bandMin, top - FULL.air);
     return { blocks, top, band };
   };
   // At the full width first; the lines beside the duration's hexagon are
@@ -1212,7 +1220,7 @@ function buildFull(
   const paints: Paint[] = [{ kind: 'backdrop', w: CARD_WIDTH, h: CARD_HEIGHT }];
   paints.push(
     photo
-      ? { kind: 'photo', w: CARD_WIDTH, h: CARD_HEIGHT }
+      ? { kind: 'photo', w: CARD_WIDTH, h: CARD_HEIGHT, fadeTop: top }
       : { kind: 'comb', x: 0, y: 0, w: CARD_WIDTH, h: band },
   );
   paints.push(...brandPill(kit, FULL.pillLeft, 76, 32, 44, false).paint(FULL.pillTop));
@@ -1228,10 +1236,6 @@ function buildFull(
   paints.push(...paintStack(blocks, top, FULL.gap));
   const floor = photo ? FULL.photoTop : FULL.bandMin + FULL.air;
   return { width: CARD_WIDTH, height: CARD_HEIGHT, paints, fits: top >= floor, dropped: [] };
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
 }
 
 /** The content block's parts, top to bottom; `narrow` is the width beside the duration hexagon. */
@@ -1258,7 +1262,7 @@ function fullBlocks(c: ShareCardContent, kit: Kit, narrow: number, kickerLines: 
         ),
     });
   }
-  const name = fitName(c.title, narrow, 2, [68, 58], measure);
+  const name = fitName(c.title, narrow, 2, [60, 52], measure);
   const lead = name.font.size * 1.15;
   blocks.push({
     height: name.lines.length * lead,
@@ -1284,7 +1288,7 @@ function fullBlocks(c: ShareCardContent, kit: Kit, narrow: number, kickerLines: 
 function statTiles(tiles: readonly ShareStat[], kit: Kit): Block {
   const gap = 24;
   const width = (FULL_INNER - gap * (tiles.length - 1)) / tiles.length;
-  const height = 28 + TILE_VALUE.size + 12 + TILE_LABEL.size * 1.2 + 28;
+  const height = 22 + TILE_VALUE.size + 10 + TILE_LABEL.size * 1.2 + 22;
   return {
     height,
     paint: (top) =>
@@ -1299,11 +1303,11 @@ function statTiles(tiles: readonly ShareStat[], kit: Kit): Block {
             shape: { kind: 'box', x, y: top, w: width, h: height, r: 40 },
             role: 'tile',
           },
-          textPaint(tile.value, x + 24, baseline(top + 28, value, 1), value, 'ink', 'left'),
+          textPaint(tile.value, x + 24, baseline(top + 22, value, 1), value, 'ink', 'left'),
           textPaint(
             label,
             x + 24,
-            baseline(top + 28 + TILE_VALUE.size + 12, TILE_LABEL, 1.2),
+            baseline(top + 22 + TILE_VALUE.size + 10, TILE_LABEL, 1.2),
             TILE_LABEL,
             'muted',
             'left',
@@ -1315,8 +1319,8 @@ function statTiles(tiles: readonly ShareStat[], kit: Kit): Block {
 
 /** The record: the only honey surface, navy on it. */
 function recordBar(record: NonNullable<ShareCardContent['record']>, kit: Kit): Block {
-  const height = 128;
-  const hexW = 64;
+  const height = 108;
+  const hexW = 56;
   return {
     height,
     paint: (top) => {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
@@ -17,7 +17,6 @@ import {
   IonTitle,
   IonToolbar,
   ViewWillEnter,
-  ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Haptics, NotificationType } from '@capacitor/haptics';
@@ -46,7 +45,6 @@ import {
 } from '../../../_shared/config/workout-visibility.config';
 import { APP_HEX_SHAPE, TILE_FRAME, tileFigure } from '../../../_shared/config/hexagon.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { ThemeService } from '../../../_shared/services/theme.service';
 import { workoutLinks } from '../../home/home-stack.config';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
 import { LoggedExercises } from '../_components/logged-exercises/logged-exercises';
@@ -134,13 +132,12 @@ interface Highlight {
   templateUrl: './finish.html',
   styleUrl: './finish.scss',
 })
-export class Finish implements ViewWillEnter, ViewWillLeave {
+export class Finish implements ViewWillEnter {
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
-  private readonly _themeService = inject(ThemeService);
   private readonly _authStore = inject(AuthStore);
   private readonly _saveRoutineService = inject(SaveRoutineService);
 
@@ -345,23 +342,12 @@ export class Finish implements ViewWillEnter, ViewWillLeave {
     return log ? this._saveRoutineService.savedName(log.id) : null;
   });
 
-  /** Showing, so the status bar follows the top while it is on screen. */
-  private readonly _shown = signal(false);
-
   constructor() {
     addIcons(WORKOUT_ICONS);
-    // Light status icons only over the photo cover's dark fade; the cream
-    // top keeps the theme's own.
-    effect(() => this._themeService.setDarkTop(this._shown() && !!this.photoUrl()));
   }
 
   ionViewWillEnter(): void {
-    this._shown.set(true);
     this.load();
-  }
-
-  ionViewWillLeave(): void {
-    this._shown.set(false);
   }
 
   load(): void {

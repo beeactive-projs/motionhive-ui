@@ -13,8 +13,6 @@ import {
   Measure,
   Paint,
   PaintRole,
-  STICKER_HEIGHT,
-  STICKER_WIDTH,
   Shape,
   ShareLayout,
 } from './share-layout.config';
@@ -425,7 +423,7 @@ function paintOne(
       return;
     }
     case 'photo':
-      if (photo) paintPhoto(ctx, photo, palette, paint.w, paint.h);
+      if (photo) paintPhoto(ctx, photo, palette, paint.w, paint.h, paint.fadeTop);
       return;
     case 'comb':
       paintComb(ctx, palette, hex, paint);
@@ -434,8 +432,9 @@ function paintOne(
 }
 
 /**
- * The photo edge to edge, darkening to the theme's colour from a quarter
- * of the way down, so the content block reads over any picture.
+ * The photo edge to edge, darkening to the theme's colour just above the
+ * content block (`fadeTop`, its top), so the block reads over any picture
+ * and the photo keeps everything above it.
  */
 function paintPhoto(
   ctx: CanvasRenderingContext2D,
@@ -443,13 +442,15 @@ function paintPhoto(
   palette: CardPalette,
   w: number,
   h: number,
+  fadeTop: number,
 ): void {
   drawCover(ctx, photo, 0, 0, w, h);
   const base = palette.surface[palette.surface.length - 1];
+  const at = (y: number) => Math.min(1, Math.max(0, y / h));
   const gradient = ctx.createLinearGradient(0, 0, 0, h);
-  gradient.addColorStop(0.25, withAlpha(base, 0));
-  gradient.addColorStop(0.5, withAlpha(base, 0.75));
-  gradient.addColorStop(0.72, withAlpha(base, 0.96));
+  gradient.addColorStop(at(fadeTop - 360), withAlpha(base, 0));
+  gradient.addColorStop(at(fadeTop - 120), withAlpha(base, 0.75));
+  gradient.addColorStop(at(fadeTop + 60), withAlpha(base, 0.96));
   gradient.addColorStop(1, withAlpha(base, 0.98));
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
@@ -525,12 +526,13 @@ const STORY_STICKER_WIDTH = 760;
  */
 export function drawQuickStory(
   ctx: CanvasRenderingContext2D,
-  sticker: CanvasImageSource,
+  sticker: HTMLCanvasElement,
   palette: CardPalette,
   photo: CanvasImageSource | null,
 ): void {
   drawStoryBackground(ctx, palette, photo);
-  const height = STORY_STICKER_WIDTH * (STICKER_HEIGHT / STICKER_WIDTH);
+  // The sticker's own proportions: it is only as tall as what is on it.
+  const height = STORY_STICKER_WIDTH * (sticker.height / sticker.width);
   ctx.drawImage(
     sticker,
     (CARD_WIDTH - STORY_STICKER_WIDTH) / 2,
