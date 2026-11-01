@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
@@ -15,6 +15,7 @@ import {
 import { appLocale, AuthStore, formatRelativeShort, localDayKey, sentenceCase } from 'core';
 
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { CoachStacks } from '../../clients/client-paths';
 import { CreateChoice, CreateChoices } from '../../programs/programs.config';
@@ -25,17 +26,25 @@ import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { NeedRowItem } from '../_components/need-row/need-row';
 import {
+  buildingCells,
   coachHiveCells,
   coachLatest,
+  coachShortcuts,
   greetingPeriod,
+  isBuilding,
   LatestRow,
   latestPreview,
   latestRow,
+  LoadStates,
+  loadState,
   movedCount,
   needPreview,
   needRow,
   NeedRow,
   RING_ONE_SIZE,
+  Shortcut,
+  ShortcutIds,
+  SLOW_LOAD_MS,
 } from '../home.config';
 import { injectActOnNeed } from '../needs-you/need-actions';
 import { CoachHomeStore } from './coach-home.store';
@@ -49,10 +58,15 @@ interface FirstStep {
 }
 
 /**
- * The coach's Home, calm: the hive card, Needs you and Latest, nothing
- * else below the greeting (a small Today row joins them only on a day with
- * sessions). The full lists are pages in Home's own stack:
- * `/tabs/home/needs-you` and `/tabs/home/latest`.
+ * The coach's Home, calm: the hive card, Needs you and Latest below the
+ * greeting (a small Today row joins them only on a day with sessions), and
+ * three small shortcuts at the bottom. The full lists are pages in Home's
+ * own stack: `/tabs/home/needs-you` and `/tabs/home/latest`; the hive card
+ * opens the whole hive, `/tabs/home/hive`.
+ *
+ * Before anything has arrived the card builds its comb and the lists show
+ * placeholder rows under their heads (`loadState`); a reload keeps what is
+ * on screen.
  */
 @Component({
   selector: 'mh-coach-home',
@@ -70,6 +84,7 @@ interface FirstStep {
     IonSkeletonText,
     LatestRowItem,
     NeedRowItem,
+    RowSkeleton,
     TranslatePipe,
   ],
   templateUrl: './coach-home.html',
@@ -80,6 +95,7 @@ export class CoachHome implements OnInit {
   private readonly _router = inject(Router);
   private readonly _translateService = inject(TranslateService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly store = inject(CoachHomeStore);
   readonly act = injectActOnNeed();
@@ -114,6 +130,26 @@ export class CoachHome implements OnInit {
   });
 
   // ─── The hive ────────────────────────────────────────────────
+
+  readonly LoadStates = LoadStates;
+
+  /** Set once a first load has run `SLOW_LOAD_MS`; reset by each new one. */
+  private readonly _slow = signal(false);
+  private _slowTimer: ReturnType<typeof setTimeout> | undefined;
+
+  readonly hiveState = computed(() =>
+    loadState({
+      shown: this.store.roster() !== null,
+      loading: this.store.rosterLoading(),
+      failed: this.store.rosterFailed(),
+      slow: this._slow(),
+    }),
+  );
+
+  readonly building = computed(() => isBuilding(this.hiveState()));
+
+  /** The first load's comb, the same every time. */
+  readonly buildCells = buildingCells();
 
   readonly cells = computed(() => coachHiveCells(this._coachName(), this.store.clients()));
 
@@ -177,6 +213,21 @@ export class CoachHome implements OnInit {
     );
   });
 
+  // ─── Shortcuts ───────────────────────────────────────────────
+
+  /**
+   * Once the card knows what it shows, so a first week never flashes the
+   * tiles its card and steps already offer (`coachShortcuts`).
+   */
+  readonly shortcuts = computed<Shortcut[]>(() => {
+    if (this.building()) return [];
+    const firstWeek = this.store.isFirstWeek();
+    return coachShortcuts({
+      invite: firstWeek,
+      program: firstWeek && this.firstSteps().some((step) => step.key === 'program'),
+    });
+  });
+
   // ─── First week ──────────────────────────────────────────────
 
   readonly firstSteps = computed<FirstStep[]>(() => {
@@ -200,7 +251,12 @@ export class CoachHome implements OnInit {
     return steps;
   });
 
+  constructor() {
+    this._destroyRef.onDestroy(() => clearTimeout(this._slowTimer));
+  }
+
   ngOnInit(): void {
+    this._watchSlow();
     this.store.load();
   }
 
@@ -211,16 +267,30 @@ export class CoachHome implements OnInit {
    */
   reenter(): void {
     this.today.set(new Date());
+    this._retrying();
     this.store.load();
   }
 
   refresh(done: () => void): void {
     this.today.set(new Date());
+    this._retrying();
     this.store.load(done);
   }
 
   retry(): void {
+    this._watchSlow();
     this.store.load();
+  }
+
+  /** A load after a failed first one is a first load again, slow timer and all. */
+  private _retrying(): void {
+    if (this.hiveState() === LoadStates.Failed) this._watchSlow();
+  }
+
+  private _watchSlow(): void {
+    clearTimeout(this._slowTimer);
+    this._slow.set(false);
+    this._slowTimer = setTimeout(() => this._slow.set(true), SLOW_LOAD_MS);
   }
 
   openNeeds(): void {
@@ -241,8 +311,23 @@ export class CoachHome implements OnInit {
     else void this._router.navigateByUrl(HomePages.Coaching);
   }
 
-  openClients(): void {
-    void this._router.navigateByUrl(CoachStacks.Clients);
+  /** The whole hive, every client a cell, in Home's stack (C1). */
+  openHive(): void {
+    void this._router.navigateByUrl(HomePages.Hive);
+  }
+
+  openShortcut(shortcut: Shortcut): void {
+    switch (shortcut.id) {
+      case ShortcutIds.Program:
+        this.createOpen.set(true);
+        return;
+      case ShortcutIds.Invite:
+        this.invite();
+        return;
+      case ShortcutIds.Exercise:
+        void this._router.navigateByUrl(HomePages.NewExercise);
+        return;
+    }
   }
 
   /** The invite page in Home's stack, so back (and Done) return here. */

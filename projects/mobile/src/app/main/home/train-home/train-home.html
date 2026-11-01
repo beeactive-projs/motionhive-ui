@@ -13,20 +13,27 @@
   The week: a cell per day, honey where you trained, a fuller cell where the
   plan asks for one, today ringed, a light for a record. One headline, one
   line under it, and the day's workout in the same card with the screen's
-  one honey button, because it is the one thing you came here to do.
+  one honey button, because it is the one thing you came here to do. The
+  week and its words open the month. Before they arrive the comb builds
+  itself, with placeholders where the words and the day go.
 -->
 <div class="hive-wrap">
   <div class="hive-card train">
-    @if (store.showWeekSkeleton()) {
-      <div class="hive-row">
-        <ion-skeleton-text class="comb-skeleton" [animated]="true" />
-        <div class="hive-copy">
-          <ion-skeleton-text [animated]="true" style="width: 50%; height: 0.625rem" />
-          <ion-skeleton-text [animated]="true" style="width: 80%; height: 1.25rem" />
-          <ion-skeleton-text [animated]="true" style="width: 90%" />
+    @if (building()) {
+      <div class="hive-row" aria-busy="true">
+        <mh-hive
+          [cells]="buildCells"
+          [label]="'home.train.week.loading' | translate"
+          [building]="true"
+        />
+        <div class="hive-copy" aria-hidden="true">
+          <ion-skeleton-text class="line-kicker" />
+          <ion-skeleton-text class="line-title" />
+          <ion-skeleton-text class="line-link" />
         </div>
       </div>
-    } @else if (store.showWeekError()) {
+      <ion-skeleton-text class="next-skeleton" aria-hidden="true" />
+    } @else if (weekState() === LoadStates.Failed) {
       <!-- Said in the card, as the coach's hive card says it: an empty week
            here would tell someone with a plan that they have none. -->
       <div class="hive-copy">
@@ -45,7 +52,18 @@
           @if (weekSub(); as sub) {
             <p class="hive-sub" [class.one-line]="weekSubIsStatus()">{{ sub }}</p>
           }
+          <!-- The words of the button laid over the week, to the eye. -->
+          <span class="hive-link" aria-hidden="true">
+            {{ 'home.train.week.month' | translate }}
+            <ion-icon name="chevron-forward-outline" />
+          </span>
         </div>
+        <ion-button
+          class="hive-open"
+          fill="clear"
+          [attr.aria-label]="'home.train.week.monthLabel' | translate"
+          (click)="openMonth()"
+        />
       </div>
 
       <!-- An open session outranks the plan; then the plan's next day; with
@@ -81,6 +99,10 @@
       }
     }
   </div>
+
+  @if (weekState() === LoadStates.Slow) {
+    <p class="slow-note" role="status">{{ 'home.slowLoad' | translate }}</p>
+  }
 </div>
 
 <!-- A session booked for today, only on a day that has one: one small row. -->
@@ -146,6 +168,23 @@
       </ion-button>
     </div>
   </section>
+} @else if (!store.peopleAnswered()) {
+  <!-- First load: the head, and placeholders where the people will stand. -->
+  <section class="mh-section" aria-busy="true">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.train.hive.title' | translate }}</h2>
+    </div>
+    <div class="members" aria-hidden="true">
+      @for (slot of [0, 1, 2]; track slot) {
+        <span class="member-skeleton">
+          <span class="member-inner">
+            <mh-hex-avatar size="lg" color="medium" tone="wash" />
+            <ion-skeleton-text class="member-line" />
+          </span>
+        </span>
+      }
+    </div>
+  </section>
 } @else if (showBuildHive()) {
   <section class="mh-section">
     <div class="mh-section-head">
@@ -192,6 +231,17 @@
     <ion-list class="mh-flat-list">
       @for (row of latest(); track row.id) {
         <mh-latest-row [row]="row" (select)="openRow(row)" />
+      }
+    </ion-list>
+  </section>
+} @else if (!store.latestAnswered()) {
+  <section class="mh-section" aria-busy="true">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.latest.title' | translate }}</h2>
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (row of [0, 1]; track row) {
+        <mh-row-skeleton [index]="row" />
       }
     </ion-list>
   </section>

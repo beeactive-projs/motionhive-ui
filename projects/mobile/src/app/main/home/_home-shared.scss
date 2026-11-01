@@ -18,6 +18,13 @@
   padding-inline: var(--mh-row-gutter);
 }
 
+// The card, and under it the line a slow first load adds.
+.hive-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .greeting h1 {
   font-size: var(--mh-text-greeting);
 }
@@ -111,9 +118,27 @@
   line-height: var(--mh-leading-body);
 }
 
-// The card's one text link ("See clients"): its own token, deep honey on
-// the cream and honey on the navy. A 44px target that takes the space of
-// one line of text.
+// The card's text link, in two forms. Its words ("Open your hive", "Your
+// month") are a span: the control is the button laid over the card (below),
+// which carries the same name, so a screen reader meets one control. A real
+// link button ("Try again") is a 44px target that takes the space of one
+// line of text. Both wear their own token, deep honey on the cream and honey
+// on the navy.
+.hive-card span.hive-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  align-self: flex-start;
+  min-height: 1.5rem;
+  color: var(--mh-color-hive-link);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.hive-card span.hive-link ion-icon {
+  font-size: var(--mh-icon-sm);
+}
+
 .hive-card ion-button.hive-link {
   --color: var(--mh-color-hive-link);
   --padding-start: 0;
@@ -140,10 +165,60 @@
   margin: 0;
 }
 
+// The whole card, or its comb and words, as one tap target: a clear button
+// laid over it and named for where it goes. Its press tints the card
+// faintly in the honeycomb's colour. Over the whole card on the coach's;
+// over the week and its words on the trainee's, whose day panel keeps its
+// own button.
+.hive-card .hive-open {
+  --background-hover: transparent;
+  --background-activated: var(--mh-color-hive-pattern);
+  --background-activated-opacity: 0.08;
+  --background-focused: var(--mh-color-hive-pattern);
+  --background-focused-opacity: 0.08;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+.hive-row:has(> .hive-open) {
+  position: relative;
+}
+
+// Out to the card's edges, and down to the middle of the gap above the day.
+.hive-row > .hive-open {
+  inset: calc(-1 * var(--mh-card-pad)) calc(-1 * var(--mh-card-pad)) -0.375rem;
+}
+
+// Placeholders on the card: the honeycomb's empty-cell colour, still (the
+// building comb beside them is the motion).
 .hive-card ion-skeleton-text {
-  --background: var(--mh-color-hive-ghost);
+  --background: var(--mh-color-hive-cell);
   --background-rgb: var(--ion-background-color-rgb);
   margin: 0;
+}
+
+// Where the kicker, the headline and the link will stand.
+.hive-copy[aria-hidden='true'] {
+  gap: 0.5rem;
+}
+
+.hive-card .line-kicker {
+  width: 50%;
+  height: 0.75rem;
+}
+
+.hive-card .line-title {
+  width: 80%;
+  height: 1.25rem;
+}
+
+.hive-card .line-link {
+  width: 40%;
+  height: 0.875rem;
 }
 
 // The glow sits behind the comb, on the left.
@@ -152,12 +227,14 @@
   --glow-y: 40%;
 }
 
-// While loading, the comb's footprint: three cells wide, three rows tall.
-.hive-card .comb-skeleton {
-  flex: none;
-  width: calc(var(--cell) * 3.16);
-  height: calc(var(--cell) * 3.03);
-  border-radius: var(--mh-radius-card);
+// A first load past eight seconds: one calm line under the card, while the
+// comb keeps building.
+.slow-note {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+  text-align: center;
 }
 
 // The comb beside what it adds up to, until the card is too narrow for

@@ -87,10 +87,15 @@ export class ProgramAssignmentService {
 
   // ── Shared ───────────────────────────────────────────────────────
 
-  /** Detail accessible to either party (instructor OR client). */
-  get(id: string): Observable<ProgramAssignment> {
+  /**
+   * Detail accessible to either party (instructor OR client). `silent` as
+   * on `listForInstructor`, for a read whose failure only leaves a detail
+   * out (the coach's hive sheet: the planned days of a client's week).
+   */
+  get(id: string, opts?: { silent?: boolean }): Observable<ProgramAssignment> {
     return this._http.get<ProgramAssignment>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.BY_ID(id)}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 

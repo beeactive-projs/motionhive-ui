@@ -17,7 +17,6 @@ import {
   IonToolbar,
   RefresherCustomEvent,
   ViewWillEnter,
-  ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
@@ -41,7 +40,6 @@ import { NotificationBell } from '../../_shared/components/notification-bell/not
 import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ClockService } from '../../_shared/services/clock.service';
-import { ThemeService } from '../../_shared/services/theme.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { CoachRow } from './_components/coach-row/coach-row';
 import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
@@ -100,12 +98,13 @@ const COMB_CELLS: readonly string[] = [
 ].map(([x, y]) => `translate(${x - 6.7} ${y}) rotate(90 50 50)`);
 
 /**
- * Discover, a tab in both modes, after the canvas design: a navy band at the
- * top (the toolbar is part of it) with the city, the way into search and the
- * goal chips; then the coach of the week, the coaches near you, the groups to
- * join and the sessions coming up. The city and the goal filter every
- * section. Coach and trainee see the same page, so it carries no role
- * branches, and never shows the reader to themselves.
+ * Discover, a tab in both modes, after the canvas design: a band at the top
+ * in the brand's light colours, the Home hive card's cream (the toolbar is
+ * part of it; the grey card step in dark, never navy), with the city, the
+ * way into search and the goal chips; then the coach of the week, the
+ * coaches near you, the groups to join and the sessions coming up. The city
+ * and the goal filter every section. Coach and trainee see the same page,
+ * so it carries no role branches, and never shows the reader to themselves.
  *
  * Search is its own screen (`search/discover-search-page.ts`), pushed from
  * the band's field so back returns here.
@@ -144,7 +143,7 @@ const COMB_CELLS: readonly string[] = [
   host: { class: 'mh-whole-words' },
   providers: [SessionsDiscoverStore, DiscoverCoachesStore, DiscoverGroupsStore],
 })
-export class Discover implements ViewWillEnter, ViewWillLeave {
+export class Discover implements ViewWillEnter {
   readonly sessionsStore = inject(SessionsDiscoverStore);
   readonly coachesStore = inject(DiscoverCoachesStore);
   readonly groupsStore = inject(DiscoverGroupsStore);
@@ -152,7 +151,6 @@ export class Discover implements ViewWillEnter, ViewWillLeave {
   private readonly _authStore = inject(AuthStore);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
   private readonly _clockService = inject(ClockService);
-  private readonly _themeService = inject(ThemeService);
   private readonly _router = inject(Router);
   private readonly _openDirectMessage = injectOpenDirectMessage();
 
@@ -176,8 +174,6 @@ export class Discover implements ViewWillEnter, ViewWillLeave {
   }
 
   ionViewWillEnter(): void {
-    // The band runs up under the status bar: light icons over it.
-    this._themeService.setDarkTop(true);
     this._clockService.bump();
     this._myBookingsIndexStore.ensureLoaded();
     this._prefs.ensureAccountCity();
@@ -185,10 +181,6 @@ export class Discover implements ViewWillEnter, ViewWillLeave {
     this.groupsStore.load();
     // Filters survive re-entry; stale rows refresh in place (no blank flash).
     this.sessionsStore.reload();
-  }
-
-  ionViewWillLeave(): void {
-    this._themeService.setDarkTop(false);
   }
 
   // ─── What the reader may see ────────────────────────────────────────────

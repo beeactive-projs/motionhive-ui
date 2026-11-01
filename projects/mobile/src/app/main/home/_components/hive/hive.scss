@@ -124,6 +124,32 @@ svg {
   transform: translateX(-50%);
 }
 
+// ─── The first load ──────────────────────────────────────────────
+// Empty cells that light with honey one after another while the data comes
+// (the loop runs in hive.ts). Each glow lies over its cell, grown from
+// nothing at its turn: the pale honey of a filled cell's top, opaque so it
+// stays warm on the navy card in dark (faded, it mixed to an olive grey
+// there), with a soft honey halo. Without the loop (reduced motion) the
+// glows stay at nothing and the comb is still, empty cells.
+.glow {
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 0 0.375rem rgba(var(--ion-color-primary-rgb), 0.55));
+  pointer-events: none;
+}
+
+.glow-honey {
+  fill: var(--mh-color-hive-honey-top);
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// The build is the comb's motion; it does not pop in as well.
+:host(.building) .cell {
+  animation: none;
+}
+
 @keyframes hive-pop {
   from {
     opacity: 0;

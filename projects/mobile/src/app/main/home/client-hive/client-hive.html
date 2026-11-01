@@ -1,0 +1,133 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>{{ 'pageTitle.clientHive' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!--
+  The hive on the page: the range, who to show, one headline, the comb,
+  its key and what the range adds up to. Light and simple: the comb is the
+  one picture, everything else is words.
+-->
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.isEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      [heading]="'clientHive.empty.title' | translate"
+      [message]="'clientHive.empty.message' | translate"
+      [actionLabel]="'clientHive.empty.action' | translate"
+      (action)="invite()"
+    />
+  } @else {
+    <div class="mh-page">
+      <!-- A value picker, so a pill segment: it sets the range, the page stays. -->
+      <ion-segment
+        class="mh-segment-fit"
+        [value]="store.range()"
+        [attr.aria-label]="'clientHive.range.label' | translate"
+        (ionChange)="setRange($event.detail.value)"
+      >
+        @for (range of ranges; track range) {
+          <ion-segment-button [value]="range">
+            <ion-label>{{ 'clientHive.range.' + range | translate }}</ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+
+      @if (store.showError()) {
+        <mh-empty-state
+          icon="cloud-offline-outline"
+          [heading]="'clientHive.loadError' | translate"
+          [message]="'error.checkConnection' | translate"
+          [actionLabel]="'button.tryAgain' | translate"
+          (action)="retry()"
+        />
+      } @else {
+        @if (attentionCount() > 0) {
+          <div
+            class="mh-chip-cloud filters"
+            role="group"
+            [attr.aria-label]="'clientHive.filter.label' | translate"
+          >
+            <ion-button
+              class="chip"
+              fill="clear"
+              shape="round"
+              size="small"
+              [class.selected]="activeFilter() === Filters.All"
+              [attr.aria-pressed]="activeFilter() === Filters.All"
+              (click)="setFilter(Filters.All)"
+            >
+              {{ 'clientHive.filter.all' | translate }}
+            </ion-button>
+            <ion-button
+              class="chip"
+              fill="clear"
+              shape="round"
+              size="small"
+              [class.selected]="activeFilter() === Filters.Attention"
+              [attr.aria-pressed]="activeFilter() === Filters.Attention"
+              (click)="setFilter(Filters.Attention)"
+            >
+              {{ 'clientHive.filter.attention' | translate }}
+              <span class="count">{{ attentionCount() }}</span>
+            </ion-button>
+          </div>
+        }
+
+        <div class="headline" aria-live="polite">
+          @if (store.loading()) {
+            <ion-skeleton-text [animated]="true" style="width: 70%; height: 1.375rem" />
+            <ion-skeleton-text [animated]="true" style="width: 50%; height: 0.875rem" />
+          } @else {
+            <h2 class="title">{{ headline() }}</h2>
+            @if (shown().length) {
+              <p class="hint">{{ 'clientHive.tapHint' | translate }}</p>
+            }
+          }
+        </div>
+
+        <mh-hive-board
+          class="comb"
+          [class.refreshing]="store.refreshing()"
+          [cells]="cells()"
+          [label]="boardLabel()"
+          [selected]="selectedKey()"
+          [loading]="store.loading()"
+          (select)="pick($event)"
+        />
+
+        @if (!store.loading()) {
+          <mh-hive-legend [items]="legend" />
+        }
+
+        <div class="mh-tiles totals">
+          @if (store.loading()) {
+            @for (i of [0, 1, 2]; track i) {
+              <mh-stat-tile label="" value="" [loading]="true" />
+            }
+          } @else {
+            @for (tile of totals(); track tile.key) {
+              <mh-stat-tile [label]="tile.label" [value]="tile.value" [hint]="tile.hint" />
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</ion-content>
+
+<mh-client-sheet
+  [(open)]="sheetOpen"
+  [client]="picked()"
+  [range]="store.range()"
+  [plans]="pickedPlans()"
+  [endingPlan]="pickedEnding()"
+/>

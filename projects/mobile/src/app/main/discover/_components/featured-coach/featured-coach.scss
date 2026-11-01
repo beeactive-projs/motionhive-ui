@@ -2,7 +2,13 @@
    no outline. Only the band, the portrait's place and the type are set
    here. */
 :host {
+  --strip: var(--mh-color-hive);
+
   display: block;
+}
+
+:host-context(.ion-palette-dark) {
+  --strip: var(--mh-color-divider);
 }
 
 .card {
@@ -11,12 +17,13 @@
 }
 
 /* The hive card's honeycomb band, as a mask so its colour stays a token:
-   cream with honey lines in light, the card's navy with honey lines in
-   dark. No glow: see-through honey over navy mixed to a grey patch. */
+   the cream with honey lines in light, a grey step above the card with
+   honey lines in dark (never navy: the hive token turns navy in dark for
+   the Home card, so dark picks the soft fill here). No glow. */
 .top {
   position: relative;
   height: 4.5rem;
-  background: var(--mh-color-hive);
+  background: var(--strip);
   isolation: isolate;
 }
 
@@ -94,14 +101,4 @@
   min-height: var(--mh-tap-target);
   margin: 0;
   font-weight: 600;
-}
-
-/* The main action without honey: the page's ink as the fill and the page
-   as the label, navy on the light card, white on the navy one. */
-.view {
-  --background: var(--ion-text-color);
-  --background-activated: var(--ion-text-color);
-  --background-hover: var(--ion-text-color);
-  --color: var(--ion-background-color);
-  --box-shadow: none;
 }

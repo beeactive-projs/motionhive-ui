@@ -43,6 +43,20 @@
         <path class="ring" [attr.d]="path" transform="rotate(90 50 50)" />
       }
     </svg>
+    <!-- The first load's honey, in its own box so its halo (a CSS filter)
+         follows the honey without blurring the cell under it. The cell's
+         own hexagon, grown from its centre: it never leaves the cell, so
+         it needs no clip (a clip did not hold over an animated layer in
+         WebKit). -->
+    @if (building()) {
+      <span class="glow">
+        <svg viewBox="6.7 0 86.6 100" preserveAspectRatio="xMidYMid meet">
+          <g transform="rotate(90 50 50)">
+            <path #glow class="glow-honey" [attr.d]="path" />
+          </g>
+        </svg>
+      </span>
+    }
     @if (cell.label) {
       <span class="label">{{ cell.label }}</span>
     }

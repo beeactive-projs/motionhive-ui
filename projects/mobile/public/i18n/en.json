@@ -291,6 +291,74 @@
       }
     }
   },
+  "clientHive": {
+    "board": "Your clients",
+    "cell": "{name}, {status}",
+    "empty": {
+      "action": "Invite a client",
+      "message": "Invite your first client and they will show up here.",
+      "title": "Your hive is empty"
+    },
+    "filter": {
+      "all": "All",
+      "attention": "Need attention",
+      "label": "Filter clients"
+    },
+    "headline": "{moved, plural, =0 {No clients trained} one {# of {total, plural, one {# client} other {# clients}} trained} other {# of {total, plural, one {# client} other {# clients}} trained}}",
+    "headlineAttention": "{count, plural, =0 {Nobody needs attention} one {# client needs attention} other {# clients need attention}}",
+    "legend": {
+      "noPlan": "No plan",
+      "plan": "How much of the plan is done",
+      "quiet": "No workout in 7 days"
+    },
+    "loadError": "Couldn't load your hive",
+    "range": {
+      "1w": "7 days",
+      "4w": "4 weeks",
+      "label": "Period"
+    },
+    "sheet": {
+      "actions": {
+        "assign": "Assign a plan",
+        "message": "Message",
+        "openPlan": "See the plan",
+        "profile": "Profile"
+      },
+      "lastWorkout": "Last workout",
+      "legend": {
+        "planned": "Planned",
+        "skipped": "Skipped",
+        "trained": "Done"
+      },
+      "loadError": "Couldn't load their week.",
+      "noWorkout": "No workouts yet.",
+      "planEnds": "{plan} ends {when}",
+      "records": "{count, plural, one {# record} other {# records}}",
+      "week": "This week",
+      "weekA11y": "This week: {trained} done, {planned} planned, {skipped} skipped",
+      "when": {
+        "today": "today",
+        "tomorrow": "tomorrow"
+      }
+    },
+    "status": {
+      "noPlan": "No plan yet",
+      "notStarted": "Hasn't started yet",
+      "plan": {
+        "1w": "{completed} of {due, plural, one {# workout} other {# workouts}} in the last 7 days",
+        "4w": "{completed} of {due, plural, one {# workout} other {# workouts}} in the last 4 weeks"
+      },
+      "quiet": "No workout for {days, plural, one {# day} other {# days}}"
+    },
+    "tapHint": "Tap a hexagon to see the client",
+    "totals": {
+      "before": "Before: {count}",
+      "percent": "{percent}%",
+      "plan": "Plan done",
+      "records": "Records",
+      "workouts": "Workouts"
+    }
+  },
   "clients": {
     "actions": {
       "acceptRequest": "Accept request",
@@ -1313,7 +1381,8 @@
         "kicker": "Your hive · last 7 days",
         "kickerFirst": "Your hive",
         "loadError": "Couldn't load your hive",
-        "seeClients": "See clients",
+        "loading": "Loading your hive",
+        "open": "Open your hive",
         "title": "{moved, plural, =0 {No clients trained} one {# of {total, plural, one {# client} other {# clients}} trained} other {# of {total, plural, one {# client} other {# clients}} trained}}"
       },
       "needs": {
@@ -1368,6 +1437,12 @@
           "today": "today",
           "tomorrow": "tomorrow"
         }
+      },
+      "shortcuts": {
+        "exercise": "New exercise",
+        "invite": "Invite client",
+        "program": "New program",
+        "title": "Shortcuts"
       }
     },
     "greeting": {
@@ -1398,6 +1473,7 @@
       "title": "Latest"
     },
     "search": "Search coaches, groups and sessions",
+    "slowLoad": "Taking longer than usual. Your connection may be slow.",
     "switchRole": {
       "comingSoon": "Coming soon",
       "footnote": "Your data stays in one account. Switching only changes what you see.",
@@ -1439,6 +1515,9 @@
         "headlinePlan": "{done} of {planned, plural, one {# workout} other {# workouts}} done",
         "kicker": "This week",
         "loadError": "Couldn't load your week",
+        "loading": "Loading your week",
+        "month": "Your month",
+        "monthLabel": "See your month",
         "planDone": "Plan done for the week.",
         "record": "Record on {weekday}",
         "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}",
@@ -1539,6 +1618,31 @@
       "notificationsOn": "Notifications on",
       "unmuted": "Unmuted"
     }
+  },
+  "monthHive": {
+    "board": "Your workouts in {month}",
+    "day": {
+      "label": "{date}: {what}",
+      "photo": "with a photo",
+      "workouts": "{count, plural, one {# workout} other {# workouts}}"
+    },
+    "empty": {
+      "current": "Nothing logged yet this month. Every workout lights a cell.",
+      "past": "Nothing logged in {month}."
+    },
+    "legend": {
+      "record": "Record",
+      "skipped": "Skipped",
+      "today": "Today",
+      "trained": "Trained"
+    },
+    "loadError": "Couldn't load this month",
+    "summary": {
+      "records": "{count, plural, one {# record} other {# records}}",
+      "skipped": "{count, plural, one {# skipped} other {# skipped}}",
+      "workouts": "{count, plural, =0 {No workouts} one {# workout} other {# workouts}}"
+    },
+    "tapHint": "Tap a day to open its workout"
   },
   "mySessions": {
     "cancelSheet": {
@@ -1807,7 +1911,9 @@
     "accountClosed": "Account closed",
     "needsYou": "Needs you",
     "latest": "Latest",
-    "search": "Search"
+    "search": "Search",
+    "clientHive": "Your hive",
+    "monthHive": "Your month"
   },
   "payments": {
     "badge": {

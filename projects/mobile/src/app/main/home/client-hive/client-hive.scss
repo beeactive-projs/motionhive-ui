@@ -1,0 +1,51 @@
+// The coach's hive page: the controls, one headline, the comb straight on
+// the page, its key and the totals, in the page's one rhythm (`.mh-page`).
+
+// Words over the comb, centred over it as the comb is centred on the page.
+.headline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding-top: 0.5rem;
+  text-align: center;
+}
+
+.headline ion-skeleton-text {
+  margin: 0;
+}
+
+.title {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-hero);
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+// Cells from 44px up to 4rem, whatever the phone: two rings fit an SE at
+// 130% text, a third ring scrolls sideways inside the board.
+.comb {
+  --cell-min: 2.75rem;
+  --cell-max: 4rem;
+  padding-block: 0.5rem;
+  transition: opacity 0.2s ease;
+}
+
+// A reread for the other range: the comb stays, a touch quieter.
+.comb.refreshing {
+  opacity: 0.6;
+}
+
+.filters {
+  justify-content: center;
+}
+
+.totals {
+  padding-top: 0.5rem;
+}

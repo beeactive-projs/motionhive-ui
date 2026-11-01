@@ -1,8 +1,8 @@
 <!--
   Calm: the greeting, then three blocks at most (the hive, Needs you,
-  Latest). Lists are flat rows on the page, no grey cards around them; the
-  hive card is the one card. A small Today row joins only on a day with
-  sessions.
+  Latest), and the shortcuts at the bottom. Lists are flat rows on the
+  page, no grey cards around them; the hive card is the one card. A small
+  Today row joins only on a day with sessions.
 -->
 <div class="greeting">
   <ion-note class="mh-kicker" color="medium">{{ dateLine() }}</ion-note>
@@ -12,21 +12,26 @@
 <!--
   The hive: the coach in the middle, each client a cell around them,
   filled by how their last 7 days went. One picture with a summary for a
-  screen reader, one headline, one link; the clients themselves are a tap
-  away on the Clients tab.
+  screen reader, one headline, and the whole card opens the full hive.
+  Before the roster arrives the comb builds itself, with placeholder lines
+  where the words go.
 -->
 <div class="hive-wrap">
   <div class="hive-card coach" [class.two-rings]="twoRings()">
-    @if (store.rosterLoading() && !store.roster()) {
-      <div class="hive-row">
-        <ion-skeleton-text class="comb-skeleton" [animated]="true" />
-        <div class="hive-copy">
-          <ion-skeleton-text [animated]="true" style="width: 50%; height: 0.625rem" />
-          <ion-skeleton-text [animated]="true" style="width: 80%; height: 1.125rem" />
-          <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.75rem" />
+    @if (building()) {
+      <div class="hive-row" aria-busy="true">
+        <mh-hive
+          [cells]="buildCells"
+          [label]="'home.coach.hive.loading' | translate"
+          [building]="true"
+        />
+        <div class="hive-copy" aria-hidden="true">
+          <ion-skeleton-text class="line-kicker" />
+          <ion-skeleton-text class="line-title" />
+          <ion-skeleton-text class="line-link" />
         </div>
       </div>
-    } @else if (store.showRosterError()) {
+    } @else if (hiveState() === LoadStates.Failed) {
       <div class="hive-copy">
         <h2 class="hive-title">{{ 'home.coach.hive.loadError' | translate }}</h2>
         <p class="hive-sub">{{ 'error.checkConnection' | translate }}</p>
@@ -53,14 +58,26 @@
         <div class="hive-copy">
           <p class="hive-kicker">{{ 'home.coach.hive.kicker' | translate }}</p>
           <h2 class="hive-title">{{ hiveTitle() }}</h2>
-          <ion-button class="hive-link" fill="clear" (click)="openClients()">
-            {{ 'home.coach.hive.seeClients' | translate }}
-            <ion-icon slot="end" name="chevron-forward-outline" aria-hidden="true" />
-          </ion-button>
+          <!-- The words of the card's one control, below, to the eye. -->
+          <span class="hive-link" aria-hidden="true">
+            {{ 'home.coach.hive.open' | translate }}
+            <ion-icon name="chevron-forward-outline" />
+          </span>
         </div>
       </div>
+      <!-- The whole card is the tap target: one button laid over it. -->
+      <ion-button
+        class="hive-open"
+        fill="clear"
+        [attr.aria-label]="'home.coach.hive.open' | translate"
+        (click)="openHive()"
+      />
     }
   </div>
+
+  @if (hiveState() === LoadStates.Slow) {
+    <p class="slow-note" role="status">{{ 'home.slowLoad' | translate }}</p>
+  }
 </div>
 
 <!-- Today's sessions, only on a day that has some: one small row. -->
@@ -107,6 +124,18 @@
       }
     </ion-list>
   </section>
+} @else if (!store.needsAnswered()) {
+  <!-- First load: the head, and rows standing in for the people. -->
+  <section class="mh-section" aria-busy="true">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.coach.needs.title' | translate }}</h2>
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (row of [0, 1, 2]; track row) {
+        <mh-row-skeleton [index]="row" />
+      }
+    </ion-list>
+  </section>
 }
 
 <!--
@@ -124,6 +153,17 @@
     <ion-list class="mh-flat-list">
       @for (row of latest(); track row.id) {
         <mh-latest-row [row]="row" (select)="openRow(row)" />
+      }
+    </ion-list>
+  </section>
+} @else if (!store.activityAnswered()) {
+  <section class="mh-section" aria-busy="true">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.latest.title' | translate }}</h2>
+    </div>
+    <ion-list class="mh-flat-list">
+      @for (row of [0, 1]; track row) {
+        <mh-row-skeleton [index]="row" />
       }
     </ion-list>
   </section>
@@ -146,6 +186,34 @@
         </ion-item>
       }
     </ion-list>
+  </section>
+}
+
+<!--
+  What a coach makes now and then rather than daily, small and last: three
+  equal tiles, an icon over a word or two.
+-->
+@if (shortcuts().length) {
+  <section class="mh-section">
+    <div class="mh-section-head">
+      <h2 class="mh-kicker">{{ 'home.coach.shortcuts.title' | translate }}</h2>
+    </div>
+    <div class="shortcuts">
+      @for (shortcut of shortcuts(); track shortcut.id) {
+        <ion-button class="shortcut" (click)="openShortcut(shortcut)">
+          <span class="shortcut-inner">
+            <mh-hex-avatar
+              size="sm"
+              color="primary"
+              tone="wash"
+              aria-hidden="true"
+              [icon]="shortcut.icon"
+            />
+            <span class="shortcut-label">{{ shortcut.label | translate }}</span>
+          </span>
+        </ion-button>
+      }
+    </div>
   </section>
 }
 

@@ -74,23 +74,41 @@ export class TrainHomeStore {
   /** Set on an answer only: a failed read is not "nobody". */
   private readonly _coachesLoaded = signal(false);
   private readonly _groupsLoaded = signal(false);
+  /** Each read has answered at least once, either way: its block can stop shimmering. */
+  private readonly _coachesAnswered = signal(false);
+  private readonly _groupsAnswered = signal(false);
+  private readonly _feedAnswered = signal(false);
+  private readonly _progressAnswered = signal(false);
 
   readonly inProgress = this._inProgress.asReadonly();
   readonly streakWeeks = this._streakWeeks.asReadonly();
   readonly coaches = this._coaches.asReadonly();
   readonly groups = this._groups.asReadonly();
 
-  /** The card shimmers until both the plan and the week's workouts are in. */
-  readonly showWeekSkeleton = computed(() => this._weekLoading() && !this._weekShown());
-  /** Only when there is no older week on screen to keep showing. */
-  readonly showWeekError = computed(
-    () => !this._weekLoading() && this._weekFailed() && !this._weekShown(),
-  );
+  /**
+   * What the week card is drawn from (`loadState` in `home.config.ts`): it
+   * builds until both the plan and the week's workouts are in, and a failed
+   * reload keeps the week it showed.
+   */
+  readonly weekShown = this._weekShown.asReadonly();
+  readonly weekLoading = this._weekLoading.asReadonly();
+  readonly weekFailed = this._weekFailed.asReadonly();
+
   /**
    * Both people reads answered. A failure leaves it false, so "Build your
    * hive" is never offered to someone whose coaches did not load.
    */
   readonly peopleLoaded = computed(() => this._coachesLoaded() && this._groupsLoaded());
+
+  /**
+   * Both people reads answered once, either way: the first load's
+   * placeholder row gives way, to the people, to "Build your hive", or to
+   * nothing on a failure. A reload never brings it back.
+   */
+  readonly peopleAnswered = computed(() => this._coachesAnswered() && this._groupsAnswered());
+
+  /** Latest's two reads (the feed, and the records in Progress) answered once. */
+  readonly latestAnswered = computed(() => this._feedAnswered() && this._progressAnswered());
 
   readonly plan = computed<TrainingDayWorkout[]>(() => this._trainingDay()?.week ?? []);
 
@@ -192,6 +210,7 @@ export class TrainHomeStore {
       (overview) => {
         this._streakWeeks.set(overview?.streak.currentWeeks ?? 0);
         this._records.set(overview?.records ?? []);
+        this._progressAnswered.set(true);
       },
     );
   }
@@ -199,6 +218,7 @@ export class TrainHomeStore {
   private _loadCoaches(settle: () => void): void {
     this._read(this._clientService.getMyInstructors({ silent: true }), settle).subscribe(
       (rows) => {
+        this._coachesAnswered.set(true);
         if (!rows) return;
         this._coaches.set(rows);
         this._coachesLoaded.set(true);
@@ -208,6 +228,7 @@ export class TrainHomeStore {
 
   private _loadGroups(settle: () => void): void {
     this._read(this._groupService.getMyGroups({ silent: true }), settle).subscribe((groups) => {
+      this._groupsAnswered.set(true);
       if (!groups) return;
       this._groups.set(groups);
       this._groupsLoaded.set(true);
@@ -216,7 +237,10 @@ export class TrainHomeStore {
 
   private _loadFeed(settle: () => void): void {
     this._read(this._postService.getFeed(1, FEED_LIMIT, { silent: true }), settle).subscribe(
-      (page) => this._posts.set(page?.items ?? []),
+      (page) => {
+        this._posts.set(page?.items ?? []);
+        this._feedAnswered.set(true);
+      },
     );
   }
 

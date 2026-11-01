@@ -29,6 +29,20 @@ export const homeRoutes: Routes = [
     title: 'pageTitle.needsYou',
   },
   {
+    // The coach's whole hive, from the Home hive card: every client as a
+    // cell, a tap opens their sheet.
+    path: 'hive',
+    canActivate: [coachGuard],
+    loadComponent: () => import('./client-hive/client-hive').then((m) => m.ClientHive),
+    title: 'pageTitle.clientHive',
+  },
+  {
+    // The trainee's month as a honeycomb, from the Home week card.
+    path: 'month',
+    loadComponent: () => import('./month-hive/month-hive').then((m) => m.MonthHive),
+    title: 'pageTitle.monthHive',
+  },
+  {
     // The last two weeks by day, from Latest's "See all"; either side's.
     path: 'latest',
     loadComponent: () => import('./latest/latest').then((m) => m.Latest),
@@ -181,6 +195,13 @@ export const homeRoutes: Routes = [
         // The header's role pill.
         path: 'switch-role',
         loadComponent: () => import('../more/switch-role/switch-role').then((m) => m.SwitchRole),
+      },
+      {
+        // The shortcuts' "New exercise"; Close and Save come back to Home.
+        path: 'new-exercise',
+        loadComponent: () =>
+          import('../exercises/exercise-create/exercise-create').then((m) => m.ExerciseCreate),
+        title: 'pageTitle.newExercise',
       },
       // A client's plan, from their page: the week grid, a day, who is on it.
       ...programPageRoutes,

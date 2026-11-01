@@ -1,7 +1,8 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, effect, ElementRef, input, viewChildren } from '@angular/core';
 
 import { HEX_PATH } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { HEX_HEIGHT, HiveCell, HiveCellKinds, HiveFills } from '../../home.config';
+import { prefersReducedMotion } from '../../../../_shared/utils/motion';
+import { buildFrames, HEX_HEIGHT, HIVE_BUILD, HiveCell, HiveCellKinds, HiveFills } from '../../home.config';
 
 /** Gradient and clip ids are document-wide, so every instance needs its own. */
 let seq = 0;
@@ -14,6 +15,11 @@ let seq = 0;
  * and this only paints. A filled cell's honey rises from the bottom once,
  * when the cell first appears; reduced motion shows it already poured.
  *
+ * `building` is the first load's comb (`buildingCells()`): empty cells that
+ * light with a softly glowing honey one after another, hold lit, and go
+ * out as one, in a loop (`buildFrames`), while the data is on its way.
+ * Reduced motion leaves them as still, empty cells.
+ *
  * It is one picture to a screen reader: `label` says what it shows, and the
  * cells are hidden. Its size is the placing card's: one cell is `--cell`
  * wide (see `hive.scss`).
@@ -25,6 +31,7 @@ let seq = 0;
   host: {
     role: 'img',
     '[attr.aria-label]': 'label()',
+    '[class.building]': 'building()',
     '[style.--w]': 'width()',
     '[style.--h]': 'height()',
   },
@@ -32,6 +39,7 @@ let seq = 0;
 export class Hive {
   readonly cells = input.required<readonly HiveCell[]>();
   readonly label = input.required<string>();
+  readonly building = input(false);
 
   readonly Kinds = HiveCellKinds;
   readonly Fills = HiveFills;
@@ -45,4 +53,29 @@ export class Hive {
 
   readonly width = computed(() => Math.max(0, ...this.cells().map((cell) => cell.x)) + 1);
   readonly height = computed(() => Math.max(0, ...this.cells().map((cell) => cell.y)) + HEX_HEIGHT);
+
+  private readonly _glows = viewChildren<ElementRef<SVGPathElement>>('glow');
+
+  constructor() {
+    // The build runs on the Web Animations API: each cell has its own
+    // keyframes (it lights at its turn, all go out together), which one CSS
+    // keyframe set shared by every cell cannot say. A level is how far the
+    // honey has grown from the cell's centre.
+    effect((onCleanup) => {
+      const glows = this._glows().map((glow) => glow.nativeElement);
+      if (!this.building() || prefersReducedMotion()) return;
+      if (!glows.length || typeof glows[0]!.animate !== 'function') return;
+      const running = glows.map((glow, i) =>
+        glow.animate(
+          buildFrames(i).map(({ offset, level }) => ({
+            offset,
+            transform: `scale(${level})`,
+            easing: 'ease-in-out',
+          })),
+          { duration: HIVE_BUILD.loopMs, iterations: Infinity },
+        ),
+      );
+      onCleanup(() => running.forEach((animation) => animation.cancel()));
+    });
+  }
 }

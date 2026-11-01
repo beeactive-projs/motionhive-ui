@@ -1,7 +1,7 @@
 <!-- The coach of the week: a honeycomb band the portrait rides over, the
      name, what they coach, a line of their own words, then the two ways
-     on. View profile is this card's main action, navy rather than honey:
-     the tab keeps honey for what is picked. -->
+     on. View profile is this card's main action, in honey; Message is the
+     quiet one beside it. -->
 <ion-card class="card">
   <div class="top" aria-hidden="true">
     <mh-hex-avatar
@@ -26,7 +26,7 @@
       <p class="quote">{{ 'discover.featured.quote' | translate: { text: quote } }}</p>
     }
     <div class="actions">
-      <ion-button class="view" [disabled]="!coach().handle" (click)="viewProfile.emit()">
+      <ion-button [disabled]="!coach().handle" (click)="viewProfile.emit()">
         {{ 'discover.featured.viewProfile' | translate }}
       </ion-button>
       <ion-button class="mh-quiet" fill="outline" (click)="message.emit()">

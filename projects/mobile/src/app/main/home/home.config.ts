@@ -438,6 +438,172 @@ export function weekLine(summary: WeekSummary, streakWeeks: number): WeekLine | 
   return null;
 }
 
+// ─── First load ──────────────────────────────────────────────────
+
+/**
+ * How long a first load may take before Home adds one calm line under the
+ * hive card saying it is still on its way. Nothing waits on it.
+ */
+export const SLOW_LOAD_MS = 8000;
+
+/**
+ * Where the hive card stands. Only a first load (or a retry after a failed
+ * one) builds the comb: a reload, from pull to refresh or coming back to
+ * the tab, keeps what is on screen and refreshes it in place.
+ */
+export const LoadStates = {
+  /** Nothing has arrived yet: the comb builds itself while the data comes. */
+  First: 'first',
+  /** The same, past `SLOW_LOAD_MS`, with the line under the card. */
+  Slow: 'slow',
+  /** The first load failed and there is nothing to keep showing. */
+  Failed: 'failed',
+  /** Something is on screen. */
+  Shown: 'shown',
+} as const;
+
+export type LoadState = (typeof LoadStates)[keyof typeof LoadStates];
+
+/** What the card knows about its reads. */
+export interface LoadFacts {
+  /** Data has been shown at least once. */
+  shown: boolean;
+  /** A read is under way. */
+  loading: boolean;
+  /** The last read failed. */
+  failed: boolean;
+  /** `SLOW_LOAD_MS` has passed since this first load started. */
+  slow: boolean;
+}
+
+/** Shown data wins over everything; a retry under way builds again. */
+export function loadState(facts: LoadFacts): LoadState {
+  if (facts.shown) return LoadStates.Shown;
+  if (facts.failed && !facts.loading) return LoadStates.Failed;
+  return facts.slow ? LoadStates.Slow : LoadStates.First;
+}
+
+/** The comb is building, with or without the line under the card. */
+export function isBuilding(state: LoadState): boolean {
+  return state === LoadStates.First || state === LoadStates.Slow;
+}
+
+/**
+ * The comb a first load builds: the centre and one ring, the footprint
+ * both cards draw most (the trainee's week is this very shape). Every
+ * place is an empty cell, in the order they light: the centre, then the
+ * ring clockwise from the upper left.
+ */
+export function buildingCells(): HiveCell[] {
+  return ringPlaces(RING_ONE_SIZE).map((place, i) => ({
+    ...place,
+    key: `build-${i}`,
+    kind: HiveCellKinds.Ghost,
+    fill: null,
+    label: '',
+    ring: null,
+    dot: false,
+  }));
+}
+
+/**
+ * One loop of the build, in milliseconds: the cells light with honey one
+ * after another, the whole comb holds lit, then goes out as one and starts
+ * again.
+ */
+export const HIVE_BUILD = {
+  /** The whole loop, the rest after the fade included. */
+  loopMs: 3000,
+  /** From one cell starting to light to the next. */
+  stepMs: 150,
+  /** How long one cell takes to light. */
+  riseMs: 350,
+  /** When the comb starts to go out, from the loop's start. */
+  fadeAtMs: 2100,
+  /** How long going out takes. */
+  fadeMs: 500,
+} as const;
+
+export type HiveBuildTiming = { readonly [K in keyof typeof HIVE_BUILD]: number };
+
+/**
+ * A keyframe of a cell's glow: how far it has lit (0 to 1) at a point of
+ * the loop (0 to 1). A level, not an opacity: honey faded over the navy
+ * card in dark mixes to an olive grey, so the glow grows and shrinks whole.
+ */
+export interface BuildFrame {
+  offset: number;
+  level: number;
+}
+
+/**
+ * The glow of the cell that lights `index`th, as keyframes over one loop:
+ * out until its turn, lit `riseMs` later, lit until the whole comb goes out
+ * together, out through the rest.
+ */
+export function buildFrames(index: number, timing: HiveBuildTiming = HIVE_BUILD): BuildFrame[] {
+  const at = (ms: number) => round(Math.min(ms, timing.loopMs) / timing.loopMs);
+  const on = Math.min(index * timing.stepMs, timing.fadeAtMs);
+  const lit = Math.min(on + timing.riseMs, timing.fadeAtMs);
+  return [
+    { offset: 0, level: 0 },
+    { offset: at(on), level: 0 },
+    { offset: at(lit), level: 1 },
+    { offset: at(timing.fadeAtMs), level: 1 },
+    { offset: at(timing.fadeAtMs + timing.fadeMs), level: 0 },
+    { offset: 1, level: 0 },
+  ];
+}
+
+// ─── The coach's shortcuts ───────────────────────────────────────
+
+export const ShortcutIds = {
+  Program: 'program',
+  Invite: 'invite',
+  Exercise: 'exercise',
+} as const;
+
+export type ShortcutId = (typeof ShortcutIds)[keyof typeof ShortcutIds];
+
+export interface Shortcut {
+  id: ShortcutId;
+  /** A translation key. */
+  label: string;
+  icon: string;
+}
+
+/**
+ * Small ways, at the bottom of the coach's Home, to what a coach makes now
+ * and then rather than daily. The glyphs are the Menu's: albums for
+ * programs, the flash for exercises.
+ */
+export const COACH_SHORTCUTS: readonly Shortcut[] = [
+  { id: ShortcutIds.Program, label: 'home.coach.shortcuts.program', icon: 'albums-outline' },
+  { id: ShortcutIds.Invite, label: 'home.coach.shortcuts.invite', icon: 'person-add-outline' },
+  { id: ShortcutIds.Exercise, label: 'home.coach.shortcuts.exercise', icon: 'flash-outline' },
+];
+
+/** What the rest of the screen already offers. */
+export interface OnScreen {
+  /** The first week's hive card, with its honey "Invite clients". */
+  invite: boolean;
+  /** The first week's "Create your first program" step. */
+  program: boolean;
+}
+
+/**
+ * The shortcuts Home shows: all three, less any action the screen already
+ * offers above them. The same action twice on one screen reads as two
+ * different things.
+ */
+export function coachShortcuts(onScreen: OnScreen): Shortcut[] {
+  return COACH_SHORTCUTS.filter(
+    (shortcut) =>
+      !(shortcut.id === ShortcutIds.Invite && onScreen.invite) &&
+      !(shortcut.id === ShortcutIds.Program && onScreen.program),
+  );
+}
+
 // ─── Durations and names ─────────────────────────────────────────
 
 /**

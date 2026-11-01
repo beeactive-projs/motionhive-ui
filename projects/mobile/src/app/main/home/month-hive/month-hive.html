@@ -1,0 +1,112 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>{{ 'pageTitle.monthHive' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!--
+  The month on the page: the month and its arrows, what it adds up to, the
+  comb (one row a week, Monday first) and its key. The month changes in
+  place; its shape shows at once and the days light as they arrive.
+-->
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  <div class="mh-page">
+    <!-- The date filter: the month, a month back, a month on (never past
+         this one). In the page rather than the header, where a long month
+         name at a large text size had no room beside two arrows. -->
+    <div class="nav">
+      <h2 class="month">{{ title() }}</h2>
+      <ion-button
+        fill="clear"
+        [attr.aria-label]="'a11y.previousMonth' | translate"
+        (click)="step(-1)"
+      >
+        <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [disabled]="!hasNext()"
+        [attr.aria-label]="'a11y.nextMonth' | translate"
+        (click)="step(1)"
+      >
+        <ion-icon slot="icon-only" name="chevron-forward-outline" aria-hidden="true" />
+      </ion-button>
+    </div>
+
+    <div class="summary" aria-live="polite">
+      @if (store.loading()) {
+        <ion-skeleton-text [animated]="true" style="width: 45%; height: 1.375rem" />
+        <ion-skeleton-text [animated]="true" style="width: 60%; height: 0.875rem" />
+      } @else if (!store.showError()) {
+        <h3 class="title">{{ headline() }}</h3>
+        @if (line()) {
+          <p class="line">{{ line() }}</p>
+        }
+      }
+    </div>
+
+    @if (store.showError()) {
+      <mh-empty-state
+        icon="cloud-offline-outline"
+        [heading]="'monthHive.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="retry()"
+      />
+    } @else {
+      <mh-hive-board
+        class="comb"
+        [cells]="cells()"
+        [headers]="letters"
+        [label]="boardLabel()"
+        [loading]="store.loading()"
+        (select)="pick($event)"
+      />
+
+      @if (!store.loading()) {
+        @if (summary().workouts) {
+          <p class="hint">{{ 'monthHive.tapHint' | translate }}</p>
+        } @else {
+          <p class="hint">{{ emptyLine() }}</p>
+        }
+        <mh-hive-legend [items]="legend" />
+      }
+    }
+  </div>
+</ion-content>
+
+<!-- A day with two workouts or more: which one to open. -->
+<ng-template #dayBody>
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (row of sheetRows(); track row.id) {
+      <ion-item button [detail]="true" (click)="openFromSheet(row.id)">
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          color="primary"
+          tone="wash"
+          [icon]="row.record ? 'trophy-outline' : 'barbell-outline'"
+        />
+        <ion-label>
+          <h2>{{ row.title }}</h2>
+          <p>{{ row.detail }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="sheetOpen"
+  [title]="sheetTitle()"
+  [body]="dayBody"
+  [fit]="true"
+  [showFooter]="false"
+/>

@@ -291,6 +291,74 @@
       }
     }
   },
+  "clientHive": {
+    "board": "Clienții tăi",
+    "cell": "{name}, {status}",
+    "empty": {
+      "action": "Invită un client",
+      "message": "Invită primul client și îl vei vedea aici.",
+      "title": "Stupul tău e gol"
+    },
+    "filter": {
+      "all": "Toți",
+      "attention": "Au nevoie de atenție",
+      "label": "Filtrează clienții"
+    },
+    "headline": "{moved, plural, =0 {Niciun client nu s-a antrenat} one {# din {total, plural, one {# client} few {# clienți} other {# de clienți}} s-a antrenat} few {# din {total, plural, one {# client} few {# clienți} other {# de clienți}} s-au antrenat} other {# din {total, plural, one {# client} few {# clienți} other {# de clienți}} s-au antrenat}}",
+    "headlineAttention": "{count, plural, =0 {Nimeni nu are nevoie de atenție} one {# client are nevoie de atenție} few {# clienți au nevoie de atenție} other {# de clienți au nevoie de atenție}}",
+    "legend": {
+      "noPlan": "Fără plan",
+      "plan": "Cât din plan e făcut",
+      "quiet": "Fără antrenament de 7 zile"
+    },
+    "loadError": "Nu am putut încărca stupul",
+    "range": {
+      "1w": "7 zile",
+      "4w": "4 săptămâni",
+      "label": "Perioada"
+    },
+    "sheet": {
+      "actions": {
+        "assign": "Atribuie un plan",
+        "message": "Scrie-i",
+        "openPlan": "Vezi planul",
+        "profile": "Profil"
+      },
+      "lastWorkout": "Ultimul antrenament",
+      "legend": {
+        "planned": "Planificat",
+        "skipped": "Sărit",
+        "trained": "Făcut"
+      },
+      "loadError": "Nu am putut încărca săptămâna.",
+      "noWorkout": "Niciun antrenament încă.",
+      "planEnds": "{plan} se termină {when}",
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
+      "week": "Săptămâna aceasta",
+      "weekA11y": "Săptămâna aceasta: {trained, plural, one {# făcut} few {# făcute} other {# de făcute}}, {planned, plural, one {# planificat} few {# planificate} other {# de planificate}}, {skipped, plural, one {# sărit} few {# sărite} other {# de sărite}}",
+      "when": {
+        "today": "azi",
+        "tomorrow": "mâine"
+      }
+    },
+    "status": {
+      "noPlan": "Niciun plan încă",
+      "notStarted": "Nu a început încă",
+      "plan": {
+        "1w": "{completed} din {due, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}} în ultimele 7 zile",
+        "4w": "{completed} din {due, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}} în ultimele 4 săptămâni"
+      },
+      "quiet": "Nu s-a mai antrenat de {days, plural, one {o zi} few {# zile} other {# de zile}}"
+    },
+    "tapHint": "Atinge un hexagon ca să vezi clientul",
+    "totals": {
+      "before": "Înainte: {count}",
+      "percent": "{percent}%",
+      "plan": "Plan îndeplinit",
+      "records": "Recorduri",
+      "workouts": "Antrenamente"
+    }
+  },
   "clients": {
     "actions": {
       "acceptRequest": "Acceptă cererea",
@@ -1313,7 +1381,8 @@
         "kicker": "Stupul tău · ultimele 7 zile",
         "kickerFirst": "Stupul tău",
         "loadError": "Nu am putut încărca stupul",
-        "seeClients": "Vezi clienții",
+        "loading": "Se încarcă stupul",
+        "open": "Vezi tot stupul",
         "title": "{moved, plural, =0 {Niciun client nu s-a antrenat} one {# din {total, plural, one {# client} few {# clienți} other {# de clienți}} s-a antrenat} few {# din {total, plural, one {# client} few {# clienți} other {# de clienți}} s-au antrenat} other {# din {total, plural, one {# client} few {# clienți} other {# de clienți}} s-au antrenat}}"
       },
       "needs": {
@@ -1368,6 +1437,12 @@
           "today": "azi",
           "tomorrow": "mâine"
         }
+      },
+      "shortcuts": {
+        "exercise": "Exercițiu nou",
+        "invite": "Invită un client",
+        "program": "Program nou",
+        "title": "Scurtături"
       }
     },
     "greeting": {
@@ -1398,6 +1473,7 @@
       "title": "Noutăți"
     },
     "search": "Caută antrenori, grupuri și sesiuni",
+    "slowLoad": "Durează mai mult decât de obicei. Poate conexiunea e lentă.",
     "switchRole": {
       "comingSoon": "În curând",
       "footnote": "Datele tale rămân într-un singur cont. Schimbarea rolului modifică doar ce vezi.",
@@ -1439,6 +1515,9 @@
         "headlinePlan": "{done} din {planned, plural, one {# antrenament făcut} few {# antrenamente făcute} other {# de antrenamente făcute}}",
         "kicker": "Săptămâna asta",
         "loadError": "Nu am putut încărca săptămâna",
+        "loading": "Se încarcă săptămâna",
+        "month": "Luna ta",
+        "monthLabel": "Vezi luna ta",
         "planDone": "Ai terminat planul pe săptămâna asta.",
         "record": "Record nou {weekday}",
         "streak": "{count, plural, one {# săptămână la rând} few {# săptămâni la rând} other {# de săptămâni la rând}}",
@@ -1539,6 +1618,31 @@
       "notificationsOn": "Notificări activate",
       "unmuted": "Notificări activate"
     }
+  },
+  "monthHive": {
+    "board": "Antrenamentele tale din {month}",
+    "day": {
+      "label": "{date}: {what}",
+      "photo": "cu poză",
+      "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
+    },
+    "empty": {
+      "current": "Nimic înregistrat încă luna aceasta. Fiecare antrenament aprinde o celulă.",
+      "past": "Nimic înregistrat în {month}."
+    },
+    "legend": {
+      "record": "Record",
+      "skipped": "Sărit",
+      "today": "Azi",
+      "trained": "Antrenament"
+    },
+    "loadError": "Nu am putut încărca luna",
+    "summary": {
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
+      "skipped": "{count, plural, one {# antrenament sărit} few {# antrenamente sărite} other {# de antrenamente sărite}}",
+      "workouts": "{count, plural, =0 {Niciun antrenament} one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
+    },
+    "tapHint": "Atinge o zi ca să vezi antrenamentul"
   },
   "mySessions": {
     "cancelSheet": {
@@ -1807,7 +1911,9 @@
     "accountClosed": "Cont închis",
     "needsYou": "Au nevoie de tine",
     "latest": "Noutăți",
-    "search": "Căutare"
+    "search": "Căutare",
+    "clientHive": "Stupul tău",
+    "monthHive": "Luna ta"
   },
   "payments": {
     "badge": {

@@ -13,35 +13,45 @@ import {
 } from 'core';
 
 import {
+  COACH_SHORTCUTS,
   ClientHiveStates,
   EndDays,
   GreetingPeriods,
+  HIVE_BUILD,
   HiveCellKinds,
   HiveFills,
   HiveRings,
   LatestCopy,
   LatestKinds,
+  LoadStates,
   NeedActions,
   NeedCopy,
   NeedItem,
   NeedReasons,
   RING_ONE_SIZE,
   RINGS_SIZE,
+  SLOW_LOAD_MS,
+  ShortcutIds,
   WeekLineKinds,
   WeekSummary,
+  buildFrames,
+  buildingCells,
   clientFill,
   clientHiveState,
   coachHiveCells,
   coachLatest,
+  coachShortcuts,
   dayGroups,
   endDay,
   firstNameOf,
   greetingPeriod,
   initialsOf,
+  isBuilding,
   knownDuration,
   latestCapped,
   latestPreview,
   latestRow,
+  loadState,
   movedCount,
   needGroups,
   needItems,
@@ -180,6 +190,113 @@ describe('honeycomb geometry', () => {
     const counts = new Map<number, number>();
     for (const p of places) counts.set(p.y, (counts.get(p.y) ?? 0) + 1);
     expect([...counts.entries()].sort((a, b) => a[0] - b[0]).map(([, n]) => n)).toEqual([3, 4, 5, 4, 3]);
+  });
+});
+
+describe('loadState', () => {
+  const facts = { shown: false, loading: false, failed: false, slow: false };
+
+  it('builds while nothing has arrived, and says so once the load is slow', () => {
+    expect(loadState({ ...facts, loading: true })).toBe(LoadStates.First);
+    expect(loadState({ ...facts, loading: true, slow: true })).toBe(LoadStates.Slow);
+    // Before the first read has even started.
+    expect(loadState(facts)).toBe(LoadStates.First);
+  });
+
+  it('keeps shown data on screen through a reload, a slow one, and a failed one', () => {
+    expect(loadState({ ...facts, shown: true, loading: true })).toBe(LoadStates.Shown);
+    expect(loadState({ ...facts, shown: true, loading: true, slow: true })).toBe(LoadStates.Shown);
+    expect(loadState({ ...facts, shown: true, failed: true })).toBe(LoadStates.Shown);
+  });
+
+  it('fails only with nothing to show, and builds again while a retry runs', () => {
+    expect(loadState({ ...facts, failed: true })).toBe(LoadStates.Failed);
+    expect(loadState({ ...facts, failed: true, slow: true })).toBe(LoadStates.Failed);
+    expect(loadState({ ...facts, failed: true, loading: true })).toBe(LoadStates.First);
+  });
+
+  it('counts first and slow as building, never failed or shown', () => {
+    expect(isBuilding(LoadStates.First)).toBe(true);
+    expect(isBuilding(LoadStates.Slow)).toBe(true);
+    expect(isBuilding(LoadStates.Failed)).toBe(false);
+    expect(isBuilding(LoadStates.Shown)).toBe(false);
+  });
+
+  it('waits eight seconds before calling a load slow', () => {
+    expect(SLOW_LOAD_MS).toBe(8000);
+  });
+});
+
+describe('the building comb', () => {
+  it('builds the one-ring comb, the centre first, every cell empty', () => {
+    const cells = buildingCells();
+    expect(cells).toHaveLength(1 + RING_ONE_SIZE);
+    expect(cells.every((cell) => cell.kind === HiveCellKinds.Ghost && !cell.fill && !cell.label)).toBe(true);
+    expect(new Set(cells.map((cell) => cell.key)).size).toBe(cells.length);
+
+    // The week's footprint, so the trainee's card does not change size when it lands.
+    const key = (p: { x: number; y: number }) => `${p.x},${p.y}`;
+    expect(new Set(cells.map(key))).toEqual(new Set(weekPlaces().map(key)));
+
+    // The first cell is the centre: the same distance from every other.
+    const [centre, ...ring] = cells;
+    const distances = ring.map((p) => Math.hypot(p.x - centre!.x, p.y - centre!.y));
+    for (const distance of distances) expect(distance).toBeCloseTo(distances[0]!, 2);
+  });
+
+  it('lights the cells one after another, each a step after the last', () => {
+    const starts = buildingCells().map((_, i) => buildFrames(i)[1]!.offset);
+    expect(starts[0]).toBe(0);
+    for (let i = 1; i < starts.length; i++) {
+      expect(starts[i]! - starts[i - 1]!).toBeCloseTo(HIVE_BUILD.stepMs / HIVE_BUILD.loopMs, 3);
+    }
+  });
+
+  it('has the whole comb lit before it goes out, and puts it out as one', () => {
+    const frames = buildingCells().map((_, i) => buildFrames(i));
+    const fadeAt = HIVE_BUILD.fadeAtMs / HIVE_BUILD.loopMs;
+    for (const cell of frames) {
+      expect(cell[2]!.level).toBe(1);
+      expect(cell[2]!.offset).toBeLessThan(fadeAt);
+      expect(cell[3]).toEqual({ offset: fadeAt, level: 1 });
+      expect(cell[4]!.level).toBe(0);
+    }
+    expect(new Set(frames.map((cell) => cell[4]!.offset)).size).toBe(1);
+  });
+
+  it('writes keyframes the browser takes: in order, from 0 to 1, out at both ends', () => {
+    for (let i = 0; i < 12; i++) {
+      const frames = buildFrames(i);
+      expect(frames[0]).toEqual({ offset: 0, level: 0 });
+      expect(frames[frames.length - 1]).toEqual({ offset: 1, level: 0 });
+      for (let f = 1; f < frames.length; f++) {
+        expect(frames[f]!.offset).toBeGreaterThanOrEqual(frames[f - 1]!.offset);
+        expect(frames[f]!.offset).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it('leaves a rest after going out before the next loop', () => {
+    expect(HIVE_BUILD.fadeAtMs + HIVE_BUILD.fadeMs).toBeLessThan(HIVE_BUILD.loopMs);
+  });
+});
+
+describe('coachShortcuts', () => {
+  const ids = (onScreen: { invite: boolean; program: boolean }) =>
+    coachShortcuts(onScreen).map((shortcut) => shortcut.id);
+
+  it('offers a new program, an invite and a new exercise, in that order', () => {
+    expect(ids({ invite: false, program: false })).toEqual([
+      ShortcutIds.Program,
+      ShortcutIds.Invite,
+      ShortcutIds.Exercise,
+    ]);
+    for (const shortcut of COACH_SHORTCUTS) expect(shortcut.label).toMatch(/^home\.coach\.shortcuts\./);
+  });
+
+  it('leaves out what the first week already offers above them', () => {
+    expect(ids({ invite: true, program: false })).toEqual([ShortcutIds.Program, ShortcutIds.Exercise]);
+    expect(ids({ invite: true, program: true })).toEqual([ShortcutIds.Exercise]);
   });
 });
 

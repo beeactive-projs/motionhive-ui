@@ -22,6 +22,7 @@ import { take } from 'rxjs';
 import { ExerciseKind, ExerciseService } from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { HOME_STACK, homeOr, inHomeStack } from '../../home/home-stack.config';
 import { ExerciseDetailsFields } from '../_components/exercise-details-fields/exercise-details-fields';
 import { LevelSegment } from '../_components/level-segment/level-segment';
 import { MuscleEquipmentFields } from '../_components/muscle-equipment-fields/muscle-equipment-fields';
@@ -120,8 +121,9 @@ export class ExerciseCreate {
     this.save();
   }
 
+  /** Close: back to the stack the form was opened in (Home's shortcut, or the library). */
   cancel(): void {
-    void this._router.navigateByUrl('/tabs/exercises');
+    void this._router.navigateByUrl(homeOr(this._router.url, '/tabs/exercises'));
   }
 
   save(): void {
@@ -139,10 +141,11 @@ export class ExerciseCreate {
             this._translateService.instant('exercises.create.toast.created'),
           );
           // Replace, so Back from the new exercise returns to the library
-          // rather than walking back into a form that has already been sent.
-          void this._router.navigate(['/tabs/exercises', exercise.id], {
-            replaceUrl: true,
-          });
+          // (or Home) rather than walking back into a form already sent.
+          const page = inHomeStack(this._router.url)
+            ? [HOME_STACK, 'exercise', exercise.id]
+            : ['/tabs/exercises', exercise.id];
+          void this._router.navigate(page, { replaceUrl: true });
         },
         error: (error: unknown) => {
           this.saving.set(false);

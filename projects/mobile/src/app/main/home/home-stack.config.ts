@@ -37,6 +37,12 @@ export const HomePages = {
   Coaching: `${HOME_STACK}/coaching`,
   /** The role switch, from the header's role pill. */
   SwitchRole: `${HOME_STACK}/switch-role`,
+  /** The coach's whole hive, every client a cell, from the hive card. */
+  Hive: `${HOME_STACK}/hive`,
+  /** The trainee's month as a hive, a cell a day, from the week card. */
+  Month: `${HOME_STACK}/month`,
+  /** The exercise form, from the coach's "New exercise" shortcut. */
+  NewExercise: `${HOME_STACK}/new-exercise`,
 } as const;
 
 /** True when the URL is Home or a page pushed onto it. */

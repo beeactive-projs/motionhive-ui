@@ -94,7 +94,9 @@ ion-header {
   padding: var(--mh-page-rhythm) var(--mh-row-gutter);
 }
 
+// The hive card's own fill, so the body's building card lands on it.
 .card-skeleton {
+  --background: var(--mh-color-hive);
   height: 12.5rem;
   margin: 0;
   border-radius: var(--mh-radius-card);

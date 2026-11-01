@@ -206,11 +206,13 @@ export class WorkoutLogService {
   /**
    * Coach-side read: a specific client's workout history. BE 404s when
    * the caller isn't an ACTIVE coach of that client, so no extra
-   * permission gating is needed here.
+   * permission gating is needed here. `silent` as on `list`, for a sheet
+   * that says it could not load and offers a retry.
    */
   listForClient(
     clientId: string,
     query: CoachClientLogsQuery = {},
+    opts?: { silent?: boolean },
   ): Observable<PaginatedWorkoutLogs> {
     let p = new HttpParams();
     if (query.page !== undefined) p = p.set('page', String(query.page));
@@ -220,7 +222,7 @@ export class WorkoutLogService {
     if (query.dateTo) p = p.set('dateTo', query.dateTo);
     return this._http.get<PaginatedWorkoutLogs>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_LIST_FOR_CLIENT(clientId)}`,
-      { params: p },
+      { params: p, ...(opts?.silent ? { context: silentRequest() } : {}) },
     );
   }
 

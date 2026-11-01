@@ -1,0 +1,61 @@
+// The key under a hive board: small hexagons drawn as the board draws each
+// state, in the muted ink, wrapping whole items.
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.375rem 1rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-tight);
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.swatch {
+  flex: none;
+  width: 0.75rem;
+  height: 0.875rem;
+  overflow: visible;
+}
+
+.swatch path {
+  fill: var(--ion-card-background);
+  stroke-width: var(--mh-ring-width);
+  vector-effect: non-scaling-stroke;
+}
+
+[data-swatch='honey'] path {
+  fill: var(--ion-color-primary);
+}
+
+[data-swatch='dashed'] path {
+  fill: none;
+  stroke: var(--ion-color-medium);
+  stroke-width: var(--mh-hairline);
+  stroke-dasharray: 3 2;
+}
+
+[data-swatch='quiet'] path {
+  fill: none;
+  stroke: var(--ion-color-coral);
+}
+
+[data-swatch='today'] path {
+  fill: none;
+  stroke: var(--ion-color-primary);
+}
+
+.dot {
+  flex: none;
+  width: 0.375rem;
+  height: 0.375rem;
+  margin-inline: 0.125rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-text-color);
+}

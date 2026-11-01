@@ -62,6 +62,11 @@ export class CoachHomeStore {
   private readonly _hasPrograms = signal<boolean | null>(null);
   private readonly _hasSpecialties = signal<boolean | null>(null);
   private readonly _todayKey = signal(localDayKey(new Date()));
+  /** Each read has answered at least once, either way: its block can stop shimmering. */
+  private readonly _rosterAnswered = signal(false);
+  private readonly _activityAnswered = signal(false);
+  private readonly _assignmentsAnswered = signal(false);
+  private readonly _requestsAnswered = signal(false);
 
   readonly roster = this._roster.asReadonly();
   readonly agenda = this._agenda.asReadonly();
@@ -70,6 +75,8 @@ export class CoachHomeStore {
   readonly hasSpecialties = this._hasSpecialties.asReadonly();
 
   readonly rosterLoading = signal(true);
+  /** The last roster read failed (an older roster may still be on screen). */
+  readonly rosterFailed = this._rosterFailed.asReadonly();
 
   readonly clients = computed(() => this._roster()?.clients ?? []);
 
@@ -78,6 +85,18 @@ export class CoachHomeStore {
 
   /** Only when there is nothing older on screen to keep showing. */
   readonly showRosterError = computed(() => this._rosterFailed() && !this._roster());
+
+  /**
+   * Every read Needs you is made of has answered once, so the first load's
+   * placeholder rows can give way: to the rows, or to nothing when nobody
+   * needs the coach. A reload never brings them back.
+   */
+  readonly needsAnswered = computed(
+    () => this._rosterAnswered() && this._assignmentsAnswered() && this._requestsAnswered(),
+  );
+
+  /** Latest's read has answered once, the same way. */
+  readonly activityAnswered = this._activityAnswered.asReadonly();
 
   /** Everything that needs the coach, most pressing first (`needItems`). */
   readonly needs = computed(() =>
@@ -115,6 +134,7 @@ export class CoachHomeStore {
     this._read(this._rosterService.roster('1w', { silent: true }), settle).subscribe((roster) => {
       if (roster) this._roster.set(roster);
       this._rosterFailed.set(roster === null);
+      this._rosterAnswered.set(true);
       this.rosterLoading.set(false);
       if (roster?.clients.length === 0) this._loadFirstSteps();
     });
@@ -125,6 +145,7 @@ export class CoachHomeStore {
     this._read(this._rosterService.activity(ACTIVITY_LIMIT, { silent: true }), settle).subscribe(
       (items) => {
         if (items) this._activity.set(items);
+        this._activityAnswered.set(true);
       },
     );
   }
@@ -137,7 +158,10 @@ export class CoachHomeStore {
         { silent: true },
       ),
       settle,
-    ).subscribe((page) => this._assignments.set(page?.items ?? []));
+    ).subscribe((page) => {
+      this._assignments.set(page?.items ?? []);
+      this._assignmentsAnswered.set(true);
+    });
   }
 
   /** Silent: the Today row only shows on a day with sessions, so a failure leaves it away. */
@@ -163,9 +187,10 @@ export class CoachHomeStore {
 
   private _loadPendingRequests(settle: () => void): void {
     // `incoming` only: an invitation the coach sent waits on someone else.
-    this._read(this._clientService.getPendingRequestsCount(), settle).subscribe((response) =>
-      this._pendingRequests.set(response?.incoming ?? 0),
-    );
+    this._read(this._clientService.getPendingRequestsCount(), settle).subscribe((response) => {
+      this._pendingRequests.set(response?.incoming ?? 0);
+      this._requestsAnswered.set(true);
+    });
   }
 
   /**

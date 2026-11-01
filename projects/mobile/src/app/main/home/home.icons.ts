@@ -1,11 +1,13 @@
 import {
   addOutline,
+  albumsOutline,
   calendarOutline,
   checkmarkDoneOutline,
   chevronDownOutline,
   chevronForwardOutline,
   cloudOfflineOutline,
   createOutline,
+  flashOutline,
   peopleOutline,
   personAddOutline,
   playOutline,
@@ -23,12 +25,14 @@ import {
  */
 export const HOME_ICONS = {
   addOutline,
+  albumsOutline,
   calendarOutline,
   checkmarkDoneOutline,
   chevronDownOutline,
   chevronForwardOutline,
   cloudOfflineOutline,
   createOutline,
+  flashOutline,
   peopleOutline,
   personAddOutline,
   playOutline,

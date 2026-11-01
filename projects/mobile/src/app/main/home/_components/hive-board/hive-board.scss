@@ -1,0 +1,319 @@
+// A honeycomb on the page (or on a sheet): cells on the surface's own card
+// step, honey for what is done. Ionic has no shape primitive, so, like
+// `mh-hex-avatar` and the Home hive, the cells are SVG; every colour is a
+// token, so the grey dark follows by itself.
+//
+// One cell's width comes from the board's own width, between the page's
+// `--cell-min` and `--cell-max`. Past the minimum the comb is wider than
+// the board and the board scrolls sideways inside itself.
+:host {
+  display: block;
+  container-type: inline-size;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.honey-top {
+  stop-color: var(--mh-color-hive-honey-top);
+}
+
+.honey-base {
+  stop-color: var(--ion-color-primary);
+}
+
+.frame {
+  --_cell: clamp(var(--cell-min, 2.75rem), calc(100cqi / var(--w)), var(--cell-max, 4rem));
+
+  position: relative;
+  width: calc(var(--_cell) * var(--w));
+  margin-inline: auto;
+}
+
+// The weekday letters, one over each box of the first row.
+.heads {
+  position: relative;
+  height: 1.5rem;
+}
+
+.head {
+  position: absolute;
+  left: calc(var(--_cell) * var(--x));
+  width: var(--_cell);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
+.comb {
+  position: relative;
+  height: calc(var(--_cell) * var(--h));
+}
+
+// A box one cell wide and 1 / cos 30° tall, the hexagon's own proportion.
+.cell {
+  position: absolute;
+  left: calc(var(--_cell) * var(--x));
+  top: calc(var(--_cell) * var(--y));
+  width: var(--_cell);
+  height: calc(var(--_cell) * 1.155);
+  animation: board-pop 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
+  animation-delay: calc(var(--i) * 18ms);
+}
+
+// A cell you can tap is an `ion-button` with nothing of a button's own
+// look: the hexagon is the whole of it. The box overlaps its neighbours at
+// the corners, so the button takes no taps itself; the hexagon's hit path
+// does, and the tap reaches the button from there.
+ion-button.cell {
+  --background: transparent;
+  --background-activated: transparent;
+  --background-focused: transparent;
+  --background-hover: transparent;
+  --border-radius: 0;
+  --box-shadow: none;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --ripple-color: transparent;
+  --opacity: 1;
+  margin: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+// Over its neighbours while its sheet is open, so its ring is whole.
+.cell[data-selected] {
+  z-index: 2;
+}
+
+.face {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.18s ease;
+}
+
+ion-button.cell.ion-activated .face {
+  transform: scale(0.94);
+}
+
+.cell[data-selected] .face {
+  transform: scale(1.06);
+}
+
+svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+// ─── Looks ───────────────────────────────────────────────────────
+
+.base {
+  fill: var(--ion-card-background);
+}
+
+[data-look='ghost'] .base {
+  opacity: 0.4;
+}
+
+// No track: a client with no plan, a skipped day.
+[data-look='dashed'] .base {
+  fill: none;
+  stroke: var(--ion-color-medium);
+  stroke-width: var(--mh-hairline);
+  stroke-dasharray: 5 4;
+  vector-effect: non-scaling-stroke;
+}
+
+// The person alone (the coach): their avatar is the cell.
+[data-look='bare'] .base {
+  fill: none;
+}
+
+[data-faded] {
+  opacity: 0.55;
+}
+
+.honey {
+  transform-box: fill-box;
+  animation: board-rise 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 18ms + 160ms);
+}
+
+// A full cell glows faintly, as honey does.
+:is([data-honey], [data-photo]) .face {
+  filter: drop-shadow(0 0 0.25rem rgba(var(--ion-color-primary-rgb), 0.35));
+}
+
+// A person in their avatar tone, set apart from the honey band around them
+// by a line of the surface.
+.avatar .tone {
+  fill: var(--tone-fill);
+  stroke: var(--ion-background-color);
+  stroke-width: var(--mh-ring-width);
+  vector-effect: non-scaling-stroke;
+}
+
+[data-look='bare'] .avatar .tone {
+  stroke: none;
+}
+
+// ─── Rings ───────────────────────────────────────────────────────
+
+.ring,
+.mark {
+  fill: none;
+  stroke-width: var(--mh-ring-width);
+  vector-effect: non-scaling-stroke;
+}
+
+.ring {
+  stroke: var(--ion-color-primary);
+}
+
+// Honey would vanish against a honey cell or a photo: today wears the ink.
+[data-ring='today']:is([data-honey], [data-photo]) .ring {
+  stroke: var(--ion-text-color);
+}
+
+[data-ring='quiet'] .ring {
+  stroke: var(--ion-color-coral);
+}
+
+// The open sheet's cell, and the keyboard's focus.
+.mark {
+  display: none;
+  stroke: var(--ion-text-color);
+}
+
+.cell[data-selected] .mark,
+ion-button.cell.ion-focused .mark {
+  display: inline;
+}
+
+// ─── Words and marks ─────────────────────────────────────────────
+
+.label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: var(--mh-leading-none);
+}
+
+[data-honey] .label {
+  color: var(--ion-color-primary-contrast);
+}
+
+[data-look='ghost'] .label,
+[data-look='dashed'] .label {
+  color: var(--ion-color-medium);
+}
+
+.label.initials {
+  font-size: var(--mh-text-md);
+}
+
+// A day's number over its photo: a small honey tag low in the cell, so the
+// photo shows and the number still reads.
+.label.on-photo {
+  inset: auto auto 14% 50%;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-size: var(--mh-text-xs);
+  transform: translateX(-50%);
+}
+
+// A record: a small light at the top of the day.
+.dot {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-text-color);
+  transform: translateX(-50%);
+}
+
+[data-honey] .dot {
+  background: var(--ion-color-primary-contrast);
+}
+
+// Over a photo the dot keeps a honey halo, so it reads on any picture.
+[data-photo] .dot {
+  box-shadow: 0 0 0 var(--mh-ring-width) var(--ion-color-primary);
+}
+
+// ─── Motion ──────────────────────────────────────────────────────
+
+// While the data is on its way the ghost cells take the track's full step,
+// as a skeleton does, and breathe, one after another.
+:host(.loading) [data-look='ghost'] .base {
+  opacity: 1;
+}
+
+:host(.loading) .cell {
+  animation: board-breathe 1.4s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes board-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes board-rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes board-breathe {
+  from {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell,
+  .honey,
+  :host(.loading) .cell {
+    animation: none;
+  }
+
+  .face {
+    transition: none;
+  }
+}

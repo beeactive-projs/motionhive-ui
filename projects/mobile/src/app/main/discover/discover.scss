@@ -4,34 +4,34 @@
    the fluid tokens where the page breathes, rem everywhere else, so the
    phone's text size carries through. */
 
-/* The band's surfaces. Light: the navy card on the white page, its chips a
-   step up. Dark: the page is navy, so the band takes the raised step to
-   still read as a band, and its chips sink to the card step. No token names
-   this pair, hence the palette context. */
+/* The band's surfaces, in the brand's light colours (user decision,
+   2026-11-01). Light: the hive card's cream on the white page, with the
+   search field and the idle chips on white, as the design puts white
+   panels on the cream. Dark: never navy; the band is the grey card step
+   and its field and chips a step above it (the soft fill). The hive token
+   turns navy in dark for the Home card, so dark names its own pair here:
+   no token says "the cream, or the grey card", hence the palette context. */
 :host {
-  --band: var(--mh-color-navy-card);
-  --band-chip: var(--mh-color-navy-card-raised);
+  --band: var(--mh-color-hive);
+  --band-raised: var(--ion-background-color);
 }
 
 :host-context(.ion-palette-dark) {
-  --band: var(--mh-color-navy-card-raised);
-  --band-chip: var(--mh-color-navy-card);
+  --band: var(--ion-card-background);
+  --band-raised: var(--mh-color-divider);
 }
 
 /* ── The bar, the top of the band ───────────────────────────────────── */
 
-/* Navy from the top of the screen, like the workout summary's hero: the
-   toolbar is the band's first row. Its buttons (the bell, the avatar, which
-   are their own components) read the page ink, so the header redefines the
-   ink rather than reaching into them. */
+/* The band from the top of the screen: the toolbar is its first row, in
+   the page's own ink (navy on the cream, light on the grey), so the bell,
+   the avatar and the status bar's dark icons read as on any light page. */
 .band-header {
   --ion-toolbar-background: var(--band);
-  --ion-text-color: var(--mh-color-navy-card-ink);
 }
 
 .band-header ion-toolbar {
   --background: var(--band);
-  --color: var(--mh-color-navy-card-ink);
 }
 
 /* The tab's display title: 22 to 26 with the screen, like Home's greeting. */
@@ -86,13 +86,13 @@
   padding: 0.25rem var(--mh-row-gutter) 0.375rem;
   overflow: hidden;
   background: var(--band);
-  color: var(--mh-color-navy-card-ink);
+  color: var(--ion-text-color);
   isolation: isolate;
 }
 
-/* The honeycomb in the corner: the app's own hexagon drawn in the band's
-   warm accent, as lines. A see-through honey fill over navy mixed to a
-   grey (colour-and-type.md); thin lines keep it warm. */
+/* The honeycomb in the corner: the app's own hexagon drawn as honey lines,
+   the hive card's pattern colour (deep honey on the cream, honey on the
+   grey). Lines, not a see-through fill, so it stays warm on either. */
 .comb {
   position: absolute;
   z-index: -1;
@@ -100,21 +100,25 @@
   inset-inline-end: -1.75rem;
   width: 7.5rem;
   fill: none;
-  stroke: var(--mh-color-navy-card-accent);
+  stroke: var(--mh-color-hive-pattern);
   stroke-width: 3;
-  opacity: 0.3;
+  opacity: 0.25;
   pointer-events: none;
 }
 
-/* The city: an outlined capsule in the band's warm accent, the label
-   ellipsing before it outgrows the band. Small to the eye, a finger's 44px
-   to press. */
+/* The city: a honey capsule that is not a selection (the role pill's
+   recipe: the honey tint, a hairline in the accent ink), its label in the
+   deep honey and ellipsing before it outgrows the band. Small to the eye,
+   a finger's 44px to press. It stays `fill="clear"`, which honours
+   `--background`; pressed, the fill holds rather than fading. */
 .city {
+  --background: var(--mh-color-honey-tint);
+  --background-hover: var(--mh-color-honey-tint);
+  --background-activated: var(--mh-color-honey-tint);
   --border-width: var(--mh-hairline);
   --border-style: solid;
-  --border-color: var(--mh-color-navy-card-accent);
-  --color: var(--mh-color-navy-card-accent);
-  --background-hover: transparent;
+  --border-color: var(--mh-color-honey-deep);
+  --color: var(--mh-color-honey-deep);
   --padding-start: 0.625rem;
   --padding-end: 0.625rem;
   position: relative;
@@ -161,13 +165,12 @@
   border-radius: var(--mh-radius-pill);
 }
 
-/* The field-look search entry: the page's own surface inside the band
-   (white in light, the navy page in dark), a tap target tall, its words on
-   one line. */
+/* The field-look search entry: white on the cream, the soft fill on the
+   grey, a tap target tall, its words on one line. */
 .search-entry {
-  --background: var(--ion-background-color);
-  --background-hover: var(--ion-background-color);
-  --background-activated: var(--ion-background-color);
+  --background: var(--band-raised);
+  --background-hover: var(--band-raised);
+  --background-activated: var(--band-raised);
   --color: var(--ion-color-medium);
   --padding-start: 0.875rem;
   --padding-end: 0.875rem;
@@ -198,9 +201,11 @@
   white-space: nowrap;
 }
 
-/* The goal chips scroll sideways to the band's edges. Idle on the band's
-   chip step in its ink; the picked one takes the honey, as every selection
-   does (the theme's selected chip, restated over the band's idle fill). */
+/* The goal chips scroll sideways to the band's edges. Idle on the field's
+   white (the soft fill in dark) in the idle chip's navy ink, so they read
+   as the search field's family on the cream; the picked one takes the
+   honey, as every selection does (the theme's selected chip, restated over
+   the band's idle fill). */
 .goals {
   align-self: stretch;
   margin-inline: calc(-1 * var(--mh-row-gutter));
@@ -208,10 +213,10 @@
 }
 
 .goals .chip {
-  --background: var(--band-chip);
-  --background-hover: var(--band-chip);
-  --background-activated: var(--band-chip);
-  --color: var(--mh-color-navy-card-ink);
+  --background: var(--band-raised);
+  --background-hover: var(--band-raised);
+  --background-activated: var(--band-raised);
+  --color: var(--mh-color-chip-idle-contrast);
 }
 
 .goals .chip.selected {

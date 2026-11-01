@@ -1,0 +1,98 @@
+<ng-template #body>
+  @if (client(); as person) {
+    <div class="mh-stack">
+      <!-- Who, and how the range went: the avatar as on their profile. -->
+      <div class="who">
+        <mh-hex-avatar
+          size="lg"
+          aria-hidden="true"
+          [name]="person.name"
+          [imageUrl]="person.avatarUrl"
+          [color]="tone()"
+        />
+        <div class="lines">
+          <p class="status">{{ status() }}</p>
+          @if (planEnds()) {
+            <p class="ends">{{ planEnds() }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Their week, Monday to Sunday: honey trained, a waiting cell
+           planned, a dashed edge skipped. -->
+      <section class="mh-section">
+        <h3 class="mh-section-label">{{ 'clientHive.sheet.week' | translate }}</h3>
+        <mh-hive-board
+          class="strip"
+          [cells]="stripCells()"
+          [headers]="letters"
+          [label]="stripLabel()"
+          [loading]="state() === States.Loading"
+        />
+        <mh-hive-legend [items]="legend" />
+      </section>
+
+      <section class="mh-section">
+        <h3 class="mh-section-label">{{ 'clientHive.sheet.lastWorkout' | translate }}</h3>
+        @switch (state()) {
+          @case (States.Loading) {
+            <ion-list [inset]="true" class="mh-card-list" aria-hidden="true">
+              <ion-item>
+                <ion-skeleton-text slot="start" class="tile-skeleton" [animated]="true" />
+                <ion-label>
+                  <ion-skeleton-text [animated]="true" style="width: 55%; height: 0.875rem" />
+                  <ion-skeleton-text [animated]="true" style="width: 35%; height: 0.75rem" />
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          }
+          @case (States.Failed) {
+            <p class="mh-footnote">{{ 'clientHive.sheet.loadError' | translate }}</p>
+            <ion-button class="mh-text-link retry" fill="clear" (click)="retry()">
+              {{ 'button.tryAgain' | translate }}
+            </ion-button>
+          }
+          @default {
+            @if (last(); as row) {
+              <ion-list [inset]="true" class="mh-card-list">
+                <ion-item button [detail]="true" (click)="openLast(row.id)">
+                  <mh-hex-avatar
+                    slot="start"
+                    size="sm"
+                    color="primary"
+                    tone="wash"
+                    [icon]="row.record ? 'trophy-outline' : 'barbell-outline'"
+                  />
+                  <ion-label>
+                    <h2>{{ row.title }}</h2>
+                    <p>{{ row.detail }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            } @else {
+              <p class="mh-footnote">{{ 'clientHive.sheet.noWorkout' | translate }}</p>
+            }
+          }
+        }
+      </section>
+
+      <!-- The quick actions: the honey one is the action that fits. -->
+      <div class="actions">
+        @for (action of actions(); track action.id) {
+          <ion-button
+            [fill]="action.main ? 'solid' : 'outline'"
+            [class.mh-quiet]="!action.main"
+            (click)="act(action.id)"
+          >
+            <span class="action">
+              <ion-icon [name]="action.icon" aria-hidden="true" />
+              <span>{{ action.label }}</span>
+            </span>
+          </ion-button>
+        }
+      </div>
+    </div>
+  }
+</ng-template>
+
+<mh-sheet-shell [(open)]="open" [title]="name()" [body]="body" [fit]="true" [showFooter]="false" />

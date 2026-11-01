@@ -1,0 +1,94 @@
+// The client sheet's body: one surface (the sheet's), with the week's cells
+// straight on it (they read the sheet's card step) and the last workout as
+// a grouped card.
+
+// The avatar beside how the range went.
+.who {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.status,
+.ends {
+  margin: 0;
+  line-height: var(--mh-leading-tight);
+}
+
+.status {
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+}
+
+.ends {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+// Both labels on the row gutter, the one over the week as the one over the
+// last workout's card.
+.mh-section > .mh-section-label {
+  padding-inline: var(--mh-row-gutter);
+}
+
+// Seven small cells that shrink to fit a narrow sheet at a large text size.
+.strip {
+  --cell-min: 1.5rem;
+  --cell-max: 2.5rem;
+}
+
+.tile-skeleton {
+  width: 1.875rem;
+  height: 1.625rem;
+  border-radius: var(--mh-radius-control);
+}
+
+// A text link under a footnote: its own line, on the row gutter.
+.retry {
+  align-self: flex-start;
+  margin: 0;
+}
+
+// Three equal tiles, an icon over a short label, in one row; a long label
+// wraps inside its tile rather than pushing the row wider.
+.actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.actions ion-button {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  --padding-top: 0.625rem;
+  --padding-bottom: 0.625rem;
+  height: auto;
+  min-height: 4rem;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: normal;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  line-height: var(--mh-leading-tight);
+  text-align: center;
+}
+
+.action ion-icon {
+  font-size: var(--mh-icon-md);
+}

@@ -1,0 +1,78 @@
+// The trainee's month: the month and its arrows, what it adds up to, the
+// comb straight on the page and its key, in the page's one rhythm
+// (`.mh-page`).
+
+// The month's name and its two arrows on one line; the name ellipses
+// before an arrow is pushed off.
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-inline-start: var(--mh-row-gutter);
+}
+
+.month {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-lg);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// The arrows in the ink, as a toolbar's icons are: they step, they are
+// not the page's main action.
+.nav ion-button {
+  --color: var(--ion-text-color);
+  --padding-start: 0;
+  --padding-end: 0;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  margin: 0;
+}
+
+.nav ion-button ion-icon {
+  font-size: var(--mh-icon-lg);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-inline: var(--mh-row-gutter);
+}
+
+.summary ion-skeleton-text {
+  margin: 0;
+}
+
+.title {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-hero);
+  font-variant-numeric: tabular-nums;
+}
+
+.line {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+// Seven columns and a half-cell offset: the cells take the page's width, so
+// an SE at 130% text still gets 44px days, and never grow past 3.5rem.
+.comb {
+  --cell-min: 0rem;
+  --cell-max: 3.5rem;
+  padding-block: 0.25rem;
+}
+
+.hint {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-align: center;
+}

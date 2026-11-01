@@ -38,6 +38,11 @@ describe('HomePages', () => {
       expect(inHomeStack(path)).toBe(true);
     }
   });
+
+  it('opens the two hive pages at the addresses both sides agreed on', () => {
+    expect(HomePages.Hive).toBe('/tabs/home/hive');
+    expect(HomePages.Month).toBe('/tabs/home/month');
+  });
 });
 
 describe('agendaLinks', () => {

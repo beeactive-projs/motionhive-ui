@@ -3,19 +3,35 @@ import { describe, expect, it } from 'vitest';
 
 import { HOME_ICONS } from './home.icons';
 
-/** Every template in this feature, inlined at build time by Vite. */
-const templates = import.meta.glob('./**/*.html', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-}) as Record<string, string>;
+/**
+ * Every template in this feature, inlined at build time by Vite. The two
+ * hive pages and their board register their own icons, with their own
+ * drift specs, so they are not counted here.
+ */
+const templates = import.meta.glob(
+  ['./**/*.html', '!./client-hive/**', '!./month-hive/**', '!./_components/hive-board/**'],
+  {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  },
+) as Record<string, string>;
 
 /** The component sources too — icons named in TypeScript carry literals. */
-const sources = import.meta.glob(['./**/*.ts', '!./**/*.spec.ts'], {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-}) as Record<string, string>;
+const sources = import.meta.glob(
+  [
+    './**/*.ts',
+    '!./**/*.spec.ts',
+    '!./client-hive/**',
+    '!./month-hive/**',
+    '!./_components/hive-board/**',
+  ],
+  {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  },
+) as Record<string, string>;
 
 /** `people-outline` → `peopleOutline`, the key `addIcons()` registers under. */
 function toCamelCase(name: string): string {

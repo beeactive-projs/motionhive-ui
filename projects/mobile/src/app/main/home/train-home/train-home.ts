@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
@@ -24,6 +24,7 @@ import {
 } from 'core';
 
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { avatarToneFor, GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupBase, personBase, ProfileStacks } from '../../../_shared/utils/stack-paths';
 import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config';
@@ -31,10 +32,15 @@ import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { HOME_STACK, HomePages } from '../home-stack.config';
 import {
+  buildingCells,
   greetingPeriod,
+  isBuilding,
   LatestRow,
   latestPreview,
   latestRow,
+  LoadStates,
+  loadState,
+  SLOW_LOAD_MS,
   weekCells,
   weekLine,
   WeekLineKinds,
@@ -58,7 +64,12 @@ interface HiveMember {
  * The trainee's Home, calm: the week card with the day's workout in it,
  * Your hive, and Latest, nothing else below the greeting (a small Today row
  * joins them only on a day with a booking). Latest's full list is a page in
- * Home's own stack, `/tabs/home/latest`.
+ * Home's own stack, `/tabs/home/latest`; the week opens the month,
+ * `/tabs/home/month`.
+ *
+ * Before anything has arrived the card builds its comb and the blocks show
+ * placeholders under their heads (`loadState`); a reload keeps what is on
+ * screen.
  */
 @Component({
   selector: 'mh-train-home',
@@ -74,6 +85,7 @@ interface HiveMember {
     IonNote,
     IonSkeletonText,
     LatestRowItem,
+    RowSkeleton,
     TranslatePipe,
   ],
   templateUrl: './train-home.html',
@@ -84,6 +96,7 @@ export class TrainHome implements OnInit {
   private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
   private readonly _translateService = inject(TranslateService);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly store = inject(TrainHomeStore);
 
@@ -110,6 +123,26 @@ export class TrainHome implements OnInit {
   });
 
   // ─── The week ────────────────────────────────────────────────
+
+  readonly LoadStates = LoadStates;
+
+  /** Set once a first load has run `SLOW_LOAD_MS`; reset by each new one. */
+  private readonly _slow = signal(false);
+  private _slowTimer: ReturnType<typeof setTimeout> | undefined;
+
+  readonly weekState = computed(() =>
+    loadState({
+      shown: this.store.weekShown(),
+      loading: this.store.weekLoading(),
+      failed: this.store.weekFailed(),
+      slow: this._slow(),
+    }),
+  );
+
+  readonly building = computed(() => isBuilding(this.weekState()));
+
+  /** The first load's comb: the week's own shape, so nothing moves when it lands. */
+  readonly buildCells = buildingCells();
 
   readonly cells = computed(() => weekCells(this.store.days(), weekdayNames('narrow')));
 
@@ -229,7 +262,12 @@ export class TrainHome implements OnInit {
     return latestPreview(this.store.latest(), this.today()).map((entry) => latestRow(entry, copy));
   });
 
+  constructor() {
+    this._destroyRef.onDestroy(() => clearTimeout(this._slowTimer));
+  }
+
   ngOnInit(): void {
+    this._watchSlow();
     this.store.load();
   }
 
@@ -240,17 +278,36 @@ export class TrainHome implements OnInit {
    */
   reenter(): void {
     this.today.set(new Date());
+    this._retrying();
     this.store.load();
   }
 
   refresh(done: () => void): void {
     this.today.set(new Date());
+    this._retrying();
     this.store.load(done);
   }
 
   /** The week card's Try again, after its reads failed. */
   retry(): void {
+    this._watchSlow();
     this.store.load();
+  }
+
+  /** A load after a failed first one is a first load again, slow timer and all. */
+  private _retrying(): void {
+    if (this.weekState() === LoadStates.Failed) this._watchSlow();
+  }
+
+  private _watchSlow(): void {
+    clearTimeout(this._slowTimer);
+    this._slow.set(false);
+    this._slowTimer = setTimeout(() => this._slow.set(true), SLOW_LOAD_MS);
+  }
+
+  /** The month as a hive, a cell a day, in Home's stack (C1). */
+  openMonth(): void {
+    void this._router.navigateByUrl(HomePages.Month);
   }
 
   // ─── Workouts ────────────────────────────────────────────────
