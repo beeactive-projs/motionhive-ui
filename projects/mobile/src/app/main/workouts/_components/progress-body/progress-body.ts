@@ -38,7 +38,6 @@ import {
   ProgressRange,
   ProgressService,
   TrainedExercise,
-  VolumeUnits,
   WorkoutLog,
   WorkoutLogService,
 } from 'core';
@@ -50,15 +49,14 @@ import { clientPath, coachStackOf } from '../../../clients/client-paths';
 import { workoutLinks } from '../../../home/home-stack.config';
 import { BadgeTones, KIND_META } from '../../../exercises/exercises.config';
 import {
-  exerciseVolumeKg,
   formatMeasure,
   logMeta,
   shortDayLabel,
   unbreakable,
 } from '../../workouts.config';
 import {
-  formatVolume,
   formatWeekValue,
+  shortWeekValue,
   WEEK_METRICS,
   weekBounds,
   weekDayLabel,
@@ -67,7 +65,7 @@ import {
   weekSlots,
   weekValue,
 } from '../../volume.config';
-import { WeekBar, WeekBars } from '../week-bars/week-bars';
+import { BarChart, ChartBar } from '../bar-chart/bar-chart';
 import {
   EXERCISES_PAGE,
   latestSetRecord,
@@ -125,7 +123,7 @@ function groupedVolume(volumeKg: number): string {
     IonSkeletonText,
     StatTile,
     TranslatePipe,
-    WeekBars,
+    BarChart,
   ],
   templateUrl: './progress-body.html',
   styleUrl: './progress-body.scss',
@@ -214,7 +212,7 @@ export class ProgressBody {
     this.weeks().find((week) => week.key === this.selectedWeek()),
   );
 
-  readonly weekBars = computed<WeekBar[]>(() => {
+  readonly weekBars = computed<ChartBar[]>(() => {
     const metric = this.weekMetric();
     const weeks = this.weeks();
     return weeks.map((week, i) => {
@@ -228,6 +226,7 @@ export class ProgressBody {
           date,
           value: formatWeekValue(value, metric),
         }),
+        top: shortWeekValue(value, metric),
       };
     });
   });
@@ -258,11 +257,6 @@ export class ProgressBody {
     this.weekLogs().map((log) => ({
       id: log.id,
       name: log.name,
-      // Its volume beside it, warm-ups left out, when anything was lifted.
-      volume: (() => {
-        const kg = (log.exercises ?? []).reduce((sum, e) => sum + exerciseVolumeKg(e), 0);
-        return kg > 0 ? formatVolume(Math.round(kg), VolumeUnits.Kg) : '';
-      })(),
       // "Wed 28 Oct · 48m · 16 sets", as History's rows say it.
       line: [shortDayLabel(log.completedAt ?? log.startedAt), logMeta(log)]
         .filter(Boolean)

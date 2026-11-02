@@ -197,6 +197,8 @@
       "soundHint": "Cât timp aplicația e deschisă. Modul silențios al telefonului se aplică.",
       "vibration": "Vibrație",
       "vibrationHint": "O atingere cu 10 secunde înainte și o vibrație la zero",
+      "lockScreen": "Pe ecranul de blocare",
+      "lockScreenHint": "Pauza și timpul antrenamentului, cu +15 și Sari peste",
       "loggingSection": "În timpul antrenamentului",
       "askEffort": "Întreabă cât de grea a fost fiecare serie",
       "askEffortHint": "Mereu activ unde planul stabilește un efort țintă",
@@ -1057,7 +1059,8 @@
       "notePlaceholder": "De exemplu: scaunul 4, știftul pe 3",
       "privateLine": "Privat: doar tu îl vezi. Îl poți modifica oricând.",
       "toast": {
-        "noteFailed": "Exercițiul a fost salvat, dar nota nu. Încearcă din nou să adaugi nota."
+        "noteFailed": "Exercițiul a fost salvat, dar nota nu. Încearcă din nou să adaugi nota.",
+        "pictureFailed": "Exercițiul a fost salvat, dar imaginea nu. Încearcă din nou să adaugi imaginea."
       },
       "track": {
         "BODYWEIGHT": "Doar repetări",
@@ -1065,7 +1068,12 @@
         "DURATION": "Timp",
         "STRENGTH": "Greutate și repetări",
         "label": "Ce urmărești?"
-      }
+      },
+      "picture": "Imagine",
+      "addPicture": "Adaugă o imagine",
+      "changePicture": "Schimbă",
+      "removePicture": "Elimină",
+      "pictureHint": "O poză cu aparatul sau cu mișcarea. O vede oricine vede exercițiul."
     }
   },
   "groups": {
@@ -3089,7 +3097,8 @@
       "day": "Ziua {number}",
       "felt": "notă {rating}/5",
       "setsDone": "{done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
-      "week": "Săptămâna {number}"
+      "week": "Săptămâna {number}",
+      "supersets": "{count, plural, one {# superset} few {# superseturi} other {# de superseturi}}"
     },
     "photo": {
       "actionsTitle": "Fotografia antrenamentului",
@@ -3435,7 +3444,8 @@
       "kg": "{value} kg",
       "kgShort": "kg",
       "meters": "{value} m",
-      "metersShort": "m"
+      "metersShort": "m",
+      "tonnes": "{value} t"
     },
     "memory": {
       "monthsAgo": "{count, plural, one {Acum o lună} few {Acum # luni} other {Acum # de luni}}",
@@ -3515,7 +3525,8 @@
       "skipped": "sărit",
       "addRound": "Adaugă o rundă",
       "restAfterRound": "Pauză după rundă: {value}",
-      "rounds": "{count, plural, one {# rundă} few {# runde} other {# de runde}}"
+      "rounds": "{count, plural, one {# rundă} few {# runde} other {# de runde}}",
+      "summary": "Superset · {count, plural, one {# rundă} few {# runde} other {# de runde}}"
     },
     "loggerOptions": {
       "title": "Acest antrenament",
@@ -3577,7 +3588,11 @@
           "volume": "Volum"
         },
         "metricLabel": "Ce arată graficul",
-        "recordStill": "Recordul a rămas același din {date}, dar ai făcut mai mult la aceeași greutate. Și asta e progres."
+        "recordStill": "Recordul a rămas același din {date}, dar ai făcut mai mult la aceeași greutate. Și asta e progres.",
+        "grouped": {
+          "week": "Fiecare bară e o săptămână: media sesiunilor ei.",
+          "month": "Fiecare bară e o lună: media sesiunilor ei."
+        }
       },
       "finish": {
         "firstTime": "Data viitoare vezi aici comparația.",
@@ -3607,6 +3622,11 @@
       "body": "Ca să îți spunem când se termină pauza, chiar și cu telefonul blocat sau în altă aplicație. Nimic altceva.",
       "allow": "Pornește notificările",
       "notNow": "Nu acum"
+    },
+    "live": {
+      "next": "Urmează: {next}",
+      "workout": "Antrenament",
+      "plus": "+{seconds} s"
     }
   },
   "feedback": {

@@ -1172,6 +1172,15 @@
         "thumbnailAlt": "Previzualizare miniatură YouTube",
         "thumbnailLoaded": "Miniatură încărcată",
         "thumbnailUsage": "Folosită în cardurile din catalog"
+      },
+      "picture": {
+        "label": "Imagine",
+        "add": "Adaugă o imagine",
+        "change": "Schimbă",
+        "remove": "Elimină",
+        "hint": "O poză cu aparatul sau cu mișcarea. Clienții tăi o văd oriunde apare exercițiul.",
+        "failed": "Exercițiul a fost salvat, dar imaginea nu. Încearcă din nou să adaugi imaginea.",
+        "unreadable": "Imaginea nu a putut fi citită. Încearcă alta."
       }
     },
     "toast": {

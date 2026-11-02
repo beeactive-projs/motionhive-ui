@@ -63,15 +63,6 @@ export class ExerciseService {
     );
   }
 
-  /**
-   * Copy a public exercise into the caller's own library.
-   *
-   * The BE answers 409 when a live fork of this source already exists. That
-   * is a designed outcome, not a failure: the caller is expected to take the
-   * user to the fork they already have. Marked `silentRequest()` so the
-   * global error dialog does not announce a "Conflict" over the top of that
-   * — the caller owns every outcome of this call.
-   */
   /** The person's own note on an exercise; `note` is null when there is none. */
   getNote(id: string): Observable<ExerciseNote> {
     return this._http.get<ExerciseNote>(
@@ -88,6 +79,35 @@ export class ExerciseService {
     );
   }
 
+  /**
+   * Sets the picture of the caller's own (or coach-made) exercise. Send a
+   * prepared JPEG; the answer is the exercise with its new `thumbnailUrl`.
+   */
+  setImage(id: string, image: Blob): Observable<Exercise> {
+    const form = new FormData();
+    form.append('file', image, 'exercise.jpg');
+    return this._http.put<Exercise>(
+      `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.IMAGE(id)}`,
+      form,
+    );
+  }
+
+  /** Takes the picture off; the exercise shows its kind's tile again. */
+  removeImage(id: string): Observable<Exercise> {
+    return this._http.delete<Exercise>(
+      `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.IMAGE(id)}`,
+    );
+  }
+
+  /**
+   * Copy a public exercise into the caller's own library.
+   *
+   * The BE answers 409 when a live fork of this source already exists. That
+   * is a designed outcome, not a failure: the caller is expected to take the
+   * user to the fork they already have. Marked `silentRequest()` so the
+   * global error dialog does not announce a "Conflict" over the top of that
+   * — the caller owns every outcome of this call.
+   */
   fork(id: string): Observable<Exercise> {
     return this._http.post<Exercise>(
       `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.FORK(id)}`,

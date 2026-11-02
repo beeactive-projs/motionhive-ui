@@ -115,6 +115,39 @@
           <p class="m-0 text-2xs leading-relaxed text-surface-500">{{ 'exercises.form.youtube.hint' | translate }}</p>
         </div>
 
+        <!-- Picture -->
+        <div class="flex flex-col gap-1.5">
+          <span class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+            {{ 'exercises.form.picture.label' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
+          </span>
+          <input #pictureInput type="file" accept="image/*" hidden (change)="onPicturePicked($event)" />
+          @if (picture(); as shown) {
+          <div class="flex items-center gap-3">
+            <img [src]="shown.url" [alt]="'exercises.form.picture.label' | translate"
+              class="size-16 shrink-0 rounded-lg object-cover" />
+            <div class="flex flex-wrap gap-1">
+              <button pButton type="button" severity="secondary" [text]="true" size="small"
+                [disabled]="preparingPicture()" (click)="pictureInput.click()">
+                <i class="pi pi-camera" aria-hidden="true"></i>
+                {{ 'exercises.form.picture.change' | translate }}
+              </button>
+              <button pButton type="button" severity="danger" [text]="true" size="small"
+                [disabled]="preparingPicture()" (click)="removePicture()">
+                <i class="pi pi-trash" aria-hidden="true"></i>
+                {{ 'exercises.form.picture.remove' | translate }}
+              </button>
+            </div>
+          </div>
+          } @else {
+          <button pButton type="button" severity="secondary" [outlined]="true" fluid
+            class="!border-dashed" [disabled]="preparingPicture()" (click)="pictureInput.click()">
+            <i class="pi" [class]="preparingPicture() ? 'pi-spinner pi-spin' : 'pi-camera'" aria-hidden="true"></i>
+            {{ 'exercises.form.picture.add' | translate }}
+          </button>
+          }
+          <p class="m-0 text-2xs leading-relaxed text-surface-500">{{ 'exercises.form.picture.hint' | translate }}</p>
+        </div>
+
       </div>
 
       <!-- Right column -->

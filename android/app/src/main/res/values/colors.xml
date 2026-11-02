@@ -6,4 +6,6 @@
          The app icon's navy tile (logo-bg-navy), so the shade repeats the launcher
          icon. Never honey: there is no honey tile. -->
     <color name="mh_notification_accent">#1e3a5f</color>
+    <!-- The rest's bar on the workout notification: the app honey, the same as the web theme. -->
+    <color name="mh_honey">#f59e0b</color>
 </resources>

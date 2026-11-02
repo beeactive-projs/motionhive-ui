@@ -91,6 +91,38 @@
       </ion-list>
     </section>
 
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <span class="mh-kicker">{{ 'exercises.simpleForm.picture' | translate }}</span>
+        <ion-note>{{ 'exercises.muscleFields.optional' | translate }}</ion-note>
+      </div>
+      <input #pictureInput type="file" accept="image/*" hidden (change)="onPicturePicked($event)" />
+      @if (picture(); as shown) {
+      <div class="picture">
+        <img [src]="shown.url" [alt]="'exercises.simpleForm.picture' | translate" />
+        <div class="picture-actions">
+          <ion-button fill="clear" size="small" [disabled]="loading() || preparingPicture()"
+            (click)="pictureInput.click()">
+            <ion-icon slot="start" name="camera-outline" aria-hidden="true" />
+            {{ 'exercises.simpleForm.changePicture' | translate }}
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" [disabled]="loading() || preparingPicture()"
+            (click)="removePicture()">
+            <ion-icon slot="start" name="trash-outline" aria-hidden="true" />
+            {{ 'exercises.simpleForm.removePicture' | translate }}
+          </ion-button>
+        </div>
+      </div>
+      } @else {
+      <button type="button" class="add-picture" [disabled]="loading() || preparingPicture()"
+        (click)="pictureInput.click()">
+        <ion-icon name="camera-outline" aria-hidden="true" />
+        <span>{{ 'exercises.simpleForm.addPicture' | translate }}</span>
+      </button>
+      }
+      <p class="picture-hint">{{ 'exercises.simpleForm.pictureHint' | translate }}</p>
+    </section>
+
     <!-- A coach's own public exercise can be edited here too; it is not
          private, so the line would be wrong for it. -->
     @if (form.isPrivate()) {

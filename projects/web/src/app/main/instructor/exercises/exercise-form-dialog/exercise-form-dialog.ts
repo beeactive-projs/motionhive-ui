@@ -7,9 +7,11 @@ import {
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -33,6 +35,7 @@ import {
   MuscleRole,
   UpdateExercisePayload,
   enumLabel,
+  preparePhoto,
   showApiError,
   youtubeThumbnailUrl,
   youtubeVideoId,
@@ -118,6 +121,15 @@ export class ExerciseFormDialog {
   readonly isUnilateral = signal(false);
   readonly youtubeUrl = signal('');
   readonly visibility = signal<ExerciseVisibility>(ExerciseVisibility.Private);
+  /**
+   * The picture shown: the saved one's link, or a new one picked here,
+   * prepared in the browser (upright, scaled down, no metadata) and sent
+   * once the exercise is saved. Clients see it wherever the exercise shows.
+   */
+  readonly picture = signal<{ url: string; jpeg: Blob | null } | null>(null);
+  readonly preparingPicture = signal(false);
+  /** The picture as loaded, so an untouched one is not sent again. */
+  private _loadedPicture: string | null = null;
 
   // Muscle picker — three separate slots so the UI stays simple and the
   // role on each row is unambiguous. BE validation is identical to what
@@ -136,6 +148,7 @@ export class ExerciseFormDialog {
 
   readonly canSave = computed(
     () =>
+      !this.preparingPicture() &&
       this.name().trim().length >= 2 &&
       this.kind() !== null &&
       this.primaryMuscleIds().length >= 1 &&
@@ -221,7 +234,10 @@ export class ExerciseFormDialog {
     // re-renders).
     effect(() => {
       if (!this.visible()) return;
-      this.populateForm(this.exercise());
+      const exercise = this.exercise();
+      // Only those two: what filling the form reads (the picture shown) must
+      // not fill it again.
+      untracked(() => this.populateForm(exercise));
     });
   }
 
@@ -233,6 +249,31 @@ export class ExerciseFormDialog {
 
   cancel(): void {
     this.visible.set(false);
+  }
+
+  async onPicturePicked(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    // The same file picked twice must still fire `change`.
+    input.value = '';
+    if (!file) return;
+    this.preparingPicture.set(true);
+    try {
+      const jpeg = await preparePhoto(file);
+      this._setPicture({ url: URL.createObjectURL(jpeg), jpeg });
+    } catch {
+      this._messageService.add({
+        severity: 'warn',
+        summary: this._translateService.instant('exercises.form.picture.unreadable'),
+        life: 4000,
+      });
+    } finally {
+      this.preparingPicture.set(false);
+    }
+  }
+
+  removePicture(): void {
+    this._setPicture(null);
   }
 
   save(): void {
@@ -247,16 +288,25 @@ export class ExerciseFormDialog {
       ? this._exerciseService.update(this.exercise()!.id, payload)
       : this._exerciseService.create(payload as CreateExercisePayload);
 
-    req$.subscribe({
-      next: (saved) => {
-        this._messageService.add({
-          severity: 'success',
-          summary: this._translateService.instant(
-            this.isEditMode() ? 'exercises.toast.updated' : 'exercises.toast.created',
-          ),
-          detail: saved.name,
-          life: 3000,
-        });
+    req$.pipe(switchMap((written) => this._writePicture(written))).subscribe({
+      next: ({ saved, pictureFailed }) => {
+        this._messageService.add(
+          pictureFailed
+            ? {
+                severity: 'warn',
+                summary: this._translateService.instant('exercises.form.picture.failed'),
+                detail: saved.name,
+                life: 5000,
+              }
+            : {
+                severity: 'success',
+                summary: this._translateService.instant(
+                  this.isEditMode() ? 'exercises.toast.updated' : 'exercises.toast.created',
+                ),
+                detail: saved.name,
+                life: 3000,
+              },
+        );
         this.saved.emit(saved);
         this.visible.set(false);
       },
@@ -276,6 +326,8 @@ export class ExerciseFormDialog {
   // ── Internals ────────────────────────────────────────────────────
 
   private populateForm(ex: Exercise | null): void {
+    this._loadedPicture = ex?.thumbnailUrl ?? null;
+    this._setPicture(this._loadedPicture ? { url: this._loadedPicture, jpeg: null } : null);
     if (!ex) {
       // Fresh create — all defaults.
       this.name.set('');
@@ -362,5 +414,28 @@ export class ExerciseFormDialog {
       muscles,
       equipmentIds: this.equipmentIds().length ? this.equipmentIds() : undefined,
     };
+  }
+
+  /** Shows a picture, letting go of the one before if it was a local copy. */
+  private _setPicture(next: { url: string; jpeg: Blob | null } | null): void {
+    const before = this.picture();
+    if (before?.jpeg && before.url !== next?.url) URL.revokeObjectURL(before.url);
+    this.picture.set(next);
+  }
+
+  /**
+   * Sends a newly picked picture, or takes the old one off when it was
+   * removed. The exercise is saved by now, so a failure here only says so.
+   */
+  private _writePicture(saved: Exercise): Observable<{ saved: Exercise; pictureFailed: boolean }> {
+    const picture = this.picture();
+    let write$: Observable<Exercise> | null = null;
+    if (picture?.jpeg) write$ = this._exerciseService.setImage(saved.id, picture.jpeg);
+    else if (!picture && this._loadedPicture) write$ = this._exerciseService.removeImage(saved.id);
+    if (!write$) return of({ saved, pictureFailed: false });
+    return write$.pipe(
+      map((withPicture) => ({ saved: withPicture, pictureFailed: false })),
+      catchError(() => of({ saved, pictureFailed: true })),
+    );
   }
 }

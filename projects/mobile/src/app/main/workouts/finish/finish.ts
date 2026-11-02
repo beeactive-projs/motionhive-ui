@@ -33,6 +33,7 @@ import {
   WorkoutLogService,
   WorkoutLogStatus,
   appLocale,
+  preparePhoto,
 } from 'core';
 
 import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
@@ -52,7 +53,7 @@ import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
 import { exerciseBlocks, memberTag } from '../logger/logger-flow';
 import { LoggedExercises } from '../_components/logged-exercises/logged-exercises';
 import { SaveRoutineService } from '../_services/save-routine.service';
-import { WorkoutPhotoStore, preparePhoto } from '../_services/workout-photo';
+import { WorkoutPhotoStore } from '../_services/workout-photo';
 import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
 import {
   NOTE_MAX_LENGTH,

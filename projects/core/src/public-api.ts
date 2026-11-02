@@ -187,6 +187,7 @@ export * from './lib/utils/cloudinary.utils';
 export * from './lib/utils/group.utils';
 export * from './lib/utils/date.utils';
 export * from './lib/utils/youtube.utils';
+export * from './lib/utils/photo.utils';
 export * from './lib/utils/html.utils';
 export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';

@@ -48,6 +48,17 @@
   font-size: var(--mh-text-sm);
 }
 
+.hero .volume-bars {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.hero .bars-note {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: var(--mh-text-sm);
+}
+
 .hero .value {
   color: var(--ion-text-color);
   font-family: var(--mh-font-heading);

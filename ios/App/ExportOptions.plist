@@ -18,6 +18,9 @@
 	<dict>
 		<key>fit.motionhive.app</key>
 		<string>MotionHive App Store</string>
+		<!-- The Live Activity widget (RestTimerExtension target). -->
+		<key>fit.motionhive.app.RestTimer</key>
+		<string>MotionHive Rest Timer App Store</string>
 	</dict>
 	<key>uploadSymbols</key>
 	<true/>

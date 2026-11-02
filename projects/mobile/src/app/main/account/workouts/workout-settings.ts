@@ -28,7 +28,7 @@ import { restChoices } from './workout-settings.config';
 
 type ToggleKey = keyof Pick<
   WorkoutSettings,
-  'sound' | 'vibration' | 'askEffort' | 'supersetJump' | 'keepScreenOn'
+  'sound' | 'vibration' | 'lockScreen' | 'askEffort' | 'supersetJump' | 'keepScreenOn'
 >;
 
 /**

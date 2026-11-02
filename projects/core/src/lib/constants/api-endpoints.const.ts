@@ -228,6 +228,7 @@ export const API_ENDPOINTS = {
     FORK: (id: string) => `/exercises/${id}/fork`,
     /** The person's own private note on an exercise ("Seat 4, pin on 3"). */
     NOTE: (id: string) => `/exercises/${id}/note`,
+    IMAGE: (id: string) => `/exercises/${id}/image`,
   },
   PROGRAMS: {
     BASE: '/programs',

@@ -36,6 +36,14 @@
             </ion-label>
           </ion-toggle>
         </ion-item>
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="settings().lockScreen" (ionChange)="toggle('lockScreen', $event)">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account.workoutSettings.lockScreen' | translate }}</h3>
+              <p>{{ 'account.workoutSettings.lockScreenHint' | translate }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
       </ion-list>
     </section>
 

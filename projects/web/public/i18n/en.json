@@ -1172,6 +1172,15 @@
         "thumbnailAlt": "YouTube thumbnail preview",
         "thumbnailLoaded": "Thumbnail loaded",
         "thumbnailUsage": "Used in catalog cards"
+      },
+      "picture": {
+        "label": "Picture",
+        "add": "Add a picture",
+        "change": "Change",
+        "remove": "Remove",
+        "hint": "A photo of the machine or the move. Your clients see it wherever the exercise shows.",
+        "failed": "The exercise is saved, but its picture is not. Try the picture again.",
+        "unreadable": "That image could not be read. Try another one."
       }
     },
     "toast": {

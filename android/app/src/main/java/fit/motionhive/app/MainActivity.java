@@ -16,6 +16,7 @@ public class MainActivity extends BridgeActivity {
         // Plugins that live in this app, not in an npm package, are registered
         // here, before the bridge starts (Capacitor 4+).
         registerPlugin(StorySharePlugin.class);
+        registerPlugin(RestLivePlugin.class);
         super.onCreate(savedInstanceState);
     }
 

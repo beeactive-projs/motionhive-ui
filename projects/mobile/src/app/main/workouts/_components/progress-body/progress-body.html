@@ -64,7 +64,7 @@
         <span class="week-name">{{ weekTitle() }}</span>
       </div>
       <p class="hint">{{ 'workouts.volume.weeks.hint' | translate }}</p>
-      <mh-week-bars [bars]="weekBars()" [selected]="selectedWeek()" (picked)="pickWeek($event)" />
+      <mh-bar-chart [bars]="weekBars()" [selected]="selectedWeek()" (picked)="pickWeek($event)" />
     </ion-card-content>
   </ion-card>
 
@@ -99,9 +99,6 @@
               <h2>{{ row.name }}</h2>
               <p class="line">{{ row.line }}</p>
             </ion-label>
-            @if (row.volume) {
-              <ion-note slot="end" class="week-volume">{{ row.volume }}</ion-note>
-            }
           </ion-item>
         }
       </ion-list>
