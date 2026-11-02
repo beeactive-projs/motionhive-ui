@@ -249,6 +249,13 @@
                   {{ 'workouts.home.noRoutines' | translate }}
                 </ion-note>
               }
+              <!-- Put away, not gone: the way back, only when there is something there. -->
+              @if (store.archivedTotal() > 0) {
+                <ion-button class="archived-link" fill="clear" size="small" (click)="openArchived()">
+                  <ion-icon slot="start" name="archive-outline" aria-hidden="true" />
+                  {{ 'workouts.archived.link' | translate: { count: store.archivedTotal() } }}
+                </ion-button>
+              }
             </section>
           }
         </div>

@@ -1,3 +1,5 @@
+import type { VolumeUnit } from './volume.enums';
+
 /**
  * The "am I improving" surface. Everything here is derived server-side
  * from the workout log and the stored 1RM history, so there is no
@@ -11,9 +13,9 @@ export interface ProgressOverview {
   totals: {
     workouts: number;
     /**
-     * Sum of reps times weight over completed, loaded sets. Bodyweight
-     * and cardio contribute nothing rather than zero-inflating it, so
-     * the number stays comparable week to week.
+     * Sum of reps times weight over completed, loaded sets, warm-ups
+     * excluded. Bodyweight and cardio contribute nothing rather than
+     * zero-inflating it, so the number stays comparable week to week.
      */
     volumeKg: number;
     setsCompleted: number;
@@ -30,11 +32,15 @@ export interface ProgressOverview {
   lifetimeWorkouts: number;
 }
 
+/** A week with at least one workout; weeks without one are not sent. */
 export interface WeeklyVolumePoint {
   /** ISO date of the Monday starting that week. */
   weekStart: string;
+  /** Working sets only: warm-ups excluded. */
   volumeKg: number;
   workouts: number;
+  /** The workouts' recorded time. Absent from APIs that predate it. */
+  minutes?: number;
 }
 
 export interface DailyActivityPoint {
@@ -97,5 +103,12 @@ export interface ExerciseProgress {
     topReps: number | null;
     bestDurationSeconds: number | null;
     bestDistanceMeters: number | null;
+    /**
+     * The session's volume over completed sets, warm-ups excluded, in
+     * `volumeUnit` (one unit for the whole history). Absent from APIs
+     * that predate it.
+     */
+    volume?: number;
+    volumeUnit?: VolumeUnit;
   }>;
 }

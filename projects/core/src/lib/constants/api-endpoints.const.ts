@@ -21,6 +21,8 @@ export const API_ENDPOINTS = {
     BASE: '/users',
     ME: '/users/me',
     ME_AVATAR: '/users/me/avatar',
+    /** The person's logger settings: default rest, sound, vibration, effort. */
+    ME_WORKOUT_SETTINGS: '/users/me/workout-settings',
     SEARCH: '/users/search',
   },
   PROFILE: {
@@ -224,6 +226,8 @@ export const API_ENDPOINTS = {
     BASE: '/exercises',
     BY_ID: (id: string) => `/exercises/${id}`,
     FORK: (id: string) => `/exercises/${id}/fork`,
+    /** The person's own private note on an exercise ("Seat 4, pin on 3"). */
+    NOTE: (id: string) => `/exercises/${id}/note`,
   },
   PROGRAMS: {
     BASE: '/programs',
@@ -275,6 +279,8 @@ export const API_ENDPOINTS = {
     PHOTO: (id: string) => `/workout-logs/${id}/photo`,
     PAUSE: (id: string) => `/workout-logs/${id}/pause`,
     RESUME: (id: string) => `/workout-logs/${id}/resume`,
+    /** Time away, paused after the fact ("You were away 25 min"). */
+    PAUSE_GAP: (id: string) => `/workout-logs/${id}/pause-gap`,
     LOG_SET: (id: string, setId: string) =>
       `/workout-logs/${id}/sets/${setId}`,
     ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,

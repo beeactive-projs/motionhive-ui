@@ -105,7 +105,8 @@
       "privacy": "Who can see my details",
       "resendVerification": "Resend verification email",
       "unverified": "{email} isn't verified yet.",
-      "deleteAccount": "Delete account"
+      "deleteAccount": "Delete account",
+      "workouts": "Workouts"
     },
     "sections": {
       "account": "Account",
@@ -186,6 +187,24 @@
       "codeFailed": "We couldn't send the code. Try again.",
       "failed": "We couldn't delete your account. Try again.",
       "coachInvoices": "As a coach, download the invoices you need for your accounts first, in Payments. You can still ask us for copies later."
+    },
+    "workoutSettings": {
+      "title": "Workouts",
+      "restSection": "Rest timer",
+      "defaultRest": "Default rest",
+      "defaultRestHint": "When neither the plan nor the routine sets one",
+      "sound": "Sound when rest ends",
+      "soundHint": "While the app is open. The phone's silent mode applies.",
+      "vibration": "Vibration",
+      "vibrationHint": "A tap at 10 seconds to go and a buzz at zero",
+      "loggingSection": "While you log",
+      "askEffort": "Ask how hard each set was",
+      "askEffortHint": "Always on where your plan sets a target effort",
+      "supersetJump": "Jump to the next exercise in a superset",
+      "supersetJumpHint": "Off: finish one exercise, then the next",
+      "saveFailed": "Couldn't save. Try again.",
+      "keepScreenOn": "Keep the screen on",
+      "keepScreenOnHint": "While a workout is open in front of you"
     }
   },
   "accountSheets": {
@@ -814,7 +833,8 @@
       "custom": "Custom exercise",
       "customBy": "Custom exercise · by {name}",
       "system": "System exercise · MotionHive library",
-      "withForks": "{origin} · {count, plural, one {forked once} other {forked # times}}"
+      "withForks": "{origin} · {count, plural, one {forked once} other {forked # times}}",
+      "yours": "Your exercise · only you see it"
     },
     "create": {
       "createExercise": "Create exercise",
@@ -864,7 +884,8 @@
       "noEquipment": "None needed",
       "privateHint": "Only you can see it",
       "publicHint": "Other coaches can find and fork it",
-      "unilateral": "Unilateral"
+      "unilateral": "Unilateral",
+      "tracks": "What it tracks"
     },
     "detailsFields": {
       "classificationHint": "All optional. Leave them for later if you like.",
@@ -970,7 +991,8 @@
       "fromCoaches": "From coaches",
       "mine": "My exercises",
       "publicOthers": "Public · others",
-      "system": "System"
+      "system": "System",
+      "mineShort": "Mine"
     },
     "picker": {
       "addExercises": "Add exercises",
@@ -983,7 +1005,13 @@
       "results": "Results",
       "about": "About {name}",
       "add": "Add",
-      "remove": "Remove"
+      "remove": "Remove",
+      "create": {
+        "confirm": "Create and add",
+        "confirmSingle": "Create and swap",
+        "hint": "“{query}” · only you can see it",
+        "title": "Can't find it? Create it"
+      }
     },
     "row": {
       "equipmentMore": "{name} +{count}",
@@ -1012,6 +1040,32 @@
       "counter": "{count} of {max}",
       "noMatch": "Nothing matches that.",
       "selected": "{count} selected"
+    },
+    "own": {
+      "deleteBody": "It leaves your exercises and the picker. Past workouts keep it, under the same name.",
+      "deleteHint": "Past workouts keep it",
+      "editHint": "Change the name, what it tracks or your note",
+      "emptyAction": "Create an exercise",
+      "emptyMessage": "Missing an exercise, like a machine at your gym? Create it and only you will see it.",
+      "menuFor": "More for {name}"
+    },
+    "simpleForm": {
+      "more": "More…",
+      "muscleGroup": "Muscle group",
+      "namePlaceholder": "e.g. Hip thrust machine",
+      "note": "Private note",
+      "notePlaceholder": "For example: seat 4, pin on 3",
+      "privateLine": "Private: only you see it. You can edit it any time.",
+      "toast": {
+        "noteFailed": "The exercise is saved, but its note is not. Try the note again."
+      },
+      "track": {
+        "BODYWEIGHT": "Reps only",
+        "DISTANCE": "Distance",
+        "DURATION": "Time",
+        "STRENGTH": "Weight and reps",
+        "label": "What do you track?"
+      }
     }
   },
   "groups": {
@@ -1913,7 +1967,9 @@
     "latest": "Latest",
     "search": "Search",
     "clientHive": "Your hive",
-    "monthHive": "Your month"
+    "monthHive": "Your month",
+    "workoutSettings": "Workout settings",
+    "archivedRoutines": "Archived routines"
   },
   "payments": {
     "badge": {
@@ -2317,7 +2373,16 @@
         "saveFailed": "Could not save the day",
         "someNotAdded": "Some exercises were not added"
       },
-      "untitledDay": "Untitled day"
+      "untitledDay": "Untitled day",
+      "rest": {
+        "day": "Rest for this day",
+        "program": "Program default",
+        "sameAsDay": "Same as the day ({value})",
+        "sameAsProgram": "Same as the program ({value})",
+        "fromProgram": "Program ({value})",
+        "clientDefault": "Client's own default",
+        "cascade": "Which rest wins: the set, then the exercise, this day, the program, the client's own default, and 90 s."
+      }
     },
     "duplicate": {
       "body": "You get a draft copy of {name} to change freely. This program, and the clients already on it, stay as they are.",
@@ -2356,7 +2421,10 @@
       "photoAlt": "Their workout photo",
       "quotedNote": "“{note}”",
       "title": "Workout",
-      "whatTheyDid": "What they did"
+      "whatTheyDid": "What they did",
+      "effortAvg": "Effort avg",
+      "restAvg": "Rest avg",
+      "highEffort": "Effort 9 or more on 3 of the last 4 sets of {name}. Maybe hold the weight next time."
     },
     "row": {
       "daysPerWeek": "{count} days/week",
@@ -2757,7 +2825,9 @@
       "swap": "Swap exercise",
       "title": "Exercise actions",
       "unskip": "Unskip exercise",
-      "history": "Exercise history"
+      "history": "Exercise history",
+      "addNote": "Add your note",
+      "editNote": "Edit your note"
     },
     "exerciseCard": {
       "actionsFor": "Actions for {name}"
@@ -2828,7 +2898,15 @@
         "saved": "Workout saved"
       },
       "whatYouDid": "What you did",
-      "workoutNumber": "your {count, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} workout"
+      "workoutNumber": "your {count, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} workout",
+      "delete": {
+        "action": "Delete workout",
+        "title": "Delete this workout?",
+        "body": "Its sets, the records it set and its photo go with it. If it was a day of your plan, that day opens again.",
+        "irreversible": "This can't be undone.",
+        "done": "Workout deleted",
+        "failed": "Couldn't delete it. Try again."
+      }
     },
     "history": {
       "calendar": {
@@ -2904,7 +2982,14 @@
       "minus": "Minus {step}",
       "numberPad": "Number pad",
       "plus": "Plus {step}",
-      "stepSeconds": "{step}s"
+      "stepSeconds": "{step}s",
+      "next": {
+        "weight": "kg",
+        "reps": "Reps",
+        "duration": "Time",
+        "distance": "Distance"
+      },
+      "logSet": "Log set"
     },
     "loadError": {
       "clientProgress": "Couldn't load their progress",
@@ -2983,6 +3068,20 @@
         "removeSetFailed": "Could not remove that set",
         "removed": "Removed {name}",
         "repeatFailed": "Could not load that workout to repeat"
+      },
+      "last": "last {value}",
+      "best": "best {value}",
+      "editing": "editing",
+      "backTo": "Back to {value}",
+      "plan": {
+        "effort": "effort {value}",
+        "rest": "rest {value}"
+      },
+      "away": {
+        "title": "You were away {minutes} min",
+        "message": "Pause the workout for that time? It won't count toward the duration.",
+        "pause": "Pause it",
+        "keep": "Keep it"
       }
     },
     "meta": {
@@ -3070,7 +3169,16 @@
       "nextUp": "Next up",
       "plusSeconds": "Plus {seconds} seconds",
       "rest": "Rest",
-      "restOver": "Rest over"
+      "restOver": "Rest over",
+      "of": "of {total} · rest",
+      "getReady": "get ready",
+      "go": "Go",
+      "restDone": "rest done",
+      "over": "over {total} rest",
+      "next": "Next",
+      "startSet": "Start set",
+      "hide": "Hide",
+      "change": "Change the rest"
     },
     "routineBuilder": {
       "copyConfirm": {
@@ -3114,6 +3222,27 @@
         "saveFailed": "Could not save the routine",
         "saved": "Routine saved",
         "startFailed": "Could not start that routine"
+      },
+      "rest": {
+        "row": "Rest between sets",
+        "hint": "For every exercise in this routine",
+        "yourDefault": "Your default ({value})",
+        "sameAsRoutine": "Same as the routine ({value})",
+        "exercise": "Rest for {name}",
+        "chip": "Rest"
+      },
+      "superset": {
+        "link": "Link as superset",
+        "unlink": "Superset · tap to unlink",
+        "linkFor": "Link {a} and {b} as a superset",
+        "unlinkFor": "Unlink {a} and {b}"
+      },
+      "archive": {
+        "action": "Archive",
+        "restore": "Restore",
+        "done": "Archived. It waits under Archived routines.",
+        "restored": "Restored to your routines",
+        "failed": "Couldn't change it. Try again."
       }
     },
     "routineRow": {
@@ -3130,9 +3259,12 @@
     },
     "setRow": {
       "cellLabel": "{field, select, weight {weight} reps {reps} duration {duration} distance {distance} other {{field}}} for set {number}",
-      "complete": "Set {number} complete",
+      "complete": "{name} done",
       "lastTime": "Last time: {value}",
-      "options": "Options for set {number}"
+      "options": "Options for set {number}",
+      "menu": "Options for {name}",
+      "edit": "Edit {name}",
+      "untick": "Mark {name} as not done"
     },
     "setTypeMark": {
       "DROPSET": "Dropset",
@@ -3302,7 +3434,8 @@
     "units": {
       "kg": "{value} kg",
       "kgShort": "kg",
-      "meters": "{value} m"
+      "meters": "{value} m",
+      "metersShort": "m"
     },
     "memory": {
       "monthsAgo": "{count, plural, one {A month ago} other {# months ago}}",
@@ -3325,7 +3458,155 @@
         "less": "{value} less than last time",
         "same": "Same as last time",
         "first": "First time on this exercise"
+      },
+      "rest": "rest {value}",
+      "restEstimated": "rest ~{value}",
+      "break": "break",
+      "quoted": "“{note}”"
+    },
+    "setBadge": {
+      "WARMUP": "W",
+      "DROPSET": "D",
+      "FAILURE": "F",
+      "AMRAP": "A",
+      "REST_PAUSE": "RP",
+      "CLUSTER": "CL"
+    },
+    "setMenu": {
+      "hints": {
+        "WARMUP": "Doesn't count toward volume or records",
+        "DROPSET": "No rest before it",
+        "AMRAP": "As many reps as possible"
+      },
+      "note": "Note on this set",
+      "addNote": "Add a note",
+      "notePlaceholder": "For example: the last rep was assisted",
+      "remove": "Remove set"
+    },
+    "effort": {
+      "title": "How hard?",
+      "target": "target {value}",
+      "skip": "Skip",
+      "rpe": "RPE {value}",
+      "choice": "Effort {value} out of 10"
+    },
+    "restSheet": {
+      "title": "Rest",
+      "scope": "Who it is for",
+      "exercise": "This exercise",
+      "exerciseHint": "{name}, from now on in this workout",
+      "workout": "Every exercise in this workout",
+      "workoutHint": "Where no other rest is set",
+      "footnote": "Only this workout changes.",
+      "apply": "Apply",
+      "less": "{seconds} seconds less",
+      "more": "{seconds} seconds more"
+    },
+    "exerciseNote": {
+      "label": "Your note",
+      "placeholder": "For example: seat 4, back pad 2, pin on 3",
+      "private": "Only you see it, every time this exercise comes up.",
+      "saveFailed": "Couldn't save your note. Try again."
+    },
+    "superset": {
+      "kicker": "Superset · round {round} of {total}",
+      "round": "Round {number}",
+      "done": "done",
+      "skipped": "skipped",
+      "addRound": "Add round",
+      "restAfterRound": "Rest after the round: {value}",
+      "rounds": "{count, plural, one {# round} other {# rounds}}"
+    },
+    "loggerOptions": {
+      "title": "This workout",
+      "restForAll": "Rest for every exercise",
+      "pause": "Pause workout",
+      "footnote": "Only this workout changes. Your defaults are in Settings › Workouts.",
+      "more": "More for this workout"
+    },
+    "archived": {
+      "link": "{count, plural, one {# archived routine} other {# archived routines}}",
+      "title": "Archived routines",
+      "note": "Put away, not gone: their workouts stay in your history. Open one to restore it.",
+      "loadError": "Couldn't load your archived routines",
+      "empty": {
+        "title": "Nothing archived",
+        "message": "Routines you archive wait here."
       }
+    },
+    "activeBar": {
+      "resting": "Rest · next {next}",
+      "restDone": "Rest done · next {next}",
+      "inProgress": "Workout in progress",
+      "paused": "Paused",
+      "open": "Back to {name}",
+      "dot": "A workout is in progress"
+    },
+    "stillTraining": {
+      "title": "Still training?",
+      "body": "{name} is still open. Tap to finish it or keep going."
+    },
+    "startConflict": {
+      "title": "{name} is still open",
+      "subtitle": "One workout at a time. What should happen to it?",
+      "resume": "Resume it",
+      "finishAndStart": "Finish it and start the new one",
+      "finishHint": "Saved with the sets you ticked",
+      "discardAndStart": "Discard it and start the new one",
+      "discardHint": "Deleted, with everything logged in it",
+      "failed": "Couldn't close the open workout. Try again."
+    },
+    "volume": {
+      "chartLabel": "{metric} went from {from} to {to}",
+      "deltaIn": "{change} in {range}",
+      "exercise": {
+        "caption": {
+          "best": "Best each session",
+          "topSet": "Heaviest set each session",
+          "volume": {
+            "kg": "Volume per session · warm-ups excluded",
+            "meters": "Distance per session · warm-ups excluded",
+            "reps": "Reps per session · warm-ups excluded",
+            "seconds": "Time per session · warm-ups excluded"
+          }
+        },
+        "metric": {
+          "best": "Best",
+          "oneRepMax": "Est. 1RM",
+          "topSet": "Top set",
+          "volume": "Volume"
+        },
+        "metricLabel": "What the chart shows",
+        "recordStill": "The record hasn't moved since {date}, but you did more at the same weight. That's progress too."
+      },
+      "finish": {
+        "firstTime": "Next time you'll see the comparison here.",
+        "lastTime": "Last time",
+        "newExercise": "First time",
+        "rowLabel": "{name}: {today} today, {last} last time",
+        "rowLabelNew": "{name}: {today} today, the first time",
+        "sameAsLast": "Same as last {name} ({total})",
+        "title": "Volume",
+        "today": "Today",
+        "vsLast": "{change} vs last {name} ({total}) · {percent}",
+        "vsLastNoPercent": "{change} vs last {name} ({total})",
+        "superset": "Superset {letter}"
+      },
+      "weeks": {
+        "barLabel": "Week of {date}: {value}",
+        "emptyWeek": "No workouts that week.",
+        "hint": "Last 12 weeks · tap a week",
+        "listError": "Couldn't load that week's workouts",
+        "metricLabel": "What the chart shows",
+        "thisWeek": "This week",
+        "weekOf": "Week of {date}"
+      }
+    },
+    "notifyAsk": {
+      "title": "Know when rest is over",
+      "body": "So we can tell you when rest is over, even with the phone locked or in another app. Nothing else.",
+      "allow": "Turn on notifications",
+      "notNow": "Not now"
     }
   },
   "feedback": {

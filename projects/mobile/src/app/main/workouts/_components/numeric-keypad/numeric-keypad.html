@@ -44,6 +44,11 @@
       <button type="button" class="ghost" [attr.aria-label]="'button.clear' | translate" (click)="clear()">C</button>
     }
     <button type="button" (click)="press('0')">0</button>
-    <ion-button class="done" (click)="commit.emit(committed())">{{ 'button.done' | translate }}</ion-button>
+    <ion-button class="done" (click)="commit.emit(committed())">
+      @if (actionIcon(); as icon) {
+        <ion-icon [slot]="actionIconSlot()" [name]="icon" aria-hidden="true" />
+      }
+      {{ actionLabel() || ('button.done' | translate) }}
+    </ion-button>
   </div>
 </div>

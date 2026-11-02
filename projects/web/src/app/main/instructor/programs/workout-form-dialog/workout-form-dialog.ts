@@ -20,6 +20,8 @@ import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
+
+import { REST_CHOICES, restClock } from '../program-rest';
 import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
@@ -91,7 +93,15 @@ export class WorkoutFormDialog {
     dayIndex: [0],
     phase: [''],
     estimatedDurationMinutes: [null as number | null],
+    /** Rest for every set of the day that sets none; null takes the program's. */
+    defaultRestSeconds: [null as number | null],
   });
+
+  /** The rests offered for a day; none means the program's default applies. */
+  readonly restOptions = computed<SelectItem<number | null>[]>(() => [
+    { value: null, label: this._translateService.instant('programs.rest.programDefault') },
+    ...REST_CHOICES.map((seconds) => ({ value: seconds, label: restClock(seconds) })),
+  ]);
 
   // ── Options ──────────────────────────────────────────────────────
 
@@ -183,6 +193,10 @@ export class WorkoutFormDialog {
       ...(value.estimatedDurationMinutes != null
         ? { estimatedDurationMinutes: value.estimatedDurationMinutes }
         : {}),
+      // Sent as null on an edit, so choosing the program's default clears it.
+      ...(value.defaultRestSeconds != null || this.workout()
+        ? { defaultRestSeconds: value.defaultRestSeconds }
+        : {}),
     };
 
     this.submitting.set(true);
@@ -236,6 +250,7 @@ export class WorkoutFormDialog {
         dayIndex: w.dayIndex,
         phase: w.phase ?? '',
         estimatedDurationMinutes: w.estimatedDurationMinutes ?? null,
+        defaultRestSeconds: w.defaultRestSeconds ?? null,
       });
     } else {
       this.form.reset({ weekIndex: this.initialWeek() ?? 0 });

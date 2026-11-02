@@ -108,10 +108,28 @@ export function isBasicsValid(draft: ExerciseDraft): boolean {
   return draft.name.trim().length >= 2 && draft.kind !== null;
 }
 
-/** At least one primary muscle, and no more than the server accepts. */
-export function isMusclesValid(draft: ExerciseDraft): boolean {
+/**
+ * No more primary muscles than the server accepts, and at least one when the
+ * exercise is a coach's. Someone's own exercise (source USER) may name none:
+ * the simple form's muscle chips are optional.
+ */
+export function isMusclesValid(draft: ExerciseDraft, requirePrimary = true): boolean {
   const count = draft.primaryMuscleIds.length;
-  return count >= 1 && count <= MAX_PRIMARY_MUSCLES;
+  return count >= (requirePrimary ? 1 : 0) && count <= MAX_PRIMARY_MUSCLES;
+}
+
+/**
+ * A blank draft for the simple form, named already when it was opened from a
+ * search. A search is typed in lower case and a name is not, so the first
+ * letter is raised; the rest is left exactly as typed. Weight and reps comes
+ * preselected: it is what most of these are (the machine at your gym the
+ * catalogue does not have), and a name typed in the picker should be one tap
+ * from added.
+ */
+export function simpleDraft(name = ''): ExerciseDraft {
+  const trimmed = name.trim().slice(0, MAX_NAME_LENGTH);
+  const named = trimmed.charAt(0).toLocaleUpperCase() + trimmed.slice(1);
+  return { ...EMPTY_DRAFT, name: named, kind: ExerciseKind.Strength };
 }
 
 /** Empty is valid — the field is optional; a URL we cannot parse is not. */
@@ -168,10 +186,17 @@ export function toPayload(draft: ExerciseDraft): CreateExercisePayload | null {
  */
 export class ExerciseDraftForm {
   readonly draft = signal<ExerciseDraft>({ ...EMPTY_DRAFT });
+  /**
+   * Whether the server will insist on a primary muscle: true for a coach's
+   * exercise (the default, and the wizard's case), false for someone's own.
+   */
+  readonly requirePrimary = signal(true);
 
   readonly nameCount = computed(() => this.draft().name.length);
   readonly isBasicsValid = computed(() => isBasicsValid(this.draft()));
-  readonly isMusclesValid = computed(() => isMusclesValid(this.draft()));
+  readonly isMusclesValid = computed(() =>
+    isMusclesValid(this.draft(), this.requirePrimary()),
+  );
   readonly isYoutubeValid = computed(() => isYoutubeValid(this.draft()));
 
   readonly isValid = computed(
@@ -189,6 +214,11 @@ export class ExerciseDraftForm {
 
   seed(exercise: Exercise): void {
     this.draft.set(draftFromExercise(exercise));
+  }
+
+  /** Start over from `draft`: a fresh form each time a sheet opens. */
+  reset(draft: ExerciseDraft = EMPTY_DRAFT): void {
+    this.draft.set({ ...draft });
   }
 
   patch(patch: Partial<ExerciseDraft>): void {

@@ -189,6 +189,30 @@
     </ion-list>
     }
 
+    @if (canKeepOwn()) {
+    <!-- Your own, made for your training: change it in the short form it was
+         made in, or let it go. Delete last and red, the one that cannot be
+         taken back. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item button detail (click)="editOwn()">
+        <mh-hex-avatar slot="start" size="sm" icon="create-outline" color="primary" />
+        <ion-label>
+          <h3>{{ 'exercises.detail.editAction' | translate }}</h3>
+          <p>{{ 'exercises.own.editHint' | translate }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item button detail="false" class="danger" (click)="deleteOwn()">
+        <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
+        <ion-label>
+          <h3>{{ 'exercises.edit.deleteAction' | translate }}</h3>
+          <p>{{ 'exercises.own.deleteHint' | translate }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    }
+
     <span class="mh-kicker attribution">{{ attribution() }}</span>
   </div>
   }
@@ -199,3 +223,5 @@
   [irreversible]="'exercises.detail.forkConfirm.irreversible' | translate"
   [confirmLabel]="'exercises.detail.forkConfirm.confirm' | translate"
   [cancelLabel]="'button.cancel' | translate" [saving]="forking()" (confirm)="fork()" />
+
+<mh-own-exercise-sheets (updated)="onOwnUpdated()" (deleted)="onOwnDeleted()" />

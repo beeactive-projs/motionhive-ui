@@ -1,0 +1,89 @@
+/* Above the page, like the tab bar: the pages are positioned, so without a
+   layer of its own the page under it would paint over the bar. */
+:host {
+  position: relative;
+  z-index: 10;
+  display: block;
+  padding: 0 0.75rem 0.5rem;
+  background: transparent;
+}
+
+/* Navy, the session talking, like the rest bar it mirrors. */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.5rem 0.875rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--mh-color-navy-card);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: var(--mh-color-navy-card-ink);
+  cursor: pointer;
+  text-align: start;
+}
+
+.hex {
+  flex: none;
+  width: 1.625rem;
+}
+
+.hex svg {
+  display: block;
+  width: 100%;
+}
+
+/* Workout time: an outline. Rest: filled, draining. */
+.hex-base {
+  fill: none;
+  stroke: var(--ion-color-primary);
+  stroke-width: 8;
+}
+
+.resting .hex-base {
+  fill: var(--mh-color-navy-card-raised);
+  stroke: none;
+}
+
+.hex-fill {
+  fill: var(--ion-color-primary);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title,
+.sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.title {
+  font-size: var(--mh-text-sm);
+  font-weight: 700;
+}
+
+.sub {
+  color: var(--mh-color-navy-card-muted);
+  font-size: var(--mh-text-xs);
+}
+
+.right {
+  flex: none;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.bar:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}

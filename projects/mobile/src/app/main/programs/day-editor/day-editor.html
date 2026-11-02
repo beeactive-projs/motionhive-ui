@@ -58,6 +58,18 @@
         (ionBlur)="saveFields()"
       />
 
+      <!-- Rest: this day's, and the program's for every day that sets none. -->
+      <div class="rest-tiles">
+        <button type="button" class="rest-tile" (click)="openRest('day')">
+          <span class="mh-kicker">{{ 'programs.dayEditor.rest.day' | translate }}</span>
+          <strong>{{ dayRestLabel() }}</strong>
+        </button>
+        <button type="button" class="rest-tile" (click)="openRest('program')">
+          <span class="mh-kicker">{{ 'programs.dayEditor.rest.program' | translate }}</span>
+          <strong>{{ programRestLabel() }}</strong>
+        </button>
+      </div>
+
       <section class="mh-section">
         <div class="mh-section-head">
           <span class="mh-kicker">{{ 'programs.dayEditor.exercises' | translate }}</span>
@@ -66,9 +78,20 @@
           }
         </div>
 
-        @for (row of exercises(); track row.id) {
-          <mh-exercise-card [name]="exerciseName(row)" [meta]="setsLabel(row)" (open)="openExercise(row)">
+        @for (row of exercises(); track row.id; let i = $index) {
+          <mh-exercise-card [name]="exerciseName(row)" [meta]="setsLabel(row)" [tag]="tags()[i]" (open)="openExercise(row)">
             <div class="controls">
+              <button
+                type="button"
+                class="rest-chip"
+                [class.own]="!!restChip(row)"
+                [disabled]="saving()"
+                [attr.aria-label]="'workouts.routineBuilder.rest.exercise' | translate: { name: exerciseName(row) }"
+                (click)="openRest(row)"
+              >
+                <ion-icon name="time-outline" aria-hidden="true" />
+                {{ restChip(row) || ('workouts.routineBuilder.rest.chip' | translate) }}
+              </button>
               <ion-button
                 class="mh-remove"
                 fill="outline"
@@ -80,6 +103,29 @@
               </ion-button>
             </div>
           </mh-exercise-card>
+
+          @if (i < exercises().length - 1) {
+            <div class="link-row">
+              <button
+                type="button"
+                class="link-chip"
+                [class.linked]="linkedToNext(i)"
+                [disabled]="saving()"
+                [attr.aria-label]="
+                  (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlinkFor' : 'workouts.routineBuilder.superset.linkFor')
+                    | translate: { a: exerciseName(row), b: exerciseName(exercises()[i + 1]) }
+                "
+                (click)="toggleLink(i)"
+              >
+                <ion-icon name="link-outline" aria-hidden="true" />
+                {{ (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlink' : 'workouts.routineBuilder.superset.link') | translate }}
+              </button>
+            </div>
+          }
+        }
+
+        @if (exercises().length) {
+          <p class="mh-helper cascade">{{ 'programs.dayEditor.rest.cascade' | translate }}</p>
         }
 
         @if (!exercises().length) {
@@ -101,6 +147,14 @@
   [context]="name() || ('programs.dayEditor.contextFallback' | translate)"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
+/>
+
+<mh-choice-sheet
+  [(open)]="restOpen"
+  [title]="restTitle()"
+  [options]="restOptions()"
+  [selected]="restSelected()"
+  (picked)="pickRest($event)"
 />
 
 <mh-confirm-sheet

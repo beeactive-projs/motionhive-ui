@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import {
@@ -29,10 +29,13 @@ import {
   COACH_OWNERSHIP_PILLS,
   EXERCISE_ICONS,
   TRAINEE_OWNERSHIP_PILLS,
+  isOwnExercise,
   resultMetaLabel,
 } from '../../exercises.config';
 import { ExerciseFilters, ExercisesStore } from '../../exercises.store';
 import { ExerciseRow } from '../exercise-row/exercise-row';
+import { CreateExerciseRow } from '../create-exercise-row/create-exercise-row';
+import { OwnExerciseSheets } from '../own-exercise-sheets/own-exercise-sheets';
 
 /** Long enough that a typist is not sending a request per letter. */
 const SEARCH_DEBOUNCE_MS = 300;
@@ -40,7 +43,9 @@ const SEARCH_DEBOUNCE_MS = 300;
 /**
  * The exercise library as a page's section: the field, the filter strip and
  * the list, a page at a time with Show more. The Workouts page's Exercises
- * tab; the library's own page keeps its header search and authoring.
+ * tab; the library's own page keeps its header search and the coach's
+ * authoring. Here a person makes and keeps their own exercises through the
+ * short form: "New exercise" over the list, a ⋯ on each of their rows.
  *
  * Its state is the host's `ExercisesStore`, so switching tabs keeps the
  * place; the host refreshes it when the section shows. `detailBase` is where
@@ -49,6 +54,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 @Component({
   selector: 'mh-exercise-library',
   imports: [
+    CreateExerciseRow,
     EmptyState,
     ExerciseFilterSheet,
     ExerciseRow,
@@ -60,6 +66,7 @@ const SEARCH_DEBOUNCE_MS = 300;
     IonList,
     IonSearchbar,
     IonSkeletonText,
+    OwnExerciseSheets,
     TranslatePipe,
   ],
   templateUrl: './exercise-library.html',
@@ -84,10 +91,19 @@ export class ExerciseLibrary {
   readonly searchInput = linkedSignal(() => this.store.search());
   private readonly _searchTerms = new Subject<string>();
 
-  /** Authoring is the coach workspace's business, not the role's alone. */
+  /** The coach's full form is the coach workspace's business, not the role's alone. */
   private readonly _canAuthor = computed(
     () => this._authStore.isInstructor() && this._appModeStore.isCoach(),
   );
+
+  /**
+   * Your own exercises through the short form. Offered outside coach mode
+   * only: a coach in coach mode authors from the library's own page, where
+   * the full form lives.
+   */
+  readonly canKeepOwn = computed(() => !this._canAuthor());
+
+  private readonly _ownSheets = viewChild(OwnExerciseSheets);
 
   readonly myUserId = computed(() => this._authStore.user()?.id ?? null);
 
@@ -96,6 +112,18 @@ export class ExerciseLibrary {
   );
 
   readonly metaLabel = computed(() => resultMetaLabel(this.store.total(), this.store.sort()));
+
+  /**
+   * Mine with nothing in it and nothing narrowing it: a beginning, with the
+   * way to make one, not "nothing matches".
+   */
+  readonly isMineEmpty = computed(
+    () =>
+      this.canKeepOwn() &&
+      this.store.ownership() === ExerciseOwnershipFilter.Mine &&
+      !this.store.hasNarrowing() &&
+      this.store.isFilteredEmpty(),
+  );
 
   constructor() {
     addIcons(EXERCISE_ICONS);
@@ -107,13 +135,6 @@ export class ExerciseLibrary {
       .pipe(debounceTime(SEARCH_DEBOUNCE_MS), takeUntilDestroyed())
       .subscribe((term) => this.store.setSearch(term));
 
-    // A trainee's pill set has no Mine, so a stale selection from a role
-    // switch would ask the server for a slice the pills cannot show.
-    effect(() => {
-      if (!this._canAuthor() && this.store.ownership() === ExerciseOwnershipFilter.Mine) {
-        this.store.setOwnership(ExerciseOwnershipFilter.All);
-      }
-    });
   }
 
   onQuery(value: string): void {
@@ -140,6 +161,33 @@ export class ExerciseLibrary {
   }
 
   retry(): void {
+    this.store.refresh();
+  }
+
+  /** From a search that found nothing by that name: the form starts from it. */
+  createFromSearch(name: string): void {
+    this._ownSheets()?.create(name);
+  }
+
+  create(): void {
+    this._ownSheets()?.create();
+  }
+
+  hasMenu(exercise: Exercise): boolean {
+    return this.canKeepOwn() && isOwnExercise(exercise, this.myUserId());
+  }
+
+  openMenu(exercise: Exercise): void {
+    this._ownSheets()?.menu(exercise);
+  }
+
+  /** Made from here: show it where it now lives, among your own. */
+  onCreated(): void {
+    if (this.store.ownership() === ExerciseOwnershipFilter.Mine) this.store.refresh();
+    else this.store.setOwnership(ExerciseOwnershipFilter.Mine);
+  }
+
+  onChanged(): void {
     this.store.refresh();
   }
 }

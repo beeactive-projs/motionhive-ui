@@ -38,6 +38,18 @@ import {
 } from 'core';
 
 import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
+import { ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
+import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
+import { WorkoutSettingsStore } from '../_services/workout-settings.store';
+import {
+  NO_REST,
+  builderRestChoices,
+  linkWithNext,
+  normalizeSupersets,
+  personDefaultLabel,
+  supersetTags,
+  unlinkFromNext,
+} from './routine-builder.config';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
@@ -59,6 +71,7 @@ import {
   formatMeasure,
   prescriptionLine,
   routineActions,
+  secondsToClock,
 } from '../workouts.config';
 
 /** The two targets a routine prescribes per exercise. */
@@ -85,6 +98,10 @@ interface DraftExercise {
   targetRepsMin: number | null;
   targetRepsMax: number | null;
   targetWeightKg: number | null;
+  /** Rest after each of its sets; null takes the routine's. */
+  restAfterSeconds: number | null;
+  /** Rows sharing a number stand together as a superset. */
+  supersetGroupId: number | null;
 }
 
 /** The URL segment that means "a routine that does not exist yet". */
@@ -110,6 +127,7 @@ const NEW = 'new';
   selector: 'mh-routine-builder',
   imports: [
     ActionSheet,
+    ChoiceSheet,
     ConfirmSheet,
     EmptyState,
     ExerciseCard,
@@ -131,6 +149,7 @@ const NEW = 'new';
     IonTitle,
     IonToolbar,
     NumericKeypad,
+    SettingsRow,
     TranslatePipe,
     WorkoutOverview,
   ],
@@ -164,6 +183,49 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly routine = signal<Routine | null>(null);
   readonly name = signal('');
   readonly exercises = signal<DraftExercise[]>([]);
+  /** "Rest between sets", for every exercise that sets none; null takes the person's. */
+  readonly defaultRest = signal<number | null>(null);
+
+  private readonly _settingsStore = inject(WorkoutSettingsStore);
+  /** Which rest the sheet is choosing: the routine's, or one exercise's (by index). */
+  readonly restFor = signal<'routine' | number | null>(null);
+  readonly restOpen = signal(false);
+  /** "A1", "A2": the superset tags, one per row. */
+  readonly tags = computed(() => supersetTags(this.exercises()));
+  readonly defaultRestLabel = computed(() => {
+    const own = this.defaultRest();
+    return own !== null
+      ? secondsToClock(own)
+      : personDefaultLabel(this._settingsStore.settings().defaultRestSeconds);
+  });
+  readonly restSheetTitle = computed(() => {
+    const target = this.restFor();
+    if (target === null || target === 'routine') {
+      return this._translateService.instant('workouts.routineBuilder.rest.row');
+    }
+    const row = this.exercises()[target];
+    return this._translateService.instant('workouts.routineBuilder.rest.exercise', {
+      name: row?.name ?? '',
+    });
+  });
+  readonly restOptions = computed(() => {
+    const target = this.restFor();
+    const inherit =
+      target === 'routine' || target === null
+        ? personDefaultLabel(this._settingsStore.settings().defaultRestSeconds)
+        : this._translateService.instant('workouts.routineBuilder.rest.sameAsRoutine', {
+            value: this.defaultRestLabel(),
+          });
+    return builderRestChoices(inherit);
+  });
+  readonly restSelected = computed(() => {
+    const target = this.restFor();
+    const value =
+      target === 'routine' || target === null
+        ? this.defaultRest()
+        : (this.exercises()[target]?.restAfterSeconds ?? null);
+    return value === null ? NO_REST : String(value);
+  });
 
   readonly loading = signal(false);
   readonly error = signal(false);
@@ -248,7 +310,10 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly showActions = computed(() => this.showOverview() && !this.readOnly());
 
   /** Coaching puts Edit in the footer; training puts Start there, so Edit joins the sheet. */
-  readonly actions = computed(() => routineActions(this.isCoachMode()));
+  readonly actions = computed(() =>
+    routineActions(this.isCoachMode(), this.routine()?.archived ?? false),
+  );
+  readonly archiving = signal(false);
 
   readonly copyBody = computed(() =>
     this._translateService.instant('workouts.routineBuilder.copyConfirm.body', {
@@ -409,10 +474,44 @@ export class RoutineBuilder implements ViewWillEnter {
       case RoutineActionIds.Duplicate:
         this.askCopy();
         return;
+      case RoutineActionIds.Archive:
+      case RoutineActionIds.Restore:
+        this._setArchived(id === RoutineActionIds.Archive);
+        return;
       case RoutineActionIds.Delete:
         this.deleteOpen.set(true);
         return;
     }
+  }
+
+  /**
+   * Archive puts the routine away and goes back to the list it no longer
+   * shows on; Restore brings it back and stays.
+   */
+  private _setArchived(archive: boolean): void {
+    const id = this._id();
+    if (!id || id === NEW || this.archiving()) return;
+    this.archiving.set(true);
+    const request = archive ? this._routineService.archive(id) : this._routineService.restore(id);
+    request.pipe(take(1)).subscribe({
+      next: (saved) => {
+        this.archiving.set(false);
+        this.routine.update((routine) => (routine ? { ...routine, archived: saved.archived } : routine));
+        void this._feedbackService.success(
+          this._translateService.instant(
+            archive ? 'workouts.routineBuilder.archive.done' : 'workouts.routineBuilder.archive.restored',
+          ),
+        );
+        if (archive) void this._router.navigate([this.stackBase()]);
+      },
+      error: (err) => {
+        this.archiving.set(false);
+        void this._feedbackService.error(
+          err,
+          this._translateService.instant('workouts.routineBuilder.archive.failed'),
+        );
+      },
+    });
   }
 
   // ─── Copying ──────────────────────────────────────────────────
@@ -496,6 +595,8 @@ export class RoutineBuilder implements ViewWillEnter {
           targetRepsMin: null,
           targetRepsMax: null,
           targetWeightKg: null,
+          restAfterSeconds: null,
+          supersetGroupId: null,
         })),
       ]);
     }
@@ -524,12 +625,51 @@ export class RoutineBuilder implements ViewWillEnter {
     );
   }
 
+  // ─── Rest and supersets ───────────────────────────────────────
+
+  openRest(target: 'routine' | number): void {
+    this._settingsStore.load();
+    this.restFor.set(target);
+    this.restOpen.set(true);
+  }
+
+  pickRest(value: string): void {
+    const seconds = value === NO_REST ? null : Number(value);
+    const target = this.restFor();
+    if (target === 'routine') {
+      this.defaultRest.set(seconds);
+    } else if (typeof target === 'number') {
+      this.exercises.update((rows) =>
+        rows.map((row, i) => (i === target ? { ...row, restAfterSeconds: seconds } : row)),
+      );
+    }
+  }
+
+  /** "2:00" on an exercise's chip, or nothing when it takes the routine's rest. */
+  restChip(row: DraftExercise): string {
+    return row.restAfterSeconds === null ? '' : secondsToClock(row.restAfterSeconds);
+  }
+
+  /** Is this row linked to the one after it? */
+  linkedToNext(index: number): boolean {
+    const rows = this.exercises();
+    const group = rows[index]?.supersetGroupId ?? null;
+    return group !== null && rows[index + 1]?.supersetGroupId === group;
+  }
+
+  toggleLink(index: number): void {
+    this.exercises.update((rows) =>
+      this.linkedToNext(index) ? unlinkFromNext(rows, index) : linkWithNext(rows, index),
+    );
+  }
+
   setsLabel(row: DraftExercise): string {
     return this._translateService.instant('count.sets', { count: row.sets });
   }
 
+  /** Taking one half out of a superset unlinks the other. */
   remove(index: number): void {
-    this.exercises.update((rows) => rows.filter((_, i) => i !== index));
+    this.exercises.update((rows) => normalizeSupersets(rows.filter((_, i) => i !== index)));
   }
 
   // ─── Targets ──────────────────────────────────────────────────
@@ -593,9 +733,12 @@ export class RoutineBuilder implements ViewWillEnter {
 
     const payload = {
       name: this.name().trim(),
-      exercises: this.exercises().map<CreateRoutineExercisePayload>((row) => ({
+      defaultRestSeconds: this.defaultRest(),
+      exercises: normalizeSupersets(this.exercises()).map<CreateRoutineExercisePayload>((row) => ({
         exerciseId: row.exerciseId,
         defaultSets: row.sets,
+        ...(row.restAfterSeconds != null ? { restAfterSeconds: row.restAfterSeconds } : {}),
+        ...(row.supersetGroupId != null ? { supersetGroupId: row.supersetGroupId } : {}),
         ...(row.targetRepsMin != null ? { targetRepsMin: row.targetRepsMin } : {}),
         ...(row.targetRepsMax != null ? { targetRepsMax: row.targetRepsMax } : {}),
         ...(row.targetWeightKg != null ? { targetWeightKg: row.targetWeightKg } : {}),
@@ -692,6 +835,7 @@ export class RoutineBuilder implements ViewWillEnter {
   /** The builder's rows, rebuilt from what is saved. */
   private _resetDraft(routine: Routine): void {
     this.name.set(routine.name);
+    this.defaultRest.set(routine.defaultRestSeconds);
     this.exercises.set(
       (routine.exercises ?? []).map((e) => ({
         key: e.id,
@@ -701,6 +845,8 @@ export class RoutineBuilder implements ViewWillEnter {
         targetRepsMin: e.targetRepsMin,
         targetRepsMax: e.targetRepsMax,
         targetWeightKg: e.targetWeightKg,
+        restAfterSeconds: e.restAfterSeconds,
+        supersetGroupId: e.supersetGroupId,
       })),
     );
   }

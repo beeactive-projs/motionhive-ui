@@ -1,57 +1,113 @@
-<!-- Swipe the row left to remove it, or tap its number: the number is the
-     visible way in, the swipe the quick one. -->
-<ion-item-sliding #sliding>
-  <ion-item lines="none" class="set-item">
-    <div class="row" [class.done]="set().isCompleted">
+@switch (mode()) {
+  @case (Modes.Done) {
+    <div class="line done">
       <button
-        class="num"
         type="button"
-        [attr.aria-label]="'workouts.setRow.options' | translate: { number: index() + 1 }"
-        (click)="openOptions()"
+        [class]="'badge tone-' + badge().tone"
+        [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
+        (click)="menu.emit()"
       >
-        <!-- A warm-up or drop set wears its mark in place of the number. -->
-        @if (typeMark(); as mark) {
-          <span class="mark">{{ mark }}</span>
-        } @else {
-          {{ index() + 1 }}
+        {{ badge().text }}
+      </button>
+      <button
+        type="button"
+        class="text"
+        [attr.aria-label]="'workouts.setRow.edit' | translate: { name: badge().name }"
+        (click)="open.emit()"
+      >
+        <span class="value">{{ doneLine() || '–' }}</span>
+        @if (rpe(); as value) {
+          <span class="rpe">{{ 'workouts.effort.rpe' | translate: { value } }}</span>
         }
       </button>
+      <ion-icon class="check" name="checkmark-outline" aria-hidden="true" />
+    </div>
+    @if (set().notes; as note) {
+      <p class="set-note">{{ note }}</p>
+    }
+  }
 
-      <span class="prev" [attr.title]="'workouts.setRow.lastTime' | translate: { value: previousLabel() }">{{ previousLabel() }}</span>
-
-      @for (cell of cells(); track cell.field) {
+  @case (Modes.Focus) {
+    <!-- The set you are on: big targets where the finger is. -->
+    <div class="focus" [class.reopened]="set().isCompleted">
+      <div class="head">
         <button
-          class="cell"
           type="button"
-          [class.active]="cell.active"
-          [class.placeholder]="!cell.value"
-          [attr.aria-label]="'workouts.setRow.cellLabel' | translate: { field: cell.field, number: index() + 1 }"
-          (click)="edit.emit(cell.field)"
+          [class]="'badge tone-' + badge().tone"
+          [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
+          (click)="menu.emit()"
         >
-          {{ cell.value || cell.placeholder || '–' }}
+          {{ badge().text }}
         </button>
-      }
-
-      <!-- The minimum bar: a tick alone is a valid log, so it is never gated on
-           a value being entered. -->
-      <button
-        class="tick"
-        type="button"
-        [attr.aria-pressed]="set().isCompleted"
-        [attr.aria-label]="'workouts.setRow.complete' | translate: { number: index() + 1 }"
-        (click)="toggle.emit()"
-      >
-        @if (set().isCompleted) {
-          <ion-icon name="checkmark-outline" aria-hidden="true" />
+        <span class="name">
+          {{ badge().name }}
+          @if (set().isCompleted) {
+            · {{ 'workouts.logger.editing' | translate }}
+          }
+        </span>
+        @if (last()) {
+          <span class="last">{{ last() }}</span>
         }
+      </div>
+
+      <div class="fields">
+        @for (cell of cells(); track cell.field) {
+          <button
+            type="button"
+            class="field"
+            [class.weight]="cell.field === 'weight'"
+            [class.active]="cell.active"
+            [class.prefill]="cell.prefill"
+            [attr.aria-label]="'workouts.setRow.cellLabel' | translate: { field: cell.field, number: badge().text }"
+            (click)="edit.emit(cell.field)"
+          >
+            <span class="num">{{ cell.text || '–' }}</span>
+            <!-- Inside the field, so a small phone at large text still fits
+                 both fields and the tick. -->
+            @if (cell.unit) {
+              <span class="unit">{{ cell.unit }}</span>
+            }
+          </button>
+        }
+        <!-- A tick alone is a valid log: never gated on a value being typed. -->
+        <button
+          type="button"
+          class="tick"
+          [class.on]="set().isCompleted"
+          [attr.aria-pressed]="set().isCompleted"
+          [attr.aria-label]="
+            (set().isCompleted ? 'workouts.setRow.untick' : 'workouts.setRow.complete')
+              | translate: { name: badge().name, number: badge().text }
+          "
+          (click)="tick.emit()"
+        >
+          <ion-icon name="checkmark-outline" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+    @if (set().notes; as note) {
+      <p class="set-note">{{ note }}</p>
+    }
+  }
+
+  @case (Modes.Future) {
+    <div class="line future">
+      <button
+        type="button"
+        [class]="'badge tone-' + badge().tone"
+        [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
+        (click)="menu.emit()"
+      >
+        {{ badge().text }}
+      </button>
+      <button
+        type="button"
+        class="text"
+        [attr.aria-label]="'workouts.setRow.edit' | translate: { name: badge().name }"
+        (click)="open.emit()"
+      >
+        <span class="value">{{ futureLine() }}</span>
       </button>
     </div>
-  </ion-item>
-
-  <ion-item-options side="end">
-    <ion-item-option color="danger" (click)="onRemove()">
-      <ion-icon slot="start" name="trash-outline" aria-hidden="true" />
-      {{ 'button.remove' | translate }}
-    </ion-item-option>
-  </ion-item-options>
-</ion-item-sliding>
+  }
+}

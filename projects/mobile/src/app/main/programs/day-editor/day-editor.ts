@@ -20,18 +20,26 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { firstValueFrom, forkJoin, of } from 'rxjs';
+import { Observable, firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import { Exercise, PrescribedExercise, Program, ProgramService, ProgramWorkout } from 'core';
 
+import { ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { coachStackOf } from '../../clients/client-paths';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../../workouts/_components/exercise-card/exercise-card';
-import { DEFAULT_SETS } from '../../workouts/workouts.config';
+import { DEFAULT_SETS, secondsToClock } from '../../workouts/workouts.config';
+import {
+  NO_REST,
+  builderRestChoices,
+  linkWithNext,
+  supersetTags,
+  unlinkFromNext,
+} from '../../workouts/routine-builder/routine-builder.config';
 import { PROGRAM_ICONS, dayLabel, weekLabel } from '../programs.config';
 
 /**
@@ -48,6 +56,7 @@ import { PROGRAM_ICONS, dayLabel, weekLabel } from '../programs.config';
 @Component({
   selector: 'mh-day-editor',
   imports: [
+    ChoiceSheet,
     ConfirmSheet,
     EmptyState,
     ExerciseCard,
@@ -93,6 +102,55 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
 
   readonly name = signal('');
   readonly note = signal('');
+
+  /** Which rest the sheet is choosing: the day's, the program's, or one exercise's. */
+  readonly restFor = signal<
+    { kind: 'day' } | { kind: 'program' } | { kind: 'exercise'; row: PrescribedExercise } | null
+  >(null);
+  readonly restOpen = signal(false);
+
+  /** "A1", "A2": superset tags, one per exercise row. */
+  readonly tags = computed(() => supersetTags(this.exercises()));
+  readonly dayRest = computed(() => this.workout()?.defaultRestSeconds ?? null);
+  readonly programRest = computed(() => this.program()?.defaultRestSeconds ?? null);
+  readonly dayRestLabel = computed(() => this._restLabel(this.dayRest(), this.programRest()));
+  readonly programRestLabel = computed(() => this._restLabel(this.programRest(), null));
+
+  readonly restTitle = computed(() => {
+    const target = this.restFor();
+    if (target?.kind === 'exercise') {
+      return this._translateService.instant('workouts.routineBuilder.rest.exercise', {
+        name: this.exerciseName(target.row),
+      });
+    }
+    return this._translateService.instant(
+      target?.kind === 'program' ? 'programs.dayEditor.rest.program' : 'programs.dayEditor.rest.day',
+    );
+  });
+
+  readonly restOptions = computed(() => {
+    const target = this.restFor();
+    const inherit =
+      target?.kind === 'exercise'
+        ? this._translateService.instant('programs.dayEditor.rest.sameAsDay', { value: this.dayRestLabel() })
+        : target?.kind === 'day'
+          ? this._translateService.instant('programs.dayEditor.rest.sameAsProgram', {
+              value: this.programRestLabel(),
+            })
+          : this._translateService.instant('programs.dayEditor.rest.clientDefault');
+    return builderRestChoices(inherit);
+  });
+
+  readonly restSelected = computed(() => {
+    const target = this.restFor();
+    const value =
+      target?.kind === 'exercise'
+        ? this.exerciseRest(target.row)
+        : target?.kind === 'program'
+          ? this.programRest()
+          : this.dayRest();
+    return value === null ? NO_REST : String(value);
+  });
 
   private _programId: string | null = null;
   private _workoutId: string | null = null;
@@ -171,6 +229,104 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
 
   setsLabel(row: PrescribedExercise): string {
     return this._translateService.instant('count.sets', { count: (row.sets ?? []).length });
+  }
+
+  // ─── Rest and supersets ───────────────────────────────────────
+
+  /** The exercise's own rest, when every set agrees on one; null when it takes the day's. */
+  exerciseRest(row: PrescribedExercise): number | null {
+    const rests = (row.sets ?? []).map((set) => set.restAfterSeconds ?? null);
+    const first = rests[0] ?? null;
+    return first !== null && rests.every((r) => r === first) ? first : null;
+  }
+
+  restChip(row: PrescribedExercise): string {
+    const rest = this.exerciseRest(row);
+    return rest === null ? '' : secondsToClock(rest);
+  }
+
+  openRest(target: 'day' | 'program' | PrescribedExercise): void {
+    this.restFor.set(
+      target === 'day' ? { kind: 'day' } : target === 'program' ? { kind: 'program' } : { kind: 'exercise', row: target },
+    );
+    this.restOpen.set(true);
+  }
+
+  pickRest(value: string): void {
+    const seconds = value === NO_REST ? null : Number(value);
+    const target = this.restFor();
+    const programId = this._programId;
+    const workoutId = this._workoutId;
+    if (!target || !programId || !workoutId) return;
+    if (target.kind === 'exercise') {
+      this._write(
+        this._programService.updateExercise(programId, workoutId, target.row.id, {
+          restAfterSeconds: seconds,
+        }),
+      );
+    } else if (target.kind === 'program') {
+      this._write(this._programService.update(programId, { defaultRestSeconds: seconds }));
+    } else {
+      this._write(
+        this._programService.updateWorkout(programId, workoutId, { defaultRestSeconds: seconds }),
+      );
+    }
+  }
+
+  /** Is this exercise linked to the one after it? */
+  linkedToNext(index: number): boolean {
+    const rows = this.exercises();
+    const group = rows[index]?.supersetGroupId ?? null;
+    return group !== null && rows[index + 1]?.supersetGroupId === group;
+  }
+
+  /**
+   * Link with the next exercise, or undo it. The new groups are worked out
+   * here, the same rules as the routine builder, and only the rows whose
+   * group changed are saved.
+   */
+  toggleLink(index: number): void {
+    const programId = this._programId;
+    const workoutId = this._workoutId;
+    const rows = this.exercises();
+    if (!programId || !workoutId) return;
+    const next = this.linkedToNext(index) ? unlinkFromNext(rows, index) : linkWithNext(rows, index);
+    const changed = next.filter((row, i) => (row.supersetGroupId ?? null) !== (rows[i].supersetGroupId ?? null));
+    if (!changed.length) return;
+    this._write(
+      forkJoin(
+        changed.map((row) =>
+          this._programService.updateExercise(programId, workoutId, row.id, {
+            supersetGroupId: row.supersetGroupId ?? null,
+          }),
+        ),
+      ),
+    );
+  }
+
+  /** "1:30", or the rest it falls back to: "Program (1:30)", "Client's own". */
+  private _restLabel(own: number | null, fallback: number | null): string {
+    if (own !== null) return secondsToClock(own);
+    return fallback !== null
+      ? this._translateService.instant('programs.dayEditor.rest.fromProgram', { value: secondsToClock(fallback) })
+      : this._translateService.instant('programs.dayEditor.rest.clientDefault');
+  }
+
+  private _write(request: Observable<unknown>): void {
+    this.saving.set(true);
+    request.pipe(take(1)).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.load();
+      },
+      error: (err) => {
+        this.saving.set(false);
+        void this._feedbackService.error(
+          err,
+          this._translateService.instant('programs.dayEditor.toast.saveFailed'),
+        );
+      },
+    });
   }
 
   // ─── Editing ──────────────────────────────────────────────────

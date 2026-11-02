@@ -326,6 +326,26 @@ export class LoggerStore {
 
   // ─── Local tree helpers ───────────────────────────────────────
 
+  /** Your note shows on every exercise of the workout that is this movement. */
+  setPersonalNote(catalogExerciseId: string, note: string | null): void {
+    this._updateLog((log) => ({
+      ...log,
+      exercises: (log.exercises ?? []).map((e) =>
+        e.exerciseId === catalogExerciseId ? { ...e, personalNote: note } : e,
+      ),
+    }));
+  }
+
+  /** Time away taken off the workout's clock, after the fact. */
+  pauseGap(seconds: number, onError: () => void): void {
+    const log = this._log();
+    if (!log) return;
+    this._workoutLogService
+      .pauseGap(log.id, seconds)
+      .pipe(take(1))
+      .subscribe({ next: (saved) => this._patchClock(saved), error: onError });
+  }
+
   private _updateLog(fn: (log: WorkoutLog) => WorkoutLog): void {
     const log = this._log();
     if (log) this._log.set(fn(log));

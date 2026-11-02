@@ -3723,6 +3723,19 @@
       "submitAdd": "Adaugă antrenament",
       "titleEdit": "Editează antrenamentul",
       "titleNew": "Antrenament nou"
+    },
+    "rest": {
+      "day": "Pauză pentru această zi",
+      "program": "Pauză între serii",
+      "programDefault": "Cea a programului",
+      "clientDefault": "Setarea fiecărui client"
+    },
+    "superset": {
+      "link": "Leagă în superset",
+      "unlink": "Superset · dezleagă",
+      "linkFor": "Leagă {a} și {b} în superset",
+      "unlinkFor": "Dezleagă {a} și {b}",
+      "saveError": "Nu am putut schimba supersetul"
     }
   },
   "publicProfile": {

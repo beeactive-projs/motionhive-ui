@@ -5,12 +5,15 @@ import {
   PersonalRecord,
   WorkoutLog,
   enumLabel,
+  ExerciseSetType,
+  RestSources,
   translate,
   WorkoutLogStatus,
 } from 'core';
 
 import { clientPath, coachStackOf } from '../../../clients/client-paths';
 import { workoutLinks } from '../../../home/home-stack.config';
+import { SetBadge, setBadge } from '../../logger/logger-flow';
 import { exerciseSessionLine, formatMeasure, secondsToClock, sessionTopValue } from '../../workouts.config';
 
 type ExerciseSession = ExerciseProgress['sessions'][number];
@@ -33,6 +36,12 @@ export interface SetLine {
   done: boolean;
   /** The set that earned the workout's record on this exercise. */
   record: boolean;
+  /** Its number, or W / D / F / A for a typed set, as the logger shows it. */
+  badge: SetBadge;
+  /** "RPE 8 · rest 2:05", "rest ~2:40", "break"; empty when neither was recorded. */
+  extras: string;
+  /** The person's note on this one set. */
+  note: string | null;
 }
 
 /** The comparison under an opened exercise: a sentence, and last time's set. */
@@ -113,8 +122,89 @@ export function setLines(exercise: LoggedExercise, record: PersonalRecord | null
       set.weightKg === record.setWeightKg &&
       set.reps === record.setReps;
     if (isRecord) marked = true;
-    return { key: set.id, number: i + 1, value: setValue(set), done: set.isCompleted, record: isRecord };
+    return {
+      key: set.id,
+      number: i + 1,
+      value: setValue(set),
+      done: set.isCompleted,
+      record: isRecord,
+      badge: setBadge(exercise.sets ?? [], i),
+      extras: setExtras(set),
+      note: set.notes?.trim() || null,
+    };
   });
+}
+
+/**
+ * What else a set recorded: its effort, and the rest after it as measured,
+ * exact ("rest 2:05"), estimated ("rest ~2:40") or a break. A rest from the
+ * older logger, which stored the planned rest there, is not shown.
+ */
+export function setExtras(set: LoggedSet): string {
+  const parts: string[] = [];
+  if (set.rpe != null) parts.push(translate('workouts.effort.rpe', { value: formatMeasure(Number(set.rpe), 1) }));
+  const rest = set.restAfterSeconds;
+  switch (set.restSource) {
+    case RestSources.Tap:
+      if (rest != null) parts.push(translate('workouts.loggedSets.rest', { value: secondsToClock(rest) }));
+      break;
+    case RestSources.Estimated:
+      if (rest != null) parts.push(translate('workouts.loggedSets.restEstimated', { value: secondsToClock(rest) }));
+      break;
+    case RestSources.Break:
+      parts.push(translate('workouts.loggedSets.break'));
+      break;
+  }
+  return parts.join(' · ');
+}
+
+/** The working sets: done, and not warm-ups. */
+const workingSets = (log: WorkoutLog): LoggedSet[] =>
+  (log.exercises ?? [])
+    .flatMap((exercise) => exercise.sets ?? [])
+    .filter((set) => set.isCompleted && set.setType !== ExerciseSetType.Warmup);
+
+/** What a coach reads first: average effort, working sets, average rest. */
+export interface CoachSummary {
+  effort: string | null;
+  workingSets: number;
+  rest: string | null;
+}
+
+export function coachSummary(log: WorkoutLog): CoachSummary {
+  const working = workingSets(log);
+  const efforts = working.map((s) => s.rpe).filter((rpe): rpe is number => rpe != null).map(Number);
+  // Averages use measured rests only, exact or estimated; never a break.
+  const rests = working
+    .filter((s) => s.restSource === RestSources.Tap || s.restSource === RestSources.Estimated)
+    .map((s) => s.restAfterSeconds)
+    .filter((r): r is number => r != null);
+  const mean = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.length;
+  return {
+    effort: efforts.length ? formatMeasure(Math.round(mean(efforts) * 10) / 10, 1) : null,
+    workingSets: working.length,
+    rest: rests.length ? secondsToClock(Math.round(mean(rests))) : null,
+  };
+}
+
+/** Effort this high, this often, on one exercise, is worth a word to the coach. */
+const HIGH_EFFORT = 9;
+const SIGNAL_WINDOW = 4;
+const SIGNAL_HITS = 3;
+
+/**
+ * The exercise where effort stayed high: 9 or more on 3 of the last 4
+ * working sets. A calm signal for the coach, never an alarm. Null when none.
+ */
+export function highEffortExercise(log: WorkoutLog): string | null {
+  for (const exercise of log.exercises ?? []) {
+    const rated = (exercise.sets ?? [])
+      .filter((s) => s.isCompleted && s.setType !== ExerciseSetType.Warmup && s.rpe != null)
+      .slice(-SIGNAL_WINDOW);
+    const hits = rated.filter((s) => Number(s.rpe) >= HIGH_EFFORT).length;
+    if (rated.length >= SIGNAL_HITS && hits >= SIGNAL_HITS) return exercise.exerciseNameSnapshot;
+  }
+  return null;
 }
 
 /**

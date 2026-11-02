@@ -1,0 +1,8 @@
+<mh-action-sheet [(open)]="menuOpen" [title]="menuTitle()" [actions]="actions" (chosen)="onAction($event)" />
+
+<mh-exercise-form-sheet [(open)]="formOpen" [exercise]="editing()" [name]="editing() ? '' : createName()"
+  (saved)="onSaved($event)" />
+
+<mh-confirm-sheet [(open)]="deleteOpen" [title]="deleteTitle()" [body]="'exercises.own.deleteBody' | translate"
+  [confirmLabel]="'exercises.edit.deleteConfirm.confirm' | translate" [cancelLabel]="'button.keepIt' | translate"
+  tone="danger" [saving]="deleting()" (confirm)="remove()" />

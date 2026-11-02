@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { ExerciseProgress, ExerciseSetType, LoggedExercise, LoggedSet, PersonalRecord } from 'core';
+import { ExerciseProgress, ExerciseSetType, LoggedExercise, LoggedSet, PersonalRecord, RestSources, WorkoutLog } from 'core';
 
 import { ExerciseActionIds, exerciseActions } from '../../workouts.config';
 import {
+  coachSummary,
+  highEffortExercise,
+  setExtras,
   compareWithLastTime,
   exerciseHistoryLink,
   exerciseLine,
@@ -157,5 +160,46 @@ describe('logged exercises', () => {
   it('offers the history first in the logger, only for a catalog exercise', () => {
     expect(exerciseActions(false).map((action) => action.id)[0]).toBe(ExerciseActionIds.History);
     expect(exerciseActions(false, false).map((action) => action.id)).not.toContain(ExerciseActionIds.History);
+  });
+});
+
+describe('what a finished set recorded', () => {
+  it('says effort and the rest as measured, never an old planned rest', () => {
+    expect(setExtras(set({ rpe: 8, restAfterSeconds: 125, restSource: RestSources.Tap }))).toBe('RPE 8 · rest 2:05');
+    expect(setExtras(set({ restAfterSeconds: 160, restSource: RestSources.Estimated }))).toBe('rest ~2:40');
+    expect(setExtras(set({ restSource: RestSources.Break }))).toBe('break');
+    expect(setExtras(set({ restAfterSeconds: 90, restSource: null }))).toBe('');
+  });
+});
+
+describe('the coach summary', () => {
+  const log = (exercises: LoggedExercise[]) => ({ exercises }) as WorkoutLog;
+
+  it('averages effort and measured rest over working sets', () => {
+    const summary = coachSummary(
+      log([
+        exercise([
+          set({ isCompleted: true, setType: ExerciseSetType.Warmup, rpe: 5, restAfterSeconds: 30, restSource: RestSources.Tap }),
+          set({ isCompleted: true, rpe: 8, restAfterSeconds: 120, restSource: RestSources.Tap }),
+          set({ isCompleted: true, rpe: 9, restAfterSeconds: 180, restSource: RestSources.Estimated }),
+          set({ isCompleted: true, restSource: RestSources.Break }),
+        ]),
+      ]),
+    );
+    expect(summary).toEqual({ effort: '8.5', workingSets: 3, rest: '2:30' });
+  });
+
+  it('says nothing it was not told', () => {
+    expect(coachSummary(log([exercise([set({ isCompleted: true })])]))).toEqual({ effort: null, workingSets: 1, rest: null });
+  });
+
+  it('names the exercise where effort stayed at 9 or more', () => {
+    const hard = exercise(
+      [8, 9, 9, 9.5].map((rpe) => set({ isCompleted: true, rpe })),
+      { exerciseNameSnapshot: 'Bench press' },
+    );
+    expect(highEffortExercise(log([hard]))).toBe('Bench press');
+    const fine = exercise([8, 9, 8, 9].map((rpe) => set({ isCompleted: true, rpe })));
+    expect(highEffortExercise(log([fine]))).toBeNull();
   });
 });

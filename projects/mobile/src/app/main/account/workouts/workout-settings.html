@@ -1,0 +1,81 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/more/account" />
+    </ion-buttons>
+    <ion-title>{{ 'account.workoutSettings.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    <section class="mh-section">
+      <ion-note class="mh-kicker" color="medium">{{ 'account.workoutSettings.restSection' | translate }}</ion-note>
+      <ion-list [inset]="true" class="mh-card-list">
+        <mh-settings-row
+          [label]="'account.workoutSettings.defaultRest' | translate"
+          icon="time-outline"
+          iconColor="primary"
+          [value]="restLabel()"
+          [note]="'account.workoutSettings.defaultRestHint' | translate"
+          (select)="restOpen.set(true)"
+        />
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="settings().sound" (ionChange)="toggle('sound', $event)">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account.workoutSettings.sound' | translate }}</h3>
+              <p>{{ 'account.workoutSettings.soundHint' | translate }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="settings().vibration" (ionChange)="toggle('vibration', $event)">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account.workoutSettings.vibration' | translate }}</h3>
+              <p>{{ 'account.workoutSettings.vibrationHint' | translate }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+      </ion-list>
+    </section>
+
+    <section class="mh-section">
+      <ion-note class="mh-kicker" color="medium">{{ 'account.workoutSettings.loggingSection' | translate }}</ion-note>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="settings().askEffort" (ionChange)="toggle('askEffort', $event)">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account.workoutSettings.askEffort' | translate }}</h3>
+              <p>{{ 'account.workoutSettings.askEffortHint' | translate }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="settings().supersetJump" (ionChange)="toggle('supersetJump', $event)">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account.workoutSettings.supersetJump' | translate }}</h3>
+              <p>{{ 'account.workoutSettings.supersetJumpHint' | translate }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="settings().keepScreenOn" (ionChange)="toggle('keepScreenOn', $event)">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account.workoutSettings.keepScreenOn' | translate }}</h3>
+              <p>{{ 'account.workoutSettings.keepScreenOnHint' | translate }}</p>
+            </ion-label>
+          </ion-toggle>
+        </ion-item>
+      </ion-list>
+    </section>
+  </div>
+</ion-content>
+
+<mh-choice-sheet
+  [(open)]="restOpen"
+  [title]="'account.workoutSettings.defaultRest' | translate"
+  [options]="restOptions()"
+  [selected]="'' + settings().defaultRestSeconds"
+  [footnote]="'account.workoutSettings.defaultRestHint' | translate"
+  (picked)="pickRest($event)"
+/>

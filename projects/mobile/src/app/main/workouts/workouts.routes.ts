@@ -20,6 +20,12 @@ export const workoutRoutes: Routes = [
     title: 'pageTitle.workouts',
   },
   {
+    path: 'archived',
+    loadComponent: () =>
+      import('./archived-routines/archived-routines').then((m) => m.ArchivedRoutines),
+    title: 'pageTitle.archivedRoutines',
+  },
+  {
     // Before `:id` routes, or the parameterised paths swallow the words.
     path: 'starters',
     loadComponent: () => import('./starters/starters').then((m) => m.Starters),

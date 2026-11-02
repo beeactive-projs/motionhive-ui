@@ -1,5 +1,7 @@
 import {
   addOutline,
+  timeOutline,
+  linkOutline,
   albumsOutline,
   alertCircleOutline,
   barbellOutline,
@@ -45,6 +47,8 @@ import { shortDayLabel } from '../workouts/workouts.config';
  */
 export const PROGRAM_ICONS = {
   addOutline,
+  timeOutline,
+  linkOutline,
   albumsOutline,
   alertCircleOutline,
   barbellOutline,

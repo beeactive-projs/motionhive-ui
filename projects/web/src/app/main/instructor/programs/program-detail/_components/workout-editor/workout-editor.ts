@@ -62,6 +62,15 @@ export class WorkoutEditor {
   readonly duplicateSet = output<{ exercise: PrescribedExercise; set: PrescribedSet }>();
   readonly removeSet = output<{ exercise: PrescribedExercise; set: PrescribedSet }>();
   readonly setsReordered = output<{ exercise: PrescribedExercise; sets: PrescribedSet[] }>();
+  /** Link the exercise at this index with the next one, or undo it. */
+  readonly toggleLink = output<number>();
+
+  /** Is the exercise at this index in a superset with the next one? */
+  linkedToNext(index: number): boolean {
+    const rows = this.exercises();
+    const group = rows[index]?.supersetGroupId ?? null;
+    return group !== null && rows[index + 1]?.supersetGroupId === group;
+  }
 
   // Session-only expansion, default collapsed — the prescription line makes
   // rows self-describing. Ids are globally unique, so the set survives

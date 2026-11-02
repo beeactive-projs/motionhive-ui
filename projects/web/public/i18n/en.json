@@ -3723,6 +3723,19 @@
       "submitAdd": "Add workout",
       "titleEdit": "Edit workout",
       "titleNew": "New workout"
+    },
+    "rest": {
+      "day": "Rest for this day",
+      "program": "Rest between sets",
+      "programDefault": "Program default",
+      "clientDefault": "Each client's own default"
+    },
+    "superset": {
+      "link": "Link as superset",
+      "unlink": "Superset · unlink",
+      "linkFor": "Link {a} and {b} as a superset",
+      "unlinkFor": "Unlink {a} and {b}",
+      "saveError": "Couldn't change the superset"
     }
   },
   "publicProfile": {

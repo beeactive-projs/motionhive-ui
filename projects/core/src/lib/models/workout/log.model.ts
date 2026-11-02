@@ -4,9 +4,12 @@ import type { ExerciseKind } from '../exercise/exercise.enums';
 import type {
   ExerciseSetType,
   ProgramAssignmentKind,
+  RestSource,
   SetField,
   WorkoutLogStatus,
 } from './workout.enums';
+import type { PrescribedSet } from './program.model';
+import type { VolumeUnit } from './volume.enums';
 
 export type { SetField } from './workout.enums';
 
@@ -101,6 +104,41 @@ export interface PersonalRecord {
   setReps?: number | null;
 }
 
+/**
+ * A finished workout's volume against last time, over working sets
+ * (completed, not warm-ups).
+ */
+export interface WorkoutVolume {
+  /** kg × reps over this workout's working sets. */
+  totalKg: number;
+  /**
+   * The last time this routine or plan day was done; null for freestyle
+   * and for a first time.
+   */
+  previous: {
+    workoutLogId: string;
+    name: string;
+    completedAt: string;
+    totalKg: number;
+  } | null;
+  /** `totalKg` minus the previous total; null without one. */
+  changeKg: number | null;
+  /** Whole percent of the previous total; null without one or when it was 0. */
+  changePercent: number | null;
+  /** One per exercise done, in order, against its last session in any workout. */
+  exercises: WorkoutExerciseVolume[];
+}
+
+export interface WorkoutExerciseVolume {
+  exerciseId: string | null;
+  /** The logged exercise it stands for, to find its name. */
+  loggedExerciseId: string;
+  unit: VolumeUnit;
+  volume: number;
+  previous: { workoutLogId: string; performedAt: string; volume: number } | null;
+  changePercent: number | null;
+}
+
 export interface WorkoutSummary {
   /** 12 for "your 12th workout". */
   workoutNumber: number;
@@ -108,6 +146,8 @@ export interface WorkoutSummary {
   streakWeeks: number;
   /** Routines only: the volume (kg) the previous time it was done. */
   previousVolumeKg: number | null;
+  /** This workout's volume against last time. Absent from older APIs. */
+  volume?: WorkoutVolume;
   /** The coach whose plan it came from; null for your own training. */
   coachName?: string | null;
   /**
@@ -152,6 +192,14 @@ export interface LoggedExercise {
     isUnilateral?: boolean;
   } | null;
   sets?: LoggedSet[];
+  /**
+   * The person's own standing note on this movement ("Seat 4, pin on 3").
+   * Private: only on the owner's read, never on a coach's.
+   */
+  personalNote?: string | null;
+  /** The plan's line for this exercise, from a coach plan or a routine. */
+  assignedExercise?: { id: string; notes: string | null } | null;
+  prescribedExercise?: { id: string; notes: string | null } | null;
 }
 
 const FIELDS_BY_KIND: Record<ExerciseKind, SetField[]> = {
@@ -193,6 +241,16 @@ export interface LoggedSet {
    * freestyle sets. Use this to render the target column.
    */
   assignedSet?: AssignedSet | null;
+  /** The same, for a workout started from a routine. */
+  prescribedSet?: PrescribedSet | null;
+  /** How the actual rest after this set was measured; see `RestSources`. */
+  restSource?: RestSource | null;
+  /**
+   * The rest the plan asks for after this set: the set's own, else the
+   * day's, else the program's. Null when the plan names none, and the app
+   * falls back to the person's default.
+   */
+  plannedRestSeconds?: number | null;
 }
 
 // ─── Payloads ────────────────────────────────────────────────────────
@@ -212,9 +270,10 @@ export interface LogSetPayload {
   distanceMeters?: number;
   rpe?: number;
   rir?: number;
-  restAfterSeconds?: number;
+  restAfterSeconds?: number | null;
+  restSource?: RestSource | null;
   isCompleted?: boolean;
-  notes?: string;
+  notes?: string | null;
 }
 
 export interface CompleteWorkoutPayload {

@@ -12,12 +12,23 @@
   padding: 0.25rem 0 0.5rem;
 }
 
-/* "883 exercises · A to Z" — a label on the list, not a row of it. */
+/* "883 exercises · A to Z" — a label on the list, not a row of it. The
+   section head gives it the row gutter. */
 .meta {
-  padding-inline: 0.875rem;
   color: var(--ion-color-medium);
 }
 
 .show-more {
   margin-top: 0.25rem;
+}
+
+/* On a narrow phone the count gives way, never the action: "New exercise"
+   stays one line and the count wraps under itself. */
+.mh-section-head .meta {
+  min-width: 0;
+}
+
+.mh-section-head ion-button {
+  flex: none;
+  white-space: nowrap;
 }

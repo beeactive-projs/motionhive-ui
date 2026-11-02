@@ -345,6 +345,120 @@
   font-weight: 600;
 }
 
+/* ─── Volume against last time ──────────────────────────────────── */
+
+.volume-total {
+  margin: 0.125rem 0 0;
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-2xl);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.volume-line {
+  margin: 0.125rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Which bar is which, once, over the rows. */
+.legend {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0.75rem 0 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+.legend .key {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.legend .key::before {
+  content: '';
+  width: 0.875rem;
+  height: 0.375rem;
+  border-radius: var(--mh-radius-pill);
+}
+
+.legend .today::before,
+.bar.today {
+  background: var(--ion-color-primary);
+}
+
+.legend .last::before,
+.bar.last {
+  background: var(--mh-color-chart-idle);
+}
+
+.volume-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.volume-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.5rem 0;
+  border-top: var(--mh-hairline) solid var(--mh-color-separator);
+}
+
+.volume-row:first-child {
+  border-top: 0;
+}
+
+.row-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+/* A long name takes two lines, then an ellipsis, and gives way to the
+   change beside it, never the other way. */
+.row-name {
+  display: -webkit-box;
+  overflow: hidden;
+  min-width: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.row-change {
+  flex: none;
+  color: var(--ion-color-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+/* More than last time reads in green; less stays grey: a lighter day is
+   part of training, not an alarm. */
+.row-change[data-trend='up'] {
+  color: var(--ion-color-success-wash-contrast);
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bar {
+  height: 0.375rem;
+  border-radius: var(--mh-radius-pill);
+}
+
 /* The one optional tap for a photo, dashed like a slot waiting to be filled. */
 .add-photo {
   display: flex;
@@ -441,4 +555,25 @@
 
 .actions .save {
   flex: 1;
+}
+
+/* A superset in the volume card: its letter above, the honey rail beside. */
+.volume-group {
+  margin-top: 0.5rem;
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-xs);
+  font-weight: 700;
+  letter-spacing: var(--mh-tracking-kicker);
+  text-transform: uppercase;
+}
+
+.volume-row.linked {
+  padding-inline-start: 0.625rem;
+  border-inline-start: 3px solid var(--ion-color-primary);
+}
+
+.row-tag {
+  margin-inline-end: 0.25rem;
+  color: var(--mh-color-honey-deep);
+  font-weight: 700;
 }

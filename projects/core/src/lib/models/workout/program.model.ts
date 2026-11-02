@@ -73,6 +73,8 @@ export interface ProgramWorkout {
   sequenceNumber: number;
   phase: string | null;
   estimatedDurationMinutes: number | null;
+  /** The coach's rest for this day, for every set that sets none. */
+  defaultRestSeconds?: number | null;
   createdAt: string;
   updatedAt: string;
   exercises?: PrescribedExercise[];
@@ -131,6 +133,8 @@ export interface Program {
   periodizationModel: string | null;
   coverImageUrl: string | null;
   goalTags: string[] | null;
+  /** The program's rest between sets, for every day and set that sets none. */
+  defaultRestSeconds?: number | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -182,6 +186,8 @@ export interface CreateProgramPayload {
   periodizationModel?: string;
   coverImageUrl?: string;
   goalTags?: string[];
+  /** The program's rest between sets; null takes each client's own default. */
+  defaultRestSeconds?: number | null;
 }
 
 export type UpdateProgramPayload = Partial<CreateProgramPayload>;
@@ -193,6 +199,7 @@ export interface CreateProgramWorkoutPayload {
   dayIndex: number;
   phase?: string;
   estimatedDurationMinutes?: number;
+  defaultRestSeconds?: number | null;
 }
 
 export type UpdateProgramWorkoutPayload = Partial<CreateProgramWorkoutPayload>;
@@ -222,7 +229,10 @@ export interface ReorderPrescribedRowsPayload {
 
 export interface CreatePrescribedExercisePayload {
   exerciseId: string;
-  supersetGroupId?: number;
+  /** Null unlinks it from its superset. */
+  supersetGroupId?: number | null;
+  /** Written to every set of the exercise; null clears them. */
+  restAfterSeconds?: number | null;
   alternateExerciseId?: string;
   blockId?: string;
   notes?: string;

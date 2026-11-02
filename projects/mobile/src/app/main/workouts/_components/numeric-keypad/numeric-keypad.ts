@@ -74,6 +74,20 @@ export class NumericKeypad {
   readonly label = input('');
   /** Offer "Next field" in place of the close chevron — the logger walks its grid. */
   readonly showNext = input(false);
+  /**
+   * The wide key's words, when it does more than Done: "Reps →" moves on to
+   * the next field, "Log set" ticks the set. Empty keeps Done.
+   */
+  readonly actionLabel = input('');
+  /** An icon on the wide key, before or after its words. */
+  readonly actionIcon = input<string | null>(null);
+  readonly actionIconSlot = input<'start' | 'end'>('start');
+  /**
+   * The first key typed replaces what the field was seeded with, later keys
+   * append: the seed is a pre-fill to confirm or overwrite, not a number to
+   * extend. Steppers work from the seed.
+   */
+  readonly replaceOnType = input(false);
 
   /** Emits the committed value: seconds for a clock, the typed number otherwise. */
   readonly commit = output<string>();
@@ -92,6 +106,8 @@ export class NumericKeypad {
 
   /** What the user has typed so far. Seeded from `value` when the cell changes. */
   readonly draft = signal('');
+  /** True from a re-seed until the first key or step: see `replaceOnType`. */
+  private _fresh = false;
 
   /** What `commit` should carry — seconds once a clock is resolved. */
   readonly committed = computed(() => {
@@ -126,11 +142,14 @@ export class NumericKeypad {
     effect(() => {
       this.cell();
       this.draft.set(this.value());
+      this._fresh = true;
     });
     effect(() => this.preview.emit(this.draft() ? this.display() : ''));
   }
 
   press(key: string): void {
+    if (this._fresh && this.replaceOnType()) this.draft.set('');
+    this._fresh = false;
     if (this.isClock()) {
       // Digits only, and capped at four so the clock cannot run past 99:59.
       if (key === '.') return;
@@ -143,6 +162,8 @@ export class NumericKeypad {
   }
 
   backspace(): void {
+    if (this._fresh && this.replaceOnType()) this.draft.set('');
+    this._fresh = false;
     this.draft.update((current) => current.slice(0, -1));
   }
 
@@ -151,6 +172,7 @@ export class NumericKeypad {
   }
 
   step(direction: 1 | -1): void {
+    this._fresh = false;
     const step = STEP[this.field()];
 
     if (this.isClock()) {

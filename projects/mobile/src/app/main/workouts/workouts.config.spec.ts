@@ -49,6 +49,7 @@ import {
   routineActions,
   routineTileColor,
   secondsToClock,
+  niceBounds,
   trendGeometry,
   unbreakable,
   volumeGainPercent,
@@ -141,14 +142,22 @@ describe('workouts config', () => {
   it('keeps the footer action out of the routine ⋯', () => {
     expect(routineActions(true).map((a) => a.id)).toEqual([
       RoutineActionIds.Duplicate,
+      RoutineActionIds.Archive,
       RoutineActionIds.Delete,
     ]);
     expect(routineActions(false).map((a) => a.id)).toEqual([
       RoutineActionIds.Edit,
       RoutineActionIds.Duplicate,
+      RoutineActionIds.Archive,
       RoutineActionIds.Delete,
     ]);
     expect(routineActions(false).at(-1)?.destructive).toBe(true);
+  });
+
+  it('offers Restore in place of Archive on an archived routine', () => {
+    const ids = routineActions(false, true).map((a) => a.id);
+    expect(ids).toContain(RoutineActionIds.Restore);
+    expect(ids).not.toContain(RoutineActionIds.Archive);
   });
 
   it('rotates routine tiles so a list never reads as one grey block', () => {
@@ -438,11 +447,19 @@ describe('workouts config', () => {
   // edge; a single point is a dot, no line.
   it('shapes a trend line in percent of its plot', () => {
     const shape = trendGeometry([{ x: 0, y: 80 }, { x: 100, y: 84 }], 0, 100);
-    expect(shape?.ticks.map((tick) => tick.value)).toEqual([85, 82, 79]);
-    expect(shape?.end).toEqual({ x: 100, y: 16.67 });
+    // A step of air beyond 80 and 84, on round numbers.
+    expect(shape?.ticks.map((tick) => tick.value)).toEqual([86, 82, 78]);
+    expect(shape?.end).toEqual({ x: 100, y: 25 });
     expect(shape?.line.startsWith('M0 ')).toBe(true);
     expect(trendGeometry([{ x: 50, y: 80 }], 0, 100)?.line).toBe('');
     expect(trendGeometry([], 0, 100)).toBeNull();
+  });
+
+  it('puts the axis on round numbers, never below zero for counts', () => {
+    expect(niceBounds(1154, 1921)).toEqual({ lo: 1000, hi: 2000 });
+    expect(niceBounds(60, 65)).toEqual({ lo: 57.5, hi: 67.5 });
+    expect(niceBounds(0, 3)).toEqual({ lo: 0, hi: 4 });
+    expect(niceBounds(5, 5).lo).toBeLessThan(5);
   });
 
   // A parameterised path listed before a literal one swallows it.

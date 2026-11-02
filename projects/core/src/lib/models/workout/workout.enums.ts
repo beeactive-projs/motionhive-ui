@@ -126,3 +126,16 @@ export const SetFields = {
   Distance: 'distance',
 } as const;
 export type SetField = (typeof SetFields)[keyof typeof SetFields];
+
+/**
+ * How a set's actual rest was measured. `TAP`: the person ended the rest
+ * themselves (Start set, Skip), so it is exact. `ESTIMATED`: worked out at
+ * the next tick from the gap minus the set's own length. `BREAK`: the gap
+ * was too long to be rest, so no time is stored.
+ */
+export const RestSources = {
+  Tap: 'TAP',
+  Estimated: 'ESTIMATED',
+  Break: 'BREAK',
+} as const;
+export type RestSource = (typeof RestSources)[keyof typeof RestSources];

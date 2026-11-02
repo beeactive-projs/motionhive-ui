@@ -1,0 +1,108 @@
+<ng-template #body>
+  @if (loadFailed()) {
+  <mh-empty-state icon="alert-circle-outline" [heading]="'exercises.edit.loadError.title' | translate"
+    [message]="'exercises.edit.loadError.message' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
+  } @else {
+  <div class="mh-stack">
+    <section class="mh-section">
+      <span class="mh-kicker">{{ 'form.label.name' | translate }}</span>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <ion-input [attr.aria-label]="'form.label.name' | translate"
+            [placeholder]="'exercises.simpleForm.namePlaceholder' | translate" autocapitalize="sentences"
+            [maxlength]="maxNameLength" [value]="form.draft().name"
+            (ionInput)="form.patch({ name: $event.detail.value ?? '' })" />
+        </ion-item>
+      </ion-list>
+    </section>
+
+    <section class="mh-section">
+      <span class="mh-kicker">{{ 'exercises.simpleForm.track.label' | translate }}</span>
+      <!-- Four tiles, not a select: what you track decides what the logger
+           asks you for, so the choice should be visible while you make it.
+           One of four, so radio semantics, as on the coach's kind grid. -->
+      <div class="tracks" role="radiogroup" [attr.aria-label]="'exercises.simpleForm.track.label' | translate">
+        @for (tile of trackTiles; track tile.value) {
+        <button type="button" role="radio" class="track" [class.on]="isKindOn(tile.value)"
+          [attr.aria-checked]="isKindOn(tile.value)" (click)="selectKind(tile.value)">
+          <ion-icon class="track-icon" aria-hidden="true" [color]="tile.color" [name]="tile.icon" />
+          <span class="label">{{ tile.label }}</span>
+        </button>
+        }
+      </div>
+    </section>
+
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <span class="mh-kicker">{{ 'exercises.simpleForm.muscleGroup' | translate }}</span>
+        <ion-note>
+          {{ (form.requirePrimary() ? 'exercises.muscleFields.required' : 'exercises.muscleFields.optional') | translate }}
+        </ion-note>
+      </div>
+      <div class="mh-chip-cloud">
+        @for (chip of muscleChips(); track chip.value) {
+        <ion-button class="chip" fill="clear" shape="round" size="small" [class.selected]="isMuscleOn(chip.value)"
+          [attr.aria-pressed]="isMuscleOn(chip.value)" [disabled]="musclesFull() && !isMuscleOn(chip.value)"
+          (click)="toggleMuscle(chip.value)">
+          {{ chip.label }}
+        </ion-button>
+        }
+        @if (hasMoreMuscles()) {
+        <ion-button class="chip more" fill="clear" shape="round" size="small" (click)="musclesExpanded.set(true)">
+          {{ 'exercises.simpleForm.more' | translate }}
+        </ion-button>
+        }
+      </div>
+    </section>
+
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <span class="mh-kicker">{{ 'exercises.fields.equipment' | translate }}</span>
+        <ion-note>{{ 'exercises.muscleFields.optional' | translate }}</ion-note>
+      </div>
+      <div class="mh-chip-cloud">
+        @for (chip of equipmentChips(); track chip.value) {
+        <ion-button class="chip" fill="clear" shape="round" size="small" [class.selected]="isEquipmentOn(chip.value)"
+          [attr.aria-pressed]="isEquipmentOn(chip.value)" (click)="toggleEquipment(chip.value)">
+          {{ chip.label }}
+        </ion-button>
+        }
+        @if (hasMoreEquipment()) {
+        <ion-button class="chip more" fill="clear" shape="round" size="small" (click)="equipmentExpanded.set(true)">
+          {{ 'exercises.simpleForm.more' | translate }}
+        </ion-button>
+        }
+      </div>
+    </section>
+
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <span class="mh-kicker">{{ 'exercises.simpleForm.note' | translate }}</span>
+        <ion-note>{{ 'exercises.muscleFields.optional' | translate }}</ion-note>
+      </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <ion-textarea [attr.aria-label]="'exercises.simpleForm.note' | translate" [autoGrow]="true" [rows]="2"
+            [maxlength]="maxNoteLength" [counter]="note().length > maxNoteLength - 40" [disabled]="loading()"
+            [placeholder]="'exercises.simpleForm.notePlaceholder' | translate" [value]="note()"
+            (ionInput)="note.set($event.detail.value ?? '')" />
+        </ion-item>
+      </ion-list>
+    </section>
+
+    <!-- A coach's own public exercise can be edited here too; it is not
+         private, so the line would be wrong for it. -->
+    @if (form.isPrivate()) {
+    <p class="private">
+      <ion-icon name="lock-closed-outline" aria-hidden="true" />
+      <span>{{ 'exercises.simpleForm.privateLine' | translate }}</span>
+    </p>
+    }
+  </div>
+  }
+</ng-template>
+
+<mh-sheet-shell [(open)]="open" [title]="title()" [body]="body" [saveLabel]="confirmLabel()"
+  [canSave]="canSave()" [saving]="saving()" [breakpoints]="[0, 0.95]" [initialBreakpoint]="0.95"
+  (save)="submit()" (dismissed)="onDismissed()" />

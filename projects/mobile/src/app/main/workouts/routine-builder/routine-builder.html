@@ -78,6 +78,18 @@
         (ionInput)="name.set($any($event).detail.value ?? '')"
       />
 
+      <!-- One rest for the whole routine; an exercise can still set its own. -->
+      <ion-list [inset]="true" class="mh-card-list rest-row">
+        <mh-settings-row
+          [label]="'workouts.routineBuilder.rest.row' | translate"
+          icon="time-outline"
+          iconColor="primary"
+          [value]="defaultRestLabel()"
+          [note]="'workouts.routineBuilder.rest.hint' | translate"
+          (select)="openRest('routine')"
+        />
+      </ion-list>
+
       <section class="mh-section">
         <div class="mh-section-head">
           <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
@@ -87,7 +99,7 @@
         </div>
 
         @for (row of exercises(); track row.key; let i = $index) {
-          <mh-exercise-card [name]="row.name" (open)="openExercise(row)">
+          <mh-exercise-card [name]="row.name" [tag]="tags()[i]" (open)="openExercise(row)">
             <!-- What to aim for. Both optional: a routine that only names the
                  movements in order is still a useful routine. The two cells
                  share the logger's keypad, so entering a number is one
@@ -141,6 +153,18 @@
                 </ion-button>
               </div>
 
+              <!-- Its own rest, or the routine's when it shows none. -->
+              <button
+                type="button"
+                class="rest-chip"
+                [class.own]="!!restChip(row)"
+                [attr.aria-label]="'workouts.routineBuilder.rest.exercise' | translate: { name: row.name }"
+                (click)="openRest(i)"
+              >
+                <ion-icon name="time-outline" aria-hidden="true" />
+                {{ restChip(row) || ('workouts.routineBuilder.rest.chip' | translate) }}
+              </button>
+
               <ion-button
                 class="mh-remove"
                 fill="outline"
@@ -152,6 +176,25 @@
               </ion-button>
             </div>
           </mh-exercise-card>
+
+          <!-- Between two exercises: link them as a superset, or undo it. -->
+          @if (i < exercises().length - 1) {
+            <div class="link-row">
+              <button
+                type="button"
+                class="link-chip"
+                [class.linked]="linkedToNext(i)"
+                [attr.aria-label]="
+                  (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlinkFor' : 'workouts.routineBuilder.superset.linkFor')
+                    | translate: { a: row.name, b: exercises()[i + 1].name }
+                "
+                (click)="toggleLink(i)"
+              >
+                <ion-icon name="link-outline" aria-hidden="true" />
+                {{ (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlink' : 'workouts.routineBuilder.superset.link') | translate }}
+              </button>
+            </div>
+          }
         }
 
         @if (!exercises().length) {
@@ -210,6 +253,14 @@
   [context]="name() || ('workouts.routineBuilder.thisRoutine' | translate)"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
+/>
+
+<mh-choice-sheet
+  [(open)]="restOpen"
+  [title]="restSheetTitle()"
+  [options]="restOptions()"
+  [selected]="restSelected()"
+  (picked)="pickRest($event)"
 />
 
 <mh-action-sheet

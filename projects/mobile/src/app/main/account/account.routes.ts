@@ -30,6 +30,12 @@ export const accountRoutes: Routes = [
     title: 'pageTitle.notifications',
   },
   {
+    path: 'workouts',
+    loadComponent: () =>
+      import('./workouts/workout-settings').then((m) => m.WorkoutSettingsPage),
+    title: 'pageTitle.workoutSettings',
+  },
+  {
     path: 'blocked',
     loadComponent: () => import('./blocked-users/blocked-users').then((m) => m.BlockedUsers),
     title: 'pageTitle.blockedUsers',

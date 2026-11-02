@@ -1,0 +1,64 @@
+<ng-template #body>
+  @if (writing()) {
+    <ion-textarea
+      mode="md"
+      fill="outline"
+      [autoGrow]="true"
+      [autofocus]="true"
+      [maxlength]="noteMax"
+      [counter]="note().length > noteMax - 40"
+      [label]="'workouts.setMenu.note' | translate"
+      labelPlacement="stacked"
+      [placeholder]="'workouts.setMenu.notePlaceholder' | translate"
+      [value]="note()"
+      (ionInput)="note.set($any($event).detail.value ?? '')"
+    />
+  } @else {
+    <div class="mh-stack">
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (choice of choices(); track choice.type) {
+          <ion-item button [detail]="false" [class.current]="choice.type === current()" (click)="pick(choice.type)">
+            <span slot="start" [class]="'badge tone-' + choice.tone" aria-hidden="true">{{ choice.badge }}</span>
+            <ion-label class="ion-text-wrap">
+              {{ choice.label }}
+              @if (choice.hint) {
+                <p>{{ choice.hint }}</p>
+              }
+            </ion-label>
+            @if (choice.type === current()) {
+              <ion-icon slot="end" name="checkmark-outline" color="primary" aria-hidden="true" />
+            }
+          </ion-item>
+        }
+      </ion-list>
+
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="false" (click)="startNote()">
+          <ion-icon slot="start" name="create-outline" color="medium" aria-hidden="true" />
+          <ion-label class="ion-text-wrap">
+            {{ (hasNote() ? 'workouts.setMenu.note' : 'workouts.setMenu.addNote') | translate }}
+            @if (set()?.notes; as text) {
+              <p>{{ text }}</p>
+            }
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="false" class="destructive" (click)="removeSet()">
+          <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+          <ion-label color="danger">{{ 'workouts.setMenu.remove' | translate }}</ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [fit]="true"
+  [showFooter]="writing()"
+  (save)="saveNote()"
+/>

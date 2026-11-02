@@ -1,7 +1,7 @@
 @if (geometry(); as shape) {
   <div class="y-axis" aria-hidden="true">
-    @for (tick of shape.ticks; track $index) {
-      <span [style.top.%]="tick.y">{{ tick.value }}</span>
+    @for (tick of yTicks(); track $index) {
+      <span [style.top.%]="tick.y">{{ tick.label }}</span>
     }
   </div>
 

@@ -175,6 +175,18 @@
           (removeSet)="removeSet.emit({ exercise: ex, set: $event })"
           (setsReordered)="setsReordered.emit({ exercise: ex, sets: $event })"
         />
+        <!-- Between two exercises: link them as a superset, or undo it. -->
+        @if (!readOnly() && i < exercises().length - 1) {
+          <div class="flex justify-center border-b border-surface-100 py-1.5 dark:border-surface-800">
+            <button pButton type="button" size="small" [text]="!linkedToNext(i)" [outlined]="linkedToNext(i)"
+              [severity]="linkedToNext(i) ? 'warn' : 'secondary'"
+              [attr.aria-label]="(linkedToNext(i) ? 'programs.superset.unlinkFor' : 'programs.superset.linkFor') | translate: { a: ex.exercise?.name ?? '', b: exercises()[i + 1].exercise?.name ?? '' }"
+              (click)="toggleLink.emit(i)">
+              <i class="pi pi-link"></i>
+              {{ (linkedToNext(i) ? 'programs.superset.unlink' : 'programs.superset.link') | translate }}
+            </button>
+          </div>
+        }
       }
       @if (!readOnly()) {
       <div class="p-3">

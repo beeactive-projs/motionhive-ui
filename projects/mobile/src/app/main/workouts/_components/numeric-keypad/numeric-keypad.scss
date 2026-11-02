@@ -46,8 +46,10 @@
   gap: 0.5rem;
 }
 
+/* Capped in points, not only rem: at large text sizes the pad would
+   otherwise take most of a small phone and hide the set being typed. */
 .keys button {
-  height: 3.25rem;
+  height: min(3.25rem, 56px);
   border: 0;
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-medium-wash);
@@ -78,7 +80,7 @@
 /* Done takes the last two columns of the bottom row. */
 .keys .done {
   grid-column: span 2;
-  height: 3.25rem;
+  height: min(3.25rem, 56px);
   margin: 0;
   font-size: var(--mh-text-base);
   font-weight: 600;

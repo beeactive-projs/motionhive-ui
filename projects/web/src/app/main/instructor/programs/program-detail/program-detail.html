@@ -139,6 +139,7 @@
         (moveDown)="moveActiveWorkout(1)" (moveToWeek)="openMoveWorkoutDialog(w)" (copyDay)="openCopyDay(w)" (edit)="openEditWorkout(w)"
         (remove)="confirmDeleteWorkout(w)" (addExercise)="openExercisePicker(w)"
         (reorderExercise)="moveExercise(w, $event.from, $event.to)" (moveExerciseTo)="openMoveExerciseDialog(w, $event)"
+        (toggleLink)="toggleSuperset(w, $event)"
         (removeExercise)="confirmDeleteExercise(w, $event)" (viewExercise)="openExerciseInfo($event)"
         (addSet)="openAddSet(w, $event)"
         (editSet)="openEditSet(w, $event.exercise, $event.set)"

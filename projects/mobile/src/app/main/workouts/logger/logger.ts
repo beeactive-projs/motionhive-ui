@@ -1,4 +1,15 @@
-import { Component, DestroyRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
@@ -27,6 +38,10 @@ import { catchError, take } from 'rxjs/operators';
 import {
   Exercise,
   ExerciseKind,
+  ExerciseService,
+  RestSources,
+  ExerciseSetType,
+  LogSetPayload,
   LoggedExercise,
   LoggedSet,
   SetField,
@@ -34,21 +49,36 @@ import {
   WorkoutLog,
   WorkoutLogService,
   appLocale,
-  setFieldsFor,
 } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
+import { prefersReducedMotion } from '../../../_shared/utils/motion';
+import { ActiveSessionStore } from '../_services/active-session.store';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
+import { RestCueService } from '../_services/rest-cue.service';
+import { ScreenAwakeService } from '../_services/screen-awake.service';
+import { StillTrainingService } from '../_services/still-training.service';
+import { WorkoutSettingsStore } from '../_services/workout-settings.store';
+import { ExerciseNoteSheet } from '../_sheets/exercise-note-sheet/exercise-note-sheet';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
+import { EffortPrompt } from '../_components/effort-prompt/effort-prompt';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
 import { RestTimerBar } from '../_components/rest-timer-bar/rest-timer-bar';
 import { SetRow } from '../_components/set-row/set-row';
 import { ExerciseActionsSheet } from '../_sheets/exercise-actions-sheet/exercise-actions-sheet';
 import { LeaveWorkoutSheet } from '../_sheets/leave-workout-sheet/leave-workout-sheet';
+import { RestChange, RestScope, RestScopes, RestSheet } from '../_sheets/rest-sheet/rest-sheet';
+import {
+  LoggerOptionId,
+  LoggerOptionIds,
+  LoggerOptionsSheet,
+  LoggerPrefs,
+} from '../_sheets/logger-options-sheet/logger-options-sheet';
+import { SetMenuSheet } from '../_sheets/set-menu-sheet/set-menu-sheet';
 import {
   ExerciseActionId,
   ExerciseActionIds,
@@ -59,14 +89,39 @@ import {
   WORKOUT_ICONS,
   formatMeasure,
   secondsToClock,
-  setPlaceholder,
-  exerciseDoneSummary,
-  exerciseSetSummary,
   isExerciseDone,
-  lastTimeSummary,
   loggerRedirect,
   workoutClock,
 } from '../workouts.config';
+import {
+  EFFORT_PROMPT_MS,
+  MeasuredRest,
+  PAYLOAD_KEY,
+  SetBadge,
+  SetRef,
+  SetRowMode,
+  SetRowModes,
+  asksEffort,
+  cellValue,
+  effortTarget,
+  estimatedRest,
+  exerciseBlocks,
+  memberTag,
+  roundCount,
+  sameRound,
+  fieldsFor,
+  focusOf,
+  foldedSummary,
+  lastLine,
+  nextAfter,
+  planLine,
+  planNoteOf,
+  prefillValue,
+  restAfterTick,
+  setBadge,
+  setLine,
+  tappedRest,
+} from './logger-flow';
 import { LoggerStore } from './logger.store';
 
 /** Which cell the keypad is bound to. */
@@ -76,14 +131,6 @@ interface EditTarget {
   field: SetField;
 }
 
-/**
- * Rest to use when nothing prescribes one — freestyle sets, mostly. Without a
- * fallback the timer would almost never fire outside a coached plan, which is
- * the opposite of what a rest timer is for. Ninety seconds is the common
- * default across trackers; it is a product choice, not a constraint.
- */
-const DEFAULT_REST_SECONDS = 90;
-
 /** The keypad's step size is keyed to the field, not the exercise kind. */
 const KEYPAD_FIELD: Record<SetField, KeypadField> = {
   [SetFields.Weight]: KeypadFields.Weight,
@@ -91,6 +138,65 @@ const KEYPAD_FIELD: Record<SetField, KeypadField> = {
   [SetFields.Duration]: KeypadFields.Duration,
   [SetFields.Distance]: KeypadFields.Distance,
 };
+
+/** One set as the list draws it. */
+interface SetView {
+  set: LoggedSet;
+  mode: SetRowMode;
+  badge: SetBadge;
+  prefill: Partial<Record<SetField, number | null>>;
+  last: string;
+  /** The set the screen points at: the next one to do. */
+  focus: boolean;
+  /** The field open in the pad, when it is this set's. */
+  editing: SetField | null;
+  effortTarget: number | null;
+}
+
+/** One exercise as the list draws it. */
+interface ExerciseView {
+  exercise: LoggedExercise;
+  /** Every set ticked: folded to one line until opened again. */
+  folded: boolean;
+  summary: string;
+  fields: SetField[];
+  plan: string;
+  planNote: string;
+  note: string;
+  rows: SetView[];
+}
+
+/** One round of a superset as the card draws it. */
+interface RoundView {
+  index: number;
+  done: boolean;
+  /** One line ("A1 62.5 × 8 · A2 × 15") for a round finished or still ahead; null shows the rows. */
+  summary: string | null;
+  rows: { tag: string; view: ExerciseView; row: SetView }[];
+}
+
+/** An exercise on its own, or a superset: what the list draws, in order. */
+type BlockView =
+  | { kind: 'single'; key: string; view: ExerciseView }
+  | {
+      kind: 'superset';
+      key: string;
+      members: { tag: string; view: ExerciseView }[];
+      rounds: RoundView[];
+      /** The round on now, from 1; the last one once all are done. */
+      current: number;
+      total: number;
+      folded: boolean;
+      names: string;
+      restLine: string;
+    };
+
+/** Programmatic scrolls fire scroll events too; ignore them for this long. */
+const PROGRAMMATIC_SCROLL_MS = 900;
+/** Where the focus set sits, as a share of the visible list's height. */
+const FOCUS_AT = 0.32;
+/** The list's scroll into place after a tick. */
+const FOCUS_SCROLL_MS = 320;
 
 /** The set grid's column heading for each field — translation keys. */
 const COLUMN_LABELS: Record<SetField, string> = {
@@ -120,9 +226,11 @@ const COLUMN_LABELS: Record<SetField, string> = {
   selector: 'mh-logger',
   imports: [
     ConfirmSheet,
+    EffortPrompt,
     EmptyState,
     ExerciseActionsSheet,
     ExerciseCard,
+    ExerciseNoteSheet,
     ExercisePickerSheet,
     IonButton,
     IonButtons,
@@ -139,8 +247,12 @@ const COLUMN_LABELS: Record<SetField, string> = {
     IonTitle,
     IonToolbar,
     LeaveWorkoutSheet,
+    LoggerOptionsSheet,
+    NgTemplateOutlet,
     NumericKeypad,
+    RestSheet,
     RestTimerBar,
+    SetMenuSheet,
     SetRow,
     TranslatePipe,
   ],
@@ -158,6 +270,45 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _translateService = inject(TranslateService);
   private readonly _navController = inject(NavController);
   private readonly _activeWorkoutService = inject(ActiveWorkoutService);
+  private readonly _restCueService = inject(RestCueService);
+  private readonly _activeSession = inject(ActiveSessionStore);
+  private readonly _stillTraining = inject(StillTrainingService);
+  private readonly _screenAwake = inject(ScreenAwakeService);
+  /** True while this page is the one in front. */
+  private readonly _onScreen = signal(false);
+  private readonly _settingsStore = inject(WorkoutSettingsStore);
+  private readonly _exerciseService = inject(ExerciseService);
+
+  /** The person's logger settings: their default rest, sound, vibration, effort. */
+  private readonly _settings = this._settingsStore.settings;
+  /** The ⋯ switches, for this workout only, over the person's settings. */
+  private readonly _workoutPrefs = signal<Partial<LoggerPrefs>>({});
+  readonly prefs = computed<LoggerPrefs>(() => {
+    const { sound, vibration, askEffort } = this._settings();
+    return { sound, vibration, askEffort, ...this._workoutPrefs() };
+  });
+  readonly optionsOpen = signal(false);
+  /** Which choice the rest sheet opens on: the ⋯ asks for every exercise. */
+  readonly restSheetScope = signal<RestScope>(RestScopes.Exercise);
+  readonly restForAllLabel = computed(() =>
+    secondsToClock(this._restForAll() ?? this._settings().defaultRestSeconds),
+  );
+
+  /** Supersets go round by round unless the person turned that off. */
+  private readonly _rounds = computed(() => this._settings().supersetJump);
+
+  /** The exercise whose personal note is being written. */
+  readonly noteFor = signal<LoggedExercise | null>(null);
+  readonly noteOpen = signal(false);
+  readonly noteSaving = signal(false);
+
+  /** Asked once, at the first workout, before the system's own question. */
+  readonly notifyAskOpen = signal(false);
+
+  /** A gap too long to be rest, asked about once: pause the workout for it? */
+  readonly awayOpen = signal(false);
+  readonly awayMinutes = signal(0);
+  private _awaySeconds = 0;
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly skeletonCards = [1, 2];
@@ -167,6 +318,29 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly draft = signal('');
   /** What the keypad has typed so far, echoed into the open cell. */
   readonly typed = signal('');
+
+  /** The next set to do: the one the list points at and scrolls to. */
+  readonly focus = computed<SetRef | null>(() =>
+    focusOf(this.store.exercises(), this._rounds()),
+  );
+
+  /** The set whose "How hard?" row is showing, for a few seconds after its tick. */
+  readonly effortFor = signal<string | null>(null);
+  private _effortTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** The set whose badge menu is open. */
+  readonly menuOpen = signal(false);
+  readonly menuSet = signal<{ exerciseId: string; set: LoggedSet; badge: SetBadge } | null>(null);
+
+  /**
+   * The person scrolled the focus set out of view themselves: the list stops
+   * following it until the next tick or a tap on "Back to…".
+   */
+  readonly userScrolled = signal(false);
+  private _programmaticScrollAt = 0;
+  private _lastFocusId: string | null = null;
+  private readonly _content = viewChild(IonContent);
+  private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /**
    * Ticks once a second for as long as this page exists — the session clock
@@ -188,8 +362,45 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly restEndsAt = signal<number | null>(null);
   /** When the current rest began — the bar's progress measures from it. */
   readonly restStartedAt = signal<number | null>(null);
-  /** The exercise whose set started the rest; "next up" looks on from there. */
-  private readonly _restFrom = signal<string | null>(null);
+  /**
+   * The rest being measured: which set it follows, when it began, how long
+   * it was meant to be. Outlives the bar (Hide puts the bar away, the rest
+   * goes on) until the next tick or a Start set records it.
+   */
+  private readonly _rest = signal<{
+    exerciseId: string;
+    setId: string;
+    startedAt: number;
+    planned: number;
+  } | null>(null);
+  /** Until the rest kept from before is picked up, this page must not overwrite it. */
+  private _restAdopted = false;
+  /** "This exercise": rests changed during this workout, by exercise. */
+  private readonly _restByExercise = signal<Readonly<Record<string, number>>>({});
+  /** "Every exercise in this workout": where nothing else sets a rest. */
+  private readonly _restForAll = signal<number | null>(null);
+  readonly restSheetOpen = signal(false);
+  /** The rest the sheet starts from: the one running now. */
+  readonly restSheetSeconds = computed(() => {
+    const start = this.restStartedAt();
+    const end = this.restEndsAt();
+    return start !== null && end !== null && this.restSheetScope() === RestScopes.Exercise
+      ? Math.round((end - start) / 1000)
+      : (this._restForAll() ?? this._settings().defaultRestSeconds);
+  });
+  readonly restExerciseName = computed(() => {
+    if (this.restSheetScope() === RestScopes.Workout) return '';
+    const id = this._rest()?.exerciseId;
+    return this.store.exercises().find((e) => e.id === id)?.exerciseNameSnapshot ?? '';
+  });
+  /**
+   * What the rest bar says comes next, what to load first: "Set 3 · 62.5 kg
+   * × 8 · Bench press". The line is cut from the end on a narrow bar.
+   */
+  readonly nextLine = computed(() => {
+    const next = this.nextUp();
+    return next ? [next.title, next.detail].filter(Boolean).join(' · ') : '';
+  });
 
   readonly pickerOpen = signal(false);
   /**
@@ -234,6 +445,187 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /** Per-exercise "last time" sets, keyed by exercise id. */
   private readonly _previous = signal<Record<string, LoggedSet[]>>({});
 
+  /** Every exercise and set as the list draws them, in direction C's three looks. */
+  readonly views = computed<ExerciseView[]>(() => {
+    const focus = this.focus();
+    const editing = this.editing();
+    const previous = this._previous();
+    const unfolded = this._unfolded();
+    const loaded = this._loaded();
+
+    const exercises = this.store.exercises();
+    const blocks = this._rounds() ? exerciseBlocks(exercises) : [];
+    return exercises.map((exercise) => {
+      const block = blocks.find((b) => b.exercises.some((e) => e.id === exercise.id));
+      const tag = block ? memberTag(block, exercise.id) : null;
+      const member = tag ? { tag, name: exercise.exerciseNameSnapshot } : null;
+      const fields = fieldsFor(exercise.exercise?.kind, loaded.has(exercise.id));
+      const sets = exercise.sets ?? [];
+      const last = exercise.exerciseId ? (previous[exercise.exerciseId] ?? []) : [];
+      const editingHere = editing?.exerciseId === exercise.id;
+
+      const rows = sets.map((set, index): SetView => {
+        const before = index > 0 ? sets[index - 1] : null;
+        const prev = last[index] ?? null;
+        const isEditing = editing?.setId === set.id;
+        const isFocus = focus?.setId === set.id;
+        return {
+          set,
+          mode:
+            isEditing || (isFocus && !set.isCompleted)
+              ? SetRowModes.Focus
+              : set.isCompleted
+                ? SetRowModes.Done
+                : SetRowModes.Future,
+          badge: setBadge(sets, index, member),
+          prefill: Object.fromEntries(
+            fields.map((field) => [field, prefillValue(set, field, prev, before)]),
+          ),
+          last: lastLine(fields, prev),
+          focus: isFocus,
+          editing: isEditing ? (editing?.field ?? null) : null,
+          effortTarget: effortTarget(set),
+        };
+      });
+
+      return {
+        exercise,
+        folded: isExerciseDone(exercise) && !unfolded.has(exercise.id) && !editingHere,
+        summary: foldedSummary(exercise, exercise.exercise?.kind ?? null),
+        fields,
+        plan: planLine(exercise),
+        planNote: planNoteOf(exercise),
+        note: exercise.personalNote?.trim() ?? '',
+        rows,
+      };
+    });
+  });
+
+  /**
+   * The list in blocks: an exercise on its own, or a superset laid out in
+   * rounds. Finished rounds and rounds still ahead read as one line; the
+   * round on now (or one being edited) shows its sets.
+   */
+  readonly blocks = computed<BlockView[]>(() => {
+    const views = this.views();
+    const exercises = this.store.exercises();
+    const effortFor = this.effortFor();
+    const unfolded = this._unfolded();
+    const editing = this.editing();
+    const byId = new Map(views.map((view) => [view.exercise.id, view]));
+    if (!this._rounds()) {
+      return views.map((view) => ({ kind: 'single' as const, key: view.exercise.id, view }));
+    }
+
+    return exerciseBlocks(exercises).map((block): BlockView => {
+      const first = byId.get(block.exercises[0].id);
+      if (block.letter === null && first) {
+        return { kind: 'single', key: first.exercise.id, view: first };
+      }
+      const members = block.exercises.flatMap((e) => {
+        const view = byId.get(e.id);
+        return view ? [{ tag: memberTag(block, e.id) ?? '', view }] : [];
+      });
+      const live = members.filter((m) => !m.view.exercise.isSkipped);
+      const total = roundCount(block);
+      const rounds: RoundView[] = [];
+      for (let index = 0; index < total; index++) {
+        const rows = live
+          .map((m) => ({ tag: m.tag, view: m.view, row: m.view.rows[index] }))
+          .filter((r) => !!r.row);
+        const done = rows.length > 0 && rows.every((r) => r.row.set.isCompleted);
+        const busy = rows.some(
+          (r) => r.row.focus || r.row.editing !== null || r.row.set.id === effortFor,
+        );
+        const untouched = rows.every((r) => !r.row.set.isCompleted);
+        const summary =
+          !busy && (done || untouched)
+            ? rows
+                .map(
+                  (r) =>
+                    `${r.tag} ${
+                      setLine(
+                        r.view.fields,
+                        (field) => cellValue(r.row.set, field) ?? r.row.prefill[field] ?? null,
+                        false,
+                      ) || '–'
+                    }`,
+                )
+                .join(' · ')
+            : null;
+        if (rows.length) rounds.push({ index, done, summary, rows });
+      }
+      const firstOpen = rounds.findIndex((r) => !r.done);
+      const key = block.exercises[0].id;
+      const allDone = live.length > 0 && live.every((m) => isExerciseDone(m.view.exercise));
+      const editingHere = members.some((m) => m.view.exercise.id === editing?.exerciseId);
+      const lastLive = live[live.length - 1]?.view.exercise;
+      const round = firstOpen < 0 ? Math.max(0, total - 1) : rounds[firstOpen].index;
+      const restSet = lastLive?.sets?.[round] ?? null;
+      const rest = restSet
+        ? restAfterTick(restSet, restSet, {
+            exerciseOverride: lastLive ? (this._restByExercise()[lastLive.id] ?? null) : null,
+            workoutDefault: this._restForAll(),
+            personDefault: this._settings().defaultRestSeconds,
+          })
+        : null;
+      return {
+        kind: 'superset',
+        key,
+        members,
+        rounds,
+        current: round + 1,
+        total,
+        folded: allDone && !unfolded.has(key) && !editingHere,
+        names: members.map((m) => m.view.exercise.exerciseNameSnapshot).join(' + '),
+        restLine:
+          rest !== null
+            ? this._translateService.instant('workouts.superset.restAfterRound', {
+                value: secondsToClock(rest),
+              })
+            : '',
+      };
+    });
+  });
+
+  /** "Back to Bench press · Set 3", on the pill shown once the focus scrolls away. */
+  readonly backToLabel = computed(() => {
+    const focus = this.focus();
+    if (!focus) return '';
+    const view = this.views().find((v) => v.exercise.id === focus.exerciseId);
+    const row = view?.rows.find((r) => r.set.id === focus.setId);
+    if (!view || !row) return '';
+    return this._translateService.instant('workouts.logger.backTo', {
+      value: `${view.exercise.exerciseNameSnapshot} · ${row.badge.short ?? row.badge.name}`,
+    });
+  });
+
+  /**
+   * The pad's wide key: on to the next field ("Reps →"), else tick the set
+   * ("Log set"), or Done when the set is already ticked.
+   */
+  readonly keypadAction = computed<{ label: string; icon: string | null; slot: 'start' | 'end' }>(() => {
+    const target = this.editing();
+    const view = target ? this.views().find((v) => v.exercise.id === target.exerciseId) : null;
+    const row = view?.rows.find((r) => r.set.id === target?.setId);
+    if (!target || !view || !row) return { label: '', icon: null, slot: 'start' };
+    const at = view.fields.indexOf(target.field);
+    const next = view.fields[at + 1];
+    if (next) {
+      return {
+        label: this._translateService.instant(`workouts.keypad.next.${next}`),
+        icon: 'arrow-forward-outline',
+        slot: 'end',
+      };
+    }
+    if (row.set.isCompleted) return { label: '', icon: null, slot: 'start' };
+    return {
+      label: this._translateService.instant('workouts.keypad.logSet'),
+      icon: 'checkmark-outline',
+      slot: 'start',
+    };
+  });
+
   /** Identifies the open cell for the keypad, so it re-seeds on every move. */
   readonly editingKey = computed(() => {
     const target = this.editing();
@@ -250,10 +642,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     const target = this.editing();
     if (!target) return '';
     const exercise = this.store.exercises().find((e) => e.id === target.exerciseId);
-    const index = (exercise?.sets ?? []).findIndex((s) => s.id === target.setId);
+    const sets = exercise?.sets ?? [];
+    const index = sets.findIndex((s) => s.id === target.setId);
     return [
       exercise?.exerciseNameSnapshot,
-      this._translateService.instant('workouts.logger.setNumber', { number: index + 1 }),
+      exercise && index >= 0 ? this._labelOf(exercise, index) : '',
       exercise ? this._columnLabel(exercise, target.field) : '',
     ]
       .filter(Boolean)
@@ -320,39 +713,30 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   });
 
   /**
-   * The set to do after this rest: the next unticked one in the exercise just
-   * worked, then on through the exercises below, wrapping round to any left
-   * open above. Null once everything is ticked.
+   * The set to do after this rest: the focus, which a tick has already moved
+   * on. Null once everything is ticked.
    */
   readonly nextUp = computed(() => {
-    const exercises = this.store.exercises().filter((e) => !e.isSkipped);
-    const from = Math.max(0, exercises.findIndex((e) => e.id === this._restFrom()));
-    const order = [...exercises.slice(from), ...exercises.slice(0, from)];
-
-    for (const exercise of order) {
-      const sets = exercise.sets ?? [];
-      const index = sets.findIndex((s) => !s.isCompleted);
-      if (index < 0) continue;
-
-      const set = sets[index];
-      const target = this._targetText(exercise, set, index);
-      const isLast = sets.slice(index + 1).every((s) => s.isCompleted);
-      return {
-        title: [
-          this._translateService.instant('workouts.logger.setNumber', { number: index + 1 }),
-          target,
-        ]
-          .filter(Boolean)
-          .join(' · '),
-        detail: [
-          exercise.exerciseNameSnapshot,
-          isLast ? this._translateService.instant('workouts.restTimer.lastSet') : '',
-        ]
-          .filter(Boolean)
-          .join(' · '),
-      };
-    }
-    return null;
+    const focus = this.focus();
+    const view = focus ? this.views().find((v) => v.exercise.id === focus.exerciseId) : null;
+    const row = view?.rows.find((r) => r.set.id === focus?.setId);
+    if (!view || !row) return null;
+    const sets = view.exercise.sets ?? [];
+    const isLast = sets.filter((s) => !s.isCompleted).length === 1;
+    const line = setLine(
+      view.fields,
+      (field) => cellValue(row.set, field) ?? row.prefill[field] ?? null,
+      true,
+    );
+    return {
+      title: [row.badge.short ?? row.badge.name, line].filter(Boolean).join(' · '),
+      detail: [
+        view.exercise.exerciseNameSnapshot,
+        isLast ? this._translateService.instant('workouts.restTimer.lastSet') : '',
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    };
   });
 
   readonly showKeypad = computed(() => this.editing() !== null);
@@ -367,13 +751,51 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     // service only reaches the OS once the app is backgrounded.
     effect(() => this._restAlertService.track(this.restEndsAt()));
 
+    // The screen stays on while the workout is in front, if the person wants.
+    effect(() => {
+      const keep = this._onScreen() && !!this.store.log() && this._settings().keepScreenOn;
+      untracked(() => void (keep ? this._screenAwake.hold() : this._screenAwake.release()));
+    });
+
+    // The workout and its rest, for the mini-bar and for after a restart:
+    // the clock and the rest live on as timestamps when this page goes.
+    effect(() => {
+      const log = this.store.log();
+      if (log) untracked(() => this._activeSession.track(log));
+    });
+    effect(() => {
+      const log = this.store.log();
+      const rest = this._rest();
+      const endsAt = this.restEndsAt();
+      const next = this.nextLine();
+      if (!log || !this._restAdopted) return;
+      untracked(() =>
+        this._activeSession.setRest(rest ? { logId: log.id, ...rest, endsAt, next } : null),
+      );
+    });
+
+    // Follow the focus: whenever it moves (a tick, the list loading), bring
+    // it to a third of the way down, unless the person scrolled away.
+    effect(() => {
+      const id = this.focus()?.setId ?? null;
+      if (id === this._lastFocusId) return;
+      this._lastFocusId = id;
+      if (id && !untracked(this.userScrolled)) this._scrollToFocusSoon();
+    });
+
     this._startTicker();
-    this._destroyRef.onDestroy(() => this._stopTicker());
+    this._destroyRef.onDestroy(() => {
+      void this._screenAwake.release();
+      this._stopTicker();
+      this._clearEffortTimer();
+    });
   }
 
   ionViewWillEnter(): void {
+    this._onScreen.set(true);
     // Catch the clock up at once rather than on the next tick.
     this._now.set(Date.now());
+    this._settingsStore.load();
 
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) return;
@@ -386,9 +808,46 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
           // Back at the workout is back to work: a paused clock starts again.
           this.store.resumeClock();
           this._loadLastTimes();
+          this._adoptRest();
+          void this._maybeAskNotifications();
         },
         (log) => this._toSummaryIfClosed(log),
       );
+  }
+
+  /** The first workout: say why notifications help, then let the system ask. */
+  private async _maybeAskNotifications(): Promise<void> {
+    if (await this._restAlertService.shouldAsk()) this.notifyAskOpen.set(true);
+  }
+
+  allowNotifications(): void {
+    this.notifyAskOpen.set(false);
+    void this._restAlertService.askNow();
+  }
+
+  notNowNotifications(): void {
+    this.notifyAskOpen.set(false);
+    void this._restAlertService.declineForNow();
+  }
+
+  /**
+   * A rest that kept running while this page was away (minimised, or the app
+   * closed) carries on here, measured from when it began.
+   */
+  private _adoptRest(): void {
+    const log = this.store.log();
+    const kept = this._activeSession.rest();
+    if (log && kept && kept.logId === log.id && !this._rest()) {
+      this._rest.set({
+        exerciseId: kept.exerciseId,
+        setId: kept.setId,
+        startedAt: kept.startedAt,
+        planned: kept.planned,
+      });
+      this.restStartedAt.set(kept.startedAt);
+      this.restEndsAt.set(kept.endsAt);
+    }
+    this._restAdopted = true;
   }
 
   /**
@@ -403,10 +862,14 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   ionViewWillLeave(): void {
-    // Leaving the screen must not leave a countdown running against a
-    // workout the user is no longer looking at.
-    this.restEndsAt.set(null);
+    this._onScreen.set(false);
+    // The rest carries on in the mini-bar; only what was being typed closes.
+    this._keepTyped();
     this.editing.set(null);
+    this.dismissEffort();
+    // Back on the page, the list finds the focus again.
+    this._lastFocusId = null;
+    this.userScrolled.set(false);
   }
 
   /** Asks whether the clock keeps running while away, then goes. */
@@ -425,6 +888,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       this._goBack();
       return;
     }
+    // A paused workout has no rest running, and nothing to ask about.
+    this.restEndsAt.set(null);
+    this._rest.set(null);
+    void this._stillTraining.cancel();
     this.store.pause(
       () => this._goBack(),
       () =>
@@ -445,108 +912,273 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   // ─── Sets ─────────────────────────────────────────────────────
 
-  toggleSet(exercise: LoggedExercise, set: LoggedSet): void {
-    // A tick while typing is a Done: keep the number, close the pad.
+  /**
+   * ✓ on a set. Values still showing their grey pre-fill are saved as they
+   * are: if the numbers were right, the tick is the only tap. Then rest
+   * starts (none before a drop set, 45 s after a warm-up), "How hard?" shows
+   * where it should, and the focus moves on.
+   *
+   * On a set already ticked (opened to edit), the tick takes it back.
+   */
+  tick(exercise: LoggedExercise, set: LoggedSet): void {
     this._keepTyped();
     this.editing.set(null);
+    this.dismissEffort();
 
-    const next = !set.isCompleted;
-    this.store.logSet(exercise.id, set.id, { isCompleted: next });
+    const fresh = this._findSet(exercise.id, set.id) ?? set;
+    if (fresh.isCompleted) {
+      this.store.logSet(exercise.id, fresh.id, { isCompleted: false });
+      if (this._rest()?.setId === fresh.id) {
+        this.restEndsAt.set(null);
+        this._rest.set(null);
+      }
+      return;
+    }
 
-    // Completing a set starts the rest it prescribes. Un-ticking cancels it —
-    // the user is correcting a mistake, not resting.
-    if (next) {
+    // The rest before this set ends here, unless it was ended by hand.
+    this._recordRest(fresh);
+    this._restCueService.unlock();
+
+    const view = this.views().find((v) => v.exercise.id === exercise.id);
+    const row = view?.rows.find((r) => r.set.id === fresh.id);
+    const payload: LogSetPayload = { isCompleted: true };
+    for (const field of view?.fields ?? []) {
+      const prefill = row?.prefill[field] ?? null;
+      if (cellValue(fresh, field) == null && prefill != null) {
+        payload[PAYLOAD_KEY[field]] = prefill;
+      }
+    }
+    this.store.logSet(exercise.id, fresh.id, payload);
+
+    const rounds = this._rounds();
+    const here = { exerciseId: exercise.id, setId: fresh.id };
+    const next = nextAfter(this.store.exercises(), here, rounds);
+    const rest = restAfterTick(fresh, next?.set ?? null, {
+      sameRound:
+        !!next &&
+        sameRound(this.store.exercises(), here, { exerciseId: next.exercise.id, setId: next.set.id }, rounds),
+      exerciseOverride: this._restByExercise()[exercise.id] ?? null,
+      workoutDefault: this._restForAll(),
+      personDefault: this._settings().defaultRestSeconds,
+    });
+    if (rest !== null) {
       const now = Date.now();
-      this._restFrom.set(exercise.id);
       this.restStartedAt.set(now);
-      this.restEndsAt.set(now + this._restSecondsFor(set) * 1000);
+      this.restEndsAt.set(now + rest * 1000);
+      this._rest.set({ exerciseId: exercise.id, setId: fresh.id, startedAt: now, planned: rest });
     } else {
       this.restEndsAt.set(null);
+      this._rest.set(null);
     }
+
+    if (asksEffort(fresh, this.prefs().askEffort)) this._showEffort(fresh.id);
+    const log = this.store.log();
+    if (log) void this._stillTraining.remind(log.id, log.name);
+    // A tick brings the list back to the focus, wherever it was scrolled.
+    this.userScrolled.set(false);
   }
 
-  /**
-   * What the user set for this set wins, then what the coach prescribed, then
-   * the default. The prescription lives on `assignedSet` — the deep copy into
-   * the log deliberately leaves `restAfterSeconds` null until someone edits
-   * it, so reading only the logged row finds nothing on a coached workout.
-   */
-  private _restSecondsFor(set: LoggedSet): number {
-    return (
-      set.restAfterSeconds ?? set.assignedSet?.restAfterSeconds ?? DEFAULT_REST_SECONDS
-    );
+  /** The set's line was tapped: open it to edit in place, from its first field. */
+  openSet(exercise: LoggedExercise, set: LoggedSet): void {
+    const field = this._fieldsFor(exercise)[0];
+    if (field) this.editCell(exercise, set, field);
   }
 
   editCell(exercise: LoggedExercise, set: LoggedSet, field: SetField): void {
     // Tapping another cell is a Done for this one: what was typed stays.
     this._keepTyped();
-    this.editing.set({ exerciseId: exercise.id, setId: set.id, field });
+    this.dismissEffort();
+    const fresh = this._findSet(exercise.id, set.id) ?? set;
+    this.editing.set({ exerciseId: exercise.id, setId: fresh.id, field });
     this.typed.set('');
-    const current = cellValue(set, field);
+    // Seeded with the value, else its pre-fill: the steppers work from what
+    // the field shows, and the first digit typed replaces it.
+    const row = this.views()
+      .find((v) => v.exercise.id === exercise.id)
+      ?.rows.find((r) => r.set.id === fresh.id);
+    const current = cellValue(fresh, field) ?? row?.prefill[field] ?? null;
     this.draft.set(current == null ? '' : String(current));
-  }
-
-  commitCell(typed: string): void {
-    this._save(typed);
-    this.editing.set(null);
+    this._revealEditingSoon();
   }
 
   /**
-   * "Next field": save this cell and open the one after it — across the row,
-   * then down to the next set, then into the next exercise. Past the last
-   * cell the pad simply closes.
+   * The pad's wide key: save this field, then the next field of the same set,
+   * else tick the set, or close when it is already ticked.
    */
-  nextCell(typed: string): void {
+  onPadAction(typed: string): void {
     const target = this.editing();
     this._save(typed);
     if (!target) return;
-
-    const cells = this.store
-      .exercises()
-      .filter((e) => !e.isSkipped)
-      .flatMap((exercise) =>
-        (exercise.sets ?? []).flatMap((set) =>
-          this._fieldsFor(exercise).map((field) => ({ exercise, set, field })),
-        ),
-      );
-    const at = cells.findIndex(
-      (c) => c.set.id === target.setId && c.field === target.field,
-    );
-    const next = at >= 0 ? cells[at + 1] : undefined;
-    if (!next) {
+    const exercise = this.store.exercises().find((e) => e.id === target.exerciseId);
+    const set = exercise ? this._findSet(exercise.id, target.setId) : null;
+    if (!exercise || !set) {
       this.editing.set(null);
       return;
     }
-    // The store has the value just saved; read the next cell from it fresh.
-    this.editCell(next.exercise, next.set, next.field);
+    const fields = this._fieldsFor(exercise);
+    const next = fields[fields.indexOf(target.field) + 1];
+    if (next) {
+      this.editCell(exercise, set, next);
+      return;
+    }
+    this.editing.set(null);
+    if (!set.isCompleted) this.tick(exercise, set);
+  }
+
+  /** "Set 2", or "Round 2" in a superset: the set as labels name it after the exercise. */
+  private _labelOf(exercise: LoggedExercise, index: number): string {
+    const row = this.views()
+      .find((v) => v.exercise.id === exercise.id)
+      ?.rows[index];
+    return row ? (row.badge.short ?? row.badge.name) : '';
+  }
+
+  /** Close keeps what was typed, like everywhere else. */
+  closePad(): void {
+    this._keepTyped();
+    this.editing.set(null);
+  }
+
+  private _findSet(exerciseId: string, setId: string): LoggedSet | null {
+    return (
+      this.store
+        .exercises()
+        .find((e) => e.id === exerciseId)
+        ?.sets?.find((s) => s.id === setId) ?? null
+    );
+  }
+
+  // ─── Effort ───────────────────────────────────────────────────
+
+  pickEffort(exercise: LoggedExercise, set: LoggedSet, value: number): void {
+    this.dismissEffort();
+    this.store.logSet(exercise.id, set.id, { rpe: value });
+  }
+
+  dismissEffort(): void {
+    this._clearEffortTimer();
+    this.effortFor.set(null);
+  }
+
+  private _showEffort(setId: string): void {
+    this._clearEffortTimer();
+    this.effortFor.set(setId);
+    this._effortTimer = setTimeout(() => {
+      if (this.effortFor() === setId) this.effortFor.set(null);
+    }, EFFORT_PROMPT_MS);
+  }
+
+  private _clearEffortTimer(): void {
+    if (this._effortTimer !== null) clearTimeout(this._effortTimer);
+    this._effortTimer = null;
+  }
+
+  // ─── Set menu ─────────────────────────────────────────────────
+
+  openMenu(exercise: LoggedExercise, set: LoggedSet, badge: SetBadge): void {
+    this._keepTyped();
+    this.editing.set(null);
+    this.dismissEffort();
+    this.menuSet.set({ exerciseId: exercise.id, set, badge });
+    this.menuOpen.set(true);
+  }
+
+  onSetType(type: ExerciseSetType): void {
+    const target = this.menuSet();
+    if (target) this.store.logSet(target.exerciseId, target.set.id, { setType: type });
+  }
+
+  onSetNote(note: string | null): void {
+    const target = this.menuSet();
+    if (target) this.store.logSet(target.exerciseId, target.set.id, { notes: note });
+  }
+
+  onSetRemove(): void {
+    const target = this.menuSet();
+    const exercise = target
+      ? this.store.exercises().find((e) => e.id === target.exerciseId)
+      : null;
+    if (target && exercise) this.removeSet(exercise, target.set);
+  }
+
+  // ─── Scroll and focus ─────────────────────────────────────────
+
+  /** The person scrolled: does the focus set still show? */
+  async onScroll(): Promise<void> {
+    if (Date.now() - this._programmaticScrollAt < PROGRAMMATIC_SCROLL_MS) return;
+    const row = this._row('[data-focus]');
+    const content = this._content();
+    if (!row || !content) return;
+    const box = this._visibleBox(await content.getScrollElement());
+    const rect = row.getBoundingClientRect();
+    const away = rect.bottom < box.top + 20 || rect.top > box.bottom - 20;
+    if (away !== this.userScrolled()) this.userScrolled.set(away);
+  }
+
+  backToFocus(): void {
+    this.userScrolled.set(false);
+    void this._scrollToFocus();
+  }
+
+  /** After the list has drawn the new focus. */
+  private _scrollToFocusSoon(): void {
+    setTimeout(() => void this._scrollToFocus(), 120);
+  }
+
+  /** The focus set to a third of the way down: above the pad and the rest bar. */
+  private async _scrollToFocus(): Promise<void> {
+    const row = this._row('[data-focus]');
+    const content = this._content();
+    if (!row || !content) return;
+    const scroller = await content.getScrollElement();
+    const box = this._visibleBox(scroller);
+    const want = box.top + (box.bottom - box.top) * FOCUS_AT;
+    const delta = row.getBoundingClientRect().top - want;
+    if (Math.abs(delta) < 4) return;
+    this._programmaticScrollAt = Date.now();
+    await content.scrollToPoint(
+      0,
+      Math.max(0, scroller.scrollTop + delta),
+      prefersReducedMotion() ? 0 : FOCUS_SCROLL_MS,
+    );
+  }
+
+  /** Once the pad is up: keep the set being typed into just above it. */
+  private _revealEditingSoon(): void {
+    setTimeout(() => void this._revealEditing(), 120);
+  }
+
+  private async _revealEditing(): Promise<void> {
+    const row = this._row('[data-editing]');
+    const content = this._content();
+    if (!row || !content) return;
+    const box = this._visibleBox(await content.getScrollElement());
+    const rect = row.getBoundingClientRect();
+    let delta = 0;
+    if (rect.bottom > box.bottom - 16) delta = rect.bottom - (box.bottom - 16);
+    else if (rect.top < box.top + 8) delta = rect.top - (box.top + 8);
+    if (delta === 0) return;
+    this._programmaticScrollAt = Date.now();
+    await content.scrollByPoint(0, delta, prefersReducedMotion() ? 0 : 200);
   }
 
   /**
-   * "82.5 kg × 6–8": what the set asks for, field by field — the number
-   * already typed, else the target or last time, the same grey the cell shows.
+   * The part of the list a person can actually see: the content runs behind
+   * the header and the docked pad or rest bar, so both are taken off.
    */
-  private _targetText(exercise: LoggedExercise, set: LoggedSet, index: number): string {
-    const previous = this.previousFor(exercise, index);
-    return this._fieldsFor(exercise)
-      .map((field) => {
-        const typed = cellValue(set, field);
-        const text =
-          typed == null
-            ? setPlaceholder(set, field, previous)
-            : field === SetFields.Duration
-              ? secondsToClock(typed)
-              : formatMeasure(typed);
-        if (!text) return '';
-        if (field === SetFields.Weight) {
-          return this._translateService.instant('workouts.units.kg', { value: text });
-        }
-        if (field === SetFields.Distance) {
-          return this._translateService.instant('workouts.units.meters', { value: text });
-        }
-        return text;
-      })
-      .filter(Boolean)
-      .join(' × ');
+  private _visibleBox(scroller: HTMLElement): { top: number; bottom: number } {
+    const box = scroller.getBoundingClientRect();
+    const host = this._host.nativeElement;
+    const header = host.querySelector('ion-header')?.getBoundingClientRect();
+    const footer = host.querySelector('ion-footer')?.getBoundingClientRect();
+    return {
+      top: Math.max(box.top, header?.bottom ?? box.top),
+      bottom: footer && footer.height > 0 ? Math.min(box.bottom, footer.top) : box.bottom,
+    };
+  }
+
+  private _row(selector: string): HTMLElement | null {
+    return this._host.nativeElement.querySelector<HTMLElement>(`mh-set-row${selector}`);
   }
 
   /** Saves whatever the open keypad holds — before focus leaves its cell. */
@@ -594,17 +1226,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     return exercise.exercise?.isUnilateral ?? false;
   }
 
-  /** Column headings for this exercise, which vary with its kind. */
-  columnsFor(exercise: LoggedExercise): string[] {
-    return this._fieldsFor(exercise).map((field) => this._columnLabel(exercise, field));
-  }
-
-  /** The cells a set row draws for this exercise, in order — the same rule `mh-set-row` uses. */
+  /** The cells a set row draws for this exercise, in order. */
   private _fieldsFor(exercise: LoggedExercise): SetField[] {
-    const fields = setFieldsFor(exercise.exercise?.kind);
-    return this.hasAddedWeight(exercise) && !fields.includes(SetFields.Weight)
-      ? [SetFields.Weight, ...fields]
-      : fields;
+    return fieldsFor(exercise.exercise?.kind, this.hasAddedWeight(exercise));
   }
 
   private _columnLabel(exercise: LoggedExercise, field: SetField): string {
@@ -613,18 +1237,6 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         ? 'workouts.logger.columns.repsEach'
         : COLUMN_LABELS[field],
     );
-  }
-
-  /**
-   * Under the name: what last time held, when there was a last time — the
-   * number you are trying to beat. Otherwise "2 of 4 sets".
-   */
-  cardMeta(exercise: LoggedExercise): string {
-    const previous = exercise.exerciseId ? this._previous()[exercise.exerciseId] : undefined;
-    const summary = previous ? lastTimeSummary(previous) : '';
-    return summary
-      ? this._translateService.instant('workouts.setRow.lastTime', { value: summary })
-      : exerciseSetSummary(exercise);
   }
 
   // ─── Folding ──────────────────────────────────────────────────
@@ -638,24 +1250,21 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this._unfolded.update((set) => new Set(set).add(exercise.id));
   }
 
-  /** "3 sets done · 2,140 kg". */
-  doneSummary(exercise: LoggedExercise): string {
-    return exerciseDoneSummary(exercise);
-  }
-
-  editingFieldFor(setId: string): SetField | null {
-    const target = this.editing();
-    return target?.setId === setId ? target.field : null;
-  }
-
-  previousFor(exercise: LoggedExercise, index: number): LoggedSet | null {
-    const id = exercise.exerciseId;
-    if (!id) return null;
-    return this._previous()[id]?.[index] ?? null;
-  }
-
   addSet(exercise: LoggedExercise): void {
     this.store.addSet(exercise.id);
+  }
+
+  /** "+ Round": one more set on every exercise of the superset still in play. */
+  addRound(members: { view: ExerciseView }[]): void {
+    for (const { view } of members) {
+      if (!view.exercise.isSkipped) this.store.addSet(view.exercise.id);
+    }
+  }
+
+  /** A summary line was tapped: open its first set to edit in place. */
+  openRound(round: RoundView): void {
+    const first = round.rows[0];
+    if (first) this.openSet(first.view.exercise, first.row.set);
   }
 
   removeSet(exercise: LoggedExercise, set: LoggedSet): void {
@@ -676,14 +1285,161 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.restEndsAt.set(Math.max(Date.now(), end + seconds * 1000));
   }
 
+  /** Skip, before zero: the rest ends now, and that is its exact length. */
   skipRest(): void {
+    this._recordTappedRest();
+  }
+
+  /** Start set, from zero on: the same, with the set about to begin. */
+  startSet(): void {
+    this._recordTappedRest();
+  }
+
+  /** Hide, in overtime: the bar goes, the rest is still measured at the next tick. */
+  hideRest(): void {
     this.restEndsAt.set(null);
   }
 
+  /** Ten minutes over: no longer rest. The bar goes; the next tick calls it a break. */
+  onRestExpired(): void {
+    this.restEndsAt.set(null);
+  }
+
+  onRestSoon(): void {
+    this._restCueService.soon(this.prefs().vibration);
+  }
+
   onRestFinished(): void {
-    void this._feedbackService.success(
-      this._translateService.instant('workouts.restTimer.restOver'),
+    const { sound, vibration } = this.prefs();
+    this._restCueService.done({ sound, vibrate: vibration });
+  }
+
+  openRestSheet(): void {
+    this.restSheetScope.set(RestScopes.Exercise);
+    this.restSheetOpen.set(true);
+  }
+
+  // ─── This workout's ⋯ ─────────────────────────────────────────
+
+  openOptions(): void {
+    this._keepTyped();
+    this.editing.set(null);
+    this.optionsOpen.set(true);
+  }
+
+  onPrefs(change: Partial<LoggerPrefs>): void {
+    this._workoutPrefs.update((prefs) => ({ ...prefs, ...change }));
+  }
+
+  onOption(id: LoggerOptionId): void {
+    switch (id) {
+      case LoggerOptionIds.RestForAll:
+        this.restSheetScope.set(RestScopes.Workout);
+        this.restSheetOpen.set(true);
+        return;
+      case LoggerOptionIds.Pause:
+        this.onLeaveChoice(LeaveChoices.Pause);
+        return;
+      case LoggerOptionIds.Discard:
+        this.openDiscard();
+        return;
+    }
+  }
+
+  /** The new rest for this exercise or for all, and the running one with it. */
+  applyRest(change: RestChange): void {
+    const rest = this._rest();
+    if (change.scope === RestScopes.Exercise && rest) {
+      this._restByExercise.update((map) => ({ ...map, [rest.exerciseId]: change.seconds }));
+    } else {
+      this._restForAll.set(change.seconds);
+    }
+    // From the timer, the running rest takes the new length too. From the ⋯
+    // ("every exercise"), the rest running now keeps what its plan said.
+    const fromTimer = this.restSheetScope() === RestScopes.Exercise;
+    const start = this.restStartedAt();
+    if (fromTimer && start !== null && this.restEndsAt() !== null) {
+      this.restEndsAt.set(start + change.seconds * 1000);
+      if (rest) this._rest.set({ ...rest, planned: change.seconds });
+    }
+  }
+
+  private _recordTappedRest(): void {
+    const rest = this._rest();
+    this.restEndsAt.set(null);
+    this._rest.set(null);
+    if (rest) this._saveRest(rest, tappedRest((Date.now() - rest.startedAt) / 1000));
+  }
+
+  /** At a tick, a rest nobody ended by hand is estimated from the gap. */
+  private _recordRest(ticked: LoggedSet): void {
+    const rest = this._rest();
+    if (!rest || rest.setId === ticked.id) return;
+    this._rest.set(null);
+    const gap = (Date.now() - rest.startedAt) / 1000;
+    const measured = estimatedRest(gap, rest.planned, ticked);
+    if (!measured) return;
+    this._saveRest(rest, measured);
+    // Away too long to be rest: ask once whether that time should count.
+    if (measured.source === RestSources.Break) {
+      this._awaySeconds = Math.max(60, Math.round(gap - rest.planned));
+      this.awayMinutes.set(Math.round(gap / 60));
+      this.awayOpen.set(true);
+    }
+  }
+
+  /** "Pause it": the time away comes off the workout's duration. */
+  confirmAway(): void {
+    this.awayOpen.set(false);
+    this.store.pauseGap(
+      this._awaySeconds,
+      () =>
+        void this._feedbackService.error(
+          null,
+          this._translateService.instant('workouts.logger.toast.pauseFailed'),
+        ),
     );
+  }
+
+  // ─── Your note ────────────────────────────────────────────────
+
+  openNote(exercise: LoggedExercise): void {
+    if (!exercise.exerciseId) return;
+    this._keepTyped();
+    this.editing.set(null);
+    this.noteFor.set(exercise);
+    this.noteOpen.set(true);
+  }
+
+  saveNote(note: string | null): void {
+    const exercise = this.noteFor();
+    const id = exercise?.exerciseId;
+    if (!id || this.noteSaving()) return;
+    this.noteSaving.set(true);
+    this._exerciseService
+      .setNote(id, note)
+      .pipe(take(1))
+      .subscribe({
+        next: (saved) => {
+          this.noteSaving.set(false);
+          this.store.setPersonalNote(id, saved.note);
+          this.noteOpen.set(false);
+        },
+        error: (err) => {
+          this.noteSaving.set(false);
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.exerciseNote.saveFailed'),
+          );
+        },
+      });
+  }
+
+  private _saveRest(rest: { exerciseId: string; setId: string }, measured: MeasuredRest): void {
+    this.store.logSet(rest.exerciseId, rest.setId, {
+      restAfterSeconds: measured.seconds,
+      restSource: measured.source,
+    });
   }
 
   // ─── Exercises ────────────────────────────────────────────────
@@ -701,6 +1457,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     switch (id) {
       case ExerciseActionIds.History:
         this.openHistory(exercise);
+        return;
+      case ExerciseActionIds.Note:
+        this.openNote(exercise);
         return;
       case ExerciseActionIds.Swap:
         this.swapTarget.set(exercise);
@@ -741,6 +1500,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       .subscribe({
         next: async () => {
           this.discarding.set(false);
+          this._activeSession.end();
+          void this._stillTraining.cancel();
           await this._discardSheet()?.close();
           void this._feedbackService.success(
             this._translateService.instant('workouts.logger.toast.discarded'),
@@ -855,6 +1616,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             await closeSheet?.();
             // Replaced, so back from the summary returns to wherever the
             // workout was opened from rather than into a finished logger.
+            this._activeSession.end();
+            void this._stillTraining.cancel();
             void this._router.navigate(['/tabs/workouts/finish', log.id], {
               queryParams: { from: 'logger' },
               replaceUrl: true,
@@ -892,6 +1655,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
           .subscribe({
             next: (log) => {
               this.store.adopt(log);
+              this._restAdopted = true;
               // Replace, so a back-swipe does not start a second empty workout.
               void this._router.navigate(['/tabs/workouts/log', log.id], {
                 replaceUrl: true,
@@ -908,7 +1672,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         onBlocked: (open) =>
           this.store.load(
             open.id,
-            () => this._loadLastTimes(),
+            () => {
+              this._loadLastTimes();
+              this._adoptRest();
+            },
             (log) => this._toSummaryIfClosed(log),
           ),
         replaceUrl: true,
@@ -980,16 +1747,4 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (this._ticker !== null) clearInterval(this._ticker);
     this._ticker = null;
   }
-}
-
-/** Which log column each set field writes to. */
-const PAYLOAD_KEY: Record<SetField, 'weightKg' | 'reps' | 'durationSeconds' | 'distanceMeters'> = {
-  [SetFields.Weight]: 'weightKg',
-  [SetFields.Reps]: 'reps',
-  [SetFields.Duration]: 'durationSeconds',
-  [SetFields.Distance]: 'distanceMeters',
-};
-
-function cellValue(set: LoggedSet, field: SetField): number | null {
-  return set[PAYLOAD_KEY[field]];
 }

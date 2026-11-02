@@ -43,11 +43,13 @@ export * from './lib/models/exercise/equipment.model';
 // Models - Workout (program / assignment / log)
 export * from './lib/models/workout/workout.enums';
 export * from './lib/models/workout/program.model';
+export * from './lib/models/workout/workout-settings.model';
 export * from './lib/models/workout/status-severity';
 export * from './lib/models/workout/assignment.model';
 export * from './lib/models/workout/log.model';
 export * from './lib/models/workout/routine.model';
 export * from './lib/models/workout/progress.model';
+export * from './lib/models/workout/volume.enums';
 export * from './lib/models/workout/training-day.model';
 export * from './lib/models/workout/roster.model';
 
@@ -178,6 +180,7 @@ export * from './lib/constants/session-meta.const';
 export * from './lib/constants/languages.const';
 
 // Utils
+export * from './lib/utils/superset-links';
 export * from './lib/utils/url.utils';
 export * from './lib/utils/api-error.utils';
 export * from './lib/utils/cloudinary.utils';
@@ -246,6 +249,7 @@ export * from './lib/services/exercise/exercise.service';
 export * from './lib/services/workout/program.service';
 export * from './lib/services/workout/program-assignment.service';
 export * from './lib/services/workout/workout-log.service';
+export * from './lib/services/workout/workout-settings.service';
 export * from './lib/services/workout/routine.service';
 export * from './lib/services/workout/progress.service';
 export * from './lib/services/workout/roster.service';

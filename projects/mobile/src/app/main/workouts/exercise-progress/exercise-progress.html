@@ -65,16 +65,38 @@
           {{ 'workouts.exerciseProgress.emptyRange' | translate }}
         </ion-note>
       } @else {
-        @if (hasSeries()) {
+        @if (metric(); as current) {
           <ion-card class="hero">
             <ion-card-content>
-              <span class="mh-kicker">{{ 'workouts.exerciseProgress.oneRepMax' | translate }}</span>
+              @if (metricOptions().length > 1) {
+                <!-- One chart, three readings: the estimate, the heaviest set
+                     and the work done, over the same range. -->
+                <ion-segment
+                  class="mh-segment-fit metric"
+                  [value]="current"
+                  [attr.aria-label]="'workouts.volume.exercise.metricLabel' | translate"
+                  (ionChange)="setMetric($event.detail.value)"
+                >
+                  @for (option of metricOptions(); track option.value) {
+                    <ion-segment-button [value]="option.value">
+                      <ion-label>{{ option.label | translate }}</ion-label>
+                    </ion-segment-button>
+                  }
+                </ion-segment>
+              } @else if (current === Metrics.OneRepMax) {
+                <span class="mh-kicker">{{ 'workouts.exerciseProgress.oneRepMax' | translate }}</span>
+              } @else {
+                <span class="mh-kicker">{{ metricOptions()[0].label | translate }}</span>
+              }
               <div class="headline">
                 <span class="value">{{ heroValue() }}</span>
                 @if (deltaLabel()) {
                   <span class="delta" [attr.data-trend]="deltaTrend()">{{ deltaLabel() }}</span>
                 }
               </div>
+              @if (caption(); as key) {
+                <p class="caption">{{ key | translate }}</p>
+              }
               @if (chartPoints().length) {
                 <mh-trend-chart
                   [points]="chartPoints()"
@@ -82,6 +104,7 @@
                   [to]="now()"
                   [xLabels]="xLabels()"
                   [label]="chartLabel()"
+                  [formatTick]="formatTick()"
                 />
                 @if (chartPoints().length === 1) {
                   <!-- One estimate is a dot, not a trend; say why the line is missing. -->
@@ -89,6 +112,10 @@
                     {{ 'workouts.exerciseProgress.firstPoint' | translate }}
                   </ion-note>
                 }
+              }
+              @if (recordStill(); as line) {
+                <!-- A flat record line is not a stall when the work grew. -->
+                <p class="record-still">{{ line }}</p>
               }
             </ion-card-content>
           </ion-card>

@@ -23,7 +23,13 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { ExerciseProgress as ExerciseProgressData, ProgressRange, ProgressService, appLocale } from 'core';
+import {
+  ExerciseProgress as ExerciseProgressData,
+  ProgressRange,
+  ProgressService,
+  VolumeUnits,
+  appLocale,
+} from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
@@ -47,8 +53,25 @@ import {
   shortDayLabel,
   monthTicks,
   trendTicks,
+  sessionTopValue,
   unbreakable,
 } from '../workouts.config';
+import {
+  ExerciseMetric,
+  ExerciseMetrics,
+  axisValue,
+  exerciseMetrics,
+  formatPercentChange,
+  formatVolume,
+  formatVolumeChange,
+  pointsChangePercent,
+  recordDayLabel,
+  recordStillSince,
+  topSetPoints,
+  topSetUnit,
+  volumePoints,
+  volumeUnitOf,
+} from '../volume.config';
 
 const DEFAULT_RANGE: ProgressRange = '12w';
 
@@ -153,52 +176,189 @@ export class ExerciseProgress implements ViewWillEnter {
 
   readonly emptyRange = computed(() => this.sessions().length === 0);
 
-  /** Loaded exercises carry a 1RM line; holds, cardio and bodyweight do not. */
-  readonly hasSeries = computed(() => (this.progress()?.oneRepMaxSeries.length ?? 0) > 0);
+  readonly Metrics = ExerciseMetrics;
+
+  /**
+   * What the chart can show: the estimated 1RM for a loaded lift, the top
+   * set (or the best, for a hold or a run), and the volume per session.
+   */
+  readonly metrics = computed(() => {
+    const progress = this.progress();
+    return progress ? exerciseMetrics(progress) : [];
+  });
+
+  private readonly _pickedMetric = signal<ExerciseMetric | null>(null);
+
+  /** The picked metric while it applies, else the first this exercise has. */
+  readonly metric = computed<ExerciseMetric | null>(() => {
+    const picked = this._pickedMetric();
+    const metrics = this.metrics();
+    return picked && metrics.includes(picked) ? picked : (metrics[0] ?? null);
+  });
+
+  /** The top set's unit: kilograms for a lift, else the hold, distance or reps. */
+  private readonly _topSetUnit = computed(() => topSetUnit(this.progress()?.sessions ?? []));
+
+  private readonly _volumeUnit = computed(() => volumeUnitOf(this.progress()?.sessions ?? []));
+
+  /** The switch's options, labelled for this exercise ("Best" for a hold). */
+  readonly metricOptions = computed(() =>
+    this.metrics().map((metric) => ({
+      value: metric,
+      label:
+        metric === ExerciseMetrics.TopSet && this._topSetUnit() !== VolumeUnits.Kg
+          ? 'workouts.volume.exercise.metric.best'
+          : `workouts.volume.exercise.metric.${metric}`,
+    })),
+  );
+
 
   readonly rangeFrom = computed(() => rangeStart(this.range(), this.now()));
 
-  readonly chartPoints = computed(() =>
-    oneRepMaxPoints(this.progress()?.oneRepMaxSeries ?? [], this.range(), this.now()),
-  );
-
-  /** The best estimate held at the end of the range — today. */
-  readonly heroValue = computed(() => {
-    const latest =
-      this.chartPoints().at(-1)?.y ?? this.progress()?.oneRepMaxSeries.at(-1)?.weightKg;
-    return latest == null
-      ? ''
-      : this._translateService.instant('workouts.units.kg', { value: formatMeasure(latest, 1) });
+  readonly chartPoints = computed(() => {
+    const progress = this.progress();
+    if (!progress) return [];
+    switch (this.metric()) {
+      case ExerciseMetrics.OneRepMax:
+        return oneRepMaxPoints(progress.oneRepMaxSeries, this.range(), this.now());
+      case ExerciseMetrics.TopSet: {
+        const unit = this._topSetUnit();
+        return unit ? topSetPoints(progress.sessions, unit, this.range(), this.now()) : [];
+      }
+      case ExerciseMetrics.Volume:
+        return volumePoints(progress.sessions, this.range(), this.now());
+      default:
+        return [];
+    }
   });
 
-  private readonly _delta = computed(() =>
-    oneRepMaxDelta(this.progress()?.oneRepMaxSeries ?? [], this.range(), this.now()),
-  );
+  /** The unit the chart's values are in, for its axis. */
+  private readonly _chartUnit = computed(() => {
+    switch (this.metric()) {
+      case ExerciseMetrics.TopSet:
+        return this._topSetUnit();
+      case ExerciseMetrics.Volume:
+        return this._volumeUnit();
+      default:
+        return VolumeUnits.Kg;
+    }
+  });
+
+  readonly formatTick = computed(() => {
+    const unit = this._chartUnit();
+    return (value: number) => axisValue(value, unit);
+  });
+
+  /**
+   * The figure leading the card: the best estimate held today, the latest
+   * session's top set ("62.5 kg × 8"), or its volume ("4,280 kg").
+   */
+  readonly heroValue = computed(() => {
+    const metric = this.metric();
+    if (metric === ExerciseMetrics.OneRepMax) {
+      const latest =
+        this.chartPoints().at(-1)?.y ?? this.progress()?.oneRepMaxSeries.at(-1)?.weightKg;
+      return latest == null
+        ? ''
+        : this._translateService.instant('workouts.units.kg', { value: formatMeasure(latest, 1) });
+    }
+    const latest = this.chartPoints().at(-1)?.y;
+    const unit = this._chartUnit();
+    if (latest == null || !unit) return '';
+    if (metric === ExerciseMetrics.TopSet && unit === VolumeUnits.Kg) {
+      const session = this.sessions()[0];
+      return session ? sessionTopValue(session) : '';
+    }
+    return formatVolume(latest, unit);
+  });
+
+  /** How far the line moved across the range; null when it has no span. */
+  private readonly _delta = computed(() => {
+    if (this.metric() === ExerciseMetrics.OneRepMax) {
+      return oneRepMaxDelta(this.progress()?.oneRepMaxSeries ?? [], this.range(), this.now());
+    }
+    const points = this.chartPoints();
+    if (points.length < 2) return null;
+    if (this.metric() === ExerciseMetrics.Volume) return pointsChangePercent(points);
+    return Math.round((points[points.length - 1].y - points[0].y) * 100) / 100;
+  });
 
   readonly deltaTrend = computed(() => {
     const delta = this._delta() ?? 0;
     return delta > 0 ? Trends.Up : delta < 0 ? Trends.Down : Trends.Flat;
   });
 
-  /** "+4 kg in 12 weeks". */
+  /** "+4 kg in 12 weeks", "+12% in 12 weeks", "+0:15 in 4 weeks". */
   readonly deltaLabel = computed(() => {
     const delta = this._delta();
     if (delta == null) return '';
-    return this._translateService.instant('workouts.exerciseProgress.delta', {
-      sign: delta > 0 ? '+' : delta < 0 ? '−' : '',
-      // Epley estimates are not round numbers; a tenth of a kilo is plenty.
-      value: formatMeasure(Math.abs(delta), 1),
-      range: this._rangeLabel(this.range()).toLocaleLowerCase(appLocale()),
+    const range = this._rangeLabel(this.range()).toLocaleLowerCase(appLocale());
+    const metric = this.metric();
+    const unit = this._chartUnit() ?? VolumeUnits.Reps;
+    if (metric === ExerciseMetrics.Volume) {
+      return this._translateService.instant('workouts.volume.deltaIn', {
+        change: formatPercentChange(delta),
+        range,
+      });
+    }
+    if (unit === VolumeUnits.Kg) {
+      return this._translateService.instant('workouts.exerciseProgress.delta', {
+        sign: delta > 0 ? '+' : delta < 0 ? '−' : '',
+        // Epley estimates are not round numbers; a tenth of a kilo is plenty.
+        value: formatMeasure(Math.abs(delta), 1),
+        range,
+      });
+    }
+    return this._translateService.instant('workouts.volume.deltaIn', {
+      change: formatVolumeChange(delta, unit),
+      range,
     });
+  });
+
+  /** What the card's line is, under its figure; the 1RM needs no words. */
+  readonly caption = computed(() => {
+    switch (this.metric()) {
+      case ExerciseMetrics.TopSet:
+        return this._topSetUnit() === VolumeUnits.Kg
+          ? 'workouts.volume.exercise.caption.topSet'
+          : 'workouts.volume.exercise.caption.best';
+      case ExerciseMetrics.Volume:
+        return `workouts.volume.exercise.caption.volume.${this._volumeUnit() ?? VolumeUnits.Kg}`;
+      default:
+        return null;
+    }
   });
 
   readonly chartLabel = computed(() => {
     const points = this.chartPoints();
     if (!points.length) return '';
-    return this._translateService.instant('workouts.exerciseProgress.chartLabel', {
-      from: formatMeasure(points[0].y, 1),
-      to: formatMeasure(points[points.length - 1].y, 1),
+    if (this.metric() === ExerciseMetrics.OneRepMax) {
+      return this._translateService.instant('workouts.exerciseProgress.chartLabel', {
+        from: formatMeasure(points[0].y, 1),
+        to: formatMeasure(points[points.length - 1].y, 1),
+      });
+    }
+    const unit = this._chartUnit() ?? VolumeUnits.Reps;
+    const option = this.metricOptions().find((o) => o.value === this.metric());
+    return this._translateService.instant('workouts.volume.chartLabel', {
+      metric: option ? this._translateService.instant(option.label) : '',
+      from: formatVolume(points[0].y, unit),
+      to: formatVolume(points[points.length - 1].y, unit),
     });
+  });
+
+  /**
+   * "The record hasn't moved since 21 Oct, but you did more at the same
+   * weight": only when it is true over the range (`recordStillSince`).
+   */
+  readonly recordStill = computed(() => {
+    const progress = this.progress();
+    const since = progress ? recordStillSince(progress, this.range(), this.now()) : null;
+    return since
+      ? this._translateService.instant('workouts.volume.exercise.recordStill', {
+          date: recordDayLabel(since, this.now()),
+        })
+      : '';
   });
 
   /**
@@ -304,6 +464,11 @@ export class ExerciseProgress implements ViewWillEnter {
   setRange(value: unknown): void {
     const range = PROGRESS_RANGES.find((option) => option === value);
     if (range) this.range.set(range);
+  }
+
+  setMetric(value: unknown): void {
+    const metric = this.metrics().find((option) => option === value);
+    if (metric) this._pickedMetric.set(metric);
   }
 
   /**

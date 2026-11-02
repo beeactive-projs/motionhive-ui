@@ -5,14 +5,40 @@
   font-weight: 600;
 }
 
-/* The estimated 1RM leads the card; its change sits beside it and wraps
-   under it when the width runs out. */
+/* The switch between the estimate, the top set and the volume, over the
+   figure it picks. */
+.hero .metric {
+  margin-bottom: 0.75rem;
+}
+
+/* The figure leads the card; its change sits beside it and wraps under it
+   when the width runs out. */
 .hero .headline {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.25rem 0.625rem;
   margin: 0.25rem 0 0.75rem;
+}
+
+/* What the line is ("Volume per session · warm-ups excluded"), between the
+   figure and the chart; the headline gives up its gap to it. */
+.hero .caption {
+  margin: -0.5rem 0 0.75rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* Progress the record line cannot show: a warm note under the chart, in
+   the honey tint that is not a selection. */
+.hero .record-still {
+  margin: 0.75rem 0 0;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--mh-color-honey-tint);
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
 }
 
 /* Under a lone dot: why there is no line yet. */

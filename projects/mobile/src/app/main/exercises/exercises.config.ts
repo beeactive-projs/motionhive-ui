@@ -7,6 +7,7 @@ import {
   checkmarkOutline,
   closeCircleOutline,
   createOutline,
+  ellipsisHorizontal,
   flashOutline,
   funnelOutline,
   gitNetworkOutline,
@@ -23,6 +24,7 @@ import {
 } from 'ionicons/icons';
 
 import {
+  Equipment,
   Exercise,
   ExerciseForce,
   ExerciseKind,
@@ -33,12 +35,14 @@ import {
   ExerciseSource,
   ExerciseVisibility,
   MovementPattern,
+  Muscle,
   MuscleRole,
   enumLabelMap,
   translate,
   withEnumLabels,
 } from 'core';
 
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import {
   HexAvatarTone,
   HexAvatarTones,
@@ -58,6 +62,7 @@ export const EXERCISE_ICONS = {
   checkmarkOutline,
   closeCircleOutline,
   createOutline,
+  ellipsisHorizontal,
   flashOutline,
   funnelOutline,
   gitNetworkOutline,
@@ -252,11 +257,10 @@ export type OwnershipPill = LabelledOption<ExerciseOwnershipFilter>;
 /**
  * The pill row over the list, one-to-one with the BE's `?ownership=`.
  *
- * A trainee gets a different set: they never author an exercise, so "My
- * exercises" would always be empty, and "Public · others" only means
- * anything once you have a library of your own to contrast it with. What
- * they can see is the system catalogue and whatever coaches published, so
- * that is what the pills say.
+ * A trainee gets different words for the same slices. "Public · others"
+ * reads as "from coaches", since only a coach can publish an exercise, and
+ * their own exercises (always private) are "Mine", last: the catalogue is
+ * what they came for, their own few are the exception.
  */
 export const COACH_OWNERSHIP_PILLS: readonly OwnershipPill[] = [
   keyedOption(ExerciseOwnershipFilter.All, 'common.all'),
@@ -269,6 +273,7 @@ export const TRAINEE_OWNERSHIP_PILLS: readonly OwnershipPill[] = [
   keyedOption(ExerciseOwnershipFilter.All, 'common.all'),
   keyedOption(ExerciseOwnershipFilter.System, 'exercises.ownership.system'),
   keyedOption(ExerciseOwnershipFilter.PublicOthers, 'exercises.ownership.fromCoaches'),
+  keyedOption(ExerciseOwnershipFilter.Mine, 'exercises.ownership.mineShort'),
 ];
 
 // ── Sort ────────────────────────────────────────────────────────────────────
@@ -335,7 +340,12 @@ export function exerciseSubline(exercise: Exercise): string {
             count: equipment.length - 1,
           });
 
-  return [muscle, gear].filter(Boolean).join(' · ') || kindLabel(exercise.kind);
+  // Someone's own exercise leads with what it tracks, in the simple form's
+  // words: it is how they told it apart when they made it, and it often has
+  // no muscle or equipment to show.
+  const tracks = exercise.source === ExerciseSource.User ? trackLabel(exercise.kind) : null;
+
+  return [tracks, muscle, gear].filter(Boolean).join(' · ') || kindLabel(exercise.kind);
 }
 
 export function musclesByRole(exercise: Exercise, role: MuscleRole): string[] {
@@ -358,10 +368,21 @@ export interface OwnershipChip {
 
 export function ownershipChip(exercise: Exercise, myUserId: string | null): OwnershipChip | null {
   if (exercise.source === ExerciseSource.System) return null;
-  if (myUserId && exercise.ownerId === myUserId) {
+  if (isOwnExercise(exercise, myUserId)) {
     return { label: translate('exercises.row.mine'), tone: BadgeTones.Honey };
   }
+  // Someone else's own exercise is private to them; it never reaches this
+  // list, and if it did, "Public" would be a lie.
+  if (exercise.source === ExerciseSource.User) return null;
   return { label: translate('exercises.fields.public'), tone: BadgeTones.Info };
+}
+
+/** Yours: you made it, so you can change it or delete it. */
+export function isOwnExercise(
+  exercise: Pick<Exercise, 'ownerId'>,
+  myUserId: string | null,
+): boolean {
+  return !!myUserId && exercise.ownerId === myUserId;
 }
 
 /** "887 exercises · sorted by name" — the meta line above the list. */
@@ -401,11 +422,18 @@ export function instructionSteps(instructions: string | null): string[] {
  * catalogue; a custom one belongs to whoever wrote it, and the fork count
  * only earns a mention once somebody has actually taken a copy.
  */
-export function attributionLine(exercise: Exercise, ownerName: string | null): string {
+export function attributionLine(
+  exercise: Exercise,
+  ownerName: string | null,
+  /** Your own exercise: it says so, and who sees it, rather than your name. */
+  mine = false,
+): string {
   const origin =
     exercise.source === ExerciseSource.System
       ? translate('exercises.attribution.system')
-      : ownerName
+      : mine
+        ? translate('exercises.attribution.yours')
+        : ownerName
         ? translate('exercises.attribution.customBy', { name: ownerName })
         : translate('exercises.attribution.custom');
 
@@ -554,18 +582,30 @@ function muscleRoleMeta(role: MuscleRole, color: string): MuscleRoleMeta {
 export function exerciseDetailRows(exercise: Exercise, mine: boolean): ExerciseChipRow[] {
   const kind = kindTone(exercise.kind);
 
+  // Someone's own exercise was made with "What do you track?" and no level:
+  // the row says what it tracks in those words, and claims no difficulty
+  // nobody chose.
   const rows: ExerciseChipRow[] = [
-    {
-      icon: kindIcon(exercise.kind),
-      color: kind,
-      tone: tileTone(kind),
-      label: translate('exercises.detailRows.kindLevel'),
-      chips: [
-        { label: kindLabel(exercise.kind), tone: badgeTone(kind) },
-        { label: levelLabel(exercise.level), tone: levelTone(exercise.level) },
-      ],
-      hint: null,
-    },
+    exercise.source === ExerciseSource.User
+      ? {
+          icon: kindIcon(exercise.kind),
+          color: kind,
+          tone: tileTone(kind),
+          label: translate('exercises.detailRows.tracks'),
+          chips: [{ label: trackLabel(exercise.kind), tone: badgeTone(kind) }],
+          hint: null,
+        }
+      : {
+          icon: kindIcon(exercise.kind),
+          color: kind,
+          tone: tileTone(kind),
+          label: translate('exercises.detailRows.kindLevel'),
+          chips: [
+            { label: kindLabel(exercise.kind), tone: badgeTone(kind) },
+            { label: levelLabel(exercise.level), tone: levelTone(exercise.level) },
+          ],
+          hint: null,
+        },
   ];
 
   // Same order as the create form's Classification card.
@@ -684,3 +724,169 @@ export function muscleEquipmentRows(exercise: Exercise): ExerciseChipRow[] {
 
   return rows;
 }
+
+// ── Your own exercises (the simple form) ────────────────────────────────────
+
+/**
+ * What a kind tracks, in the simple form's words: "Weight and reps", "Reps
+ * only", "Time", "Distance". The coach's full form names categories; a
+ * person making their own exercise picks what they will write down. A kind
+ * the simple form does not offer keeps its category name.
+ */
+export function trackLabel(kind: ExerciseKind): string {
+  return SIMPLE_KINDS.includes(kind)
+    ? translate(`exercises.simpleForm.track.${kind}`)
+    : kindLabel(kind);
+}
+
+/**
+ * The four kinds the simple form offers, in its tile order: weight and reps,
+ * reps only, time, distance. Cardio and mobility stay on the coach's full
+ * form; a person logging their own training thinks in what they write down,
+ * not in categories.
+ */
+export const SIMPLE_KINDS: readonly ExerciseKind[] = [
+  ExerciseKind.Strength,
+  ExerciseKind.Bodyweight,
+  ExerciseKind.Duration,
+  ExerciseKind.Distance,
+];
+
+/**
+ * A name as a person means it: case, accents, and runs of spaces do not
+ * make "hip thrust" a different exercise from "Hip  Thrust".
+ */
+export function normalizeExerciseName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Whether the search already found the very exercise typed, by its name or
+ * by the English name under a translated one. Only then is "Create it"
+ * withheld: a near match ("Barbell hip thrust" for "hip thrust machine") is
+ * a suggestion, not the thing the person asked for.
+ */
+export function hasExactNameMatch(
+  query: string,
+  exercises: readonly Pick<Exercise, 'name' | 'originalName'>[],
+): boolean {
+  const wanted = normalizeExerciseName(query);
+  if (!wanted) return false;
+  return exercises.some(
+    (exercise) =>
+      normalizeExerciseName(exercise.name) === wanted ||
+      (!!exercise.originalName && normalizeExerciseName(exercise.originalName) === wanted),
+  );
+}
+
+/** A muscle or equipment chip on the simple form: the row's id, name and slug. */
+export interface TaxonomyChip extends TaxonomyOption {
+  slug: string;
+}
+
+export function muscleChip(muscle: Muscle): TaxonomyChip {
+  return { value: muscle.id, label: muscle.commonName, slug: muscle.slug };
+}
+
+export function equipmentChip(item: Equipment): TaxonomyChip {
+  return { value: item.id, label: item.name, slug: item.slug };
+}
+
+/**
+ * The muscles a person reaches for first, by slug, in the order the chips
+ * show them. Seventeen chips would push the rest of the form off the
+ * screen; these cover most of what anyone trains, and More shows the rest.
+ */
+export const FEATURED_MUSCLE_SLUGS: readonly string[] = [
+  'chest',
+  'lats',
+  'shoulders',
+  'quadriceps',
+  'glutes',
+  'abdominals',
+];
+
+/** The equipment a gym has most of, by slug, in chip order. */
+export const FEATURED_EQUIPMENT_SLUGS: readonly string[] = [
+  'machine',
+  'barbell',
+  'dumbbell',
+  'bodyweight',
+  'cable',
+];
+
+/**
+ * Every chip of a cloud, the featured ones first (in their order) and the
+ * rest after them in the taxonomy's own order. Expanding the cloud only adds
+ * chips after the ones already showing: nothing the thumb was about to tap
+ * moves.
+ */
+export function featuredFirst(
+  all: readonly TaxonomyChip[],
+  featuredSlugs: readonly string[],
+): TaxonomyChip[] {
+  const bySlug = new Map(all.map((chip) => [chip.slug, chip]));
+  const head = featuredSlugs
+    .map((slug) => bySlug.get(slug))
+    .filter((chip): chip is TaxonomyChip => !!chip);
+  const shown = new Set(head.map((chip) => chip.value));
+  return [...head, ...all.filter((chip) => !shown.has(chip.value))];
+}
+
+/**
+ * The chips a collapsed cloud shows: the first `limit` of `featuredFirst`
+ * (topped up from the rest should a featured slug be missing), then any chip
+ * already selected that would otherwise hide (an edit, or one picked before
+ * collapsing). A selection you cannot see is a selection you cannot undo.
+ */
+export function collapsedChips(
+  all: readonly TaxonomyChip[],
+  featuredSlugs: readonly string[],
+  selectedIds: readonly string[],
+  limit: number,
+): TaxonomyChip[] {
+  const ordered = featuredFirst(all, featuredSlugs);
+  const head = ordered.slice(0, limit);
+  const shown = new Set(head.map((chip) => chip.value));
+  const selected = new Set(selectedIds);
+  const hidden = ordered.filter((chip) => selected.has(chip.value) && !shown.has(chip.value));
+  return [...head, ...hidden];
+}
+
+/**
+ * Tap a chip in a capped cloud: off if it was on, on if there is room. At the
+ * cap a new chip is refused rather than bumping the oldest, which would undo
+ * a choice the person never touched.
+ */
+export function toggleCapped(ids: readonly string[], id: string, max: number): string[] {
+  if (ids.includes(id)) return ids.filter((entry) => entry !== id);
+  return ids.length >= max ? [...ids] : [...ids, id];
+}
+
+/** The ⋯ on a row of your own: change it, or let it go. */
+export const OwnExerciseActionIds = {
+  Edit: 'edit',
+  Delete: 'delete',
+} as const;
+
+export type OwnExerciseActionId = (typeof OwnExerciseActionIds)[keyof typeof OwnExerciseActionIds];
+
+export const OWN_EXERCISE_ACTIONS: readonly SheetAction<OwnExerciseActionId>[] = [
+  {
+    id: OwnExerciseActionIds.Edit,
+    label: 'button.edit',
+    icon: 'create-outline',
+  },
+  {
+    id: OwnExerciseActionIds.Delete,
+    label: 'button.delete',
+    hint: 'exercises.own.deleteHint',
+    icon: 'trash-outline',
+    destructive: true,
+  },
+];

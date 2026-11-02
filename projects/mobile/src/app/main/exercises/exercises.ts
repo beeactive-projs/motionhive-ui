@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import {
@@ -42,11 +42,14 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { ExerciseRow } from './_components/exercise-row/exercise-row';
+import { CreateExerciseRow } from './_components/create-exercise-row/create-exercise-row';
+import { OwnExerciseSheets } from './_components/own-exercise-sheets/own-exercise-sheets';
 import { ExerciseFilterSheet } from './_sheets/exercise-filter-sheet/exercise-filter-sheet';
 import {
   COACH_OWNERSHIP_PILLS,
   EXERCISE_ICONS,
   TRAINEE_OWNERSHIP_PILLS,
+  isOwnExercise,
   resultMetaLabel,
 } from './exercises.config';
 import { ExerciseFilters, ExercisesStore } from './exercises.store';
@@ -59,18 +62,19 @@ const SEARCH_DEBOUNCE_MS = 300;
  *
  * A coach comes here to keep the movements their programs are built from: to
  * find one, to copy a public one into their own library, to write one the
- * catalogue does not have. A trainee comes to look something up, and gets
- * the same surface with the authoring taken out — no create button, no fork,
- * no "My exercises" pill, because none of those mean anything to someone who
- * never owns an exercise.
+ * catalogue does not have. A trainee comes to look something up, and to make
+ * the odd one the catalogue lacks for their own training: the same create
+ * button opens the short form instead of the coach's wizard, their own rows
+ * carry a ⋯ to edit or delete them, and "Mine" lists them.
  *
- * Authoring is gated on coach *mode*, not just the instructor role: a coach
- * reading their own training plan in train mode is a trainee for as long as
- * they are in it, and a create button there belongs to the other workspace.
+ * The full form is gated on coach *mode*, not just the instructor role: a
+ * coach in train mode is a trainee for as long as they are in it, and gets
+ * the short form like one.
  */
 @Component({
   selector: 'mh-exercises',
   imports: [
+    CreateExerciseRow,
     EmptyState,
     ExerciseFilterSheet,
     ExerciseRow,
@@ -95,6 +99,7 @@ const SEARCH_DEBOUNCE_MS = 300;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    OwnExerciseSheets,
     SearchbarAutofocusDirective,
     TranslatePipe,
   ],
@@ -119,7 +124,10 @@ export class Exercises implements ViewWillEnter {
   /** Keystrokes on their way to the store — debounced, and dropped with the page. */
   private readonly _searchTerms = new Subject<string>();
 
-  /** Authoring is the coach workspace's business, not the role's alone. */
+  /** Make, change or delete your own, through the short form. */
+  private readonly _ownSheets = viewChild(OwnExerciseSheets);
+
+  /** The coach's full form is the coach workspace's business, not the role's alone. */
   readonly canAuthor = computed(
     () => this._authStore.isInstructor() && this._appModeStore.isCoach(),
   );
@@ -159,13 +167,6 @@ export class Exercises implements ViewWillEnter {
       .pipe(debounceTime(SEARCH_DEBOUNCE_MS), takeUntilDestroyed())
       .subscribe((term) => this.store.setSearch(term));
 
-    // A trainee's pill set has no Mine, so a stale selection from a role
-    // switch would ask the server for a slice the pills cannot show.
-    effect(() => {
-      if (!this.canAuthor() && this.store.ownership() === ExerciseOwnershipFilter.Mine) {
-        this.store.setOwnership(ExerciseOwnershipFilter.All);
-      }
-    });
   }
 
   // Not ngOnInit: Ionic keeps the page alive in the tab stack, and an
@@ -212,11 +213,44 @@ export class Exercises implements ViewWillEnter {
     void this._router.navigate(['/tabs/exercises', exercise.id]);
   }
 
-  create(): void {
-    void this._router.navigateByUrl('/tabs/exercises/new');
+  /** From a search that found nothing by that name: the form starts from it. */
+  createFromSearch(name: string): void {
+    if (this.canAuthor()) {
+      void this._router.navigate(['/tabs/exercises/new'], { queryParams: { name } });
+      return;
+    }
+    this._ownSheets()?.create(name);
   }
 
-  /** From the empty Mine state — the fastest library is somebody else's. */
+  /** A coach in coach mode gets the wizard; everyone else the short form. */
+  create(): void {
+    if (this.canAuthor()) {
+      void this._router.navigateByUrl('/tabs/exercises/new');
+      return;
+    }
+    this._ownSheets()?.create();
+  }
+
+  /** Outside coach mode your own rows get the ⋯; a coach edits from the exercise's page. */
+  hasMenu(exercise: Exercise): boolean {
+    return !this.canAuthor() && isOwnExercise(exercise, this.myUserId());
+  }
+
+  openMenu(exercise: Exercise): void {
+    this._ownSheets()?.menu(exercise);
+  }
+
+  /** Made from here: show it where it now lives, among your own. */
+  onCreated(): void {
+    if (this.store.ownership() === ExerciseOwnershipFilter.Mine) this.store.refresh();
+    else this.store.setOwnership(ExerciseOwnershipFilter.Mine);
+  }
+
+  onChanged(): void {
+    this.store.refresh();
+  }
+
+  /** From the coach's empty Mine state — the fastest library is somebody else's. */
   browsePublic(): void {
     this.store.setOwnership(ExerciseOwnershipFilter.PublicOthers);
   }

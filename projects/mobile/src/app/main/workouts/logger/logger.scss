@@ -70,43 +70,14 @@ ion-toolbar.progress {
   font-weight: 600;
 }
 
-/* Column labels over the set grid. The grid itself is the one custom control
-   on this screen (set-row): its cells and tick are sized for a thumb between
-   sets, which no list row is. These headings sit over those cells, so they
-   share the row's geometry — the set number, the "last time" column, the
-   input cells, and the tick's width — rather than an Ionic row's. */
-.grid-head {
+/* The sets: done ones as lines, the one you are on as a card, the rest as
+   grey lines (set-row draws all three). */
+.sets {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.25rem 0.375rem 0.125rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  letter-spacing: var(--mh-tracking-kicker);
+  flex-direction: column;
 }
 
-.grid-head .num {
-  width: 1.75rem;
-}
-
-.grid-head .prev {
-  width: 3.5rem;
-}
-
-/* Column headings sit over the cells they name, so a hold says "time" and a
-   split squat says "reps each" rather than both saying "actual". */
-.grid-head .col {
-  flex: 1;
-  min-width: 0;
-  text-align: center;
-}
-
-.grid-head .tick-head {
-  flex: none;
-  width: var(--mh-tap-target);
-}
-
-/* Add set / Add weight under the grid — quiet text actions in the honey ink,
+/* Add set / Add weight under the sets — quiet text actions in the honey ink,
    centred under the rows they add to. */
 .ex-actions {
   display: flex;
@@ -131,4 +102,224 @@ ion-card ion-skeleton-text {
 ion-button.discard {
   margin: 0.5rem 0 0;
   font-weight: 600;
+}
+
+/* Room under the last exercise, so its last sets can still rise to a third
+   of the way down, above the pad and the rest bar. */
+.mh-page {
+  padding-bottom: 16rem;
+}
+
+/* "Back to Bench press · Set 3": floats over the list, above the bars. */
+.back-to {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  padding-inline: 1rem;
+  pointer-events: none;
+}
+
+.back-to-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 100%;
+  min-height: var(--mh-tap-target);
+  padding: 0 1rem;
+  border: 0;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-navy-card);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: var(--mh-color-navy-card-ink);
+  cursor: pointer;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  pointer-events: auto;
+}
+
+.back-to-pill ion-icon {
+  flex: none;
+  color: var(--ion-color-primary);
+}
+
+.back-to-pill span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Superset: one card with a honey rail, in rounds ───────────── */
+
+ion-card.superset {
+  border-inline-start: 3px solid var(--ion-color-primary);
+}
+
+.ss-head {
+  padding: 0.875rem 0.75rem 0.25rem 1rem;
+}
+
+.ss-kicker {
+  display: block;
+  margin-bottom: 0.375rem;
+  color: var(--mh-color-honey-deep);
+}
+
+.ss-member {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--mh-tap-target);
+}
+
+.ss-tag {
+  flex: none;
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-sm);
+  font-weight: 700;
+}
+
+.ss-name {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ion-text-color);
+  cursor: pointer;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  text-align: start;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.ss-member.skipped .ss-name {
+  color: var(--ion-color-medium);
+  text-decoration: line-through;
+}
+
+.ss-skipped {
+  flex: none;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+.ss-actions {
+  flex: none;
+  margin: 0;
+}
+
+.ss-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: -0.25rem 0 0.25rem;
+  padding-inline-start: 1.75rem;
+}
+
+.ss-line {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ion-color-medium);
+  font: inherit;
+  font-size: var(--mh-text-xs);
+  text-align: start;
+}
+
+.ss-line ion-icon {
+  flex: none;
+  font-size: var(--mh-icon-sm);
+}
+
+.ss-line span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ss-line.note {
+  min-height: 1.75rem;
+  color: var(--ion-text-color);
+  cursor: pointer;
+}
+
+.ss-line.plan-note {
+  font-style: italic;
+}
+
+ion-card.superset .sets {
+  padding: 0 0.75rem 0 1rem;
+}
+
+.round-label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-inline: 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+  text-transform: uppercase;
+}
+
+.round-done {
+  color: var(--ion-color-success-shade);
+  text-transform: lowercase;
+}
+
+/* A round finished or still ahead, in one line; tap to open its first set. */
+.round-summary {
+  display: block;
+  width: 100%;
+  min-height: var(--mh-tap-target);
+  padding: 0 0.25rem;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--ion-color-medium);
+  cursor: pointer;
+  font-size: var(--mh-text-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.round-summary.done {
+  color: var(--ion-text-color);
+  font-weight: 600;
+}
+
+.ss-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem 0.75rem 1rem;
+}
+
+.ss-foot ion-button {
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.ss-rest {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  text-align: end;
 }

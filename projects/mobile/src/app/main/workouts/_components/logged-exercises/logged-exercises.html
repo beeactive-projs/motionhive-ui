@@ -16,14 +16,20 @@
           </ion-item>
 
           <div slot="content" class="content">
+            @if (row.exercise.notes) {
+              <p class="exercise-note">{{ 'workouts.loggedSets.quoted' | translate: { note: row.exercise.notes } }}</p>
+            }
             <ol class="sets">
               @for (set of row.sets; track set.key) {
                 <li class="set" [class.undone]="!set.done">
-                  <span class="number" aria-hidden="true">{{ set.number }}</span>
-                  <span class="mh-visually-hidden">{{ 'workouts.loggedSets.set' | translate: { number: set.number } }}</span>
+                  <span [class]="'badge tone-' + set.badge.tone" aria-hidden="true">{{ set.badge.text }}</span>
+                  <span class="mh-visually-hidden">{{ set.badge.name }}</span>
                   <span class="value">
                     {{ set.value || ('workouts.loggedSets.notDone' | translate) }}
                   </span>
+                  @if (set.extras) {
+                    <span class="extras">{{ set.extras }}</span>
+                  }
                   @if (!set.done && set.value) {
                     <span class="state">{{ 'workouts.loggedSets.notDone' | translate }}</span>
                   }
@@ -33,6 +39,9 @@
                     </ion-badge>
                   }
                 </li>
+                @if (set.note) {
+                  <li class="set-note">{{ 'workouts.loggedSets.quoted' | translate: { note: set.note } }}</li>
+                }
               }
             </ol>
 

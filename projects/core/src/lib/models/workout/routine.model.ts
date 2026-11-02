@@ -33,6 +33,10 @@ export interface Routine {
   lastPerformedAt: string | null;
   /** Editorial difficulty. Starters carry one; a user's own routine is never graded. */
   level: ExerciseLevel | null;
+  /** "Rest between sets" for every exercise of the routine that sets none. */
+  defaultRestSeconds: number | null;
+  /** Put away: hidden from lists and pickers, history kept, restorable. */
+  archived: boolean;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -125,6 +129,9 @@ export interface ProgramWire {
   isSingleWorkout: boolean;
   /** Curated content only; null on user routines. */
   level?: ExerciseLevel | null;
+  defaultRestSeconds?: number | null;
+  /** DRAFT, PUBLISHED or ARCHIVED; a routine only reads ARCHIVED. */
+  status?: string;
   lastPerformedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -161,6 +168,8 @@ export interface CreateRoutinePayload {
   name: string;
   notes?: string;
   folder?: string;
+  /** "Rest between sets"; null clears it, so the person's default applies. */
+  defaultRestSeconds?: number | null;
   exercises?: CreateRoutineExercisePayload[];
 }
 
@@ -173,6 +182,8 @@ export interface ListRoutinesQuery {
   page?: number;
   limit?: number;
   library?: RoutineLibrary;
+  /** Archived routines: left out unless asked for (`only` lists just them). */
+  archived?: 'include' | 'exclude' | 'only';
 }
 
 export interface PaginatedRoutines {

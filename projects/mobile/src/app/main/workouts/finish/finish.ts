@@ -28,6 +28,7 @@ import {
   PersonalRecord,
   ProfilePrivacy,
   ProfilePrivacyLabels,
+  VolumeUnits,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
@@ -37,6 +38,7 @@ import {
 import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
 import { SheetAction } from '../../../_shared/components/action-sheet/action-sheet.model';
 import { ChoiceOption, ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
+import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import {
@@ -47,6 +49,7 @@ import { APP_HEX_SHAPE, TILE_FRAME, tileFigure } from '../../../_shared/config/h
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { workoutLinks } from '../../home/home-stack.config';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
+import { exerciseBlocks, memberTag } from '../logger/logger-flow';
 import { LoggedExercises } from '../_components/logged-exercises/logged-exercises';
 import { SaveRoutineService } from '../_services/save-routine.service';
 import { WorkoutPhotoStore, preparePhoto } from '../_services/workout-photo';
@@ -62,6 +65,12 @@ import {
   workoutTiles,
   workoutVolume,
 } from '../workouts.config';
+import {
+  ExerciseVolumeRow,
+  exerciseVolumeRows,
+  formatVolume,
+  workoutComparisonLine,
+} from '../volume.config';
 
 type PhotoAction = 'change' | 'remove';
 
@@ -78,6 +87,16 @@ const MAX_HIGHLIGHTS = 2;
 interface HeroStat {
   label: string;
   value: string;
+}
+
+/** The volume card: the total against last time, then each exercise's bars. */
+interface VolumeCard {
+  /** "4,280 kg"; empty for a workout that lifted nothing. */
+  total: string;
+  /** "+340 kg vs last Push day (3,940 kg) · +9%", or the first-time promise. */
+  line: string | null;
+  /** Only once something has a last time: one bar each is no comparison. */
+  rows: ExerciseVolumeRow[];
 }
 
 interface Highlight {
@@ -107,6 +126,7 @@ interface Highlight {
   imports: [
     ActionSheet,
     ChoiceSheet,
+    ConfirmSheet,
     EmptyState,
     FeelingScale,
     IonBackButton,
@@ -176,6 +196,16 @@ export class Finish implements ViewWillEnter {
     { id: 'remove', label: 'workouts.photo.remove', icon: 'trash-outline', destructive: true },
   ];
   private readonly _photoInput = viewChild<ElementRef<HTMLInputElement>>('photoInput');
+
+  /** The page's ⋯: deleting a finished workout, for test runs and mistakes. */
+  readonly moreOpen = signal(false);
+  readonly moreActions: readonly SheetAction<'delete'>[] = [
+    { id: 'delete', label: 'workouts.finish.delete.action', icon: 'trash-outline', destructive: true },
+  ];
+  readonly deleteOpen = signal(false);
+  readonly deleting = signal(false);
+  /** Closed through its own `close()` before navigating, as the logger's discard is. */
+  private readonly _deleteSheet = viewChild<ConfirmSheet>('deleteSheet');
   private readonly _photoStore = inject(WorkoutPhotoStore);
 
   readonly visibility = computed(() => this.log()?.visibility ?? ProfilePrivacy.OnlyMe);
@@ -314,8 +344,11 @@ export class Finish implements ViewWillEnter {
       });
     }
 
-    // A record already says it was a good day; this is for the days without one.
-    const gain = volumeGainPercent(workoutVolume(log), log.summary?.previousVolumeKg ?? null);
+    // A record already says it was a good day; this is for the days without
+    // one. The volume card says it whenever it has a last time to compare.
+    const gain = log.summary?.volume?.previous
+      ? null
+      : volumeGainPercent(workoutVolume(log), log.summary?.previousVolumeKg ?? null);
     if (records.length === 0 && gain !== null) {
       list.push({
         glyph: '📈',
@@ -328,6 +361,33 @@ export class Finish implements ViewWillEnter {
     }
 
     return list.slice(0, MAX_HIGHLIGHTS);
+  });
+
+  /**
+   * The workout's volume against last time: the total and the change on
+   * the same workout, then today and last time per exercise. Nothing on a
+   * workout with no volume at all, or from an API that does not send it.
+   */
+  readonly volumeCard = computed<VolumeCard | null>(() => {
+    const log = this.log();
+    const volume = log?.summary?.volume;
+    if (!log || !volume) return null;
+    if (volume.totalKg <= 0 && volume.exercises.length === 0) return null;
+    const names = new Map(
+      (log.exercises ?? []).map((exercise) => [exercise.id, exercise.exerciseNameSnapshot]),
+    );
+    const compared = volume.exercises.some((exercise) => exercise.previous);
+    // A superset's members read as one block, with its letter and rail.
+    const blocks = exerciseBlocks(log.exercises ?? []);
+    const tagOf = (id: string): string | null => {
+      const block = blocks.find((b) => b.exercises.some((e) => e.id === id));
+      return block ? memberTag(block, id) : null;
+    };
+    return {
+      total: volume.totalKg > 0 ? formatVolume(volume.totalKg, VolumeUnits.Kg) : '',
+      line: workoutComparisonLine(volume),
+      rows: compared ? exerciseVolumeRows(volume, (id) => names.get(id) ?? '', tagOf) : [],
+    };
   });
 
   /** A freestyle session is the one that can become a routine. */
@@ -348,6 +408,40 @@ export class Finish implements ViewWillEnter {
 
   ionViewWillEnter(): void {
     this.load();
+  }
+
+  onMore(): void {
+    this.deleteOpen.set(true);
+  }
+
+  /**
+   * Gone for good: its sets, the records it set and its photo; a plan's day
+   * it completed opens again. Back to where the workout was opened from.
+   */
+  confirmDelete(): void {
+    const log = this.log();
+    if (!log || this.deleting()) return;
+    this.deleting.set(true);
+    this._workoutLogService
+      .remove(log.id)
+      .pipe(take(1))
+      .subscribe({
+        next: async () => {
+          this.deleting.set(false);
+          await this._deleteSheet()?.close();
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.finish.delete.done'),
+          );
+          void this._router.navigate([this.backHref], { replaceUrl: true });
+        },
+        error: (err) => {
+          this.deleting.set(false);
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.finish.delete.failed'),
+          );
+        },
+      });
   }
 
   load(): void {

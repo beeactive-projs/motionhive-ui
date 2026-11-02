@@ -81,6 +81,7 @@
     </ion-list>
   </div>
   } @else if (isMineEmpty()) {
+  @if (canAuthor()) {
   <!-- The catalogue is the reason this is not a dead end: 700+ movements are
        already there, so writing one is a choice, not a chore you owe. -->
   <mh-empty-state icon="flash-outline" [heading]="'exercises.library.mineEmpty.title' | translate"
@@ -91,7 +92,20 @@
       {{ 'exercises.library.mineEmpty.browse' | translate }}
     </ion-button>
   </div>
+  } @else {
+  <!-- No fork for a trainee, so no second way out: the catalogue is one pill
+       away, and the reason to be here is the one it lacks. -->
+  <mh-empty-state icon="flash-outline" [heading]="'exercises.library.mineEmpty.title' | translate"
+    [message]="'exercises.own.emptyMessage' | translate"
+    [actionLabel]="'exercises.own.emptyAction' | translate" (action)="create()" />
+  }
   } @else if (store.isFilteredEmpty()) {
+  @if (store.createName(); as name) {
+  <!-- Nothing by that name: the way to make it, before the way back out. -->
+  <div class="mh-page">
+    <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+  </div>
+  }
   <mh-empty-state icon="search-outline" [heading]="'empty.nothingMatches' | translate"
     [message]="'exercises.library.noMatch' | translate"
     [actionLabel]="'button.clearFilters' | translate" (action)="clearNarrowing()" />
@@ -104,9 +118,14 @@
     <span class="mh-kicker meta">{{ metaLabel() }}</span>
     <ion-list [inset]="true" class="mh-card-list">
       @for (exercise of store.items(); track exercise.id) {
-      <mh-exercise-row [exercise]="exercise" [myUserId]="myUserId()" (select)="open(exercise)" />
+      <mh-exercise-row [exercise]="exercise" [myUserId]="myUserId()" [showMenu]="hasMenu(exercise)"
+        (select)="open(exercise)" (menu)="openMenu(exercise)" />
       }
     </ion-list>
+    <!-- Near matches above, none by that exact name: the way to make it. -->
+    @if (store.createName(); as name) {
+    <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+    }
   </div>
 
   <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
@@ -114,14 +133,16 @@
   </ion-infinite-scroll>
   }
 
-  @if (canAuthor()) {
+  <!-- Everyone can make an exercise now: a coach in coach mode through the
+       wizard, anyone else through the short form, private to them. -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button [attr.aria-label]="'exercises.library.newExercise' | translate" (click)="create()">
       <ion-icon name="add-outline" />
     </ion-fab-button>
   </ion-fab>
-  }
 </ion-content>
 
 <mh-exercise-filter-sheet [(open)]="filterOpen" [filters]="store.filters()" [facets]="store.facets()"
   [ownership]="store.ownership()" [search]="store.search()" (applied)="applyFilters($event)" />
+
+<mh-own-exercise-sheets (created)="onCreated()" (updated)="onChanged()" (deleted)="onChanged()" />

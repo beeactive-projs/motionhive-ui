@@ -12,6 +12,8 @@ import {
   ListExercisesQuery,
 } from 'core';
 
+import { hasExactNameMatch } from './exercises.config';
+
 const PAGE_SIZE = 20;
 /** The API caps `limit` at 100 — five pages is the most one request can re-read. */
 const MAX_REFRESH_PAGES = 5;
@@ -145,6 +147,16 @@ export class ExercisesStore {
 
   /** Nothing at all under an unnarrowed All — a seeding problem, not a filter. */
   readonly isEmpty = computed(() => this._isSettledEmpty() && !this.isFilteredEmpty());
+
+  /**
+   * The search to offer creating, once it has settled without an exercise
+   * of exactly that name; empty otherwise. Near matches stay as suggestions.
+   */
+  readonly createName = computed(() => {
+    const query = this.search().trim();
+    if (!query || this._loading()) return '';
+    return hasExactNameMatch(query, this._items()) ? '' : query;
+  });
 
   // ── Loading ───────────────────────────────────────────────────────────────
 

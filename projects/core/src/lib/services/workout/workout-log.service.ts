@@ -112,6 +112,25 @@ export class WorkoutLogService {
     );
   }
 
+  /**
+   * Delete a finished workout, with its sets, the records it set and its
+   * photo; a plan day it completed is open again. Same route as `discard`,
+   * which the API reads by the workout's status.
+   */
+  remove(id: string): Observable<void> {
+    return this._http.delete<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.BY_ID(id)}`,
+    );
+  }
+
+  /** Add time away to the paused time, after the fact. */
+  pauseGap(id: string, seconds: number): Observable<WorkoutLog> {
+    return this._http.post<WorkoutLog>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.PAUSE_GAP(id)}`,
+      { seconds },
+    );
+  }
+
   /** Start the clock again. Does nothing on a workout that is running. */
   resume(id: string): Observable<WorkoutLog> {
     return this._http.post<WorkoutLog>(

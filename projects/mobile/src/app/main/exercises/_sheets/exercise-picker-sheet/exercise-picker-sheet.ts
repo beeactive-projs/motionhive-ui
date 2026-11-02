@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -22,14 +23,22 @@ import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-she
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
 import { ExerciseRow } from '../../_components/exercise-row/exercise-row';
-import { ExercisePreviewSheet } from '../exercise-preview-sheet/exercise-preview-sheet';
+import { hasExactNameMatch } from '../../exercises.config';
 import { RecentExercisesStore } from '../../recent-exercises.store';
+import { ExerciseFormSheet } from '../exercise-form-sheet/exercise-form-sheet';
+import { CreateExerciseRow } from '../../_components/create-exercise-row/create-exercise-row';
+import { ExercisePreviewSheet } from '../exercise-preview-sheet/exercise-preview-sheet';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const PAGE_SIZE = 20;
 
 /**
  * Adding exercises to a routine or a live workout, without leaving it.
+ *
+ * When a search finds nothing by that exact name, the last row offers to
+ * make it: the short form opens over the picker with the name already in
+ * it, and the new exercise comes back through `picked` like any other, with
+ * whatever was ticked before it. Private to whoever made it, so anyone can.
  *
  * The whole catalog is browsable **here**, paginated. It used to push the
  * exercises page instead, which tore down whatever was half-built behind the
@@ -46,6 +55,8 @@ const PAGE_SIZE = 20;
 @Component({
   selector: 'mh-exercise-picker-sheet',
   imports: [
+    CreateExerciseRow,
+    ExerciseFormSheet,
     ExerciseRow,
     ExercisePreviewSheet,
     HexAvatar,
@@ -57,6 +68,7 @@ const PAGE_SIZE = 20;
     IonNote,
     IonSearchbar,
     IonSkeletonText,
+    NgTemplateOutlet,
     SearchbarAutofocusDirective,
     SheetShell,
     TranslatePipe,
@@ -162,6 +174,23 @@ export class ExercisePickerSheet {
 
   readonly canAdd = computed(() => this.selectedIds().length > 0);
 
+  /**
+   * "Can't find it? Create it": offered once a search has settled without
+   * an exercise of exactly that name. Near matches stay above it as
+   * suggestions; the row is the way out when none of them is the one.
+   */
+  readonly canCreate = computed(
+    () =>
+      this.isSearching() &&
+      !this.loading() &&
+      !hasExactNameMatch(this.query(), [...this.results(), ...this._recentExercisesStore.exercises()]),
+  );
+
+  /** The trimmed search, as the create row quotes it and the form starts from it. */
+  readonly createName = computed(() => this.query().trim());
+
+  readonly createOpen = signal(false);
+
   constructor() {
     // Every opening is a fresh pick — a selection carried over from the last
     // time would be added to this list by accident.
@@ -262,6 +291,35 @@ export class ExercisePickerSheet {
 
     chosen.forEach((exercise) => this._recentExercisesStore.push(exercise));
     this.picked.emit(chosen);
+    this.open.set(false);
+  }
+
+  openCreate(): void {
+    this.createOpen.set(true);
+  }
+
+  /**
+   * Made from the search: added like a pick, after anything already ticked
+   * (a swap takes it alone), and the picker closes, as Add would. The form
+   * has already gone by now, so the two sheets leave one after the other.
+   */
+  onCreated(exercise: Exercise): void {
+    this._recentExercisesStore.push(exercise);
+
+    if (this.single()) {
+      this.picked.emit([exercise]);
+      this.open.set(false);
+      return;
+    }
+
+    const byId = new Map(
+      [...this._recentExercisesStore.exercises(), ...this.results()].map((row) => [row.id, row]),
+    );
+    const chosen = this.selectedIds()
+      .map((id) => byId.get(id))
+      .filter((row): row is Exercise => !!row && row.id !== exercise.id);
+    chosen.forEach((row) => this._recentExercisesStore.push(row));
+    this.picked.emit([...chosen, exercise]);
     this.open.set(false);
   }
 

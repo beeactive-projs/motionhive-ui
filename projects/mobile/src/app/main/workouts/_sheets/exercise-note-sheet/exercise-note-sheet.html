@@ -1,0 +1,28 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <ion-textarea
+      mode="md"
+      fill="outline"
+      [autoGrow]="true"
+      [autofocus]="true"
+      [maxlength]="max"
+      [counter]="draft().length > max - 40"
+      [label]="'workouts.exerciseNote.label' | translate"
+      labelPlacement="stacked"
+      [placeholder]="'workouts.exerciseNote.placeholder' | translate"
+      [value]="draft()"
+      (ionInput)="draft.set($any($event).detail.value ?? '')"
+    />
+    <p class="mh-helper">{{ 'workouts.exerciseNote.private' | translate }}</p>
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="exerciseName()"
+  [body]="body"
+  [fit]="true"
+  [saving]="saving()"
+  [canSave]="!saving()"
+  (save)="submit()"
+/>

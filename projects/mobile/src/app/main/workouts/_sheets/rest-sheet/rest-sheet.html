@@ -1,0 +1,72 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <div class="presets" role="radiogroup" [attr.aria-label]="'workouts.restSheet.title' | translate">
+      @for (preset of presets; track preset) {
+        <button
+          type="button"
+          role="radio"
+          class="preset"
+          [class.on]="value() === preset"
+          [attr.aria-checked]="value() === preset"
+          (click)="value.set(preset)"
+        >
+          {{ label(preset) }}
+        </button>
+      }
+    </div>
+
+    <div class="stepper">
+      <button type="button" [attr.aria-label]="'workouts.restSheet.less' | translate: { seconds: step }" (click)="nudge(-1)">
+        <ion-icon name="remove-outline" aria-hidden="true" />
+      </button>
+      <strong aria-live="polite">{{ display() }}</strong>
+      <button type="button" [attr.aria-label]="'workouts.restSheet.more' | translate: { seconds: step }" (click)="nudge(1)">
+        <ion-icon name="add-outline" aria-hidden="true" />
+      </button>
+    </div>
+
+    <div class="scopes" role="radiogroup" [attr.aria-label]="'workouts.restSheet.scope' | translate">
+      @if (exerciseName()) {
+      <button
+        type="button"
+        role="radio"
+        class="scope"
+        [class.on]="scope() === Scopes.Exercise"
+        [attr.aria-checked]="scope() === Scopes.Exercise"
+        (click)="scope.set(Scopes.Exercise)"
+      >
+        <span class="dot" aria-hidden="true"></span>
+        <span class="text">
+          <span class="title">{{ 'workouts.restSheet.exercise' | translate }}</span>
+          <span class="hint">{{ 'workouts.restSheet.exerciseHint' | translate: { name: exerciseName() } }}</span>
+        </span>
+      </button>
+      }
+      <button
+        type="button"
+        role="radio"
+        class="scope"
+        [class.on]="scope() === Scopes.Workout"
+        [attr.aria-checked]="scope() === Scopes.Workout"
+        (click)="scope.set(Scopes.Workout)"
+      >
+        <span class="dot" aria-hidden="true"></span>
+        <span class="text">
+          <span class="title">{{ 'workouts.restSheet.workout' | translate }}</span>
+          <span class="hint">{{ 'workouts.restSheet.workoutHint' | translate }}</span>
+        </span>
+      </button>
+    </div>
+
+    <p class="mh-helper">{{ 'workouts.restSheet.footnote' | translate }}</p>
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'workouts.restSheet.title' | translate"
+  [body]="body"
+  [fit]="true"
+  [saveLabel]="'workouts.restSheet.apply' | translate"
+  (save)="save()"
+/>

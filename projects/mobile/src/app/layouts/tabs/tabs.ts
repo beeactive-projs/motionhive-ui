@@ -43,6 +43,9 @@ import {
   TAB_SETS,
 } from '../../_shared/config/tabs.config';
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
+import { ActiveWorkoutBar } from '../../main/workouts/_components/active-workout-bar/active-workout-bar';
+import { ActiveSessionStore } from '../../main/workouts/_services/active-session.store';
+import { StartConflictSheet } from '../../main/workouts/_sheets/start-conflict-sheet/start-conflict-sheet';
 import { SaveRoutineSheet } from '../../main/workouts/_sheets/save-routine-sheet/save-routine-sheet';
 import { TabIds, TabItem } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
@@ -153,8 +156,10 @@ function appReturns(): Observable<void> {
     IonTabBar,
     IonTabButton,
     IonTabs,
+    ActiveWorkoutBar,
     NotificationBanner,
     SaveRoutineSheet,
+    StartConflictSheet,
     TranslatePipe,
   ],
   templateUrl: './tabs.html',
@@ -248,6 +253,19 @@ export class Tabs {
   );
 
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
+
+  private readonly _activeSessionStore = inject(ActiveSessionStore);
+  /** A workout is open: the mini-bar shows, and the Workouts tab wears a dot. */
+  readonly activeWorkout = computed(() => this._activeSessionStore.session() !== null);
+
+  /** On the logger itself the mini-bar would only repeat the screen. */
+  readonly onLogger = toSignal(
+    this._settled.pipe(
+      map(() => this._router.url.includes('/workouts/log/')),
+      distinctUntilChanged(),
+    ),
+    { initialValue: this._router.url.includes('/workouts/log/') },
+  );
 
   /**
    * The button to light: the stack's own tab, or the Menu for every stack

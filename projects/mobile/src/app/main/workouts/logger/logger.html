@@ -14,6 +14,13 @@
       }
     </ion-title>
     <ion-buttons slot="end">
+      <ion-button
+        [attr.aria-label]="'workouts.loggerOptions.more' | translate"
+        [disabled]="!store.log()"
+        (click)="openOptions()"
+      >
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+      </ion-button>
       <ion-button class="finish" fill="solid" shape="round" [disabled]="!store.log() || finishing()" (click)="finish()">
         {{ 'workouts.logger.finish' | translate }}
       </ion-button>
@@ -29,7 +36,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="onScroll()">
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
@@ -54,80 +61,108 @@
     </div>
   } @else {
     <div class="mh-page">
-      @for (exercise of store.exercises(); track exercise.id) {
-        @if (isFolded(exercise)) {
-          <!-- Done: folded to one check row so the open exercise stays near
-               the top. Tapping it opens the sets again. -->
+      @for (block of blocks(); track block.key) {
+        @if (block.kind === 'single') {
+          <ng-container *ngTemplateOutlet="exerciseTpl; context: { $implicit: block.view }" />
+        } @else if (block.folded) {
+          <!-- A finished superset folds to one line, like an exercise. -->
           <ion-card class="folded">
             <ion-item
               button
               detail="false"
               lines="none"
-              [attr.aria-label]="'workouts.logger.expand' | translate: { name: exercise.exerciseNameSnapshot }"
-              (click)="unfold(exercise)"
+              [attr.aria-label]="'workouts.logger.expand' | translate: { name: block.names }"
+              (click)="unfold(block.members[0].view.exercise)"
             >
               <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
               <ion-label>
-                <h2>{{ exercise.exerciseNameSnapshot }}</h2>
-                <p>{{ doneSummary(exercise) }}</p>
+                <h2>{{ block.names }}</h2>
+                <p>{{ 'workouts.superset.rounds' | translate: { count: block.total } }}</p>
               </ion-label>
               <ion-icon slot="end" name="chevron-down-outline" color="medium" aria-hidden="true" />
             </ion-item>
           </ion-card>
         } @else {
-          <mh-exercise-card
-            [name]="exercise.exerciseNameSnapshot"
-            [meta]="cardMeta(exercise)"
-            [kind]="exercise.exercise?.kind ?? null"
-            [skipped]="exercise.isSkipped"
-            [showActions]="true"
-            (open)="openExercise(exercise)"
-            (actions)="openActions(exercise)"
-          >
-            @if (!exercise.isSkipped) {
-              <!-- Column labels, once per exercise — the set rows stay wordless. -->
-              <div class="grid-head">
-                <span class="num">{{ 'workouts.logger.gridHead.set' | translate }}</span>
-                <span class="prev">{{ 'workouts.logger.gridHead.prev' | translate }}</span>
-                @for (column of columnsFor(exercise); track column) {
-                  <span class="col">{{ column }}</span>
-                }
-                <span class="tick-head"></span>
-              </div>
-
-              @for (set of exercise.sets ?? []; track set.id; let i = $index) {
-                <mh-set-row
-                  [set]="set"
-                  [index]="i"
-                  [kind]="exercise.exercise?.kind ?? null"
-                  [unilateral]="isUnilateral(exercise)"
-                  [showAddedWeight]="hasAddedWeight(exercise)"
-                  [previous]="previousFor(exercise, i)"
-                  [editing]="editingFieldFor(set.id)"
-                  [draft]="editingFieldFor(set.id) ? typed() : null"
-                  (toggle)="toggleSet(exercise, set)"
-                  (edit)="editCell(exercise, set, $event)"
-                  (remove)="removeSet(exercise, set)"
-                />
-              }
-
-              <div class="ex-actions">
-                <ion-button fill="clear" size="small" (click)="addSet(exercise)">
-                  <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                  {{ 'workouts.logger.addSet' | translate }}
-                </ion-button>
-
-                <!-- Weighted pull-ups and dips still deserve a volume number, and
-                     push-ups still deserve not to be asked. -->
-                @if (canAddWeight(exercise)) {
-                  <ion-button fill="clear" size="small" (click)="addWeight(exercise)">
-                    <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                    {{ 'workouts.logger.addWeight' | translate }}
+          <!-- A superset: one card with a rail, laid out in rounds. -->
+          <ion-card class="superset">
+            <div class="ss-head">
+              <span class="mh-kicker ss-kicker">
+                {{ 'workouts.superset.kicker' | translate: { round: block.current, total: block.total } }}
+              </span>
+              @for (member of block.members; track member.view.exercise.id) {
+                <div class="ss-member" [class.skipped]="member.view.exercise.isSkipped">
+                  <span class="ss-tag">{{ member.tag }}</span>
+                  <button type="button" class="ss-name" (click)="openExercise(member.view.exercise)">
+                    {{ member.view.exercise.exerciseNameSnapshot }}
+                  </button>
+                  @if (member.view.exercise.isSkipped) {
+                    <span class="ss-skipped">{{ 'workouts.superset.skipped' | translate }}</span>
+                  }
+                  <ion-button
+                    fill="clear"
+                    shape="round"
+                    color="medium"
+                    class="ss-actions"
+                    [attr.aria-label]="'workouts.exerciseCard.actionsFor' | translate: { name: member.view.exercise.exerciseNameSnapshot }"
+                    (click)="openActions(member.view.exercise)"
+                  >
+                    <ion-icon slot="icon-only" name="ellipsis-vertical-outline" aria-hidden="true" />
                   </ion-button>
+                </div>
+                @if (member.view.note || member.view.plan || member.view.planNote) {
+                  <div class="ss-lines">
+                    @if (member.view.note) {
+                      <button type="button" class="ss-line note" (click)="openNote(member.view.exercise)">
+                        <ion-icon name="create-outline" aria-hidden="true" />
+                        <span>{{ member.view.note }}</span>
+                      </button>
+                    }
+                    @if (member.view.plan) {
+                      <p class="ss-line">
+                        <ion-icon name="person-outline" aria-hidden="true" />
+                        <span>{{ member.view.plan }}</span>
+                      </p>
+                    }
+                    @if (member.view.planNote) {
+                      <p class="ss-line plan-note">{{ member.view.planNote }}</p>
+                    }
+                  </div>
                 }
-              </div>
-            }
-          </mh-exercise-card>
+              }
+            </div>
+
+            <div class="sets">
+              @for (round of block.rounds; track round.index) {
+                <div class="round-label">
+                  <span>{{ 'workouts.superset.round' | translate: { number: round.index + 1 } }}</span>
+                  @if (round.done) {
+                    <span class="round-done">{{ 'workouts.superset.done' | translate }}</span>
+                  }
+                </div>
+                @if (round.summary !== null) {
+                  <button type="button" class="round-summary" [class.done]="round.done" (click)="openRound(round)">
+                    {{ round.summary }}
+                  </button>
+                } @else {
+                  @for (item of round.rows; track item.row.set.id) {
+                    <ng-container
+                      *ngTemplateOutlet="rowTpl; context: { $implicit: item.row, view: item.view }"
+                    />
+                  }
+                }
+              }
+            </div>
+
+            <div class="ss-foot">
+              <ion-button fill="clear" size="small" (click)="addRound(block.members)">
+                <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                {{ 'workouts.superset.addRound' | translate }}
+              </ion-button>
+              @if (block.restLine) {
+                <span class="ss-rest">{{ block.restLine }}</span>
+              }
+            </div>
+          </ion-card>
         }
       }
 
@@ -158,6 +193,17 @@
       }
     </div>
   }
+
+  <!-- Scrolled away from the set you are on: the list stops following it,
+       and this takes you back. -->
+  @if (userScrolled() && backToLabel() && !editing()) {
+    <div slot="fixed" class="back-to">
+      <button type="button" class="back-to-pill" (click)="backToFocus()">
+        <ion-icon name="arrow-down-outline" aria-hidden="true" />
+        <span>{{ backToLabel() }}</span>
+      </button>
+    </div>
+  }
 </ion-content>
 
 <!-- One slot, three states: the keypad while a cell is open, the rest timer
@@ -170,26 +216,172 @@
       [label]="keypadLabel()"
       [value]="draft()"
       [cell]="editingKey()"
-      [showNext]="true"
-      (commit)="commitCell($event)"
-      (next)="nextCell($event)"
+      [replaceOnType]="true"
+      [actionLabel]="keypadAction().label"
+      [actionIcon]="keypadAction().icon"
+      [actionIconSlot]="keypadAction().slot"
+      (commit)="onPadAction($event)"
       (preview)="typed.set($event)"
-      (dismiss)="editing.set(null)"
+      (dismiss)="closePad()"
     />
   } @else if (showRest()) {
     <mh-rest-timer-bar
       [endsAt]="restEndsAt()"
       [startedAt]="restStartedAt()"
-      [nextTitle]="nextUp()?.title ?? ''"
-      [nextDetail]="nextUp()?.detail ?? ''"
+      [next]="nextLine()"
       (nudge)="nudgeRest($event)"
       (skip)="skipRest()"
+      (start)="startSet()"
+      (hide)="hideRest()"
+      (change)="openRestSheet()"
+      (soon)="onRestSoon()"
       (finished)="onRestFinished()"
+      (expired)="onRestExpired()"
     />
   }
 </ion-footer>
 
+<ng-template #exerciseTpl let-view>
+  @if (view.folded) {
+    <!-- Done: folded to one line so the open exercise stays near the
+         top. Tapping it opens the sets again. -->
+    <ion-card class="folded">
+      <ion-item
+        button
+        detail="false"
+        lines="none"
+        [attr.aria-label]="'workouts.logger.expand' | translate: { name: view.exercise.exerciseNameSnapshot }"
+        (click)="unfold(view.exercise)"
+      >
+        <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
+        <ion-label>
+          <h2>{{ view.exercise.exerciseNameSnapshot }}</h2>
+          <p>{{ view.summary }}</p>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-down-outline" color="medium" aria-hidden="true" />
+      </ion-item>
+    </ion-card>
+  } @else {
+    <mh-exercise-card
+      [name]="view.exercise.exerciseNameSnapshot"
+      [kind]="view.exercise.exercise?.kind ?? null"
+      [skipped]="view.exercise.isSkipped"
+      [showActions]="true"
+      [note]="view.note || null"
+      [plan]="view.plan || null"
+      [planNote]="view.planNote || null"
+      (open)="openExercise(view.exercise)"
+      (actions)="openActions(view.exercise)"
+      (noteTap)="openNote(view.exercise)"
+    >
+      @if (!view.exercise.isSkipped) {
+        <div class="sets">
+          @for (row of view.rows; track row.set.id) {
+            <ng-container *ngTemplateOutlet="rowTpl; context: { $implicit: row, view: view }" />
+          }
+        </div>
+
+        <div class="ex-actions">
+          <ion-button fill="clear" size="small" (click)="addSet(view.exercise)">
+            <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+            {{ 'workouts.logger.addSet' | translate }}
+          </ion-button>
+
+          <!-- Weighted pull-ups and dips still deserve a volume number, and
+               push-ups still deserve not to be asked. -->
+          @if (canAddWeight(view.exercise)) {
+            <ion-button fill="clear" size="small" (click)="addWeight(view.exercise)">
+              <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+              {{ 'workouts.logger.addWeight' | translate }}
+            </ion-button>
+          }
+        </div>
+      }
+    </mh-exercise-card>
+  }
+</ng-template>
+
+<ng-template #rowTpl let-row let-view="view">
+  <mh-set-row
+    [attr.data-focus]="row.focus ? '' : null"
+    [attr.data-editing]="row.editing ? '' : null"
+    [set]="row.set"
+    [mode]="row.mode"
+    [badge]="row.badge"
+    [fields]="view.fields"
+    [prefill]="row.prefill"
+    [last]="row.last"
+    [unilateral]="isUnilateral(view.exercise)"
+    [editing]="row.editing"
+    [draft]="row.editing ? typed() : null"
+    (tick)="tick(view.exercise, row.set)"
+    (edit)="editCell(view.exercise, row.set, $event)"
+    (menu)="openMenu(view.exercise, row.set, row.badge)"
+    (open)="openSet(view.exercise, row.set)"
+  />
+  @if (effortFor() === row.set.id) {
+    <mh-effort-prompt
+      [target]="row.effortTarget"
+      (picked)="pickEffort(view.exercise, row.set, $event)"
+      (skip)="dismissEffort()"
+    />
+  }
+</ng-template>
+
 <mh-leave-workout-sheet [(open)]="leaveOpen" (choice)="onLeaveChoice($event)" />
+
+<mh-exercise-note-sheet
+  [(open)]="noteOpen"
+  [exerciseName]="noteFor()?.exerciseNameSnapshot ?? ''"
+  [note]="noteFor()?.personalNote ?? null"
+  [saving]="noteSaving()"
+  (save)="saveNote($event)"
+/>
+
+<!-- The first workout: why notifications help, before the system asks. -->
+<mh-confirm-sheet
+  [open]="notifyAskOpen()"
+  (openChange)="!$event && notifyAskOpen() && notNowNotifications()"
+  [title]="'workouts.notifyAsk.title' | translate"
+  [body]="'workouts.notifyAsk.body' | translate"
+  [confirmLabel]="'workouts.notifyAsk.allow' | translate"
+  [cancelLabel]="'workouts.notifyAsk.notNow' | translate"
+  (confirm)="allowNotifications()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="awayOpen"
+  [title]="'workouts.logger.away.title' | translate: { minutes: awayMinutes() }"
+  [body]="'workouts.logger.away.message' | translate"
+  [confirmLabel]="'workouts.logger.away.pause' | translate"
+  [cancelLabel]="'workouts.logger.away.keep' | translate"
+  (confirm)="confirmAway()"
+/>
+
+<mh-logger-options-sheet
+  [(open)]="optionsOpen"
+  [prefs]="prefs()"
+  [restForAll]="restForAllLabel()"
+  (prefsChange)="onPrefs($event)"
+  (chosen)="onOption($event)"
+/>
+
+<mh-rest-sheet
+  [(open)]="restSheetOpen"
+  [seconds]="restSheetSeconds()"
+  [exerciseName]="restExerciseName()"
+  [initialScope]="restSheetScope()"
+  (apply)="applyRest($event)"
+/>
+
+<mh-set-menu-sheet
+  [(open)]="menuOpen"
+  [set]="menuSet()?.set ?? null"
+  [badge]="menuSet()?.badge ?? null"
+  (typeChange)="onSetType($event)"
+  (noteChange)="onSetNote($event)"
+  (remove)="onSetRemove()"
+/>
 
 <mh-exercise-actions-sheet
   [(open)]="actionsOpen"

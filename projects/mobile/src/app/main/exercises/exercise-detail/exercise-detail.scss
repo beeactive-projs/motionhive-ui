@@ -167,3 +167,9 @@ ion-label .prose {
   margin-block-end: 0.25rem;
   line-height: 1.25;
 }
+
+/* The destructive row wears its colour in the label, not the surface, as on
+   the edit page: a red card reads as an error the page is reporting. */
+.danger ion-label h3 {
+  color: var(--ion-color-danger);
+}

@@ -1,0 +1,46 @@
+/* The set badge (number, or W / D / F / A), shared by the set row and the
+   set menu so a type looks the same in both. */
+
+.badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.25rem;
+  border: 0;
+  border-radius: var(--mh-radius-control);
+  background: transparent;
+  color: var(--ion-color-medium);
+  cursor: pointer;
+  font-size: var(--mh-text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tone-warmup {
+  background: var(--ion-color-primary-wash);
+  color: var(--ion-color-primary-wash-contrast);
+}
+
+.tone-drop {
+  background: var(--ion-color-violet-wash);
+  color: var(--ion-color-violet-wash-contrast);
+}
+
+.tone-failure {
+  background: var(--ion-color-danger-wash);
+  color: var(--ion-color-danger-wash-contrast);
+}
+
+.tone-amrap {
+  background: var(--ion-color-info-wash);
+  color: var(--ion-color-info-wash-contrast);
+}
+
+.tone-other {
+  background: var(--ion-color-medium-wash);
+  color: var(--ion-color-medium-wash-contrast);
+}
+

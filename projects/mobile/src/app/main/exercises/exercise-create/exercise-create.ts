@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
   IonButtons,
@@ -102,6 +102,9 @@ export class ExerciseCreate {
 
   constructor() {
     addIcons(EXERCISE_ICONS);
+    // Opened from a search that found nothing: start from the words typed.
+    const name = inject(ActivatedRoute).snapshot.queryParamMap.get('name')?.trim();
+    if (name) this.form.patch({ name: name.slice(0, MAX_NAME_LENGTH) });
   }
 
   selectKind(kind: ExerciseKind): void {

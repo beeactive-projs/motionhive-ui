@@ -84,6 +84,8 @@ function toRoutine(p: ProgramWire): Routine {
     folder: p.folder,
     lastPerformedAt: p.lastPerformedAt,
     level: p.level ?? null,
+    defaultRestSeconds: p.defaultRestSeconds ?? null,
+    archived: p.status === 'ARCHIVED',
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
     deletedAt: p.deletedAt,
@@ -114,6 +116,7 @@ export class RoutineService {
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.library) p = p.set('library', query.library);
+    p = p.set('archived', query.archived ?? 'exclude');
     return this._http
       .get<{
         items: ProgramWire[];
@@ -122,6 +125,20 @@ export class RoutineService {
         pageSize: number;
       }>(this._base, { params: p })
       .pipe(map((r) => ({ ...r, items: r.items.map(toRoutine) })));
+  }
+
+  /** Put a routine away: off the lists, history kept. */
+  archive(id: string): Observable<Routine> {
+    return this._http
+      .patch<ProgramWire>(`${this._base}/${id}`, { status: 'ARCHIVED' })
+      .pipe(map(toRoutine));
+  }
+
+  /** Bring an archived routine back to the lists. */
+  restore(id: string): Observable<Routine> {
+    return this._http
+      .patch<ProgramWire>(`${this._base}/${id}`, { status: 'DRAFT' })
+      .pipe(map(toRoutine));
   }
 
   get(id: string): Observable<Routine> {

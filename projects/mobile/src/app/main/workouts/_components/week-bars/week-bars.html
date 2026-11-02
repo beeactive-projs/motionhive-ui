@@ -1,0 +1,19 @@
+<div class="bars">
+  @for (bar of shown(); track bar.key) {
+    <!-- A native button, as the calendar's days are: a bar in a row of
+         twelve has no room for an Ionic button's padding and ripple. -->
+    <button
+      type="button"
+      class="week"
+      [class.selected]="bar.key === selected()"
+      [attr.aria-pressed]="bar.key === selected()"
+      [attr.aria-label]="bar.label"
+      (click)="pick(bar.key)"
+    >
+      <span class="track">
+        <span class="bar" [style.height.%]="bar.height"></span>
+      </span>
+      <span class="tick" aria-hidden="true">{{ bar.tick }}</span>
+    </button>
+  }
+</div>

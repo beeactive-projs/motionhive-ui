@@ -337,6 +337,11 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
     void this._router.navigate(['/tabs/workouts/routine', routine.id]);
   }
 
+  /** Your archived routines, on a page of their own. */
+  openArchived(): void {
+    void this._router.navigate(['/tabs/workouts/archived']);
+  }
+
   /** Start straight from the list, the same as from the routine's own page. */
   startRoutine(routine: Routine): void {
     if (this.startingId()) return;

@@ -99,3 +99,47 @@
     display: block;
   }
 }
+
+/* The weeks' card: the chips sit in the card's padding, not a bar's. Only
+   three, so they wrap rather than scroll when a small phone at large text
+   can't fit them on one line. */
+.weeks .mh-chip-row {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  padding: 0 0 0.5rem;
+}
+
+.weeks .headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.weeks .value {
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-3xl);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.weeks .week-name {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.weeks .hint {
+  margin: 0.125rem 0 0.75rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* A week's workout and what it moved, on the right like History's numbers. */
+.week-volume {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}

@@ -38,8 +38,19 @@ export class TrendChart {
   readonly xLabels = input<TrendLabel[]>([]);
   /** What the chart says, for screen readers. */
   readonly label = input('');
+  /**
+   * How a value on the axis is written: as is by default, a clock for a
+   * time, a short "4.3k" for a big volume.
+   */
+  readonly formatTick = input<(value: number) => string>(String);
 
   readonly geometry = computed(() => trendGeometry(this.points(), this.from(), this.to()));
+
+  /** The gridlines' values, written the way `formatTick` says. */
+  readonly yTicks = computed(() => {
+    const format = this.formatTick();
+    return (this.geometry()?.ticks ?? []).map((tick) => ({ y: tick.y, label: format(tick.value) }));
+  });
 
   readonly xTicks = computed(() => {
     const span = Math.max(this.to() - this.from(), 1);

@@ -1,0 +1,73 @@
+:host {
+  display: block;
+}
+
+.prompt {
+  margin: 0.125rem 0 0.375rem;
+  padding: 0.5rem 0.625rem 0.625rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-medium-wash);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.target {
+  color: var(--ion-color-medium);
+  font-weight: 400;
+}
+
+.skip {
+  min-height: 2rem;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--ion-color-medium);
+  cursor: pointer;
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+.choices {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.choice {
+  flex: 1;
+  min-width: 0;
+  height: var(--mh-tap-target);
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  cursor: pointer;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.choice.target {
+  border: 1.5px solid var(--ion-color-primary);
+}
+
+.choice:active {
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}

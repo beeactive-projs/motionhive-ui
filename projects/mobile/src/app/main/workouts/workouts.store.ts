@@ -37,6 +37,8 @@ export class WorkoutsStore {
   private readonly _routines = signal<Routine[]>([]);
   private readonly _starters = signal<Routine[]>([]);
   private readonly _starterTotal = signal(0);
+  /** How many of your routines are archived, for the way back to them. */
+  private readonly _archivedTotal = signal(0);
   private readonly _inProgress = signal<WorkoutLog | null>(null);
 
   private readonly _loading = signal(false);
@@ -50,6 +52,7 @@ export class WorkoutsStore {
   readonly starters = this._starters.asReadonly();
   /** The whole starter catalogue, for the "See all" count — not just the page we read. */
   readonly starterTotal = this._starterTotal.asReadonly();
+  readonly archivedTotal = this._archivedTotal.asReadonly();
 
   /** What a plan says to do today. Null on a rest day, which is an answer. */
   readonly today = computed<TrainingDayWorkout | null>(
@@ -114,11 +117,15 @@ export class WorkoutsStore {
       starters: this._routineService
         .list({ library: 'system', limit: ROUTINE_LIMIT })
         .pipe(catchError(() => of(null))),
+      archived: this._routineService
+        .list({ library: 'mine', archived: 'only', limit: 1 })
+        .pipe(catchError(() => of(null))),
       inProgress: this._workoutLogService.getInProgress().pipe(catchError(() => of(null))),
     })
       .pipe(take(1))
       .subscribe({
-        next: ({ day, routines, starters, inProgress }) => {
+        next: ({ day, routines, starters, archived, inProgress }) => {
+          if (archived) this._archivedTotal.set(archived.total);
           if (day) this._trainingDay.set(day);
           if (routines) this._routines.set(routines.items);
           if (starters) {

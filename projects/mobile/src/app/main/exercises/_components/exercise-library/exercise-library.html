@@ -66,7 +66,21 @@
       </ion-item>
     }
   </ion-list>
+} @else if (isMineEmpty()) {
+  <!-- Nothing of your own yet: the way to make one, rather than "nothing
+       matches" over a filter nobody set wrong. -->
+  <mh-empty-state
+    icon="flash-outline"
+    [heading]="'exercises.library.mineEmpty.title' | translate"
+    [message]="'exercises.own.emptyMessage' | translate"
+    [actionLabel]="'exercises.own.emptyAction' | translate"
+    (action)="create()"
+  />
 } @else if (store.isFilteredEmpty()) {
+  @if (canKeepOwn() && store.createName(); as name) {
+    <!-- Nothing by that name: the way to make it, before the way back out. -->
+    <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+  }
   <mh-empty-state
     icon="search-outline"
     [heading]="'empty.nothingMatches' | translate"
@@ -83,12 +97,32 @@
     (action)="retry()"
   />
 } @else {
-  <span class="mh-kicker meta">{{ metaLabel() }}</span>
+  <!-- The count, and the way to add the one the catalogue lacks: the kicker
+       and trailing action pair the routines list uses. -->
+  <div class="mh-section-head">
+    <span class="mh-kicker meta">{{ metaLabel() }}</span>
+    @if (canKeepOwn()) {
+      <ion-button fill="clear" size="small" (click)="create()">
+        <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+        {{ 'exercises.library.newExercise' | translate }}
+      </ion-button>
+    }
+  </div>
   <ion-list [inset]="true" class="mh-card-list">
     @for (exercise of store.items(); track exercise.id) {
-      <mh-exercise-row [exercise]="exercise" [myUserId]="myUserId()" (select)="open(exercise)" />
+      <mh-exercise-row
+        [exercise]="exercise"
+        [myUserId]="myUserId()"
+        [showMenu]="hasMenu(exercise)"
+        (select)="open(exercise)"
+        (menu)="openMenu(exercise)"
+      />
     }
   </ion-list>
+  <!-- Near matches above, none by that exact name: the way to make it. -->
+  @if (canKeepOwn() && store.createName(); as name) {
+    <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+  }
 
   @if (store.hasMore()) {
     <ion-button
@@ -111,3 +145,5 @@
   [search]="store.search()"
   (applied)="applyFilters($event)"
 />
+
+<mh-own-exercise-sheets (created)="onCreated()" (updated)="onChanged()" (deleted)="onChanged()" />

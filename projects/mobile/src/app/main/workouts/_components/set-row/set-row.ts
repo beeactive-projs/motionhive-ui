@@ -1,133 +1,135 @@
-import { Component, computed, input, output, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+
+import { LoggedSet, SetField, SetFields } from 'core';
+
 import {
-  IonIcon,
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-} from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
+  SetBadge,
+  SetRowMode,
+  SetRowModes,
+  cellValue,
+  fieldText,
+  setLine,
+} from '../../logger/logger-flow';
+import { formatMeasure } from '../../workouts.config';
 
-import { LoggedSet, SetField, SetFields, setFieldsFor } from 'core';
-
-import { formatMeasure, secondsToClock, setPlaceholder, setTypeMark } from '../../workouts.config';
-
-/** One input cell as the row draws it. */
-interface SetCell {
+/** One input field of the focus card, as drawn. */
+interface FocusCell {
   field: SetField;
-  value: string;
-  placeholder: string;
+  text: string;
+  /** The grey pre-fill, not a value: shown until confirmed or typed over. */
+  prefill: boolean;
   active: boolean;
+  unit: string;
 }
 
 /**
- * One set: what was planned, what happened, and the tick that says it did.
+ * One set of the logger, in the three looks of direction C:
  *
- * The tick alone is a valid log — every number is optional — so the checkbox
- * is the largest target in the row and never gated on a value being present.
+ * - **Done**: one line, "62.5 kg × 8", the effort chip if rated, a check.
+ *   Tapping the line opens it to edit in place; the focus and the rest timer
+ *   stay where they are.
+ * - **Focus**: the set you are on (or one opened to edit), as a honey card
+ *   with big fields and the tick. The numbers come pre-filled in grey from
+ *   the plan or from last time; a tick with them untouched saves them.
+ * - **Future**: a grey line with what the set will be and what it was.
  *
- * Which cells appear is driven by the exercise's kind via `setFieldsFor`, so
- * a plank shows a duration cell and no weight field at all. An empty cell
- * shows the target in grey (or last time's number when nothing is
- * prescribed), and the cell open in the keypad shows what is being typed.
+ * The badge (number, or W / D / F / A for a typed set) is its own button: it
+ * opens the set's menu (type, note, remove), in every look.
  *
- * A set comes out by swiping the row left, or by tapping its number, which
- * opens the same Remove option — the swipe alone would be invisible.
- *
- * The cells and the tick are plain buttons on theme tokens rather than
- * `ion-button`s on purpose: they are grid cells sized for a thumb between
- * sets, and Ionic's button chrome (its padding, its ripple, its label
- * sizing) fights a grid at every row.
+ * Plain buttons on theme tokens rather than Ionic's: these are grid cells
+ * sized for a thumb between sets, and Ionic's button chrome fights them.
  */
 @Component({
   selector: 'mh-set-row',
-  imports: [IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, TranslatePipe],
+  imports: [IonIcon, TranslatePipe],
   templateUrl: './set-row.html',
   styleUrl: './set-row.scss',
 })
 export class SetRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly set = input.required<LoggedSet>();
-  readonly index = input.required<number>();
-  readonly kind = input<string | null>(null);
-  /** What the user did for this set number last time. */
-  readonly previous = input<LoggedSet | null>(null);
-  /** The cell currently open in the keypad, if it belongs to this row. */
+  readonly mode = input.required<SetRowMode>();
+  readonly badge = input.required<SetBadge>();
+  /** The cells this exercise records, in order. */
+  readonly fields = input.required<readonly SetField[]>();
+  /** What each empty field is pre-filled with. */
+  readonly prefill = input<Partial<Record<SetField, number | null>>>({});
+  /** "last 60 × 8", or empty. */
+  readonly last = input('');
+  /** Split squats and single-arm work: reps read as per side. */
+  readonly unilateral = input(false);
+  /** The field open in the number pad, when it belongs to this set. */
   readonly editing = input<SetField | null>(null);
-  /** What the keypad has built so far for the open cell, already formatted. */
+  /** What the pad has built so far for that field, already formatted. */
   readonly draft = input<string | null>(null);
 
-  readonly toggle = output<void>();
+  readonly tick = output<void>();
   readonly edit = output<SetField>();
-  readonly remove = output<void>();
+  readonly menu = output<void>();
+  /** The line was tapped: open this set to edit in place. */
+  readonly open = output<void>();
 
-  private readonly _sliding = viewChild.required<IonItemSliding>('sliding');
+  readonly Modes = SetRowModes;
 
-  /** Split squats and single-arm work are logged per side. */
-  readonly unilateral = input(false);
-  /**
-   * Bodyweight work the user has opted into loading — weighted pull-ups and
-   * dips still deserve a volume number.
-   */
-  readonly showAddedWeight = input(false);
+  /** A finished set reads with its units: "62.5 kg × 8". */
+  readonly doneLine = computed(() =>
+    setLine(this.fields(), (field) => cellValue(this.set(), field), true),
+  );
 
-  readonly fields = computed<SetField[]>(() => {
-    const base = setFieldsFor(this.kind());
-    // Weight is prepended rather than appended so the column order matches
-    // a loaded exercise: weight then reps, everywhere.
-    return this.showAddedWeight() && !base.includes(SetFields.Weight)
-      ? [SetFields.Weight, ...base]
-      : base;
+  /** A set ahead: its values or its pre-fill, then last time. */
+  readonly futureLine = computed(() => {
+    const set = this.set();
+    const prefill = this.prefill();
+    const line = setLine(
+      this.fields(),
+      (field) => cellValue(set, field) ?? prefill[field] ?? null,
+      false,
+    );
+    // "22 × 10 · last 22 × 10" says one thing twice: keep the last time only
+    // when the pre-fill differs from it.
+    const last = this.last();
+    const sameAsLast = !!line && last.endsWith(` ${line}`);
+    return [line || '–', sameAsLast ? '' : last].filter(Boolean).join(' · ');
   });
 
-  readonly cells = computed<SetCell[]>(() =>
-    this.fields().map((field) => {
+  readonly rpe = computed(() => {
+    const rpe = this.set().rpe;
+    return rpe == null ? '' : formatMeasure(Number(rpe), 1);
+  });
+
+  readonly cells = computed<FocusCell[]>(() => {
+    const set = this.set();
+    const prefill = this.prefill();
+    return this.fields().map((field) => {
       const active = this.editing() === field;
       const draft = this.draft();
+      const value = cellValue(set, field);
+      const shown = value ?? prefill[field] ?? null;
       return {
         field,
         active,
-        value: active && draft !== null ? draft : this.cellValue(field),
-        placeholder: setPlaceholder(this.set(), field, this.previous()),
+        prefill: value == null && !(active && draft),
+        text: active && draft ? draft : shown == null ? '' : fieldText(field, shown, false),
+        unit: this._unit(field),
       };
-    }),
-  );
-
-  /** Only shown when it is not a plain working set. */
-  readonly typeMark = computed(() => setTypeMark(this.set().setType));
-
-  /** "60 × 8" from the same set number last time — the memory aid. */
-  readonly previousLabel = computed(() => {
-    const prev = this.previous();
-    if (!prev) return '—';
-    const bits: string[] = [];
-    if (prev.weightKg != null) bits.push(formatMeasure(prev.weightKg));
-    if (prev.reps != null) bits.push(formatMeasure(prev.reps));
-    if (prev.durationSeconds != null) bits.push(secondsToClock(prev.durationSeconds));
-    return bits.length ? bits.join(' × ') : '—';
+    });
   });
 
-  /** The number is a button: it slides the row open on its Remove option. */
-  openOptions(): void {
-    void this._sliding().open('end');
-  }
-
-  onRemove(): void {
-    void this._sliding().close();
-    this.remove.emit();
-  }
-
-  cellValue(field: SetField): string {
-    const set = this.set();
+  private _unit(field: SetField): string {
     switch (field) {
       case SetFields.Weight:
-        return set.weightKg == null ? '' : formatMeasure(set.weightKg);
+        return this._translateService.instant('workouts.units.kgShort');
       case SetFields.Reps:
-        return set.reps == null ? '' : String(set.reps);
-      case SetFields.Duration:
-        // A hold reads as a clock, not as a count of seconds: 90 is "1:30".
-        return set.durationSeconds == null ? '' : secondsToClock(set.durationSeconds);
+        return this._translateService.instant(
+          this.unilateral() ? 'workouts.logger.columns.repsEach' : 'workouts.logger.columns.reps',
+        );
       case SetFields.Distance:
-        return set.distanceMeters == null ? '' : formatMeasure(set.distanceMeters);
+        return this._translateService.instant('workouts.units.metersShort');
+      case SetFields.Duration:
+        return '';
     }
   }
 }

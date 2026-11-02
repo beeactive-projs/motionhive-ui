@@ -9,6 +9,7 @@ import type { Equipment } from '../../models/exercise/equipment.model';
 import type {
   CreateExercisePayload,
   Exercise,
+  ExerciseNote,
   ListExercisesQuery,
   PaginatedExercises,
   UpdateExercisePayload,
@@ -71,6 +72,22 @@ export class ExerciseService {
    * global error dialog does not announce a "Conflict" over the top of that
    * — the caller owns every outcome of this call.
    */
+  /** The person's own note on an exercise; `note` is null when there is none. */
+  getNote(id: string): Observable<ExerciseNote> {
+    return this._http.get<ExerciseNote>(
+      `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.NOTE(id)}`,
+      { context: silentRequest() },
+    );
+  }
+
+  /** Writes the note; an empty one deletes it. */
+  setNote(id: string, note: string | null): Observable<ExerciseNote> {
+    return this._http.put<ExerciseNote>(
+      `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.NOTE(id)}`,
+      { note },
+    );
+  }
+
   fork(id: string): Observable<Exercise> {
     return this._http.post<Exercise>(
       `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.FORK(id)}`,

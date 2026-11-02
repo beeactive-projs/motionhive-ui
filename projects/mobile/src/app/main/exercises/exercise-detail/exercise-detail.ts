@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonBadge,
+  NavController,
   IonButtons,
   IonContent,
   IonHeader,
@@ -40,6 +41,7 @@ import { prefersReducedMotion } from '../../../_shared/utils/motion';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { OwnExerciseSheets } from '../_components/own-exercise-sheets/own-exercise-sheets';
 import {
   EXERCISE_ICONS,
   ExerciseChipRow,
@@ -72,8 +74,9 @@ const SWIPE_PX = 30;
  * (delete lives inside it, where the consequences are visible). Someone
  * else's public exercise — including the system catalogue's — gets Fork,
  * which copies it into your library so you can change it without touching
- * theirs. A trainee gets neither: they are here to look, and the API would
- * refuse them anyway.
+ * theirs. Outside coach mode, an exercise of your own (one you made for your
+ * training) gets Edit and Delete through the short form's sheets, and
+ * anything else is there to look at.
  */
 @Component({
   selector: 'mh-exercise-detail',
@@ -94,6 +97,7 @@ const SWIPE_PX = 30;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    OwnExerciseSheets,
     TranslatePipe,
     YoutubeEmbed,
   ],
@@ -105,6 +109,7 @@ export class ExerciseDetail implements ViewWillEnter {
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _navController = inject(NavController);
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
@@ -126,6 +131,9 @@ export class ExerciseDetail implements ViewWillEnter {
    * would otherwise leave it presented over the exercise it just opened.
    */
   private readonly _forkSheet = viewChild(ConfirmSheet);
+
+  /** Edit and Delete for your own exercise outside coach mode. */
+  private readonly _ownSheets = viewChild(OwnExerciseSheets);
 
   readonly frameIndex = signal(0);
 
@@ -206,7 +214,7 @@ export class ExerciseDetail implements ViewWillEnter {
 
   readonly attribution = computed(() => {
     const exercise = this.exercise();
-    return exercise ? attributionLine(exercise, this.ownerName()) : '';
+    return exercise ? attributionLine(exercise, this.ownerName(), this.isMine()) : '';
   });
 
   // ── Media ─────────────────────────────────────────────────────────────────
@@ -248,6 +256,9 @@ export class ExerciseDetail implements ViewWillEnter {
   );
 
   readonly canEdit = computed(() => this._canAuthor() && this.isMine());
+
+  /** Yours, outside coach mode: the short form edits it, and it can go. */
+  readonly canKeepOwn = computed(() => !this._canAuthor() && this.isMine());
 
   /**
    * Forking copies someone else's public exercise into your own library.
@@ -344,6 +355,26 @@ export class ExerciseDetail implements ViewWillEnter {
 
   edit(): void {
     void this._router.navigate(['/tabs/exercises', this.exerciseId(), 'edit']);
+  }
+
+  editOwn(): void {
+    const exercise = this.exercise();
+    if (exercise) this._ownSheets()?.edit(exercise);
+  }
+
+  deleteOwn(): void {
+    const exercise = this.exercise();
+    if (exercise) this._ownSheets()?.confirmDelete(exercise);
+  }
+
+  /** Saved in the sheet: what is on screen is now out of date. */
+  onOwnUpdated(): void {
+    this._load(this.exerciseId(), { silent: true });
+  }
+
+  /** Gone: back to wherever this page was opened from, which re-reads its list. */
+  onOwnDeleted(): void {
+    void this._navController.navigateBack(this.backHref());
   }
 
   confirmFork(): void {

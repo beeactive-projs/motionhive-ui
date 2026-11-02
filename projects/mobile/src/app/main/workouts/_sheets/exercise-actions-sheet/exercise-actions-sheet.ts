@@ -25,6 +25,8 @@ export class ExerciseActionsSheet {
 
   readonly actions = computed(() => {
     const exercise = this.exercise();
-    return exerciseActions(exercise?.isSkipped ?? false, !!exercise?.exerciseId);
+    const inCatalog = !!exercise?.exerciseId;
+    const note = !inCatalog ? null : exercise?.personalNote?.trim() ? 'edit' : 'add';
+    return exerciseActions(exercise?.isSkipped ?? false, inCatalog, note);
   });
 }

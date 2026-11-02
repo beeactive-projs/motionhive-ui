@@ -7,6 +7,11 @@ export const ExerciseSource = {
   System: 'SYSTEM',
   Instructor: 'INSTRUCTOR',
   Admin: 'ADMIN',
+  /**
+   * Made by someone who is not a coach, for their own training (API
+   * migration 079). Always PRIVATE: the server forces it.
+   */
+  User: 'USER',
 } as const;
 export type ExerciseSource =
   (typeof ExerciseSource)[keyof typeof ExerciseSource];

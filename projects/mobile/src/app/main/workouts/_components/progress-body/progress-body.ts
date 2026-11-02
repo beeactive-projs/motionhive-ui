@@ -3,11 +3,14 @@ import { Router } from '@angular/router';
 import {
   IonBadge,
   IonButton,
+  IonCard,
+  IonCardContent,
   IonItem,
   IonLabel,
   IonList,
   IonNote,
   IonSearchbar,
+  IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
@@ -28,21 +31,43 @@ import {
 import { take } from 'rxjs/operators';
 
 import {
-  ProgressOverview,
+  appLocale,
   ExerciseKind,
+  formatTotalDuration,
+  ProgressOverview,
   ProgressRange,
   ProgressService,
   TrainedExercise,
-  appLocale,
-  formatTotalDuration,
+  VolumeUnits,
+  WorkoutLog,
+  WorkoutLogService,
 } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { StatTile } from '../../../../_shared/components/stat-tile/stat-tile';
 import { clientPath, coachStackOf } from '../../../clients/client-paths';
+import { workoutLinks } from '../../../home/home-stack.config';
 import { BadgeTones, KIND_META } from '../../../exercises/exercises.config';
-import { formatMeasure, unbreakable } from '../../workouts.config';
+import {
+  exerciseVolumeKg,
+  formatMeasure,
+  logMeta,
+  shortDayLabel,
+  unbreakable,
+} from '../../workouts.config';
+import {
+  formatVolume,
+  formatWeekValue,
+  WEEK_METRICS,
+  weekBounds,
+  weekDayLabel,
+  WeekMetric,
+  WeekMetrics,
+  weekSlots,
+  weekValue,
+} from '../../volume.config';
+import { WeekBar, WeekBars } from '../week-bars/week-bars';
 import {
   EXERCISES_PAGE,
   latestSetRecord,
@@ -55,6 +80,12 @@ import {
 
 /** The window the page reads — twelve weeks is a training block. */
 const RANGE: ProgressRange = '12w';
+
+/** A tick under every fourth bar, counted back from this week. */
+const TICK_EVERY = 4;
+
+/** More workouts than anyone does in a week: the week's list is one page. */
+const WEEK_LIST_LIMIT = 30;
 
 /**
  * Months of volume run to five or six digits: grouped from 10,000 so
@@ -84,19 +115,24 @@ function groupedVolume(volumeKg: number): string {
     HexAvatar,
     IonBadge,
     IonButton,
+    IonCard,
+    IonCardContent,
     IonItem,
     IonLabel,
     IonList,
     IonNote,
     IonSearchbar,
+    IonSkeletonText,
     StatTile,
     TranslatePipe,
+    WeekBars,
   ],
   templateUrl: './progress-body.html',
   styleUrl: './progress-body.scss',
 })
 export class ProgressBody {
   private readonly _progressService = inject(ProgressService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _translateService = inject(TranslateService);
   private readonly _router = inject(Router);
 
@@ -143,6 +179,98 @@ export class ProgressBody {
   });
 
   readonly Tones = BadgeTones;
+
+  // ─── The twelve weeks ──────────────────────────────────────────────
+
+  /** Pinned per load, so the weeks and "this week" agree. */
+  private readonly _now = signal(Date.now());
+
+  readonly weeks = computed(() => weekSlots(this.overview()?.weeklyVolume ?? [], this._now()));
+
+  /** Time per week only from an API that sends it. */
+  private readonly _hasMinutes = computed(() =>
+    (this.overview()?.weeklyVolume ?? []).some((week) => week.minutes !== undefined),
+  );
+
+  readonly weekMetrics = computed(() =>
+    WEEK_METRICS.filter((metric) => metric !== WeekMetrics.Time || this._hasMinutes()),
+  );
+
+  private readonly _pickedMetric = signal<WeekMetric | null>(null);
+
+  /** Volume first, as the design leads with it; workouts for someone who lifts nothing. */
+  readonly weekMetric = computed<WeekMetric>(() => {
+    const picked = this._pickedMetric();
+    if (picked && this.weekMetrics().includes(picked)) return picked;
+    return this.weeks().some((week) => week.volumeKg > 0) ? WeekMetrics.Volume : WeekMetrics.Workouts;
+  });
+
+  private readonly _pickedWeek = signal<string | null>(null);
+
+  /** The tapped week, else this one. */
+  readonly selectedWeek = computed(() => this._pickedWeek() ?? this.weeks().at(-1)?.key ?? null);
+
+  private readonly _selectedSlot = computed(() =>
+    this.weeks().find((week) => week.key === this.selectedWeek()),
+  );
+
+  readonly weekBars = computed<WeekBar[]>(() => {
+    const metric = this.weekMetric();
+    const weeks = this.weeks();
+    return weeks.map((week, i) => {
+      const value = weekValue(week, metric);
+      const date = weekDayLabel(week.key);
+      return {
+        key: week.key,
+        value,
+        tick: (weeks.length - 1 - i) % TICK_EVERY === 0 ? date : '',
+        label: this._translateService.instant('workouts.volume.weeks.barLabel', {
+          date,
+          value: formatWeekValue(value, metric),
+        }),
+      };
+    });
+  });
+
+  /** The selected week's figure, "11,240 kg". */
+  readonly weekHeadline = computed(() => {
+    const slot = this._selectedSlot();
+    return slot ? unbreakable(formatWeekValue(weekValue(slot, this.weekMetric()), this.weekMetric())) : '';
+  });
+
+  /** "This week", or "Week of 26 Oct". */
+  readonly weekTitle = computed(() => {
+    const key = this.selectedWeek();
+    if (!key) return '';
+    return key === this.weeks().at(-1)?.key
+      ? this._translateService.instant('workouts.volume.weeks.thisWeek')
+      : this._translateService.instant('workouts.volume.weeks.weekOf', { date: weekDayLabel(key) });
+  });
+
+  /** The workouts of the selected week, read when it is picked. */
+  readonly weekLogs = signal<WorkoutLog[]>([]);
+  readonly weekLoading = signal(false);
+  readonly weekError = signal(false);
+  /** The week the list belongs to: a slow answer for another week is dropped. */
+  private _weekRequest: string | null = null;
+
+  readonly weekRows = computed(() =>
+    this.weekLogs().map((log) => ({
+      id: log.id,
+      name: log.name,
+      // Its volume beside it, warm-ups left out, when anything was lifted.
+      volume: (() => {
+        const kg = (log.exercises ?? []).reduce((sum, e) => sum + exerciseVolumeKg(e), 0);
+        return kg > 0 ? formatVolume(Math.round(kg), VolumeUnits.Kg) : '';
+      })(),
+      // "Wed 28 Oct · 48m · 16 sets", as History's rows say it.
+      line: [shortDayLabel(log.completedAt ?? log.startedAt), logMeta(log)]
+        .filter(Boolean)
+        .join(' · '),
+    })),
+  );
+
+  private readonly _weekHasWorkouts = computed(() => (this._selectedSlot()?.workouts ?? 0) > 0);
 
   /**
    * Every exercise trained, most recent first: lifts, holds and runs alike
@@ -203,6 +331,59 @@ export class ProgressBody {
     });
   }
 
+  setWeekMetric(metric: WeekMetric): void {
+    this._pickedMetric.set(metric);
+  }
+
+  pickWeek(key: string): void {
+    this._pickedWeek.set(key);
+    this.loadWeek();
+  }
+
+  /**
+   * The selected week's workouts, from History's own list bounded to that
+   * week (a coach's read of the client's, under the same rule as the
+   * numbers). A week with none asks nothing.
+   */
+  loadWeek(): void {
+    const key = this.selectedWeek();
+    this._weekRequest = key;
+    this.weekError.set(false);
+    if (!key || !this._weekHasWorkouts()) {
+      this.weekLogs.set([]);
+      this.weekLoading.set(false);
+      return;
+    }
+    this.weekLoading.set(true);
+    const query = { ...weekBounds(key), limit: WEEK_LIST_LIMIT };
+    const clientId = this.clientId();
+    const request = clientId
+      ? this._workoutLogService.listForClient(clientId, query, { silent: true })
+      : this._workoutLogService.list(query, { silent: true });
+    request.pipe(take(1)).subscribe({
+      next: (page) => {
+        if (this._weekRequest !== key) return;
+        this.weekLogs.set(page.items);
+        this.weekLoading.set(false);
+      },
+      error: () => {
+        if (this._weekRequest !== key) return;
+        this.weekLogs.set([]);
+        this.weekError.set(true);
+        this.weekLoading.set(false);
+      },
+    });
+  }
+
+  /** The trainee reopens their summary; a coach, the review of that workout. */
+  openWorkout(workoutLogId: string): void {
+    if (this.clientId()) {
+      void this._router.navigate([coachStackOf(this._router.url), 'log', workoutLogId]);
+      return;
+    }
+    void this._router.navigate(workoutLinks(this._router.url).finish(workoutLogId));
+  }
+
   showMoreExercises(): void {
     this._shownExercises.update((shown) => shown + EXERCISES_PAGE);
   }
@@ -231,9 +412,11 @@ export class ProgressBody {
       : this._progressService.overview(RANGE);
     request.pipe(take(1)).subscribe({
       next: (overview) => {
+        this._now.set(Date.now());
         this.overview.set(overview);
         this.loaded.set(true);
         this.loading.set(false);
+        this.loadWeek();
       },
       error: () => {
         this.error.set(true);

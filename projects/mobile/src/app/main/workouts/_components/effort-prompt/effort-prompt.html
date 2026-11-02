@@ -1,0 +1,24 @@
+<div class="prompt" role="group" [attr.aria-label]="'workouts.effort.title' | translate">
+  <div class="head">
+    <span class="title">
+      {{ 'workouts.effort.title' | translate }}
+      @if (target(); as value) {
+        <span class="target">({{ 'workouts.effort.target' | translate: { value } }})</span>
+      }
+    </span>
+    <button type="button" class="skip" (click)="skip.emit()">{{ 'workouts.effort.skip' | translate }}</button>
+  </div>
+  <div class="choices">
+    @for (value of choices; track value) {
+      <button
+        type="button"
+        class="choice"
+        [class.target]="value === target()"
+        [attr.aria-label]="'workouts.effort.choice' | translate: { value }"
+        (click)="picked.emit(value)"
+      >
+        {{ value }}
+      </button>
+    }
+  </div>
+</div>

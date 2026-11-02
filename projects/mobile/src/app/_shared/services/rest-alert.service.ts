@@ -2,7 +2,11 @@ import { DestroyRef, Service, inject, signal } from '@angular/core';
 import { App as CapacitorApp } from '@capacitor/app';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 import { TranslateService } from '@ngx-translate/core';
+
+/** Set once the person has been asked, with the reason, whatever they said. */
+const ASKED_KEY = 'mh-rest-notifications-asked';
 
 /** One fixed id: there is only ever one rest running, so a new one replaces it. */
 const REST_NOTIFICATION_ID = 1;
@@ -110,6 +114,42 @@ export class RestAlertService {
       });
     } catch {
       // Nothing to withdraw is the same outcome as withdrawing it.
+    }
+  }
+
+  /**
+   * Whether to ask now, with the reason, at the first workout: on a phone,
+   * never asked before, and the system has not been answered yet.
+   */
+  async shouldAsk(): Promise<boolean> {
+    if (!this.available) return false;
+    try {
+      const { value } = await Preferences.get({ key: ASKED_KEY });
+      if (value) return false;
+      const status = await LocalNotifications.checkPermissions();
+      return status.display === 'prompt' || status.display === 'prompt-with-rationale';
+    } catch {
+      return false;
+    }
+  }
+
+  /** "Turn on": the system question, now that the reason has been given. */
+  async askNow(): Promise<void> {
+    await this._remember();
+    await this.ensurePermission();
+  }
+
+  /** "Not now": no system prompt behind their back later in the workout. */
+  async declineForNow(): Promise<void> {
+    await this._remember();
+    this._permitted.set(false);
+  }
+
+  private async _remember(): Promise<void> {
+    try {
+      await Preferences.set({ key: ASKED_KEY, value: '1' });
+    } catch {
+      // Asking again next time is the worst that happens.
     }
   }
 

@@ -69,6 +69,13 @@ export const APP_HEX_SHAPE: HexShape = HexShapes.Classic;
 /** The brand's hexagon, for the share images and the share sheet. */
 export const SHARE_HEX_SHAPE: HexShape = HexShapes.Logo;
 
+/**
+ * The rest timer's hexagon, which drains as the rest passes: the brand's
+ * squarer shape, the one place in the app that uses it (owner's call,
+ * 2026-11-02). Lists, avatars and tiles keep the app's own.
+ */
+export const TIMER_HEX_SHAPE: HexShape = HexShapes.Logo;
+
 /** The size of a hexagon `width` wide, in the given shape and orientation. */
 export function hexSize(
   shape: HexShape,

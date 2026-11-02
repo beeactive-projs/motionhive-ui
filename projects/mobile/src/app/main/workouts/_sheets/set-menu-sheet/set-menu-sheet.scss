@@ -1,0 +1,9 @@
+@use '../../_components/set-row/set-badge';
+
+ion-item.current {
+  --background: var(--ion-color-primary-wash);
+}
+
+span.badge {
+  margin-inline-end: 0.875rem;
+}

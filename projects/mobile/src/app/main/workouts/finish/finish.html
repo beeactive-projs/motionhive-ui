@@ -18,13 +18,18 @@
     <ion-title>
       <span class="when">{{ whenLabel() }}</span>
     </ion-title>
-    @if (isReview() && log() && !takenDown()) {
+    @if (isReview() && log()) {
       <ion-buttons slot="end">
-        <ion-button
-          [attr.aria-label]="'workouts.share.title' | translate"
-          (click)="shareOpen.set(true)"
-        >
-          <ion-icon slot="icon-only" name="share-outline" aria-hidden="true" />
+        @if (!takenDown()) {
+          <ion-button
+            [attr.aria-label]="'workouts.share.title' | translate"
+            (click)="shareOpen.set(true)"
+          >
+            <ion-icon slot="icon-only" name="share-outline" aria-hidden="true" />
+          </ion-button>
+        }
+        <ion-button [attr.aria-label]="'a11y.moreActions' | translate" (click)="moreOpen.set(true)">
+          <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
         </ion-button>
       </ion-buttons>
     }
@@ -107,6 +112,56 @@
             </div>
           }
         </div>
+      }
+      @if (volumeCard(); as card) {
+        <!-- How much work it was, against last time: the workout's total,
+             then each exercise as two bars, today and last time. -->
+        <ion-card class="volume">
+          <ion-card-content>
+            <span class="mh-kicker">{{ 'workouts.volume.finish.title' | translate }}</span>
+            @if (card.total) {
+              <p class="volume-total">{{ card.total }}</p>
+            }
+            @if (card.line; as line) {
+              <p class="volume-line">{{ line }}</p>
+            }
+            @if (card.rows.length) {
+              <div class="legend" aria-hidden="true">
+                <span class="key today">{{ 'workouts.volume.finish.today' | translate }}</span>
+                <span class="key last">{{ 'workouts.volume.finish.lastTime' | translate }}</span>
+              </div>
+              <ul class="volume-rows">
+                @for (row of card.rows; track row.loggedExerciseId) {
+                  @if (row.group; as group) {
+                    <li class="volume-group" aria-hidden="true">{{ group }}</li>
+                  }
+                  <li class="volume-row" [class.linked]="!!row.tag">
+                    <span class="mh-visually-hidden">{{ row.label }}</span>
+                    <div class="row-head" aria-hidden="true">
+                      <span class="row-name">
+                        @if (row.tag) {
+                          <span class="row-tag">{{ row.tag }}</span>
+                        }
+                        {{ row.name }}
+                      </span>
+                      @if (row.change) {
+                        <span class="row-change" [attr.data-trend]="row.trend">{{
+                          row.change
+                        }}</span>
+                      }
+                    </div>
+                    <div class="bars" aria-hidden="true">
+                      <span class="bar today" [style.width.%]="row.todayWidth"></span>
+                      @if (row.lastWidth !== null) {
+                        <span class="bar last" [style.width.%]="row.lastWidth"></span>
+                      }
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+          </ion-card-content>
+        </ion-card>
       }
       @if (!photoUrl()) {
         <!-- One optional tap: the photo becomes this workout's cover. -->
@@ -232,6 +287,26 @@
   [title]="'workouts.photo.actionsTitle' | translate"
   [actions]="photoActions"
   (chosen)="onPhotoAction($event)"
+/>
+
+<mh-action-sheet
+  [(open)]="moreOpen"
+  [title]="log()?.name ?? ''"
+  [actions]="moreActions"
+  (chosen)="onMore()"
+/>
+
+<mh-confirm-sheet
+  #deleteSheet
+  [(open)]="deleteOpen"
+  [title]="'workouts.finish.delete.title' | translate"
+  [body]="'workouts.finish.delete.body' | translate"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  tone="danger"
+  [irreversible]="'workouts.finish.delete.irreversible' | translate"
+  [saving]="deleting()"
+  (confirm)="confirmDelete()"
 />
 
 <mh-choice-sheet

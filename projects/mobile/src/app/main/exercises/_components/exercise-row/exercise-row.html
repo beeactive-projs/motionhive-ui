@@ -1,4 +1,4 @@
-<ion-item lines="none" button [detail]="!isPicker()" [class.picked]="selected()"
+<ion-item lines="none" button [detail]="!isPicker() && !hasMenu()" [class.picked]="selected()"
   [attr.aria-pressed]="selected()" (click)="select.emit()">
   <!-- Decorative: the name it would announce is the very next thing in the row. -->
   <mh-hex-avatar slot="start" size="md" tone="wash" aria-hidden="true" [color]="kindTone()"
@@ -28,6 +28,14 @@
   @if (selected()) {
   <ion-icon class="tick" slot="end" name="checkmark-circle" aria-hidden="true" />
   }
+  } @else if (hasMenu()) {
+  <!-- Yours, so the ⋯ says so on its own: a "Mine" chip beside it would
+       take the width the name needs on a narrow phone. -->
+  <ion-button class="menu" slot="end" fill="clear" shape="round" color="medium"
+    [attr.aria-label]="'exercises.own.menuFor' | translate: { name: name() }"
+    (click)="$event.stopPropagation(); menu.emit()">
+    <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+  </ion-button>
   } @else {
   @if (ownership(); as chip) {
   <div class="chips" slot="end">

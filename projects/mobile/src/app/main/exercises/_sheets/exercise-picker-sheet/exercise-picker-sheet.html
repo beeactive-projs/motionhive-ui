@@ -20,6 +20,9 @@
     </ion-list>
   } @else if (isEmpty()) {
     <ion-note class="mh-note-block">{{ emptyMessage() }}</ion-note>
+    @if (canCreate()) {
+      <ng-container [ngTemplateOutlet]="createRow" />
+    }
   } @else {
     <!-- Your own last picks first: the fastest path to the movement you meant. -->
     @if (recents().length) {
@@ -46,6 +49,10 @@
       </ion-list>
     }
 
+    @if (canCreate()) {
+      <ng-container [ngTemplateOutlet]="createRow" />
+    }
+
     <!-- The whole catalog is reachable by scrolling, rather than by leaving. -->
     <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($any($event))">
       <ion-infinite-scroll-content loadingSpinner="crescent" />
@@ -53,10 +60,23 @@
   }
 </ng-template>
 
+<!-- The search found nothing by that name: make it, private to you, with
+     the name already typed. A dashed card, not a row of the list: it is not
+     an exercise yet, it is the way to one. -->
+<ng-template #createRow>
+  <mh-create-exercise-row [query]="createName()" (create)="openCreate()" />
+</ng-template>
+
 <!-- Over the picker, not in place of it: the list and its ticks are still
      there underneath when the reader is done looking. -->
 <mh-exercise-preview-sheet [(open)]="previewOpen" [exercise]="previewing()"
   [selected]="previewing() ? isOn(previewing()!.id) : false" (toggle)="toggle($event)" />
+
+<!-- The short form, over the picker like the preview: closing it without
+     saving leaves the search and the ticks exactly as they were. -->
+<mh-exercise-form-sheet [(open)]="createOpen" [name]="createName()"
+  [saveLabel]="(single() ? 'exercises.picker.create.confirmSingle' : 'exercises.picker.create.confirm') | translate"
+  (saved)="onCreated($event)" />
 
 <mh-sheet-shell [(open)]="open" [title]="sheetTitle()" [subtitle]="context()"
   [sticky]="sticky" [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"

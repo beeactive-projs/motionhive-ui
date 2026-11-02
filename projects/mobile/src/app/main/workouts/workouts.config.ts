@@ -29,6 +29,10 @@ import {
 import {
   addOutline,
   alertCircleOutline,
+  archiveOutline,
+  arrowDownOutline,
+  arrowForwardOutline,
+  arrowUndoOutline,
   backspaceOutline,
   barbellOutline,
   barChartOutline,
@@ -53,9 +57,11 @@ import {
   globeOutline,
   imageOutline,
   listOutline,
+  linkOutline,
   lockClosedOutline,
   pauseOutline,
   peopleOutline,
+  personOutline,
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
@@ -81,6 +87,10 @@ import { BadgeTone, BadgeTones } from '../exercises/exercises.config';
 export const WORKOUT_ICONS = {
   addOutline,
   alertCircleOutline,
+  archiveOutline,
+  arrowDownOutline,
+  arrowForwardOutline,
+  arrowUndoOutline,
   backspaceOutline,
   barbellOutline,
   barChartOutline,
@@ -105,9 +115,11 @@ export const WORKOUT_ICONS = {
   globeOutline,
   imageOutline,
   listOutline,
+  linkOutline,
   lockClosedOutline,
   pauseOutline,
   peopleOutline,
+  personOutline,
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
@@ -909,8 +921,7 @@ export function trendGeometry(
 ): TrendGeometry | null {
   if (!points.length) return null;
   const values = points.map((point) => point.y);
-  const lo = Math.floor(Math.min(...values) - 1);
-  const hi = Math.ceil(Math.max(...values) + 1);
+  const { lo, hi } = niceBounds(Math.min(...values), Math.max(...values));
   const span = Math.max(to - from, 1);
   const x = (at: number) => round2(((at - from) / span) * 100);
   const y = (value: number) => round2(((hi - value) / (hi - lo)) * 100);
@@ -918,7 +929,7 @@ export function trendGeometry(
   const coords = points.map((point) => `${x(point.x)} ${y(point.y)}`);
   const line = points.length > 1 ? `M${coords.join(' L')}` : '';
   const area = line ? `${line} L${x(points[points.length - 1].x)} 100 L${x(points[0].x)} 100 Z` : '';
-  const mid = Math.round((lo + hi) / 2);
+  const mid = round2((lo + hi) / 2);
   const last = points[points.length - 1];
   return {
     line,
@@ -926,6 +937,31 @@ export function trendGeometry(
     ticks: [hi, mid, lo].map((value) => ({ value, y: y(value) })),
     end: { x: x(last.x), y: y(last.y) },
   };
+}
+
+/**
+ * The chart's floor and ceiling on round numbers (steps of 1, 2, 2.5 or 5
+ * times a power of ten), with a step of air beyond the data at either end
+ * so the line never sits on an edge: 1154 to 1921 reads as 1000 to 2000.
+ */
+export function niceBounds(min: number, max: number): { lo: number; hi: number } {
+  const span = max - min || Math.abs(max) * 0.1 || 1;
+  const step = niceStep(span / 2);
+  let lo = Math.floor(min / step) * step;
+  let hi = Math.ceil(max / step) * step;
+  if (lo === min) lo -= step;
+  if (hi === max) hi += step;
+  // Nothing measured here goes below zero, so neither does the axis.
+  if (min >= 0) lo = Math.max(0, lo);
+  return { lo: round2(lo), hi: round2(hi) };
+}
+
+/** The tidy step nearest above `raw`: 1, 2, 2.5 or 5 times a power of ten. */
+function niceStep(raw: number): number {
+  const power = 10 ** Math.floor(Math.log10(raw));
+  const unit = raw / power;
+  const nice = unit <= 1 ? 1 : unit <= 2 ? 2 : unit <= 2.5 ? 2.5 : unit <= 5 ? 5 : 10;
+  return nice * power;
 }
 
 /** `count` instants evenly spread from `from` to `to`, both ends included. */
@@ -1191,7 +1227,12 @@ export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
   return tiles;
 }
 
+/**
+ * A set's weight × reps. Warm-ups count for nothing, the same rule the API
+ * uses, so a page that shows both numbers never shows two volumes.
+ */
 function loadedVolume(set: LoggedSet): number {
+  if (set.setType === ExerciseSetType.Warmup) return 0;
   return set.weightKg != null && set.reps != null ? set.weightKg * set.reps : 0;
 }
 
@@ -1404,6 +1445,7 @@ export const LEAVE_OPTIONS: readonly LeaveOption[] = [
 /** The verbs for one exercise mid-workout, in priority order, destructive last. */
 export const ExerciseActionIds = {
   History: 'history',
+  Note: 'note',
   Swap: 'swap',
   Skip: 'skip',
   Remove: 'remove',
@@ -1420,7 +1462,12 @@ export type ExerciseAction = SheetAction<ExerciseActionId>;
  * the same either way. Removing loses whatever was logged against the
  * exercise, so it reads as the destructive option it is.
  */
-export function exerciseActions(skipped: boolean, hasHistory = true): ExerciseAction[] {
+export function exerciseActions(
+  skipped: boolean,
+  hasHistory = true,
+  /** Offer the person's own note: write one, or change the one there is. */
+  note: 'add' | 'edit' | null = null,
+): ExerciseAction[] {
   const history: ExerciseAction[] = hasHistory
     ? [
         {
@@ -1431,8 +1478,19 @@ export function exerciseActions(skipped: boolean, hasHistory = true): ExerciseAc
         },
       ]
     : [];
+  const noteAction: ExerciseAction[] = note
+    ? [
+        {
+          id: ExerciseActionIds.Note,
+          label: note === 'edit' ? 'workouts.exerciseActions.editNote' : 'workouts.exerciseActions.addNote',
+          icon: 'create-outline',
+          color: 'medium',
+        },
+      ]
+    : [];
   return [
     ...history,
+    ...noteAction,
     {
       id: ExerciseActionIds.Swap,
       label: 'workouts.exerciseActions.swap',
@@ -1464,6 +1522,8 @@ export function exerciseActions(skipped: boolean, hasHistory = true): ExerciseAc
 export const RoutineActionIds = {
   Edit: 'edit',
   Duplicate: 'duplicate',
+  Archive: 'archive',
+  Restore: 'restore',
   Delete: 'delete',
 } as const;
 
@@ -1475,7 +1535,7 @@ export type RoutineAction = SheetAction<RoutineActionId>;
  * Edit is left out when it is already the footer's button (coaching), since
  * the screen's main action is never only in the sheet and never in both.
  */
-export function routineActions(editInFooter: boolean): RoutineAction[] {
+export function routineActions(editInFooter: boolean, archived = false): RoutineAction[] {
   const actions: RoutineAction[] = [
     {
       id: RoutineActionIds.Edit,
@@ -1489,6 +1549,20 @@ export function routineActions(editInFooter: boolean): RoutineAction[] {
       icon: 'copy-outline',
       color: 'medium',
     },
+    // Put away rather than gone: off the lists, its workouts kept.
+    archived
+      ? {
+          id: RoutineActionIds.Restore,
+          label: 'workouts.routineBuilder.archive.restore',
+          icon: 'arrow-undo-outline',
+          color: 'medium',
+        }
+      : {
+          id: RoutineActionIds.Archive,
+          label: 'workouts.routineBuilder.archive.action',
+          icon: 'archive-outline',
+          color: 'medium',
+        },
     {
       id: RoutineActionIds.Delete,
       label: 'workouts.routineBuilder.delete.title',

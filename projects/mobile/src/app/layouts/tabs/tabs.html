@@ -1,4 +1,6 @@
 <ion-tabs (ionTabsDidChange)="onTabsDidChange()">
+  <!-- The workout in progress, over the tab bar on every screen but its own. -->
+  <mh-active-workout-bar slot="bottom" [class.ion-hide]="onLogger() || hideTabBar()" />
   <ion-tab-bar
     slot="bottom"
     [selectedTab]="litTab()"
@@ -9,6 +11,10 @@
       <ion-tab-button [tab]="tab.id">
         <ion-icon [name]="tab.icon" aria-hidden="true" />
         <ion-label>{{ tab.label | translate }}</ion-label>
+        @if (tab.id === 'workouts' && activeWorkout()) {
+          <!-- A workout is open: a honey dot, not a count. -->
+          <ion-badge color="primary" class="dot" [attr.aria-label]="'workouts.activeBar.dot' | translate"></ion-badge>
+        }
         @if (tab.badge; as count) {
           @if (count() > 0) {
             <!-- Messages: honey, like the unread badge and time on the inbox
@@ -44,3 +50,6 @@
 <!-- Opened by the "Save as routine" offer on the toast after a workout; the
      screen that made the offer is gone by the time it is taken up. -->
 <mh-save-routine-sheet />
+
+<!-- A start that ran into another open workout: resume, finish or discard it. -->
+<mh-start-conflict-sheet />

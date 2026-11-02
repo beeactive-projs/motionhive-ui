@@ -17,7 +17,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, defer, from, of, throwError } from 'rxjs';
+import { defer, forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, concatMap, finalize, map, toArray } from 'rxjs/operators';
 
 import {
@@ -41,6 +41,9 @@ import {
   injectIsTablet,
   showApiError,
   weekdayNames,
+  linkWithNext,
+  normalizeSupersets,
+  unlinkFromNext,
 } from 'core';
 
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
@@ -774,6 +777,45 @@ export class ProgramDetail implements OnInit {
     });
   }
 
+  /**
+   * Link an exercise with the next one as a superset, or undo it, with the
+   * same rules as the mobile builders; only the rows whose group changed
+   * are saved.
+   */
+  toggleSuperset(workout: ProgramWorkout, index: number): void {
+    const p = this.program();
+    if (!p) return;
+    const rows = workout.exercises ?? [];
+    const group = rows[index]?.supersetGroupId ?? null;
+    const linked = group !== null && rows[index + 1]?.supersetGroupId === group;
+    const next = linked ? unlinkFromNext(rows, index) : linkWithNext(rows, index);
+    const changed = next.filter(
+      (row, i) => (row.supersetGroupId ?? null) !== (rows[i].supersetGroupId ?? null),
+    );
+    if (!changed.length) return;
+    this._track(
+      forkJoin(
+        changed.map((row) =>
+          this._programService.updateExercise(p.id, workout.id, row.id, {
+            supersetGroupId: row.supersetGroupId ?? null,
+          }),
+        ),
+      ),
+    ).subscribe({
+      next: () => {
+        const current = this.program();
+        if (!current) return;
+        this.program.set({
+          ...current,
+          workouts: (current.workouts ?? []).map((w) =>
+            w.id === workout.id ? { ...w, exercises: next } : w,
+          ),
+        });
+      },
+      error: (err) => this._apiError('programs.superset.saveError', err),
+    });
+  }
+
   private _deleteExercise(workout: ProgramWorkout, ex: PrescribedExercise): void {
     const p = this.program();
     if (!p) return;
@@ -783,7 +825,8 @@ export class ProgramDetail implements OnInit {
           w.id === workout.id
             ? {
                 ...w,
-                exercises: (w.exercises ?? []).filter((e) => e.id !== ex.id),
+                // The API unlinks a partner left alone; so does this copy.
+                exercises: normalizeSupersets((w.exercises ?? []).filter((e) => e.id !== ex.id)),
               }
             : w,
         );

@@ -304,6 +304,14 @@
   --mh-color-divider: var(--mh-slate-200);
 
   /*
+   * A chart's bar that is not picked: the weeks on Progress, last time
+   * beside today on a finished workout. Neutral, since a bar's length is
+   * the news (the picked one is honey: a selection). The divider above is
+   * too pale on the card for something that has to be read.
+   */
+  --mh-color-chart-idle: var(--mh-slate-300);
+
+  /*
    * The hairline between rows of a grouped list (ion-list.css). Not the
    * divider above: that one doubles as a soft fill (pills) and is
    * too pale to read as a line on a card. Mixed from the ink rather
@@ -797,6 +805,7 @@
      no line at all (ion-header/footer/tab-bar.css). */
   --ion-border-color: #48484a;
   --mh-color-divider: #3a3a3c;
+  --mh-color-chart-idle: #636366;
 
   /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
      and a sheet scales the scrim by how far it is open. */

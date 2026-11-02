@@ -1,0 +1,33 @@
+@if (session(); as running) {
+  <button
+    type="button"
+    class="bar"
+    [class.resting]="resting()"
+    [attr.aria-label]="'workouts.activeBar.open' | translate: { name: running.name }"
+    (click)="open()"
+  >
+    <span class="hex" aria-hidden="true">
+      <svg [attr.viewBox]="hex.viewBox">
+        <defs>
+          <clipPath [attr.id]="clipId"><path [attr.d]="hex.d" /></clipPath>
+        </defs>
+        <path class="hex-base" [attr.d]="hex.d" />
+        @if (resting()) {
+          <rect
+            class="hex-fill"
+            [attr.x]="hex.x"
+            [attr.y]="fillY()"
+            [attr.width]="hex.width"
+            [attr.height]="fillHeight()"
+            [attr.clip-path]="'url(#' + clipId + ')'"
+          />
+        }
+      </svg>
+    </span>
+    <span class="text">
+      <span class="title">{{ title() }}</span>
+      <span class="sub">{{ sub() }}</span>
+    </span>
+    <span class="right" role="timer">{{ right() }}</span>
+  </button>
+}

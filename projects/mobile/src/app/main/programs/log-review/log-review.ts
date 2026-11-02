@@ -16,7 +16,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -30,6 +30,10 @@ import {
 } from '../../workouts/workouts.config';
 import { coachStackOf } from '../../clients/client-paths';
 import { LoggedExercises } from '../../workouts/_components/logged-exercises/logged-exercises';
+import {
+  coachSummary,
+  highEffortExercise,
+} from '../../workouts/_components/logged-exercises/logged-exercises.config';
 import { PROGRAM_ICONS } from '../programs.config';
 
 /**
@@ -83,6 +87,8 @@ export class LogReview implements ViewWillEnter {
 
   readonly skeletonTiles = [1, 2, 3];
 
+  private readonly _translateService = inject(TranslateService);
+
   readonly showSkeleton = computed(() => this.loading() && !this.log());
   readonly showError = computed(() => this.error() && !this.log());
 
@@ -93,7 +99,22 @@ export class LogReview implements ViewWillEnter {
   /** Only the modalities this session actually contained. */
   readonly tiles = computed(() => {
     const log = this.log();
-    return log ? workoutTiles(log) : [];
+    if (!log) return [];
+    // What a coach reads first, when the client recorded it: how hard it
+    // was and how long they rested. Then the same tiles the client sees.
+    const { effort, rest } = coachSummary(log);
+    return [
+      ...(effort ? [{ label: this._translateService.instant('programs.logReview.effortAvg'), value: effort }] : []),
+      ...(rest ? [{ label: this._translateService.instant('programs.logReview.restAvg'), value: rest }] : []),
+      ...workoutTiles(log),
+    ];
+  });
+
+  /** "Effort 9+ on 3 of the last 4 sets of bench press": calm, never red. */
+  readonly signal = computed(() => {
+    const log = this.log();
+    const name = log ? highEffortExercise(log) : null;
+    return name ? this._translateService.instant('programs.logReview.highEffort', { name }) : '';
   });
 
   readonly hasFeedback = computed(() => !!this.log()?.feelingRating || !!this.log()?.notes);

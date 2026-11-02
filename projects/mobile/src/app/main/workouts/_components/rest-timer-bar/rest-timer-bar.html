@@ -1,37 +1,75 @@
-<div class="bar" [class.done]="done()">
-  <!-- How much of the rest has gone, along the top edge. -->
-  <div class="elapsed" aria-hidden="true">
-    <span [style.width.%]="elapsedPercent()"></span>
-  </div>
+<div [class]="'bar state-' + state()">
+  <!-- The hexagon and the time are one button: tap to change the rest. -->
+  <button
+    type="button"
+    class="clock"
+    [attr.aria-label]="'workouts.restTimer.change' | translate"
+    (click)="change.emit()"
+  >
+    <span class="hex">
+      <svg [attr.viewBox]="hex.viewBox" aria-hidden="true">
+        <defs>
+          <clipPath [attr.id]="clipId"><path [attr.d]="hex.d" /></clipPath>
+        </defs>
+        <path class="hex-base" [attr.d]="hex.d" />
+        <rect
+          class="hex-fill"
+          [attr.x]="hex.x"
+          [attr.y]="fillY()"
+          [attr.width]="hex.width"
+          [attr.height]="fillHeight()"
+          [attr.clip-path]="'url(#' + clipId + ')'"
+        />
+      </svg>
+      @if (state() === States.Go) {
+        <ion-icon name="checkmark-outline" aria-hidden="true" />
+      } @else if (state() === States.Over) {
+        <ion-icon name="add-outline" aria-hidden="true" />
+      }
+    </span>
+    <span class="time-block" role="timer" aria-live="polite">
+      <strong class="time">{{ display() }}</strong>
+      <span class="sub">{{ sub() }}</span>
+    </span>
+  </button>
 
-  <div class="body">
-    <div class="count" role="timer" aria-live="polite">
-      <span class="mh-kicker">{{ (done() ? 'workouts.restTimer.restOver' : 'workouts.restTimer.rest') | translate }}</span>
-      <strong>{{ display() }}</strong>
-    </div>
+  @if (next()) {
+    <span class="next">
+      <span class="next-label">{{ 'workouts.restTimer.next' | translate }}</span>
+      <span class="next-text">{{ next() }}</span>
+    </span>
+  }
 
-    @if (nextTitle()) {
-      <div class="next">
-        <span class="mh-kicker">{{ 'workouts.restTimer.nextUp' | translate }}</span>
-        <strong>{{ nextTitle() }}</strong>
-        @if (nextDetail()) {
-          <span class="detail">{{ nextDetail() }}</span>
-        }
-      </div>
-    }
-  </div>
-
-  <div class="actions">
-    <!-- Nothing left to take off once the count is out. -->
-    @if (!done()) {
-      <button type="button" [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: nudgeSeconds }" (click)="subtract()">
-        −{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
+  <span class="actions">
+    @if (counting()) {
+      <button
+        type="button"
+        class="step"
+        [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: nudgeSeconds }"
+        (pointerdown)="holdStart(-1, $event)"
+        (pointerup)="holdEnd()"
+        (pointerleave)="holdEnd()"
+        (pointercancel)="holdEnd()"
+        (click)="stepByKey(-1, $event)"
+      >
+        −{{ nudgeSeconds }}
       </button>
+      <button
+        type="button"
+        class="step"
+        [attr.aria-label]="'workouts.restTimer.plusSeconds' | translate: { seconds: nudgeSeconds }"
+        (pointerdown)="holdStart(1, $event)"
+        (pointerup)="holdEnd()"
+        (pointerleave)="holdEnd()"
+        (pointercancel)="holdEnd()"
+        (click)="stepByKey(1, $event)"
+      >
+        +{{ nudgeSeconds }}
+      </button>
+      <button type="button" class="quiet" (click)="skip.emit()">{{ 'button.skip' | translate }}</button>
+    } @else {
+      <button type="button" class="start" (click)="start.emit()">{{ 'workouts.restTimer.startSet' | translate }}</button>
+      <button type="button" class="quiet" (click)="hide.emit()">{{ 'workouts.restTimer.hide' | translate }}</button>
     }
-    <button type="button" [attr.aria-label]="'workouts.restTimer.plusSeconds' | translate: { seconds: nudgeSeconds }" (click)="add()">
-      +{{ 'workouts.keypad.stepSeconds' | translate: { step: nudgeSeconds } }}
-    </button>
-    <!-- Nothing left to skip once the count is out: the same key closes the bar. -->
-    <button type="button" class="skip" (click)="skip.emit()">{{ (done() ? 'workouts.restTimer.backToWork' : 'button.skip') | translate }}</button>
-  </div>
+  </span>
 </div>

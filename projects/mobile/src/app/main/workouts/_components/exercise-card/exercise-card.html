@@ -7,7 +7,12 @@
       <mh-hex-avatar slot="start" size="md" tone="wash" aria-hidden="true" [color]="tile.tone" [icon]="tile.icon" />
     }
     <ion-label>
-      <h2>{{ name() }}</h2>
+      <h2>
+        @if (tag(); as label) {
+          <span class="tag">{{ label }}</span>
+        }
+        {{ name() }}
+      </h2>
       @if (meta(); as text) {
         <p>{{ text }}</p>
       }
@@ -28,6 +33,27 @@
       <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
     }
   </ion-item>
+
+  <!-- Only what exists: your note, then the plan's line and its note. -->
+  @if (note() || plan() || planNote()) {
+    <div class="lines">
+      @if (note(); as text) {
+        <button type="button" class="line note" (click)="noteTap.emit()">
+          <ion-icon name="create-outline" aria-hidden="true" />
+          <span>{{ text }}</span>
+        </button>
+      }
+      @if (plan(); as text) {
+        <p class="line plan">
+          <ion-icon name="person-outline" aria-hidden="true" />
+          <span>{{ text }}</span>
+        </p>
+      }
+      @if (planNote(); as text) {
+        <p class="line plan-note">{{ text }}</p>
+      }
+    </div>
+  }
 
   <ion-card-content>
     <ng-content />

@@ -195,9 +195,21 @@ export interface CreateExercisePayload {
   isUnilateral?: boolean;
   youtubeUrl?: string;
   visibility?: ExerciseVisibility;
-  muscles: { muscleId: string; role: MuscleRole }[];
+  /**
+   * A coach's exercise needs at least one PRIMARY. Someone's own (source
+   * USER) exercise may have none, and the server forces it PRIVATE whatever
+   * `visibility` says.
+   */
+  muscles?: { muscleId: string; role: MuscleRole }[];
   equipmentIds?: string[];
 }
 
 /** Body for `PATCH /exercises/:id`. All fields optional (partial of Create). */
 export type UpdateExercisePayload = Partial<CreateExercisePayload>;
+
+/** The person's own private note on an exercise ("Seat 4, pin on 3"). */
+export interface ExerciseNote {
+  exerciseId: string;
+  note: string | null;
+  updatedAt: string | null;
+}

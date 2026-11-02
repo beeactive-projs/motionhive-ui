@@ -27,6 +27,8 @@ import { RadioButton } from 'primeng/radiobutton';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
+
+import { REST_CHOICES, restClock } from '../program-rest';
 import { SelectButton } from 'primeng/selectbutton';
 import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
@@ -128,11 +130,18 @@ export class ProgramFormDialog {
     durationValue: [null as number | null],
     periodizationModel: [''],
     goalTags: ['', maxTagsValidator(10)],
+    /** Rest between sets for every day that sets none; null takes each client's own. */
+    defaultRestSeconds: [null as number | null],
     /** The coach's answer for the empty weeks. Not part of the payload. */
     newWeeks: [null as NewWeeksChoice | null],
   });
 
   // ── Options ──────────────────────────────────────────────────────
+
+  readonly restOptions: SelectItem<number | null>[] = [
+    { value: null, label: this._translateService.instant('programs.rest.clientDefault') },
+    ...REST_CHOICES.map((seconds) => ({ value: seconds, label: restClock(seconds) })),
+  ];
 
   readonly kindOptions: SelectItem<ProgramKind>[] = [
     { value: ProgramKind.Workout, label: enumLabel('programKind', ProgramKind.Workout) },
@@ -346,6 +355,10 @@ export class ProgramFormDialog {
         ? { periodizationModel: value.periodizationModel.trim() }
         : {}),
       ...(goalTags.length > 0 ? { goalTags } : {}),
+      // On an edit null is sent too, so picking the client's default clears it.
+      ...(value.defaultRestSeconds != null || this.program()
+        ? { defaultRestSeconds: value.defaultRestSeconds }
+        : {}),
     };
 
     this.submitting.set(true);
@@ -439,6 +452,7 @@ export class ProgramFormDialog {
       durationValue,
       periodizationModel: p.periodizationModel ?? '',
       goalTags: (p.goalTags ?? []).join(', '),
+      defaultRestSeconds: p.defaultRestSeconds ?? null,
     });
   }
 }
