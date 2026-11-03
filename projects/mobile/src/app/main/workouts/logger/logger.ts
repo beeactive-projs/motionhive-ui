@@ -55,9 +55,11 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
+import { RestLiveAction, RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
 import { ActiveSessionStore } from '../_services/active-session.store';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
+import { LockScreenService } from '../_services/lock-screen.service';
 import { RestCueService } from '../_services/rest-cue.service';
 import { ScreenAwakeService } from '../_services/screen-awake.service';
 import { StillTrainingService } from '../_services/still-training.service';
@@ -274,6 +276,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _activeSession = inject(ActiveSessionStore);
   private readonly _stillTraining = inject(StillTrainingService);
   private readonly _screenAwake = inject(ScreenAwakeService);
+  private readonly _lockScreen = inject(LockScreenService);
+  /** Lets go of the lock screen's buttons; set once the kept rest is picked up. */
+  private _detachLockScreen: (() => void) | null = null;
   /** True while this page is the one in front. */
   private readonly _onScreen = signal(false);
   private readonly _settingsStore = inject(WorkoutSettingsStore);
@@ -773,6 +778,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         this._activeSession.setRest(rest ? { logId: log.id, ...rest, endsAt, next } : null),
       );
     });
+    // What comes next, for the lock screen between rests too.
+    effect(() => {
+      const next = this.nextLine();
+      untracked(() => this._activeSession.setNext(next));
+    });
 
     // Follow the focus: whenever it moves (a tick, the list loading), bring
     // it to a third of the way down, unless the person scrolled away.
@@ -785,6 +795,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
     this._startTicker();
     this._destroyRef.onDestroy(() => {
+      this._detachLockScreen?.();
       void this._screenAwake.release();
       this._stopTicker();
       this._clearEffortTimer();
@@ -848,6 +859,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       this.restEndsAt.set(kept.endsAt);
     }
     this._restAdopted = true;
+    // From now on the lock screen's buttons act on this page's rest.
+    this._detachLockScreen ??= this._lockScreen.attach((action) => this._onLockScreen(action));
+  }
+
+  /** +15, Skip or Start set on the lock screen: as if tapped on the bar, at that moment. */
+  private _onLockScreen(action: RestLiveAction): void {
+    if (action.type === RestLiveActionTypes.Extend) {
+      if (action.endsAt && this.restEndsAt() !== null) this.restEndsAt.set(action.endsAt);
+      return;
+    }
+    this._recordTappedRest(action.at);
   }
 
   /**
@@ -1364,11 +1386,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     }
   }
 
-  private _recordTappedRest(): void {
+  /** `at`: when it was ended, which is now unless it was on the lock screen. */
+  private _recordTappedRest(at = Date.now()): void {
     const rest = this._rest();
     this.restEndsAt.set(null);
     this._rest.set(null);
-    if (rest) this._saveRest(rest, tappedRest((Date.now() - rest.startedAt) / 1000));
+    if (rest) this._saveRest(rest, tappedRest((at - rest.startedAt) / 1000));
   }
 
   /** At a tick, a rest nobody ended by hand is estimated from the gap. */

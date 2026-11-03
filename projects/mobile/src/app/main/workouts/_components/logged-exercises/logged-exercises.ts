@@ -15,9 +15,10 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
-import { ExerciseProgress, LoggedExercise, ProgressService, WorkoutLog } from 'core';
+import { ExerciseProgress, LoggedExercise, ProgressService, WorkoutLog, translate } from 'core';
 
 import { BadgeTones } from '../../../exercises/exercises.config';
+import { exerciseBlocks, memberTag, roundCount } from '../../logger/logger-flow';
 import { recordSessionIds, shortDayLabel } from '../../workouts.config';
 import {
   Comparison,
@@ -36,6 +37,9 @@ type History =
   | { status: 'ready'; progress: ExerciseProgress };
 
 interface Row {
+  kind: 'exercise';
+  /** The accordion's value: the exercise's id. */
+  key: string;
   exercise: LoggedExercise;
   /** Only an exercise with sets opens; a skipped one or an empty one is a plain row. */
   openable: boolean;
@@ -46,6 +50,23 @@ interface Row {
   comparing: boolean;
   /** How the top set compares with last time; null until known, or when it can't be. */
   comparison: Comparison | null;
+}
+
+/**
+ * A superset as one block (Workouts R2, 4d): its exercises tagged A1, A2,
+ * then the sets round by round. Opened, each exercise says how it went
+ * against last time and links to its history.
+ */
+interface SupersetRow {
+  kind: 'superset';
+  /** The accordion's value: the first member's id. */
+  key: string;
+  /** "Superset · 3 rounds". */
+  kicker: string;
+  members: { tag: string; row: Row }[];
+  /** "A1 22 × 10 · A2 × 15", one per round. */
+  rounds: { index: number; line: string; done: boolean }[];
+  record: boolean;
 }
 
 /**
@@ -87,15 +108,17 @@ export class LoggedExercises {
   /** By exercise id, so the same exercise twice in a workout reads once. */
   private readonly _history = signal<Record<string, History>>({});
 
-  readonly rows = computed<Row[]>(() => {
+  readonly rows = computed<(Row | SupersetRow)[]>(() => {
     const log = this.log();
     const history = this._history();
-    return (log.exercises ?? []).map((exercise) => {
+    const rowOf = (exercise: LoggedExercise): Row => {
       const state = exercise.exerciseId ? history[exercise.exerciseId] : undefined;
       const record = recordFor(exercise, log.personalRecords);
       const recordFromHistory =
         state?.status === 'ready' && recordSessionIds(state.progress).has(log.id);
       return {
+        kind: 'exercise',
+        key: exercise.id,
         exercise,
         openable: !exercise.isSkipped && (exercise.sets ?? []).length > 0,
         line: exerciseLine(exercise),
@@ -107,18 +130,51 @@ export class LoggedExercises {
             ? compareWithLastTime(exercise, log, state.progress.sessions, shortDayLabel)
             : null,
       };
+    };
+
+    return exerciseBlocks(log.exercises ?? []).flatMap((block): (Row | SupersetRow)[] => {
+      if (block.letter === null) return block.exercises.map(rowOf);
+      const members = block.exercises.map((exercise) => ({
+        tag: memberTag(block, exercise.id) ?? '',
+        row: rowOf(exercise),
+      }));
+      const live = members.filter((m) => !m.row.exercise.isSkipped);
+      const total = roundCount({ ...block, exercises: live.map((m) => m.row.exercise) });
+      const rounds = Array.from({ length: total }, (_, index) => {
+        const parts = live
+          .map((m) => ({ tag: m.tag, set: m.row.sets[index] }))
+          .filter((p) => !!p.set);
+        return {
+          index,
+          line: parts.map((p) => `${p.tag} ${p.set.value || '–'}`).join(' · '),
+          done: parts.every((p) => p.set.done),
+        };
+      });
+      return [
+        {
+          kind: 'superset',
+          key: block.exercises[0].id,
+          kicker: translate('workouts.superset.summary', { count: total }),
+          members,
+          rounds,
+          record: members.some((m) => m.row.record),
+        },
+      ];
     });
   });
 
-  /** The group reports every open exercise; the newly opened ones read their history. */
   onChange(event: AccordionGroupCustomEvent): void {
     // Only the group's own change: an Ionic control inside would bubble one too.
     if (event.target !== event.currentTarget) return;
     const value = event.detail.value;
     const open: unknown[] = Array.isArray(value) ? value : value ? [value] : [];
     for (const id of open) {
-      const exercise = this.log().exercises?.find((e) => e.id === id);
-      if (exercise?.exerciseId) this._read(exercise.exerciseId);
+      const row = this.rows().find((r) => r.key === id);
+      const exercises =
+        row?.kind === 'superset' ? row.members.map((m) => m.row.exercise) : row ? [row.exercise] : [];
+      for (const exercise of exercises) {
+        if (exercise.exerciseId) this._read(exercise.exerciseId);
+      }
     }
   }
 

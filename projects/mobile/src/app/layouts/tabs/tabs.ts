@@ -45,6 +45,7 @@ import {
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
 import { ActiveWorkoutBar } from '../../main/workouts/_components/active-workout-bar/active-workout-bar';
 import { ActiveSessionStore } from '../../main/workouts/_services/active-session.store';
+import { LockScreenService } from '../../main/workouts/_services/lock-screen.service';
 import { StartConflictSheet } from '../../main/workouts/_sheets/start-conflict-sheet/start-conflict-sheet';
 import { SaveRoutineSheet } from '../../main/workouts/_sheets/save-routine-sheet/save-routine-sheet';
 import { TabIds, TabItem } from '../../_shared/models/tab.model';
@@ -255,6 +256,8 @@ export class Tabs {
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
 
   private readonly _activeSessionStore = inject(ActiveSessionStore);
+  /** The workout on the lock screen, from the moment someone is signed in. */
+  private readonly _lockScreen = inject(LockScreenService);
   /** A workout is open: the mini-bar shows, and the Workouts tab wears a dot. */
   readonly activeWorkout = computed(() => this._activeSessionStore.session() !== null);
 

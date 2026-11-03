@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { OneRepMaxSource, ProgramAssignmentKind, WorkoutLogStatus } from 'core';
+import { ExerciseSetType, OneRepMaxSource, ProgramAssignmentKind, WorkoutLogStatus } from 'core';
 
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
@@ -230,6 +230,12 @@ describe('workouts config', () => {
     expect(logMeta(log({ exercises: [{ sets: [set()] }] }))).toBe('31m · 1 set');
     expect(logMeta(log({ exercises: [{ sets: [set({ isCompleted: false })] }] }))).toBe('31m');
     expect(logMeta(log({ exercises: undefined, durationSeconds: null }))).toBe('');
+    // What it moved, warm-ups left out, and the supersets in it.
+    const lifted = [
+      { supersetGroupId: 1, sets: [set({ weightKg: 60, reps: 8 }), set({ weightKg: 20, reps: 10, setType: ExerciseSetType.Warmup })] },
+      { supersetGroupId: 1, sets: [set({ weightKg: 20, reps: 10 })] },
+    ];
+    expect(logMeta(log({ exercises: lifted }))).toBe('31m · 3 sets · 680 kg · 1 superset');
   });
 
   // The calendar shows the most meaningful thing a day held: finished beats

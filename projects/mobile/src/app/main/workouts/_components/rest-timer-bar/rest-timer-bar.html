@@ -1,4 +1,5 @@
 <div [class]="'bar state-' + state()">
+  <div class="top">
   <!-- The hexagon and the time are one button: tap to change the rest. -->
   <button
     type="button"
@@ -33,13 +34,6 @@
     </span>
   </button>
 
-  @if (next()) {
-    <span class="next">
-      <span class="next-label">{{ 'workouts.restTimer.next' | translate }}</span>
-      <span class="next-text">{{ next() }}</span>
-    </span>
-  }
-
   <span class="actions">
     @if (counting()) {
       <button
@@ -72,4 +66,14 @@
       <button type="button" class="quiet" (click)="hide.emit()">{{ 'workouts.restTimer.hide' | translate }}</button>
     }
   </span>
+  </div>
+
+  <!-- Its own line, the bar's full width: next to the keys it was squeezed
+       to nothing, in Romanian most of all. -->
+  @if (next()) {
+    <p class="next">
+      <span class="next-label">{{ 'workouts.restTimer.next' | translate }}</span>
+      <span class="next-text">{{ next() }}</span>
+    </p>
+  }
 </div>

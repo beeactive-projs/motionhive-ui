@@ -1,0 +1,36 @@
+<ng-template #column let-bar>
+  <span class="track">
+    @if (bar.top) {
+      <span class="top" [attr.data-edge]="bar.edge" [style.bottom.%]="bar.height">{{ bar.top }}</span>
+    }
+    <span class="bar" [style.height.%]="bar.height"></span>
+  </span>
+  <span class="tick" aria-hidden="true">{{ bar.tick }}</span>
+</ng-template>
+
+@if (interactive()) {
+  <div class="bars" [class.has-top]="hasTop()">
+    @for (bar of shown(); track bar.key) {
+      <!-- A native button, as the calendar's days are: a bar in a row of
+           twelve has no room for an Ionic button's padding and ripple. -->
+      <button
+        type="button"
+        class="column"
+        [class.selected]="bar.key === selected()"
+        [attr.aria-pressed]="bar.key === selected()"
+        [attr.aria-label]="bar.label"
+        (click)="pick(bar.key)"
+      >
+        <ng-container *ngTemplateOutlet="column; context: { $implicit: bar }" />
+      </button>
+    }
+  </div>
+} @else {
+  <div class="bars" [class.has-top]="hasTop()" role="img" [attr.aria-label]="label()">
+    @for (bar of shown(); track bar.key) {
+      <span class="column" [class.selected]="bar.key === selected()" aria-hidden="true">
+        <ng-container *ngTemplateOutlet="column; context: { $implicit: bar }" />
+      </span>
+    }
+  </div>
+}

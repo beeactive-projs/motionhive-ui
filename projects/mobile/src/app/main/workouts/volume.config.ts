@@ -13,6 +13,7 @@ import {
   weekStart,
 } from 'core';
 
+import type { ChartBar } from './_components/bar-chart/bar-chart';
 import {
   TrendPoint,
   formatMeasure,
@@ -418,6 +419,120 @@ export function formatWeekValue(value: number, metric: WeekMetric): string {
 export function barHeights(values: readonly number[]): number[] {
   const max = Math.max(0, ...values);
   return values.map((value) => (max > 0 && value > 0 ? Math.max(4, Math.round((value / max) * 100)) : 0));
+}
+
+/**
+ * The picked week's figure on top of its bar, short enough to sit there:
+ * "4.3 t" from a tonne on, "680 kg" under it, "3" workouts, "2h 26m".
+ */
+export function shortWeekValue(value: number, metric: WeekMetric): string {
+  switch (metric) {
+    case WeekMetrics.Volume:
+      if (value < 1000) return formatVolume(value, VolumeUnits.Kg);
+      return translate('workouts.units.tonnes', {
+        value: new Intl.NumberFormat(appLocale(), { maximumFractionDigits: 1 }).format(value / 1000),
+      });
+    case WeekMetrics.Time:
+      return formatTotalDuration(value);
+    default:
+      return grouped(value);
+  }
+}
+
+// ─── An exercise's volume as bars ─────────────────────────────────────────
+
+export const BarGroupings = {
+  /** A bar for each day the exercise was trained. */
+  Session: 'session',
+  /** A bar for each week: the average of its sessions. */
+  Week: 'week',
+  /** A bar for each month: the average of its sessions. */
+  Month: 'month',
+} as const;
+
+export type BarGrouping = (typeof BarGroupings)[keyof typeof BarGroupings];
+
+/** Up to this many sessions get a bar each; past it a bar would be a hairline. */
+export const MAX_SESSION_BARS = 24;
+
+/** About this many dates under the bars, the last always among them. */
+const BAR_TICKS = 4;
+
+/**
+ * The volume per session as bars (Workouts R2, 4a): one a session while they
+ * fit, else one a week (one a month over a year), each the average of its
+ * sessions, so a bar still reads as "a session's volume". Weeks or months
+ * with no session stay as gaps, keeping the calendar's spacing. The last bar
+ * is the one the card's figure speaks of: it is the selected one, and with a
+ * bar a session it carries that figure on top.
+ */
+export function volumeBars(
+  points: readonly TrendPoint[],
+  unit: VolumeUnit,
+  range: ProgressRange,
+  now: number,
+): { grouping: BarGrouping; bars: ChartBar[] } {
+  if (points.length <= MAX_SESSION_BARS) {
+    const bars = points.map((point, i) => ({
+      key: String(point.x),
+      value: point.y,
+      tick: tickAt(i, points.length) ? dayMonth(point.x) : '',
+      label: '',
+      top: i === points.length - 1 ? barFigure(point.y, unit) : '',
+    }));
+    return { grouping: BarGroupings.Session, bars };
+  }
+
+  const grouping = range === '1y' ? BarGroupings.Month : BarGroupings.Week;
+  const startOf = (time: number): Date => {
+    const date = new Date(time);
+    return grouping === BarGroupings.Month
+      ? new Date(date.getFullYear(), date.getMonth(), 1)
+      : weekStart(date);
+  };
+  const sums = new Map<string, { total: number; count: number }>();
+  for (const point of points) {
+    const key = localDayKey(startOf(point.x));
+    const sum = sums.get(key) ?? { total: 0, count: 0 };
+    sums.set(key, { total: sum.total + point.y, count: sum.count + 1 });
+  }
+  const periods: Date[] = [];
+  for (let start = startOf(rangeStart(range, now)); start.getTime() <= now; ) {
+    periods.push(start);
+    start =
+      grouping === BarGroupings.Month
+        ? new Date(start.getFullYear(), start.getMonth() + 1, 1)
+        : new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7);
+  }
+  const bars = periods.map((start, i) => {
+    const key = localDayKey(start);
+    const sum = sums.get(key);
+    const label =
+      grouping === BarGroupings.Month
+        ? start.toLocaleDateString(appLocale(), { month: 'short' })
+        : dayMonth(start.getTime());
+    return {
+      key,
+      value: sum ? Math.round(sum.total / sum.count) : 0,
+      tick: tickAt(i, periods.length) ? label : '',
+      label: '',
+    };
+  });
+  return { grouping, bars };
+}
+
+/** A date under every few bars, counted back from the last. */
+function tickAt(index: number, count: number): boolean {
+  return (count - 1 - index) % Math.max(1, Math.ceil(count / BAR_TICKS)) === 0;
+}
+
+function dayMonth(time: number): string {
+  return new Date(time).toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' });
+}
+
+/** On top of the last bar: the number alone ("1,920"), the card says the unit. */
+function barFigure(value: number, unit: VolumeUnit): string {
+  return unit === VolumeUnits.Seconds ? formatVolume(value, unit) : grouped(value);
 }
 
 /** "26 Oct" for a week's Monday. */

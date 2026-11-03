@@ -1,7 +1,61 @@
 <ion-list [inset]="true" class="mh-card-list">
   <ion-accordion-group [multiple]="true" (ionChange)="onChange($event)">
-    @for (row of rows(); track row.exercise.id) {
-      @if (row.openable) {
+    @for (row of rows(); track row.key) {
+      @if (row.kind === 'superset') {
+        <!-- A superset as one block: its exercises, then the sets round by round. -->
+        <ion-accordion [value]="row.key" class="superset">
+          <ion-item slot="header">
+            <ion-label>
+              <span class="mh-kicker ss-kicker">{{ row.kicker }}</span>
+              <h2>
+                @for (member of row.members; track member.row.key; let last = $last) {
+                  <span [class.skipped-name]="member.row.exercise.isSkipped">
+                    <span class="ss-tag">{{ member.tag }}</span> {{ member.row.exercise.exerciseNameSnapshot }}</span>@if (!last) { + }
+                }
+              </h2>
+            </ion-label>
+            @if (row.record) {
+              <ion-badge slot="end" [attr.data-tone]="Tones.Honey">
+                {{ 'workouts.exerciseProgress.record' | translate }}
+              </ion-badge>
+            }
+          </ion-item>
+
+          <div slot="content" class="content">
+            <ol class="rounds">
+              @for (round of row.rounds; track round.index) {
+                <li class="round" [class.undone]="!round.done">
+                  <span class="round-name">{{ 'workouts.superset.round' | translate: { number: round.index + 1 } }}</span>
+                  <span class="round-line">{{ round.line }}</span>
+                </li>
+              }
+            </ol>
+
+            <!-- Each exercise against last time, and the way to its history. -->
+            @for (member of row.members; track member.row.key) {
+              @if (!member.row.exercise.isSkipped) {
+                <div class="member">
+                  <span class="member-name"><span class="ss-tag">{{ member.tag }}</span> {{ member.row.exercise.exerciseNameSnapshot }}</span>
+                  @if (member.row.comparing) {
+                    <ion-skeleton-text [animated]="true" class="line-verdict" />
+                  } @else if (member.row.comparison; as comparison) {
+                    <p class="verdict" role="status">{{ comparison.verdict }}</p>
+                  }
+                  @if (member.row.exercise.exerciseId) {
+                    <ion-button class="mh-text-link history" fill="clear" size="small" (click)="openHistory(member.row.exercise)">
+                      {{ 'workouts.loggedSets.history' | translate }}
+                    </ion-button>
+                  }
+                </div>
+              } @else {
+                <p class="member skipped-member">
+                  <span class="ss-tag">{{ member.tag }}</span> {{ member.row.exercise.exerciseNameSnapshot }} · {{ 'workouts.superset.skipped' | translate }}
+                </p>
+              }
+            }
+          </div>
+        </ion-accordion>
+      } @else if (row.openable) {
         <ion-accordion [value]="row.exercise.id">
           <ion-item slot="header">
             <ion-label>

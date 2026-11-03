@@ -197,6 +197,8 @@
       "soundHint": "While the app is open. The phone's silent mode applies.",
       "vibration": "Vibration",
       "vibrationHint": "A tap at 10 seconds to go and a buzz at zero",
+      "lockScreen": "On the lock screen",
+      "lockScreenHint": "The rest and the workout time, with +15 and Skip",
       "loggingSection": "While you log",
       "askEffort": "Ask how hard each set was",
       "askEffortHint": "Always on where your plan sets a target effort",
@@ -1069,7 +1071,8 @@
       "notePlaceholder": "For example: seat 4, pin on 3",
       "privateLine": "Private: only you see it. You can edit it any time.",
       "toast": {
-        "noteFailed": "The exercise is saved, but its note is not. Try the note again."
+        "noteFailed": "The exercise is saved, but its note is not. Try the note again.",
+        "pictureFailed": "The exercise is saved, but its picture is not. Try the picture again."
       },
       "track": {
         "BODYWEIGHT": "Reps only",
@@ -1077,7 +1080,12 @@
         "DURATION": "Time",
         "STRENGTH": "Weight and reps",
         "label": "What do you track?"
-      }
+      },
+      "picture": "Picture",
+      "addPicture": "Add a picture",
+      "changePicture": "Change",
+      "removePicture": "Remove",
+      "pictureHint": "A photo of the machine or the move. Anyone who can see the exercise sees it."
     }
   },
   "groups": {
@@ -3140,7 +3148,8 @@
       "day": "Day {number}",
       "felt": "felt {rating}/5",
       "setsDone": "{done} of {total, plural, one {# set} other {# sets}}",
-      "week": "Week {number}"
+      "week": "Week {number}",
+      "supersets": "{count, plural, one {# superset} other {# supersets}}"
     },
     "photo": {
       "actionsTitle": "Workout photo",
@@ -3486,7 +3495,8 @@
       "kg": "{value} kg",
       "kgShort": "kg",
       "meters": "{value} m",
-      "metersShort": "m"
+      "metersShort": "m",
+      "tonnes": "{value} t"
     },
     "memory": {
       "monthsAgo": "{count, plural, one {A month ago} other {# months ago}}",
@@ -3566,7 +3576,8 @@
       "skipped": "skipped",
       "addRound": "Add round",
       "restAfterRound": "Rest after the round: {value}",
-      "rounds": "{count, plural, one {# round} other {# rounds}}"
+      "rounds": "{count, plural, one {# round} other {# rounds}}",
+      "summary": "Superset · {count, plural, one {# round} other {# rounds}}"
     },
     "loggerOptions": {
       "title": "This workout",
@@ -3628,7 +3639,11 @@
           "volume": "Volume"
         },
         "metricLabel": "What the chart shows",
-        "recordStill": "The record hasn't moved since {date}, but you did more at the same weight. That's progress too."
+        "recordStill": "The record hasn't moved since {date}, but you did more at the same weight. That's progress too.",
+        "grouped": {
+          "week": "Each bar is a week: the average of its sessions.",
+          "month": "Each bar is a month: the average of its sessions."
+        }
       },
       "finish": {
         "firstTime": "Next time you'll see the comparison here.",
@@ -3658,6 +3673,11 @@
       "body": "So we can tell you when rest is over, even with the phone locked or in another app. Nothing else.",
       "allow": "Turn on notifications",
       "notNow": "Not now"
+    },
+    "live": {
+      "next": "Next: {next}",
+      "workout": "Workout",
+      "plus": "+{seconds} s"
     }
   },
   "feedback": {

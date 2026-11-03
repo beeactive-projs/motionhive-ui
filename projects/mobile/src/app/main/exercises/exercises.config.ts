@@ -3,6 +3,7 @@ import {
   alertCircleOutline,
   barbellOutline,
   bodyOutline,
+  cameraOutline,
   checkmarkCircle,
   checkmarkOutline,
   closeCircleOutline,
@@ -54,6 +55,7 @@ import {
  * reference an icon nobody registered.
  */
 export const EXERCISE_ICONS = {
+  cameraOutline,
   addOutline,
   alertCircleOutline,
   barbellOutline,

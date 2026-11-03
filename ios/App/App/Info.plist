@@ -37,6 +37,10 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- The workout on the lock screen and in the Dynamic Island
+	     (RestLivePlugin.swift, drawn by the RestTimerExtension target). -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

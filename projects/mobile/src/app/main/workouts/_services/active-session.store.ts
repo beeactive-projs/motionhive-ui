@@ -49,10 +49,16 @@ export class ActiveSessionStore {
 
   private readonly _session = signal<ActiveSession | null>(null);
   private readonly _rest = signal<ActiveRest | null>(null);
+  private readonly _next = signal('');
+  private readonly _checked = signal(false);
   private _restored = false;
 
   readonly session = this._session.asReadonly();
   readonly rest = this._rest.asReadonly();
+  /** What the logger says comes next ("Set 3 · 62.5 kg × 8 · Bench press"), rest or not. */
+  readonly next = this._next.asReadonly();
+  /** True once the API has said whether a workout is open: until then, null means unknown. */
+  readonly checked = this._checked.asReadonly();
 
   constructor() {
     void this._restoreRest();
@@ -94,8 +100,13 @@ export class ActiveSessionStore {
       pausedAt: log.pausedAt ?? null,
       pausedSeconds: log.pausedSeconds ?? 0,
     });
+    this._checked.set(true);
     const rest = this._rest();
     if (rest && rest.logId !== log.id) this.setRest(null);
+  }
+
+  setNext(next: string): void {
+    this._next.set(next);
   }
 
   setRest(rest: ActiveRest | null): void {
@@ -105,7 +116,9 @@ export class ActiveSessionStore {
 
   /** Finished or discarded: nothing is running any more. */
   end(): void {
+    this._checked.set(true);
     this._session.set(null);
+    this._next.set('');
     this.setRest(null);
   }
 

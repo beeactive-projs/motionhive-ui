@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
 import {
   IonButton,
   IonIcon,
@@ -19,6 +19,7 @@ import {
   ExerciseService,
   ExerciseSource,
   ExerciseTaxonomyStore,
+  preparePhoto,
 } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
@@ -68,6 +69,9 @@ const EQUIPMENT_PREVIEW = FEATURED_EQUIPMENT_SLUGS.length;
  *
  * Edit loads the full row before it lets you save: a list row carries only
  * the primary muscles, and saving from it would quietly drop the rest.
+ *
+ * A picture is optional: picked here, prepared on the phone (upright, scaled
+ * down, no location) and sent once the exercise is saved, as the note is.
  */
 @Component({
   selector: 'mh-exercise-form-sheet',
@@ -111,12 +115,17 @@ export class ExerciseFormSheet {
   readonly saving = signal(false);
   readonly musclesExpanded = signal(false);
   readonly equipmentExpanded = signal(false);
+  /** The picture shown: the saved one's link, or a new one picked here. */
+  readonly picture = signal<{ url: string; jpeg: Blob | null } | null>(null);
+  readonly preparingPicture = signal(false);
 
   readonly maxNameLength = MAX_NAME_LENGTH;
   readonly maxNoteLength = EXERCISE_NOTE_MAX_LENGTH;
 
   /** The note as loaded, so an untouched one is not written back. */
   private _loadedNote = '';
+  /** The picture as loaded, so an untouched one is not sent again. */
+  private _loadedPicture: string | null = null;
   /** The saved exercise, held until the sheet has finished leaving. */
   private _pending: Exercise | null = null;
 
@@ -132,7 +141,9 @@ export class ExerciseFormSheet {
       this._translateService.instant(this.isEdit() ? 'button.saveChanges' : 'button.create'),
   );
 
-  readonly canSave = computed(() => !this.loading() && !this.loadFailed() && this.form.isValid());
+  readonly canSave = computed(
+    () => !this.loading() && !this.loadFailed() && !this.preparingPicture() && this.form.isValid(),
+  );
 
   /** The four "What do you track?" tiles, wearing their kind's tile as the list rows do. */
   readonly trackTiles = SIMPLE_KINDS.map((kind) => ({
@@ -197,6 +208,32 @@ export class ExerciseFormSheet {
       if (!this.open()) return;
       untracked(() => this._start());
     });
+    inject(DestroyRef).onDestroy(() => this._setPicture(null));
+  }
+
+  /** A photo from the library or the camera, made ready to send. */
+  async onPicturePicked(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    // The same photo picked twice must still fire `change`.
+    input.value = '';
+    if (!file) return;
+    this.preparingPicture.set(true);
+    try {
+      const jpeg = await preparePhoto(file);
+      this._setPicture({ url: URL.createObjectURL(jpeg), jpeg });
+    } catch {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('workouts.photo.toast.unreadable'),
+      );
+    } finally {
+      this.preparingPicture.set(false);
+    }
+  }
+
+  removePicture(): void {
+    this._setPicture(null);
   }
 
   selectKind(kind: ExerciseKind): void {
@@ -244,10 +281,15 @@ export class ExerciseFormSheet {
     write$
       .pipe(
         take(1),
-        switchMap((saved) => this._writeNote(saved.id).pipe(map((noteError) => ({ saved, noteError })))),
+        switchMap((written) =>
+          forkJoin({
+            noteError: this._writeNote(written.id),
+            picture: this._writePicture(written),
+          }).pipe(map(({ noteError, picture }) => ({ saved: picture.saved, noteError, pictureError: picture.error }))),
+        ),
       )
       .subscribe({
-        next: ({ saved, noteError }) => {
+        next: ({ saved, noteError, pictureError }) => {
           this.saving.set(false);
           if (noteError !== null) {
             // The exercise is saved; only the note is not. Say exactly that,
@@ -255,6 +297,11 @@ export class ExerciseFormSheet {
             void this._feedbackService.error(
               noteError,
               this._translateService.instant('exercises.simpleForm.toast.noteFailed'),
+            );
+          } else if (pictureError !== null) {
+            void this._feedbackService.error(
+              pictureError,
+              this._translateService.instant('exercises.simpleForm.toast.pictureFailed'),
             );
           } else {
             void this._feedbackService.success(
@@ -292,6 +339,7 @@ export class ExerciseFormSheet {
     this.loadFailed.set(false);
 
     const exercise = this.exercise();
+    this._seedPicture(exercise?.thumbnailUrl ?? null);
     if (!exercise) {
       this.form.reset(simpleDraft(this.name()));
       // The server holds a coach's exercise to a primary muscle, whatever
@@ -327,6 +375,8 @@ export class ExerciseFormSheet {
         next: ({ exercise: full, note }) => {
           this.form.seed(full);
           this._setNote(note);
+          // Unless one was picked meanwhile: that one is what will be sent.
+          if (!this.picture()?.jpeg) this._seedPicture(full.thumbnailUrl ?? null);
           this.loading.set(false);
         },
         error: () => {
@@ -339,6 +389,35 @@ export class ExerciseFormSheet {
   private _setNote(note: string): void {
     this._loadedNote = note.trim();
     this.note.set(note);
+  }
+
+  private _seedPicture(url: string | null): void {
+    this._loadedPicture = url;
+    this._setPicture(url ? { url, jpeg: null } : null);
+  }
+
+  /** Shows a picture, letting go of the one before if it was a local copy. */
+  private _setPicture(next: { url: string; jpeg: Blob | null } | null): void {
+    const before = this.picture();
+    if (before?.jpeg && before.url !== next?.url) URL.revokeObjectURL(before.url);
+    this.picture.set(next);
+  }
+
+  /**
+   * Send a newly picked picture, or take the old one off when it was
+   * removed. Resolves to the exercise as it now is (with its new link) and
+   * the error when that failed; never errors itself, as the note.
+   */
+  private _writePicture(saved: Exercise): Observable<{ saved: Exercise; error: unknown | null }> {
+    const picture = this.picture();
+    let write$: Observable<Exercise> | null = null;
+    if (picture?.jpeg) write$ = this._exerciseService.setImage(saved.id, picture.jpeg);
+    else if (!picture && this._loadedPicture) write$ = this._exerciseService.removeImage(saved.id);
+    if (!write$) return of({ saved, error: null });
+    return write$.pipe(
+      map((withPicture) => ({ saved: withPicture, error: null })),
+      catchError((error: unknown) => of({ saved, error: error ?? new Error('picture') })),
+    );
   }
 
   /**

@@ -97,7 +97,20 @@
               @if (caption(); as key) {
                 <p class="caption">{{ key | translate }}</p>
               }
-              @if (chartPoints().length) {
+              @if (volumeChart(); as chart) {
+                @if (chart.bars.length) {
+                  <mh-bar-chart
+                    class="volume-bars"
+                    [bars]="chart.bars"
+                    [selected]="lastBarKey()"
+                    [interactive]="false"
+                    [label]="chartLabel()"
+                  />
+                  @if (barsNote(); as note) {
+                    <ion-note class="bars-note">{{ note | translate }}</ion-note>
+                  }
+                }
+              } @else if (chartPoints().length) {
                 <mh-trend-chart
                   [points]="chartPoints()"
                   [from]="rangeFrom()"

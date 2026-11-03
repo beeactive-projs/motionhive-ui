@@ -37,6 +37,7 @@ import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { clientUrl, coachStackOf } from '../../clients/client-paths';
 import { workoutLinks } from '../../home/home-stack.config';
 import { BadgeTones } from '../../exercises/exercises.config';
+import { BarChart } from '../_components/bar-chart/bar-chart';
 import { TrendChart, TrendLabel } from '../_components/trend-chart/trend-chart';
 import {
   PROGRESS_RANGES,
@@ -70,6 +71,8 @@ import {
   topSetPoints,
   topSetUnit,
   volumePoints,
+  volumeBars,
+  BarGroupings,
   volumeUnitOf,
 } from '../volume.config';
 
@@ -112,6 +115,7 @@ const Trends = {
     SessionRowSkeleton,
     StatTile,
     TranslatePipe,
+    BarChart,
     TrendChart,
   ],
   templateUrl: './exercise-progress.html',
@@ -230,6 +234,27 @@ export class ExerciseProgress implements ViewWillEnter {
       default:
         return [];
     }
+  });
+
+  /**
+   * Volume reads as bars, one a session (or a week, a month), as the
+   * design draws it; the estimate and the top set stay a line.
+   */
+  readonly volumeChart = computed(() =>
+    this.metric() === ExerciseMetrics.Volume
+      ? volumeBars(this.chartPoints(), this._volumeUnit() ?? VolumeUnits.Kg, this.range(), this.now())
+      : null,
+  );
+  /** The latest bar with a session in it: the one the card's figure speaks of. */
+  readonly lastBarKey = computed(
+    () => this.volumeChart()?.bars.filter((bar) => bar.value > 0).at(-1)?.key ?? null,
+  );
+  /** Said under grouped bars: each one is an average, not a session. */
+  readonly barsNote = computed(() => {
+    const grouping = this.volumeChart()?.grouping;
+    return grouping && grouping !== BarGroupings.Session
+      ? `workouts.volume.exercise.grouped.${grouping}`
+      : null;
   });
 
   /** The unit the chart's values are in, for its axis. */

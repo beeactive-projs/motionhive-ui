@@ -27,12 +27,13 @@ jobs:
           IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
           IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
           IOS_PROVISIONING_PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE }}
+          IOS_REST_TIMER_PROVISIONING_PROFILE: ${{ secrets.IOS_REST_TIMER_PROVISIONING_PROFILE }}
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           missing=0
-          for name in IOS_DIST_CERT_P12 IOS_DIST_CERT_PASSWORD IOS_PROVISIONING_PROFILE ASC_KEY_P8 ASC_KEY_ID ASC_ISSUER_ID; do
+          for name in IOS_DIST_CERT_P12 IOS_DIST_CERT_PASSWORD IOS_PROVISIONING_PROFILE IOS_REST_TIMER_PROVISIONING_PROFILE ASC_KEY_P8 ASC_KEY_ID ASC_ISSUER_ID; do
             if [ -z "${!name}" ]; then
               echo "::error::Secret $name is not set."
               missing=1
@@ -68,13 +69,16 @@ jobs:
           npx cap sync ios
 
       # Release is signed manually (project.pbxproj): the Apple Distribution
-      # certificate and the "MotionHive App Store" profile come from secrets
-      # and live in a throwaway keychain for this run only.
+      # certificate and two profiles come from secrets and live in a throwaway
+      # keychain for this run only. "MotionHive App Store" signs the app
+      # (fit.motionhive.app); "MotionHive Rest Timer App Store" signs the
+      # Live Activity widget inside it (fit.motionhive.app.RestTimer).
       - name: Install signing certificate & provisioning profile
         env:
           IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
           IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
           IOS_PROVISIONING_PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE }}
+          IOS_REST_TIMER_PROVISIONING_PROFILE: ${{ secrets.IOS_REST_TIMER_PROVISIONING_PROFILE }}
         run: |
           KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
           KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
@@ -90,6 +94,7 @@ jobs:
           for dir in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles" "$HOME/Library/MobileDevice/Provisioning Profiles"; do
             mkdir -p "$dir"
             echo "$IOS_PROVISIONING_PROFILE" | base64 --decode > "$dir/motionhive-app-store.mobileprovision"
+            echo "$IOS_REST_TIMER_PROVISIONING_PROFILE" | base64 --decode > "$dir/motionhive-rest-timer-app-store.mobileprovision"
           done
 
       # altool finds the key by its ID in ~/.appstoreconnect/private_keys. The

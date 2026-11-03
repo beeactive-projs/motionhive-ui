@@ -543,8 +543,39 @@ export function logMeta(log: WorkoutLog): string {
   if (duration) parts.push(duration);
   const sets = completedSetCount(log);
   if (sets > 0) parts.push(translate('count.sets', { count: sets }));
+  // What it moved, warm-ups left out, and its supersets (Workouts R2, 4d).
+  const volume = Math.round(
+    (log.exercises ?? []).reduce((sum, exercise) => sum + exerciseVolumeKg(exercise), 0),
+  );
+  if (volume > 0) {
+    parts.push(translate('workouts.units.kg', { value: new Intl.NumberFormat(appLocale()).format(volume) }));
+  }
+  const supersets = supersetCount(log);
+  if (supersets > 0) parts.push(translate('workouts.meta.supersets', { count: supersets }));
   if (log.feelingRating) parts.push(translate('workouts.meta.felt', { rating: log.feelingRating }));
   return parts.join(' · ');
+}
+
+/** Supersets in a workout: runs of two or more exercises sharing a group. */
+function supersetCount(log: WorkoutLog): number {
+  let count = 0;
+  let run = 0;
+  let group: number | null = null;
+  // In the workout's order: a list read may hand them back in any order.
+  const ordered = [...(log.exercises ?? [])].sort(
+    (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0),
+  );
+  for (const exercise of ordered) {
+    const next = exercise.supersetGroupId ?? null;
+    if (next !== null && next === group) {
+      run += 1;
+      if (run === 2) count += 1;
+    } else {
+      run = next === null ? 0 : 1;
+    }
+    group = next;
+  }
+  return count;
 }
 
 function completedSetCount(log: WorkoutLog): number {

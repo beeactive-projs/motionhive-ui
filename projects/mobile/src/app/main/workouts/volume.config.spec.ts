@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { ExerciseProgress, VolumeUnit, VolumeUnits, WorkoutVolume } from 'core';
+import { ExerciseProgress, VolumeUnit, VolumeUnits, WorkoutVolume, localDayKey, weekStart } from 'core';
 
 import {
   ExerciseMetrics,
   VolumeTrends,
   axisValue,
+  BarGroupings,
+  MAX_SESSION_BARS,
   barHeights,
   exerciseMetrics,
   exerciseVolumeRows,
@@ -15,8 +17,10 @@ import {
   formatWeekValue,
   pointsChangePercent,
   recordStillSince,
+  shortWeekValue,
   topSetPoints,
   topSetUnit,
+  volumeBars,
   volumePoints,
   weekBounds,
   weekSlots,
@@ -312,5 +316,57 @@ describe('volume', () => {
         dateTo: new Date(2026, 10, 2).toISOString(),
       });
     });
+  });
+});
+
+describe('shortWeekValue', () => {
+  it('says tonnes from a thousand kilograms, and the rest as it is', () => {
+    expect(shortWeekValue(4280, WeekMetrics.Volume)).toBe('4.3 t');
+    expect(shortWeekValue(11_240, WeekMetrics.Volume)).toBe('11.2 t');
+    expect(shortWeekValue(680, WeekMetrics.Volume)).toBe('680 kg');
+    expect(shortWeekValue(3, WeekMetrics.Workouts)).toBe('3');
+    expect(shortWeekValue(146, WeekMetrics.Time)).toBe('2h 26m');
+  });
+});
+
+describe('volumeBars', () => {
+  const NOW = new Date(2026, 10, 2, 20).getTime();
+  const point = (month: number, day: number, y: number) => ({ x: new Date(2026, month - 1, day, 18).getTime(), y });
+
+  it('draws a bar a session while they fit, the last one carrying its figure', () => {
+    const points = [point(10, 5, 1200), point(10, 12, 1500), point(10, 19, 1920)];
+    const { grouping, bars } = volumeBars(points, VolumeUnits.Kg, '12w', NOW);
+    expect(grouping).toBe(BarGroupings.Session);
+    expect(bars.map((bar) => bar.value)).toEqual([1200, 1500, 1920]);
+    expect(bars.map((bar) => bar.top)).toEqual(['', '', '1,920']);
+    expect(bars.at(-1)?.tick).not.toBe('');
+  });
+
+  it('says a hold as a time on top', () => {
+    const { bars } = volumeBars([point(10, 5, 390)], VolumeUnits.Seconds, '4w', NOW);
+    expect(bars[0].top).toBe('6:30');
+  });
+
+  it('past the limit, averages each week and keeps the empty ones', () => {
+    // Every day from 6 to 30 October: 100 a day, 200 in the last week.
+    const points = Array.from({ length: 25 }, (_, i) => point(10, 6 + i, 6 + i >= 26 ? 200 : 100));
+    expect(points.length).toBeGreaterThan(MAX_SESSION_BARS);
+    const { grouping, bars } = volumeBars(points, VolumeUnits.Kg, '12w', NOW);
+    expect(grouping).toBe(BarGroupings.Week);
+    const valueOf = (month: number, day: number) =>
+      bars.find((bar) => bar.key === localDayKey(weekStart(new Date(2026, month - 1, day))))?.value;
+    expect(valueOf(10, 28)).toBe(200);
+    expect(valueOf(10, 21)).toBe(100);
+    expect(valueOf(9, 16)).toBe(0);
+    expect(bars.length).toBeGreaterThanOrEqual(12);
+    expect(bars.every((bar) => !bar.top)).toBe(true);
+  });
+
+  it('over a year, averages each month', () => {
+    const points = Array.from({ length: 30 }, (_, i) => point(i < 15 ? 8 : 10, 1 + (i % 15), i < 15 ? 1000 : 1500));
+    const { grouping, bars } = volumeBars(points, VolumeUnits.Kg, '1y', NOW);
+    expect(grouping).toBe(BarGroupings.Month);
+    const valueOf = (month: number) => bars.find((bar) => bar.key === localDayKey(new Date(2026, month - 1, 1)))?.value;
+    expect([valueOf(8), valueOf(9), valueOf(10)]).toEqual([1000, 0, 1500]);
   });
 });

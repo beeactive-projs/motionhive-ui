@@ -64,6 +64,11 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/mh_notification_accent" />
 
+        <!-- The buttons on the workout's ongoing notification (RestLive.java). -->
+        <receiver
+            android:name=".RestLiveReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
