@@ -140,6 +140,9 @@ export class ExercisesStore {
 
   readonly showError = computed(() => this._error() && this._items().length === 0);
 
+  /** The last load failed, but rows from an earlier one are still showing. */
+  readonly isStale = computed(() => this._error() && this._items().length > 0);
+
   private readonly _isSettledEmpty = computed(
     () => this._loaded() && !this._loading() && !this._error() && this._items().length === 0,
   );

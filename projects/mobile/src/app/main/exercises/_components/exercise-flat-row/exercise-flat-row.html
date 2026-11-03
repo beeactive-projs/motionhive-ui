@@ -1,0 +1,49 @@
+<ion-item-sliding #sliding>
+  <!-- No chevron, as in every flat list: the whole row is the tap. -->
+  <ion-item detail="false" button (click)="select.emit()">
+    <!-- Decorative: the name it would announce is the very next thing in the row. -->
+    <mh-hex-avatar
+      slot="start"
+      size="lg"
+      tone="wash"
+      aria-hidden="true"
+      [color]="kindTone()"
+      [icon]="tileIcon()"
+      [imageUrl]="thumbnailUrl()"
+    />
+
+    <!-- The name owns the first line, and may take a second; whose it is
+         trails it. What it trains shares the last line with its level. -->
+    <ion-label>
+      <div class="mh-row-line name">
+        <h2>{{ name() }}</h2>
+        @if (ownership(); as chip) {
+          <span class="trail">
+            <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+          </span>
+        }
+      </div>
+      <div class="mh-row-line">
+        <p>{{ subline() }}</p>
+        @if (levelLabel(); as level) {
+          <ion-badge [attr.data-tone]="levelTone()">{{ level }}</ion-badge>
+        }
+      </div>
+    </ion-label>
+  </ion-item>
+
+  @if (swipeable()) {
+    <!-- Nothing here is `expandable`: a full swipe must never reach Delete. -->
+    <ion-item-options side="end">
+      <!-- Navy, the routine row's Edit. -->
+      <ion-item-option color="secondary" (click)="emitAndClose(sliding, edit)">
+        <ion-icon slot="top" name="create-outline" aria-hidden="true" />
+        {{ 'button.edit' | translate }}
+      </ion-item-option>
+      <ion-item-option color="danger" (click)="emitAndClose(sliding, remove)">
+        <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
+        {{ 'button.delete' | translate }}
+      </ion-item-option>
+    </ion-item-options>
+  }
+</ion-item-sliding>

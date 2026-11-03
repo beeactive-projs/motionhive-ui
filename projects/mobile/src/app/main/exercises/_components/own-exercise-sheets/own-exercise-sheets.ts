@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
@@ -33,6 +33,12 @@ import {
   templateUrl: './own-exercise-sheets.html',
 })
 export class OwnExerciseSheets {
+  /**
+   * The delete confirmation's body, as a key. A coach's exercise may sit in
+   * programs, so the library passes the coach's wording in coach mode.
+   */
+  readonly deleteBody = input('exercises.own.deleteBody');
+
   readonly created = output<Exercise>();
   readonly updated = output<Exercise>();
   /** The id of the exercise that is gone. */

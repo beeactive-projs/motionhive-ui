@@ -971,6 +971,7 @@
         "message": "Nu există încă exerciții disponibile. Încearcă din nou puțin mai târziu.",
         "title": "Biblioteca e goală"
       },
+      "filterBar": "Filtrează exercițiile",
       "loadError": "Biblioteca nu a putut fi încărcată",
       "meta": "{count, plural, one {# exercițiu} few {# exerciții} other {# de exerciții}} · sortare după {sort}",
       "mineEmpty": {
@@ -981,6 +982,10 @@
       },
       "newExercise": "Exercițiu nou",
       "noMatch": "Niciun exercițiu nu se potrivește cu ce ai cerut. Încearcă alt filtru sau o căutare mai scurtă.",
+      "results": {
+        "count": "{count, plural, one {# exercițiu} few {# exerciții} other {# de exerciții}}.",
+        "none": "Niciun exercițiu nu se potrivește."
+      },
       "search": "Caută exerciții",
       "searchPlaceholder": "Caută după nume"
     },

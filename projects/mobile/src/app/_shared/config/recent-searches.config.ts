@@ -4,15 +4,17 @@ import { DetailTile } from './detail-tiles.config';
  * The people a search ended on, kept on the device so the next search can
  * open on them, as Messenger's does.
  *
- * A recent is a person, not the text that was typed: every result on these
- * screens is a person, so a row that opens Ana beats one that types "an"
- * back in. The snapshot is what the row draws (name, avatar, the line under
- * it); the screen re-reads the person from the server when it opens.
+ * A recent is what a search ended on, not the text that was typed: a row
+ * that opens Ana beats one that types "an" back in. On most screens that is a
+ * person; on Exercises it is an exercise, drawn with its tile. The snapshot is
+ * what the row draws (name, avatar, the line under it); the screen re-reads
+ * the record from the server when it opens.
  */
 export interface RecentPerson {
-  /** The person's user id. */
+  /** The person's user id, or the exercise's id. */
   id: string;
   name: string;
+  /** A person's avatar, or an exercise's photo. */
   avatarUrl: string | null;
   /** The second line: an email, a handle. Null shows the name alone. */
   subline: string | null;
@@ -21,6 +23,11 @@ export interface RecentPerson {
    * coach directory) rather than by user id.
    */
   handle?: string | null;
+  /**
+   * A tile in place of the initials, for a recent that is not a person (an
+   * exercise's kind). A photo in `avatarUrl` still wins over its glyph.
+   */
+  tile?: DetailTile | null;
 }
 
 /**
@@ -31,8 +38,6 @@ export interface RecentPerson {
 export interface SuggestedPerson extends RecentPerson {
   /** Translated status ("Invited", "Request"). Set only while it is waiting. */
   pendingLabel?: string | null;
-  /** A tile in place of the avatar, for someone with no account yet. */
-  tile?: DetailTile | null;
   /**
    * What the avatar's colour is keyed on, when that is not `id`: a pending
    * request is keyed by the request, but its list row is coloured by the
@@ -53,6 +58,7 @@ export const RecentSearchScopes = {
   Messages: 'messages',
   Clients: 'clients',
   Coaches: 'coaches',
+  Exercises: 'exercises',
 } as const;
 
 export type RecentSearchScope = (typeof RecentSearchScopes)[keyof typeof RecentSearchScopes];
@@ -93,6 +99,13 @@ function isRecentPerson(value: unknown): value is RecentPerson {
     typeof entry['id'] === 'string' &&
     typeof entry['name'] === 'string' &&
     (entry['avatarUrl'] === null || typeof entry['avatarUrl'] === 'string') &&
-    (entry['subline'] === null || typeof entry['subline'] === 'string')
+    (entry['subline'] === null || typeof entry['subline'] === 'string') &&
+    (entry['tile'] === undefined || entry['tile'] === null || isTile(entry['tile']))
   );
+}
+
+function isTile(value: unknown): value is DetailTile {
+  if (typeof value !== 'object' || value === null) return false;
+  const tile = value as Record<string, unknown>;
+  return typeof tile['icon'] === 'string' && typeof tile['color'] === 'string';
 }

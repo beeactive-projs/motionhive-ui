@@ -1,0 +1,32 @@
+/* Layout, type and the swipe options come from the flat-list skin
+   (`theme/components/ion-list.css`); this file only lets the name wrap. */
+:host {
+  display: block;
+}
+
+/* The one flat-list title that wraps (user decision, 2026-11-03): in
+   Romanian three names in four outgrow a line at phone width, and a list
+   where every name ends in an ellipsis cannot be told apart. Two lines, then
+   the ellipsis. Each line is a whole `--mh-row-line`, so a wrapped row is
+   exactly 6rem and every separator below it stays on the pixel grid. */
+ion-label > .name {
+  block-size: auto;
+  min-block-size: var(--mh-row-line);
+  align-items: flex-start;
+}
+
+ion-label > .name h2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  line-height: var(--mh-row-line);
+}
+
+/* The badge stays on the first line, centred on it, where a time would sit;
+   a wrapped name runs on under it. */
+.trail {
+  display: flex;
+  align-items: center;
+  block-size: var(--mh-row-line);
+}

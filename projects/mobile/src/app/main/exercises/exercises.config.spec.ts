@@ -19,11 +19,13 @@ import {
   MAX_NAME_LENGTH,
 } from './exercise-draft';
 import {
+  BadgeTones,
   OWN_EXERCISE_ACTIONS,
   OwnExerciseActionIds,
   SIMPLE_KINDS,
   TRAINEE_OWNERSHIP_PILLS,
   TaxonomyChip,
+  announceResults,
   collapsedChips,
   exerciseDetailRows,
   exerciseSubline,
@@ -32,6 +34,7 @@ import {
   isOwnExercise,
   normalizeExerciseName,
   ownershipChip,
+  recentFromExercise,
   toggleCapped,
   trackLabel,
 } from './exercises.config';
@@ -209,6 +212,11 @@ describe('your own exercises in the library', () => {
     expect(ownershipChip(own(), 'someone-else')).toBeNull();
   });
 
+  // Honey is for actions and selection; "yours" is violet, as "Your coach" is.
+  it('marks your own exercise in violet, never honey', () => {
+    expect(ownershipChip(own(), ME)?.tone).toBe(BadgeTones.Violet);
+  });
+
   it('offers Edit, then Delete as the one destructive verb', () => {
     expect(OWN_EXERCISE_ACTIONS.map((action) => action.id)).toEqual([
       OwnExerciseActionIds.Edit,
@@ -217,6 +225,27 @@ describe('your own exercises in the library', () => {
     expect(OWN_EXERCISE_ACTIONS.filter((action) => action.destructive).map((a) => a.id)).toEqual([
       OwnExerciseActionIds.Delete,
     ]);
+  });
+});
+
+describe('the library\'s search', () => {
+  // A recent looks like the row it was opened from: the photo where there
+  // is one, the kind's tile where there is not.
+  it('keeps an exercise as a recent with its facts line and tile', () => {
+    expect(recentFromExercise(exercise())).toEqual({
+      id: 'ex-1',
+      name: 'Bench press',
+      avatarUrl: null,
+      subline: 'Strength',
+      tile: { icon: 'flash-outline', color: 'warning' },
+    });
+    expect(recentFromExercise(exercise({ thumbnailUrl: 'start.jpg' })).avatarUrl).toBe('start.jpg');
+  });
+
+  it('announces the whole result, not the page loaded so far', () => {
+    expect(announceResults(0)).toBe('No exercises match that.');
+    expect(announceResults(1)).toBe('1 exercise.');
+    expect(announceResults(42)).toBe('42 exercises.');
   });
 });
 

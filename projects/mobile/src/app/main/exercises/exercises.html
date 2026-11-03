@@ -1,148 +1,239 @@
-@if (searchOpen()) {
-<!-- Search owns the toolbar while it is open: a title, three actions and a
-     pill row do not fit above the fold beside a field. Same as the inbox and
-     the clients directory. -->
+<!-- The Clients header: back, the title, the bell and the honey "+", a search
+     field that is always there, then the Filters chip and the ownership
+     pills. Searching folds the title and the pills away and keeps the same
+     field, so the caret the tap put there stays. They fold rather than
+     vanish, so the field glides up to its place. -->
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'exercises.library.searchPlaceholder' | translate"
-      inputmode="search" [debounce]="0" [value]="searchInput()"
-      (ionInput)="onQuery($event.detail.value ?? '')" />
-    <ion-buttons slot="end">
-      <ion-button (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-} @else {
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
-    </ion-buttons>
-    <ion-title>{{ 'nav.exercises' | translate }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button shape="round" [attr.aria-label]="'exercises.library.search' | translate"
-        (click)="openSearch()">
-        <ion-icon slot="icon-only" name="search-outline" />
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+  @if (!searchOpen()) {
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
+      <ion-buttons slot="start">
+        <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
+      </ion-buttons>
+      <ion-title>{{ 'nav.exercises' | translate }}</ion-title>
+      <ion-buttons slot="end">
+        <mh-notification-bell />
+        <!-- The one filled control in the header: making an exercise is the
+             page's primary action, as inviting is on Clients. Everyone can:
+             a coach in coach mode through the wizard, anyone else through the
+             short form, private to them. -->
+        <ion-button
+          class="round"
+          shape="round"
+          fill="solid"
+          color="primary"
+          [attr.aria-label]="'exercises.library.newExercise' | translate"
+          (click)="create()"
+        >
+          <ion-icon slot="icon-only" name="add-outline" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  }
 
   <ion-toolbar>
-    <!-- Scrolls sideways rather than wrapping, same strip as the sessions
-         page: the filter trigger leads it, and the count beside its glyph is the
-         thing you need to know before you wonder why the list is short. -->
-    <div class="mh-chip-row">
-      <ion-button class="chip filters" fill="clear" shape="round" size="small" aria-haspopup="dialog"
-        [class.selected]="store.activeFilterCount() > 0"
-        [attr.aria-label]="'a11y.filters' | translate: { count: store.activeFilterCount() }"
-        (click)="openFilters()">
-        <ion-icon name="options-outline" aria-hidden="true" />
-        @if (store.activeFilterCount() > 0) {
-        <span class="count">{{ store.activeFilterCount() }}</span>
+    @if (searchOpen()) {
+      <ion-buttons
+        slot="start"
+        (animate.enter)="fold.backIn($event)"
+        (animate.leave)="fold.backOut($event)"
+      >
+        <ion-button [attr.aria-label]="'a11y.closeSearch' | translate" (click)="closeSearch()">
+          <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+        </ion-button>
+      </ion-buttons>
+    }
+    <!-- No `mhAutofocus`: this field is on screen from the start, and focusing
+         it is what opens search. The page debounces the term, not Ionic, so
+         closing search can drop a keystroke still on its way. -->
+    <ion-searchbar
+      class="mh-search-pill"
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      inputmode="search"
+      [placeholder]="'exercises.library.search' | translate"
+      [attr.aria-label]="'exercises.library.search' | translate"
+      [debounce]="0"
+      [value]="searchInput()"
+      (ionFocus)="openSearch()"
+      (ionInput)="onQuery($event.detail.value ?? '')"
+    />
+  </ion-toolbar>
+
+  @if (!searchOpen() && !store.isEmpty()) {
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'exercises.library.filterBar' | translate">
+        <!-- One thing on at a time: the sheet's picks, or a pill. Picking a
+             pill sets the picks aside (the sheet reopens on them); applying
+             picks puts the pill back on All. -->
+        <ion-button
+          class="chip filters"
+          fill="clear"
+          shape="round"
+          size="small"
+          aria-haspopup="dialog"
+          [class.selected]="store.activeFilterCount() > 0"
+          [attr.aria-label]="'a11y.filters' | translate: { count: store.activeFilterCount() }"
+          (click)="openFilters()"
+        >
+          <ion-icon name="options-outline" aria-hidden="true" />
+          @if (store.activeFilterCount() > 0) {
+            <span class="count">{{ store.activeFilterCount() }}</span>
+          }
+        </ion-button>
+
+        @for (pill of pills(); track pill.value) {
+          <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
+               reader reads it as text and never says which one is on. -->
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="store.isOwnershipOn(pill.value)"
+            [attr.aria-pressed]="store.isOwnershipOn(pill.value)"
+            (click)="setOwnership(pill.value)"
+          >
+            {{ pill.label }}
+          </ion-button>
         }
-      </ion-button>
-
-      @for (pill of pills(); track pill.value) {
-      <ion-chip [class.selected]="store.isOwnershipOn(pill.value)"
-        [attr.aria-pressed]="store.isOwnershipOn(pill.value)" (click)="setOwnership(pill.value)">
-        {{ pill.label }}
-      </ion-chip>
-      }
-    </div>
-  </ion-toolbar>
+      </div>
+    </ion-toolbar>
+  }
 </ion-header>
-}
 
-<ion-content [fullscreen]="true">
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
-    <ion-refresher-content />
-  </ion-refresher>
+<!-- A flat list: the rows run edge to edge on the page, and the loading,
+     empty and error states sit on the same page. -->
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <!-- The toolbar shows the page's name but `ion-title` is not a heading. -->
+  <h1 class="mh-visually-hidden">{{ 'nav.exercises' | translate }}</h1>
+
+  <!-- A search, a pill or the sheet is silent otherwise: the list simply
+       becomes shorter. Polite, and only once the result is the final one. -->
+  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
+
+  @if (!searchOpen()) {
+    <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher-content />
+    </ion-refresher>
+  }
+
+  @if (store.isStale()) {
+    <mh-stale-bar (retry)="retry()" />
+  }
 
   @if (store.showError()) {
-  <mh-empty-state icon="alert-circle-outline" [heading]="'exercises.library.loadError' | translate"
-    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
-    (action)="retry()" />
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'exercises.library.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (showSearchStart()) {
+    <mh-search-start
+      [recents]="recents.entries()"
+      (select)="openRecent($event)"
+      (remove)="removeRecent($event)"
+      (clearAll)="clearRecents()"
+    />
   } @else if (store.showSkeleton()) {
-  <!-- Mirrors the row shape so nothing shifts when the rows land. -->
-  <div class="mh-page">
-    <span class="mh-kicker meta">
-      <ion-skeleton-text [animated]="true" style="width: 11rem; height: 0.75rem" />
-    </span>
-    <ion-list [inset]="true" class="mh-card-list">
+    <!-- The real rows' geometry, so nothing shifts when data lands. -->
+    <ion-list class="mh-flat-list" aria-busy="true">
       @for (_ of skeletonRows; track $index) {
-      <ion-item>
-        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 65%" /></p>
-        </ion-label>
-      </ion-item>
+        <mh-row-skeleton [index]="$index" />
       }
     </ion-list>
-  </div>
   } @else if (isMineEmpty()) {
-  @if (canAuthor()) {
-  <!-- The catalogue is the reason this is not a dead end: 700+ movements are
-       already there, so writing one is a choice, not a chore you owe. -->
-  <mh-empty-state icon="flash-outline" [heading]="'exercises.library.mineEmpty.title' | translate"
-    [message]="'exercises.library.mineEmpty.message' | translate"
-    [actionLabel]="'exercises.library.mineEmpty.action' | translate" (action)="create()" />
-  <div class="secondary-action">
-    <ion-button fill="clear" size="small" (click)="browsePublic()">
-      {{ 'exercises.library.mineEmpty.browse' | translate }}
-    </ion-button>
-  </div>
-  } @else {
-  <!-- No fork for a trainee, so no second way out: the catalogue is one pill
-       away, and the reason to be here is the one it lacks. -->
-  <mh-empty-state icon="flash-outline" [heading]="'exercises.library.mineEmpty.title' | translate"
-    [message]="'exercises.own.emptyMessage' | translate"
-    [actionLabel]="'exercises.own.emptyAction' | translate" (action)="create()" />
-  }
+    @if (canAuthor()) {
+      <!-- The catalogue is the reason this is not a dead end: 700+ movements
+           are already there, so writing one is a choice, not a chore you owe. -->
+      <mh-empty-state
+        icon="flash-outline"
+        [heading]="'exercises.library.mineEmpty.title' | translate"
+        [message]="'exercises.library.mineEmpty.message' | translate"
+        [actionLabel]="'exercises.library.mineEmpty.action' | translate"
+        (action)="create()"
+      />
+      <div class="secondary-action">
+        <ion-button fill="clear" size="small" (click)="browsePublic()">
+          {{ 'exercises.library.mineEmpty.browse' | translate }}
+        </ion-button>
+      </div>
+    } @else {
+      <!-- No fork for a trainee, so no second way out: the catalogue is one
+           pill away, and the reason to be here is the one it lacks. -->
+      <mh-empty-state
+        icon="flash-outline"
+        [heading]="'exercises.library.mineEmpty.title' | translate"
+        [message]="'exercises.own.emptyMessage' | translate"
+        [actionLabel]="'exercises.own.emptyAction' | translate"
+        (action)="create()"
+      />
+    }
   } @else if (store.isFilteredEmpty()) {
-  @if (store.createName(); as name) {
-  <!-- Nothing by that name: the way to make it, before the way back out. -->
-  <div class="mh-page">
-    <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
-  </div>
-  }
-  <mh-empty-state icon="search-outline" [heading]="'empty.nothingMatches' | translate"
-    [message]="'exercises.library.noMatch' | translate"
-    [actionLabel]="'button.clearFilters' | translate" (action)="clearNarrowing()" />
+    @if (store.createName(); as name) {
+      <!-- Nothing by that name: the way to make it, before the way back out. -->
+      <div class="create">
+        <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+      </div>
+    }
+    <mh-empty-state
+      icon="search-outline"
+      [heading]="'empty.nothingMatches' | translate"
+      [message]="'exercises.library.noMatch' | translate"
+      [actionLabel]="'button.clearFilters' | translate"
+      (action)="clearNarrowing()"
+    />
   } @else if (store.isEmpty()) {
-  <mh-empty-state icon="barbell-outline" [heading]="'exercises.library.empty.title' | translate"
-    [message]="'exercises.library.empty.message' | translate"
-    [actionLabel]="'button.tryAgain' | translate" (action)="retry()" />
+    <mh-empty-state
+      icon="barbell-outline"
+      [heading]="'exercises.library.empty.title' | translate"
+      [message]="'exercises.library.empty.message' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
   } @else {
-  <div class="mh-page">
-    <span class="mh-kicker meta">{{ metaLabel() }}</span>
-    <ion-list [inset]="true" class="mh-card-list">
+    <!-- "887 exercises · sorted by name": how big the thing you are
+         scrolling is. A label, so it is the seam over the first row. -->
+    <div class="mh-section-label">{{ metaLabel() }}</div>
+    <ion-list class="mh-flat-list">
       @for (exercise of store.items(); track exercise.id) {
-      <mh-exercise-row [exercise]="exercise" [myUserId]="myUserId()" [showMenu]="hasMenu(exercise)"
-        (select)="open(exercise)" (menu)="openMenu(exercise)" />
+        <mh-exercise-flat-row
+          [exercise]="exercise"
+          [myUserId]="myUserId()"
+          [swipeable]="isOwn(exercise)"
+          [showOwnership]="onAll()"
+          (select)="open(exercise)"
+          (edit)="edit(exercise)"
+          (remove)="confirmDelete(exercise)"
+        />
       }
     </ion-list>
     <!-- Near matches above, none by that exact name: the way to make it. -->
     @if (store.createName(); as name) {
-    <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+      <div class="create">
+        <mh-create-exercise-row [query]="name" (create)="createFromSearch(name)" />
+      </div>
     }
-  </div>
 
-  <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
-    <ion-infinite-scroll-content />
-  </ion-infinite-scroll>
+    <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
   }
-
-  <!-- Everyone can make an exercise now: a coach in coach mode through the
-       wizard, anyone else through the short form, private to them. -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button [attr.aria-label]="'exercises.library.newExercise' | translate" (click)="create()">
-      <ion-icon name="add-outline" />
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>
 
-<mh-exercise-filter-sheet [(open)]="filterOpen" [filters]="store.sheetDraft()" [facets]="store.facets()"
-  [ownership]="store.ownership()" [search]="store.search()" (applied)="applyFilters($event)" />
+<mh-exercise-filter-sheet
+  [(open)]="filterOpen"
+  [filters]="store.sheetDraft()"
+  [facets]="store.facets()"
+  [ownership]="store.ownership()"
+  [search]="store.search()"
+  (applied)="applyFilters($event)"
+/>
 
-<mh-own-exercise-sheets (created)="onCreated()" (updated)="onChanged()" (deleted)="onChanged()" />
+<mh-own-exercise-sheets
+  [deleteBody]="deleteBody()"
+  (created)="onCreated()"
+  (updated)="onChanged()"
+  (deleted)="onDeleted($event)"
+/>

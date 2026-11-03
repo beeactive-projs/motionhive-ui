@@ -6,6 +6,7 @@ import {
   cameraOutline,
   checkmarkCircle,
   checkmarkOutline,
+  chevronBackOutline,
   closeCircleOutline,
   createOutline,
   ellipsisHorizontal,
@@ -48,6 +49,7 @@ import {
   HexAvatarTone,
   HexAvatarTones,
 } from '../../_shared/components/hex-avatar/hex-avatar';
+import { RecentPerson } from '../../_shared/config/recent-searches.config';
 
 /**
  * Every icon the exercise screens render. Each page calls
@@ -62,6 +64,7 @@ export const EXERCISE_ICONS = {
   bodyOutline,
   checkmarkCircle,
   checkmarkOutline,
+  chevronBackOutline,
   closeCircleOutline,
   createOutline,
   ellipsisHorizontal,
@@ -360,8 +363,9 @@ export function musclesByRole(exercise: Exercise, role: MuscleRole): string[] {
 /**
  * The ownership chip on a row. Exceptions only: a System exercise is the
  * default case in a catalogue of 800, and labelling every row "system"
- * would say nothing. Mine wears the amber wash, someone else's public
- * exercise the sky one.
+ * would say nothing. Mine wears the violet wash, the colour of what is yours
+ * (the coach directory's "Your coach"); honey is for actions and selection,
+ * never a status. Someone else's public exercise wears the sky one.
  */
 export interface OwnershipChip {
   label: string;
@@ -371,7 +375,7 @@ export interface OwnershipChip {
 export function ownershipChip(exercise: Exercise, myUserId: string | null): OwnershipChip | null {
   if (exercise.source === ExerciseSource.System) return null;
   if (isOwnExercise(exercise, myUserId)) {
-    return { label: translate('exercises.row.mine'), tone: BadgeTones.Honey };
+    return { label: translate('exercises.row.mine'), tone: BadgeTones.Violet };
   }
   // Someone else's own exercise is private to them; it never reaches this
   // list, and if it did, "Public" would be a lie.
@@ -393,6 +397,31 @@ export function resultMetaLabel(total: number, sort: ExerciseSortKey): string {
     count: total,
     sort: translate(`${sortKey(sort)}.inline`),
   });
+}
+
+/**
+ * What a screen reader hears once a search, a pill or the sheet settles:
+ * "12 exercises." over the whole result, not the page loaded so far.
+ */
+export function announceResults(total: number): string {
+  return total === 0
+    ? translate('exercises.library.results.none')
+    : translate('exercises.library.results.count', { count: total });
+}
+
+/**
+ * An exercise as the library's recent searches keep it: the name, the facts
+ * line its row shows, and its tile (the photo where it has one, the kind's
+ * glyph where it has not), so a recent looks like the row it was opened from.
+ */
+export function recentFromExercise(exercise: Exercise): RecentPerson {
+  return {
+    id: exercise.id,
+    name: exercise.name,
+    avatarUrl: exercise.thumbnailUrl || null,
+    subline: exerciseSubline(exercise),
+    tile: { icon: kindIcon(exercise.kind), color: kindTone(exercise.kind) },
+  };
 }
 
 // ── Detail copy ─────────────────────────────────────────────────────────────

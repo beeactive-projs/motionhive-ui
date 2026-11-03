@@ -6,21 +6,15 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonHeader,
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
@@ -39,18 +33,29 @@ import {
 } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
-import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
+import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
+import { SearchStart } from '../../_shared/components/search-start/search-start';
+import { StaleBar } from '../../_shared/components/stale-bar/stale-bar';
+import {
+  RecentPerson,
+  RecentSearchScopes,
+  SuggestedPerson,
+} from '../../_shared/config/recent-searches.config';
 import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
-import { ExerciseRow } from './_components/exercise-row/exercise-row';
+import { SearchHeaderFold } from '../../_shared/utils/fold';
+import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { CreateExerciseRow } from './_components/create-exercise-row/create-exercise-row';
+import { ExerciseFlatRow } from './_components/exercise-flat-row/exercise-flat-row';
 import { OwnExerciseSheets } from './_components/own-exercise-sheets/own-exercise-sheets';
 import { ExerciseFilterSheet } from './_sheets/exercise-filter-sheet/exercise-filter-sheet';
 import {
   COACH_OWNERSHIP_PILLS,
   EXERCISE_ICONS,
   TRAINEE_OWNERSHIP_PILLS,
+  announceResults,
   isOwnExercise,
+  recentFromExercise,
   resultMetaLabel,
 } from './exercises.config';
 import { ExerciseFilters, ExercisesStore } from './exercises.store';
@@ -59,14 +64,16 @@ import { ExerciseFilters, ExercisesStore } from './exercises.store';
 const SEARCH_DEBOUNCE_MS = 300;
 
 /**
- * The exercise library — a pushed page off the menu, for both roles.
+ * The exercise library — a pushed page off the menu, for both roles, laid
+ * out like the Clients tab: one flat list (`mh-flat-list`) under a search
+ * field that is always there and the Filters chip and ownership pills.
  *
  * A coach comes here to keep the movements their programs are built from: to
  * find one, to copy a public one into their own library, to write one the
  * catalogue does not have. A trainee comes to look something up, and to make
- * the odd one the catalogue lacks for their own training: the same create
- * button opens the short form instead of the coach's wizard, their own rows
- * carry a ⋯ to edit or delete them, and "Mine" lists them.
+ * the odd one the catalogue lacks for their own training: the same "+" opens
+ * the short form instead of the coach's wizard, and "Mine" lists them.
+ * Either way an exercise of your own swipes to Edit and Delete.
  *
  * The full form is gated on coach *mode*, not just the instructor role: a
  * coach in train mode is a trainee for as long as they are in it, and gets
@@ -78,31 +85,27 @@ const SEARCH_DEBOUNCE_MS = 300;
     CreateExerciseRow,
     EmptyState,
     ExerciseFilterSheet,
-    ExerciseRow,
-    HexAvatar,
+    ExerciseFlatRow,
     IonBackButton,
     IonButton,
     IonButtons,
-    IonChip,
     IonContent,
-    IonFab,
-    IonFabButton,
     IonHeader,
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
-    IonLabel,
     IonList,
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonSkeletonText,
     IonTitle,
     IonToolbar,
+    NotificationBell,
     OwnExerciseSheets,
-    SearchbarAutofocusDirective,
+    RowSkeleton,
+    SearchStart,
     SearchbarLabelDirective,
+    StaleBar,
     TranslatePipe,
   ],
   templateUrl: './exercises.html',
@@ -115,9 +118,17 @@ export class Exercises implements ViewWillEnter {
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _exerciseTaxonomyStore = inject(ExerciseTaxonomyStore);
   private readonly _router = inject(Router);
+  private readonly _searchbar = viewChild(IonSearchbar);
 
-  readonly skeletonRows = [1, 2, 3, 4, 5, 6];
+  /** Exercise names are translated, so the list is kept per language too. */
+  readonly recents = injectRecentSearches(RecentSearchScopes.Exercises, { perLanguage: true });
 
+  /** Folds the title, the pills and the back chevron as search opens and closes. */
+  readonly fold = new SearchHeaderFold();
+
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  /** Focusing the search field folds the title and the pills away. */
   readonly searchOpen = signal(false);
   readonly filterOpen = signal(false);
 
@@ -142,6 +153,14 @@ export class Exercises implements ViewWillEnter {
 
   readonly metaLabel = computed(() => resultMetaLabel(this.store.total(), this.store.sort()));
 
+  /** The one slice that mixes owners, so the only one whose rows say whose they are. */
+  readonly onAll = computed(() => this.store.ownership() === ExerciseOwnershipFilter.All);
+
+  /** A coach's exercise may sit in programs, so its delete says what happens to them. */
+  readonly deleteBody = computed(() =>
+    this.canAuthor() ? 'exercises.edit.deleteConfirm.body' : 'exercises.own.deleteBody',
+  );
+
   /** Where Back goes when the page is opened cold from a deep link. */
   readonly backHref = '/tabs/more';
 
@@ -157,6 +176,32 @@ export class Exercises implements ViewWillEnter {
       this.store.isFilteredEmpty(),
   );
 
+  /**
+   * Search is open and nothing is typed yet: the exercises the last searches
+   * ended on, as Clients opens its search. With none of them the list stays,
+   * which is still something to search through.
+   */
+  readonly showSearchStart = computed(
+    () =>
+      this.searchOpen() && !this.searchInput().trim() && this.recents.entries().length > 0,
+  );
+
+  /**
+   * What a screen reader is told once a search, a pill or the sheet settles.
+   * Empty while a term is still on its way, and empty when nothing narrows
+   * the list, where the count is just the catalogue's size.
+   */
+  readonly resultAnnouncement = computed(() => {
+    const term = this.searchInput().trim();
+    const narrowing =
+      !!term ||
+      this.store.ownership() !== ExerciseOwnershipFilter.All ||
+      this.store.activeFilterCount() > 0;
+    const settled = term === this.store.search() && !this.store.loading();
+    if (!narrowing || !settled || this.store.showSkeleton()) return '';
+    return announceResults(this.store.total());
+  });
+
   constructor() {
     addIcons(EXERCISE_ICONS);
     // The filter sheet renders muscle and equipment names, and the create
@@ -168,7 +213,6 @@ export class Exercises implements ViewWillEnter {
     this._searchTerms
       .pipe(debounceTime(SEARCH_DEBOUNCE_MS), takeUntilDestroyed())
       .subscribe((term) => this.store.setSearch(term));
-
   }
 
   // Not ngOnInit: Ionic keeps the page alive in the tab stack, and an
@@ -182,14 +226,30 @@ export class Exercises implements ViewWillEnter {
     this.store.setOwnership(value);
   }
 
+  /**
+   * Search covers the whole library: the pills fold away with the title, so
+   * a pill left on would narrow the results with nothing on screen saying
+   * so. All sets the sheet's picks aside too; the sheet reopens on them.
+   */
   openSearch(): void {
+    if (this.searchOpen()) return;
+    this.fold.arm();
     this.searchOpen.set(true);
+    if (!this.store.isOwnershipOn(ExerciseOwnershipFilter.All)) {
+      this.store.setOwnership(ExerciseOwnershipFilter.All);
+    }
   }
 
   closeSearch(): void {
+    this.fold.arm();
     this.searchOpen.set(false);
     this._clearSearch();
     this.store.setSearch('');
+    // Otherwise the field keeps focus, the keyboard stays up, and the next
+    // tap on it fires no focus event to open search again.
+    void this._searchbar()
+      ?.getInputElement()
+      .then((input) => input.blur());
   }
 
   onQuery(value: string): void {
@@ -205,14 +265,32 @@ export class Exercises implements ViewWillEnter {
     this.store.setFilters(filters);
   }
 
+  /** Drops the pill, the sheet's picks and the search together. */
   clearNarrowing(): void {
+    this.fold.arm();
     this.searchOpen.set(false);
     this._clearSearch();
     this.store.clearNarrowing();
   }
 
   open(exercise: Exercise): void {
+    // An exercise opened from search is where that search ended.
+    if (this.searchOpen()) this.recents.push(recentFromExercise(exercise));
     void this._router.navigate(['/tabs/exercises', exercise.id]);
+  }
+
+  /** A recent: remembered again, so it moves to the top, then its page. */
+  openRecent(entry: SuggestedPerson): void {
+    this.recents.push(entry);
+    void this._router.navigate(['/tabs/exercises', entry.id]);
+  }
+
+  removeRecent(entry: RecentPerson): void {
+    this.recents.remove(entry.id);
+  }
+
+  clearRecents(): void {
+    this.recents.clear();
   }
 
   /** From a search that found nothing by that name: the form starts from it. */
@@ -233,13 +311,22 @@ export class Exercises implements ViewWillEnter {
     this._ownSheets()?.create();
   }
 
-  /** Outside coach mode your own rows get the ⋯; a coach edits from the exercise's page. */
-  hasMenu(exercise: Exercise): boolean {
-    return !this.canAuthor() && isOwnExercise(exercise, this.myUserId());
+  /** You made it, so you can change it or delete it: the row swipes. */
+  isOwn(exercise: Exercise): boolean {
+    return isOwnExercise(exercise, this.myUserId());
   }
 
-  openMenu(exercise: Exercise): void {
-    this._ownSheets()?.menu(exercise);
+  /** The form that made it: the coach's edit page in coach mode, the short form elsewhere. */
+  edit(exercise: Exercise): void {
+    if (this.canAuthor()) {
+      void this._router.navigate(['/tabs/exercises', exercise.id, 'edit']);
+      return;
+    }
+    this._ownSheets()?.edit(exercise);
+  }
+
+  confirmDelete(exercise: Exercise): void {
+    this._ownSheets()?.confirmDelete(exercise);
   }
 
   /** Made from here: show it where it now lives, among your own. */
@@ -252,11 +339,21 @@ export class Exercises implements ViewWillEnter {
     this.store.refresh();
   }
 
+  /** Gone, so it stops being a shortcut as well. */
+  onDeleted(id: string): void {
+    this.recents.remove(id);
+    this.store.refresh();
+  }
+
   /** From the coach's empty Mine state — the fastest library is somebody else's. */
   browsePublic(): void {
     this.store.setOwnership(ExerciseOwnershipFilter.PublicOthers);
   }
 
+  /**
+   * A refresh that fails leaves the rows that were already there, and the
+   * stale bar above the list says so and offers the retry.
+   */
   onRefresh(event: RefresherCustomEvent): void {
     this.store.refresh(() => void event.target.complete());
   }

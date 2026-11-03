@@ -15,6 +15,7 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
 /**
  * What an open search shows before anything is typed, after Messenger: the
  * last few people a search ended on, then a strip of people worth a tap.
+ * Exercises uses the recents alone, for the exercises a search ended on.
  *
  * Laid out as a grouped flat list (`mh-section-label` + `mh-flat-list`), so
  * it sits straight in `ion-content` like the results that replace it. Either

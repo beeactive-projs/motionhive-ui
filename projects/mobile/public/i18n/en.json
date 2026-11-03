@@ -971,6 +971,7 @@
         "message": "No exercises are available yet. Try again in a moment.",
         "title": "The library is empty"
       },
+      "filterBar": "Filter exercises",
       "loadError": "Couldn't load the library",
       "meta": "{count, plural, one {# exercise} other {# exercises}} · sorted by {sort}",
       "mineEmpty": {
@@ -981,6 +982,10 @@
       },
       "newExercise": "New exercise",
       "noMatch": "No exercise matches what you asked for. Try a different filter or a shorter search.",
+      "results": {
+        "count": "{count, plural, one {# exercise} other {# exercises}}.",
+        "none": "No exercises match that."
+      },
       "search": "Search exercises",
       "searchPlaceholder": "Search by name"
     },

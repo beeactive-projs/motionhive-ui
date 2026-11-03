@@ -1,6 +1,6 @@
 import { Signal, computed, inject, signal } from '@angular/core';
 
-import { AuthStore } from 'core';
+import { AuthStore, appLanguage } from 'core';
 
 import {
   RecentPerson,
@@ -28,14 +28,25 @@ export interface RecentSearches {
  * Storage that refuses to read or write costs the shortcut and nothing else,
  * so every access is guarded.
  *
+ * `perLanguage` keys the list by language as well, for entries whose names
+ * are translated (exercises): after a switch the shortcut starts empty rather
+ * than showing names in the old language. A person's name is the same in
+ * both, so the people screens leave it off.
+ *
  * Call from an injection context.
  */
-export function injectRecentSearches(scope: RecentSearchScope): RecentSearches {
+export function injectRecentSearches(
+  scope: RecentSearchScope,
+  { perLanguage = false }: { perLanguage?: boolean } = {},
+): RecentSearches {
   const authStore = inject(AuthStore);
 
   /** Bumped on every write so `entries` re-reads storage. */
   const version = signal(0);
-  const key = computed(() => `${STORAGE_PREFIX}.${scope}.${authStore.user()?.id ?? 'anonymous'}`);
+  const key = computed(() => {
+    const base = `${STORAGE_PREFIX}.${scope}.${authStore.user()?.id ?? 'anonymous'}`;
+    return perLanguage ? `${base}.${appLanguage()}` : base;
+  });
 
   const entries = computed(() => {
     version();

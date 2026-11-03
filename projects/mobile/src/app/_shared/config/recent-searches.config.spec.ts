@@ -41,4 +41,14 @@ describe('recent searches', () => {
       ),
     ).toEqual(['a', 'c']);
   });
+
+  // An exercise recent carries its kind's tile; a broken one is dropped.
+  it('reads a tile back only when it is whole', () => {
+    const tiled = { ...person('a'), tile: { icon: 'flash-outline', color: 'warning' } };
+    const broken = { ...person('b'), tile: { icon: 'flash-outline' } };
+    expect(parseRecents([tiled, broken, { ...person('c'), tile: null }]).map((entry) => entry.id)).toEqual([
+      'a',
+      'c',
+    ]);
+  });
 });
