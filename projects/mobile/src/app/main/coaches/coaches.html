@@ -1,74 +1,252 @@
+<!-- The Clients header: back, the title and the bell, a search field that is
+     always there, then the Filters chip and the quick chips. Searching folds
+     the title and the pills away and keeps the same field, so the caret the
+     tap put there stays. They fold rather than vanish, so the field glides
+     up to its place. -->
 <ion-header [translucent]="true">
+  @if (!searchOpen()) {
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
+      <ion-buttons slot="start">
+        <ion-back-button [defaultHref]="backHref()" />
+      </ion-buttons>
+      <ion-title>{{ 'coaches.title' | translate }}</ion-title>
+      <ion-buttons slot="end">
+        <mh-notification-bell />
+      </ion-buttons>
+    </ion-toolbar>
+  }
+
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/more" />
-    </ion-buttons>
-    <ion-title>{{ 'coaches.title' | translate }}</ion-title>
+    @if (searchOpen()) {
+      <ion-buttons
+        slot="start"
+        (animate.enter)="fold.backIn($event)"
+        (animate.leave)="fold.backOut($event)"
+      >
+        <ion-button [attr.aria-label]="'a11y.closeSearch' | translate" (click)="closeSearch()">
+          <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+        </ion-button>
+      </ion-buttons>
+    }
+    <!-- No `mhAutofocus`: this field is on screen from the start, and focusing
+         it is what opens search. Debounced: every term is a request. Named,
+         because a searchbar with only a placeholder announces itself as
+         Ionic's default "search text". -->
+    <ion-searchbar
+      class="mh-search-pill"
+      searchIcon="search-outline"
+      clearIcon="close-outline"
+      inputmode="search"
+      [placeholder]="'coaches.list.search' | translate"
+      [attr.aria-label]="'coaches.list.search' | translate"
+      [debounce]="300"
+      [value]="directory.query()"
+      (ionFocus)="openSearch()"
+      (ionInput)="onQuery($event.detail.value ?? '')"
+    />
   </ion-toolbar>
+
+  @if (!searchOpen() && !(directory.isEmpty() && store.isEmpty())) {
+    <ion-toolbar (animate.enter)="fold.in($event)" (animate.leave)="fold.out($event)">
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'coaches.list.filterBar' | translate">
+        <!-- One thing on at a time: the sheet's picks, or a chip. Picking a
+             chip sets the picks aside (the sheet reopens on them); applying
+             picks puts the chip back on All. -->
+        <ion-button
+          class="chip filters"
+          fill="clear"
+          shape="round"
+          size="small"
+          aria-haspopup="dialog"
+          [class.selected]="filterCount() > 0"
+          [attr.aria-label]="'a11y.filters' | translate: { count: filterCount() }"
+          (click)="openFilters()"
+        >
+          <ion-icon name="options-outline" aria-hidden="true" />
+          @if (filterCount() > 0) {
+            <span class="count">{{ filterCount() }}</span>
+          }
+        </ion-button>
+
+        @for (option of filters(); track option.id) {
+          <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
+               reader reads it as text and never says which one is on. -->
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="isFilterOn(option.id)"
+            [attr.aria-pressed]="isFilterOn(option.id)"
+            (click)="setFilter(option.id)"
+          >
+            {{ option.label | translate }}
+          </ion-button>
+        }
+      </div>
+    </ion-toolbar>
+  }
 </ion-header>
 
+<!-- A flat list: the rows run edge to edge on the page, and the loading,
+     empty and error states sit on the same page. -->
 <ion-content [fullscreen]="true" class="mh-flat-page">
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
-    <ion-refresher-content />
-  </ion-refresher>
+  <!-- The toolbar shows the page's name but `ion-title` is not a heading. -->
+  <h1 class="mh-visually-hidden">{{ 'coaches.title' | translate }}</h1>
 
-  @if (store.isStale()) {
+  <!-- A search, a chip or the sheet is silent otherwise: the list simply
+       becomes shorter. Polite, and only once the result is the final one. -->
+  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
+
+  @if (!searchOpen()) {
+    <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher-content />
+    </ion-refresher>
+  }
+
+  @if (searchOpen() && directory.queryTooShort()) {
+    <ion-note class="mh-note-block">
+      {{ 'coaches.list.searchHint' | translate: { count: minSearchLength } }}
+    </ion-note>
+  }
+
+  @if (onYours() ? store.isStale() : directory.isStale()) {
     <mh-stale-bar (retry)="retry()" />
   }
 
-  @if (store.showSkeleton()) {
-    <!-- A placeholder label: which section comes first is only known once
-         the two calls have landed. -->
-    <div class="mh-section-label">
-      <ion-skeleton-text [animated]="true" style="width: 6rem; height: 0.75rem" />
-    </div>
-    <ion-list class="mh-flat-list">
-      @for (_ of skeletonRows; track $index) {
-        <mh-row-skeleton [index]="$index" />
-      }
-    </ion-list>
-  } @else if (store.showLoadError()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      [heading]="'coaches.loadError' | translate"
-      [message]="'error.checkConnection' | translate"
-      [actionLabel]="'button.tryAgain' | translate"
-      (action)="retry()"
-    />
-  } @else if (store.isEmpty()) {
-    <mh-empty-state
-      icon="people-outline"
-      [heading]="'coaches.empty.title' | translate"
-      [message]="'coaches.empty.message' | translate"
-      [actionLabel]="'coaches.empty.cta' | translate"
-      (action)="openDiscover()"
-    />
-  } @else {
-    <!-- Invitations first: they are the only part of this screen that is
-         waiting on the reader. -->
-    @if (store.invites(); as invites) {
-      @if (invites.length > 0) {
+  @if (onYours()) {
+    @if (store.showSkeleton()) {
+      <ion-list class="mh-flat-list" aria-busy="true">
+        @for (_ of skeletonRows; track $index) {
+          <mh-row-skeleton [index]="$index" />
+        }
+      </ion-list>
+    } @else if (store.showLoadError()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'coaches.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="retry()"
+      />
+    } @else if (store.isEmpty()) {
+      <mh-empty-state
+        icon="people-outline"
+        [heading]="'coaches.empty.title' | translate"
+        [message]="'coaches.empty.message' | translate"
+        [actionLabel]="'coaches.empty.cta' | translate"
+        (action)="setFilter(Filters.All)"
+      />
+    } @else {
+      <!-- Invitations first: they are the only part of this screen that is
+           waiting on the reader. -->
+      @if (store.invites().length > 0) {
         <div class="mh-section-label">{{ 'coaches.sections.invitations' | translate }}</div>
         <ion-list class="mh-flat-list">
-          @for (row of invites; track row.id) {
+          @for (row of store.invites(); track row.id) {
             <mh-person-row [person]="row.person" (select)="openInvite(row)" />
           }
         </ion-list>
       }
-    }
 
-    @if (store.coaches(); as coaches) {
-      @if (coaches.length > 0) {
+      @if (store.coaches().length > 0) {
         <div class="mh-section-label">{{ 'coaches.sections.yours' | translate }}</div>
         <ion-list class="mh-flat-list">
-          @for (row of coaches; track row.id) {
-            <mh-person-row [person]="row.person" (select)="openCoach(row)" />
+          @for (row of store.coaches(); track row.id) {
+            <mh-person-row [person]="row.person" (select)="openMyCoach(row)" />
           }
         </ion-list>
       }
     }
+  } @else if (directory.showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'coaches.list.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
+  } @else if (showSearchStart()) {
+    <mh-search-start
+      [recents]="recents.entries()"
+      [strips]="strips()"
+      (select)="openRecent($event)"
+      (remove)="removeRecent($event)"
+      (clearAll)="clearRecents()"
+    />
+  } @else if (directory.showSkeleton()) {
+    <!-- The real rows' geometry, so nothing shifts when data lands. -->
+    <ion-list class="mh-flat-list" aria-busy="true">
+      @for (_ of skeletonRows; track $index) {
+        <mh-row-skeleton [index]="$index" />
+      }
+    </ion-list>
+  } @else if (directory.isEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      [heading]="'coaches.list.empty.title' | translate"
+      [message]="'coaches.list.empty.message' | translate"
+    />
+  } @else if (directory.isFilteredEmpty() && !showInvites()) {
+    @if (onRequests()) {
+      <!-- Nothing asked and nothing waiting on the reader: point them at
+           the coaches they could ask. -->
+      <mh-empty-state
+        icon="hourglass-outline"
+        [heading]="'coaches.requests.empty.title' | translate"
+        [message]="'coaches.requests.empty.message' | translate"
+        [actionLabel]="'coaches.requests.empty.cta' | translate"
+        (action)="setFilter(Filters.All)"
+      />
+    } @else {
+      <!-- The API searched and filtered every coach, so there is nothing left
+           to scroll for and the copy does not say there is. -->
+      <mh-empty-state
+        icon="people-outline"
+        [heading]="'empty.nothingMatches' | translate"
+        [message]="'coaches.list.noMatch' | translate"
+        [actionLabel]="'button.clear' | translate"
+        (action)="clearFilters()"
+      />
+    }
+  } @else {
+    <!-- Invitations first: they are the only thing here waiting on the
+         reader. On Requests they sit over the requests the reader sent, which
+         may be none. -->
+    @if (showInvites()) {
+      <div class="mh-section-label">{{ 'coaches.sections.invitations' | translate }}</div>
+      <ion-list class="mh-flat-list">
+        @for (row of store.invites(); track row.id) {
+          <mh-person-row [person]="row.person" (select)="openInvite(row)" />
+        }
+      </ion-list>
+      @if (directory.visibleCoaches().length > 0) {
+        <div class="mh-section-label">{{ directoryLabel() | translate }}</div>
+      }
+    }
+    <ion-list class="mh-flat-list">
+      @for (coach of directory.visibleCoaches(); track coach.id) {
+        <mh-coach-row
+          [coach]="coach"
+          [mine]="coachUserIds().has(coach.userId)"
+          [highlight]="searchOpen() ? directory.query() : ''"
+          (select)="openCoach(coach)"
+        />
+      }
+    </ion-list>
+
+    <ion-infinite-scroll [disabled]="!directory.hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
   }
 </ion-content>
+
+<mh-coach-filter-sheet
+  [(open)]="filterSheetOpen"
+  [filters]="directory.sheetDraft()"
+  [facets]="directory.facets()"
+  (applied)="applyFilters($event)"
+/>
 
 <mh-action-sheet
   [(open)]="sheetOpen"

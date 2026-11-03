@@ -75,13 +75,12 @@
     <!-- Scrolls sideways rather than wrapping: a second chip row would
                push the first session below the fold. -->
     <div class="mh-chip-row">
-      <ion-button class="filters" fill="clear" shape="round" size="small" [class.active]="filterCount() > 0"
-        (click)="openFilters()">
-        <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
-        @if (filterCount() > 0) {
-        {{ 'common.filtersCount' | translate: { count: filterCount() } }}
-        } @else {
-        {{ 'common.filters' | translate }}
+      <ion-button class="chip filters" fill="clear" shape="round" size="small" aria-haspopup="dialog"
+        [class.selected]="sheetCount() > 0"
+        [attr.aria-label]="'a11y.filters' | translate: { count: sheetCount() }" (click)="openFilters()">
+        <ion-icon name="options-outline" aria-hidden="true" />
+        @if (sheetCount() > 0) {
+        <span class="count">{{ sheetCount() }}</span>
         }
       </ion-button>
 
@@ -89,8 +88,9 @@
            or tab stop, so a screen reader could not reach or read it. -->
       @for (option of locationFilters; track option.value) {
       <ion-button class="chip" fill="clear" shape="round" size="small"
-        [class.selected]="filters().locationKind === option.value"
-        [attr.aria-pressed]="filters().locationKind === option.value" (click)="setLocation(option.value)">
+        [class.selected]="sheetCount() === 0 && filters().locationKind === option.value"
+        [attr.aria-pressed]="sheetCount() === 0 && filters().locationKind === option.value"
+        (click)="setLocation(option.value)">
         {{ option.label }}
       </ion-button>
       }
@@ -101,8 +101,8 @@
       </ion-button>
       }
 
-      <ion-button class="filters calendar-toggle" fill="clear" shape="round" size="small"
-        [class.active]="calendarOpen()" [attr.aria-pressed]="calendarOpen()"
+      <ion-button class="chip calendar-toggle" fill="clear" shape="round" size="small"
+        [class.selected]="calendarOpen()" [attr.aria-pressed]="calendarOpen()"
         [attr.aria-label]="(calendarOpen() ? 'sessions.agenda.calendar.hide' : 'sessions.agenda.calendar.show') | translate"
         (click)="toggleCalendar()">
         <ion-icon slot="icon-only" name="calendar-outline" aria-hidden="true" />
@@ -209,4 +209,4 @@
 <mh-session-actions-sheet [(open)]="actionsOpen" [instance]="actionsInstance()" [canShare]="canShare()"
   (action)="onAction($event)" />
 
-<mh-session-filter-sheet [(open)]="filterOpen" [filters]="filters()" (applied)="onFiltersApplied($event)" />
+<mh-session-filter-sheet [(open)]="filterOpen" [filters]="sheetDraft()" (applied)="onFiltersApplied($event)" />

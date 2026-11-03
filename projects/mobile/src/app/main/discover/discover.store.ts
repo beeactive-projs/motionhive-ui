@@ -11,14 +11,14 @@ import {
 } from 'core';
 
 /**
- * The coach directory behind Discover: the coach of the week, "Coaches near
- * you", the all-coaches page and search's goals. Page-scoped
- * (`providers: [DiscoverCoachesStore]`) so each surface owns its instance
- * and refetch policy.
+ * The coaches behind Discover: the coach of the week, "Coaches near you" and
+ * search's goals. Page-scoped (`providers: [DiscoverCoachesStore]`) so each
+ * surface owns its instance and refetch policy.
  *
- * The endpoint returns the whole directory as one plain array — no paging,
- * no total — so a `loaded` gate plus client-side filtering is the entire
- * strategy.
+ * `/profile/instructors/discover` returns its top 30 as one plain array (no
+ * paging, no total), so a `loaded` gate plus client-side filtering is the
+ * entire strategy. The full, paged list is the Coaches screen's
+ * (`CoachDirectoryStore`).
  */
 @Injectable()
 export class DiscoverCoachesStore {

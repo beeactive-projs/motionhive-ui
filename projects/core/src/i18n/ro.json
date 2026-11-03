@@ -7,6 +7,7 @@
     "closePhoto": "Închide fotografia",
     "closeSearch": "Închide căutarea",
     "dismissNotification": "Închide notificarea",
+    "filters": "{count, plural, =0 {Filtre} one {Filtre, # activ} few {Filtre, # active} other {Filtre, # active}}",
     "hidePassword": "Ascunde parola",
     "loading": "Se încarcă",
     "moreActions": "Mai multe acțiuni",

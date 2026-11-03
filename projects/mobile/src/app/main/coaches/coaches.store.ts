@@ -18,9 +18,11 @@ const FRESH_MS = 15_000;
 type LoadOptions = { force?: boolean; done?: (error?: unknown) => void };
 
 /**
- * Page-scoped state for the trainee's coaches screen: the settled
- * relationships from `GET /clients/my-instructors` and the invitations
- * waiting on an answer from `GET /clients/requests/pending`.
+ * Page-scoped state for the Coaches screen's Yours chip, and for the
+ * invitations it shows first on All: the settled relationships from
+ * `GET /clients/my-instructors` and the invitations waiting on an answer from
+ * `GET /clients/requests/pending`. The directory itself is
+ * `CoachDirectoryStore`.
  *
  * The two load together (`forkJoin`) because the screen is one list in two
  * parts: accepting an invitation moves a row from the first section to the
@@ -60,6 +62,11 @@ export class CoachesStore {
   readonly invites = computed(() => incomingInvites(this._requests(), this._clockService.now()));
 
   readonly coaches = computed(() => myCoachRows(this._instructors()));
+
+  /** The reader's coaches by user id, so a directory row can say "Your coach". */
+  readonly coachUserIds = computed(
+    () => new Set(this._instructors().map((item) => item.instructorId)),
+  );
 
   readonly showSkeleton = computed(() => this._loading() && !this._loaded());
 

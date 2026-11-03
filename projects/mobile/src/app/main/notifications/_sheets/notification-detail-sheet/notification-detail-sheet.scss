@@ -1,38 +1,15 @@
-.head {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0 0.25rem;
-}
-
-.head h2 {
-  margin: 0;
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-lg);
-  font-weight: 600;
-}
-
-.head .body {
-  margin: 0;
-  color: var(--ion-color-dark);
-  font-size: var(--mh-text-base);
-  line-height: var(--mh-leading-body);
-}
-
-.actions {
+/* The message and its footnote, flush with the cards under them as the action
+   sheet's own note is, one rhythm step above the verbs. */
+.message {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.625rem;
-  margin-top: 1.25rem;
+  gap: var(--mh-section-gap);
+  margin-block-end: var(--mh-page-rhythm);
 }
 
-.footnote {
-  display: block;
-  margin-top: 1rem;
-  padding: 0.625rem 0.875rem;
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-  font-size: var(--mh-text-sm);
+/* Full ink: `--ion-color-dark` is a dim slate in the dark palette. */
+.body {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-base);
   line-height: var(--mh-leading-body);
 }

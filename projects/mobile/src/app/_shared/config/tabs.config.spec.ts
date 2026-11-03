@@ -63,17 +63,30 @@ describe('litTabId', () => {
 
   it('lights the Menu for every stack the Menu opens, in both modes', () => {
     // The audit: coach Sessions / Programs / Exercises / Groups lit nothing,
-    // and a trainee's Sessions lit nothing.
+    // and a trainee's Sessions lit nothing. The coach directory is the one
+    // Menu row whose stack belongs to a tab, and it has its own case below.
     const fromMenu = (set: typeof COACH_TAB_SET) =>
       set.more
         .flatMap((section) => section.items)
-        .map((tile) => activeTabIdFromUrl(tile.route));
+        .map((tile) => activeTabIdFromUrl(tile.route))
+        .filter((stack) => stack !== TabIds.Coaches);
     for (const stack of fromMenu(COACH_TAB_SET)) {
       expect(litTabId(stack, coachTabs)).toBe(TabIds.More);
     }
     for (const stack of fromMenu(TRAIN_TAB_SET)) {
       expect(litTabId(stack, trainTabs)).toBe(TabIds.More);
     }
+  });
+
+  it('lights Discover for the coach directory, in both modes', () => {
+    expect(litTabId(TabIds.Coaches, coachTabs)).toBe(TabIds.Discover);
+    expect(litTabId(TabIds.Coaches, trainTabs)).toBe(TabIds.Discover);
+    // The Menu's Coaches row carries the chip in its query, which is not a stack.
+    expect(activeTabIdFromUrl('/tabs/coaches?filter=yours')).toBe(TabIds.Coaches);
+  });
+
+  it('falls back to the Menu when the owning tab is not on the bar', () => {
+    expect(litTabId(TabIds.Coaches, [TabIds.Home, TabIds.Messages])).toBe(TabIds.More);
   });
 
   it("lights the Menu for a stack that is a tab only in the other mode", () => {

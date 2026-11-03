@@ -24,8 +24,16 @@ export const ProfileStacks = {
   CoachSessions: '/tabs/coach/sessions',
   UserSessions: '/tabs/user/sessions',
   Account: '/tabs/more/account',
-  Coaches: '/tabs/more/coaches',
+  Coaches: '/tabs/coaches',
 } as const;
+
+/**
+ * The coach directory opened on the reader's own coaches: the Menu's Coaches
+ * row and My coaches' old address. The chip is the directory's
+ * `?filter=yours` (`coaches.filters.ts`, whose spec holds the two together),
+ * spelled out because `_shared` may not import from a feature.
+ */
+export const MY_COACHES_URL = `${ProfileStacks.Coaches}?filter=yours`;
 
 const ROOTS: readonly string[] = Object.values(ProfileStacks);
 

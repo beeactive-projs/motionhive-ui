@@ -109,12 +109,10 @@ export const homeRoutes: Routes = [
     title: 'pageTitle.exercise',
   },
   {
-    // Discover's coaches, from "Find a coach" (C1: Discover makes its rows
-    // open in the stack it is mounted in).
+    // The coach list's old address in Home's stack: "Find a coach" opens the
+    // directory's own stack now. Kept so a restored URL lands there.
     path: 'coaches',
-    loadComponent: () =>
-      import('../discover/all-coaches/all-coaches').then((m) => m.AllCoaches),
-    title: 'pageTitle.coaches',
+    redirectTo: '/tabs/coaches',
   },
   {
     // Discover's groups, from "Join a group". Not `groups`: the profile

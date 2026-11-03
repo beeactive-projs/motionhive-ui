@@ -1,6 +1,6 @@
 import { User } from '../user/user.model';
 import { InstructorCertification } from '../profile/instructor-profile.model';
-import { CoachSuggestionReason } from './client.enums';
+import { CoachDirectorySort, CoachSuggestionReason } from './client.enums';
 
 /**
  * A coach from `GET /profile/instructors/suggested`, picked for the reader:
@@ -59,9 +59,53 @@ export interface InstructorSearchResult {
   specializations: string[] | null;
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
+  /** Has an active online venue (a meeting link): what "Online" means everywhere. */
+  isOnline: boolean;
   city: string | null;
-  country: string | null;
+  countryCode: string | null;
   socialLinks: Record<string, string> | null;
+  /**
+   * The reader asked this coach and is still waiting on an answer. Only the
+   * directory (`GET /profile/instructors/directory`) sends it; Discover's
+   * list does not know who is reading.
+   */
+  requestSent?: boolean;
+}
+
+/**
+ * `GET /profile/instructors/directory` query. Filters combine with AND; a
+ * signed-in reader is never in the list, so a page is never short.
+ */
+export interface CoachDirectoryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  /** Contains, blind to accents and case. */
+  city?: string;
+  /** ISO 3166-1 alpha-2. */
+  country?: string;
+  accepting?: boolean;
+  online?: boolean;
+  /** Only coaches the reader asked and is still waiting on (`requestSent`). */
+  requested?: boolean;
+  /** Any of them, matched whole, blind to accents and case. */
+  specializations?: readonly string[];
+  minYears?: number;
+  sort?: CoachDirectorySort;
+}
+
+/** A city or specialization the directory's filter sheet offers. */
+export interface CoachFacet {
+  /** The spelling most coaches use. */
+  label: string;
+  /** How many coaches in the whole directory. */
+  count: number;
+}
+
+/** `GET /profile/instructors/directory/facets`, the most common first. */
+export interface CoachDirectoryFacets {
+  cities: CoachFacet[];
+  specializations: CoachFacet[];
 }
 
 export interface PublicInstructorProfile {

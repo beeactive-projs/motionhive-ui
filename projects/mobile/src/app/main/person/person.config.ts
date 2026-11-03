@@ -1,4 +1,4 @@
-import { ProfileWorkout, enumLabel } from 'core';
+import { ClientRequestTypes, ProfileWorkout, PublicUserProfile, enumLabel } from 'core';
 import {
   alertCircleOutline,
   callOutline,
@@ -81,6 +81,61 @@ export function workoutMonths(workouts: readonly ProfileWorkout[]): WorkoutMonth
     ...month,
     workouts: items,
   }));
+}
+
+/**
+ * The coaching verb a coach's profile offers in its footer, beside Message:
+ * the reader's side of what a coach's Invite is on theirs.
+ */
+export const CoachingCtas = {
+  /** Ask this coach to coach you. */
+  Request: 'request',
+  /** You asked and they have not answered: say so, and offer Withdraw. */
+  Requested: 'requested',
+  /** They invited you: the answer is right here. */
+  Invited: 'invited',
+} as const;
+
+export type CoachingCta = (typeof CoachingCtas)[keyof typeof CoachingCtas];
+
+/**
+ * A note to a coach, capped at what their request sheet reads at a glance
+ * (the API allows 1000). Same cap as a coach's note on an invitation.
+ */
+export const REQUEST_MESSAGE_MAX_LENGTH = 500;
+
+/** How long a request stays open before it lapses (the API's `expiresAt`). */
+export const REQUEST_EXPIRY_DAYS = 30;
+
+/**
+ * Which coaching verb, if any, a profile offers. None on your own page, on
+ * someone who is not a coach, or on your coach. A pending request decides
+ * before anything else, because any pending request between the two blocks
+ * a new one: one you sent reads as sent, an invitation from them as an
+ * invitation, and one about the other way round (you coaching them) leaves
+ * nothing to ask. Otherwise a coach taking new clients can be asked; one who
+ * is not, or whose profile has not landed yet (`acceptingClients` null), offers
+ * nothing rather than a button the API would refuse.
+ */
+export function coachingCta(
+  profile: PublicUserProfile | null,
+  options: { isSelf: boolean; acceptingClients: boolean | null },
+): CoachingCta | null {
+  if (!profile || options.isSelf || !profile.isInstructor) return null;
+  if (profile.yourCoachSince) return null;
+
+  const pending = profile.pendingRequest;
+  if (pending) {
+    if (pending.sentByYou && pending.type === ClientRequestTypes.ClientToInstructor) {
+      return CoachingCtas.Requested;
+    }
+    if (!pending.sentByYou && pending.type === ClientRequestTypes.InstructorToClient) {
+      return CoachingCtas.Invited;
+    }
+    return null;
+  }
+
+  return options.acceptingClients ? CoachingCtas.Request : null;
 }
 
 /**

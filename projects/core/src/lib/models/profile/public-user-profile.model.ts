@@ -1,4 +1,5 @@
 import { PublicProfileAudience } from './profile.enums';
+import type { ClientRequestType } from '../client/client.enums';
 import type { MessageReportCategory } from '../messaging/report.model';
 
 /**
@@ -45,6 +46,24 @@ export interface PublicUserProfile {
    * viewer's coach now. Absent from older APIs.
    */
   yourCoachSince?: string | null;
+  /**
+   * A coaching request between the viewer and this person still waiting, in
+   * either direction; null for a guest, the owner, or when there is none.
+   * Any pending request blocks a new one. Absent from older APIs.
+   */
+  pendingRequest?: PendingCoachingRequest | null;
+}
+
+/** A coaching request still waiting between the viewer and a profile's owner. */
+export interface PendingCoachingRequest {
+  /** What accept, decline and cancel key on. */
+  id: string;
+  /** CLIENT_TO_INSTRUCTOR when a trainee asked; INSTRUCTOR_TO_CLIENT when a coach invited. */
+  type: ClientRequestType;
+  /** The viewer sent it; only the sender may withdraw it. */
+  sentByYou: boolean;
+  createdAt: string;
+  expiresAt: string;
 }
 
 /**

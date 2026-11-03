@@ -280,8 +280,8 @@
           {{ option.label | translate }}
         </ion-button>
         }
-        <ion-button class="filters calendar-toggle" fill="clear" shape="round" size="small"
-          [class.active]="sessionCalendarOpen()" [attr.aria-pressed]="sessionCalendarOpen()" [attr.aria-label]="
+        <ion-button class="chip calendar-toggle" fill="clear" shape="round" size="small"
+          [class.selected]="sessionCalendarOpen()" [attr.aria-pressed]="sessionCalendarOpen()" [attr.aria-label]="
                   (sessionCalendarOpen()
                     ? 'sessions.agenda.calendar.hide'
                     : 'sessions.agenda.calendar.show'
@@ -406,8 +406,8 @@
           {{ option.label | translate }}
         </ion-button>
         }
-        <ion-button class="filters calendar-toggle" fill="clear" shape="round" size="small"
-          [class.active]="calendarOpen()" [attr.aria-pressed]="calendarOpen()" [attr.aria-label]="
+        <ion-button class="chip calendar-toggle" fill="clear" shape="round" size="small"
+          [class.selected]="calendarOpen()" [attr.aria-pressed]="calendarOpen()" [attr.aria-label]="
                   (calendarOpen()
                     ? 'workouts.history.calendar.hide'
                     : 'workouts.history.calendar.show'

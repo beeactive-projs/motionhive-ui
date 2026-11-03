@@ -25,8 +25,6 @@ export const HomePages = {
   Agenda: `${HOME_STACK}/sessions`,
   /** The trainee's bookings, from a Today row with two bookings or more. */
   Bookings: `${HOME_STACK}/bookings`,
-  /** Discover's coaches, from "Find a coach". */
-  Coaches: `${HOME_STACK}/coaches`,
   /** Discover's groups, from "Join a group". */
   GroupsToJoin: `${HOME_STACK}/groups-to-join`,
   /** Discover's search, from the header's search button. */

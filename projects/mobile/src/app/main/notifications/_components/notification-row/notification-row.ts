@@ -23,9 +23,9 @@ import { categoryStyle } from '../../../../_shared/config/notification-categorie
  * chevron, as in every flat list: the whole row opens, into the screen it points
  * at or, failing that, the detail sheet.
  *
- * Swiping right toggles read (reversible, safe), and a full swipe commits it.
- * Swiping left reveals delete and dismiss; only dismiss is reachable by a full
- * swipe, since delete is not undoable.
+ * Swiping right toggles read, swiping left deletes; a full swipe commits
+ * either. There is no dismiss: the API keeps dismissed rows in the All list,
+ * so one came back on the next load.
  */
 @Component({
   selector: 'mh-notification-row',
@@ -51,7 +51,6 @@ export class NotificationRow {
 
   readonly select = output<void>();
   readonly toggleRead = output<void>();
-  readonly dismiss = output<void>();
   readonly remove = output<void>();
 
   readonly isUnread = computed(() => !this.notification().readAt);

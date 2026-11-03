@@ -385,6 +385,20 @@ describe('activeFilterCount', () => {
   });
 });
 
+describe('sheetChipCount', () => {
+  it('leaves a place alone to the location chips', async () => {
+    const { NO_FILTERS, sheetChipCount } = await import('./sessions.config');
+    expect(sheetChipCount(NO_FILTERS)).toBe(0);
+    expect(sheetChipCount({ ...NO_FILTERS, locationKind: 'ONLINE' })).toBe(0);
+  });
+
+  it('counts everything once the sheet holds more than a place', async () => {
+    const { NO_FILTERS, sheetChipCount } = await import('./sessions.config');
+    expect(sheetChipCount({ ...NO_FILTERS, locationKind: 'ONLINE', type: 'GROUP' })).toBe(2);
+    expect(sheetChipCount({ ...NO_FILTERS, dateFrom: '2026-05-01' })).toBe(1);
+  });
+});
+
 describe('window fitting', () => {
   const day = (iso: string) => new Date(`${iso}T12:00:00`);
 

@@ -160,6 +160,22 @@
         <h2 class="mh-kicker">{{ 'discover.feed.title' | translate }}</h2>
       </div>
       <div class="mh-chip-row" role="group" [attr.aria-label]="'discover.filterSheet.title' | translate">
+        <!-- The filter trigger leads the strip, as on every other page. -->
+        <ion-button
+          class="chip filters"
+          fill="clear"
+          shape="round"
+          size="small"
+          aria-haspopup="dialog"
+          [class.selected]="filterCount() > 0"
+          [attr.aria-label]="'a11y.filters' | translate: { count: filterCount() }"
+          (click)="openFilters()"
+        >
+          <ion-icon name="options-outline" aria-hidden="true" />
+          @if (filterCount() > 0) {
+            <span class="count">{{ filterCount() }}</span>
+          }
+        </ion-button>
         @for (chip of quickFilters; track chip.id) {
           <!-- `ion-button`, not `ion-chip`: the chip has no role, so a
                screen reader reads it as text and never says which is on. -->
@@ -175,17 +191,6 @@
             {{ chip.label }}
           </ion-button>
         }
-        <ion-button
-          class="filters"
-          fill="clear"
-          shape="round"
-          size="small"
-          [class.active]="datesActive()"
-          (click)="openFilters()"
-        >
-          <ion-icon slot="start" name="calendar-outline" aria-hidden="true" />
-          {{ 'discover.feed.dates' | translate }}
-        </ion-button>
       </div>
 
       <div class="gutter">
@@ -274,6 +279,6 @@
 
 <mh-discover-filter-sheet
   [(open)]="filterSheetOpen"
-  [filters]="sheetFilters()"
+  [filters]="sheetDraft()"
   (applied)="onFiltersApplied($event)"
 />

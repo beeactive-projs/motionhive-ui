@@ -293,21 +293,6 @@
         "updated": "Photo updated"
       },
       "tooLarge": "Images must be under {size} MB."
-    },
-    "share": {
-      "empty": {
-        "message": "Your handle is the short link people use to find you. Pick one on your profile and you can share it from here.",
-        "title": "Claim a handle first"
-      },
-      "openProfile": "Open profile",
-      "shareTitle": "My MotionHive profile",
-      "shareVia": "Share via…",
-      "subtitle": "Drop this link in your Instagram bio, your story, or anywhere people can find you.",
-      "title": "Share this profile",
-      "toast": {
-        "copyFailed": "Could not copy the link.",
-        "shareFailed": "Could not share the link."
-      }
     }
   },
   "clientHive": {
@@ -544,21 +529,9 @@
       "inviteEmailRowLabel": "Invite {email} by email",
       "inviteRowLabel": "Invite {name}",
       "invited": "Invited",
+      "linkHint": "The link opens your public profile, where they can see what you offer and get in touch.",
       "linkRow": {
         "hint": "They scan it, right here",
-        "title": "Share link or QR"
-      },
-      "linkSheet": {
-        "copy": "Copy link",
-        "fullScreen": "Show QR full screen",
-        "hint": "The link opens your public profile, where they can see what you offer and get in touch.",
-        "noHandle": {
-          "action": "Choose a username",
-          "message": "Your link is built from your username, so you need one before you can share it.",
-          "title": "No username yet"
-        },
-        "scanTitle": "Scan with your phone camera",
-        "share": "Share link",
         "title": "Share link or QR"
       },
       "minChars": "Type at least {count, plural, one {# character} other {# characters}}.",
@@ -678,7 +651,53 @@
       "message": "When a coach invites you, the invitation waits here. You can also go looking for one yourself.",
       "title": "No coaches yet"
     },
+    "filter": {
+      "anyExperience": "Any",
+      "applyCount": "{count, plural, one {Apply · # filter} other {Apply · # filters}}",
+      "city": "City",
+      "everywhere": "Everywhere",
+      "experience": "Experience",
+      "sort": {
+        "experience": "Most experienced",
+        "label": "Sort by",
+        "name": "Name",
+        "recommended": "Recommended"
+      },
+      "speciality": "Speciality",
+      "yearsPlus": "{count, plural, one {#+ year} other {#+ years}}"
+    },
+    "filters": {
+      "all": "All",
+      "nearYou": "Near you",
+      "online": "Online",
+      "requests": "Requests",
+      "yours": "Yours"
+    },
+    "list": {
+      "empty": {
+        "message": "When a coach joins MotionHive, they show up here.",
+        "title": "No coaches yet"
+      },
+      "filterBar": "Filter coaches",
+      "loadError": "Couldn't load coaches",
+      "noMatch": "Try fewer filters or another word.",
+      "results": {
+        "count": "{count, plural, one {# coach} other {# coaches}}.",
+        "none": "No coaches match that."
+      },
+      "search": "Search coaches",
+      "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search every coach.",
+      "takingStrip": "Taking new clients",
+      "yoursStrip": "Your coaches"
+    },
     "loadError": "Couldn't load your coaches",
+    "requests": {
+      "empty": {
+        "cta": "Find a coach",
+        "message": "Coaches you ask to train you show here until they answer.",
+        "title": "No requests"
+      }
+    },
     "row": {
       "invited": {
         "daysAgo": "Invited you {count, plural, one {# day ago} other {# days ago}}",
@@ -688,10 +707,12 @@
       "since": "Coaching you since {date}"
     },
     "sections": {
+      "directory": "All coaches",
       "invitations": "Invitations",
+      "sent": "Sent by you",
       "yours": "Your coaches"
     },
-    "title": "My coaches",
+    "title": "Coaches",
     "toast": {
       "acceptFailed": "Couldn't accept the invitation",
       "accepted": "{name} is now your coach",
@@ -702,16 +723,6 @@
     }
   },
   "discover": {
-    "allCoaches": {
-      "empty": {
-        "heading": "No coaches to show",
-        "message": "When a coach makes their profile public, it shows up here."
-      },
-      "filterLabel": "Filter by specialization",
-      "loadError": "Couldn't load coaches",
-      "noMatches": "No coach lists that specialization.",
-      "title": "Coaches"
-    },
     "allGroups": {
       "empty": {
         "heading": "No public groups yet",
@@ -742,7 +753,9 @@
     },
     "coachRow": {
       "online": "Online",
-      "takingClients": "Taking clients"
+      "requestSent": "Request sent",
+      "takingClients": "Taking clients",
+      "yourCoach": "Your coach"
     },
     "coaches": {
       "all": "{count, plural, one {See all} other {All #}}",
@@ -757,7 +770,6 @@
       "viewProfile": "View profile"
     },
     "feed": {
-      "dates": "Dates",
       "empty": {
         "heading": "Nothing coming up yet",
         "message": "When coaches publish sessions, they show up here."
@@ -1935,7 +1947,6 @@
     "manageGroup": "Manage group",
     "manageSessions": "Manage sessions",
     "messages": "Messages",
-    "myCoaches": "My coaches",
     "mySessions": "My sessions",
     "newExercise": "New exercise",
     "newGroup": "New group",
@@ -2170,6 +2181,28 @@
   },
   "person": {
     "about": "About",
+    "coaching": {
+      "acceptInvite": "Accept invitation",
+      "request": "Request to train",
+      "requested": "Request sent",
+      "sheet": {
+        "body": "{name} gets your request and can accept it from their clients.",
+        "expiry": "{count, plural, one {It stays open for # day.} other {It stays open for # days.}}",
+        "noteLabel": "A note for the coach",
+        "notePlaceholder": "What are you training for? (optional)",
+        "send": "Send request",
+        "title": "Request to train"
+      },
+      "toast": {
+        "acceptFailed": "Couldn't accept the invitation",
+        "accepted": "{name} is now your coach",
+        "sendFailed": "Couldn't send the request",
+        "sent": "Request sent to {name}",
+        "withdrawFailed": "Couldn't withdraw the request",
+        "withdrawn": "Request withdrawn"
+      },
+      "withdraw": "Withdraw"
+    },
     "contactShared": "{name} chose to share these.",
     "experience": "{count, plural, one {# year of experience} other {# years of experience}}",
     "groupsInCommon": "Groups in common",
@@ -2234,6 +2267,24 @@
         "title": "Workout not available",
         "message": "It may have been made private or removed."
       }
+    }
+  },
+  "profileShare": {
+    "copy": "Copy link",
+    "fullScreen": "Show QR full screen",
+    "hint": "Drop this link in your Instagram bio, your story, or anywhere people can find you.",
+    "noHandle": {
+      "action": "Choose a username",
+      "message": "Your link is built from your username, so you need one before you can share it.",
+      "title": "No username yet"
+    },
+    "scanTitle": "Scan with your phone camera",
+    "share": "Share link",
+    "shareTitle": "My MotionHive profile",
+    "title": "Share link or QR",
+    "toast": {
+      "copyFailed": "Could not copy the link.",
+      "shareFailed": "Could not share the link."
     }
   },
   "programs": {

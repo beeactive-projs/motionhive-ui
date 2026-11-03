@@ -293,21 +293,6 @@
         "updated": "Poză actualizată"
       },
       "tooLarge": "Imaginile trebuie să aibă sub {size} MB."
-    },
-    "share": {
-      "empty": {
-        "message": "Numele de utilizator e linkul scurt după care te găsesc oamenii. Alege unul din profil și îl poți distribui de aici.",
-        "title": "Alege mai întâi un nume de utilizator"
-      },
-      "openProfile": "Deschide profilul",
-      "shareTitle": "Profilul meu MotionHive",
-      "shareVia": "Distribuie prin…",
-      "subtitle": "Pune linkul în bio-ul de Instagram, în story sau oriunde te pot găsi oamenii.",
-      "title": "Distribuie profilul",
-      "toast": {
-        "copyFailed": "Linkul nu a putut fi copiat.",
-        "shareFailed": "Linkul nu a putut fi distribuit."
-      }
     }
   },
   "clientHive": {
@@ -544,21 +529,9 @@
       "inviteEmailRowLabel": "Invită {email} prin email",
       "inviteRowLabel": "Invită {name}",
       "invited": "Invitat",
+      "linkHint": "Linkul deschide profilul tău public, unde poate vedea ce oferi și te poate contacta.",
       "linkRow": {
         "hint": "Îl scanează, pe loc",
-        "title": "Trimite linkul sau codul QR"
-      },
-      "linkSheet": {
-        "copy": "Copiază linkul",
-        "fullScreen": "Arată codul QR pe tot ecranul",
-        "hint": "Linkul deschide profilul tău public, unde poate vedea ce oferi și te poate contacta.",
-        "noHandle": {
-          "action": "Alege un nume de utilizator",
-          "message": "Linkul tău se construiește din numele de utilizator, așa că ai nevoie de unul ca să-l poți trimite.",
-          "title": "Niciun nume de utilizator"
-        },
-        "scanTitle": "Scanează cu camera telefonului",
-        "share": "Trimite linkul",
         "title": "Trimite linkul sau codul QR"
       },
       "minChars": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}}.",
@@ -678,7 +651,53 @@
       "message": "Când un antrenor te invită, invitația te așteaptă aici. Poți căuta și tu unul.",
       "title": "Niciun antrenor deocamdată"
     },
+    "filter": {
+      "anyExperience": "Oricât",
+      "applyCount": "{count, plural, one {Aplică · # filtru} few {Aplică · # filtre} other {Aplică · # de filtre}}",
+      "city": "Oraș",
+      "everywhere": "Peste tot",
+      "experience": "Experiență",
+      "sort": {
+        "experience": "Cei mai experimentați",
+        "label": "Sortează după",
+        "name": "Nume",
+        "recommended": "Recomandați"
+      },
+      "speciality": "Specializare",
+      "yearsPlus": "{count, plural, one {#+ an} few {#+ ani} other {#+ de ani}}"
+    },
+    "filters": {
+      "all": "Toți",
+      "nearYou": "Lângă tine",
+      "online": "Online",
+      "requests": "Cereri",
+      "yours": "Ai tăi"
+    },
+    "list": {
+      "empty": {
+        "message": "Când un antrenor se alătură MotionHive, apare aici.",
+        "title": "Niciun antrenor deocamdată"
+      },
+      "filterBar": "Filtrează antrenorii",
+      "loadError": "Nu am putut încărca antrenorii",
+      "noMatch": "Încearcă mai puține filtre sau alt cuvânt.",
+      "results": {
+        "count": "{count, plural, one {# antrenor} few {# antrenori} other {# de antrenori}}.",
+        "none": "Niciun antrenor nu se potrivește."
+      },
+      "search": "Caută antrenori",
+      "searchHint": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}} ca să cauți printre toți antrenorii.",
+      "takingStrip": "Primesc clienți noi",
+      "yoursStrip": "Antrenorii tăi"
+    },
     "loadError": "Nu am putut încărca antrenorii",
+    "requests": {
+      "empty": {
+        "cta": "Caută un antrenor",
+        "message": "Antrenorii cărora le ceri să te antreneze apar aici până îți răspund.",
+        "title": "Nicio cerere"
+      }
+    },
     "row": {
       "invited": {
         "daysAgo": "Te-a invitat acum {count, plural, one {# zi} few {# zile} other {# de zile}}",
@@ -688,10 +707,12 @@
       "since": "Te antrenează din {date}"
     },
     "sections": {
+      "directory": "Toți antrenorii",
       "invitations": "Invitații",
+      "sent": "Trimise de tine",
       "yours": "Antrenorii tăi"
     },
-    "title": "Antrenorii mei",
+    "title": "Antrenori",
     "toast": {
       "acceptFailed": "Invitația nu a putut fi acceptată",
       "accepted": "{name} îți este acum antrenor",
@@ -702,16 +723,6 @@
     }
   },
   "discover": {
-    "allCoaches": {
-      "empty": {
-        "heading": "Niciun antrenor de afișat",
-        "message": "Când un antrenor își face profilul public, apare aici."
-      },
-      "filterLabel": "Filtrează după specializare",
-      "loadError": "Nu am putut încărca antrenorii",
-      "noMatches": "Niciun antrenor nu are această specializare.",
-      "title": "Antrenori"
-    },
     "allGroups": {
       "empty": {
         "heading": "Încă nu sunt grupuri publice",
@@ -742,7 +753,9 @@
     },
     "coachRow": {
       "online": "Online",
-      "takingClients": "Primește clienți"
+      "requestSent": "Cerere trimisă",
+      "takingClients": "Primește clienți",
+      "yourCoach": "Antrenorul tău"
     },
     "coaches": {
       "all": "{count, plural, one {Vezi tot} few {Toți cei #} other {Toți cei #}}",
@@ -757,7 +770,6 @@
       "viewProfile": "Vezi profilul"
     },
     "feed": {
-      "dates": "Perioadă",
       "empty": {
         "heading": "Nimic programat încă",
         "message": "Când antrenorii publică sesiuni, apar aici."
@@ -1935,7 +1947,6 @@
     "manageGroup": "Gestionează grupul",
     "manageSessions": "Gestionează sesiunile",
     "messages": "Mesaje",
-    "myCoaches": "Antrenorii mei",
     "mySessions": "Sesiunile mele",
     "newExercise": "Exercițiu nou",
     "newGroup": "Grup nou",
@@ -2170,6 +2181,28 @@
   },
   "person": {
     "about": "Despre",
+    "coaching": {
+      "acceptInvite": "Acceptă invitația",
+      "request": "Cere să te antreneze",
+      "requested": "Cerere trimisă",
+      "sheet": {
+        "body": "{name} primește cererea ta și o poate accepta din lista de clienți.",
+        "expiry": "{count, plural, one {Rămâne deschisă # zi.} few {Rămâne deschisă # zile.} other {Rămâne deschisă # de zile.}}",
+        "noteLabel": "Un mesaj pentru antrenor",
+        "notePlaceholder": "Pentru ce te antrenezi? (opțional)",
+        "send": "Trimite cererea",
+        "title": "Cere să te antreneze"
+      },
+      "toast": {
+        "acceptFailed": "Invitația nu a putut fi acceptată",
+        "accepted": "{name} îți este acum antrenor",
+        "sendFailed": "Cererea nu a putut fi trimisă",
+        "sent": "Cerere trimisă către {name}",
+        "withdrawFailed": "Cererea nu a putut fi retrasă",
+        "withdrawn": "Cerere retrasă"
+      },
+      "withdraw": "Retrage"
+    },
     "contactShared": "{name} a ales să le facă vizibile.",
     "experience": "{count, plural, one {# an de experiență} few {# ani de experiență} other {# de ani de experiență}}",
     "groupsInCommon": "Grupuri comune",
@@ -2234,6 +2267,24 @@
         "title": "Antrenament indisponibil",
         "message": "Poate a devenit privat sau a fost șters."
       }
+    }
+  },
+  "profileShare": {
+    "copy": "Copiază linkul",
+    "fullScreen": "Arată codul QR pe tot ecranul",
+    "hint": "Pune linkul în bio-ul de Instagram, în story sau oriunde te pot găsi oamenii.",
+    "noHandle": {
+      "action": "Alege un nume de utilizator",
+      "message": "Linkul tău se construiește din numele de utilizator, așa că ai nevoie de unul ca să-l poți trimite.",
+      "title": "Niciun nume de utilizator"
+    },
+    "scanTitle": "Scanează cu camera telefonului",
+    "share": "Trimite linkul",
+    "shareTitle": "Profilul meu MotionHive",
+    "title": "Trimite linkul sau codul QR",
+    "toast": {
+      "copyFailed": "Linkul nu a putut fi copiat.",
+      "shareFailed": "Linkul nu a putut fi distribuit."
     }
   },
   "programs": {

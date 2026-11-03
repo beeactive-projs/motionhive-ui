@@ -932,6 +932,9 @@
       "defaultShareText": "Check this out on MotionHive",
       "defaultSubcopy": "Drop this link in your Instagram bio, your story, or anywhere people can find you.",
       "previewLabel": "Preview · How it looks when shared",
+      "qrHint": "Point a phone camera at it to open the link.",
+      "qrLabel": "QR code for this link",
+      "qrTitle": "Or scan the code",
       "toast": {
         "anywhereHint": "Paste it anywhere you want to share.",
         "instagramHint": "Paste it in your Instagram bio, story, or DM."

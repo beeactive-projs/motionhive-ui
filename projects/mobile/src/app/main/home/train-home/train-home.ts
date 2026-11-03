@@ -27,6 +27,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { avatarToneFor, GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupBase, personBase, ProfileStacks } from '../../../_shared/utils/stack-paths';
+import { COACHES_URL, COACHES_YOURS_URL } from '../../coaches/coaches.filters';
 import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
@@ -335,11 +336,12 @@ export class TrainHome implements OnInit {
 
   // ─── People and posts ────────────────────────────────────────
 
-  /** Discover's lists, in Home's stack so back returns here. */
+  /** The coach directory, a stack of its own whose back returns here. */
   findCoach(): void {
-    void this._router.navigateByUrl(HomePages.Coaches);
+    void this._router.navigateByUrl(COACHES_URL);
   }
 
+  /** Discover's groups, in Home's stack so back returns here. */
   findGroup(): void {
     void this._router.navigateByUrl(HomePages.GroupsToJoin);
   }
@@ -384,11 +386,11 @@ export class TrainHome implements OnInit {
       imageUrl: user.avatarUrl ?? null,
       color: avatarToneFor(user.id),
       // The profile in Home's own stack; a coach with no handle has none to
-      // open, so their row in My coaches instead.
+      // open, so their row under the Coaches screen's Yours chip instead.
       open: () =>
         handle
           ? void this._router.navigate([personBase(ProfileStacks.Home), handle])
-          : void this._router.navigateByUrl(ProfileStacks.Coaches),
+          : void this._router.navigateByUrl(COACHES_YOURS_URL),
     };
   }
 

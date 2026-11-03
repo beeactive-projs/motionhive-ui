@@ -2,19 +2,18 @@ import { Routes } from '@angular/router';
 import { personRoutes } from '../person/person.routes';
 
 /**
- * The trainee's coaches area, mounted at `/tabs/more/coaches`.
+ * The Coaches screen, mounted at `/tabs/coaches`: the coach directory, and on
+ * its Yours chip the reader's own coaches.
  *
- * It hangs off `more` so the Menu tab stays lit on the way in and on the
- * profile pushed from it — `activeTabIdFromUrl` reads the segment right
- * after `/tabs`. The profile is declared here rather than reusing another
- * stack's so back returns to the coaches list it was opened from, which is
- * the settled cross-surface rule.
+ * A stack of its own, so its profiles are declared here rather than reusing
+ * another stack's: back returns to the list they were opened from, which is
+ * the settled cross-surface rule. `litTabId` lights Discover for it.
  */
 export const coachesRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./coaches').then((m) => m.Coaches),
-    title: 'pageTitle.myCoaches',
+    title: 'pageTitle.coaches',
   },
   // Before any parameterised route this area might gain.
   ...personRoutes,

@@ -1,42 +1,23 @@
-<ng-template #body>
+<!-- The whole message, which the row cuts to one line, and where it lives when
+     this app has no screen for it, before the verbs about it. -->
+<ng-template #details>
   @if (notification(); as item) {
-  <div class="head">
-    <mh-hex-avatar
-      size="lg"
-      tone="wash"
-      aria-hidden="true"
-      [icon]="style()?.icon ?? 'notifications-outline'"
-      [color]="style()?.color ?? 'medium'"
-    />
-
-    <div class="mh-kicker">{{ eyebrow() }}</div>
-    <h2>{{ item.title }}</h2>
-    <p class="body">{{ item.body }}</p>
-  </div>
-
-  <div class="actions">
-    <ion-button fill="outline" color="medium" expand="block" (click)="toggleRead.emit()">
-      <ion-icon slot="start" name="checkmark-done-outline" />
-      {{ (isUnread() ? 'notifications.markRead' : 'notifications.markUnread') | translate }}
-    </ion-button>
-    <ion-button fill="outline" color="danger" expand="block" (click)="remove.emit()">
-      <ion-icon slot="start" name="trash-outline" />
-      {{ 'button.delete' | translate }}
-    </ion-button>
-  </div>
-
-  @if (elsewhere(); as place) {
-  <ion-note class="footnote">
-    {{ 'notifications.detail.webOnly' | translate: { place: place } }}
-  </ion-note>
-  } }
+    <div class="message">
+      <p class="body">{{ item.body }}</p>
+      @if (elsewhere(); as place) {
+        <p class="mh-footnote">
+          {{ 'notifications.detail.webOnly' | translate: { place: place } }}
+        </p>
+      }
+    </div>
+  }
 </ng-template>
 
-<mh-sheet-shell
+<mh-action-sheet
   [(open)]="open"
-  [title]="'notifications.detail.title' | translate"
-  [body]="body"
-  [showFooter]="false"
-  [breakpoints]="[0, 0.6, 0.95]"
-  [initialBreakpoint]="0.6"
+  [title]="title()"
+  [subtitle]="eyebrow()"
+  [details]="details"
+  [actions]="actions()"
+  (chosen)="onChosen($event)"
 />

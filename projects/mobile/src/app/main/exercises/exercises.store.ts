@@ -89,6 +89,12 @@ export class ExercisesStore {
   readonly ownership = signal<ExerciseOwnershipFilter>(ExerciseOwnershipFilter.All);
   readonly sort = signal<ExerciseSortKey>(ExerciseSortKey.Name);
   readonly filters = signal<ExerciseFilters>(NO_FILTERS);
+  /** Picks a pill set aside, offered again the next time the sheet opens. */
+  private readonly _keptFilters = signal<ExerciseFilters | null>(null);
+  /** What the sheet opens on: the picks on screen, or the ones set aside. */
+  readonly sheetDraft = computed(() =>
+    filterCount(this.filters()) > 0 ? this.filters() : (this._keptFilters() ?? this.filters()),
+  );
   /** The committed search term — the page debounces the raw input into this. */
   readonly search = signal('');
 
@@ -188,9 +194,24 @@ export class ExercisesStore {
   // Each starts over from a single page: a narrower query has its own first
   // page, and appending it to what is already there would mix result sets.
 
+  /** All is on only while the sheet is empty: its picks are the view then. */
+  isOwnershipOn(value: ExerciseOwnershipFilter): boolean {
+    return (
+      this.ownership() === value &&
+      (value !== ExerciseOwnershipFilter.All || this.activeFilterCount() === 0)
+    );
+  }
+
+  /**
+   * A pill and the sheet's picks are one choice, as the strip shows only one
+   * thing on: picking a pill, All included, sets the picks aside. The sheet
+   * opens on them again, so Apply brings them back.
+   */
   setOwnership(value: ExerciseOwnershipFilter): void {
-    if (value === this.ownership()) return;
+    if (value === this.ownership() && this.activeFilterCount() === 0) return;
+    if (this.activeFilterCount() > 0) this._keptFilters.set(this.filters());
     this.ownership.set(value);
+    this.filters.set(NO_FILTERS);
     this._restart();
   }
 
@@ -207,14 +228,18 @@ export class ExercisesStore {
     this._restart();
   }
 
+  /** ...and picks in the sheet put the pill back on All, under them. */
   setFilters(filters: ExerciseFilters): void {
     this.filters.set({ ...filters });
+    this._keptFilters.set(null);
+    if (filterCount(filters) > 0) this.ownership.set(ExerciseOwnershipFilter.All);
     this._restart();
   }
 
   /** Clears the sheet's chips, the search and the pill; the sort key is not a filter. */
   clearNarrowing(): void {
     this.filters.set(NO_FILTERS);
+    this._keptFilters.set(null);
     this.search.set('');
     this.ownership.set(ExerciseOwnershipFilter.All);
     this._restart();

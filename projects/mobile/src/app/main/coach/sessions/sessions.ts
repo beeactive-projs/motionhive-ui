@@ -69,11 +69,11 @@ import {
   SessionActionId,
   SessionActionIds,
   SessionPrefill,
-  activeFilterCount,
   fitWindow,
   instanceTone,
   matchesFilters,
   prefillFromInstance,
+  sheetChipCount,
   weekdayLetters,
 } from './sessions.config';
 
@@ -188,7 +188,14 @@ export class Sessions implements ViewWillEnter {
   readonly selectedDay = signal(startOfDay(new Date()));
 
   readonly filters = signal<AgendaFilters>({ ...NO_FILTERS });
-  readonly filterCount = computed(() => activeFilterCount(this.filters()));
+  /** The Filters chip's number; while it is 0, the location chips are the view. */
+  readonly sheetCount = computed(() => sheetChipCount(this.filters()));
+  /** Picks a location chip set aside, offered again the next time the sheet opens. */
+  private readonly _keptFilters = signal<AgendaFilters | null>(null);
+  /** What the sheet opens on: the picks on screen, or the ones set aside. */
+  readonly sheetDraft = computed(() =>
+    this.sheetCount() > 0 ? this.filters() : (this._keptFilters() ?? this.filters()),
+  );
 
   /**
    * The day the default window is anchored on. A signal rather than a fresh
@@ -523,18 +530,27 @@ export class Sessions implements ViewWillEnter {
   /** A date filter can point outside the loaded window, so the window follows. */
   onFiltersApplied(filters: AgendaFilters): void {
     this.filters.set(filters);
+    this._keptFilters.set(null);
     this._syncWindow();
   }
 
   clearFilters(): void {
     this.filters.set({ ...NO_FILTERS });
+    this._keptFilters.set(null);
     this.query.set('');
     this._syncWindow();
   }
 
-  /** The quick chips under the strip write straight through to the sheet's state. */
+  /**
+   * The quick chips under the strip write straight through to the sheet's
+   * place, and set the rest of it aside: one thing is on at a time. A date
+   * set aside moves the window back, hence the sync.
+   */
   setLocation(kind: SessionLocationKind | null): void {
-    this.filters.update((filters) => ({ ...filters, locationKind: kind }));
+    const picks = this.sheetCount() > 0 ? this.filters() : this._keptFilters();
+    this.filters.set({ ...NO_FILTERS, locationKind: kind });
+    this._keptFilters.set(picks);
+    this._syncWindow();
   }
 
   showAgenda(): void {

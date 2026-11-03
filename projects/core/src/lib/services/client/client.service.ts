@@ -171,11 +171,9 @@ export class ClientService {
     );
   }
 
-  requestToBeClient(
-    instructorId: string,
-    message?: string,
-  ): Observable<{ message: string; request: ClientRequest }> {
-    return this._http.post<{ message: string; request: ClientRequest }>(
+  /** Answers with the new request itself, not a `{ message, request }` envelope. */
+  requestToBeClient(instructorId: string, message?: string): Observable<ClientRequest> {
+    return this._http.post<ClientRequest>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.REQUEST}/${instructorId}`,
       { message },
     );

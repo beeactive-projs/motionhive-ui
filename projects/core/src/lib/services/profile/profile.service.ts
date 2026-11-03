@@ -13,6 +13,8 @@ import {
   CreateInstructorProfilePayload,
 } from '../../models/profile/instructor-profile.model';
 import {
+  CoachDirectoryFacets,
+  CoachDirectoryParams,
   InstructorSearchResult,
   PublicInstructorProfile,
   SuggestedCoach,
@@ -106,6 +108,37 @@ export class ProfileService {
     return this._http.get<InstructorSearchResult[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROFILE.DISCOVER_INSTRUCTORS}`,
       { params },
+    );
+  }
+
+  /**
+   * One page of the coach directory, filtered on the server. Unlike
+   * `discoverInstructors` (the top 30, one array), this pages for real.
+   */
+  coachDirectory(
+    params: CoachDirectoryParams = {},
+    opts?: { silent?: boolean },
+  ): Observable<PaginatedResponse<InstructorSearchResult>> {
+    let httpParams = new HttpParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null || value === '' || value === false) continue;
+      // A specialization is free text, so a list repeats the param rather
+      // than joining on a comma the value may hold.
+      for (const item of Array.isArray(value) ? value : [value]) {
+        httpParams = httpParams.append(key, String(item));
+      }
+    }
+    return this._http.get<PaginatedResponse<InstructorSearchResult>>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.COACH_DIRECTORY}`,
+      { params: httpParams, ...(opts?.silent ? { context: silentRequest() } : {}) },
+    );
+  }
+
+  /** The cities and specializations the whole directory has, with counts. */
+  coachDirectoryFacets(opts?: { silent?: boolean }): Observable<CoachDirectoryFacets> {
+    return this._http.get<CoachDirectoryFacets>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.COACH_DIRECTORY_FACETS}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 

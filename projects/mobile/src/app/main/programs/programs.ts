@@ -122,6 +122,13 @@ export class Programs implements ViewWillEnter {
     this.store.setOrigin(origin);
   }
 
+  /** All is on only while the sheet holds nothing: its origin is the view then. */
+  isSizeOn(size: ProgramSize): boolean {
+    return (
+      this.store.size() === size && (size !== ProgramSizes.All || this.activeFilterCount() === 0)
+    );
+  }
+
   setSize(size: ProgramSize): void {
     this.store.setSize(size);
   }

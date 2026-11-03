@@ -25,6 +25,7 @@ import { ROLES } from '../../_shared/config/roles.config';
 import { resolveMode, TAB_SETS } from '../../_shared/config/tabs.config';
 import { MoreSection, MoreTile } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
+import { MY_COACHES_URL } from '../../_shared/utils/stack-paths';
 import { FeedbackSheet } from './_sheets/feedback-sheet/feedback-sheet';
 
 /**
@@ -84,7 +85,7 @@ export class More implements ViewWillEnter {
   private readonly _dots = new Map<string, Signal<boolean>>([
     ['/tabs/more/billing', this._moreBadgesService.hasBillDue],
     ['/tabs/more/payments', this._moreBadgesService.hasOverdueInvoices],
-    ['/tabs/more/coaches', this._moreBadgesService.hasCoachInvites],
+    [MY_COACHES_URL, this._moreBadgesService.hasCoachInvites],
   ]);
 
   /** The mode's sections, with the live dots spliced onto their rows. */

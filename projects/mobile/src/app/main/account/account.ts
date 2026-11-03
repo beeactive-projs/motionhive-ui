@@ -38,6 +38,7 @@ import {
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
+import { ProfileShareSheet } from '../../_shared/components/profile-share-sheet/profile-share-sheet';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import {
@@ -49,7 +50,6 @@ import { ACCOUNT_ICONS } from './account.config';
 import { AccountStore } from './account.store';
 import { ChoiceOption, ChoiceSheet } from '../../_shared/components/choice-sheet/choice-sheet';
 import { PhotoSheet } from './_sheets/photo-sheet/photo-sheet';
-import { ShareSheet } from './_sheets/share-sheet/share-sheet';
 import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 
 /** Translation keys for the appearance row's value and its sheet. */
@@ -87,8 +87,8 @@ export const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
     IonToolbar,
     ChoiceSheet,
     PhotoSheet,
+    ProfileShareSheet,
     SettingsRow,
-    ShareSheet,
     TranslatePipe,
   ],
   templateUrl: './account.html',

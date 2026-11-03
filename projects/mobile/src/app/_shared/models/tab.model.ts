@@ -19,6 +19,8 @@ export const TabIds = {
   User: 'user',
   Workouts: 'workouts',
   Discover: 'discover',
+  /** The coach directory: its own stack, reached from Discover, Home and the Menu. */
+  Coaches: 'coaches',
   Messages: 'messages',
   Groups: 'groups',
   Programs: 'programs',

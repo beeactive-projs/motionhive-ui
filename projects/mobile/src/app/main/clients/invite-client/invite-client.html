@@ -169,4 +169,12 @@
   (done)="finishEmailInvite()"
 />
 
-<mh-invite-link-sheet [(open)]="linkSheetOpen" [handle]="handle()" (chooseHandle)="chooseHandle()" />
+<!-- Said plainly in the hint: the link opens a profile, and the person still
+     has to ask. Better that than a coach wondering why nobody arrived. -->
+<mh-profile-share-sheet
+  [(open)]="linkSheetOpen"
+  [handle]="handle()"
+  [shareTitle]="'clients.invite.share.title' | translate"
+  [shareText]="'clients.invite.share.text' | translate"
+  [hint]="'clients.invite.linkHint' | translate"
+/>

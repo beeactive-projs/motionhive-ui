@@ -183,7 +183,8 @@ export class ExerciseFilterSheet {
               // The body is not read — only `total` is — so ask for the
               // smallest page the endpoint will serve.
               limit: 1,
-              ownership: this.ownership(),
+              // Picks put the pill back on All, so that is what Apply shows.
+              ownership: filterCount(draft) > 0 ? ExerciseOwnershipFilter.All : this.ownership(),
               search: term || undefined,
               ...filtersToQuery(draft),
             })

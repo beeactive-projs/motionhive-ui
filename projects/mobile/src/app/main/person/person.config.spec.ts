@@ -1,10 +1,22 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ProfileWorkout } from 'core';
+import {
+  ClientRequestTypes,
+  PendingCoachingRequest,
+  ProfileWorkout,
+  PublicUserProfile,
+} from 'core';
 
 import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
-import { PERSON_ICONS, PersonTabs, personTabs, workoutMonths } from './person.config';
+import {
+  CoachingCtas,
+  PERSON_ICONS,
+  PersonTabs,
+  coachingCta,
+  personTabs,
+  workoutMonths,
+} from './person.config';
 
 /**
  * The page and its row. The report sheet registers its own glyph, so it is
@@ -59,6 +71,68 @@ describe('PERSON_ICONS', () => {
     for (const name of used)
       expect(registered, `${name} is used but not registered`).toContain(name);
     for (const name of registered) expect(used, `${name} is registered but unused`).toContain(name);
+  });
+});
+
+describe('coachingCta', () => {
+  const coach = (overrides: Partial<PublicUserProfile> = {}): PublicUserProfile =>
+    ({
+      userId: 'coach-1',
+      handle: 'ana',
+      isInstructor: true,
+      yourCoachSince: null,
+      pendingRequest: null,
+      ...overrides,
+    }) as PublicUserProfile;
+  const pending = (overrides: Partial<PendingCoachingRequest>): PendingCoachingRequest => ({
+    id: 'req-1',
+    type: ClientRequestTypes.ClientToInstructor,
+    sentByYou: true,
+    createdAt: '2026-11-01T10:00:00Z',
+    expiresAt: '2026-12-01T10:00:00Z',
+    ...overrides,
+  });
+  const open = { isSelf: false, acceptingClients: true };
+
+  it('offers a request to a coach taking new clients', () => {
+    expect(coachingCta(coach(), open)).toBe(CoachingCtas.Request);
+  });
+
+  // The API refuses both, so the page must not offer a button that fails.
+  it('offers nothing to a coach who is closed, or whose profile has not landed', () => {
+    expect(coachingCta(coach(), { isSelf: false, acceptingClients: false })).toBeNull();
+    expect(coachingCta(coach(), { isSelf: false, acceptingClients: null })).toBeNull();
+  });
+
+  it('offers nothing on your own page, a non-coach, or your own coach', () => {
+    expect(coachingCta(coach(), { ...open, isSelf: true })).toBeNull();
+    expect(coachingCta(coach({ isInstructor: false }), open)).toBeNull();
+    expect(coachingCta(coach({ yourCoachSince: '2026-03-01' }), open)).toBeNull();
+    expect(coachingCta(null, open)).toBeNull();
+  });
+
+  it('says a request you sent is sent, even once they close their doors', () => {
+    const asked = coach({ pendingRequest: pending({}) });
+    expect(coachingCta(asked, open)).toBe(CoachingCtas.Requested);
+    expect(coachingCta(asked, { isSelf: false, acceptingClients: false })).toBe(
+      CoachingCtas.Requested,
+    );
+  });
+
+  it('answers an invitation from the coach', () => {
+    const invited = coach({
+      pendingRequest: pending({ type: ClientRequestTypes.InstructorToClient, sentByYou: false }),
+    });
+    expect(coachingCta(invited, open)).toBe(CoachingCtas.Invited);
+  });
+
+  // A request about the other way round (you coaching them) blocks a new
+  // one on the API's side too, so there is nothing to ask.
+  it('offers nothing over a request the other way round', () => {
+    const reversed = coach({
+      pendingRequest: pending({ type: ClientRequestTypes.InstructorToClient, sentByYou: true }),
+    });
+    expect(coachingCta(reversed, open)).toBeNull();
   });
 });
 

@@ -26,11 +26,10 @@ export const discoverRoutes: Routes = [
     title: 'pageTitle.search',
   },
   {
-    // Before `:id`, or the parameterised route swallows the word. Home
-    // mounts it too, at `/tabs/home/coaches`.
+    // The coach list's old address: it is a stack of its own now. Kept so a
+    // restored URL lands there. Before `:id`, which would read it as a session.
     path: 'coaches',
-    loadComponent: () => import('./all-coaches/all-coaches').then((m) => m.AllCoaches),
-    title: 'pageTitle.coaches',
+    redirectTo: '/tabs/coaches',
   },
   {
     // Every group to join (Home mounts it at `/tabs/home/groups-to-join`).

@@ -11,6 +11,7 @@ import {
   leafOutline,
   locationOutline,
   lockClosedOutline,
+  optionsOutline,
   peopleOutline,
   searchOutline,
   timeOutline,
@@ -75,6 +76,7 @@ export const DISCOVER_ICONS = {
   leafOutline,
   locationOutline,
   lockClosedOutline,
+  optionsOutline,
   peopleOutline,
   searchOutline,
   timeOutline,
@@ -396,6 +398,20 @@ export function quickFilterSelected(filters: DiscoverFilters, id: QuickFilterId)
   }
 }
 
+/**
+ * Whether the sheet holds more than one quick chip can say: a date, or a
+ * pick no chip matches (Group + Online, type Open). The strip shows one
+ * thing on, so then the Filters chip carries it and no quick chip lights.
+ */
+export function sheetBeyondQuickChips(filters: DiscoverSheetFilters): boolean {
+  if (filters.datePreset !== DiscoverDatePresets.Any) return true;
+  const picked: DiscoverFilters = {
+    type: filters.type ?? undefined,
+    locationKind: filters.locationKind ?? undefined,
+  };
+  return !QUICK_FILTERS.some((chip) => quickFilterSelected(picked, chip.id));
+}
+
 // ─── Coaches ───────────────────────────────────────────────────────────────
 
 export function coachName(c: InstructorSearchResult): string {
@@ -448,15 +464,28 @@ export function coachFacts(c: InstructorSearchResult): string {
   return trimmed([...(c.specializations ?? []).slice(0, 3), coachYears(c)]).join(' · ');
 }
 
-/** A coach row's one badge: Online for a coach who coaches online, else
-    Taking clients while the door is open, else nothing. */
+/** A coach row's one badge: "Your coach" for the reader's own, else Request
+    sent while the reader's request waits, else Online for a coach with an
+    online venue, else Taking clients while the door is open, else nothing. */
 export interface CoachBadge {
   label: string;
-  tone: 'teal' | 'success';
+  tone: 'violet' | 'warning' | 'teal' | 'success';
 }
 
-export function coachBadge(c: InstructorSearchResult): CoachBadge | null {
-  if (coachMatchesGoal(c, DiscoverGoalIds.Online)) {
+export function coachBadge(
+  c: InstructorSearchResult,
+  options: { mine?: boolean } = {},
+): CoachBadge | null {
+  // Violet: people are violet on every screen (lists.md).
+  if (options.mine) {
+    return { label: translate('discover.coachRow.yourCoach'), tone: 'violet' };
+  }
+  // The tone the coach's Clients list gives the same request, so it reads
+  // the same from either end.
+  if (c.requestSent) {
+    return { label: translate('discover.coachRow.requestSent'), tone: 'warning' };
+  }
+  if (c.isOnline) {
     return { label: translate('discover.coachRow.online'), tone: 'teal' };
   }
   if (c.isAcceptingClients) {
@@ -478,35 +507,6 @@ export function sortCoaches(list: InstructorSearchResult[]): InstructorSearchRes
 /** Everyone but the reader: Discover never pitches a coach to themselves. */
 export function withoutReader<T extends { userId: string }>(list: readonly T[], readerId: string | null | undefined): T[] {
   return readerId ? list.filter((item) => item.userId !== readerId) : [...list];
-}
-
-/**
- * The all-coaches filter chips come from the coaches themselves — deduped
- * case-insensitively (first casing wins), sorted — never a hardcoded list
- * that can drift from what coaches actually type into their profiles.
- */
-export function specializationOptions(list: InstructorSearchResult[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const coach of list) {
-    for (const raw of coach.specializations ?? []) {
-      const label = raw.trim();
-      const key = label.toLowerCase();
-      if (!label || seen.has(key)) continue;
-      seen.add(key);
-      out.push(label);
-    }
-  }
-  return out.sort((a, b) => a.localeCompare(b));
-}
-
-export function matchesSpecialization(
-  c: InstructorSearchResult,
-  spec: string | null,
-): boolean {
-  if (!spec) return true;
-  const needle = spec.trim().toLowerCase();
-  return (c.specializations ?? []).some((s) => s.trim().toLowerCase() === needle);
 }
 
 /**
@@ -677,9 +677,15 @@ export function textMatchesGoal(
   );
 }
 
-/** A coach by what they coach; no goal matches everyone. */
+/**
+ * A coach by what they coach, and Online by an online venue (the API's
+ * `isOnline`), never by a word in their specializations. No goal matches
+ * everyone.
+ */
 export function coachMatchesGoal(c: InstructorSearchResult, goal: DiscoverGoalId | null): boolean {
-  return !goal || textMatchesGoal(c.specializations ?? [], goal);
+  if (!goal) return true;
+  if (goal === DiscoverGoalIds.Online) return c.isOnline;
+  return textMatchesGoal(c.specializations ?? [], goal);
 }
 
 /** A group by its name and tags. */
@@ -1006,10 +1012,10 @@ export function parseRecents(raw: unknown): DiscoverRecent[] {
 
 /**
  * Where Discover's screens send a tap, from the stack their URL is in. The
- * coach and group lists and search are mounted in Discover and in Home;
- * whichever opened them, a coach, a group or a session opens in that same
- * stack, so back returns there (`stack-paths.ts`). Anywhere else falls back
- * to Discover's own.
+ * group list and search are mounted in Discover and in Home; whichever
+ * opened them, a coach, a group or a session opens in that same stack, so
+ * back returns there (`stack-paths.ts`). Anywhere else falls back to
+ * Discover's own. The coach list is a stack of its own (`/tabs/coaches`).
  */
 export function discoverLinks(url: string) {
   const inHome = stackRootOf(url) === ProfileStacks.Home;
@@ -1024,7 +1030,6 @@ export function discoverLinks(url: string) {
     /** The group itself, once the reader is in. */
     group: (groupId: string) => [groupBase(root), groupId],
     session: (instanceId: string) => (inHome ? [root, 'booking', instanceId] : [root, instanceId]),
-    allCoaches: `${root}/coaches`,
     allGroups: inHome ? `${root}/groups-to-join` : `${root}/groups`,
     search: `${root}/search`,
   };

@@ -12,6 +12,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import {
+  countryNameFromCode,
   DiscoverFilters,
   DiscoverGroup,
   GroupService,
@@ -207,7 +208,7 @@ export class Discover implements OnInit {
 
   coachLocation(c: InstructorSearchResult): string {
     return (
-      [c.city, c.country].filter(Boolean).join(', ') ||
+      [c.city, countryNameFromCode(c.countryCode)].filter(Boolean).join(', ') ||
       this._translateService.instant('discover.coaches.online')
     );
   }

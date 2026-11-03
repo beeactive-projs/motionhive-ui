@@ -29,6 +29,8 @@ export const API_ENDPOINTS = {
     BASE: '/profile',
     INSTRUCTORS: '/profile/instructors',
     DISCOVER_INSTRUCTORS: '/profile/instructors/discover',
+    COACH_DIRECTORY: '/profile/instructors/directory',
+    COACH_DIRECTORY_FACETS: '/profile/instructors/directory/facets',
     SUGGESTED_INSTRUCTORS: '/profile/instructors/suggested',
     INSTRUCTOR_BY_HANDLE: (handle: string) => `/profile/instructors/by-handle/${handle}`,
     INSTRUCTOR_GROUPS: (id: string) => `/profile/instructors/${id}/groups`,

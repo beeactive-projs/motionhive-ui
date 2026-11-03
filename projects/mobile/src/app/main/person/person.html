@@ -303,6 +303,53 @@
           <ion-icon slot="start" name="create-outline" aria-hidden="true" />
           {{ 'person.editProfile' | translate }}
         </ion-button>
+      } @else if (coachingCta(); as cta) {
+        <!-- A coach you could train with: the coaching verb takes the width
+             and the honey, Message steps down to an icon beside it. -->
+        <div class="cta-row">
+          <ion-button
+            class="message mh-quiet"
+            fill="outline"
+            [attr.aria-label]="'person.message' | translate"
+            (click)="message()"
+          >
+            <ion-icon slot="icon-only" name="chatbubble-ellipses-outline" aria-hidden="true" />
+          </ion-button>
+          @switch (cta) {
+            @case (Ctas.Request) {
+              <ion-button expand="block" class="cta" color="primary" (click)="openRequest()">
+                {{ 'person.coaching.request' | translate }}
+              </ion-button>
+            }
+            @case (Ctas.Requested) {
+              <!-- A state, not an action: a line of text with the one thing
+                   still to do beside it, as a group join request reads. -->
+              <div class="pending">
+                <span>{{ 'person.coaching.requested' | translate }}</span>
+                <ion-button
+                  class="mh-text-link"
+                  fill="clear"
+                  size="small"
+                  [disabled]="coachingBusy()"
+                  (click)="withdrawRequest()"
+                >
+                  {{ 'person.coaching.withdraw' | translate }}
+                </ion-button>
+              </div>
+            }
+            @case (Ctas.Invited) {
+              <ion-button
+                expand="block"
+                class="cta"
+                color="primary"
+                [disabled]="coachingBusy()"
+                (click)="acceptInvite()"
+              >
+                {{ 'person.coaching.acceptInvite' | translate }}
+              </ion-button>
+            }
+          }
+        </div>
       } @else {
         <ion-button expand="block" class="cta" color="primary" (click)="message()">
           <ion-icon slot="start" name="chatbubble-ellipses-outline" aria-hidden="true" />
@@ -311,6 +358,15 @@
       }
     </ion-toolbar>
   </ion-footer>
+
+  @if (coachingCta() === Ctas.Request) {
+    <mh-request-coach-sheet
+      [(open)]="requestOpen"
+      [name]="name()"
+      [saving]="requestSaving()"
+      (send)="sendRequest($event)"
+    />
+  }
 
   @if (!isSelf()) {
     <mh-action-sheet

@@ -3,6 +3,7 @@ import { authGuard } from 'core';
 
 import { coachGuard } from './_shared/guards/coach.guard';
 import { TabIds } from './_shared/models/tab.model';
+import { MY_COACHES_URL } from './_shared/utils/stack-paths';
 
 /**
  * The notification centre, mounted once under every tab.
@@ -117,6 +118,16 @@ export const routes: Routes = [
           import('./main/discover/discover.routes').then((m) => m.discoverRoutes),
       },
       {
+        // The coach directory, and on its Yours chip the reader's own coaches
+        // and the invitations waiting on them: the only place on mobile a
+        // coach's invitation can be answered. A stack of its own with three
+        // doors (Discover, Home, the Menu), so Discover lights while in it
+        // (`litTabId`). No guard: anyone can look for a coach, or be invited.
+        path: 'coaches',
+        loadChildren: () =>
+          import('./main/coaches/coaches.routes').then((m) => m.coachesRoutes),
+      },
+      {
         path: 'more',
         loadComponent: () => import('./main/more/more').then((m) => m.More),
       },
@@ -139,14 +150,10 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./main/account/account.routes').then((m) => m.accountRoutes),
       },
-      {
-        // The trainee's side of a coaching relationship, and the only place
-        // on mobile a coach's invitation can be answered. No guard: anyone
-        // can be invited by a coach, a coach who also trains included.
-        path: 'more/coaches',
-        loadChildren: () =>
-          import('./main/coaches/coaches.routes').then((m) => m.coachesRoutes),
-      },
+      // My coaches' old address: the Coaches screen's Yours chip now. Kept so
+      // a restored URL lands there.
+      { path: 'more/coaches', pathMatch: 'full', redirectTo: MY_COACHES_URL },
+      { path: 'more/coaches/person/:handle', redirectTo: 'coaches/person/:handle' },
       {
         // Only an instructor holds a second role, so only an instructor has
         // anything to switch between.

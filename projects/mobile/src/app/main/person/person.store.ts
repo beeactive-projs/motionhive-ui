@@ -1,8 +1,11 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subscription, finalize, take } from 'rxjs';
+import { EMPTY, Observable, Subscription, finalize, take, tap } from 'rxjs';
 
 import {
+  ClientRequestTypes,
+  ClientService,
+  PendingCoachingRequest,
   ProfilePreviewAs,
   ProfileService,
   ProfileWorkout,
@@ -10,7 +13,9 @@ import {
   PublicUserProfile,
 } from 'core';
 
+import { MoreBadgesService } from '../../_shared/services/more-badges.service';
 import { PagedList } from '../../_shared/utils/paged-list';
+import { CoachesRefreshService } from '../coaches/_services/coaches-refresh.service';
 
 /** Workouts shown per page on a profile; more come on request. */
 const WORKOUTS_PAGE_SIZE = 10;
@@ -28,6 +33,9 @@ const WORKOUTS_PAGE_SIZE = 10;
 @Injectable()
 export class PersonStore {
   private readonly _profileService = inject(ProfileService);
+  private readonly _clientService = inject(ClientService);
+  private readonly _moreBadgesService = inject(MoreBadgesService);
+  private readonly _coachesRefreshService = inject(CoachesRefreshService);
   /** The page's, since the page provides this store. */
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -132,6 +140,73 @@ export class PersonStore {
   /** The next page of workouts, appended. Quiet on failure: the profile still stands. */
   loadMoreWorkouts(): void {
     this._workouts.more();
+  }
+
+  // ── Coaching ─────────────────────────────────────────────────────────────
+  // The reader's side of a coaching relationship, from a coach's profile.
+  // The profile's `pendingRequest` is patched the moment a call lands, so the
+  // footer moves on without waiting for a reload.
+
+  /**
+   * Ask this coach to coach the reader, with an optional note for them. The
+   * Coaches screen under this page is told too, so its row says so on the
+   * way back.
+   */
+  requestToTrain(message: string): Observable<unknown> {
+    const profile = this._profile();
+    if (!profile) return EMPTY;
+    return this._clientService.requestToBeClient(profile.userId, message || undefined).pipe(
+      take(1),
+      takeUntilDestroyed(this._destroyRef),
+      tap((request) => {
+        this._setPending({
+          id: request.id,
+          type: ClientRequestTypes.ClientToInstructor,
+          sentByYou: true,
+          createdAt: request.createdAt,
+          expiresAt: request.expiresAt,
+        });
+        this._coachesRefreshService.requestChanged(profile.userId, true);
+      }),
+    );
+  }
+
+  /** Take back a request the reader sent. Only the sender may. */
+  withdrawRequest(): Observable<unknown> {
+    const profile = this._profile();
+    const pending = profile?.pendingRequest;
+    if (!profile || !pending?.sentByYou) return EMPTY;
+    return this._clientService.cancelRequest(pending.id).pipe(
+      take(1),
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        this._setPending(null);
+        this._coachesRefreshService.requestChanged(profile.userId, false);
+      }),
+    );
+  }
+
+  /**
+   * Say yes to this coach's invitation. The relationship it becomes ("coaching
+   * you since") only the API can hand back, so the profile reloads; the Menu's
+   * invitation dot is forced, as the Coaches screen does.
+   */
+  acceptInvite(): Observable<unknown> {
+    const pending = this._profile()?.pendingRequest;
+    if (!pending || pending.sentByYou) return EMPTY;
+    return this._clientService.acceptRequest(pending.id).pipe(
+      take(1),
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        this._setPending(null);
+        this._moreBadgesService.refreshPendingRequests(true);
+        this.load();
+      }),
+    );
+  }
+
+  private _setPending(pendingRequest: PendingCoachingRequest | null): void {
+    this._profile.update((profile) => (profile ? { ...profile, pendingRequest } : profile));
   }
 
   /** Silent on failure: a private or missing coach profile just means no bio. */

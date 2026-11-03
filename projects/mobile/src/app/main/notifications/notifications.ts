@@ -43,6 +43,7 @@ import {
   categoryListLabel,
   notificationListActions,
   sameFilters,
+  sheetChipCount,
 } from './notifications.config';
 
 /** One day's worth of rows, as the template consumes them. */
@@ -121,6 +122,14 @@ export class Notifications implements ViewWillEnter {
   }));
   readonly filterCount = computed(() => activeFilterCount(this.filters()));
   readonly hasFilter = computed(() => this.filterCount() > 0);
+  /** The Filters chip's number; while it is 0, the All / Unread chips are the view. */
+  readonly sheetCount = computed(() => sheetChipCount(this.filters()));
+  /** Picks a quick chip set aside, offered again the next time the sheet opens. */
+  private readonly _keptFilters = signal<NotificationFilters | null>(null);
+  /** What the sheet opens on: the picks on screen, or the ones set aside. */
+  readonly sheetDraft = computed(() =>
+    this.sheetCount() > 0 ? this.filters() : (this._keptFilters() ?? this.filters()),
+  );
 
   /** "Sessions and Payments" — null with no category on. */
   readonly categoryLabel = computed(() => categoryListLabel(this.store.categories()));
@@ -192,13 +201,19 @@ export class Notifications implements ViewWillEnter {
   }
 
   onFiltersApplied(filters: NotificationFilters): void {
+    this._keptFilters.set(null);
     if (sameFilters(filters, this.filters())) return;
     this.store.loadList({ ...filters, markViewedAfter: true });
   }
 
-  /** The quick chips in the strip write straight through to the sheet's Status. */
+  /**
+   * The quick chips in the strip write straight through to the sheet's
+   * Status, and set its categories aside: one thing is on at a time.
+   */
   setUnreadOnly(unreadOnly: boolean): void {
-    this.onFiltersApplied({ ...this.filters(), unreadOnly });
+    const picks = this.sheetCount() > 0 ? this.filters() : this._keptFilters();
+    this.onFiltersApplied({ unreadOnly, categories: [] });
+    this._keptFilters.set(picks);
   }
 
   clearFilters(): void {
@@ -239,10 +254,6 @@ export class Notifications implements ViewWillEnter {
     else this.store.markRead(item.id);
   }
 
-  dismiss(item: BellNotification): void {
-    this.store.dismiss(item.id);
-  }
-
   remove(item: BellNotification): void {
     this.store.remove(item.id);
     void this._feedbackService.success(this._translateService.instant('notifications.toast.deleted'));
@@ -272,26 +283,22 @@ export class Notifications implements ViewWillEnter {
   }
 
   // ─── Detail sheet ─────────────────────────────────────────────
+  // The sheet reports a verb once it has closed, so neither closes it.
 
   toggleReadFromDetail(): void {
     const item = this.detail();
-    if (!item) return;
-    this.toggleRead(item);
-    // The sheet reads from the list, so re-point it at the updated row.
-    this.detail.set(this._current(item.id));
+    if (item) this.toggleRead(item);
   }
 
   removeFromDetail(): void {
     const item = this.detail();
-    if (!item) return;
-    this.detailOpen.set(false);
-    this.remove(item);
+    if (item) this.remove(item);
   }
 
   /**
    * Open a row the user tapped somewhere else — the arrival banner. Silently
-   * does nothing if it is no longer on the first page (dismissed, deleted, or
-   * pushed off by a burst); the list is right there either way.
+   * does nothing if it is no longer on the first page (deleted, or pushed off
+   * by a burst); the list is right there either way.
    */
   private _openById(receiptId: string): void {
     // Drop the param so a back-navigation or a tab return does not reopen it.

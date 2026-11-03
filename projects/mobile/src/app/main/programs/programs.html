@@ -16,20 +16,20 @@
            is the kind of thing (a multi-week program or a single routine);
            whose it is (yours or MotionHive's) lives in the sheet. -->
       <div class="mh-chip-row">
-        <ion-button class="filters" fill="clear" shape="round" size="small"
-          [class.active]="activeFilterCount() > 0" (click)="openFilters()">
-          <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
+        <ion-button class="chip filters" fill="clear" shape="round" size="small" aria-haspopup="dialog"
+          [class.selected]="activeFilterCount() > 0"
+          [attr.aria-label]="'a11y.filters' | translate: { count: activeFilterCount() }"
+          (click)="openFilters()">
+          <ion-icon name="options-outline" aria-hidden="true" />
           @if (activeFilterCount() > 0) {
-            {{ 'common.filtersCount' | translate: { count: activeFilterCount() } }}
-          } @else {
-            {{ 'common.filters' | translate }}
+            <span class="count">{{ activeFilterCount() }}</span>
           }
         </ion-button>
 
         @for (pill of pills; track pill.value) {
           <ion-chip
-            [class.selected]="store.size() === pill.value"
-            [attr.aria-pressed]="store.size() === pill.value"
+            [class.selected]="isSizeOn(pill.value)"
+            [attr.aria-pressed]="isSizeOn(pill.value)"
             (click)="setSize(pill.value)"
           >
             {{ pill.label | translate }} · {{ countFor(pill.value) }}
@@ -109,7 +109,7 @@
 
 <mh-program-filter-sheet
   [(open)]="filtersOpen"
-  [origin]="store.origin()"
+  [origin]="store.sheetOrigin()"
   [counts]="store.originCounts()"
   (apply)="setOrigin($event)"
 />

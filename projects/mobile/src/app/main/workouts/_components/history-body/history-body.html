@@ -36,11 +36,11 @@
     </ion-button>
   }
   <ion-button
-    class="filters calendar-toggle"
+    class="chip calendar-toggle"
     fill="clear"
     shape="round"
     size="small"
-    [class.active]="store.calendarOpen()"
+    [class.selected]="store.calendarOpen()"
     [attr.aria-pressed]="store.calendarOpen()"
     [attr.aria-label]="
       (store.calendarOpen() ? 'workouts.history.calendar.hide' : 'workouts.history.calendar.show')

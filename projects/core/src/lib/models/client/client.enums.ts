@@ -76,6 +76,19 @@ export const CoachSuggestionReasons = {
 export type CoachSuggestionReason =
   (typeof CoachSuggestionReasons)[keyof typeof CoachSuggestionReasons];
 
+/**
+ * How the coach directory orders its rows; mirrors the API's
+ * `CoachDirectorySort`. Recommended is taking clients first, then the most
+ * experienced, then by name.
+ */
+export const CoachDirectorySorts = {
+  Recommended: 'recommended',
+  Experience: 'experience',
+  Name: 'name',
+} as const;
+
+export type CoachDirectorySort = (typeof CoachDirectorySorts)[keyof typeof CoachDirectorySorts];
+
 /** Translated on read — see `enumLabelMap`. */
 export const ClientStatusLabels: Record<InstructorClientStatus, string> = enumLabelMap(
   'clientStatus',

@@ -932,6 +932,9 @@
       "defaultShareText": "Vezi asta pe MotionHive",
       "defaultSubcopy": "Pune acest link în bio-ul de Instagram, în story sau oriunde te pot găsi oamenii.",
       "previewLabel": "Previzualizare · Cum arată când e distribuit",
+      "qrHint": "Îndreaptă camera unui telefon spre cod ca să deschizi linkul.",
+      "qrLabel": "Cod QR pentru acest link",
+      "qrTitle": "Sau scanează codul",
       "toast": {
         "anywhereHint": "Lipește-l oriunde vrei să-l distribui.",
         "instagramHint": "Lipește-l în bio-ul de Instagram, în story sau într-un mesaj."

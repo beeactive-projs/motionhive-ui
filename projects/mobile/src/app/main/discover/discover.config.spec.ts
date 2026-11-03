@@ -44,7 +44,6 @@ import {
   inCity,
   isSessionFull,
   isoWeek,
-  matchesSpecialization,
   parseRecents,
   pushRecent,
   quickFilterSelected,
@@ -52,9 +51,9 @@ import {
   sessionInCity,
   sessionMatchesGoal,
   sessionPriceParts,
+  sheetBeyondQuickChips,
   sheetFilterCount,
   sortCoaches,
-  specializationOptions,
   spotsLabel,
   textMatchesGoal,
   withoutReader,
@@ -188,8 +187,9 @@ function coach(
     specializations: ['Yoga'],
     yearsOfExperience: 8,
     isAcceptingClients: true,
+    isOnline: false,
     city: 'Bucharest',
-    country: 'RO',
+    countryCode: 'RO',
     socialLinks: null,
     ...overrides,
   };
@@ -430,6 +430,26 @@ describe('quickFilterSelected', () => {
   });
 });
 
+describe('sheetBeyondQuickChips', () => {
+  const sheet = (patch: Partial<typeof NO_SHEET_FILTERS>) => ({ ...NO_SHEET_FILTERS, ...patch });
+
+  it('is false while a quick chip says it all', () => {
+    expect(sheetBeyondQuickChips(NO_SHEET_FILTERS)).toBe(false);
+    expect(sheetBeyondQuickChips(sheet({ locationKind: SessionLocationKind.Online }))).toBe(false);
+    expect(sheetBeyondQuickChips(sheet({ type: SessionType.Group }))).toBe(false);
+  });
+
+  it('is true for a date, a combination or a sheet-only type', () => {
+    expect(sheetBeyondQuickChips(sheet({ datePreset: DiscoverDatePresets.Weekend }))).toBe(true);
+    expect(
+      sheetBeyondQuickChips(
+        sheet({ type: SessionType.Group, locationKind: SessionLocationKind.Online }),
+      ),
+    ).toBe(true);
+    expect(sheetBeyondQuickChips(sheet({ type: SessionType.Open }))).toBe(true);
+  });
+});
+
 // ─── Coaches ───────────────────────────────────────────────────────────────
 
 describe('coach helpers', () => {
@@ -461,21 +481,6 @@ describe('coach helpers', () => {
     expect(
       sortCoaches([closed, acceptingZ, acceptingA]).map((c) => c.id),
     ).toEqual(['p1', 'p3', 'p2']);
-  });
-
-  it('specializationOptions dedupes case-insensitively and sorts', () => {
-    const list = [
-      coach({ specializations: ['Yoga', 'strength'] }),
-      coach({ id: 'p2', specializations: ['Strength', 'Boxing', ' '] }),
-      coach({ id: 'p3', specializations: null }),
-    ];
-    expect(specializationOptions(list)).toEqual(['Boxing', 'strength', 'Yoga']);
-  });
-
-  it('matchesSpecialization is an exact case-insensitive match', () => {
-    expect(matchesSpecialization(coach(), 'yoga')).toBe(true);
-    expect(matchesSpecialization(coach(), 'yog')).toBe(false);
-    expect(matchesSpecialization(coach(), null)).toBe(true);
   });
 });
 
@@ -512,9 +517,31 @@ describe('coach lines and badge', () => {
   });
 
   it('coachBadge says Online for an online coach, else Taking clients, else nothing', () => {
-    expect(coachBadge(coach({ specializations: ['Online coaching'] }))).toEqual({ label: 'Online', tone: 'teal' });
+    expect(coachBadge(coach({ isOnline: true }))).toEqual({ label: 'Online', tone: 'teal' });
     expect(coachBadge(coach())).toEqual({ label: 'Taking clients', tone: 'success' });
     expect(coachBadge(coach({ isAcceptingClients: false }))).toBeNull();
+  });
+
+  // The venue decides, so a coach who only writes "online" in their
+  // specialties is not badged as one.
+  it('coachBadge never reads Online off a word in the specialties', () => {
+    expect(coachBadge(coach({ specializations: ['Online coaching'] }))?.label).toBe('Taking clients');
+  });
+
+  it("coachBadge puts the reader's own coach first", () => {
+    expect(coachBadge(coach({ isOnline: true }), { mine: true })).toEqual({
+      label: 'Your coach',
+      tone: 'violet',
+    });
+  });
+
+  // Amber, as the coach's Clients list shows the same pending request.
+  it('coachBadge says Request sent over Online while the request waits', () => {
+    expect(coachBadge(coach({ isOnline: true, requestSent: true }))).toEqual({
+      label: 'Request sent',
+      tone: 'warning',
+    });
+    expect(coachBadge(coach({ requestSent: true }), { mine: true })?.label).toBe('Your coach');
   });
 
   it('withoutReader leaves the reader out, and everyone in without one', () => {
@@ -613,6 +640,8 @@ describe('goals', () => {
     expect(coachMatchesGoal(coach({ specializations: ['Powerlifting'] }), DiscoverGoalIds.Strength)).toBe(true);
     expect(coachMatchesGoal(coach(), DiscoverGoalIds.Strength)).toBe(false);
     expect(coachMatchesGoal(coach(), null)).toBe(true);
+    expect(coachMatchesGoal(coach({ isOnline: true }), DiscoverGoalIds.Online)).toBe(true);
+    expect(coachMatchesGoal(coach({ specializations: ['Online'] }), DiscoverGoalIds.Online)).toBe(false);
     expect(groupMatchesGoal(group({ name: 'Club', tags: ['mobilitate'] }), DiscoverGoalIds.Mobility)).toBe(true);
     expect(groupMatchesGoal(group(), DiscoverGoalIds.Running)).toBe(false);
     expect(sessionMatchesGoal(instance(), DiscoverGoalIds.Online)).toBe(true);
@@ -761,13 +790,12 @@ describe('discoverLinks', () => {
   });
 
   it('opens everything in Home\'s stack when mounted there', () => {
-    const links = discoverLinks('/tabs/home/coaches');
+    const links = discoverLinks('/tabs/home/search');
     expect(links.root).toBe('/tabs/home');
     expect(links.person('irina')).toEqual(['/tabs/home/person', 'irina']);
     expect(links.groupPreview('g1')).toEqual(['/tabs/home/groups', 'preview', 'g1']);
     expect(links.group('g1')).toEqual(['/tabs/home/groups', 'g1']);
     expect(links.session('s1')).toEqual(['/tabs/home', 'booking', 's1']);
-    expect(links.allCoaches).toBe('/tabs/home/coaches');
     expect(links.allGroups).toBe('/tabs/home/groups-to-join');
   });
 

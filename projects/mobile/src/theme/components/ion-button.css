@@ -64,47 +64,6 @@ ion-buttons .button-has-icon-only ion-icon[slot='icon-only'] {
   font-size: var(--mh-icon-lg);
 }
 
-/* The filter-sheet trigger leading a `.mh-chip-row` strip (layout.css) —
-   same recipe as home's role pill: honey-tinted capsule, plain sentence-case
-   label. It must stay `fill="clear"` — a solid button in a toolbar is styled
-   as an inverted chip and would ignore `--color`. */
-.mh-chip-row .filters {
-  --background: var(--mh-color-honey-tint);
-  --background-hover: rgba(var(--ion-color-primary-rgb), 0.2);
-  --background-activated: rgba(var(--ion-color-primary-rgb), 0.24);
-  /* Text colour, not amber: amber on an amber tint fails AA, and it flips
-     with the palette so the pill still reads in dark mode. */
-  --color: var(--mh-color-honey-deep);
-  --padding-start: 1rem;
-  --padding-end: 1rem;
-  flex: none;
-  /* Matches the chips beside it — Ionic's small button floor is taller. */
-  height: 2rem;
-  min-height: 0;
-  margin: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
-}
-
-.mh-chip-row .filters.active {
-  border: var(--mh-hairline) solid var(--mh-color-honey-deep);
-  border-radius: var(--mh-radius-pill);
-}
-
-.mh-chip-row .filters ion-icon {
-  font-size: var(--mh-icon-sm);
-}
-
-/* The calendar's button, an icon in the same capsule, at the end of the
-   strip: the month stays out of the way until asked for. */
-.mh-chip-row .filters.calendar-toggle {
-  margin-inline-start: auto;
-  --padding-start: 0.75rem;
-  --padding-end: 0.75rem;
-}
-
 /* The day a list is narrowed to from its calendar, with the way back to
    every day: a honey pill under the chips (History, a client's Training
    and Sessions). The same height as the chips above it. */
@@ -139,10 +98,9 @@ ion-button.mh-day-chip ion-icon {
    `aria-pressed` on it names a state nothing can reach, and a keyboard or
    switch user could not change the filter at all. Same light navy idle fill as
    `.mh-chip-row ion-chip` (ion-chip.css) so the two read as one vocabulary,
-   and the same geometry as `.filters` beside it — with the trigger's roomier
-   inline padding, which is also what lifts a two-letter label off its
-   minimum. It must stay `fill="clear"`: a solid button in a toolbar is styled
-   as an inverted chip and would ignore `--background`. */
+   with roomy inline padding, which is also what lifts a two-letter label off
+   its minimum. It must stay `fill="clear"`: a solid button in a toolbar is
+   styled as an inverted chip and would ignore `--background`. */
 :is(.mh-chip-row, .mh-chip-cloud) .chip {
   --background: var(--mh-color-chip-idle);
   --background-hover: var(--mh-color-chip-idle);
@@ -201,6 +159,35 @@ ion-button.mh-day-chip ion-icon {
   font-weight: 600;
 }
 
+/* A glyph in a chip: the Filters trigger and the calendar's button. */
+.mh-chip-row .chip ion-icon {
+  font-size: var(--mh-icon-sm);
+}
+
+/* The filter-sheet trigger leading a `.mh-chip-row` strip (layout.css): a
+   chip holding the options glyph alone, then the number of filters on once
+   any are ("2" in a `.count`). Navy like the chips beside it until the sheet
+   holds picks; then it is the picked chip (`.selected`, honey) and no other
+   chip lights, since a strip shows one choice (colour-and-type.md). It opens
+   a sheet rather than switching, so it carries no `aria-pressed`. Its name
+   is the `aria-label` (`a11y.filters`, "Filters, 2 active"), since a glyph
+   and a digit say nothing to a screen reader.
+
+   The glyph takes the default slot, not `icon-only`, so the count follows it
+   in the same row and the ripple stays inside the pill (Ionic gives an
+   icon-only clear button in a toolbar an unbounded one). */
+.mh-chip-row .chip:is(.filters, .calendar-toggle) {
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+}
+
+/* The calendar's button, a glyph in a chip at the end of the strip: the
+   month stays out of the way until asked for. A switch, so open it is a
+   picked chip (`.selected`). */
+.mh-chip-row .chip.calendar-toggle {
+  margin-inline-start: auto;
+}
+
 /* A clear button sitting on a card. Ionic gives it the honey *fill* colour,
    which is 2.05:1 on white; text wants the deep ink token. Scoped to rows so
    toolbar buttons keep Ionic's own treatment. */
@@ -238,9 +225,10 @@ ion-item ion-button.mh-row-action::after {
 
 /* The same fix for a clear button used as a text link on a page ("Forgot
    password?", "Create one for free"), which sits on the page surface rather
-   than in a row. */
+   than in a row: the deep ink in light, the honey itself in dark
+   (`--mh-color-link`). */
 ion-button.mh-text-link {
-  --color: var(--mh-color-honey-deep);
+  --color: var(--mh-color-link);
 }
 
 /* …and one that sits inside a sentence ("Don't have an account? Create one

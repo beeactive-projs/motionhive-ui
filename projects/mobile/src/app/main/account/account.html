@@ -65,8 +65,11 @@
         <ion-button expand="block" [disabled]="!handle()" (click)="openPublicProfile()">
           {{ 'button.viewProfile' | translate }}
         </ion-button>
+        <!-- The QR glyph, like the invite page's door: both open the same
+             sheet, with the code first. -->
         <ion-button expand="block" fill="outline" [disabled]="!handle()"
           (click)="shareSheetOpen.set(true)">
+          <ion-icon slot="start" name="qr-code-outline" aria-hidden="true" />
           {{ 'button.share' | translate }}
         </ion-button>
       </div>
@@ -146,7 +149,7 @@
   </div>
 
   <mh-photo-sheet [(open)]="photoSheetOpen" />
-  <mh-share-sheet [(open)]="shareSheetOpen" [handle]="handle()" />
+  <mh-profile-share-sheet [(open)]="shareSheetOpen" [handle]="handle()" />
   <mh-choice-sheet [(open)]="appearanceOpen" [title]="'account.rows.appearance' | translate"
     [options]="themeOptions" [selected]="themePreference()" (picked)="onThemePicked($event)" />
   <mh-choice-sheet [(open)]="languageOpen" [title]="'form.label.language' | translate"

@@ -36,16 +36,25 @@ export class ProgramsStore {
    */
   readonly origin = signal<ProgramOrigin>(ProgramOrigins.Mine);
 
+  /** An origin a size pill set aside, offered again the next time the sheet opens. */
+  private readonly _keptOrigin = signal<ProgramOrigin | null>(null);
+
+  /** What the sheet opens on: the origin on screen, or the one set aside. */
+  readonly sheetOrigin = computed(() =>
+    this.origin() !== ProgramOrigins.Mine ? this.origin() : (this._keptOrigin() ?? this.origin()),
+  );
+
+  private readonly _hasOwn = computed(() =>
+    this._all().some((p) => p.source !== ProgramSource.System),
+  );
+
   /**
    * The origin actually applied. "Mine" with nothing of your own would open
    * on an empty list beside a library full of starters, so it shows
    * everything until there is something of yours to show.
    */
   private readonly _appliedOrigin = computed<ProgramOrigin>(() =>
-    this.origin() === ProgramOrigins.Mine &&
-    !this._all().some((p) => p.source !== ProgramSource.System)
-      ? ProgramOrigins.All
-      : this.origin(),
+    this.origin() === ProgramOrigins.Mine && !this._hasOwn() ? ProgramOrigins.All : this.origin(),
   );
 
   readonly loading = this._loading.asReadonly();
@@ -78,9 +87,13 @@ export class ProgramsStore {
     }
   });
 
-  /** Counts within the chosen origin — a pill must predict its own result. */
+  /**
+   * Counts within Mine, the origin a pill lands on (it sets any other aside)
+   * — a pill must predict its own result.
+   */
   readonly counts = computed<Record<ProgramSize, number>>(() => {
-    const rows = this._byOrigin();
+    const all = this._all();
+    const rows = this._hasOwn() ? all.filter((p) => p.source !== ProgramSource.System) : all;
     return {
       all: rows.length,
       program: rows.filter((p) => !p.isSingleWorkout).length,
@@ -89,28 +102,35 @@ export class ProgramsStore {
   });
 
   /**
-   * Counts per origin, within the type filter that is already on — a pill
-   * must predict its own result. Showing 20 beside a list of 12 routines
-   * would be a number the tap cannot produce.
+   * Counts per origin — a pill must predict its own result. All and Starters
+   * put the size pill back on All, so they count every size; Mine keeps the
+   * size pill, so it counts within it. Showing 20 beside a list of 12
+   * routines would be a number the tap cannot produce.
    */
   readonly originCounts = computed<Record<ProgramOrigin, number>>(() => {
     const size = this.size();
-    const rows = this._all().filter((p) =>
-      size === ProgramSizes.Program
-        ? !p.isSingleWorkout
-        : size === ProgramSizes.Routine
-          ? p.isSingleWorkout
-          : true,
+    const rows = this._all();
+    const mine = rows.filter(
+      (p) =>
+        p.source !== ProgramSource.System &&
+        (size === ProgramSizes.Program
+          ? !p.isSingleWorkout
+          : size === ProgramSizes.Routine
+            ? p.isSingleWorkout
+            : true),
     );
     return {
       all: rows.length,
-      mine: rows.filter((p) => p.source !== ProgramSource.System).length,
+      mine: mine.length,
       starters: rows.filter((p) => p.source === ProgramSource.System).length,
     };
   });
 
+  /** An origin other than Mine puts the size pill back on All, under it. */
   setOrigin(origin: ProgramOrigin): void {
     this.origin.set(origin);
+    this._keptOrigin.set(null);
+    if (origin !== ProgramOrigins.Mine) this.size.set(ProgramSizes.All);
   }
 
   /** First load only — a refresh happens under the rows already on screen. */
@@ -165,7 +185,16 @@ export class ProgramsStore {
       });
   }
 
+  /**
+   * A size pill and the sheet's origin are one choice, as the strip shows
+   * only one thing on: picking a pill, All included, sets an origin other
+   * than Mine aside. The sheet opens on it again, so Apply brings it back.
+   */
   setSize(size: ProgramSize): void {
+    if (this.origin() !== ProgramOrigins.Mine) {
+      this._keptOrigin.set(this.origin());
+      this.origin.set(ProgramOrigins.Mine);
+    }
     this.size.set(size);
   }
 }

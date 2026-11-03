@@ -24,19 +24,18 @@
     <ion-toolbar>
       <div class="mh-chip-row" role="group" [attr.aria-label]="'notifications.filterBar' | translate">
         <ion-button
-          class="filters"
+          class="chip filters"
           fill="clear"
           shape="round"
           size="small"
           aria-haspopup="dialog"
-          [class.active]="filterCount() > 0"
+          [class.selected]="sheetCount() > 0"
+          [attr.aria-label]="'a11y.filters' | translate: { count: sheetCount() }"
           (click)="openFilters()"
         >
-          <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
-          @if (filterCount() > 0) {
-            {{ 'common.filtersCount' | translate: { count: filterCount() } }}
-          } @else {
-            {{ 'common.filters' | translate }}
+          <ion-icon name="options-outline" aria-hidden="true" />
+          @if (sheetCount() > 0) {
+            <span class="count">{{ sheetCount() }}</span>
           }
         </ion-button>
 
@@ -47,8 +46,8 @@
           fill="clear"
           shape="round"
           size="small"
-          [class.selected]="!store.unreadOnly()"
-          [attr.aria-pressed]="!store.unreadOnly()"
+          [class.selected]="sheetCount() === 0 && !store.unreadOnly()"
+          [attr.aria-pressed]="sheetCount() === 0 && !store.unreadOnly()"
           (click)="setUnreadOnly(false)"
         >
           {{ 'common.all' | translate }}
@@ -59,8 +58,8 @@
           fill="clear"
           shape="round"
           size="small"
-          [class.selected]="store.unreadOnly()"
-          [attr.aria-pressed]="store.unreadOnly()"
+          [class.selected]="sheetCount() === 0 && store.unreadOnly()"
+          [attr.aria-pressed]="sheetCount() === 0 && store.unreadOnly()"
           (click)="setUnreadOnly(true)"
         >
           {{ 'notifications.filter.unread' | translate }}
@@ -115,7 +114,6 @@
               [notification]="item"
               (select)="open(item)"
               (toggleRead)="toggleRead(item)"
-              (dismiss)="dismiss(item)"
               (remove)="remove(item)"
             />
           }
@@ -131,7 +129,6 @@
             [notification]="item"
             (select)="open(item)"
             (toggleRead)="toggleRead(item)"
-            (dismiss)="dismiss(item)"
             (remove)="remove(item)"
           />
         }
@@ -168,4 +165,4 @@
   (chosen)="onListAction($event)"
 />
 
-<mh-notification-filter-sheet [(open)]="filterOpen" [filters]="filters()" (applied)="onFiltersApplied($event)" />
+<mh-notification-filter-sheet [(open)]="filterOpen" [filters]="sheetDraft()" (applied)="onFiltersApplied($event)" />

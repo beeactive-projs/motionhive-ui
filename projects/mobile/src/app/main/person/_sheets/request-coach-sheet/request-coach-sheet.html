@@ -1,0 +1,30 @@
+<ng-template #body>
+  <p class="mh-helper">{{ 'person.coaching.sheet.body' | translate: { name: name() } }}</p>
+
+  <ion-textarea
+    mode="md"
+    fill="outline"
+    [autoGrow]="true"
+    [rows]="3"
+    [maxlength]="messageMaxLength"
+    [placeholder]="'person.coaching.sheet.notePlaceholder' | translate"
+    [attr.aria-label]="'person.coaching.sheet.noteLabel' | translate"
+    [value]="note()"
+    (ionInput)="note.set($event.detail.value ?? '')"
+  />
+
+  <p class="mh-helper">{{ 'person.coaching.sheet.expiry' | translate: { count: expiryDays } }}</p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'person.coaching.sheet.title' | translate"
+  [subtitle]="name()"
+  [body]="body"
+  [saveLabel]="'person.coaching.sheet.send' | translate"
+  [dismissLabel]="'button.cancel' | translate"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.6, 0.95]"
+  [initialBreakpoint]="0.6"
+  (save)="onSend()"
+/>

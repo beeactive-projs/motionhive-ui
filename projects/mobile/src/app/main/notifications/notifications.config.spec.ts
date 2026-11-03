@@ -6,11 +6,14 @@ import { NotificationCategory } from 'core';
 import {
   NOTIFICATION_ICONS,
   NO_FILTERS,
+  NotificationDetailActions,
   NotificationListActions,
   activeFilterCount,
   categoryListLabel,
+  notificationDetailActions,
   notificationListActions,
   sameFilters,
+  sheetChipCount,
 } from './notifications.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -86,6 +89,12 @@ describe('notification filters', () => {
     expect(activeFilterCount({ unreadOnly: true, categories: [Sessions, Payments] })).toBe(3);
   });
 
+  it('counts on the Filters chip only once a category is on', () => {
+    expect(sheetChipCount(NO_FILTERS)).toBe(0);
+    expect(sheetChipCount({ unreadOnly: true, categories: [] })).toBe(0);
+    expect(sheetChipCount({ unreadOnly: true, categories: [Sessions] })).toBe(2);
+  });
+
   it('compares categories regardless of tap order', () => {
     const a = { unreadOnly: false, categories: [Sessions, Payments] };
     const b = { unreadOnly: false, categories: [Payments, Sessions] };
@@ -115,5 +124,22 @@ describe('notificationListActions', () => {
     const ids = (hasUnread: boolean) => notificationListActions(hasUnread).map((action) => action.id);
     expect(ids(false)).toEqual(ids(true));
     expect(notificationListActions(true).some((action) => action.destructive)).toBe(false);
+  });
+});
+
+describe('notificationDetailActions', () => {
+  const toggle = (isUnread: boolean) =>
+    notificationDetailActions(isUnread).find((action) => action.id === NotificationDetailActions.ToggleRead);
+
+  it('offers whichever of Mark read and Mark unread undoes the current state', () => {
+    expect(toggle(true)?.label).toBe('notifications.markRead');
+    expect(toggle(false)?.label).toBe('notifications.markUnread');
+  });
+
+  it('makes Delete the one destructive verb, read or unread', () => {
+    for (const isUnread of [true, false]) {
+      const destructive = notificationDetailActions(isUnread).filter((action) => action.destructive);
+      expect(destructive.map((action) => action.id)).toEqual([NotificationDetailActions.Delete]);
+    }
   });
 });

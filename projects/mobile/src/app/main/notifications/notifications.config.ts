@@ -2,9 +2,8 @@ import {
   alertCircleOutline,
   checkmarkDoneOutline,
   ellipsisHorizontalOutline,
-  eyeOffOutline,
-  funnelOutline,
   mailUnreadOutline,
+  optionsOutline,
   settingsOutline,
   trashOutline,
 } from 'ionicons/icons';
@@ -30,9 +29,8 @@ export const NOTIFICATION_ICONS = {
   alertCircleOutline,
   checkmarkDoneOutline,
   ellipsisHorizontalOutline,
-  eyeOffOutline,
-  funnelOutline,
   mailUnreadOutline,
+  optionsOutline,
   settingsOutline,
   trashOutline,
 };
@@ -71,6 +69,49 @@ export function notificationListActions(hasUnread: boolean): SheetAction<Notific
   ];
 }
 
+/** The verbs on the detail sheet: ones about the one notification it shows. */
+export const NotificationDetailActions = {
+  ToggleRead: 'toggleRead',
+  Delete: 'delete',
+} as const;
+
+export type NotificationDetailAction =
+  (typeof NotificationDetailActions)[keyof typeof NotificationDetailActions];
+
+/**
+ * The detail sheet's verbs, the pair the row's swipes offer: whichever of Mark
+ * read / Mark unread undoes the current state, then Delete in its own red
+ * card. Read is the done tick in green, as Mark all read is; unread is the
+ * envelope in info, a notification state and nothing destroyed.
+ */
+export function notificationDetailActions(
+  isUnread: boolean,
+): SheetAction<NotificationDetailAction>[] {
+  return [
+    isUnread
+      ? {
+          id: NotificationDetailActions.ToggleRead,
+          label: 'notifications.markRead',
+          icon: 'checkmark-done-outline',
+          color: 'success',
+          tone: 'shade',
+        }
+      : {
+          id: NotificationDetailActions.ToggleRead,
+          label: 'notifications.markUnread',
+          icon: 'mail-unread-outline',
+          color: 'info',
+          tone: 'shade',
+        },
+    {
+      id: NotificationDetailActions.Delete,
+      label: 'button.delete',
+      icon: 'trash-outline',
+      destructive: true,
+    },
+  ];
+}
+
 /**
  * What the centre is narrowed to — the shape the filter sheet edits.
  *
@@ -96,6 +137,15 @@ export const NO_FILTERS: NotificationFilters = {
  */
 export function activeFilterCount(filters: NotificationFilters): number {
   return (filters.unreadOnly ? 1 : 0) + filters.categories.length;
+}
+
+/**
+ * The number on the strip's Filters chip. Status alone is what the All /
+ * Unread chips beside it say, so it counts only once a category is on and
+ * the sheet, not a chip, is the view: one thing is on at a time.
+ */
+export function sheetChipCount(filters: NotificationFilters): number {
+  return filters.categories.length > 0 ? activeFilterCount(filters) : 0;
 }
 
 /** Order-insensitive — the sheet hands categories back in tap order. */

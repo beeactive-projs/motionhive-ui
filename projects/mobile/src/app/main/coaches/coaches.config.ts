@@ -1,6 +1,7 @@
 import {
   ClientRequest,
   ClientRequestTypes,
+  InstructorSearchResult,
   MyInstructor,
   appLocale,
   displayName,
@@ -8,12 +9,18 @@ import {
 } from 'core';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
-import { RecentPerson } from '../../_shared/config/recent-searches.config';
+import {
+  RecentPerson,
+  SUGGESTION_LIMIT,
+  SuggestedPerson,
+} from '../../_shared/config/recent-searches.config';
 import { daysBetween } from '../../_shared/utils/dates';
+import { coachName as directoryName, coachSubline } from '../discover/discover.config';
 
 /**
- * The trainee's side of a coaching relationship: what the coaches page shows
- * and what can be done to each row.
+ * The reader's side of a coaching relationship, the Coaches screen's Yours
+ * chip: what it shows and what can be done to each row. The directory's
+ * chips and filters are `coaches.filters.ts`.
  *
  * Two API calls feed two lists. `GET /clients/my-instructors` gives the
  * settled relationships; `GET /clients/requests/pending` gives the requests
@@ -24,8 +31,8 @@ import { daysBetween } from '../../_shared/utils/dates';
  * returned the row the moment a coach invited the reader. So the rows here
  * are always coach invitations, and `type` is still checked rather than
  * assumed, in case the endpoint ever widens. A trainee's own requests to a
- * coach have no endpoint to read them back from, so this screen does not
- * claim to show them.
+ * coach are read off the directory instead (the Requests chip,
+ * `requested=true`), never from that endpoint.
  *
  * Everything here is pure, so `coaches.config.spec.ts` can cover the shaping
  * and the verb registries without standing up the page.
@@ -105,8 +112,62 @@ export function myCoachRows(instructors: readonly MyInstructor[]): MyCoachRow[] 
       name: coachName(item),
       avatarUrl: item.instructor?.avatarUrl ?? null,
       subline: sinceLabel(item.startedAt),
+      handle: item.instructor?.handle ?? null,
     },
   }));
+}
+
+// ── Search start ────────────────────────────────────────────────────────────
+
+/**
+ * A directory row as a recent search: where a search ended. Null for a coach
+ * with no handle, who has no profile to open again.
+ */
+export function recentFromCoach(coach: InstructorSearchResult): RecentPerson | null {
+  if (!coach.handle) return null;
+  return {
+    id: coach.userId,
+    name: directoryName(coach),
+    avatarUrl: coach.avatarUrl,
+    subline: coachSubline(coach),
+    handle: coach.handle,
+  };
+}
+
+/**
+ * The search start's "Your coaches" strip: the reader's own, newest
+ * relationship first, the ones already in the recents left out. A coach with
+ * no handle has no profile to open from a strip.
+ */
+export function yourCoachesStrip(
+  rows: readonly MyCoachRow[],
+  excludeIds: readonly string[],
+  limit = SUGGESTION_LIMIT,
+): SuggestedPerson[] {
+  return rows
+    .filter((row) => !!row.handle && !excludeIds.includes(row.person.id))
+    .slice(0, limit)
+    .map((row) => row.person);
+}
+
+/**
+ * The search start's "Taking new clients" strip, from the directory rows
+ * already on screen (no request of its own): coaches with the door open who
+ * are not the reader's, not already asked and not already in the recents.
+ */
+export function takingClientsStrip(
+  coaches: readonly InstructorSearchResult[],
+  excludeIds: readonly string[],
+  limit = SUGGESTION_LIMIT,
+): SuggestedPerson[] {
+  return coaches
+    .filter(
+      (coach) =>
+        coach.isAcceptingClients && !coach.requestSent && !excludeIds.includes(coach.userId),
+    )
+    .map(recentFromCoach)
+    .filter((person): person is RecentPerson => person !== null)
+    .slice(0, limit);
 }
 
 /**

@@ -42,15 +42,19 @@ import type { SheetAction } from '../../_shared/components/action-sheet/action-s
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
+import { FeedbackService } from '../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { ProfileStacks, groupLinks, stackRootOf } from '../../_shared/utils/stack-paths';
 import { ProfileWorkoutRow } from './_components/profile-workout-row/profile-workout-row';
 import { ReportWorkoutSheet } from './_sheets/report-workout-sheet/report-workout-sheet';
+import { RequestCoachSheet } from './_sheets/request-coach-sheet/request-coach-sheet';
 import {
+  CoachingCtas,
   PERSON_ICONS,
   PersonTab,
   PersonTabs,
+  coachingCta,
   personTabs,
   roleLabel,
   workoutMonths,
@@ -97,6 +101,7 @@ type WorkoutActionId = 'report';
     IonToolbar,
     ProfileWorkoutRow,
     ReportWorkoutSheet,
+    RequestCoachSheet,
     TranslatePipe,
   ],
   templateUrl: './person.html',
@@ -106,11 +111,13 @@ type WorkoutActionId = 'report';
 export class Person {
   readonly Tiles = DETAIL_TILES;
   readonly Tabs = PersonTabs;
+  readonly Ctas = CoachingCtas;
 
   readonly store = inject(PersonStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
+  private readonly _feedbackService = inject(FeedbackService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
   private readonly _router = inject(Router);
 
@@ -255,6 +262,23 @@ export class Person {
 
   readonly months = computed(() => workoutMonths(this.store.workouts()));
 
+  /**
+   * The coaching verb in the footer, beside Message: ask this coach, the
+   * request you already sent, or the invitation they sent you. Null leaves
+   * Message alone, as on anyone else's page.
+   */
+  readonly coachingCta = computed(() =>
+    coachingCta(this.store.profile(), {
+      isSelf: this.isSelf(),
+      acceptingClients: this.store.coachProfile()?.isAcceptingClients ?? null,
+    }),
+  );
+
+  readonly requestOpen = signal(false);
+  readonly requestSaving = signal(false);
+  /** Withdraw or accept on its way: the footer verb takes no second tap. */
+  readonly coachingBusy = signal(false);
+
   /** The workout whose menu or report sheet is open. */
   readonly workoutTarget = signal<ProfileWorkout | null>(null);
   readonly workoutMenuOpen = signal(false);
@@ -339,6 +363,79 @@ export class Person {
       id: profile.userId,
       firstName: profile.firstName,
       lastName: profile.lastName,
+    });
+  }
+
+  openRequest(): void {
+    this.requestOpen.set(true);
+  }
+
+  /**
+   * The sheet stays up while the request is on its way and closes when it
+   * lands, so a failure leaves the note where it was typed. A conflict means
+   * the API knows of a request this page does not (sent from the web, or the
+   * coach invited the reader meanwhile), so the profile reloads to show it.
+   */
+  sendRequest(message: string): void {
+    if (this.requestSaving()) return;
+    this.requestSaving.set(true);
+    this.store.requestToTrain(message).subscribe({
+      next: () => {
+        this.requestSaving.set(false);
+        this.requestOpen.set(false);
+        void this._feedbackService.success(
+          translate('person.coaching.toast.sent', { name: this.name() }),
+        );
+      },
+      error: (error: unknown) => {
+        this.requestSaving.set(false);
+        if ((error as { status?: number } | null)?.status === 409) {
+          this.requestOpen.set(false);
+          this.store.load();
+        }
+        void this._feedbackService.error(error, translate('person.coaching.toast.sendFailed'));
+      },
+    });
+  }
+
+  /** Fires on the tap, as withdrawing a group request does: asking again is one tap away. */
+  withdrawRequest(): void {
+    if (this.coachingBusy()) return;
+    this.coachingBusy.set(true);
+    this.store.withdrawRequest().subscribe({
+      next: () => {
+        this.coachingBusy.set(false);
+        void this._feedbackService.success(translate('person.coaching.toast.withdrawn'));
+      },
+      error: (error: unknown) => {
+        this.coachingBusy.set(false);
+        void this._feedbackService.error(
+          error,
+          translate('person.coaching.toast.withdrawFailed'),
+        );
+      },
+    });
+  }
+
+  /**
+   * Accepts on the tap: on the coach's own page, after reading it, saying yes
+   * is the whole point. Declining stays on the Coaches screen's Yours chip,
+   * with the invitation's other verbs.
+   */
+  acceptInvite(): void {
+    if (this.coachingBusy()) return;
+    this.coachingBusy.set(true);
+    this.store.acceptInvite().subscribe({
+      next: () => {
+        this.coachingBusy.set(false);
+        void this._feedbackService.success(
+          translate('person.coaching.toast.accepted', { name: this.name() }),
+        );
+      },
+      error: (error: unknown) => {
+        this.coachingBusy.set(false);
+        void this._feedbackService.error(error, translate('person.coaching.toast.acceptFailed'));
+      },
     });
   }
 }

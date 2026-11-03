@@ -41,6 +41,7 @@ import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleto
 import { APP_HEX_SHAPE, combFigure } from '../../_shared/config/hexagon.config';
 import { ClockService } from '../../_shared/services/clock.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
+import { COACHES_URL } from '../coaches/coaches.filters';
 import { CoachRow } from './_components/coach-row/coach-row';
 import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
 import { FeaturedCoach } from './_components/featured-coach/featured-coach';
@@ -49,7 +50,6 @@ import { DiscoverFilterSheet } from './_sheets/discover-filter-sheet/discover-fi
 import {
   DISCOVER_GOALS,
   DISCOVER_ICONS,
-  DiscoverDatePresets,
   DiscoverGoalId,
   DiscoverSheetFilters,
   EVERYWHERE,
@@ -69,6 +69,8 @@ import {
   resolveCity,
   sessionInCity,
   sessionMatchesGoal,
+  sheetBeyondQuickChips,
+  sheetFilterCount,
   sortCoaches,
   withoutReader,
 } from './discover.config';
@@ -353,24 +355,41 @@ export class Discover implements ViewWillEnter {
     () => this._sessions().length === 0 && !this.feedFiltered(),
   );
 
-  readonly datesActive = computed(
-    () => this.sheetFilters().datePreset !== DiscoverDatePresets.Any,
+  /**
+   * The number on the Filters chip, only while the sheet holds more than a
+   * quick chip can say. One thing is on at a time: the sheet, or a chip.
+   */
+  readonly filterCount = computed(() =>
+    sheetBeyondQuickChips(this.sheetFilters()) ? sheetFilterCount(this.sheetFilters()) : 0,
+  );
+
+  /** Picks a quick chip set aside, offered again the next time the sheet opens. */
+  private readonly _keptSheet = signal<DiscoverSheetFilters | null>(null);
+
+  /** What the sheet opens on: the picks on screen, or the ones set aside. */
+  readonly sheetDraft = computed(() =>
+    this.filterCount() > 0 ? this.sheetFilters() : (this._keptSheet() ?? this.sheetFilters()),
   );
 
   isQuickSelected(id: QuickFilterId): boolean {
-    return quickFilterSelected(this.sessionsStore.filters(), id);
+    return this.filterCount() === 0 && quickFilterSelected(this.sessionsStore.filters(), id);
   }
 
+  /**
+   * A quick chip is a view of its own: it sets the sheet's picks aside, date
+   * included, and the sheet opens on them again.
+   */
   onQuickFilter(id: QuickFilterId): void {
     const chip = this.quickFilters.find((c) => c.id === id);
     if (!chip) return;
-    // Keep the sheet's draft source in step so reopening it shows reality.
-    this.sheetFilters.update((filters) => ({
-      ...filters,
+    const picks = this.filterCount() > 0 ? this.sheetFilters() : this._keptSheet();
+    this.sheetFilters.set({
+      ...NO_SHEET_FILTERS,
       type: chip.patch.type ?? null,
       locationKind: chip.patch.locationKind ?? null,
-    }));
-    this.sessionsStore.setFilters(chip.patch);
+    });
+    this._keptSheet.set(picks);
+    this.sessionsStore.setFilters({ ...chip.patch, dateFrom: undefined, dateTo: undefined });
   }
 
   openFilters(): void {
@@ -379,6 +398,7 @@ export class Discover implements ViewWillEnter {
 
   onFiltersApplied(filters: DiscoverSheetFilters): void {
     this.sheetFilters.set(filters);
+    this._keptSheet.set(null);
     const window = compileDatePreset(filters.datePreset, new Date());
     this.sessionsStore.setFilters({
       type: filters.type ?? undefined,
@@ -392,6 +412,7 @@ export class Discover implements ViewWillEnter {
   clearFilters(): void {
     this.selectedGoal.set(null);
     this.sheetFilters.set({ ...NO_SHEET_FILTERS });
+    this._keptSheet.set(null);
     this.sessionsStore.setFilters({
       type: undefined,
       locationKind: undefined,
@@ -451,8 +472,9 @@ export class Discover implements ViewWillEnter {
     });
   }
 
+  /** The coach directory, a stack of its own; back returns here. */
   openAllCoaches(): void {
-    void this._router.navigateByUrl(this._links.allCoaches);
+    void this._router.navigateByUrl(COACHES_URL);
   }
 
   openGroup(groupId: string): void {

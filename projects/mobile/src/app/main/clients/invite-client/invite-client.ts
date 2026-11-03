@@ -33,6 +33,7 @@ import {
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { ProfileShareSheet } from '../../../_shared/components/profile-share-sheet/profile-share-sheet';
 import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchbar-autofocus.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
@@ -41,7 +42,6 @@ import { injectPeopleSearch } from '../../../_shared/utils/people-search';
 import { InviteResultRow } from '../_components/invite-result-row/invite-result-row';
 import { ClientsRefreshService } from '../_services/clients-refresh.service';
 import { InviteEmailSheet } from '../_sheets/invite-email-sheet/invite-email-sheet';
-import { InviteLinkSheet } from '../_sheets/invite-link-sheet/invite-link-sheet';
 import { inHomeStack } from '../../home/home-stack.config';
 import { GroupSuggestionsStore } from './group-suggestions.store';
 import { CoachStacks } from '../client-paths';
@@ -83,7 +83,6 @@ import {
     EmptyState,
     HexAvatar,
     InviteEmailSheet,
-    InviteLinkSheet,
     InviteResultRow,
     IonBackButton,
     IonButton,
@@ -97,6 +96,7 @@ import {
     IonSearchbar,
     IonTitle,
     IonToolbar,
+    ProfileShareSheet,
     RowSkeleton,
     SearchbarAutofocusDirective,
     TranslatePipe,
@@ -121,7 +121,6 @@ export class InviteClient implements ViewWillEnter {
   readonly backHref: string = this._fromHome ? CoachStacks.Home : CoachStacks.Clients;
 
   private readonly _emailSheet = viewChild(InviteEmailSheet);
-  private readonly _linkSheet = viewChild(InviteLinkSheet);
 
   /** Trainees only, and only ones the coach is not already connected to. */
   readonly people = injectPeopleSearch({ role: UserRoles.User, excludeConnected: true });
@@ -340,17 +339,6 @@ export class InviteClient implements ViewWillEnter {
 
   openLinkSheet(): void {
     this.linkSheetOpen.set(true);
-  }
-
-  /**
-   * No username yet, so there is no public address to share. Off to the
-   * screen that sets one — awaiting the dismissal first, or the sheet is
-   * stranded over the account page.
-   */
-  async chooseHandle(): Promise<void> {
-    await this._linkSheet()?.close();
-    this.linkSheetOpen.set(false);
-    await this._navController.navigateForward('/tabs/more/account/profile');
   }
 
   /**

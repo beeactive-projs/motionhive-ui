@@ -1,8 +1,16 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ClientRequest, ClientRequestTypes, MyInstructor, User } from 'core';
+import {
+  ClientRequest,
+  ClientRequestTypes,
+  CoachDirectorySorts,
+  InstructorSearchResult,
+  MyInstructor,
+  User,
+} from 'core';
 
+import { MY_COACHES_URL } from '../../_shared/utils/stack-paths';
 import {
   COACH_ACTIONS,
   CoachActionIds,
@@ -10,9 +18,28 @@ import {
   incomingInvites,
   invitedLabel,
   myCoachRows,
+  recentFromCoach,
   sinceLabel,
+  takingClientsStrip,
   visibleCoachActions,
+  yourCoachesStrip,
 } from './coaches.config';
+import {
+  COACHES_BACK_DEFAULT,
+  COACHES_URL,
+  COACHES_YOURS_URL,
+  CoachFilterIds,
+  DirectoryRequest,
+  NO_SHEET_FILTERS,
+  backHrefFrom,
+  directoryParams,
+  filterFromUrl,
+  matchesCoachQuery,
+  narrowsDirectory,
+  nearYouCity,
+  sheetFilterCount,
+  sheetNarrows,
+} from './coaches.filters';
 import { COACH_ICONS } from './coaches.icons';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -258,5 +285,252 @@ describe('visibleCoachActions', () => {
     );
 
     expect(destructive).toEqual([CoachActionIds.Decline, CoachActionIds.Leave]);
+  });
+});
+
+// ── The directory ────────────────────────────────────────────────────────────
+
+function coach(overrides: Partial<InstructorSearchResult> = {}): InstructorSearchResult {
+  return {
+    id: 'prof-1',
+    userId: 'usr-1',
+    handle: 'ana',
+    firstName: 'Ana',
+    lastName: 'Popescu',
+    avatarId: null,
+    avatarUrl: null,
+    displayName: null,
+    bio: null,
+    specializations: ['Yoga'],
+    yearsOfExperience: 8,
+    isAcceptingClients: true,
+    isOnline: false,
+    city: 'Cluj-Napoca',
+    countryCode: 'RO',
+    socialLinks: null,
+    ...overrides,
+  };
+}
+
+function directoryRequest(overrides: Partial<DirectoryRequest> = {}): DirectoryRequest {
+  return {
+    filter: CoachFilterIds.All,
+    sheet: NO_SHEET_FILTERS,
+    query: '',
+    nearCity: null,
+    searching: false,
+    page: 1,
+    limit: 20,
+    ...overrides,
+  };
+}
+
+describe('directory URLs', () => {
+  // `_shared` spells the Menu's URL out; the two must never drift apart.
+  it('agrees with the shared Yours URL', () => {
+    expect(COACHES_YOURS_URL).toBe(MY_COACHES_URL);
+  });
+
+  it('reads the chip off the screen root only', () => {
+    expect(filterFromUrl('/tabs/coaches?filter=yours')).toBe(CoachFilterIds.Yours);
+    expect(filterFromUrl('/tabs/coaches')).toBeNull();
+    expect(filterFromUrl('/tabs/coaches?filter=nope')).toBeNull();
+    expect(filterFromUrl('/tabs/coaches/person/ana?filter=yours')).toBeNull();
+  });
+
+  // Three doors, one back: whichever the reader came through.
+  it('goes back to the screen it was opened from', () => {
+    expect(backHrefFrom('/tabs/home', COACHES_BACK_DEFAULT)).toBe('/tabs/home');
+    expect(backHrefFrom('/tabs/more?x=1', COACHES_BACK_DEFAULT)).toBe('/tabs/more');
+  });
+
+  it('keeps its target on a return from inside its own stack', () => {
+    expect(backHrefFrom('/tabs/coaches/person/ana', '/tabs/home')).toBe('/tabs/home');
+    expect(backHrefFrom('/tabs/coaches/notifications', '/tabs/more')).toBe('/tabs/more');
+    expect(backHrefFrom('/tabs/coaches?filter=yours', '/tabs/more')).toBe('/tabs/more');
+    expect(backHrefFrom(null, COACHES_BACK_DEFAULT)).toBe(COACHES_BACK_DEFAULT);
+    expect(backHrefFrom('/auth/login', COACHES_BACK_DEFAULT)).toBe(COACHES_BACK_DEFAULT);
+  });
+});
+
+describe('directoryParams', () => {
+  it('asks for a bare recommended page with nothing picked', () => {
+    const params = directoryParams(directoryRequest());
+    expect(params).toEqual({ page: 1, limit: 20, sort: CoachDirectorySorts.Recommended });
+    expect(narrowsDirectory(params)).toBe(false);
+  });
+
+  it('turns each quick chip into its filter', () => {
+    const forChip = (filter: DirectoryRequest['filter'], nearCity: string | null = null) =>
+      directoryParams(directoryRequest({ filter, nearCity }));
+
+    expect(forChip(CoachFilterIds.Requests).requested).toBe(true);
+    expect(forChip(CoachFilterIds.Online).online).toBe(true);
+    expect(forChip(CoachFilterIds.NearYou, 'Cluj-Napoca').city).toBe('Cluj-Napoca');
+    expect(narrowsDirectory(forChip(CoachFilterIds.Requests))).toBe(true);
+  });
+
+  // The Filters chip is unlit on Requests, so a pick left in the sheet must
+  // not hide a request with nothing on screen saying so.
+  it('lists every request the reader sent, whatever the sheet holds', () => {
+    const params = directoryParams(
+      directoryRequest({
+        filter: CoachFilterIds.Requests,
+        sheet: { ...NO_SHEET_FILTERS, sort: CoachDirectorySorts.Name, city: 'București' },
+      }),
+    );
+    expect(params).toEqual({
+      page: 1,
+      limit: 20,
+      sort: CoachDirectorySorts.Recommended,
+      requested: true,
+    });
+  });
+
+  it('opens on Requests from the URL', () => {
+    expect(filterFromUrl(`${COACHES_URL}?filter=requests`)).toBe(CoachFilterIds.Requests);
+    expect(filterFromUrl(`${COACHES_URL}?filter=accepting`)).toBeNull();
+  });
+
+  // Yours lists the reader's own coaches, so the directory behind it is All:
+  // coming back to All reloads nothing.
+  it('reads Yours as All', () => {
+    expect(directoryParams(directoryRequest({ filter: CoachFilterIds.Yours }))).toEqual(
+      directoryParams(directoryRequest()),
+    );
+  });
+
+  it("lets the sheet's city win over Near you", () => {
+    const params = directoryParams(
+      directoryRequest({
+        filter: CoachFilterIds.NearYou,
+        nearCity: 'Cluj-Napoca',
+        sheet: { ...NO_SHEET_FILTERS, city: 'București' },
+      }),
+    );
+    expect(params.city).toBe('București');
+  });
+
+  it('sends the sheet picks', () => {
+    const params = directoryParams(
+      directoryRequest({
+        sheet: {
+          sort: CoachDirectorySorts.Experience,
+          specializations: ['Yoga', 'Forță'],
+          city: null,
+          minYears: 5,
+        },
+      }),
+    );
+    expect(params).toMatchObject({
+      sort: CoachDirectorySorts.Experience,
+      specializations: ['Yoga', 'Forță'],
+      minYears: 5,
+    });
+    expect(narrowsDirectory(params)).toBe(true);
+  });
+
+  // The chips and the sheet fold away while searching, so they must not
+  // narrow results with nothing on screen saying so. The sort still holds.
+  it('searches the whole directory, keeping only the sort', () => {
+    const params = directoryParams(
+      directoryRequest({
+        searching: true,
+        query: 'ana',
+        filter: CoachFilterIds.Online,
+        sheet: { ...NO_SHEET_FILTERS, sort: CoachDirectorySorts.Name, minYears: 10 },
+      }),
+    );
+    expect(params).toEqual({
+      page: 1,
+      limit: 20,
+      sort: CoachDirectorySorts.Name,
+      search: 'ana',
+    });
+  });
+});
+
+describe('the filter sheet', () => {
+  it('counts each pick, and a sort other than the default', () => {
+    expect(sheetFilterCount(NO_SHEET_FILTERS)).toBe(0);
+    expect(
+      sheetFilterCount({
+        sort: CoachDirectorySorts.Name,
+        specializations: ['Yoga', 'Pilates'],
+        city: 'Cluj-Napoca',
+        minYears: 2,
+      }),
+    ).toBe(5);
+  });
+
+  it('tells a reorder apart from a narrowing', () => {
+    expect(sheetNarrows({ ...NO_SHEET_FILTERS, sort: CoachDirectorySorts.Name })).toBe(false);
+    expect(sheetNarrows({ ...NO_SHEET_FILTERS, minYears: 5 })).toBe(true);
+  });
+});
+
+describe('nearYouCity', () => {
+  const cities = [
+    { label: 'Cluj-Napoca', count: 3 },
+    { label: 'București', count: 2 },
+  ];
+
+  it("prefers the city Discover shows, then the reader's own", () => {
+    expect(nearYouCity('bucuresti', 'Cluj', cities)).toBe('București');
+    expect(nearYouCity(null, 'cluj-napoca', cities)).toBe('Cluj-Napoca');
+  });
+
+  // Discover's "Everywhere" is what to browse, not where the reader is.
+  it('falls through Everywhere to the account city', () => {
+    expect(nearYouCity('everywhere', 'Bucharest', cities)).toBe('București');
+  });
+
+  it('is null where the directory has no coach, so the chip hides', () => {
+    expect(nearYouCity(null, 'Timișoara', cities)).toBeNull();
+    expect(nearYouCity(null, null, cities)).toBeNull();
+  });
+});
+
+describe('search start', () => {
+  it('remembers a coach by handle, and not one without a profile', () => {
+    expect(recentFromCoach(coach())).toEqual({
+      id: 'usr-1',
+      name: 'Ana Popescu',
+      avatarUrl: null,
+      subline: 'Yoga · Cluj-Napoca',
+      handle: 'ana',
+    });
+    expect(recentFromCoach(coach({ handle: null }))).toBeNull();
+  });
+
+  it("suggests open coaches who are not the reader's, asked or already recent", () => {
+    const rows = [
+      coach(),
+      coach({ id: 'p2', userId: 'usr-2', handle: 'ion', isAcceptingClients: false }),
+      coach({ id: 'p3', userId: 'usr-3', handle: 'eva' }),
+      coach({ id: 'p4', userId: 'usr-4', handle: 'dan' }),
+      coach({ id: 'p5', userId: 'usr-5', handle: 'ana', requestSent: true }),
+    ];
+    expect(takingClientsStrip(rows, ['usr-3']).map((person) => person.id)).toEqual([
+      'usr-1',
+      'usr-4',
+    ]);
+  });
+
+  it("offers the reader's coaches with a handle, recents left out", () => {
+    const rows = myCoachRows([
+      instructor(),
+      instructor({ id: 'rel-2', instructorId: 'u2', instructor: user({ id: 'u2', handle: 'ion' }) }),
+      instructor({ id: 'rel-3', instructorId: 'u3', instructor: user({ id: 'u3', handle: null }) }),
+    ]);
+    const strip = yourCoachesStrip(rows, ['coach-user-1']);
+    expect(strip.map((person) => person.handle)).toEqual(['ion']);
+  });
+
+  it('narrows the loaded rows by name, city or specialty, accents aside', () => {
+    expect(matchesCoachQuery(coach({ specializations: ['Forță'] }), 'forta')).toBe(true);
+    expect(matchesCoachQuery(coach(), 'cluj')).toBe(true);
+    expect(matchesCoachQuery(coach(), 'popes')).toBe(true);
+    expect(matchesCoachQuery(coach(), 'boxing')).toBe(false);
   });
 });

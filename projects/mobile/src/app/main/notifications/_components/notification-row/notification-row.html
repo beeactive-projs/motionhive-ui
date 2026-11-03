@@ -35,18 +35,11 @@
     </ion-label>
   </ion-item>
 
-  <!-- Dismiss sits at the screen edge and is the one a full swipe commits.
-       Ionic moves the `expandable` option outermost mid-swipe (`order: 1`), so
-       it lives there in the DOM too and never jumps. Delete is never
-       expandable: a full swipe must not reach an action you cannot undo. -->
-  <ion-item-options side="end" (ionSwipe)="emitAndClose(sliding, dismiss)">
-    <ion-item-option color="danger" (click)="emitAndClose(sliding, remove)">
+  <!-- Swipe left: Delete. A full swipe commits it, as Mail's does. -->
+  <ion-item-options side="end" (ionSwipe)="emitAndClose(sliding, remove)">
+    <ion-item-option color="danger" [expandable]="true" (click)="emitAndClose(sliding, remove)">
       <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
       {{ 'button.delete' | translate }}
-    </ion-item-option>
-    <ion-item-option color="medium" [expandable]="true" (click)="emitAndClose(sliding, dismiss)">
-      <ion-icon slot="top" name="eye-off-outline" aria-hidden="true" />
-      {{ 'button.dismiss' | translate }}
     </ion-item-option>
   </ion-item-options>
 </ion-item-sliding>

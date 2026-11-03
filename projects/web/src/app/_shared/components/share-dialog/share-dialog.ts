@@ -1,17 +1,22 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   input,
   model,
   signal,
 } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
+import { Skeleton } from 'primeng/skeleton';
 import { Toast } from 'primeng/toast';
+
+import { QR_CODE_SVG_OPTIONS } from 'core';
 
 type ShareTarget = 'instagram' | 'facebook' | 'whatsapp' | 'anywhere';
 
@@ -24,6 +29,8 @@ interface ShareTile {
 /**
  * Reusable "Share this …" dialog. Drives:
  *   - a copyable URL row
+ *   - a QR code of the same URL, for a phone held up to the screen (drawn
+ *     with core's `QR_CODE_SVG_OPTIONS`, like the mobile app's share sheet)
  *   - 4 share-target tiles (Instagram, Facebook, WhatsApp, Anywhere)
  *   - an OG-style preview card so users see what gets pasted
  *
@@ -39,12 +46,13 @@ interface ShareTile {
  */
 @Component({
   selector: 'mh-share-dialog',
-  imports: [Dialog, ButtonDirective, InputText, Toast, TranslatePipe],
+  imports: [Dialog, ButtonDirective, InputText, Skeleton, Toast, TranslatePipe],
   providers: [MessageService],
   templateUrl: './share-dialog.html',
   styleUrl: './share-dialog.scss',
 })
 export class ShareDialog {
+  private readonly _domSanitizer = inject(DomSanitizer);
   private readonly _messageService = inject(MessageService);
   private readonly _translateService = inject(TranslateService);
 
@@ -79,6 +87,11 @@ export class ShareDialog {
 
   readonly copied = signal(false);
 
+  /** The code for `url`, drawn the first time the dialog opens on it. */
+  readonly qr = signal<SafeHtml | null>(null);
+  readonly qrFailed = signal(false);
+  private _qrUrl: string | null = null;
+
   readonly displayUrl = computed(() => this.url().replace(/^https?:\/\//i, ''));
 
   readonly tiles: ShareTile[] = [
@@ -91,6 +104,13 @@ export class ShareDialog {
       icon: 'pi pi-link',
     },
   ];
+
+  constructor() {
+    effect(() => {
+      const url = this.url();
+      if (this.visible() && url) void this._renderQr(url);
+    });
+  }
 
   async copy(): Promise<void> {
     await this._writeToClipboard(this.url());
@@ -151,6 +171,27 @@ export class ShareDialog {
 
   close(): void {
     this.visible.set(false);
+  }
+
+  /**
+   * Trusted into `[innerHTML]`: the encoder emits only the code's own path
+   * data, never the encoded text, so nothing a caller passes can inject markup.
+   * Loaded on first open; it is a large table no other screen needs.
+   */
+  private async _renderQr(url: string): Promise<void> {
+    if (this._qrUrl === url) return;
+    this._qrUrl = url;
+    this.qr.set(null);
+    this.qrFailed.set(false);
+    try {
+      const { toString } = await import('qrcode');
+      const svg = await toString(url, QR_CODE_SVG_OPTIONS);
+      // A newer URL may have started rendering while this one was encoding.
+      if (this._qrUrl === url) this.qr.set(this._domSanitizer.bypassSecurityTrustHtml(svg));
+    } catch {
+      // The link and the share targets still work; only the code is missing.
+      if (this._qrUrl === url) this.qrFailed.set(true);
+    }
   }
 
   private async _writeToClipboard(value: string): Promise<void> {

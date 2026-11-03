@@ -31,9 +31,9 @@ p {
   text-wrap: pretty;
 }
 
-// The deep honey ink of every text link (`mh-text-link`): the honey itself
-// was 2.15:1 on the white page, a label you could not read. On navy the
-// token is the honey (8:1).
+// The ink of every text link (`mh-text-link`, `--mh-color-link`): the deep
+// honey in light, since the honey itself was 2.15:1 on the white page, a
+// label you could not read, and the honey in dark.
 ion-button {
   margin: 1.25rem 0 0;
   font-weight: 600;

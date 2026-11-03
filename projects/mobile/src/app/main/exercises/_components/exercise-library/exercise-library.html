@@ -9,22 +9,22 @@
   (ionInput)="onQuery($event.detail.value ?? '')"
 />
 
-<!-- The filter trigger leads the strip, and the count in its label is the
+<!-- The filter trigger leads the strip, and the count beside its glyph is the
      thing you need to know before you wonder why the list is short. -->
 <div class="mh-chip-row bar">
   <ion-button
-    class="filters"
+    class="chip filters"
     fill="clear"
     shape="round"
     size="small"
-    [class.active]="store.activeFilterCount() > 0"
+    aria-haspopup="dialog"
+    [class.selected]="store.activeFilterCount() > 0"
+    [attr.aria-label]="'a11y.filters' | translate: { count: store.activeFilterCount() }"
     (click)="filterOpen.set(true)"
   >
-    <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
+    <ion-icon name="options-outline" aria-hidden="true" />
     @if (store.activeFilterCount() > 0) {
-      {{ 'common.filtersCount' | translate: { count: store.activeFilterCount() } }}
-    } @else {
-      {{ 'common.filters' | translate }}
+      <span class="count">{{ store.activeFilterCount() }}</span>
     }
   </ion-button>
 
@@ -36,8 +36,8 @@
       fill="clear"
       shape="round"
       size="small"
-      [class.selected]="store.ownership() === pill.value"
-      [attr.aria-pressed]="store.ownership() === pill.value"
+      [class.selected]="store.isOwnershipOn(pill.value)"
+      [attr.aria-pressed]="store.isOwnershipOn(pill.value)"
       (click)="setOwnership(pill.value)"
     >
       {{ pill.label }}
@@ -139,7 +139,7 @@
 
 <mh-exercise-filter-sheet
   [(open)]="filterOpen"
-  [filters]="store.filters()"
+  [filters]="store.sheetDraft()"
   [facets]="store.facets()"
   [ownership]="store.ownership()"
   [search]="store.search()"

@@ -14,6 +14,7 @@ import {
 } from 'ionicons/icons';
 
 import { MoreTile, TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
+import { MY_COACHES_URL } from '../utils/stack-paths';
 
 /**
  * Every icon the shell renders, in one place so `addIcons()` and the kebab
@@ -120,9 +121,10 @@ export const TRAIN_TAB_SET: TabSet = {
     {
       label: 'nav.myTraining',
       items: [
-        // Who coaches this reader — and the only screen on mobile where a
-        // coach's invitation can be accepted, so it carries the dot for one.
-        { label: 'nav.coaches', icon: 'people-outline', iconColor: 'violet', route: '/tabs/more/coaches' },
+        // Who coaches this reader, on the coach directory's Yours chip — the
+        // only screen on mobile where a coach's invitation can be accepted, so
+        // it carries the dot for one.
+        { label: 'nav.coaches', icon: 'people-outline', iconColor: 'violet', route: MY_COACHES_URL },
         // The trainee's bookings, in their own stack at `/tabs/user/sessions`
         // since Discover took the tab.
         {
@@ -180,14 +182,26 @@ export function activeTabIdFromUrl(url: string): TabId | undefined {
 }
 
 /**
+ * Stacks with no button that belong to one tab rather than to the Menu. The
+ * coach directory is Discover's: finding a coach is what Discover is for,
+ * whichever of its doors (Discover, Home, the Menu) the reader came in by.
+ */
+const LIT_INSTEAD: Partial<Record<TabId, TabId>> = {
+  [TabIds.Coaches]: TabIds.Discover,
+};
+
+/**
  * The tab button to light for a stack. A stack that is one of the bar's
- * tabs lights its own button. Every other stack under `/tabs` (the coach's
- * Sessions, Programs, Exercises, Groups, a trainee's Sessions, and the
- * Workouts stack in coach mode) is reached from the Menu, so the Menu tab
- * lights: the bar always says where the reader is, and never goes dark.
- * Nothing outside the shell lights anything.
+ * tabs lights its own button, and one that belongs to a tab (`LIT_INSTEAD`)
+ * lights that tab's. Every other stack under `/tabs` (the coach's Sessions,
+ * Programs, Exercises, Groups, a trainee's Sessions, and the Workouts stack
+ * in coach mode) is reached from the Menu, so the Menu tab lights: the bar
+ * always says where the reader is, and never goes dark. Nothing outside the
+ * shell lights anything.
  */
 export function litTabId(stackId: TabId | undefined, tabs: readonly TabId[]): TabId | undefined {
   if (!stackId) return undefined;
-  return tabs.includes(stackId) ? stackId : TabIds.More;
+  if (tabs.includes(stackId)) return stackId;
+  const owner = LIT_INSTEAD[stackId];
+  return owner && tabs.includes(owner) ? owner : TabIds.More;
 }

@@ -1,0 +1,102 @@
+<ng-template #body>
+  <div class="mh-section-label">{{ 'coaches.filter.sort.label' | translate }}</div>
+  <div class="mh-chip-cloud">
+    @for (option of sortOptions; track option.value) {
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
+        [class.selected]="draft().sort === option.value"
+        [attr.aria-pressed]="draft().sort === option.value"
+        (click)="setSort(option.value)"
+      >
+        {{ option.label | translate }}
+      </ion-button>
+    }
+  </div>
+
+  @if (facets().specializations.length > 0) {
+    <div class="mh-section-label">{{ 'coaches.filter.speciality' | translate }}</div>
+    <div class="mh-chip-cloud">
+      @for (facet of facets().specializations; track facet.label) {
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="isPicked(facet.label)"
+          [attr.aria-pressed]="isPicked(facet.label)"
+          (click)="toggleSpecialization(facet.label)"
+        >
+          {{ facet.label }}
+          <span class="count">{{ facet.count }}</span>
+        </ion-button>
+      }
+    </div>
+  }
+
+  @if (facets().cities.length > 0) {
+    <div class="mh-section-label">{{ 'coaches.filter.city' | translate }}</div>
+    <div class="mh-chip-cloud">
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
+        [class.selected]="!draft().city"
+        [attr.aria-pressed]="!draft().city"
+        (click)="setCity(null)"
+      >
+        {{ 'coaches.filter.everywhere' | translate }}
+      </ion-button>
+      @for (facet of facets().cities; track facet.label) {
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="draft().city === facet.label"
+          [attr.aria-pressed]="draft().city === facet.label"
+          (click)="setCity(facet.label)"
+        >
+          {{ facet.label }}
+          <span class="count">{{ facet.count }}</span>
+        </ion-button>
+      }
+    </div>
+  }
+
+  <div class="mh-section-label">{{ 'coaches.filter.experience' | translate }}</div>
+  <div class="mh-chip-cloud">
+    @for (years of experienceOptions; track $index) {
+      <ion-button
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
+        [class.selected]="draft().minYears === years"
+        [attr.aria-pressed]="draft().minYears === years"
+        (click)="setMinYears(years)"
+      >
+        @if (years) {
+          {{ 'coaches.filter.yearsPlus' | translate: { count: years } }}
+        } @else {
+          {{ 'coaches.filter.anyExperience' | translate }}
+        }
+      </ion-button>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'common.filters' | translate"
+  [actionLabel]="'button.reset' | translate"
+  [actionDisabled]="count() === 0"
+  [saveLabel]="applyLabel()"
+  [body]="body"
+  [initialBreakpoint]="0.95"
+  (action)="reset()"
+  (save)="apply()"
+/>

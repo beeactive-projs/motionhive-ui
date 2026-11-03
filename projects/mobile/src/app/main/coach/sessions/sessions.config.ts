@@ -34,12 +34,12 @@ import {
   copyOutline,
   createOutline,
   ellipsisVerticalOutline,
-  funnelOutline,
   globeOutline,
   heartOutline,
   hourglassOutline,
   locationOutline,
   notificationsOutline,
+  optionsOutline,
   peopleOutline,
   personOutline,
   pricetagOutline,
@@ -71,12 +71,12 @@ export const SESSION_ICONS = {
   copyOutline,
   createOutline,
   ellipsisVerticalOutline,
-  funnelOutline,
   globeOutline,
   heartOutline,
   hourglassOutline,
   locationOutline,
   notificationsOutline,
+  optionsOutline,
   peopleOutline,
   personOutline,
   pricetagOutline,
@@ -676,6 +676,18 @@ export function activeFilterCount(filters: AgendaFilters): number {
   if (filters.dateFrom || filters.dateTo) count++;
   if (filters.groupId) count++;
   return count;
+}
+
+/**
+ * The number on the strip's Filters chip. A place alone is what the
+ * location chips beside it say, so it counts only once the sheet holds more
+ * (a type, a status, dates, a group, or a place no chip offers): one thing
+ * is on at a time.
+ */
+export function sheetChipCount(filters: AgendaFilters): number {
+  const chipSaysIt = LOCATION_QUICK_FILTERS.some((chip) => chip.value === filters.locationKind);
+  const beyond = !chipSaysIt || activeFilterCount({ ...filters, locationKind: null }) > 0;
+  return beyond ? activeFilterCount(filters) : 0;
 }
 
 /** Does this occurrence survive `status`? Shared so page and sheet agree. */

@@ -7,6 +7,7 @@
     "closePhoto": "Close photo",
     "closeSearch": "Close search",
     "dismissNotification": "Dismiss notification",
+    "filters": "{count, plural, =0 {Filters} other {Filters, # active}}",
     "hidePassword": "Hide password",
     "loading": "Loading",
     "moreActions": "More actions",

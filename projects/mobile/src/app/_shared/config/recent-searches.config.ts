@@ -14,6 +14,11 @@ export interface RecentPerson {
   avatarUrl: string | null;
   /** The second line: an email, a handle. Null shows the name alone. */
   subline: string | null;
+  /**
+   * The public profile's handle, for a screen that opens people by it (the
+   * coach directory) rather than by user id.
+   */
+  handle?: string | null;
 }
 
 /**
@@ -39,6 +44,7 @@ export interface SuggestionStrip {
 export const RecentSearchScopes = {
   Messages: 'messages',
   Clients: 'clients',
+  Coaches: 'coaches',
 } as const;
 
 export type RecentSearchScope = (typeof RecentSearchScopes)[keyof typeof RecentSearchScopes];
