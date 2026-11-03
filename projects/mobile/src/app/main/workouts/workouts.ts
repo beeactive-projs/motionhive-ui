@@ -36,12 +36,11 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { take } from 'rxjs/operators';
+import { finalize, take } from 'rxjs/operators';
 
 import {
   ProgramAssignmentKind,
   Routine,
-  RoutineService,
   TrainingDayPlan,
   WorkoutLogService,
   displayName,
@@ -49,6 +48,7 @@ import {
 } from 'core';
 
 import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
+import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
@@ -61,15 +61,20 @@ import { HistoryBody } from './_components/history-body/history-body';
 import { ProgressBody } from './_components/progress-body/progress-body';
 import { RoutineRow } from './_components/routine-row/routine-row';
 import { TodayHero } from './_components/today-hero/today-hero';
-import { ActiveWorkoutService } from './_services/active-workout.service';
+import { RoutineActionsService } from './_services/routine-actions.service';
 import { HistoryStore } from './history/history.store';
 import {
+  ROUTINE_EDIT_PARAM,
+  RoutineActionId,
+  RoutineActionIds,
+  RoutineSwipes,
   WORKOUT_ICONS,
   WorkoutStartAction,
   WorkoutStartActions,
   WorkoutTab,
   WorkoutTabs,
   planWeekLabel,
+  routineActions,
   routineTileColor,
   workoutClock,
   workoutStartActions,
@@ -89,10 +94,10 @@ const PLAN_PREVIEW_LIMIT = 3;
  * page) and re-read when shown.
  *
  * The two ways to begin, an empty workout and a new routine, sit behind the
- * header's ⋯. Routines' order is deliberate: anything already in progress
+ * header's honey "+". Routines' order is deliberate: anything already in progress
  * outranks everything, then what a plan says to do today, the plans, and
- * your routines with Start on each. A casual user who never opens a plan
- * still has a one-tap way to start.
+ * your routines, where a swipe left offers More (copy, archive, delete) and
+ * Edit.
  *
  * One workout at a time: while a session is open, nothing on this page offers
  * to start another. Today's day turns into something to look at, and the
@@ -102,6 +107,7 @@ const PLAN_PREVIEW_LIMIT = 3;
   selector: 'mh-workouts',
   imports: [
     ActionSheet,
+    ConfirmSheet,
     EmptyState,
     ExerciseLibrary,
     HexAvatar,
@@ -143,8 +149,7 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _routineService = inject(RoutineService);
-  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
+  private readonly _routineActionsService = inject(RoutineActionsService);
   private readonly _clockService = inject(ClockService);
   private readonly _translateService = inject(TranslateService);
   private readonly _workoutLogService = inject(WorkoutLogService);
@@ -162,17 +167,16 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   readonly skeletonRows = [1, 2, 3];
   readonly routineTileColor = routineTileColor;
   readonly Tabs = WorkoutTabs;
+  readonly Swipes = RoutineSwipes;
 
   /** The tab a link asked for, until you pick another. */
   readonly tab = signal<WorkoutTab>(WorkoutTabs.Routines);
   private readonly _progressBody = viewChild(ProgressBody);
-  /** The routine whose Start was tapped, while it starts. */
-  readonly startingId = signal<string | null>(null);
   /** Where an exercise opens from the Exercises tab: this stack, so back returns here. */
   readonly exerciseBase = ['/tabs/workouts/exercise'];
 
   readonly actionsOpen = signal(false);
-  /** The ⋯ sheet: an empty workout (unless one is open) and a new routine. */
+  /** The "+" sheet: an empty workout (unless one is open) and a new routine. */
   readonly startActions = computed(() => workoutStartActions(!this.store.inProgress()));
 
   /** Every plan, or the first few: a long list would bury the routines. */
@@ -182,6 +186,31 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
     return this.showAllPlans() ? plans : plans.slice(0, PLAN_PREVIEW_LIMIT);
   });
   readonly hasHiddenPlans = computed(() => this.store.activePlans().length > PLAN_PREVIEW_LIMIT);
+
+  /** The routine whose swipe was used; the More, copy and delete sheets act on it. */
+  private readonly _routineTarget = signal<Routine | null>(null);
+  readonly routineName = computed(() => this._routineTarget()?.name ?? '');
+  readonly routineActionsOpen = signal(false);
+  /** Edit is the row's own swipe, so the More sheet holds the rest. */
+  readonly routineSheetActions = routineActions(true);
+  readonly copyOpen = signal(false);
+  readonly copying = signal(false);
+  readonly deleteOpen = signal(false);
+  readonly deleting = signal(false);
+  /** A copy opens once made, so its sheet is closed before navigating (see ConfirmSheet.close). */
+  private readonly _copySheet = viewChild<ConfirmSheet>('copySheet');
+
+  readonly copyBody = computed(() =>
+    this._translateService.instant('workouts.routineBuilder.copyConfirm.body', {
+      name: this.routineName(),
+    }),
+  );
+
+  readonly deleteBody = computed(() =>
+    this._translateService.instant('workouts.routineBuilder.delete.message', {
+      name: this.routineName(),
+    }),
+  );
 
   private readonly _todayKey = computed(() => localDayKey(new Date(this._clockService.now())));
 
@@ -342,30 +371,73 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
     void this._router.navigate(['/tabs/workouts/archived']);
   }
 
-  /** Start straight from the list, the same as from the routine's own page. */
-  startRoutine(routine: Routine): void {
-    if (this.startingId()) return;
-    this.startingId.set(routine.id);
-    this._activeWorkoutService.startOrResume(
-      () =>
-        this._routineService
-          .start(routine.id)
-          .pipe(take(1))
-          .subscribe({
-            next: (log) => {
-              this.startingId.set(null);
-              void this._router.navigate(['/tabs/workouts/log', log.id]);
-            },
-            error: (err) => {
-              this.startingId.set(null);
-              void this._feedbackService.error(
-                err,
-                this._translateService.instant('workouts.routineBuilder.toast.startFailed'),
-              );
-            },
-          }),
-      { onBlocked: () => this.startingId.set(null) },
-    );
+  // ─── A routine's swipes ───────────────────────────────────────
+
+  /** Straight into the builder, past the read view. */
+  editRoutine(routine: Routine): void {
+    void this._router.navigate(['/tabs/workouts/routine', routine.id], {
+      queryParams: { [ROUTINE_EDIT_PARAM]: true },
+    });
+  }
+
+  openRoutineActions(routine: Routine): void {
+    this._routineTarget.set(routine);
+    this.routineActionsOpen.set(true);
+  }
+
+  /** The sheet reports the verb once it has closed, so a confirm can open straight after. */
+  onRoutineAction(id: RoutineActionId): void {
+    switch (id) {
+      case RoutineActionIds.Duplicate:
+        this.copyOpen.set(true);
+        return;
+      case RoutineActionIds.Archive:
+        this._archiveRoutine();
+        return;
+      case RoutineActionIds.Delete:
+        this.deleteOpen.set(true);
+        return;
+    }
+  }
+
+  /** Asked first, then opened, as from the routine's own page: the copy is the one to change. */
+  makeCopy(): void {
+    const target = this._routineTarget();
+    if (!target || this.copying()) return;
+    this.copying.set(true);
+    this._routineActionsService
+      .copy(target.id)
+      .pipe(finalize(() => this.copying.set(false)))
+      .subscribe(async (copy) => {
+        await this._copySheet()?.close();
+        void this._router.navigate(['/tabs/workouts/routine', copy.id]);
+      });
+  }
+
+  /**
+   * Undone from the archive in one tap, so it happens on the tap. The row
+   * leaves once the server agrees; a second Archive meanwhile sends nothing.
+   */
+  private _archiveRoutine(): void {
+    const target = this._routineTarget();
+    if (!target) return;
+    this._routineActionsService
+      .setArchived(target.id, true)
+      .subscribe(() => this.store.moveToArchived(target.id));
+  }
+
+  /** After the red confirm. The workouts logged from it stay in History. */
+  confirmDeleteRoutine(): void {
+    const target = this._routineTarget();
+    if (!target || this.deleting()) return;
+    this.deleting.set(true);
+    this._routineActionsService
+      .remove(target.id)
+      .pipe(finalize(() => this.deleting.set(false)))
+      .subscribe(() => {
+        this.deleteOpen.set(false);
+        this.store.dropRoutine(target.id);
+      });
   }
 
   // ─── Libraries ────────────────────────────────────────────────

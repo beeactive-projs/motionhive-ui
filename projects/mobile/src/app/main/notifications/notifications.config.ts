@@ -107,6 +107,7 @@ export function notificationDetailActions(
       id: NotificationDetailActions.Delete,
       label: 'button.delete',
       icon: 'trash-outline',
+      color: 'danger',
       destructive: true,
     },
   ];

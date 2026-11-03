@@ -41,6 +41,7 @@ import {
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { ExerciseRow } from './_components/exercise-row/exercise-row';
 import { CreateExerciseRow } from './_components/create-exercise-row/create-exercise-row';
 import { OwnExerciseSheets } from './_components/own-exercise-sheets/own-exercise-sheets';
@@ -101,6 +102,7 @@ const SEARCH_DEBOUNCE_MS = 300;
     IonToolbar,
     OwnExerciseSheets,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './exercises.html',

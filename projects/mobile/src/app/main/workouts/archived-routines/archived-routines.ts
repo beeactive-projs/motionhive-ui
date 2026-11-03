@@ -23,13 +23,15 @@ import { Routine, RoutineService } from 'core';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { RoutineRow } from '../_components/routine-row/routine-row';
-import { WORKOUT_ICONS, routineTileColor } from '../workouts.config';
+import { RoutineActionsService } from '../_services/routine-actions.service';
+import { RoutineSwipes, WORKOUT_ICONS, routineTileColor } from '../workouts.config';
 
 const ARCHIVED_LIMIT = 100;
 
 /**
  * Your archived routines: put away, not gone. Their workouts stay in your
- * history; opening one offers Restore in its ⋯.
+ * history. A swipe left unarchives one (a full swipe too), and opening one
+ * offers Unarchive in its ⋯.
  */
 @Component({
   selector: 'mh-archived-routines',
@@ -54,6 +56,7 @@ const ARCHIVED_LIMIT = 100;
 })
 export class ArchivedRoutines implements ViewWillEnter {
   private readonly _routineService = inject(RoutineService);
+  private readonly _routineActionsService = inject(RoutineActionsService);
   private readonly _router = inject(Router);
 
   readonly routines = signal<Routine[]>([]);
@@ -63,6 +66,7 @@ export class ArchivedRoutines implements ViewWillEnter {
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6];
   readonly routineTileColor = routineTileColor;
+  readonly Swipes = RoutineSwipes;
 
   readonly showSkeleton = computed(() => this.loading() && this.routines().length === 0);
   readonly showError = computed(() => this.error() && this.routines().length === 0);
@@ -74,7 +78,7 @@ export class ArchivedRoutines implements ViewWillEnter {
     addIcons(WORKOUT_ICONS);
   }
 
-  // Fresh each time: a routine restored from its page has left this list.
+  // Fresh each time: a routine unarchived from its page has left this list.
   ionViewWillEnter(): void {
     this.load();
   }
@@ -101,5 +105,17 @@ export class ArchivedRoutines implements ViewWillEnter {
 
   open(routine: Routine): void {
     void this._router.navigate(['/tabs/workouts/routine', routine.id]);
+  }
+
+  /**
+   * Back among your routines; the row leaves this list once the server
+   * agrees. A tap and a full swipe on the same row send it once.
+   */
+  unarchive(routine: Routine): void {
+    this._routineActionsService
+      .setArchived(routine.id, false)
+      .subscribe(() =>
+        this.routines.update((routines) => routines.filter((r) => r.id !== routine.id)),
+      );
   }
 }

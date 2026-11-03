@@ -37,6 +37,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { GROUP_AVATAR_TONE, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { CoachRow } from '../_components/coach-row/coach-row';
@@ -116,6 +117,7 @@ type SearchMode = (typeof SearchModes)[keyof typeof SearchModes];
     IonToolbar,
     RowSkeleton,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     SessionResultRow,
     TranslatePipe,
   ],

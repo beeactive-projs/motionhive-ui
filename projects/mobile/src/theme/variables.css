@@ -298,11 +298,22 @@
   --mh-color-link: var(--mh-color-honey-deep);
 
   /*
-   * The danger slot (red 500) is 3.76:1 on white: enough for an outline,
-   * short of AA for text. Field errors and invalid labels use this step,
-   * 4.83:1 on the white page and 4.4:1 on slate-100 (a card, a sheet).
+   * Red as text or as a glyph on its own: a field error, a destructive
+   * label, an overlap mark. The danger slot is a fill (red 600, 3.9:1 on a
+   * sheet's cards, short of AA for text); red 700 is 6.5:1 on the white
+   * page, 5.9:1 on slate-100 (a card, a sheet) and 5.3:1 on a sheet's cards.
+   * Ionic's text components read it on their own (the ink rules after the
+   * colour classes).
    */
-  --mh-color-danger-deep: var(--mh-danger-600);
+  --mh-color-danger-deep: var(--mh-danger-700);
+
+  /*
+   * Green as text or as a glyph on its own: a done tick, "Done" beside a
+   * round. The success slot is a fill for black ink and only 2.5:1 on the
+   * white page; emerald 700 is 5.5:1 there and 5:1 on slate-100. A sheet's
+   * cards take a step deeper (the sheet context).
+   */
+  --mh-color-success-deep: var(--mh-success-700);
 
   /*
    * A soft fill one step off the card (pills, wells, the search field), as
@@ -511,13 +522,19 @@
   --ion-color-warning-shade: var(--mh-warning-600);
   --ion-color-warning-tint: var(--mh-warning-400);
 
-  /* Danger — Red */
-  --ion-color-danger: var(--mh-danger-500);
-  --ion-color-danger-rgb: 239, 68, 68;
+  /*
+   * Danger — Red, at step 600 rather than 500, in both palettes. It is a
+   * fill under white ink (a destructive button, a toast, a count, a swipe),
+   * and white on red 500 is 3.8:1, under the 4.5:1 a label needs; on 600 it
+   * is 4.8:1. The deeper red also sits better beside the honey. As text it
+   * is `--mh-color-danger-deep`, never this slot.
+   */
+  --ion-color-danger: var(--mh-danger-600);
+  --ion-color-danger-rgb: 220, 38, 38;
   --ion-color-danger-contrast: #ffffff;
   --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: var(--mh-danger-600);
-  --ion-color-danger-tint: var(--mh-danger-400);
+  --ion-color-danger-shade: var(--mh-danger-700);
+  --ion-color-danger-tint: var(--mh-danger-500);
 
   /*
    * Info — Sky. Ionic has no `info` slot; the workspace palette does, so it
@@ -661,6 +678,25 @@
 }
 
 /*
+ * Red and green as ink. The danger and success slots are fills; the
+ * components that draw `color` as their text or glyph (a label, a note, a
+ * text, a bare icon, a clear or outline button) take the deep step instead,
+ * so `color="danger"` on them is always readable. Fills (a solid button, a
+ * badge, a swipe, a toast) keep the slot, and a hex tile's glyph sets its
+ * own ink. The element in the selector outranks Ionic's own `.ion-color-*`
+ * blocks, which are `!important` too.
+ */
+:is(ion-label, ion-note, ion-text, ion-icon).ion-color-danger,
+ion-button.ion-color-danger:is(.button-clear, .button-outline) {
+  --ion-color-base: var(--mh-color-danger-deep) !important;
+}
+
+:is(ion-label, ion-note, ion-text, ion-icon).ion-color-success,
+ion-button.ion-color-success:is(.button-clear, .button-outline) {
+  --ion-color-base: var(--mh-color-success-deep) !important;
+}
+
+/*
  * Dark palette — grey surfaces, as iOS draws them (user decision,
  * 2026-11-01: the navy page of 2026-10-31 is undone). Backgrounds are greys
  * (block at the end); text = navy 50; honey for accents. Only tokens flip
@@ -680,8 +716,10 @@
   /* A text link is the honey itself too, not the light tint (user decision,
      2026-11-03). */
   --mh-color-link: var(--ion-color-primary);
-  /* On a dark page the step goes the other way: red 400 is 6.22:1 on it. */
+  /* On a dark page the steps go the other way: red 400 is 6:1 on it and 5:1
+     on a card, emerald 400 8.6:1 and 7.3:1. */
   --mh-color-danger-deep: var(--mh-danger-400);
+  --mh-color-success-deep: var(--mh-success-400);
 
   /* Selection inverts like the washes: deep honey fill, light ink. */
   --mh-color-selected-background: var(--mh-warning-950);
@@ -834,6 +872,9 @@ ion-modal.mh-sheet {
   --ion-card-background: var(--mh-slate-200);
   --ion-item-background: var(--mh-slate-200);
   --ion-toolbar-background: var(--mh-slate-100);
+
+  /* Emerald 700 is 4.4:1 on these cards; 800 is 6.2:1. */
+  --mh-color-success-deep: var(--mh-success-800);
 }
 
 .ion-palette-dark ion-modal.mh-sheet {
@@ -849,4 +890,10 @@ ion-modal.mh-sheet {
   --ion-color-medium-rgb: 203, 213, 225;
   --ion-color-medium-shade: var(--mh-slate-400);
   --ion-color-medium-tint: var(--mh-slate-200);
+
+  /* So does red text: red 400 is 4.1:1 on these cards, red 300 6:1. Green
+     keeps the page's step (emerald 400, 5.9:1), restated because the light
+     sheet's deeper step would otherwise apply here too. */
+  --mh-color-danger-deep: var(--mh-danger-300);
+  --mh-color-success-deep: var(--mh-success-400);
 }

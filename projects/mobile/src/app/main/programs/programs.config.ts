@@ -184,25 +184,33 @@ export const CreateChoices = {
 
 export type CreateChoice = (typeof CreateChoices)[keyof typeof CreateChoices];
 
-/** `label` and `hint` are translation keys; the sheet's template translates them. */
+/**
+ * `label` and `hint` are translation keys; the sheet's template translates
+ * them. Honey for the program, teal for the routine (as on the Workouts "+"
+ * sheet), and sky for the starters, a catalogue to browse.
+ */
 export const CREATE_OPTIONS: readonly SheetAction<CreateChoice>[] = [
   {
     id: CreateChoices.Program,
     label: 'programs.create.newProgram',
     hint: 'programs.create.newProgramHint',
     icon: 'albums-outline',
+    color: 'primary',
   },
   {
     id: CreateChoices.Routine,
     label: 'programs.create.newRoutine',
     hint: 'programs.create.newRoutineHint',
     icon: 'repeat-outline',
+    color: 'teal',
   },
   {
     id: CreateChoices.Starters,
     label: 'programs.create.browseStarters',
     hint: 'programs.create.browseStartersHint',
     icon: 'flash-outline',
+    color: 'info',
+    tone: 'shade',
   },
 ];
 
@@ -224,39 +232,44 @@ export const ProgramActionIds = {
 
 export type ProgramActionId = (typeof ProgramActionIds)[keyof typeof ProgramActionIds];
 
-/** `label` and `hint` are translation keys; the sheet translates them. */
+/**
+ * `label` and `hint` are translation keys; the sheet translates them. Each
+ * tile takes its concept's hue: the assignments are people (violet), the
+ * copy teal, unpublishing makes it private (violet). View assignments sits
+ * beside Assign, the pair about who has it, so the two honey verbs (Assign,
+ * the published program's purpose, and Edit details) never touch.
+ */
 export const PROGRAM_ACTIONS: readonly SheetAction<ProgramActionId>[] = [
   {
-    // Honey, because it is what a published program is for; the rest are plumbing.
     id: ProgramActionIds.Assign,
     label: 'programs.assignments.assignToClient',
     icon: 'person-add-outline',
     color: 'primary',
   },
   {
-    id: ProgramActionIds.EditDetails,
-    label: 'programs.actions.editDetails',
-    icon: 'create-outline',
-    color: 'medium',
-  },
-  {
     id: ProgramActionIds.ViewAssignments,
     label: 'programs.settings.viewAssignments',
     icon: 'people-outline',
-    color: 'medium',
+    color: 'violet',
+  },
+  {
+    id: ProgramActionIds.EditDetails,
+    label: 'programs.actions.editDetails',
+    icon: 'create-outline',
+    color: 'primary',
   },
   {
     id: ProgramActionIds.Duplicate,
     label: 'button.duplicate',
     icon: 'copy-outline',
-    color: 'medium',
+    color: 'teal',
   },
   {
     id: ProgramActionIds.Unpublish,
     label: 'programs.settings.unpublish',
     hint: 'programs.actions.unpublishHint',
     icon: 'eye-off-outline',
-    color: 'medium',
+    color: 'violet',
   },
   {
     id: ProgramActionIds.Delete,

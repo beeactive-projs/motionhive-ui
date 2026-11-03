@@ -7,6 +7,7 @@ import { WorkoutLog } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { SessionRowSkeleton } from '../../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { HistoryFilter, HistoryFilters, HistoryStore } from '../../history/history.store';
 import { logMonths, logWeeks, shortDayLabel } from '../../workouts.config';
 import { HistoryCalendar } from '../history-calendar/history-calendar';
@@ -43,6 +44,7 @@ import { PhotoTile } from '../photo-tile/photo-tile';
     LogRow,
     MemoryCard,
     PhotoTile,
+    SearchbarLabelDirective,
     SessionRowSkeleton,
     TranslatePipe,
   ],

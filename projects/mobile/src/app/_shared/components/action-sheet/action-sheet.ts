@@ -60,6 +60,12 @@ export class ActionSheet<T extends string> {
     );
   });
 
+  /** Red for the verbs that destroy, grey only while a verb is off, else its own hue. */
+  tileColor(action: SheetAction<T>): string {
+    if (action.destructive) return 'danger';
+    return action.disabled ? 'medium' : action.color;
+  }
+
   /** The choice waits here until the sheet has actually gone. */
   private _pending: T | null = null;
 

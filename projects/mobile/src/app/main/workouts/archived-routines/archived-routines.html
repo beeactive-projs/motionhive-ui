@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/workouts" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/workouts" />
     </ion-buttons>
     <ion-title>{{ 'workouts.archived.title' | translate }}</ion-title>
   </ion-toolbar>
@@ -41,11 +41,13 @@
       } @else {
         <ion-list [inset]="true" class="mh-card-list">
           @for (routine of routines(); track routine.id; let i = $index) {
+            <!-- Swipe left to unarchive, all the way or onto the button. -->
             <mh-routine-row
               [routine]="routine"
               [color]="routineTileColor(i)"
-              [detail]="false"
+              [swipe]="Swipes.Unarchive"
               (select)="open(routine)"
+              (unarchive)="unarchive(routine)"
             />
           }
         </ion-list>

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="backHref" [text]="'button.cancel' | translate" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" [text]="'button.cancel' | translate" />
     </ion-buttons>
     <ion-title>{{ 'groups.compose.title' | translate }}</ion-title>
     <ion-buttons slot="end">

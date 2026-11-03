@@ -28,15 +28,26 @@ document is about placement and flow, not styling.
    | creates something new          | a confirm (`mh-confirm-sheet`) saying what you get           | Duplicate, Make a copy     |
    | loses data                     | a red confirm (`tone="danger"`) naming what goes and what stays | Delete program          |
 
-5. **Only destructive verbs are red.** Mark them `destructive: true`; the sheet puts them last, in
-   their own card. Everything else stays neutral (`color: 'medium'`). Honey (`primary`) is kept for
-   the sheet's one main verb (sessions: Open, a published program: Assign to a client), and a verb
-   with a meaning of its own may take that hue (check in is `success`). See the note on
-   `SESSION_ACTIONS`.
+5. **Every verb's tile is coloured; only destructive verbs are red.** Mark those
+   `destructive: true`; the sheet puts them last, in their own card. Every other verb takes its
+   concept's hue from the tile table in `projects/mobile/.claude/rules/lists.md` ("Leading
+   icons"): honey (`primary`) for the sheet's main verb or for editing and creating, `success` for
+   unarchiving or checking in, `teal` for a place, a copy or a new routine, `violet` for people
+   and for archiving (not red: it loses nothing and one tap undoes it, so it stays out of the
+   destructive card), `info` for sharing, calendars, links and notes. Keep a verb's hue the same
+   on every sheet, and give neighbours different hues. Grey (`medium`) is only for a verb that is
+   off or unavailable, never the default (user decision, 2026-11-03): `color` is required and its
+   type (`SheetActionColor`) leaves grey out, and the sheet greys a `disabled` verb itself. See the
+   note on `SESSION_ACTIONS`.
 6. **Say the effect when it is not obvious.** Use `hint` for a second line (Unpublish: "Back to
    draft. Clients already on it keep their copy.").
 
 ## Confirm wording
+
+- The archive pair is **Archive / Unarchive** ("Arhivează" / "Dezarhivează"; the shared
+  `button.archive` / `button.unarchive`), on every screen, never Restore (user decision,
+  2026-11-03). Unarchive names the exact undo; Restore reads as getting back something deleted, and
+  stays free for that.
 
 - The title asks with the verb: "Duplicate this program?", "Make a copy?".
 - The confirm button repeats the verb ("Duplicate", "Make a copy", "Delete"). Never "OK" or "Yes".
@@ -54,8 +65,8 @@ export const ThingActionIds = { EditDetails: 'editDetails', Duplicate: 'duplicat
 export type ThingActionId = (typeof ThingActionIds)[keyof typeof ThingActionIds];
 
 export const THING_ACTIONS: readonly SheetAction<ThingActionId>[] = [
-  { id: ThingActionIds.EditDetails, label: 'things.actions.editDetails', icon: 'create-outline', color: 'medium' },
-  { id: ThingActionIds.Duplicate, label: 'button.duplicate', icon: 'copy-outline', color: 'medium' },
+  { id: ThingActionIds.EditDetails, label: 'things.actions.editDetails', icon: 'create-outline', color: 'primary' },
+  { id: ThingActionIds.Duplicate, label: 'button.duplicate', icon: 'copy-outline', color: 'teal' },
   { id: ThingActionIds.Delete, label: 'things.delete.title', icon: 'trash-outline', color: 'danger', destructive: true },
 ];
 
@@ -112,8 +123,8 @@ void this._router.navigate([...]);
 | Action             | Shown when            | Then                                                                                         |
 | ------------------ | --------------------- | -------------------------------------------------------------------------------------------- |
 | Assign to a client | published             | the assign sheet opens from the bottom                                                       |
-| Edit details       | yours                 | sheet: name, description, length in weeks. Growing asks whether to repeat the existing weeks or leave the new ones empty; shrinking warns how many days go. |
 | View assignments   | published             | the assignments page                                                                         |
+| Edit details       | yours                 | sheet: name, description, length in weeks. Growing asks whether to repeat the existing weeks or leave the new ones empty; shrinking warns how many days go. |
 | Duplicate          | always                | confirm, then opens the draft copy                                                           |
 | Unpublish          | yours and published   | immediate, toast; the footer turns into Publish                                              |
 | Delete program     | yours                 | red confirm, then back to the library                                                        |
@@ -133,6 +144,12 @@ nothing it cannot change.
 | Trainee, starter   | Start        | none                                 |
 
 Make a copy always asks first and then opens the copy.
+
+**Workouts list** (`workouts/workouts.html`, the swipe on your routine rows): a swipe left reveals
+More and Edit; there is no swipe right. More is the builder's sheet without Edit (Make a copy,
+Archive, Delete routine). Edit opens the builder in edit mode (`?edit`). Archive happens on the tap
+with a toast; Delete asks in red, as on the routine's page. On the archived routines page the swipe
+left holds Unarchive alone, and a full swipe unarchives too: it happens at once, with a toast.
 
 **Library filters** (`programs/programs.html`): the chip row filters by kind (All, Programs,
 Routines). Who made it (Mine, MotionHive, All) is in the Filters sheet, and the Filters chip

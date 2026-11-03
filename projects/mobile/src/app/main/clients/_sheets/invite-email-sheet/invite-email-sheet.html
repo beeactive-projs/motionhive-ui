@@ -23,12 +23,15 @@
       </div>
     </div>
   } @else {
-    <p class="mh-helper">{{ 'clients.invite.emailSheet.body' | translate }}</p>
+    <!-- Body copy, not a field helper: `.mh-helper` is the line under a field,
+         and its inset pushed this off the title's edge. -->
+    <p class="lead">{{ 'clients.invite.emailSheet.body' | translate }}</p>
 
     <!-- Folded away: worth having for a cold email, worth nothing on the
-         main path, where another open field is a reason to stop. -->
+         main path, where another open field is a reason to stop. A text link,
+         so the link ink: bare honey on the sheet was 1.96:1. -->
     <ion-button
-      class="note-toggle"
+      class="note-toggle mh-text-link"
       fill="clear"
       size="small"
       [attr.aria-expanded]="noteOpen()"
@@ -56,7 +59,7 @@
       />
     }
 
-    <p class="mh-helper">{{ 'clients.invite.expiry' | translate: { count: expiryDays } }}</p>
+    <p class="mh-footnote expiry">{{ 'clients.invite.expiry' | translate: { count: expiryDays } }}</p>
   }
 </ng-template>
 

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="backHref" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
     </ion-buttons>
     <ion-title>{{ 'clients.inviteClient' | translate }}</ion-title>
     @if (anySent()) {
@@ -129,9 +129,9 @@
           slot="start"
           size="lg"
           aria-hidden="true"
-          icon="mail-outline"
-          color="info"
           tone="wash"
+          [icon]="emailTile.icon"
+          [color]="emailTile.color"
         />
         <ion-label>
           <h2>{{ email }}</h2>

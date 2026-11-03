@@ -1,16 +1,21 @@
+/* A column, so the empty state (which grows in one) can take the height the
+   Workouts tab gives this body and centre in it, as on Messages and Clients. */
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 /* The search field and the chips sit in the page's gutter here, not a
    bar's: Ionic's own searchbar padding would indent the field past the
-   chips under it. */
+   chips under it. The strip keeps its block padding, as in the Messages
+   header, which spaces it off the field and keeps the chips' 44px boxes
+   inside its scroll box. */
 .search {
   padding: 0 0 0.5rem;
 }
 
 .bar {
-  padding: 0 0 0.5rem;
+  padding-inline: 0;
 }
 
 /* "12 workouts with a photo" — a label on the list rather than a row of it.

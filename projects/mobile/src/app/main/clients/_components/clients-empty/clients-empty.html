@@ -19,7 +19,14 @@
 
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item>
-      <mh-hex-avatar slot="start" size="sm" icon="mail-outline" color="info" />
+      <!-- The shade: white on Sky 500 is 2.8:1, under the 3:1 a glyph needs. -->
+      <mh-hex-avatar
+        slot="start"
+        size="sm"
+        tone="shade"
+        [icon]="emailTile.icon"
+        [color]="emailTile.color"
+      />
       <ion-label>
         <h3>{{ 'clients.empty.byEmailTitle' | translate }}</h3>
         <p>{{ 'clients.empty.byEmailHint' | translate }}</p>

@@ -14,6 +14,7 @@ import { BellNotification, formatCalendarShort } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { categoryStyle } from '../../../../_shared/config/notification-categories.config';
+import { emitAndClose } from '../../../../_shared/utils/swipe';
 
 /**
  * One row of the notification centre, a flat-list row (`mh-flat-list`): the
@@ -60,9 +61,5 @@ export class NotificationRow {
   /** Clock time, not "2h" — the day divider above already said which day. */
   readonly time = computed(() => formatCalendarShort(this.notification().createdAt));
 
-  /** Ionic leaves a row open after an option is tapped. */
-  emitAndClose(sliding: IonItemSliding, action: { emit: () => void }): void {
-    action.emit();
-    void sliding.close();
-  }
+  readonly emitAndClose = emitAndClose;
 }

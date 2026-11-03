@@ -14,6 +14,7 @@ import { daysBetween } from '../../_shared/utils/dates';
 import {
   CLIENT_ACTIONS,
   ClientActionIds,
+  EMAIL_ONLY_TILE,
   NOTES_COUNTER_FROM,
   NOTES_MAX_LENGTH,
   REQUEST_ACTIONS,
@@ -29,11 +30,13 @@ import {
 import {
   CLIENT_FILTERS,
   CLIENT_REQUESTS_URL,
+  ClientFilterId,
   ClientFilterIds,
   MIN_SEARCH_LENGTH,
   filterFromUrl,
   filterStatus,
   matchesClientQuery,
+  resultAnnouncementKey,
 } from './clients.filters';
 import { CLIENT_ICONS } from './clients.icons';
 import { candidatesFrom } from './invite-client/group-suggestions.store';
@@ -92,6 +95,9 @@ function iconNamesUsed(): string[] {
       names.add(match[1]);
     }
   }
+
+  // Tiles read from shared config rather than written out here.
+  names.add(EMAIL_ONLY_TILE.icon);
 
   // Ionic's own components name these; we never register them.
   names.delete('crescent');
@@ -184,6 +190,20 @@ describe('filters', () => {
     expect(filterFromUrl('/tabs/clients?filter=nope')).toBeNull();
     expect(filterFromUrl('/tabs/clients/user-1?filter=requests')).toBeNull();
   });
+
+  // Read to a screen reader once a chip or a search settles: the words must
+  // match the screen, which says requests under Requests and "this status"
+  // under an empty chip.
+  it('announces requests as requests, and an empty chip as an empty chip', () => {
+    const key = (filter: ClientFilterId, hasQuery: boolean, count: number) =>
+      resultAnnouncementKey(filter, hasQuery, count).replace('clients.list.results.', '');
+
+    expect(key(ClientFilterIds.Requests, false, 4)).toBe('requests');
+    expect(key(ClientFilterIds.Active, false, 2)).toBe('count');
+    expect(key(ClientFilterIds.All, true, 1)).toBe('count');
+    expect(key(ClientFilterIds.Archived, false, 0)).toBe('noneForFilter');
+    expect(key(ClientFilterIds.All, true, 0)).toBe('none');
+  });
 });
 
 describe('search start', () => {
@@ -247,10 +267,36 @@ describe('search start', () => {
       id: 'req-1',
       name: 'new@example.com',
       pendingLabel: 'Email sent',
-      icon: 'mail-outline',
+      tile: EMAIL_ONLY_TILE,
     });
     expect(rest).toEqual([]);
     expect(newestClients(rows, []).map((person) => person.id)).toEqual(['user-1']);
+  });
+
+  // The strip opens where the rows were: keyed by the request (the page finds
+  // the row by it), but coloured by the person, as the row is.
+  it('colours a pending person by the person, not the request', () => {
+    const rows = [
+      client({
+        id: 'req-2',
+        clientId: 'user-7',
+        client: { id: 'user-7', firstName: 'Maria' },
+        status: InstructorClientStatuses.Pending,
+        requestType: ClientRequestTypes.InstructorToClient,
+      }),
+      client({
+        id: 'req-3',
+        clientId: null,
+        client: null,
+        invitedEmail: 'new@example.com',
+        status: InstructorClientStatuses.Pending,
+        requestType: ClientRequestTypes.InstructorToClient,
+      }),
+    ];
+
+    const [person, emailOnly] = pendingClients(rows);
+    expect(person).toMatchObject({ id: 'req-2', toneId: 'user-7', tile: null });
+    expect(emailOnly).toMatchObject({ id: 'req-3', toneId: 'req-3' });
   });
 });
 
@@ -486,7 +532,7 @@ describe('client actions', () => {
   // A colour Ionic cannot resolve is not an error — the glyph silently falls
   // back to the item's ink, so a typo shows up as one row quietly losing its tint.
   it('tints every verb with a palette colour Ionic knows', () => {
-    const palette = ['primary', 'success', 'info', 'medium', 'danger'];
+    const palette = ['primary', 'success', 'info', 'violet', 'danger'];
     for (const action of CLIENT_ACTIONS) {
       expect(palette).toContain(action.color);
     }
@@ -498,11 +544,12 @@ describe('client actions', () => {
     expect(honey.map((action) => action.id)).toEqual([ClientActionIds.Message]);
   });
 
-  it('marks archive, and only archive, destructive — and keeps it last', () => {
-    const destructive = CLIENT_ACTIONS.filter((action) => action.destructive);
-    expect(destructive.map((action) => action.id)).toEqual([ClientActionIds.Archive]);
-    expect(destructive[0].color).toBe('danger');
-    expect(CLIENT_ACTIONS[CLIENT_ACTIONS.length - 1].id).toBe(ClientActionIds.Archive);
+  // Archiving loses nothing and Unarchive undoes it, so it is no red verb.
+  it('keeps archive out of red, violet and last', () => {
+    expect(CLIENT_ACTIONS.filter((action) => action.destructive)).toEqual([]);
+    const archive = CLIENT_ACTIONS[CLIENT_ACTIONS.length - 1];
+    expect(archive.id).toBe(ClientActionIds.Archive);
+    expect(archive.color).toBe('violet');
   });
 
   it('offers archive or unarchive, never both, and notes only on a settled row', () => {
@@ -561,7 +608,7 @@ describe('request actions', () => {
     visibleRequestActions(row, resent).map((a) => a.id);
 
   it('tints every verb with a palette colour Ionic knows', () => {
-    const palette = ['primary', 'success', 'info', 'medium', 'danger'];
+    const palette = ['primary', 'violet', 'danger'];
     for (const action of REQUEST_ACTIONS) {
       expect(palette).toContain(action.color);
     }

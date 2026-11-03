@@ -155,7 +155,7 @@ export function workoutTabFrom(value: unknown): WorkoutTab {
     : WorkoutTabs.Routines;
 }
 
-/** The two ways to begin, behind the Workouts page's ⋯. */
+/** The two ways to begin, behind the Workouts page's "+". */
 export const WorkoutStartActions = {
   StartEmpty: 'start-empty',
   NewRoutine: 'new-routine',
@@ -163,7 +163,12 @@ export const WorkoutStartActions = {
 
 export type WorkoutStartAction = (typeof WorkoutStartActions)[keyof typeof WorkoutStartActions];
 
-/** The ⋯ sheet's verbs; while a workout is open, starting another is not one. */
+/**
+ * The "+" sheet's verbs; while a workout is open, starting another is not
+ * one. Honey for starting, as the start-conflict sheet's Resume is, and teal
+ * for the routine, the second colour of the routine tiles and the hue a new
+ * routine or copy takes on every sheet (`lists.md`, "Leading icons").
+ */
 export function workoutStartActions(canStart: boolean): SheetAction<WorkoutStartAction>[] {
   return [
     ...(canStart
@@ -172,13 +177,15 @@ export function workoutStartActions(canStart: boolean): SheetAction<WorkoutStart
             id: WorkoutStartActions.StartEmpty,
             label: 'workouts.home.startEmpty',
             icon: 'play-outline',
-          },
+            color: 'primary',
+          } satisfies SheetAction<WorkoutStartAction>,
         ]
       : []),
     {
       id: WorkoutStartActions.NewRoutine,
       label: 'workouts.common.newRoutine',
       icon: 'add-outline',
+      color: 'teal',
     },
   ];
 }
@@ -221,6 +228,12 @@ const ROUTINE_TILE_COLORS = ['primary', 'teal', 'info', 'coral'] as const;
 export function routineTileColor(index: number): string {
   return ROUTINE_TILE_COLORS[index % ROUTINE_TILE_COLORS.length];
 }
+
+/**
+ * `?edit` on a saved routine's address opens it in the builder rather than
+ * its read view: the list's Edit swipe has already said what it wants.
+ */
+export const ROUTINE_EDIT_PARAM = 'edit';
 
 /**
  * A logged workout's spine: emerald for a finished session, honey for one
@@ -377,6 +390,20 @@ export function planWeekLabel(plan: TrainingDayPlan, todayKey: string): string {
   }
   const total = Math.max(1, Math.ceil((daysBetween(plan.startDate, plan.endDate) + 1) / 7));
   return translate('workouts.home.weekOf', { week: Math.min(week, total), total });
+}
+
+/**
+ * The plans under "From your coach", by start date ascending: the ones under
+ * way lead, then those still to start, the closest first. The API sends them
+ * newest first. Plans starting the same day keep one order by name, so rows
+ * don't trade places on a refresh.
+ */
+export function plansByDate(plans: readonly TrainingDayPlan[]): TrainingDayPlan[] {
+  return [...plans].sort(
+    (a, b) =>
+      a.startDate.localeCompare(b.startDate) ||
+      a.programNameSnapshot.localeCompare(b.programNameSnapshot, appLocale()),
+  );
 }
 
 /**
@@ -1454,7 +1481,8 @@ export type LeaveOption = SheetAction<LeaveChoice>;
 /**
  * Running first: stepping out for a minute is the common case, and a pause
  * is the decision that something longer has come up. Neither ends the
- * workout; Finish and Discard stay the only two ways out of it.
+ * workout; Finish and Discard stay the only two ways out of it. Running is
+ * honey, as Resume is; the pause is about the clock, so coral.
  */
 export const LEAVE_OPTIONS: readonly LeaveOption[] = [
   {
@@ -1462,12 +1490,14 @@ export const LEAVE_OPTIONS: readonly LeaveOption[] = [
     label: 'workouts.logger.leaveSheet.keepRunning',
     hint: 'workouts.logger.leaveSheet.keepRunningHint',
     icon: 'play-outline',
+    color: 'primary',
   },
   {
     id: LeaveChoices.Pause,
     label: 'workouts.logger.leaveSheet.pause',
     hint: 'workouts.logger.leaveSheet.pauseHint',
     icon: 'pause-outline',
+    color: 'coral',
   },
 ];
 
@@ -1492,6 +1522,11 @@ export type ExerciseAction = SheetAction<ExerciseActionId>;
  * Skip flips to unskip on an exercise already skipped; the other verbs are
  * the same either way. Removing loses whatever was logged against the
  * exercise, so it reads as the destructive option it is.
+ *
+ * Tiles by concept: history is the last time (coral), a note a document
+ * (sky), swapping edits the workout (honey), and skipping puts the exercise
+ * aside until one tap brings it back (violet, green to unskip), as Archive /
+ * Unarchive do.
  */
 export function exerciseActions(
   skipped: boolean,
@@ -1505,7 +1540,7 @@ export function exerciseActions(
           id: ExerciseActionIds.History,
           label: 'workouts.exerciseActions.history',
           icon: 'trending-up-outline',
-          color: 'medium',
+          color: 'coral',
         },
       ]
     : [];
@@ -1515,7 +1550,8 @@ export function exerciseActions(
           id: ExerciseActionIds.Note,
           label: note === 'edit' ? 'workouts.exerciseActions.editNote' : 'workouts.exerciseActions.addNote',
           icon: 'create-outline',
-          color: 'medium',
+          color: 'info',
+          tone: 'shade',
         },
       ]
     : [];
@@ -1526,13 +1562,13 @@ export function exerciseActions(
       id: ExerciseActionIds.Swap,
       label: 'workouts.exerciseActions.swap',
       icon: 'repeat-outline',
-      color: 'medium',
+      color: 'primary',
     },
     {
       id: ExerciseActionIds.Skip,
       label: skipped ? 'workouts.exerciseActions.unskip' : 'workouts.exerciseActions.skip',
       icon: 'play-skip-forward-outline',
-      color: 'medium',
+      color: skipped ? 'success' : 'violet',
     },
     {
       id: ExerciseActionIds.Remove,
@@ -1554,7 +1590,7 @@ export const RoutineActionIds = {
   Edit: 'edit',
   Duplicate: 'duplicate',
   Archive: 'archive',
-  Restore: 'restore',
+  Unarchive: 'unarchive',
   Delete: 'delete',
 } as const;
 
@@ -1563,36 +1599,43 @@ export type RoutineActionId = (typeof RoutineActionIds)[keyof typeof RoutineActi
 export type RoutineAction = SheetAction<RoutineActionId>;
 
 /**
- * Edit is left out when it is already the footer's button (coaching), since
- * the screen's main action is never only in the sheet and never in both.
+ * Edit is left out where the screen already offers it: the footer's button
+ * (coaching), or the row's own Edit swipe on the Workouts list. A verb is
+ * never only in the sheet when it is the main one, and never in both.
+ *
+ * Every tile takes its verb's colour, never the grey: honey for editing,
+ * teal for the copy (a new routine, as the "+" sheet's New routine is),
+ * green for unarchiving and violet for archiving, as on Clients. Archiving
+ * loses nothing and Unarchive undoes it, so it is not red and stays out of
+ * Delete's card. The pair is Archive / Unarchive everywhere, never Restore.
  */
-export function routineActions(editInFooter: boolean, archived = false): RoutineAction[] {
+export function routineActions(editOffered: boolean, archived = false): RoutineAction[] {
   const actions: RoutineAction[] = [
     {
       id: RoutineActionIds.Edit,
       label: 'button.edit',
       icon: 'create-outline',
-      color: 'medium',
+      color: 'primary',
     },
     {
       id: RoutineActionIds.Duplicate,
       label: 'workouts.routineBuilder.makeCopy',
       icon: 'copy-outline',
-      color: 'medium',
+      color: 'teal',
     },
     // Put away rather than gone: off the lists, its workouts kept.
     archived
       ? {
-          id: RoutineActionIds.Restore,
-          label: 'workouts.routineBuilder.archive.restore',
+          id: RoutineActionIds.Unarchive,
+          label: 'button.unarchive',
           icon: 'arrow-undo-outline',
-          color: 'medium',
+          color: 'success',
         }
       : {
           id: RoutineActionIds.Archive,
           label: 'workouts.routineBuilder.archive.action',
           icon: 'archive-outline',
-          color: 'medium',
+          color: 'violet',
         },
     {
       id: RoutineActionIds.Delete,
@@ -1602,5 +1645,16 @@ export function routineActions(editInFooter: boolean, archived = false): Routine
       destructive: true,
     },
   ];
-  return editInFooter ? actions.filter((action) => action.id !== RoutineActionIds.Edit) : actions;
+  return editOffered ? actions.filter((action) => action.id !== RoutineActionIds.Edit) : actions;
 }
+
+/**
+ * What a routine row's swipe left offers: More and Edit on your routines,
+ * Unarchive alone in the archive, where a full swipe unarchives too.
+ */
+export const RoutineSwipes = {
+  Manage: 'manage',
+  Unarchive: 'unarchive',
+} as const;
+
+export type RoutineSwipe = (typeof RoutineSwipes)[keyof typeof RoutineSwipes];

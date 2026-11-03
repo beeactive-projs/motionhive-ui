@@ -40,6 +40,7 @@ import {
   SuggestedPerson,
   SuggestionStrip,
 } from '../../_shared/config/recent-searches.config';
+import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { ClockService } from '../../_shared/services/clock.service';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
@@ -133,6 +134,7 @@ type OpenRow =
     PersonRow,
     RowSkeleton,
     SearchStart,
+    SearchbarLabelDirective,
     StaleBar,
     TranslatePipe,
   ],

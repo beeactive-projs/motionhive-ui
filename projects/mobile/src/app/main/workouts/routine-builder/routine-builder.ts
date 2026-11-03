@@ -20,7 +20,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { take } from 'rxjs/operators';
+import { finalize, take } from 'rxjs/operators';
 
 import {
   AppModeStore,
@@ -29,7 +29,6 @@ import {
   Exercise,
   ExerciseKind,
   NavModes,
-  ProgramService,
   Routine,
   RoutineService,
   RoutineSources,
@@ -56,6 +55,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { resolveMode } from '../../../_shared/config/tabs.config';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
+import { RoutineActionsService } from '../_services/routine-actions.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { levelLabel } from '../../exercises/exercises.config';
@@ -65,6 +65,7 @@ import {
   DEFAULT_SETS,
   KeypadField,
   KeypadFields,
+  ROUTINE_EDIT_PARAM,
   RoutineActionId,
   RoutineActionIds,
   WORKOUT_ICONS,
@@ -163,7 +164,7 @@ export class RoutineBuilder implements ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
-  private readonly _programService = inject(ProgramService);
+  private readonly _routineActionsService = inject(RoutineActionsService);
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
 
@@ -313,7 +314,6 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly actions = computed(() =>
     routineActions(this.isCoachMode(), this.routine()?.archived ?? false),
   );
-  readonly archiving = signal(false);
 
   readonly copyBody = computed(() =>
     this._translateService.instant('workouts.routineBuilder.copyConfirm.body', {
@@ -433,7 +433,9 @@ export class RoutineBuilder implements ViewWillEnter {
 
     if (id === this._id()) return;
     this._id.set(id);
-    this.editMode.set(false);
+    // The list's Edit swipe opens your own routine straight in the builder;
+    // a starter still only reads (`showOverview`).
+    this.editMode.set(this._route.snapshot.queryParamMap.has(ROUTINE_EDIT_PARAM));
     this.load();
   }
 
@@ -475,7 +477,7 @@ export class RoutineBuilder implements ViewWillEnter {
         this.askCopy();
         return;
       case RoutineActionIds.Archive:
-      case RoutineActionIds.Restore:
+      case RoutineActionIds.Unarchive:
         this._setArchived(id === RoutineActionIds.Archive);
         return;
       case RoutineActionIds.Delete:
@@ -486,31 +488,14 @@ export class RoutineBuilder implements ViewWillEnter {
 
   /**
    * Archive puts the routine away and goes back to the list it no longer
-   * shows on; Restore brings it back and stays.
+   * shows on; Unarchive brings it back and stays.
    */
   private _setArchived(archive: boolean): void {
     const id = this._id();
-    if (!id || id === NEW || this.archiving()) return;
-    this.archiving.set(true);
-    const request = archive ? this._routineService.archive(id) : this._routineService.restore(id);
-    request.pipe(take(1)).subscribe({
-      next: (saved) => {
-        this.archiving.set(false);
-        this.routine.update((routine) => (routine ? { ...routine, archived: saved.archived } : routine));
-        void this._feedbackService.success(
-          this._translateService.instant(
-            archive ? 'workouts.routineBuilder.archive.done' : 'workouts.routineBuilder.archive.restored',
-          ),
-        );
-        if (archive) void this._router.navigate([this.stackBase()]);
-      },
-      error: (err) => {
-        this.archiving.set(false);
-        void this._feedbackService.error(
-          err,
-          this._translateService.instant('workouts.routineBuilder.archive.failed'),
-        );
-      },
+    if (!id || id === NEW) return;
+    this._routineActionsService.setArchived(id, archive).subscribe((saved) => {
+      this.routine.update((routine) => (routine ? { ...routine, archived: saved.archived } : routine));
+      if (archive) void this._router.navigate([this.stackBase()]);
     });
   }
 
@@ -533,25 +518,12 @@ export class RoutineBuilder implements ViewWillEnter {
     const id = this._id();
     if (!id || id === NEW || this.copying()) return;
     this.copying.set(true);
-    this._programService
-      .duplicate(id)
-      .pipe(take(1))
-      .subscribe({
-        next: async (copy) => {
-          this.copying.set(false);
-          await this._copySheet()?.close();
-          void this._feedbackService.success(
-            this._translateService.instant('workouts.routineBuilder.toast.copied'),
-          );
-          void this._router.navigate([this.stackBase(), 'routine', copy.id], { replaceUrl: true });
-        },
-        error: (err) => {
-          this.copying.set(false);
-          void this._feedbackService.error(
-            err,
-            this._translateService.instant('workouts.routineBuilder.toast.copyFailed'),
-          );
-        },
+    this._routineActionsService
+      .copy(id)
+      .pipe(finalize(() => this.copying.set(false)))
+      .subscribe(async (copy) => {
+        await this._copySheet()?.close();
+        void this._router.navigate([this.stackBase(), 'routine', copy.id], { replaceUrl: true });
       });
   }
 
@@ -775,30 +747,20 @@ export class RoutineBuilder implements ViewWillEnter {
     });
   }
 
-  /** Nothing else can remove a routine, so this is the only way out. */
+  /**
+   * After the red confirm, then back to the list it has left. The Workouts
+   * list deletes from its More sheet too, through the same service.
+   */
   confirmDelete(): void {
     const id = this._id();
     if (!id || id === NEW || this.deleting()) return;
     this.deleting.set(true);
-    this._routineService
+    this._routineActionsService
       .remove(id)
-      .pipe(take(1))
-      .subscribe({
-        next: async () => {
-          this.deleting.set(false);
-          await this._deleteSheet()?.close();
-          void this._feedbackService.success(
-            this._translateService.instant('workouts.routineBuilder.toast.deleted'),
-          );
-          void this._router.navigate([this.stackBase()], { replaceUrl: true });
-        },
-        error: (err) => {
-          this.deleting.set(false);
-          void this._feedbackService.error(
-            err,
-            this._translateService.instant('workouts.routineBuilder.toast.deleteFailed'),
-          );
-        },
+      .pipe(finalize(() => this.deleting.set(false)))
+      .subscribe(async () => {
+        await this._deleteSheet()?.close();
+        void this._router.navigate([this.stackBase()], { replaceUrl: true });
       });
   }
 

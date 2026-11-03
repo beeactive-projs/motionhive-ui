@@ -233,7 +233,7 @@ export type CoachRowKind = (typeof CoachRowKinds)[keyof typeof CoachRowKinds];
 
 /**
  * Every verb on this screen. Accepting and messaging move things forward and
- * take honey; the plumbing verb stays neutral; the two that end something
+ * take honey; the profile is a person, so violet; the two that end something
  * are red and sorted into their own card by the sheet.
  */
 export const COACH_ACTIONS: readonly CoachAction[] = [
@@ -253,7 +253,7 @@ export const COACH_ACTIONS: readonly CoachAction[] = [
     id: CoachActionIds.ViewProfile,
     label: 'coaches.actions.viewProfile',
     icon: 'person-outline',
-    color: 'medium',
+    color: 'violet',
   },
   {
     id: CoachActionIds.Decline,

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/home" />
     </ion-buttons>
     <ion-title>{{ 'nav.notifications' | translate }}</ion-title>
     <!-- List-wide verbs (Mark all read, settings) behind one ⋯ button, so the title

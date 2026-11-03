@@ -22,7 +22,8 @@ import {
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { clientStatusTone, clientSubline } from '../../clients.config';
+import { emitAndClose } from '../../../../_shared/utils/swipe';
+import { EMAIL_ONLY_TILE, clientStatusTone, clientSubline } from '../../clients.config';
 
 /**
  * One row of the client list, a flat-list row (`mh-flat-list`): hex avatar,
@@ -100,6 +101,8 @@ export class ClientRow {
 
   readonly isEmailOnly = computed(() => !this.client().client);
 
+  readonly emailTile = EMAIL_ONLY_TILE;
+
   /** Someone with an account, and not a request still waiting on the coach. */
   readonly canMessage = computed(() => !this.isEmailOnly() && !this.isIncoming());
 
@@ -115,12 +118,5 @@ export class ClientRow {
     if (this.pressable()) this.select.emit();
   }
 
-  /**
-   * Ionic leaves the row open after an option is tapped, so the next render
-   * shows a half-swiped row with stale buttons.
-   */
-  emitAndClose(sliding: IonItemSliding, action: { emit: () => void }): void {
-    action.emit();
-    void sliding.close();
-  }
+  readonly emitAndClose = emitAndClose;
 }

@@ -33,6 +33,7 @@ import {
 import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchStart } from '../../_shared/components/search-start/search-start';
@@ -91,6 +92,7 @@ import {
     PersonRow,
     RowSkeleton,
     SearchStart,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './messages.html',

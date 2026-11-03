@@ -23,10 +23,10 @@
       <mh-hex-avatar
         slot="start"
         size="lg"
-        icon="mail-outline"
-        color="medium"
         tone="wash"
         aria-hidden="true"
+        [icon]="emailTile.icon"
+        [color]="emailTile.color"
       />
     } @else {
       <!-- Decorative: the name it would announce is the very next thing in the row. -->
@@ -58,11 +58,14 @@
          or withdraw, and notes is not worth committing blind. -->
     <ion-item-options side="end">
       @if (isActive()) {
-        <ion-item-option color="medium" (click)="emitAndClose(sliding, notes)">
+        <!-- Navy, the routine row's Edit: notes are edited here. Grey is only
+             for a verb that is off. -->
+        <ion-item-option color="secondary" (click)="emitAndClose(sliding, notes)">
           <ion-icon slot="top" name="create-outline" aria-hidden="true" />
           {{ 'clients.actions.notes' | translate }}
         </ion-item-option>
-        <ion-item-option color="danger" (click)="emitAndClose(sliding, archive)">
+        <!-- Violet, not red: archiving is undone in one tap and loses nothing. -->
+        <ion-item-option color="violet" (click)="emitAndClose(sliding, archive)">
           <ion-icon slot="top" name="archive-outline" aria-hidden="true" />
           {{ 'button.archive' | translate }}
         </ion-item-option>

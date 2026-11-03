@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="builderUrl()" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="builderUrl()" />
     </ion-buttons>
     <ion-title>{{ name() || ('programs.dayEditor.titleFallback' | translate) }}</ion-title>
     <ion-buttons slot="end">

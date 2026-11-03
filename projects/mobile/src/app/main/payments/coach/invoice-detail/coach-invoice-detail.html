@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/more/payments" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/more/payments" />
     </ion-buttons>
     <ion-title>{{ 'payments.detail.title' | translate }}</ion-title>
   </ion-toolbar>

@@ -11,6 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
 import { TaxonomyOption, selectionCounter } from '../../exercises.config';
 
@@ -37,6 +38,7 @@ import { TaxonomyOption, selectionCounter } from '../../exercises.config';
     IonNote,
     IonSearchbar,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     SheetShell,
     TranslatePipe,
   ],

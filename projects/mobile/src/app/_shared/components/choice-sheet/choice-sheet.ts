@@ -16,6 +16,7 @@ import { checkmarkOutline } from 'ionicons/icons';
 
 import { foldForSearch } from 'core';
 
+import { SearchbarLabelDirective } from '../../directives/searchbar-label.directive';
 import { SheetShell } from '../sheet-shell/sheet-shell';
 
 export interface ChoiceOption {
@@ -65,6 +66,7 @@ export function matchChoices(
     IonList,
     IonNote,
     IonSearchbar,
+    SearchbarLabelDirective,
     SheetShell,
     TranslatePipe,
   ],

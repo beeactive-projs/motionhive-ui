@@ -193,15 +193,27 @@ export class Finish implements ViewWillEnter {
   readonly uploadingPhoto = signal(false);
   readonly photoActionsOpen = signal(false);
   readonly photoActions: readonly SheetAction<PhotoAction>[] = [
-    { id: 'change', label: 'workouts.photo.change', icon: 'image-outline' },
-    { id: 'remove', label: 'workouts.photo.remove', icon: 'trash-outline', destructive: true },
+    { id: 'change', label: 'workouts.photo.change', icon: 'image-outline', color: 'primary' },
+    {
+      id: 'remove',
+      label: 'workouts.photo.remove',
+      icon: 'trash-outline',
+      color: 'danger',
+      destructive: true,
+    },
   ];
   private readonly _photoInput = viewChild<ElementRef<HTMLInputElement>>('photoInput');
 
   /** The page's ⋯: deleting a finished workout, for test runs and mistakes. */
   readonly moreOpen = signal(false);
   readonly moreActions: readonly SheetAction<'delete'>[] = [
-    { id: 'delete', label: 'workouts.finish.delete.action', icon: 'trash-outline', destructive: true },
+    {
+      id: 'delete',
+      label: 'workouts.finish.delete.action',
+      icon: 'trash-outline',
+      color: 'danger',
+      destructive: true,
+    },
   ];
   readonly deleteOpen = signal(false);
   readonly deleting = signal(false);

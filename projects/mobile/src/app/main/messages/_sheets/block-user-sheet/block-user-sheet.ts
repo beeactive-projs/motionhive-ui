@@ -11,11 +11,14 @@ import { SheetAction } from '../../../../_shared/components/action-sheet/action-
  * the one red card. Order and values come from core; the labels are core's
  * `enum.userBlockReason` keys.
  */
-const BLOCK_ACTIONS: readonly SheetAction<UserBlockReason>[] = BLOCK_REASONS.map(({ value }) => ({
-  id: value,
-  label: `enum.userBlockReason.${value}`,
-  destructive: true,
-}));
+const BLOCK_ACTIONS: readonly SheetAction<UserBlockReason>[] = BLOCK_REASONS.map(
+  ({ value }): SheetAction<UserBlockReason> => ({
+    id: value,
+    label: `enum.userBlockReason.${value}`,
+    color: 'danger',
+    destructive: true,
+  }),
+);
 
 /**
  * The block confirmation — the reason list from chat details' Privacy row.

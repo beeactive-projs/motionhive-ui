@@ -1,3 +1,5 @@
+import { DetailTile } from './detail-tiles.config';
+
 /**
  * The people a search ended on, kept on the device so the next search can
  * open on them, as Messenger's does.
@@ -29,8 +31,14 @@ export interface RecentPerson {
 export interface SuggestedPerson extends RecentPerson {
   /** Translated status ("Invited", "Request"). Set only while it is waiting. */
   pendingLabel?: string | null;
-  /** A tile glyph in place of the avatar, for someone with no account yet. */
-  icon?: string | null;
+  /** A tile in place of the avatar, for someone with no account yet. */
+  tile?: DetailTile | null;
+  /**
+   * What the avatar's colour is keyed on, when that is not `id`: a pending
+   * request is keyed by the request, but its list row is coloured by the
+   * person, and the strip must match the row.
+   */
+  toneId?: string | null;
 }
 
 /** One labelled row of people under the recents. */

@@ -24,6 +24,7 @@ import {
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { ExerciseFilterSheet } from '../../_sheets/exercise-filter-sheet/exercise-filter-sheet';
 import {
   COACH_OWNERSHIP_PILLS,
@@ -67,6 +68,7 @@ const SEARCH_DEBOUNCE_MS = 300;
     IonSearchbar,
     IonSkeletonText,
     OwnExerciseSheets,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './exercise-library.html',

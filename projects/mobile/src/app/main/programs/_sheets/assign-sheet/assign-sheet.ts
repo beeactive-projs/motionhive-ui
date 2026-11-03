@@ -44,6 +44,7 @@ import {
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import {
   ProgramOrigin,
@@ -116,6 +117,7 @@ const WEEKDAYS: readonly { iso: number; label: string }[] = weekdayNames('short'
     IonNote,
     IonSearchbar,
     IonTextarea,
+    SearchbarLabelDirective,
     SheetShell,
     TranslatePipe,
   ],

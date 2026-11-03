@@ -61,7 +61,7 @@ ion-toolbar.progress {
 
 .folded .done-mark {
   margin-inline-end: 0.875rem;
-  color: var(--ion-color-success-shade);
+  color: var(--mh-color-success-deep);
   font-size: var(--mh-icon-xl);
 }
 
@@ -275,7 +275,7 @@ ion-card.superset .sets {
 }
 
 .round-done {
-  color: var(--ion-color-success-shade);
+  color: var(--mh-color-success-deep);
   text-transform: lowercase;
 }
 

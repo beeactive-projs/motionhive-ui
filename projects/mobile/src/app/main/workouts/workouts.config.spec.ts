@@ -44,6 +44,7 @@ import {
   oneRepMaxPoints,
   planPositionLabel,
   planWeekLabel,
+  plansByDate,
   prescriptionLine,
   recordSessionIds,
   routineActions,
@@ -154,9 +155,9 @@ describe('workouts config', () => {
     expect(routineActions(false).at(-1)?.destructive).toBe(true);
   });
 
-  it('offers Restore in place of Archive on an archived routine', () => {
+  it('offers Unarchive in place of Archive on an archived routine', () => {
     const ids = routineActions(false, true).map((a) => a.id);
-    expect(ids).toContain(RoutineActionIds.Restore);
+    expect(ids).toContain(RoutineActionIds.Unarchive);
     expect(ids).not.toContain(RoutineActionIds.Archive);
   });
 
@@ -589,6 +590,28 @@ describe('workouts config', () => {
       'Week 3',
     );
     expect(planWeekLabel(plan({ startDate: '2026-10-12' }), '2026-10-08')).toMatch(/^Starts /);
+  });
+
+  it('lists coach plans by start date, the closest first, same-day ones by name', () => {
+    const plan = (programNameSnapshot: string, startDate: string) =>
+      ({ programNameSnapshot, startDate }) as Parameters<typeof plansByDate>[0][number];
+    // Newest first, as the API sends them.
+    const sent = [
+      plan('Posterior chain', '2026-11-12'),
+      plan('Morning mobility', '2026-11-04'),
+      plan('Upper strength', '2026-11-03'),
+      plan('Evening arms', '2026-11-03'),
+      plan('Strength block', '2026-10-01'),
+    ];
+    expect(plansByDate(sent).map((p) => p.programNameSnapshot)).toEqual([
+      'Strength block',
+      'Evening arms',
+      'Upper strength',
+      'Morning mobility',
+      'Posterior chain',
+    ]);
+    // The store's input is left as it was.
+    expect(sent[0].programNameSnapshot).toBe('Posterior chain');
   });
 
   it('counts weeks and days from one, not zero', () => {

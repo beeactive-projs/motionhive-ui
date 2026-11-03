@@ -21,6 +21,7 @@ import { Exercise, ExerciseService, ExerciseSortKey } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
 import { ExerciseRow } from '../../_components/exercise-row/exercise-row';
 import { hasExactNameMatch } from '../../exercises.config';
@@ -70,6 +71,7 @@ const PAGE_SIZE = 20;
     IonSkeletonText,
     NgTemplateOutlet,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     SheetShell,
     TranslatePipe,
   ],

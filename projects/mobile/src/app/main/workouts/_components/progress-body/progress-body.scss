@@ -1,4 +1,5 @@
-/* A stack in the host page's rhythm: the page owns the gutter. */
+/* A stack in the host page's rhythm: the page owns the gutter. A column, so
+   the empty state can take the height the Workouts tab gives this body. */
 :host {
   display: flex;
   flex-direction: column;

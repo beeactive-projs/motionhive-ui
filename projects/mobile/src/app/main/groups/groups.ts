@@ -35,6 +35,7 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { GROUP_AVATAR_TONE } from '../../_shared/utils/avatar-tone.utils';
 import { PostGallery } from './_components/post-gallery/post-gallery';
 import { GROUP_ICONS } from './groups.icons';
@@ -83,6 +84,7 @@ import { PostWorkoutCard } from './_components/post-workout/post-workout';
     NotificationBell,
     PostGallery,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './groups.html',

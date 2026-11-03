@@ -21,13 +21,20 @@ type PhotoActionId = (typeof PhotoActionIds)[keyof typeof PhotoActionIds];
 
 /** "Remove photo" is disabled rather than absent: there is no DELETE avatar endpoint yet. */
 const PHOTO_ACTIONS: readonly SheetAction<PhotoActionId>[] = [
-  { id: PhotoActionIds.Take, label: 'accountSheets.photo.take', icon: 'camera-outline' },
-  { id: PhotoActionIds.Choose, label: 'accountSheets.photo.choose', icon: 'image-outline' },
+  { id: PhotoActionIds.Take, label: 'accountSheets.photo.take', icon: 'camera-outline', color: 'primary' },
+  {
+    id: PhotoActionIds.Choose,
+    label: 'accountSheets.photo.choose',
+    icon: 'image-outline',
+    color: 'info',
+    tone: 'shade',
+  },
   {
     id: PhotoActionIds.Remove,
     label: 'accountSheets.photo.remove',
     hint: 'accountSheets.photo.comingSoon',
     icon: 'trash-outline',
+    color: 'danger',
     destructive: true,
     disabled: true,
   },

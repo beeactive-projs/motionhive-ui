@@ -22,6 +22,7 @@ import {
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 
 /**
@@ -43,6 +44,7 @@ import { FeedbackService } from '../../../../_shared/services/feedback.service';
     IonList,
     IonSearchbar,
     IonSkeletonText,
+    SearchbarLabelDirective,
     SheetShell,
     TranslatePipe,
   ],

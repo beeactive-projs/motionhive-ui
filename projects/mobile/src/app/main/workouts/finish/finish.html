@@ -3,7 +3,7 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (isReview()) {
-        <ion-back-button [defaultHref]="backHref" />
+        <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
       } @else {
         <!-- Closing keeps what was picked or typed, like Save. -->
         <ion-button

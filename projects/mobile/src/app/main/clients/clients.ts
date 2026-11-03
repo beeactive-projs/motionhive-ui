@@ -43,6 +43,7 @@ import {
   SuggestedPerson,
   SuggestionStrip,
 } from '../../_shared/config/recent-searches.config';
+import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { ClockService } from '../../_shared/services/clock.service';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
@@ -67,6 +68,7 @@ import {
   ClientFilterIds,
   MIN_SEARCH_LENGTH,
   filterFromUrl,
+  resultAnnouncementKey,
 } from './clients.filters';
 import { CLIENT_ICONS } from './clients.icons';
 import { ClientsStore } from './clients.store';
@@ -104,6 +106,7 @@ import { ClientsStore } from './clients.store';
     RequestSheet,
     RowSkeleton,
     SearchStart,
+    SearchbarLabelDirective,
     StaleBar,
     TranslatePipe,
   ],
@@ -227,8 +230,8 @@ export class Clients implements ViewWillEnter {
     if (!narrowing || !this.store.searchSettled() || this.store.showSkeleton()) return '';
 
     const count = this.store.visibleClients().length;
-    if (count === 0) return this._translateService.instant('clients.list.results.none');
-    return this._translateService.instant('clients.list.results.count', { count });
+    const key = resultAnnouncementKey(this.store.filter(), !!this.store.query().trim(), count);
+    return this._translateService.instant(key, { count });
   });
 
   constructor() {

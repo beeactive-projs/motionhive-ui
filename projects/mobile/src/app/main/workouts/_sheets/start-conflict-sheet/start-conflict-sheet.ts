@@ -53,13 +53,16 @@ export class StartConflictSheet {
       label: 'workouts.startConflict.finishAndStart',
       hint: 'workouts.startConflict.finishHint',
       icon: 'checkmark-outline',
-      color: 'medium',
+      // Done is green.
+      color: 'success',
+      tone: 'shade',
     },
     {
       id: StartConflictChoices.DiscardAndStart,
       label: 'workouts.startConflict.discardAndStart',
       hint: 'workouts.startConflict.discardHint',
       icon: 'trash-outline',
+      color: 'danger',
       destructive: true,
     },
   ];

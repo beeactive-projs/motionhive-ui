@@ -38,8 +38,9 @@
     }
     <!-- No `mhAutofocus`: this field is on screen from the start, and focusing
          it is what opens search. Debounced, unlike the inbox's: every term is
-         a request. Named, because a searchbar with only a placeholder
-         announces itself as Ionic's default "search text". -->
+         a request. The host's `aria-label` alone never reaches the input
+         (Ionic hardcodes "search text" there); `SearchbarLabelDirective`
+         copies it across. -->
     <ion-searchbar
       class="mh-search-pill"
       searchIcon="search-outline"
@@ -192,7 +193,6 @@
   [body]="'clients.confirm.archive.body' | translate"
   [confirmLabel]="'clients.actions.archiveClient' | translate"
   [cancelLabel]="'button.keep' | translate"
-  tone="danger"
   [saving]="archiveSaving()"
   (confirm)="archive()"
 />

@@ -1,30 +1,53 @@
-<ion-item button [detail]="detail() && !startable()" lines="none" (click)="select.emit()">
-  <!-- Decorative: the name it would announce is the very next thing in the row. -->
-  <mh-hex-avatar slot="start" size="md" tone="wash" icon="flash-outline" [color]="color()" />
+<ion-item-sliding #sliding [disabled]="!swipe()">
+  <ion-item button [detail]="detail()" lines="none" (click)="select.emit()">
+    <!-- Decorative: the name it would announce is the very next thing in the row. -->
+    <mh-hex-avatar slot="start" size="md" tone="wash" icon="flash-outline" [color]="color()" />
 
-  <!-- The level rides the meta line rather than the row's end, so the name
-       has the row's width: beside an end badge, at large text, a long
-       Romanian name broke inside a word ("echipamen/t"). -->
-  <ion-label class="ion-text-wrap">
-    <h2>{{ routine().name }}</h2>
-    @if (level(); as value) {
-      <div class="meta">
+    <!-- The level rides the meta line rather than the row's end, so the name
+         has the row's width: beside an end badge, at large text, a long
+         Romanian name broke inside a word ("echipamen/t"). -->
+    <ion-label class="ion-text-wrap">
+      <h2>{{ routine().name }}</h2>
+      @if (level(); as value) {
+        <div class="meta">
+          <p>{{ meta() }}</p>
+          <ion-badge [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
+        </div>
+      } @else {
         <p>{{ meta() }}</p>
-        <ion-badge [attr.data-tone]="levelTone(value)">{{ levelLabel(value) }}</ion-badge>
-      </div>
-    } @else {
-      <p>{{ meta() }}</p>
+      }
+    </ion-label>
+  </ion-item>
+
+  <!-- Swipe left only. No swipe right: that is the swipe made by accident. -->
+  @switch (swipe()) {
+    @case (Swipes.Manage) {
+      <!-- More (copy, archive, delete) beside Edit, as the inbox puts More
+           beside Mute. Navy, so Edit never matches More. Delete waits in More. -->
+      <ion-item-options side="end">
+        <ion-item-option color="medium" (click)="emitAndClose(sliding, more)">
+          <ion-icon slot="top" name="ellipsis-horizontal-outline" aria-hidden="true" />
+          {{ 'workouts.routineRow.more' | translate }}
+        </ion-item-option>
+        <ion-item-option color="secondary" (click)="emitAndClose(sliding, edit)">
+          <ion-icon slot="top" name="create-outline" aria-hidden="true" />
+          {{ 'button.edit' | translate }}
+        </ion-item-option>
+      </ion-item-options>
     }
-  </ion-label>
-  @if (startable()) {
-    <ion-button
-      slot="end"
-      shape="round"
-      class="mh-row-action"
-      [disabled]="starting()"
-      (click)="onStart($event)"
-    >
-      {{ 'button.start' | translate }}
-    </ion-button>
+    @case (Swipes.Unarchive) {
+      <!-- Unarchive alone, green as on Clients. A full swipe unarchives
+           too: it loses nothing, and Archive undoes it. -->
+      <ion-item-options side="end" (ionSwipe)="emitAndClose(sliding, unarchive)">
+        <ion-item-option
+          color="success"
+          [expandable]="true"
+          (click)="emitAndClose(sliding, unarchive)"
+        >
+          <ion-icon slot="top" name="arrow-undo-outline" aria-hidden="true" />
+          {{ 'button.unarchive' | translate }}
+        </ion-item-option>
+      </ion-item-options>
+    }
   }
-</ion-item>
+</ion-item-sliding>

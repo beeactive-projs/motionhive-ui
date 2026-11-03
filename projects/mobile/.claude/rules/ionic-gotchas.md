@@ -31,7 +31,9 @@ Each of these has caused a real bug or a false QA finding in this app.
 ## Searchbars
 
 - Every `ion-searchbar` carries `mhAutofocus` (`_shared/directives/searchbar-autofocus.directive.ts`). It waits for the sheet's `mh-presented` class and for Stencil to render the inner input; `setFocus()` called earlier is a silent no-op.
+- Every component with an `ion-searchbar` imports `SearchbarLabelDirective` (`_shared/directives/searchbar-label.directive.ts`; its selector is the bare element). Ionic hardcodes `aria-label="search text"` on the inner input and never copies the host's, so without it every field is announced as "search text", in English in Romanian too. Give the host an `aria-label` when the placeholder is not the field's name; the directive falls back to the placeholder. Check `ion-searchbar input`'s `aria-label`, not the host's.
 
 ## Accessible names on Ionic buttons
 
 - Ionic moves `aria-label` from the `ion-button` / `ion-fab-button` host onto the shadow `<button>`. A host query (`ion-button[aria-label]`) finds nothing; that is not a missing label. Check the shadow button (`host.shadowRoot.querySelector('button')`), and in Playwright target `button[aria-label="…"]`.
+- Every `ion-back-button` carries `[attr.aria-label]="'a11y.back' | translate"`. Without it Ionic names the button with its English default "back" (`backButtonText` is empty in `app.config.ts`, so there is no text to fall back on).

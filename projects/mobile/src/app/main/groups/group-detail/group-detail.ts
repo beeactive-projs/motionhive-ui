@@ -43,6 +43,7 @@ import {
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { SearchbarLabelDirective } from '../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
@@ -104,6 +105,7 @@ import { PostWorkoutCard } from '../_components/post-workout/post-workout';
     IonTitle,
     IonToolbar,
     PostGallery,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './group-detail.html',

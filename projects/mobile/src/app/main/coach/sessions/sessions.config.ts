@@ -302,11 +302,12 @@ export type SessionActionId =
  * Glyph colour per verb, so a column of six rows is scannable rather than a
  * wall of one hue.
  *
- * Honey lands on `Open` alone. It is the sheet's primary action — the same
- * thing tapping the row does — and the brand rule reserves honey for exactly
- * that. The two verbs with a meaning of their own take it (attendance is
- * green, sending is sky), the plumbing verbs stay neutral, and destructive is
- * red. None of these encode a *state*, which is the line honey must not cross.
+ * Honey lands on `Open`, the sheet's primary action (the same thing tapping
+ * the row does), and on `Edit`, which only the detail screen shows, where
+ * Open is not: one honey row per sheet. The rest take their concept's hue
+ * (attendance green, sending and sharing sky, the copy teal), and destructive
+ * is red. None of these encode a *state*, which is the line honey must not
+ * cross.
  */
 export const SESSION_ACTIONS: readonly SheetAction<SessionActionId>[] = [
   {
@@ -331,19 +332,20 @@ export const SESSION_ACTIONS: readonly SheetAction<SessionActionId>[] = [
     id: SessionActionIds.Edit,
     label: 'sessions.actions.edit',
     icon: 'create-outline',
-    color: 'medium',
+    color: 'primary',
   },
   {
     id: SessionActionIds.Duplicate,
     label: 'button.duplicate',
     icon: 'copy-outline',
-    color: 'medium',
+    color: 'teal',
   },
   {
     id: SessionActionIds.Share,
     label: 'sessions.actions.share',
     icon: 'share-outline',
-    color: 'medium',
+    color: 'info',
+    tone: 'shade',
   },
   {
     id: SessionActionIds.Cancel,

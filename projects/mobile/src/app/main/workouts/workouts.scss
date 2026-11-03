@@ -32,6 +32,19 @@
   font-weight: 600;
 }
 
+/* ─── History, Progress, Exercises ────────────────────────────────
+   On Messages and Clients the search and chips are in the header and an
+   empty state sits straight in the content, filling it. Here they scroll
+   with the tab, so the tab fills the screen instead and its body takes the
+   room left, where the body's empty state grows and centres. */
+.tab-body {
+  min-block-size: 100%;
+}
+
+.tab-body > * {
+  flex-grow: 1;
+}
+
 /* ─── Cold start ──────────────────────────────────────────────────
    One card holding the promise and both ways in: the empty workout as the
    honey ask, the starters as its quiet neutral alternative. */

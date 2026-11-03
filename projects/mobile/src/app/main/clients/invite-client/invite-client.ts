@@ -36,6 +36,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { ProfileShareSheet } from '../../../_shared/components/profile-share-sheet/profile-share-sheet';
 import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
 import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ShareOutcomes, shareOrCopy } from '../../../_shared/utils/share';
 import { injectPeopleSearch } from '../../../_shared/utils/people-search';
@@ -45,6 +46,7 @@ import { InviteEmailSheet } from '../_sheets/invite-email-sheet/invite-email-she
 import { inHomeStack } from '../../home/home-stack.config';
 import { GroupSuggestionsStore } from './group-suggestions.store';
 import { CoachStacks } from '../client-paths';
+import { EMAIL_ONLY_TILE } from '../clients.config';
 import { ClientFilterIds, MIN_SEARCH_LENGTH } from '../clients.filters';
 import { CLIENT_ICONS } from '../clients.icons';
 import {
@@ -99,6 +101,7 @@ import {
     ProfileShareSheet,
     RowSkeleton,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './invite-client.html',
@@ -135,6 +138,7 @@ export class InviteClient implements ViewWillEnter {
 
   readonly minSearchLength = MIN_SEARCH_LENGTH;
   readonly skeletonRows = [1, 2, 3];
+  readonly emailTile = EMAIL_ONLY_TILE;
 
   /**
    * Invited on this visit, by user id. Not a flag on the row: the result list

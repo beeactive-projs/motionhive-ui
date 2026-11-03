@@ -569,7 +569,9 @@
       "pendingStrip": "Pending requests",
       "results": {
         "count": "{count, plural, one {# client} other {# clients}}.",
-        "none": "No clients match that."
+        "none": "No clients match that.",
+        "noneForFilter": "No clients with this status.",
+        "requests": "{count, plural, one {# request} other {# requests}}."
       },
       "search": "Search clients",
       "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search every client."
@@ -3299,17 +3301,17 @@
       },
       "archive": {
         "action": "Archive",
-        "restore": "Restore",
         "done": "Archived. It waits under Archived routines.",
-        "restored": "Restored to your routines",
-        "failed": "Couldn't change it. Try again."
+        "failed": "Couldn't change it. Try again.",
+        "unarchived": "Unarchived. It is back in your routines."
       }
     },
     "routineRow": {
       "lastDone": "Last done {day}",
       "lastDoneOn": "last done {day}",
       "lastDoneToday": "last done today",
-      "lastDoneYesterday": "last done yesterday"
+      "lastDoneYesterday": "last done yesterday",
+      "more": "More"
     },
     "routineView": {
       "about": "About this routine",
@@ -3589,7 +3591,7 @@
     "archived": {
       "link": "{count, plural, one {# archived routine} other {# archived routines}}",
       "title": "Archived routines",
-      "note": "Put away, not gone: their workouts stay in your history. Open one to restore it.",
+      "note": "Put away, not gone: their workouts stay in your history. Swipe one left, or open it, to unarchive it.",
       "loadError": "Couldn't load your archived routines",
       "empty": {
         "title": "Nothing archived",

@@ -3,12 +3,17 @@
     <ion-title>{{ 'nav.workouts' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
-      <!-- The two ways to begin: an empty workout, a new routine. -->
+      <!-- The two ways to begin, an empty workout and a new routine, behind
+           the honey "+" Messages and Clients wear for their primary action. -->
       <ion-button
+        class="round"
+        shape="round"
+        fill="solid"
+        color="primary"
         [attr.aria-label]="'workouts.home.startActions' | translate"
         (click)="actionsOpen.set(true)"
       >
-        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+        <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -47,18 +52,20 @@
   </ion-refresher>
 
   @switch (tab()) {
+    <!-- `tab-body`: the tab fills the screen, so an empty state centres in
+         the room under the search and chips (workouts.scss). -->
     @case (Tabs.History) {
-      <div class="mh-page">
+      <div class="mh-page tab-body">
         <mh-history-body />
       </div>
     }
     @case (Tabs.Progress) {
-      <div class="mh-page">
+      <div class="mh-page tab-body">
         <mh-progress-body />
       </div>
     }
     @case (Tabs.Exercises) {
-      <div class="mh-page">
+      <div class="mh-page tab-body">
         <mh-exercise-library [detailBase]="exerciseBase" />
       </div>
     }
@@ -233,14 +240,14 @@
               @if (store.routines().length) {
                 <ion-list [inset]="true" class="mh-card-list">
                   @for (routine of store.routines(); track routine.id; let i = $index) {
-                    <!-- Start on each, the quickest way to train, while nothing is open. -->
+                    <!-- Swipe left for More and Edit. -->
                     <mh-routine-row
                       [routine]="routine"
                       [color]="routineTileColor(i)"
-                      [startable]="!store.inProgress()"
-                      [starting]="startingId() === routine.id"
+                      [swipe]="Swipes.Manage"
                       (select)="openRoutine(routine)"
-                      (start)="startRoutine(routine)"
+                      (edit)="editRoutine(routine)"
+                      (more)="openRoutineActions(routine)"
                     />
                   }
                 </ion-list>
@@ -269,4 +276,34 @@
   [title]="'workouts.home.startActions' | translate"
   [actions]="startActions()"
   (chosen)="onStartAction($event)"
+/>
+
+<!-- One More sheet and its two confirms for the whole list, aimed at
+     whichever row was swiped. -->
+<mh-action-sheet
+  [(open)]="routineActionsOpen"
+  [title]="routineName()"
+  [actions]="routineSheetActions"
+  (chosen)="onRoutineAction($event)"
+/>
+
+<mh-confirm-sheet
+  #copySheet
+  [(open)]="copyOpen"
+  [title]="'workouts.routineBuilder.copyConfirm.title' | translate"
+  [body]="copyBody()"
+  [confirmLabel]="'workouts.routineBuilder.makeCopy' | translate"
+  [saving]="copying()"
+  (confirm)="makeCopy()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="deleteOpen"
+  [title]="'workouts.routineBuilder.delete.title' | translate"
+  [body]="deleteBody()"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  tone="danger"
+  [saving]="deleting()"
+  (confirm)="confirmDeleteRoutine()"
 />

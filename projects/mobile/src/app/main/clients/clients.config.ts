@@ -11,6 +11,7 @@ import {
 } from 'core';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
+import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 import {
   RecentPerson,
   SUGGESTION_LIMIT,
@@ -56,6 +57,13 @@ export function clientSubline(client: InstructorClient): string {
   return client.client ? clientEmail(client) : translate('clients.row.notOnPlatform');
 }
 
+/**
+ * The tile of someone with no account yet, an email-only invite: the email
+ * detail's own tile, so an address reads the same on the list row, in the
+ * search strip, on the invite page and on the first-run screen.
+ */
+export const EMAIL_ONLY_TILE = DETAIL_TILES.email;
+
 // ── Client page tabs ────────────────────────────────────────────────────────
 
 /** The client page's four tabs, the web client page's order. */
@@ -93,8 +101,10 @@ export type ClientAction = SheetAction<ClientActionId>;
 
 /**
  * The verbs on a client — the ⋮ on the detail screen. Message is the primary
- * one and takes honey; the plumbing verb stays neutral, restoring is green,
- * and archiving is red and last. None of these encode a state.
+ * one and takes honey; the profile is a person (violet), notes are a document
+ * (info), unarchiving is green, and archiving is violet and last. Archiving
+ * is not red: the client keeps their account and history, and Unarchive
+ * undoes it. None of these encode a state.
  */
 export const CLIENT_ACTIONS: readonly ClientAction[] = [
   {
@@ -107,13 +117,14 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
     id: ClientActionIds.ViewProfile,
     label: 'clients.actions.viewProfile',
     icon: 'person-outline',
-    color: 'medium',
+    color: 'violet',
   },
   {
     id: ClientActionIds.EditNotes,
     label: 'clients.actions.editNotes',
     icon: 'create-outline',
-    color: 'medium',
+    color: 'info',
+    tone: 'shade',
   },
   {
     id: ClientActionIds.Unarchive,
@@ -125,8 +136,7 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
     id: ClientActionIds.Archive,
     label: 'clients.actions.archiveClientEllipsis',
     icon: 'archive-outline',
-    color: 'danger',
-    destructive: true,
+    color: 'violet',
   },
 ];
 
@@ -197,7 +207,7 @@ export const REQUEST_ACTIONS: readonly RequestAction[] = [
     id: RequestActionIds.ViewProfile,
     label: 'clients.actions.viewProfile',
     icon: 'person-outline',
-    color: 'medium',
+    color: 'violet',
   },
   {
     id: RequestActionIds.Decline,
@@ -308,7 +318,9 @@ export function newestClients(
  * to them, newest first. Each carries its status word, which is said with
  * the name and sends the tap to the request sheet (there is no profile yet),
  * and an email-only invite its mail tile, as on the list row. Keyed by the
- * request, which is all an email-only invite has.
+ * request, which is all an email-only invite has, but coloured by the person
+ * as the row is (`clientId ?? id`): the strip opens where the rows were, and
+ * the same person in two colours read as two people.
  */
 export function pendingClients(
   clients: readonly InstructorClient[],
@@ -319,10 +331,11 @@ export function pendingClients(
     .slice(0, limit)
     .map((client) => ({
       id: client.id,
+      toneId: client.clientId ?? client.id,
       name: clientDisplayName(client),
       avatarUrl: client.client?.avatarUrl ?? null,
       subline: null,
       pendingLabel: clientStatusLabel(client),
-      icon: client.client ? null : 'mail-outline',
+      tile: client.client ? null : EMAIL_ONLY_TILE,
     }));
 }

@@ -4,7 +4,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="backHref" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
     </ion-buttons>
 
     <ion-title class="mh-person-title">
@@ -58,6 +58,12 @@
 </ng-template>
 
 <ion-content>
+  <!-- The name is the bar's title, and `ion-title` is not a heading: without
+       this a screen reader had nothing to land on, as on the Clients list. -->
+  @if (store.client()) {
+  <h1 class="mh-visually-hidden">{{ name() }}</h1>
+  }
+
   @if (store.error(); as error) {
   <mh-empty-state icon="alert-circle-outline" [heading]="'clients.detail.loadError.title' | translate" [message]="error"
     [actionLabel]="'button.tryAgain' | translate" (action)="retry()" />
@@ -483,5 +489,5 @@
   (assign)="onAssign($event)" />
 
 <mh-confirm-sheet [(open)]="archiveOpen" [title]="archiveTitle()" [body]="'clients.confirm.archive.body' | translate"
-  [confirmLabel]="'clients.actions.archiveClient' | translate" [cancelLabel]="'button.keep' | translate" tone="danger"
+  [confirmLabel]="'clients.actions.archiveClient' | translate" [cancelLabel]="'button.keep' | translate"
   [saving]="archiveSaving()" (confirm)="archive()" />

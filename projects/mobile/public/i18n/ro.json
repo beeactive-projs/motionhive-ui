@@ -569,7 +569,9 @@
       "pendingStrip": "Cereri în așteptare",
       "results": {
         "count": "{count, plural, one {# client} few {# clienți} other {# de clienți}}.",
-        "none": "Niciun client nu se potrivește."
+        "none": "Niciun client nu se potrivește.",
+        "noneForFilter": "Niciun client cu acest status.",
+        "requests": "{count, plural, one {# cerere} few {# cereri} other {# de cereri}}."
       },
       "search": "Caută clienți",
       "searchHint": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}} ca să cauți printre toți clienții."
@@ -3299,17 +3301,17 @@
       },
       "archive": {
         "action": "Arhivează",
-        "restore": "Readu în listă",
         "done": "Arhivată. O găsești la Rutine arhivate.",
-        "restored": "Readusă printre rutinele tale",
-        "failed": "Nu am putut face schimbarea. Încearcă din nou."
+        "failed": "Nu am putut face schimbarea. Încearcă din nou.",
+        "unarchived": "Dezarhivată. E din nou printre rutinele tale."
       }
     },
     "routineRow": {
       "lastDone": "Ultima dată: {day}",
       "lastDoneOn": "ultima dată {day}",
       "lastDoneToday": "ultima dată azi",
-      "lastDoneYesterday": "ultima dată ieri"
+      "lastDoneYesterday": "ultima dată ieri",
+      "more": "Mai multe"
     },
     "routineView": {
       "about": "Despre această rutină",
@@ -3589,7 +3591,7 @@
     "archived": {
       "link": "{count, plural, one {# rutină arhivată} few {# rutine arhivate} other {# de rutine arhivate}}",
       "title": "Rutine arhivate",
-      "note": "Puse deoparte, nu șterse: antrenamentele rămân în istoric. Deschide una ca să o readuci.",
+      "note": "Puse deoparte, nu șterse: antrenamentele rămân în istoric. Glisează una spre stânga sau deschide-o ca să o dezarhivezi.",
       "loadError": "Nu am putut încărca rutinele arhivate",
       "empty": {
         "title": "Nimic arhivat",

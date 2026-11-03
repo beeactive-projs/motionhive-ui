@@ -143,8 +143,8 @@ describe('programs config', () => {
     const ids = (over: Record<string, unknown>) => visibleProgramActions(program(over)).map((a) => a.id);
     expect(ids({ source: ProgramSource.Instructor })).toEqual([
       ProgramActionIds.Assign,
-      ProgramActionIds.EditDetails,
       ProgramActionIds.ViewAssignments,
+      ProgramActionIds.EditDetails,
       ProgramActionIds.Duplicate,
       ProgramActionIds.Unpublish,
       ProgramActionIds.Delete,

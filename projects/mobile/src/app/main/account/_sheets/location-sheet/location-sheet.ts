@@ -22,6 +22,7 @@ import {
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AccountStore } from '../../account.store';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
@@ -45,6 +46,7 @@ const SEARCH_DEBOUNCE_MS = 400;
     IonSearchbar,
     IonSpinner,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     SheetShell,
     TranslatePipe,
   ],

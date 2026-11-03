@@ -3,6 +3,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { IonButton, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { EMAIL_ONLY_TILE } from '../../clients.config';
 
 /**
  * The first thing a coach with no clients sees.
@@ -22,4 +23,6 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
 })
 export class ClientsEmpty {
   readonly invite = output<void>();
+
+  readonly emailTile = EMAIL_ONLY_TILE;
 }

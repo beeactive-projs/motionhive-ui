@@ -45,6 +45,7 @@ import {
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { StatTile } from '../../../../_shared/components/stat-tile/stat-tile';
+import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { clientPath, coachStackOf } from '../../../clients/client-paths';
 import { workoutLinks } from '../../../home/home-stack.config';
 import { BadgeTones, KIND_META } from '../../../exercises/exercises.config';
@@ -121,6 +122,7 @@ function groupedVolume(volumeKg: number): string {
     IonNote,
     IonSearchbar,
     IonSkeletonText,
+    SearchbarLabelDirective,
     StatTile,
     TranslatePipe,
     BarChart,

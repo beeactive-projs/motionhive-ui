@@ -213,17 +213,18 @@ describe('option constants', () => {
   // back to the item's ink, so a typo here shows up as one row quietly losing
   // its tint rather than as a failure.
   it('tints every verb with a palette colour Ionic knows', () => {
-    const palette = ['primary', 'success', 'info', 'medium', 'danger'];
+    const palette = ['primary', 'success', 'info', 'teal', 'danger'];
     for (const action of SESSION_ACTIONS) {
       expect(palette).toContain(action.color);
     }
   });
 
-  // Honey is the brand's "act here" colour, so exactly one row may wear it —
-  // the primary verb. A second honey row and neither reads as primary.
-  it('spends honey on the primary verb alone', () => {
+  // Honey is the brand's "act here" colour, so one row per sheet may wear it.
+  // Open is the agenda's and Edit the detail screen's; the sheet never shows
+  // both (session-actions-sheet), so neither competes with the other.
+  it('spends honey on Open and Edit alone', () => {
     const honey = SESSION_ACTIONS.filter((action) => action.color === 'primary');
-    expect(honey.map((action) => action.id)).toEqual([SessionActionIds.Open]);
+    expect(honey.map((action) => action.id)).toEqual([SessionActionIds.Open, SessionActionIds.Edit]);
   });
 
   // Red label and red glyph both key off `destructive`, and cancel is the only

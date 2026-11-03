@@ -36,10 +36,14 @@ ion-item.mh-list-row {
 
 /* One gap between a leading tile (or icon, avatar, checkbox) and the label.
    md opens 32px after a slot="start" icon — wide enough to read as two
-   columns at phone width. The separator inset below assumes this gap. */
+   columns at phone width. The separator inset below assumes this gap.
+   No block margin: iOS mode adds 2px above and below a leading item, which
+   took the 45px box of an `lg` hex avatar past the 48px label and made every
+   flat-list row 73.031px instead of 4.5rem in iOS mode. */
 ion-list ion-item > [slot='start'],
 ion-item.mh-list-row > [slot='start'] {
   margin-inline-end: var(--mh-row-gutter);
+  margin-block: 0;
 }
 
 /* ─── Rows of a grouped list ───────────────────────────────────────────
@@ -148,9 +152,9 @@ ion-list.mh-flat-list {
   background: var(--ion-background-color);
 }
 
-/* `--mh-flat-row-pad` around a 3.25rem avatar is WhatsApp's 76px row. The
-   label's own md margins (10px top and bottom) would stack on that padding,
-   so the padding alone sets the rhythm. */
+/* `--mh-flat-row-pad` around the label's two 1.5rem lines is the 4.5rem row
+   (below). The label's own md margins (10px top and bottom) would stack on
+   that padding, so the padding alone sets the rhythm. */
 ion-list.mh-flat-list ion-item {
   --background: var(--ion-background-color);
   --padding-top: var(--mh-flat-row-pad);
@@ -257,16 +261,25 @@ ion-list.mh-flat-list ion-label p {
   display: none;
 }
 
-/* Swipe options, WhatsApp style: icon over label (`slot="top"` on the
-   icon), wide enough that the longest label (RO "Mai multe") stays on one
-   line. */
-ion-list.mh-flat-list ion-item-option {
+/* Swipe options, WhatsApp style, in either kind of list (the inbox's rows,
+   the Workouts routines card): icon over label (`slot="top"` on the icon),
+   wide enough that the longest label (RO "Mai multe") stays on one line. */
+ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option {
   min-width: 5rem;
   font-size: var(--mh-text-sm);
   font-weight: 600;
   text-transform: none;
 }
 
-ion-list.mh-flat-list ion-item-option ion-icon {
+ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option ion-icon {
   font-size: var(--mh-icon-lg);
+}
+
+/* A swipe label is 12px text, so it needs 4.5:1, and white misses it on
+   violet 500 (4.2:1). Violet swipes from its shade step instead (600,
+   5.7:1). The other hues already pass: the red slot is 600 (4.8:1), honey
+   and green take black ink, slate and navy are dark enough. `!important`
+   because Ionic's own `.ion-color-*` slots are. */
+ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option.ion-color-violet {
+  --ion-color-base: var(--ion-color-shade) !important;
 }

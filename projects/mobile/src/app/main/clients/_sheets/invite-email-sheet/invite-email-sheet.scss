@@ -1,3 +1,16 @@
+/* What the email does, in the sheet's body type, on the body's own edge
+   like the title above it (the confirm sheet's lead). */
+.lead {
+  margin: 0;
+  color: var(--ion-color-dark);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+}
+
+.expiry {
+  margin-top: 0.5rem;
+}
+
 /* The disclosure sits tight under the line it expands on, and keeps the
    body's edges rather than a button's own inset. */
 .note-toggle {

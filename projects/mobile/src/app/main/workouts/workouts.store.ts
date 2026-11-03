@@ -14,6 +14,8 @@ import {
   localDayKey,
 } from 'core';
 
+import { plansByDate } from './workouts.config';
+
 /** Enough starters to fill the cold-start rail; the rest live behind "See all". */
 const STARTER_PREVIEW_LIMIT = 3;
 const ROUTINE_LIMIT = 50;
@@ -40,6 +42,8 @@ export class WorkoutsStore {
   /** How many of your routines are archived, for the way back to them. */
   private readonly _archivedTotal = signal(0);
   private readonly _inProgress = signal<WorkoutLog | null>(null);
+  /** Counts the list's own patches, so a read begun before one cannot undo it. */
+  private _routineEdits = 0;
 
   private readonly _loading = signal(false);
   private readonly _loaded = signal(false);
@@ -59,8 +63,9 @@ export class WorkoutsStore {
     () => this._trainingDay()?.today ?? null,
   );
 
-  readonly activePlans = computed<TrainingDayPlan[]>(
-    () => this._trainingDay()?.activePlans ?? [],
+  /** By start date, oldest first: the plans under way, then those still to start (`plansByDate`). */
+  readonly activePlans = computed<TrainingDayPlan[]>(() =>
+    plansByDate(this._trainingDay()?.activePlans ?? []),
   );
 
   /**
@@ -88,14 +93,19 @@ export class WorkoutsStore {
     return !!open && !!hero && open.assignedWorkoutId === hero.assignedWorkoutId;
   });
 
-  /** Nothing assigned, nothing saved, nothing logged — the cold start. */
+  /**
+   * Nothing assigned, nothing saved, nothing logged — the cold start. An
+   * archived routine was saved, so it keeps the page that holds the way back
+   * to the archive.
+   */
   readonly isColdStart = computed(
     () =>
       this._loaded() &&
       !this.today() &&
       !this.upNext() &&
       this.activePlans().length === 0 &&
-      this._routines().length === 0,
+      this._routines().length === 0 &&
+      this._archivedTotal() === 0,
   );
 
   readonly starterPreview = computed(() => this._starters().slice(0, STARTER_PREVIEW_LIMIT));
@@ -106,8 +116,23 @@ export class WorkoutsStore {
   /** The load-bearing read failed and there is nothing older to show instead. */
   readonly showError = computed(() => this._failed() && !this._trainingDay());
 
+  /** A routine deleted from the list leaves it at once, without a reload. */
+  dropRoutine(id: string): void {
+    this._routineEdits++;
+    this._routines.update((routines) => routines.filter((routine) => routine.id !== id));
+  }
+
+  /** An archived one leaves it too, and joins the way back to the archive. */
+  moveToArchived(id: string): void {
+    this.dropRoutine(id);
+    this._archivedTotal.update((total) => total + 1);
+  }
+
   load(opts: { done?: () => void } = {}): void {
     this._loading.set(true);
+    // A routine archived or deleted while this read is out was read before
+    // the change, so its lists would bring the row back. The patch wins.
+    const edits = this._routineEdits;
 
     forkJoin({
       day: this._programAssignmentService.trainingDay().pipe(catchError(() => of(null))),
@@ -125,9 +150,10 @@ export class WorkoutsStore {
       .pipe(take(1))
       .subscribe({
         next: ({ day, routines, starters, archived, inProgress }) => {
-          if (archived) this._archivedTotal.set(archived.total);
+          const current = edits === this._routineEdits;
+          if (archived && current) this._archivedTotal.set(archived.total);
           if (day) this._trainingDay.set(day);
-          if (routines) this._routines.set(routines.items);
+          if (routines && current) this._routines.set(routines.items);
           if (starters) {
             this._starters.set(starters.items);
             this._starterTotal.set(starters.total);

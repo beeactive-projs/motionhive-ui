@@ -1,10 +1,13 @@
+<!-- The pill History and Messages use. Named, as a placeholder alone
+     announces Ionic's "search text". -->
 <ion-searchbar
-  class="search"
+  class="mh-search-pill search"
   searchIcon="search-outline"
   clearIcon="close-outline"
   inputmode="search"
   [debounce]="0"
   [placeholder]="'exercises.library.searchPlaceholder' | translate"
+  [attr.aria-label]="'exercises.library.searchPlaceholder' | translate"
   [value]="searchInput()"
   (ionInput)="onQuery($event.detail.value ?? '')"
 />

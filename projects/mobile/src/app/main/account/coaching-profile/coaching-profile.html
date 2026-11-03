@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="backHref" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
     </ion-buttons>
     <ion-title><span class="mh-title-text">{{ 'account.rows.coachingProfile' | translate }}</span></ion-title>
     <ion-buttons slot="end">

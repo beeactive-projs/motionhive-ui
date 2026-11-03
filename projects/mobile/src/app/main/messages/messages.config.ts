@@ -84,7 +84,7 @@ export function conversationActions(
             label: 'button.viewProfile',
             icon: 'person-outline',
             color: 'violet',
-          },
+          } satisfies SheetAction<ConversationAction>,
         ]
       : []),
     {
@@ -98,12 +98,14 @@ export function conversationActions(
       id: ConversationActions.Delete,
       label: 'messages.actions.delete',
       icon: 'trash-outline',
+      color: 'danger',
       destructive: true,
     },
     {
       id: ConversationActions.Block,
       label: 'messages.actions.block',
       icon: 'ban-outline',
+      color: 'danger',
       destructive: true,
     },
   ];

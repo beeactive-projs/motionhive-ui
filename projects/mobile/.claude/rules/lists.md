@@ -41,6 +41,7 @@ Grouped lists are described first; the flat list has its own section at the end.
   - `--detail-icon-color` / `--detail-icon-opacity`
   - a `margin-inline-end` on the leading item
 - Rows are 3rem at least, padded by `--mh-row-gutter`. Use `[detail]="true"` for the chevron, never a hand-placed `chevron-forward` icon in `slot="end"`.
+- A card row may swipe (`ion-item-sliding`), with the same options as a flat row (icon over label, closed after a tap; the skin covers both kinds). The Workouts page's own routines do (user decisions, 2026-11-03): a card list in `.mh-page`, not a flat list, with no search field, since a field under the cards ends mid-page; no Start button, the row opens the routine. A swipe left reveals More (Make a copy, Archive, Delete routine: `routineActions(true)`) and Edit, which opens the builder in edit mode (`?edit`, `ROUTINE_EDIT_PARAM`). There is no swipe right: it is the swipe made by accident while scrolling or reaching for back, so a destructive verb never sits there; Delete waits in More and asks in red. Archive and Delete patch `WorkoutsStore` instead of reloading. The archived routines page is the same card with chevrons, and its swipe left holds Unarchive alone (green, `RoutineSwipes.Unarchive`), which a full swipe triggers too (`expandable`): unarchiving loses nothing and Archive undoes it. A full swipe never reaches a verb that loses something or needs a confirm (client-row's Archive and Withdraw are not `expandable`).
 - Everything in a row sits on its centre line: tile, label, notes in either slot, trailing controls. Never `align-self: flex-start` or a `margin-top` nudge on a leading item. One exception: an `mh-person-row` with a verb on a narrow row (under 22rem, an SE from about 107% text) stacks the verb under the text, and its avatar then lines up with the two text lines instead of the whole block's centre, which would leave it floating between the title and the button (`person-row.scss`).
 
 ## Separators
@@ -64,16 +65,16 @@ Grouped lists are described first; the flat list has its own section at the end.
   | Concept | Colour |
   |---|---|
   | Personal details: email, phone, location, language, timezone, member since | from [`DETAIL_TILES`](../../src/app/_shared/config/detail-tiles.config.ts), never literals |
-  | calendar, info, link, share, documents; notifications, reminders, mute | `info` (`tone="shade"`) |
-  | place, venue, video call, public / open | `teal` |
-  | people, members, private / locked by choice | `violet` |
-  | time, deadlines, cancellation windows | `coral` |
+  | calendar, info, link, share, documents, notes; notifications, reminders, mute | `info` (`tone="shade"`) |
+  | place, venue, video call, public / open; a copy, a new routine | `teal` |
+  | people, members, a profile, private / locked by choice; archive or skip (put aside, undone in one tap) | `violet` |
+  | time, deadlines, cancellation windows; a pause, an exercise's history | `coral` |
   | money, prices, payments, done | `success` |
-  | destructive verbs only: delete, remove, block, cancel, archive, leave, discard, sign out | `danger` |
+  | destructive verbs only: delete, remove, block, cancel, leave, discard, sign out (not archive) | `danger` |
   | a row that creates or edits something | `primary` |
   | something that is off or unavailable | `medium` (never the default) |
 
-- **Red is for destruction only.** A tile, label or option is `danger` only when the row destroys, cancels, ends or cuts something off. Notifications, alerts, warnings, "off" states and anything merely important are never red. In an action sheet, mark the verb `destructive: true` (the sheet paints it red and moves it to its own card) instead of setting `color: 'danger'`.
+- **Red is for destruction only.** A tile, label or option is `danger` only when the row destroys, cancels, ends or cuts something off. Notifications, alerts, warnings, "off" states and anything merely important are never red. In an action sheet, mark the verb `destructive: true`: the sheet paints it red and moves it to its own card, whatever its `color` (required on every verb, so `danger` there too).
 - Neighbouring rows in one card take different hues. If two rows would collide, move the less specific one.
 - A tile repeated down a content list (exercises, routines, notifications) uses `tone="wash"`; a settings or detail row uses the base tone.
 
@@ -126,6 +127,7 @@ The WhatsApp chat list. First use: the Messages inbox ([`messages.html`](../../s
 - Each line is a 1.5rem box (set by the skin), so a flat-list row is exactly 4.5rem. Don't put anything taller than 1.5rem in a line, and don't change a line's height or leading in a row. A row a fraction of a pixel off (the text's own 1.55 leading gave 72.047px) moves every separator below it off the pixel grid, and the ones that straddle two pixels draw thicker.
 - Full ink in a row is `--ion-text-color`. `--ion-color-dark` is a dim slate in the dark palette.
 - Swipe actions follow WhatsApp: `ion-item-option`s with the icon over the label (`slot="top"`), and the row closes after a tap.
+- A swipe label is 12px text and needs 4.5:1. White on violet 500 (4.2:1) misses it, so the skin swipes violet from its shade step (`ion-list.css`); the red slot is already 600 (4.8:1). A new hue on a swipe gets its label measured before it ships; sky with white fails even at 600.
 
 ### Grouped flat lists
 
@@ -145,7 +147,7 @@ The coach's Clients tab is one flat list off `/clients`, laid out like the Messa
 
 - Inviting is the header's honey "+", not a floating button. It opens the invite page below, not a sheet.
 - Opening search resets the chip to All: the pills fold away with the title, so a chip left on would narrow the results with nothing on screen saying so. A term under the API's floor gets a note under the header.
-- Rows ([`client-row`](../../src/app/main/clients/_components/client-row/client-row.html)) are flat-list rows: `lg` avatar (a mail tile for an email-only invite), the name on the first line, the address and the status badge on the second. An email-only invite's address ellipses like any title; lines never wrap.
+- Rows ([`client-row`](../../src/app/main/clients/_components/client-row/client-row.html)) are flat-list rows: `lg` avatar (a mail tile for an email-only invite: `EMAIL_ONLY_TILE`, the email detail's tile, in its wash; the same tile in the search strip, on the invite page and on the first-run screen), the name on the first line, the address and the status badge on the second. An email-only invite's address ellipses like any title; lines never wrap.
 
 ### Invite client
 
@@ -205,5 +207,5 @@ A screen with nothing to show says so through [`mh-empty-state`](../../src/app/_
 - **The action is a plain `fill="clear"` text link, `class="mh-text-link"`**: the ink every text link wears, `--mh-color-link`. That is the deep honey in light, 5:1 on the white page, because the bare honey (`color="primary"`) was 2.15:1 on white, a label you could not read (fix wave 3, 2026-10-31). In dark it is the honey itself (user decision, 2026-11-03). There is no solid or outline variant; an empty screen has one thing left to do and the words are enough for it.
 - The tile is honey in its wash (`color="primary" tone="wash"`), the same tile the hand-built empty screens use (clients, sessions, notifications), so every list with nothing to show looks the same (user decision, 2026-10-29). A load error destroys nothing, so it never turns red.
 - The message is one sentence. The block caps its own width at about thirty characters a line so it breaks into a short stack under the heading; don't pass a paragraph.
-- It fills the screen only where there is a screen to fill: `min-block-size: 100%` catches `ion-content`'s scroll box and resolves to nothing inside `.mh-page` or a sheet body, where the block keeps its natural height. The same component is both the whole-screen state and the one under a half-filled section, so don't wrap it in a spacer either way.
+- It fills the screen only where there is a screen to fill: `min-block-size: 100%` catches `ion-content`'s scroll box and resolves to nothing inside `.mh-page` or a sheet body, where the block keeps its natural height. Its host also grows in a flex column that has room to give (a Workouts tab body), so a body never sets `flex-grow` on it. The same component is both the whole-screen state and the one under a half-filled section, so don't wrap it in a spacer either way.
 - The block sits on the page the rows do, so an empty inbox and a full one are one surface.

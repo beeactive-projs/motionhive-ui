@@ -883,12 +883,14 @@ export const OWN_EXERCISE_ACTIONS: readonly SheetAction<OwnExerciseActionId>[] =
     id: OwnExerciseActionIds.Edit,
     label: 'button.edit',
     icon: 'create-outline',
+    color: 'primary',
   },
   {
     id: OwnExerciseActionIds.Delete,
     label: 'button.delete',
     hint: 'exercises.own.deleteHint',
     icon: 'trash-outline',
+    color: 'danger',
     destructive: true,
   },
 ];

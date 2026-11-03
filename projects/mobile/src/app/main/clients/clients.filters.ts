@@ -90,6 +90,25 @@ export function filterFromUrl(url: string): ClientFilterId | null {
  */
 export const MIN_SEARCH_LENGTH = 2;
 
+/**
+ * The key a settled search or chip is announced with. An empty chip says
+ * what the screen says ("No clients with this status"), not a search's
+ * "No clients match that"; the Requests chip counts requests, since an
+ * invitation is not a client yet.
+ */
+export function resultAnnouncementKey(
+  filter: ClientFilterId,
+  hasQuery: boolean,
+  count: number,
+): string {
+  if (count === 0) {
+    return hasQuery ? 'clients.list.results.none' : 'clients.list.results.noneForFilter';
+  }
+  return filter === ClientFilterIds.Requests
+    ? 'clients.list.results.requests'
+    : 'clients.list.results.count';
+}
+
 /** Header search over the loaded rows: name or email, blind to case and accents. */
 export function matchesClientQuery(client: InstructorClient, query: string): boolean {
   return foldedIncludes(clientDisplayName(client), query) || foldedIncludes(clientEmail(client), query);

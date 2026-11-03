@@ -3,7 +3,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/messages" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/messages" />
     </ion-buttons>
     <ion-title>{{ 'messages.newMessage' | translate }}</ion-title>
   </ion-toolbar>

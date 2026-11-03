@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="profileUrl()" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="profileUrl()" />
     </ion-buttons>
     <ion-title>{{ 'person.workout.title' | translate }}</ion-title>
     @if (workout() && !isSelf()) {

@@ -99,6 +99,7 @@ export class ProfileWorkoutPage {
       id: 'report',
       label: translate('person.workouts.report.action'),
       icon: 'flag-outline',
+      color: 'danger',
       destructive: true,
     },
   ];

@@ -20,6 +20,7 @@ import {
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
+import { emitAndClose } from '../../../../_shared/utils/swipe';
 
 /**
  * One row of the inbox. Unread is weight and colour rather than an extra
@@ -101,12 +102,5 @@ export class ConversationRow {
     return count > 99 ? '99+' : String(count);
   });
 
-  /**
-   * Ionic leaves the row open after an option is tapped, so the next render
-   * shows a half-swiped row with stale buttons.
-   */
-  emitAndClose(sliding: IonItemSliding, action: { emit: () => void }): void {
-    action.emit();
-    void sliding.close();
-  }
+  readonly emitAndClose = emitAndClose;
 }

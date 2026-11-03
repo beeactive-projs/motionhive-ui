@@ -31,6 +31,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { RecentPerson, SUGGESTION_LIMIT } from '../../../_shared/config/recent-searches.config';
 import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchbar-autofocus.directive';
+import { SearchbarLabelDirective } from '../../../_shared/directives/searchbar-label.directive';
 import { injectPeopleSearch } from '../../../_shared/utils/people-search';
 import { ConversationRow } from '../_components/conversation-row/conversation-row';
 import { PersonRow } from '../../../_shared/components/person-row/person-row';
@@ -74,6 +75,7 @@ import {
     PersonRow,
     RowSkeleton,
     SearchbarAutofocusDirective,
+    SearchbarLabelDirective,
     TranslatePipe,
   ],
   templateUrl: './new-message.html',

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="stack" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="stack" />
     </ion-buttons>
     <ion-title>{{ 'common.session' | translate }}</ion-title>
     @if (instance()) {
