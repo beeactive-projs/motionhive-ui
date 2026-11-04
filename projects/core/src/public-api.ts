@@ -202,6 +202,7 @@ export * from './lib/utils/money.utils';
 export * from './lib/utils/notification.utils';
 export * from './lib/utils/number.utils';
 export * from './lib/utils/search.utils';
+export * from './lib/utils/list.utils';
 export * from './lib/utils/text.utils';
 export * from './lib/utils/qr.utils';
 

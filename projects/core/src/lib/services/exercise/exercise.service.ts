@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { silentRequest } from '../../interceptors/silent-request.context';
 import type { Equipment } from '../../models/exercise/equipment.model';
+import { ExerciseSortKey } from '../../models/exercise/exercise.enums';
 import type {
   CreateExercisePayload,
   Exercise,
@@ -144,7 +145,9 @@ export class ExerciseService {
     set('limit', query.limit);
     set('search', query.search);
     set('ownership', query.ownership);
-    set('sort', query.sort);
+    // `relevance` is the API's default, so it is never sent: an API older
+    // than it answers 400 to the word, and sorts by name without it.
+    set('sort', query.sort === ExerciseSortKey.Relevance ? undefined : query.sort);
     set('withFacets', query.withFacets);
     if (query.kind?.length) p = p.set('kind', query.kind.join(','));
     if (query.level?.length) p = p.set('level', query.level.join(','));

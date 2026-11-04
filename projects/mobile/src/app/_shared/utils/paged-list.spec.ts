@@ -75,7 +75,7 @@ describe('PagedList', () => {
     expect(read.mock.calls.at(-1)).toEqual([1, 90]);
   });
 
-  it('drops a response a newer request overtook, but still says it is done', () => {
+  it('cancels a request a newer one overtook, but still says it is done', () => {
     const slow = new Subject<PageOf<Row>>();
     const read = vi
       .fn()
@@ -88,8 +88,58 @@ describe('PagedList', () => {
     list.reset();
     slow.next({ items: rows('old'), total: 1 });
 
+    expect(slow.observed).toBe(false);
     expect(list.items().map((row) => row.id)).toEqual(['new']);
-    expect(done).toHaveBeenCalled();
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  it('cancels the request on its way when cleared', () => {
+    const slow = new Subject<PageOf<Row>>();
+    const list = new PagedList<Row>(2, () => slow);
+    const done = vi.fn();
+
+    list.reset(done);
+    list.clear();
+
+    expect(slow.observed).toBe(false);
+    expect(list.loading()).toBe(false);
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  // The page after a dropped repeat comes back short while the rows are
+  // still one under the total: without the stop, every scroll asks again.
+  it('stops at a short page, even when the rows are under the total', () => {
+    const read = vi
+      .fn()
+      .mockReturnValueOnce(of({ items: rows('a', 'b'), total: 4 }))
+      .mockReturnValueOnce(of({ items: rows('b', 'c'), total: 4 }))
+      .mockReturnValueOnce(of({ items: [], total: 4 }));
+    const list = new PagedList<Row>(2, read);
+
+    list.reset();
+    list.more();
+    list.more();
+    list.more();
+
+    expect(list.items().map((row) => row.id)).toEqual(['a', 'b', 'c']);
+    expect(list.hasMore()).toBe(false);
+    expect(read).toHaveBeenCalledTimes(3);
+  });
+
+  it('asks for a failed page again rather than skipping it', () => {
+    const read = vi
+      .fn()
+      .mockReturnValueOnce(of({ items: rows('a', 'b'), total: 4 }))
+      .mockReturnValueOnce(throwError(() => new Error('offline')))
+      .mockReturnValueOnce(of({ items: rows('c', 'd'), total: 4 }));
+    const list = new PagedList<Row>(2, read);
+
+    list.reset();
+    list.more();
+    list.more();
+
+    expect(read.mock.calls.map(([page]) => page)).toEqual([1, 2, 2]);
+    expect(list.items().map((row) => row.id)).toEqual(['a', 'b', 'c', 'd']);
   });
 
   it('refuses a second Show more while one is on its way', () => {

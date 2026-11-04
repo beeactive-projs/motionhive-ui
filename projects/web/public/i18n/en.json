@@ -1082,18 +1082,20 @@
         "system": "System"
       },
       "searchAria": "Search exercises",
-      "searchPlaceholder": "Search by name…",
+      "searchPlaceholder": "Search by name or muscle…",
       "showResults": "{count, plural, one {Show # result} other {Show # results}}",
       "sort": {
         "menu": {
           "mostForked": "Most forked",
           "name": "Name (A-Z)",
-          "newest": "Newest first"
+          "newest": "Newest first",
+          "relevance": "Most relevant"
         },
         "short": {
           "mostForked": "Most forked",
           "name": "Name",
-          "newest": "Newest"
+          "newest": "Newest",
+          "relevance": "Most relevant"
         }
       },
       "subtitle": "Browse and build the movement library your programs draw from.",

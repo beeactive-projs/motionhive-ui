@@ -101,7 +101,13 @@ export const ExerciseOwnershipFilter = {
 export type ExerciseOwnershipFilter =
   (typeof ExerciseOwnershipFilter)[keyof typeof ExerciseOwnershipFilter];
 
+/**
+ * `relevance` (the API's default): the best match for what was typed, then
+ * what the person and everyone use most; with nothing typed, the most used
+ * first. `name` is A to Z when nothing is typed.
+ */
 export const ExerciseSortKey = {
+  Relevance: 'relevance',
   Name: 'name',
   Newest: 'newest',
   MostForked: 'most-forked',

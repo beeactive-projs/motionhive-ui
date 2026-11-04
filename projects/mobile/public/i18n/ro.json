@@ -987,7 +987,7 @@
         "none": "Niciun exercițiu nu se potrivește."
       },
       "search": "Caută exerciții",
-      "searchPlaceholder": "Caută după nume"
+      "searchPlaceholder": "Caută după nume sau mușchi"
     },
     "muscleFields": {
       "bodyweight": "Greutatea corpului",
@@ -1040,22 +1040,17 @@
     },
     "sort": {
       "mostForked": {
-        "hint": "Populare printre alți antrenori",
-        "inline": "cele mai copiate",
-        "label": "Cele mai copiate"
+        "inline": "cele mai copiate"
       },
       "name": {
-        "hint": "De la A la Z",
-        "inline": "nume",
-        "label": "Nume"
+        "inline": "nume"
       },
       "newest": {
-        "hint": "Întâi cele adăugate recent",
-        "inline": "cele mai noi",
-        "label": "Cele mai noi"
+        "inline": "cele mai noi"
       },
-      "selected": "Selectat",
-      "title": "Sortează după"
+      "relevance": {
+        "inline": "relevanță"
+      }
     },
     "taxonomyPicker": {
       "counter": "{count} din {max}",

@@ -1082,18 +1082,20 @@
         "system": "Sistem"
       },
       "searchAria": "Caută exerciții",
-      "searchPlaceholder": "Caută după nume…",
+      "searchPlaceholder": "Caută după nume sau mușchi…",
       "showResults": "{count, plural, one {Arată # rezultat} few {Arată # rezultate} other {Arată # de rezultate}}",
       "sort": {
         "menu": {
           "mostForked": "Cele mai copiate",
           "name": "Nume (A-Z)",
-          "newest": "Cele mai recente"
+          "newest": "Cele mai recente",
+          "relevance": "Cele mai relevante"
         },
         "short": {
           "mostForked": "Cele mai copiate",
           "name": "Nume",
-          "newest": "Cele mai noi"
+          "newest": "Cele mai noi",
+          "relevance": "Cele mai relevante"
         }
       },
       "subtitle": "Răsfoiește și construiește biblioteca de mișcări pe care se sprijină programele tale.",

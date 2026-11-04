@@ -19,7 +19,7 @@ import { InputText } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
 import { Toast } from 'primeng/toast';
-import { from } from 'rxjs';
+import { Subscription, from } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
 
 import {
@@ -27,6 +27,7 @@ import {
   EnumLabelPipe,
   Exercise,
   ExerciseService,
+  ExerciseSortKey,
   PrescribedExercise,
   Program,
   ProgramService,
@@ -45,8 +46,9 @@ import {
  * via a separate dialog (FE-P2e).
  *
  * The catalog list is scoped to a 300ms debounced search and the first
- * 50 results — enough to bridge to the full catalog page if we ever
- * need more advanced filtering.
+ * 50 results, best match first (`relevance`), so the 50 are the right
+ * ones — enough to bridge to the full catalog page if we ever need more
+ * advanced filtering.
  */
 @Component({
   selector: 'mh-exercise-picker-dialog',
@@ -93,6 +95,8 @@ export class ExercisePickerDialog {
   readonly query = signal('');
   readonly debouncedQuery = signal('');
   private _searchTimer: ReturnType<typeof setTimeout> | null = null;
+  /** The list request on its way; a newer one, or closing, cancels it. */
+  private _listRequest?: Subscription;
 
   readonly results = signal<Exercise[]>([]);
   readonly loading = signal(false);
@@ -127,8 +131,14 @@ export class ExercisePickerDialog {
       this._load();
     });
     effect(() => {
-      // Reset state on close so the next open starts clean.
+      // Reset state on close so the next open starts clean. The keystroke
+      // still waiting goes too: its timer would put the old term back under
+      // an empty box, and the next open would search it.
       if (!this.visible()) {
+        if (this._searchTimer) clearTimeout(this._searchTimer);
+        this._searchTimer = null;
+        this._listRequest?.unsubscribe();
+        this.loading.set(false);
         this.query.set('');
         this.debouncedQuery.set('');
         this.selectedById.set(new Map());
@@ -260,12 +270,18 @@ export class ExercisePickerDialog {
   // ── Internals ────────────────────────────────────────────────────
 
   private _load(): void {
+    // Only the newest request may land: answers to "squ" and "squat" can
+    // arrive in either order. The older one is cancelled rather than
+    // ignored, so the server stops ranking a search nobody will see.
+    this._listRequest?.unsubscribe();
     this.loading.set(true);
-    this._exerciseService
+    this._listRequest = this._exerciseService
       .list({
         page: 1,
         limit: 50,
         search: this.debouncedQuery() || undefined,
+        // Best match first while searching, the most used first otherwise.
+        sort: ExerciseSortKey.Relevance,
       })
       .subscribe({
         next: (res) => {

@@ -12,6 +12,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
 import { Toast } from 'primeng/toast';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import {
   AuthStore,
@@ -24,6 +25,7 @@ import {
   ExerciseSortKey,
   ExerciseTaxonomyStore,
   ListExercisesQuery,
+  appendUnique,
   enumLabel,
   injectIsMobile,
   injectIsTablet,
@@ -103,8 +105,11 @@ export class Exercises {
   readonly facets = signal<ExerciseFacets | undefined>(undefined);
   readonly loading = signal(false);
   readonly loadingMore = signal(false);
+  /** The last page that landed. */
   readonly page = signal(1);
   readonly pageSize = 24;
+  /** A page came back shorter than asked: the server has nothing past it. */
+  private readonly _endReached = signal(false);
 
   // Filters / search (signals so we can trigger refetch via effect)
   // `search` is the committed value the fetch effect reacts to;
@@ -113,10 +118,13 @@ export class Exercises {
   readonly search = signal('');
   readonly searchInput = signal('');
   private _searchTimer: ReturnType<typeof setTimeout> | null = null;
+  /** The list request on its way; a newer one cancels it. */
+  private _listRequest?: Subscription;
   readonly ownership = signal<ExerciseOwnershipFilter>(
     ExerciseOwnershipFilter.All,
   );
-  readonly sort = signal<ExerciseSortKey>(ExerciseSortKey.Name);
+  /** Best match while searching, the most used first while browsing. */
+  readonly sort = signal<ExerciseSortKey>(ExerciseSortKey.Relevance);
   readonly selectedKinds = signal<Set<ExerciseKind>>(new Set());
   readonly selectedLevels = signal<Set<ExerciseLevel>>(new Set());
   readonly selectedMuscleIds = signal<Set<string>>(new Set());
@@ -135,7 +143,9 @@ export class Exercises {
 
   // ── Derived ──────────────────────────────────────────────────────
 
-  readonly hasMore = computed(() => this.items().length < this.total());
+  // Rows and total alone can say "more" forever: a repeat left out of a page
+  // keeps the rows one short of the total.
+  readonly hasMore = computed(() => !this._endReached() && this.items().length < this.total());
 
   readonly activeFilterCount = computed(() => {
     return (
@@ -194,6 +204,11 @@ export class Exercises {
 
   readonly sortItems: MenuItem[] = [
     {
+      label: this._translateService.instant('exercises.catalog.sort.menu.relevance'),
+      icon: 'pi pi-sort-amount-down',
+      command: () => this.setSort(ExerciseSortKey.Relevance),
+    },
+    {
       label: this._translateService.instant('exercises.catalog.sort.menu.name'),
       icon: 'pi pi-sort-alpha-down',
       command: () => this.setSort(ExerciseSortKey.Name),
@@ -216,8 +231,10 @@ export class Exercises {
         return this._translateService.instant('exercises.catalog.sort.short.newest');
       case ExerciseSortKey.MostForked:
         return this._translateService.instant('exercises.catalog.sort.short.mostForked');
-      default:
+      case ExerciseSortKey.Name:
         return this._translateService.instant('exercises.catalog.sort.short.name');
+      default:
+        return this._translateService.instant('exercises.catalog.sort.short.relevance');
     }
   });
 
@@ -234,12 +251,10 @@ export class Exercises {
       this.selectedLevels();
       this.selectedMuscleIds();
       this.selectedEquipmentIds();
-      // Untracked: the fetch reads `page`, and tracking it made "Load more"
-      // re-run this effect and fall back to page 1.
-      untracked(() => {
-        this.page.set(1);
-        this.fetch(true);
-      });
+      // Untracked: only the filters above re-run this, never a signal the
+      // fetch itself reads or writes (tracking `page` once made "Load more"
+      // fall back to page 1).
+      untracked(() => this.fetch(1));
     });
   }
 
@@ -281,6 +296,11 @@ export class Exercises {
   }
 
   clearFilters(): void {
+    // The box too, and a pending keystroke with it, or the field keeps the
+    // old text and the timer puts the search back a moment later.
+    if (this._searchTimer) clearTimeout(this._searchTimer);
+    this._searchTimer = null;
+    this.searchInput.set('');
     this.search.set('');
     this.selectedKinds.set(new Set());
     this.selectedLevels.set(new Set());
@@ -290,8 +310,7 @@ export class Exercises {
 
   loadMore(): void {
     if (this.loading() || this.loadingMore() || !this.hasMore()) return;
-    this.page.update((p) => p + 1);
-    this.fetch(false);
+    this.fetch(this.page() + 1);
   }
 
   openDetail(exercise: Exercise): void {
@@ -332,8 +351,7 @@ export class Exercises {
   }
 
   private refresh(): void {
-    this.page.set(1);
-    this.fetch(true);
+    this.fetch(1);
   }
 
   isMine(_exercise: Exercise): boolean {
@@ -346,9 +364,15 @@ export class Exercises {
 
   // ── Internals ────────────────────────────────────────────────────
 
-  private fetch(replace: boolean): void {
+  /**
+   * Page 1 replaces the list and its facets; a later page appends to it.
+   * `page` moves only once that page has landed, so a failed "Load more"
+   * asks for the same page again.
+   */
+  private fetch(page: number): void {
+    const replace = page === 1;
     const query: ListExercisesQuery = {
-      page: this.page(),
+      page,
       limit: this.pageSize,
       search: this.search() || undefined,
       ownership: this.ownership(),
@@ -368,26 +392,30 @@ export class Exercises {
       withFacets: replace, // facets only refresh on filter changes, not on Load More
     };
 
-    if (replace) {
-      this.loading.set(true);
-    } else {
-      this.loadingMore.set(true);
-    }
-
+    // Only the newest request may land: typing "squat" fast sends "squ"
+    // and "squat". The older one is cancelled rather than ignored, so the
+    // server stops ranking a search nobody will see. A filter change can
+    // cancel a "Load more", so both flags follow the request now on its way.
+    this._listRequest?.unsubscribe();
+    this.loading.set(replace);
+    this.loadingMore.set(!replace);
     const settle = () => {
       // Always release loading — `complete` doesn't fire after `error`.
       // Without this, a BE outage leaves the page stuck on the skeleton.
       this.loading.set(false);
       this.loadingMore.set(false);
     };
-    this._exerciseService.list(query).subscribe({
+    this._listRequest = this._exerciseService.list(query).subscribe({
       next: (res) => {
         if (replace) {
           this.items.set(res.items);
           this.facets.set(res.facets);
         } else {
-          this.items.update((cur) => [...cur, ...res.items]);
+          // The order moves with use, so a page can repeat a row.
+          this.items.update((cur) => appendUnique(cur, res.items));
         }
+        this.page.set(page);
+        this._endReached.set(res.items.length < this.pageSize);
         this.total.set(res.total);
         settle();
       },

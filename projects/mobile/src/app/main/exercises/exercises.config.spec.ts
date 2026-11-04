@@ -6,6 +6,7 @@ import {
   ExerciseLevel,
   ExerciseMediaKind,
   ExerciseOwnershipFilter,
+  ExerciseSortKey,
   ExerciseSource,
   ExerciseVisibility,
   MuscleRole,
@@ -32,9 +33,11 @@ import {
   featuredFirst,
   hasExactNameMatch,
   isOwnExercise,
+  keepPlaces,
   normalizeExerciseName,
   ownershipChip,
   recentFromExercise,
+  resultMetaLabel,
   toggleCapped,
   trackLabel,
 } from './exercises.config';
@@ -112,6 +115,38 @@ describe('exact name match (the picker\'s "Create it" row)', () => {
 
   it('never matches an empty search', () => {
     expect(hasExactNameMatch('   ', [exercise({ name: '' })])).toBe(false);
+  });
+});
+
+// The library's order moves with use: coming back from a workout re-reads
+// the window, and the rows must not reshuffle under the reader.
+describe('a refresh in place', () => {
+  const ids = (rows: { id: string }[]) => rows.map((row) => row.id);
+
+  it('keeps the rows on screen where they were, with their new content', () => {
+    const onScreen = [exercise({ id: 'a' }), exercise({ id: 'b' }), exercise({ id: 'c' })];
+    const fresh = [
+      exercise({ id: 'c' }),
+      exercise({ id: 'a', name: 'Renamed' }),
+      exercise({ id: 'b' }),
+    ];
+
+    const rows = keepPlaces(onScreen, fresh);
+
+    expect(ids(rows)).toEqual(['a', 'b', 'c']);
+    expect(rows[0].name).toBe('Renamed');
+  });
+
+  it('drops the rows gone from the window and adds the new ones after the rest', () => {
+    const onScreen = [exercise({ id: 'a' }), exercise({ id: 'b' }), exercise({ id: 'c' })];
+    const fresh = [exercise({ id: 'new' }), exercise({ id: 'c' }), exercise({ id: 'a' })];
+
+    expect(ids(keepPlaces(onScreen, fresh))).toEqual(['a', 'c', 'new']);
+  });
+
+  it('takes the server order when nothing was on screen', () => {
+    const fresh = [exercise({ id: 'b' }), exercise({ id: 'a' })];
+    expect(ids(keepPlaces([], fresh))).toEqual(['b', 'a']);
   });
 });
 
@@ -246,6 +281,14 @@ describe('the library\'s search', () => {
     expect(announceResults(0)).toBe('No exercises match that.');
     expect(announceResults(1)).toBe('1 exercise.');
     expect(announceResults(42)).toBe('42 exercises.');
+  });
+
+  // No sort control: the list says the order it is in, the API's default.
+  it('names the order over the list', () => {
+    expect(resultMetaLabel(908, ExerciseSortKey.Relevance)).toBe(
+      '908 exercises · sorted by relevance',
+    );
+    expect(resultMetaLabel(1, ExerciseSortKey.Name)).toBe('1 exercise · sorted by name');
   });
 });
 

@@ -987,7 +987,7 @@
         "none": "No exercises match that."
       },
       "search": "Search exercises",
-      "searchPlaceholder": "Search by name"
+      "searchPlaceholder": "Search by name or muscle"
     },
     "muscleFields": {
       "bodyweight": "Bodyweight",
@@ -1040,22 +1040,17 @@
     },
     "sort": {
       "mostForked": {
-        "hint": "Popular with other coaches",
-        "inline": "most forked",
-        "label": "Most forked"
+        "inline": "most forked"
       },
       "name": {
-        "hint": "A to Z",
-        "inline": "name",
-        "label": "Name"
+        "inline": "name"
       },
       "newest": {
-        "hint": "Recently added first",
-        "inline": "newest",
-        "label": "Newest"
+        "inline": "newest"
       },
-      "selected": "Selected",
-      "title": "Sort by"
+      "relevance": {
+        "inline": "relevance"
+      }
     },
     "taxonomyPicker": {
       "counter": "{count} of {max}",

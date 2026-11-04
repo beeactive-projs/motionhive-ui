@@ -110,8 +110,8 @@ export type BadgeTone = (typeof BadgeTones)[keyof typeof BadgeTones];
 /**
  * One option row in a picker, a pill strip or a chip cloud. Every list of
  * choices on these screens is this shape or extends it — the pills, the
- * sort rows, the facet chips, the taxonomy picker — so a row renderer written
- * for one of them reads the others.
+ * facet chips, the taxonomy picker — so a row renderer written for one of
+ * them reads the others.
  */
 export interface LabelledOption<T> {
   value: T;
@@ -283,43 +283,36 @@ export const TRAINEE_OWNERSHIP_PILLS: readonly OwnershipPill[] = [
 
 // ── Sort ────────────────────────────────────────────────────────────────────
 
-export interface SortOption extends LabelledOption<ExerciseSortKey> {
-  hint: string;
-}
-
 /** Each sort key's segment under `exercises.sort.*`. */
 const SORT_KEYS: Record<ExerciseSortKey, string> = {
+  [ExerciseSortKey.Relevance]: 'relevance',
   [ExerciseSortKey.Name]: 'name',
   [ExerciseSortKey.Newest]: 'newest',
   [ExerciseSortKey.MostForked]: 'mostForked',
 };
 
 function sortKey(sort: ExerciseSortKey): string {
-  return `exercises.sort.${SORT_KEYS[sort] ?? SORT_KEYS[ExerciseSortKey.Name]}`;
+  return `exercises.sort.${SORT_KEYS[sort] ?? SORT_KEYS[ExerciseSortKey.Relevance]}`;
 }
 
-function sortOption(value: ExerciseSortKey): SortOption {
-  const key = sortKey(value);
-  return {
-    value,
-    get label() {
-      return translate(`${key}.label`);
-    },
-    get hint() {
-      return translate(`${key}.hint`);
-    },
-  };
-}
-
-/** The three keys the BE can order by — nothing invented on top. */
-export const SORT_OPTIONS: readonly SortOption[] = [
-  sortOption(ExerciseSortKey.Name),
-  sortOption(ExerciseSortKey.Newest),
-  sortOption(ExerciseSortKey.MostForked),
-];
-
-export function sortLabel(sort: ExerciseSortKey): string {
-  return translate(`${sortKey(sort)}.label`);
+/**
+ * A refresh's rows, in the places the rows on screen already had. The
+ * library's order (`relevance`) moves with use, so a window re-read as the
+ * server now ranks it would move the exercise just added to a routine out
+ * from under the reader. Rows still in the window keep their place with
+ * their new content, rows gone from it leave, and rows new to it follow,
+ * in the server's order.
+ */
+export function keepPlaces<T extends { id: string }>(
+  onScreen: readonly T[],
+  fresh: readonly T[],
+): T[] {
+  const freshById = new Map(fresh.map((row) => [row.id, row]));
+  const held = new Set(onScreen.map((row) => row.id));
+  return [
+    ...onScreen.flatMap((row) => freshById.get(row.id) ?? []),
+    ...fresh.filter((row) => !held.has(row.id)),
+  ];
 }
 
 // ── Row copy ────────────────────────────────────────────────────────────────
@@ -391,7 +384,7 @@ export function isOwnExercise(
   return !!myUserId && exercise.ownerId === myUserId;
 }
 
-/** "887 exercises · sorted by name" — the meta line above the list. */
+/** "887 exercises · sorted by relevance" — the meta line above the list. */
 export function resultMetaLabel(total: number, sort: ExerciseSortKey): string {
   return translate('exercises.library.meta', {
     count: total,

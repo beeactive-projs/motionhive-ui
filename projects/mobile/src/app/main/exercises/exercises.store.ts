@@ -10,9 +10,10 @@ import {
   ExerciseService,
   ExerciseSortKey,
   ListExercisesQuery,
+  appendUnique,
 } from 'core';
 
-import { hasExactNameMatch } from './exercises.config';
+import { hasExactNameMatch, keepPlaces } from './exercises.config';
 
 const PAGE_SIZE = 20;
 /** The API caps `limit` at 100 — five pages is the most one request can re-read. */
@@ -64,18 +65,18 @@ interface FetchOptions {
   limit: number;
   /** Replace the rows on screen (a query's first page) or append to them (scroll). */
   replace: boolean;
+  /** A refresh: the rows on screen keep their places (`keepPlaces`). */
+  inPlace?: boolean;
   done?: () => void;
 }
 
 /**
  * Page-scoped state for the exercise library.
  *
- * Five things narrow the catalogue — an ownership pill, a search term, a
- * sort key and two chip groups in the filter sheet — and every one of them
- * composes into the same `GET /exercises` query. They are separate signals
- * rather than one blob because they change on different gestures and only
- * some of them reset the list: sorting keeps your filters, and the design
- * says so explicitly by giving sort its own sheet.
+ * Three things narrow the catalogue — an ownership pill, a search term and
+ * the filter sheet's picks — and every one of them composes into the same
+ * `GET /exercises` query, in the API's `relevance` order. They are separate
+ * signals rather than one blob because they change on different gestures.
  *
  * Facets come back on the same request (`withFacets`), so the filter sheet
  * can show counts without a second round trip. They are only asked for on a
@@ -87,7 +88,8 @@ export class ExercisesStore {
   private readonly _exerciseService = inject(ExerciseService);
 
   readonly ownership = signal<ExerciseOwnershipFilter>(ExerciseOwnershipFilter.All);
-  readonly sort = signal<ExerciseSortKey>(ExerciseSortKey.Name);
+  /** Best match while searching, the most used first while browsing. */
+  readonly sort = signal<ExerciseSortKey>(ExerciseSortKey.Relevance);
   readonly filters = signal<ExerciseFilters>(NO_FILTERS);
   /** Picks a pill set aside, offered again the next time the sheet opens. */
   private readonly _keptFilters = signal<ExerciseFilters | null>(null);
@@ -176,13 +178,14 @@ export class ExercisesStore {
    * detail three pages down the list. Re-fetching page 1 there would snap
    * the coach to the top of an 800-row catalogue; instead the whole loaded
    * window is asked for again as one request, so the rows refresh under a
-   * scroll position that does not move. Past the API's cap the window is
-   * trimmed to what one request can carry — the tail reloads on the next
-   * scroll.
+   * scroll position that does not move, and they keep their places: the
+   * order moves with use, and finishing a workout must not reshuffle the
+   * list behind it. Past the API's cap the window is trimmed to what one
+   * request can carry — the tail reloads on the next scroll.
    */
   refresh(done?: () => void): void {
     const pages = Math.min(Math.max(this._pagesLoaded(), 1), MAX_REFRESH_PAGES);
-    this._fetch({ page: 1, limit: pages * PAGE_SIZE, replace: true, done });
+    this._fetch({ page: 1, limit: pages * PAGE_SIZE, replace: true, inPlace: true, done });
   }
 
   loadMore(done?: () => void): void {
@@ -218,12 +221,6 @@ export class ExercisesStore {
     this._restart();
   }
 
-  setSort(value: ExerciseSortKey): void {
-    if (value === this.sort()) return;
-    this.sort.set(value);
-    this._restart();
-  }
-
   setSearch(value: string): void {
     const next = value.trim();
     if (next === this.search()) return;
@@ -254,7 +251,7 @@ export class ExercisesStore {
     this._fetch({ page: 1, limit: PAGE_SIZE, replace: true });
   }
 
-  private _fetch({ page, limit, replace, done }: FetchOptions): void {
+  private _fetch({ page, limit, replace, inPlace, done }: FetchOptions): void {
     const seq = ++this._seq;
     const search = this.search().trim();
 
@@ -280,9 +277,10 @@ export class ExercisesStore {
             done?.();
             return;
           }
-          this._items.update((rows) =>
-            replace ? response.items : appendUnique(rows, response.items),
-          );
+          this._items.update((rows) => {
+            if (!replace) return appendUnique(rows, response.items);
+            return inPlace ? keepPlaces(rows, response.items) : response.items;
+          });
           // A refresh re-reads several pages as one request; count it as them.
           this._pagesLoaded.set(page - 1 + limit / PAGE_SIZE);
           this._endReached.set(response.items.length < limit);
@@ -304,13 +302,4 @@ export class ExercisesStore {
         },
       });
   }
-}
-
-/**
- * Append, skipping rows already held — a row added above the window pushes
- * one down into the next page.
- */
-function appendUnique(rows: Exercise[], incoming: Exercise[]): Exercise[] {
-  const held = new Set(rows.map((row) => row.id));
-  return [...rows, ...incoming.filter((row) => !held.has(row.id))];
 }
