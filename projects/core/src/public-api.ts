@@ -183,7 +183,7 @@ export * from './lib/constants/languages.const';
 export * from './lib/utils/superset-links';
 export * from './lib/utils/url.utils';
 export * from './lib/utils/api-error.utils';
-export * from './lib/utils/cloudinary.utils';
+export * from './lib/utils/image-transform.utils';
 export * from './lib/utils/group.utils';
 export * from './lib/utils/date.utils';
 export * from './lib/utils/youtube.utils';

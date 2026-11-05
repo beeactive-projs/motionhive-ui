@@ -19,7 +19,7 @@ import {
   BLOG_COVER_PRESETS,
   BlogCategories,
   BlogService,
-  withCloudinaryTransform,
+  withImageTransform,
 } from 'core';
 import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -164,14 +164,14 @@ export class BlogComponent {
 
   /** Featured-card cover — 4:3 frame, gravity north so portrait
    *  subjects keep their face + shoulders in view (instead of
-   *  Cloudinary's auto-gravity zooming into the face). */
+   *  the auto crop zooming into the face). */
   featuredCoverUrl(url: string | null | undefined): string {
-    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.featuredCard);
+    return withImageTransform(url, BLOG_COVER_PRESETS.featuredCard);
   }
 
   /** Grid-card cover — 16:9 carousel-sized crop. */
   gridCoverUrl(url: string | null | undefined): string {
-    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.homeCarousel);
+    return withImageTransform(url, BLOG_COVER_PRESETS.homeCarousel);
   }
 
   /**

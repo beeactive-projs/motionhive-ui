@@ -20,7 +20,7 @@ import {
   blogCategoryLabel,
   escapeHtml,
   TagSeverity,
-  withCloudinaryTransform,
+  withImageTransform,
 } from 'core';
 import { SelectItem } from 'primeng/api';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
@@ -173,9 +173,9 @@ export class Posts implements OnInit {
 
   trackById = (_: number, item: { id: string }) => item.id;
 
-  /** Pipe a Cloudinary cover URL through the list-thumb preset so we
+  /** Pipe a cover URL through the list-thumb preset so we
    *  serve a 480px 16:9 image instead of the original full-size file. */
   thumbUrl(coverImage: string | null | undefined): string {
-    return withCloudinaryTransform(coverImage, BLOG_COVER_PRESETS.listThumb);
+    return withImageTransform(coverImage, BLOG_COVER_PRESETS.listThumb);
   }
 }

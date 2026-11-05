@@ -40,7 +40,7 @@ export class UserService {
 
   /**
    * Upload a new profile picture. Backend accepts multipart/form-data
-   * with a single `file` field. Returns the new Cloudinary URL so the
+   * with a single `file` field. Returns the new picture URL so the
    * caller can swap the avatar in place without refetching the whole
    * profile.
    */

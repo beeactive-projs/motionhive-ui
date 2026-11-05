@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BLOG_COVER_PRESETS, withCloudinaryTransform, type BlogPost } from 'core';
+import { BLOG_COVER_PRESETS, withImageTransform, type BlogPost } from 'core';
 import { BlogCategoryPipe } from '../../blog-category.pipe';
 
 /**
  * Blog post card — the single card used by the article "Keep reading"
  * grid, and ready to replace the near-identical cards on the blog list
- * (follow-up). Cover art is Cloudinary-cropped to the 16:9 carousel
+ * (follow-up). Cover art is cropped by the image host to the 16:9 carousel
  * preset; the title/excerpt clamp to two lines.
  */
 @Component({
@@ -23,7 +23,7 @@ export class BlogPostCard {
   readonly variant = input<'related' | 'grid'>('related');
 
   readonly coverUrl = computed(() =>
-    withCloudinaryTransform(this.post().coverImage, BLOG_COVER_PRESETS.homeCarousel),
+    withImageTransform(this.post().coverImage, BLOG_COVER_PRESETS.homeCarousel),
   );
 
   /**

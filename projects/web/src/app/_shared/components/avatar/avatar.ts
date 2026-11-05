@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { AvatarModule, type AvatarShape } from 'primeng/avatar';
-import { AvatarUser, withCloudinaryTransform } from 'core';
+import { AvatarUser, withImageTransform } from 'core';
 import { HexAvatar } from '../hex-avatar/hex-avatar';
 
 export type AvatarSize = 'normal' | 'large' | 'xlarge';
@@ -40,7 +40,7 @@ export class Avatar {
     // Face-cropped thumbnail (~2× rendered px) instead of the full-res
     // original — avoids the NG0913 oversized-image performance warning.
     const px = HEX_PX[this.size()] * 2;
-    return withCloudinaryTransform(raw, {
+    return withImageTransform(raw, {
       width: px,
       height: px,
       crop: 'fill',

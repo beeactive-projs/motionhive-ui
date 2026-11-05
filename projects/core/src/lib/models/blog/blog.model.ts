@@ -21,7 +21,7 @@ export interface BlogPost {
    */
   authorInitials: string;
   /**
-   * Cloudinary URL of the registered author's profile picture, or
+   * Public URL of the registered author's profile picture, or
    * null. Always null for guest-authored posts (no user link). Use
    * with the initials circle as fallback when null.
    */

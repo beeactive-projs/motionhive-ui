@@ -49,7 +49,7 @@ interface PendingImage {
  * of the thing being written.
  *
  * Images upload on submit, not on pick. Uploading eagerly would leave
- * orphaned files on Cloudinary every time someone changed their mind, and
+ * orphaned files in storage every time someone changed their mind, and
  * there is no endpoint to clean those up.
  */
 @Component({

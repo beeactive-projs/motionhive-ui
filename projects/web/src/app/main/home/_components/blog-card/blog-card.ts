@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
-import { BLOG_COVER_PRESETS, BlogPost, withCloudinaryTransform } from 'core';
+import { BLOG_COVER_PRESETS, BlogPost, withImageTransform } from 'core';
 
 /**
  * Compact blog-post card for the home carousel. Shows the cover image,
@@ -29,11 +29,11 @@ export class BlogCard {
       : this._translateService.instant('home.blogCard.quickRead');
   });
 
-  /** Cover URL piped through Cloudinary so a tall portrait upload
+  /** Cover URL resized by the image host so a tall portrait upload
    *  comes back as a 16:9 cropped, ~800px-wide JPG/WebP — guarantees
    *  the carousel cell renders correctly regardless of source size. */
   readonly coverUrl = computed(() =>
-    withCloudinaryTransform(this.post().coverImage, BLOG_COVER_PRESETS.homeCarousel),
+    withImageTransform(this.post().coverImage, BLOG_COVER_PRESETS.homeCarousel),
   );
 
   onRead(): void {

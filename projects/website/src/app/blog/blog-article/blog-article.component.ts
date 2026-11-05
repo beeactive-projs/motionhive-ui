@@ -16,7 +16,7 @@ import { filter, map } from 'rxjs/operators';
 import { ButtonDirective } from 'primeng/button';
 import { Skeleton } from 'primeng/skeleton';
 import type { BlogPost } from 'core';
-import { authorBylineUrl, BLOG_COVER_PRESETS, BlogService, withCloudinaryTransform } from 'core';
+import { authorBylineUrl, BLOG_COVER_PRESETS, BlogService, withImageTransform } from 'core';
 import { BlogCategoryPipe } from '../blog-category.pipe';
 import { SeoService } from '../../_shared/seo.service';
 import { enrichArticleContent } from '../../_shared/article-content.util';
@@ -153,7 +153,7 @@ export class BlogArticleComponent {
 
   /** Article hero — wide cinematic crop, ~1600px wide. */
   heroCoverUrl(url: string | null | undefined): string {
-    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.articleHero);
+    return withImageTransform(url, BLOG_COVER_PRESETS.articleHero);
   }
 
   private _buildArticleLd(p: BlogPost): Record<string, unknown> {

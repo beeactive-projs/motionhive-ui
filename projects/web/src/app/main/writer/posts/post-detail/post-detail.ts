@@ -23,7 +23,7 @@ import {
   languageName,
   UserRoles,
   validationMessage,
-  withCloudinaryTransform,
+  withImageTransform,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
@@ -377,10 +377,10 @@ export class PostDetail implements OnInit {
       .replace(/^-|-$/g, '');
   }
 
-  /** Editor preview — pipe Cloudinary URLs through the editor preset
+  /** Editor preview — pipe our image URLs through the editor preset
    *  so the preview shows the cropped 16:9 the readers will see, not
-   *  the writer's raw upload. Non-Cloudinary URLs pass through. */
+   *  the writer's raw upload. Other URLs pass through. */
   coverPreviewUrl(url: string | null | undefined): string {
-    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.editorPreview);
+    return withImageTransform(url, BLOG_COVER_PRESETS.editorPreview);
   }
 }
