@@ -3687,7 +3687,10 @@
       "done": "Gata",
       "target": "Ținta {value}",
       "progress": "{done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
-      "planned": "din {total}"
+      "planned": "din {total}",
+      "skipSet": "Sari seria",
+      "otherValue": "Altă valoare",
+      "allDone": "Toate seriile gata"
     }
   },
   "feedback": {

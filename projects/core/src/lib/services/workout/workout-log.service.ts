@@ -131,11 +131,18 @@ export class WorkoutLogService {
     );
   }
 
-  /** Start the clock again. Does nothing on a workout that is running. */
-  resume(id: string): Observable<WorkoutLog> {
+  /**
+   * Start the clock again. Does nothing on a workout that is running. `at`
+   * (epoch ms) when Continue was tapped earlier, on the lock screen.
+   */
+  resume(id: string, at: number | null = null): Observable<WorkoutLog> {
+    const body: { at?: string } = {};
+    if (at !== null) {
+      body.at = new Date(at).toISOString();
+    }
     return this._http.post<WorkoutLog>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.RESUME(id)}`,
-      {},
+      body,
     );
   }
 

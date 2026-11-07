@@ -115,17 +115,22 @@ export class LoggerStore {
   }
 
   /**
-   * Coming back to a paused workout starts its clock again. Optimistic: the
-   * pause is folded in here at once so the clock moves on from where it
-   * stopped, and the server's sum replaces it when it answers.
+   * Coming back to a paused workout starts its clock again (`at`: Continue
+   * tapped then, on the lock screen). Optimistic: the pause is folded in
+   * here at once so the clock moves on from where it stopped, and the
+   * server's sum replaces it when it answers.
    */
-  resumeClock(): void {
+  resumeClock(at: number | null = null): void {
     const log = this._log();
     if (!log?.pausedAt) return;
-    const open = Math.max(0, Math.round((Date.now() - new Date(log.pausedAt).getTime()) / 1000));
+    let end = Date.now();
+    if (at !== null) {
+      end = at;
+    }
+    const open = Math.max(0, Math.round((end - new Date(log.pausedAt).getTime()) / 1000));
     this._patchClock({ pausedAt: null, pausedSeconds: (log.pausedSeconds ?? 0) + open });
     this._workoutLogService
-      .resume(log.id)
+      .resume(log.id, at)
       .pipe(
         take(1),
         catchError(() => of(null)),

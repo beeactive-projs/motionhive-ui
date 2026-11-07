@@ -3687,7 +3687,10 @@
       "done": "Done",
       "target": "Target {value}",
       "progress": "{done} of {total, plural, one {# set} other {# sets}}",
-      "planned": "of {total}"
+      "planned": "of {total}",
+      "skipSet": "Skip set",
+      "otherValue": "Other value",
+      "allDone": "All sets done"
     }
   },
   "feedback": {

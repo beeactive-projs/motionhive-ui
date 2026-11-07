@@ -4,7 +4,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { APP_HOME_URL, WEB_APP_URL } from 'core';
 
-import { resolveAppLink } from '../config/app-link.config';
+import { resolveAppLink, resolveLiveLink } from '../config/app-link.config';
 
 /**
  * A cold start can report its link twice (as the launch URL and as an
@@ -14,7 +14,7 @@ const SAME_TAP_MS = 2_000;
 
 /**
  * Opens web app links inside the app (Android App Links, iOS universal
- * links).
+ * links), and the app's own `motionhive://` links from the lock screen.
  *
  * An email's "Open conversation" or "Verify email" is a link to the web
  * app. The Android manifest and `/.well-known/apple-app-site-association`
@@ -55,6 +55,11 @@ export class AppLinkService {
     this.lastUrl = url;
     this.lastAt = now;
 
+    const live = resolveLiveLink(url);
+    if (live) {
+      void this._router.navigate(live.commands, { queryParams: live.queryParams ?? undefined });
+      return;
+    }
     const link = resolveAppLink(url, this._host);
     if (!link) {
       void this._router.navigateByUrl(this._appHomeUrl);

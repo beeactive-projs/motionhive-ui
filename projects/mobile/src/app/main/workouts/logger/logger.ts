@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
@@ -62,8 +63,9 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { RestLiveAction, RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
-import { ActiveSessionStore, LiveNext } from '../_services/active-session.store';
+import { ActiveSessionStore, LiveStep, LiveValues } from '../_services/active-session.store';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
+import { liveValues } from '../_services/lock-screen.config';
 import { LockScreenService } from '../_services/lock-screen.service';
 import { RestCueService } from '../_services/rest-cue.service';
 import { ScreenAwakeService } from '../_services/screen-awake.service';
@@ -121,6 +123,7 @@ import {
   foldedSummary,
   lastLine,
   nextAfter,
+  withTicked,
   planLine,
   planNoteOf,
   prefillValue,
@@ -232,6 +235,15 @@ function shownValue(row: SetView, field: SetField): number | null {
 
 /** Programmatic scrolls fire scroll events too; ignore them for this long. */
 const PROGRAMMATIC_SCROLL_MS = 900;
+/** A tick from the lock screen's ✓: when it was tapped, and what its button showed. */
+interface LockScreenTick {
+  at: number;
+  values: LiveValues;
+}
+
+/** How many sets the lock screen knows ahead: the next one and two after it. */
+const LIVE_STEPS = 3;
+
 /** Where the focus set sits, as a share of the visible list's height. */
 const FOCUS_AT = 0.32;
 /** The list's scroll into place after a tick. */
@@ -367,7 +379,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   /** The next set to do: the one the list points at and scrolls to. */
   readonly focus = computed<SetRef | null>(() =>
-    focusOf(this.store.exercises(), this._rounds()),
+    focusOf(this.store.exercises(), this._rounds(), this._activeSession.passed()),
   );
 
   /** The set whose "How hard?" row is showing, for a few seconds after its tick. */
@@ -430,6 +442,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     startedAt: number;
     planned: number;
   } | null>(null);
+  /** The set "Other value" on the lock screen asked for, until the workout has loaded it. */
+  private readonly _openSetId = signal<string | null>(null);
   /** Until the rest kept from before is picked up, this page must not overwrite it. */
   private _restAdopted = false;
   /** "This exercise": rests changed during this workout, by exercise. */
@@ -460,69 +474,29 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   });
 
   /**
-   * The same next set in pieces, for the lock screen: it lays them out on
-   * its own and cuts the exercise's name before the weight. In a superset,
-   * the whole round in order ("A1 Incline press 22 × 10 → A2 Push-ups × 15").
+   * The next sets in pieces, for the lock screen: it lays them out on its
+   * own and cuts the exercise's name before the weight. In a superset, the
+   * whole round in order ("A1 Incline press 22 × 10 → A2 Push-ups × 15").
+   * The first is the next set; the ones after it are worked out as if the
+   * sets before them were ticked, so the lock screen's ✓ and Skip set can
+   * move on with the app asleep.
    */
-  readonly liveNext = computed<LiveNext | null>(() => {
-    const focus = this.focus();
-    if (!focus) {
-      return null;
+  readonly liveSteps = computed<LiveStep[]>(() => {
+    const rounds = this._rounds();
+    const passed = this._activeSession.passed();
+    let exercises: readonly LoggedExercise[] = this.store.exercises();
+    const steps: LiveStep[] = [];
+    let ref = focusOf(exercises, rounds, passed);
+    while (ref && steps.length < LIVE_STEPS) {
+      const step = this._liveStep(ref, exercises, rounds, passed);
+      if (!step) {
+        break;
+      }
+      steps.push(step);
+      exercises = withTicked(exercises, ref.setId);
+      ref = focusOf(exercises, rounds, passed);
     }
-    const view = this.views().find((v) => v.exercise.id === focus.exerciseId);
-    if (!view) {
-      return null;
-    }
-    const row = view.rows.find((r) => r.set.id === focus.setId);
-    if (!row) {
-      return null;
-    }
-    const everySet = this.store
-      .exercises()
-      .filter((exercise) => !exercise.isSkipped)
-      .flatMap((exercise) => exercise.sets ?? []);
-    const sets = view.exercise.sets ?? [];
-    const next: LiveNext = {
-      exercise: view.exercise.exerciseNameSnapshot,
-      set: row.badge.short ?? row.badge.name,
-      target: setLine(view.fields, (field) => shownValue(row, field), true),
-      last: row.last,
-      done: sets.filter((set) => set.isCompleted).length,
-      total: sets.length,
-      workoutDone: everySet.filter((set) => set.isCompleted).length,
-      workoutTotal: everySet.length,
-      kicker: '',
-      order: '',
-    };
-    const block = this.blocks().find(
-      (b): b is SupersetBlock =>
-        b.kind === 'superset' && b.members.some((m) => m.view.exercise.id === view.exercise.id),
-    );
-    if (!block) {
-      return next;
-    }
-    const round = block.rounds.find((r) => r.rows.some((r2) => r2.row.set.id === row.set.id));
-    const order = (round ? round.rows : [])
-      .map((member) =>
-        [
-          member.tag,
-          member.view.exercise.exerciseNameSnapshot,
-          setLine(member.view.fields, (field) => shownValue(member.row, field), false),
-        ]
-          .filter(Boolean)
-          .join(' '),
-      )
-      .join(' → ');
-    return {
-      ...next,
-      done: block.rounds.filter((r) => r.done).length,
-      total: block.total,
-      kicker: this._translateService.instant('workouts.superset.kicker', {
-        round: block.current,
-        total: block.total,
-      }),
-      order,
-    };
+    return steps;
   });
 
   readonly pickerOpen = signal(false);
@@ -899,8 +873,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     // What comes next, for the lock screen between rests too.
     effect(() => {
       const next = this.nextLine();
-      const live = this.liveNext();
-      untracked(() => this._activeSession.setNext(next, live));
+      const steps = this.liveSteps();
+      untracked(() => this._activeSession.setNext(next, steps));
     });
 
     // Follow the focus: whenever it moves (a tick, the list loading), bring
@@ -910,6 +884,37 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       if (id === this._lastFocusId) return;
       this._lastFocusId = id;
       if (id && !untracked(this.userScrolled)) this._scrollToFocusSoon();
+    });
+
+    // "Other value" on the lock screen opens the logger on that set, to type it.
+    this._route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const setId = params.get('set');
+      if (setId) {
+        this._openSetId.set(setId);
+      }
+    });
+    effect(() => {
+      const setId = this._openSetId();
+      if (!setId) {
+        return;
+      }
+      const exercise = this.store.exercises().find((e) => (e.sets ?? []).some((set) => set.id === setId));
+      if (!exercise) {
+        return;
+      }
+      const set = this._findSet(exercise.id, setId);
+      untracked(() => {
+        this._openSetId.set(null);
+        void this._router.navigate([], {
+          relativeTo: this._route,
+          queryParams: { set: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+        if (set) {
+          this.openSet(exercise, set);
+        }
+      });
     });
 
     this._startTicker();
@@ -982,13 +987,47 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this._detachLockScreen ??= this._lockScreen.attach((action) => this._onLockScreen(action));
   }
 
-  /** +15, Skip or Start set on the lock screen: as if tapped on the bar, at that moment. */
+  /**
+   * The lock screen's buttons, as if tapped here at that moment: +15, Skip
+   * and Start set on the bar, ✓ on the set, Skip set passing it over,
+   * Continue on a paused workout.
+   */
   private _onLockScreen(action: RestLiveAction): void {
     if (action.type === RestLiveActionTypes.Extend) {
-      if (action.endsAt && this.restEndsAt() !== null) this.restEndsAt.set(action.endsAt);
+      if (action.endsAt && this.restEndsAt() !== null) {
+        this.restEndsAt.set(action.endsAt);
+      }
+      return;
+    }
+    if (action.type === RestLiveActionTypes.Log) {
+      this._tickFromLockScreen(action);
+      return;
+    }
+    if (action.type === RestLiveActionTypes.SkipSet) {
+      const log = this.store.log();
+      if (log && action.setId) {
+        this._activeSession.pass(log.id, action.setId);
+      }
+      return;
+    }
+    if (action.type === RestLiveActionTypes.Resume) {
+      this.store.resumeClock(action.at);
       return;
     }
     this._recordTappedRest(action.at);
+  }
+
+  /** ✓ on the lock screen: the set ticked with what its button showed, at that moment. */
+  private _tickFromLockScreen(action: RestLiveAction): void {
+    if (!action.exerciseId || !action.setId) {
+      return;
+    }
+    const exercise = this.store.exercises().find((e) => e.id === action.exerciseId);
+    const set = this._findSet(action.exerciseId, action.setId);
+    if (!exercise || !set || set.isCompleted) {
+      return;
+    }
+    this.tick(exercise, set, { at: action.at, values: liveValues(action.values) });
   }
 
   /**
@@ -1051,6 +1090,107 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.ionViewWillEnter();
   }
 
+  /**
+   * One set for the lock screen, counted in `exercises` (the sets before it
+   * taken as ticked): what it shows, what its ✓ saves, the rest after it.
+   */
+  private _liveStep(
+    ref: SetRef,
+    exercises: readonly LoggedExercise[],
+    rounds: boolean,
+    passed: ReadonlySet<string>,
+  ): LiveStep | null {
+    const view = this.views().find((v) => v.exercise.id === ref.exerciseId);
+    if (!view) {
+      return null;
+    }
+    const row = view.rows.find((r) => r.set.id === ref.setId);
+    if (!row) {
+      return null;
+    }
+    const exercise = exercises.find((e) => e.id === ref.exerciseId);
+    let sets: LoggedSet[] = [];
+    if (exercise && exercise.sets) {
+      sets = exercise.sets;
+    }
+    const everySet = exercises.filter((e) => !e.isSkipped).flatMap((e) => e.sets ?? []);
+    const values: LiveValues = {};
+    for (const field of view.fields) {
+      const value = shownValue(row, field);
+      if (value !== null) {
+        values[PAYLOAD_KEY[field]] = value;
+      }
+    }
+    const after = nextAfter(exercises, ref, rounds, passed);
+    let afterSet: LoggedSet | null = null;
+    let inRound = false;
+    if (after) {
+      afterSet = after.set;
+      inRound = sameRound(exercises, ref, { exerciseId: after.exercise.id, setId: after.set.id }, rounds);
+    }
+    const rest = restAfterTick(row.set, afterSet, {
+      sameRound: inRound,
+      exerciseOverride: this._restByExercise()[ref.exerciseId] ?? null,
+      workoutDefault: this._restForAll(),
+      personDefault: this._settings().defaultRestSeconds,
+    });
+    const name = view.exercise.exerciseNameSnapshot;
+    const setName = row.badge.short ?? row.badge.name;
+    const target = setLine(view.fields, (field) => shownValue(row, field), true);
+    const step: LiveStep = {
+      exercise: name,
+      set: setName,
+      target,
+      last: row.last,
+      done: sets.filter((set) => set.isCompleted).length,
+      total: sets.length,
+      workoutDone: everySet.filter((set) => set.isCompleted).length,
+      workoutTotal: everySet.length,
+      kicker: '',
+      order: '',
+      exerciseId: ref.exerciseId,
+      setId: ref.setId,
+      values,
+      short: setLine(view.fields, (field) => shownValue(row, field), false),
+      rest,
+      line: [setName, target, name].filter(Boolean).join(' · '),
+      final: after === null,
+    };
+    const block = this.blocks().find(
+      (b): b is SupersetBlock =>
+        b.kind === 'superset' && b.members.some((m) => m.view.exercise.id === ref.exerciseId),
+    );
+    if (!block) {
+      return step;
+    }
+    const round = block.rounds.find((r) => r.rows.some((member) => member.row.set.id === ref.setId));
+    if (!round) {
+      return step;
+    }
+    const ticked = new Set(everySet.filter((set) => set.isCompleted).map((set) => set.id));
+    const order = round.rows
+      .map((member) =>
+        [
+          member.tag,
+          member.view.exercise.exerciseNameSnapshot,
+          setLine(member.view.fields, (field) => shownValue(member.row, field), false),
+        ]
+          .filter(Boolean)
+          .join(' '),
+      )
+      .join(' → ');
+    return {
+      ...step,
+      done: block.rounds.filter((r) => r.rows.every((member) => ticked.has(member.row.set.id))).length,
+      total: block.total,
+      kicker: this._translateService.instant('workouts.superset.kicker', {
+        round: round.index + 1,
+        total: block.total,
+      }),
+      order,
+    };
+  }
+
   // ─── Sets ─────────────────────────────────────────────────────
 
   /**
@@ -1061,13 +1201,16 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
    *
    * On a set already ticked (opened to edit), the tick takes it back.
    */
-  tick(exercise: LoggedExercise, set: LoggedSet): void {
+  tick(exercise: LoggedExercise, set: LoggedSet, from: LockScreenTick | null = null): void {
     this._keepTyped();
     this.editing.set(null);
     this.dismissEffort();
 
     const fresh = this._findSet(exercise.id, set.id) ?? set;
     if (fresh.isCompleted) {
+      if (from) {
+        return;
+      }
       this.store.logSet(exercise.id, fresh.id, { isCompleted: false });
       if (this._rest()?.setId === fresh.id) {
         this.restEndsAt.set(null);
@@ -1076,24 +1219,33 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       return;
     }
 
+    let now = Date.now();
+    if (from) {
+      now = from.at;
+    }
     // The rest before this set ends here, unless it was ended by hand.
-    this._recordRest(fresh);
-    this._restCueService.unlock();
+    this._recordRest(fresh, now);
 
-    const view = this.views().find((v) => v.exercise.id === exercise.id);
-    const row = view?.rows.find((r) => r.set.id === fresh.id);
-    const payload: LogSetPayload = { isCompleted: true };
-    for (const field of view?.fields ?? []) {
-      const prefill = row?.prefill[field] ?? null;
-      if (cellValue(fresh, field) == null && prefill != null) {
-        payload[PAYLOAD_KEY[field]] = prefill;
+    let payload: LogSetPayload = { isCompleted: true };
+    if (from) {
+      // Exactly what the lock screen's button said, stamped when it was tapped.
+      payload = { ...from.values, isCompleted: true, completedAt: new Date(from.at).toISOString() };
+    } else {
+      this._restCueService.unlock();
+      const view = this.views().find((v) => v.exercise.id === exercise.id);
+      const row = view?.rows.find((r) => r.set.id === fresh.id);
+      for (const field of view?.fields ?? []) {
+        const prefill = row?.prefill[field] ?? null;
+        if (cellValue(fresh, field) == null && prefill != null) {
+          payload[PAYLOAD_KEY[field]] = prefill;
+        }
       }
     }
     this.store.logSet(exercise.id, fresh.id, payload);
 
     const rounds = this._rounds();
     const here = { exerciseId: exercise.id, setId: fresh.id };
-    const next = nextAfter(this.store.exercises(), here, rounds);
+    const next = nextAfter(this.store.exercises(), here, rounds, this._activeSession.passed());
     const rest = restAfterTick(fresh, next?.set ?? null, {
       sameRound:
         !!next &&
@@ -1103,7 +1255,6 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       personDefault: this._settings().defaultRestSeconds,
     });
     if (rest !== null) {
-      const now = Date.now();
       this.restStartedAt.set(now);
       this.restEndsAt.set(now + rest * 1000);
       this._rest.set({ exerciseId: exercise.id, setId: fresh.id, startedAt: now, planned: rest });
@@ -1112,7 +1263,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       this._rest.set(null);
     }
 
-    if (asksEffort(fresh, this.prefs().askEffort)) this._showEffort(fresh.id);
+    // "How hard?" asks right after the set; from the lock screen that moment has passed.
+    if (!from && asksEffort(fresh, this.prefs().askEffort)) {
+      this._showEffort(fresh.id);
+    }
     const log = this.store.log();
     if (log) void this._stillTraining.remind(log.id, log.name);
     // A tick brings the list back to the focus, wherever it was scrolled.
@@ -1561,11 +1715,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   /** At a tick, a rest nobody ended by hand is estimated from the gap. */
-  private _recordRest(ticked: LoggedSet): void {
+  private _recordRest(ticked: LoggedSet, at = Date.now()): void {
     const rest = this._rest();
     if (!rest || rest.setId === ticked.id) return;
     this._rest.set(null);
-    const gap = (Date.now() - rest.startedAt) / 1000;
+    const gap = (at - rest.startedAt) / 1000;
     const measured = estimatedRest(gap, rest.planned, ticked);
     if (!measured) return;
     this._saveRest(rest, measured);

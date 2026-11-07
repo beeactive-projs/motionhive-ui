@@ -28,6 +28,16 @@
 				<string>com.googleusercontent.apps.119425399334-l8dkteues0kljvkjalv411qkpl15d3mb</string>
 			</array>
 		</dict>
+		<dict>
+			<!-- The app's own links: the lock screen's "Other value" opens
+			     motionhive://log/<logId>?set=<setId> (AppLinkService). -->
+			<key>CFBundleURLName</key>
+			<string>fit.motionhive.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>motionhive</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>

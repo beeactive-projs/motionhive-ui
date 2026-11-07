@@ -273,6 +273,8 @@ export interface LogSetPayload {
   restAfterSeconds?: number | null;
   restSource?: RestSource | null;
   isCompleted?: boolean;
+  /** With `isCompleted`: when it was ticked, if not now (a lock screen ✓ saved later). ISO time. */
+  completedAt?: string;
   notes?: string | null;
 }
 

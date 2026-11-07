@@ -147,12 +147,26 @@ export function loggingOrder(exercises: readonly LoggedExercise[], rounds = true
   return out;
 }
 
-/** The first set not yet ticked, in logging order: the one the screen points at. */
-export function focusOf(exercises: readonly LoggedExercise[], rounds = true): SetRef | null {
+/** No set passed over: the default for `focusOf` and `nextAfter`. */
+const NONE_PASSED: ReadonlySet<string> = new Set();
+
+/**
+ * The first set not yet ticked, in logging order: the one the screen points
+ * at. Sets in `passed` ("Skip set" on the lock screen) stay as they are,
+ * unticked, and the focus goes on past them.
+ */
+export function focusOf(
+  exercises: readonly LoggedExercise[],
+  rounds = true,
+  passed: ReadonlySet<string> = NONE_PASSED,
+): SetRef | null {
   const sets = new Map(
     exercises.flatMap((exercise) => (exercise.sets ?? []).map((set) => [set.id, set] as const)),
   );
-  return loggingOrder(exercises, rounds).find((ref) => !sets.get(ref.setId)?.isCompleted) ?? null;
+  const found = loggingOrder(exercises, rounds).find(
+    (ref) => !sets.get(ref.setId)?.isCompleted && !passed.has(ref.setId),
+  );
+  return found ?? null;
 }
 
 /** The set after `ref` in logging order that is still to do, or null. */
@@ -160,11 +174,15 @@ export function nextAfter(
   exercises: readonly LoggedExercise[],
   ref: SetRef,
   rounds = true,
+  passed: ReadonlySet<string> = NONE_PASSED,
 ): { exercise: LoggedExercise; set: LoggedSet; index: number } | null {
   const order = loggingOrder(exercises, rounds);
   const at = order.findIndex((r) => r.setId === ref.setId);
   const rest = at >= 0 ? [...order.slice(at + 1), ...order.slice(0, at)] : order;
   for (const r of rest) {
+    if (passed.has(r.setId)) {
+      continue;
+    }
     const exercise = exercises.find((e) => e.id === r.exerciseId);
     const sets = exercise?.sets ?? [];
     const index = sets.findIndex((s) => s.id === r.setId);
@@ -172,6 +190,28 @@ export function nextAfter(
     if (exercise && set && !set.isCompleted) return { exercise, set, index };
   }
   return null;
+}
+
+/**
+ * The exercises as they would be once `setId` is ticked: for working out
+ * what the lock screen shows after its ✓, before the app has saved it.
+ */
+export function withTicked(exercises: readonly LoggedExercise[], setId: string): LoggedExercise[] {
+  return exercises.map((exercise) => {
+    const sets = exercise.sets ?? [];
+    if (!sets.some((set) => set.id === setId)) {
+      return exercise;
+    }
+    return {
+      ...exercise,
+      sets: sets.map((set) => {
+        if (set.id !== setId) {
+          return set;
+        }
+        return { ...set, isCompleted: true };
+      }),
+    };
+  });
 }
 
 /**
@@ -446,7 +486,7 @@ export const BREAK_AFTER_SECONDS = 600;
  * How long a set takes, to take off the gap between two ticks: the logged
  * time for a timed set, else about 3 s a rep, between 20 s and 90 s.
  */
-export function setLengthSeconds(set: LoggedSet): number {
+export function setLengthSeconds(set: Pick<LoggedSet, 'durationSeconds' | 'reps'>): number {
   if (set.durationSeconds != null) return set.durationSeconds;
   const reps = set.reps ?? 8;
   return Math.min(90, Math.max(20, reps * 3));
@@ -467,7 +507,7 @@ export interface MeasuredRest {
 export function estimatedRest(
   gapSeconds: number,
   plannedSeconds: number,
-  nextSet: LoggedSet,
+  nextSet: Pick<LoggedSet, 'durationSeconds' | 'reps'>,
 ): MeasuredRest | null {
   if (gapSeconds > Math.max(BREAK_AFTER_SECONDS, 3 * plannedSeconds)) {
     return { seconds: null, source: RestSources.Break };

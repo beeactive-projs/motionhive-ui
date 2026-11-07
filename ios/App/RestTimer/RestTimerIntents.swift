@@ -100,6 +100,94 @@ enum RestTimerActions {
         record(["type": type, "at": milliseconds(Date())])
     }
 
+    /// ✓ on the next set: it is done as the button showed it. The set after
+    /// it shows at once, with its rest counting down and the rest-over
+    /// alert set for its end; the web side saves the set when it runs.
+    @available(iOS 16.2, *)
+    static func logSet(_ setId: String) async {
+        guard let activity = Activity<RestTimerAttributes>.activities.first else { return }
+        var state = activity.content.state
+        guard let shown = state.steps?.first, shown.setId == setId, !shown.values.isEmpty else { return }
+        guard let step = state.moveOn(past: setId) else { return }
+        let now = Date()
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [restAlertId])
+        center.removeDeliveredNotifications(withIdentifiers: [restAlertId])
+        var endsAt: Date?
+        if let rest = step.rest, rest > 0 {
+            endsAt = now.addingTimeInterval(TimeInterval(rest))
+            state.restStartedAt = now
+        } else {
+            state.restStartedAt = nil
+        }
+        state.restEndsAt = endsAt
+        await activity.update(ActivityContent(state: state, staleDate: endsAt))
+        if let endsAt {
+            await scheduleRestAlert(at: endsAt, state: state)
+        }
+        record([
+            "type": "log",
+            "at": milliseconds(now),
+            "setId": step.setId,
+            "exerciseId": step.exerciseId,
+            "values": step.values
+        ])
+    }
+
+    /// Skip set: the next set is passed over, left unticked, and the one after shows.
+    @available(iOS 16.2, *)
+    static func skipSet(_ setId: String) async {
+        guard let activity = Activity<RestTimerAttributes>.activities.first else { return }
+        var state = activity.content.state
+        guard state.steps?.first?.setId == setId, state.moveOn(past: setId) != nil else { return }
+        await activity.update(ActivityContent(state: state, staleDate: activity.content.staleDate))
+        record(["type": "skipSet", "at": milliseconds(Date()), "setId": setId])
+    }
+
+    /// Continue on a paused workout: the clock runs again from where it stood.
+    @available(iOS 16.2, *)
+    static func resume() async {
+        guard let activity = Activity<RestTimerAttributes>.activities.first else { return }
+        var state = activity.content.state
+        guard state.clockFrom == nil, let seconds = state.pausedSeconds else { return }
+        let now = Date()
+        state.clockFrom = now.addingTimeInterval(-TimeInterval(seconds))
+        state.pausedSeconds = nil
+        await activity.update(ActivityContent(state: state, staleDate: nil))
+        record(["type": "resume", "at": milliseconds(now)])
+    }
+
+    /// The rest-over alert for a rest the lock screen started: the next set
+    /// as its text, as `RestAlertService` writes it. Nothing when the person
+    /// did not allow notifications.
+    @available(iOS 16.2, *)
+    private static func scheduleRestAlert(at date: Date, state: RestTimerAttributes.ContentState) async {
+        let content = UNMutableNotificationContent()
+        var title = state.labels.alertTitle ?? ""
+        if title.isEmpty {
+            title = state.labels.restOver ?? ""
+        }
+        var body = ""
+        if let next = state.steps?.first {
+            body = next.line
+        }
+        if body.isEmpty {
+            body = state.labels.alertBody ?? ""
+        }
+        content.title = title
+        content.body = body
+        content.sound = .default
+        // The shape Capacitor gives its own, so a tap on it reads like theirs.
+        content.userInfo = ["cap_schedule": [String: Any]()]
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: max(1, date.timeIntervalSinceNow),
+            repeats: false
+        )
+        try? await UNUserNotificationCenter.current().add(
+            UNNotificationRequest(identifier: restAlertId, content: content, trigger: trigger)
+        )
+    }
+
     /// The alert keeps what Capacitor put in it (its text, its data); only the
     /// moment changes. After "+30 s" it has already gone off: the one shown is
     /// taken down and comes again at the new end.
@@ -180,6 +268,57 @@ struct StartSetIntent: LiveActivityIntent {
 
     func perform() async throws -> some IntentResult {
         await RestTimerActions.endRest("start")
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
+struct LogSetIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Log the next set as planned"
+    static var isDiscoverable: Bool = false
+
+    @Parameter(title: "Set")
+    var setId: String
+
+    init() {}
+
+    init(setId: String) {
+        self.setId = setId
+    }
+
+    func perform() async throws -> some IntentResult {
+        await RestTimerActions.logSet(setId)
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
+struct SkipSetIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Skip the next set"
+    static var isDiscoverable: Bool = false
+
+    @Parameter(title: "Set")
+    var setId: String
+
+    init() {}
+
+    init(setId: String) {
+        self.setId = setId
+    }
+
+    func perform() async throws -> some IntentResult {
+        await RestTimerActions.skipSet(setId)
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
+struct ResumeWorkoutIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Continue the workout"
+    static var isDiscoverable: Bool = false
+
+    func perform() async throws -> some IntentResult {
+        await RestTimerActions.resume()
         return .result()
     }
 }

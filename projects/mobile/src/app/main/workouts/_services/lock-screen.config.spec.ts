@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { ActiveRest, ActiveSession, LiveNext } from './active-session.store';
-import { liveState, Translate } from './lock-screen.config';
+import { ActiveRest, ActiveSession, LiveStep } from './active-session.store';
+import { liveState, liveValues, STEPS_BUDGET_BYTES, Translate } from './lock-screen.config';
 
 const START = Date.parse('2026-11-02T17:00:00Z');
 const NOW = START + 20 * 60_000;
@@ -22,6 +22,26 @@ const rest: ActiveRest = {
   endsAt: NOW + 60_000,
   planned: 90,
   next: 'Set 3 · 62.5 kg × 8 · Bench press',
+};
+
+const bench: LiveStep = {
+  exercise: 'Bench press',
+  set: 'Set 3',
+  target: '62.5 kg × 8',
+  last: 'last 60 × 8',
+  done: 2,
+  total: 4,
+  workoutDone: 7,
+  workoutTotal: 13,
+  kicker: '',
+  order: '',
+  exerciseId: 'ex-1',
+  setId: 'set-3',
+  values: { weightKg: 62.5, reps: 8 },
+  short: '62.5 × 8',
+  rest: 90,
+  line: 'Set 3 · 62.5 kg × 8 · Bench press',
+  final: false,
 };
 
 /** The key, with its params, so the test reads what was asked for. */
@@ -68,19 +88,7 @@ describe('liveState', () => {
   });
 
   it('sends the next set in pieces, with the rest as planned', () => {
-    const live: LiveNext = {
-      exercise: 'Bench press',
-      set: 'Set 3',
-      target: '62.5 kg × 8',
-      last: 'last 60 × 8',
-      done: 2,
-      total: 4,
-      workoutDone: 7,
-      workoutTotal: 13,
-      kicker: '',
-      order: '',
-    };
-    const state = liveState(session, rest, '', translate, NOW, live);
+    const state = liveState(session, rest, '', translate, NOW, [bench]);
     expect(state.exercise).toBe('Bench press');
     expect(state.set).toBe('Set 3');
     expect(state.aim).toBe('workouts.live.target {"value":"62.5 kg × 8"}');
@@ -93,5 +101,44 @@ describe('liveState', () => {
     const state = liveState(session, null, 'Set 1 · Squat', translate, NOW);
     expect([state.exercise, state.aim, state.progress, state.planned]).toEqual(['', '', '', '']);
     expect([state.done, state.total]).toEqual([0, 0]);
+    expect(state.steps).toEqual([]);
+  });
+
+  it('sends the sets ahead, with what ✓ saves and the rest after each', () => {
+    const next: LiveStep = { ...bench, setId: 'set-4', set: 'Set 4', done: 3, workoutDone: 8, final: true, rest: null };
+    const state = liveState(session, null, '', translate, NOW, [bench, next]);
+    expect(state.steps.map((step) => step.setId)).toEqual(['set-3', 'set-4']);
+    expect(state.steps[0]).toMatchObject({
+      exerciseId: 'ex-1',
+      values: { weightKg: 62.5, reps: 8 },
+      rest: 90,
+      line: 'Set 3 · 62.5 kg × 8 · Bench press',
+      final: false,
+      aim: 'workouts.live.target {"value":"62.5 kg × 8"}',
+    });
+    expect(state.steps[1]).toMatchObject({ set: 'Set 4', rest: null, final: true });
+    expect(state.labels.skipSet).toBe('workouts.live.skipSet');
+    expect(state.labels.resume).toBe('button.continue');
+  });
+
+  it('leaves out the sets ahead that would make the Live Activity too big, never the next one', () => {
+    const long = 'Î'.repeat(400);
+    const steps = [0, 1, 2].map((n) => ({ ...bench, setId: `set-${n}`, order: long }));
+    const state = liveState(session, null, '', translate, NOW, steps);
+    expect(state.steps.length).toBeGreaterThanOrEqual(1);
+    expect(state.steps.length).toBeLessThan(3);
+    expect(new TextEncoder().encode(JSON.stringify(state.steps)).length).toBeLessThanOrEqual(
+      Math.max(STEPS_BUDGET_BYTES, new TextEncoder().encode(JSON.stringify(state.steps.slice(0, 1))).length),
+    );
+  });
+});
+
+describe('liveValues', () => {
+  it('keeps the values the API takes and drops anything else', () => {
+    expect(liveValues({ weightKg: 62.5, reps: 8, rpe: 9, durationSeconds: -1, distanceMeters: 'far' })).toEqual({
+      weightKg: 62.5,
+      reps: 8,
+    });
+    expect(liveValues(undefined)).toEqual({});
   });
 });

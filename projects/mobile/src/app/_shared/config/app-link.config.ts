@@ -53,3 +53,33 @@ export function resolveAppLink(url: string, host: string): DeepLink | null {
     queryParams: query,
   });
 }
+
+/** The app's own scheme, for links from the lock screen (`CFBundleURLSchemes`). */
+export const APP_SCHEME = 'motionhive:';
+
+/**
+ * Where a link from the lock screen opens: "Other value" is
+ * `motionhive://log/<logId>?set=<setId>`, the logger on that set. Null for
+ * anything else.
+ */
+export function resolveLiveLink(url: string): DeepLink | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== APP_SCHEME || parsed.host !== 'log') {
+    return null;
+  }
+  const segments = parsed.pathname.split('/').filter(Boolean);
+  if (segments.length !== 1) {
+    return null;
+  }
+  const set = parsed.searchParams.get('set');
+  let queryParams: Record<string, string> | null = null;
+  if (set) {
+    queryParams = { set };
+  }
+  return { commands: ['/tabs/workouts/log', segments[0]], queryParams };
+}

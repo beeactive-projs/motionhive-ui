@@ -1,4 +1,4 @@
-import { DestroyRef, Service, inject, signal } from '@angular/core';
+import { DestroyRef, Service, computed, inject, signal } from '@angular/core';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
@@ -59,7 +59,38 @@ export interface LiveNext {
   order: string;
 }
 
+/** What ✓ on the lock screen saves for a set: the values its button shows. */
+export type LiveValues = Partial<Record<'weightKg' | 'reps' | 'durationSeconds' | 'distanceMeters', number>>;
+
+/**
+ * One set to come, for the lock screen: the pieces it shows, and what its
+ * buttons need to act with the app asleep. The first is the next set; the
+ * ones after it are what the lock screen shows once ✓ or Skip set moved it on.
+ */
+export interface LiveStep extends LiveNext {
+  exerciseId: string;
+  setId: string;
+  /** What ✓ saves. Empty when nothing is planned or pre-filled: no ✓ then. */
+  values: LiveValues;
+  /** The same, short, on the ✓ button: "62.5 × 8". */
+  short: string;
+  /** The rest that starts once it is ticked, in seconds; null when none does. */
+  rest: number | null;
+  /** "Set 3 · 62.5 kg × 8 · Bench press": the rest-over alert's text. */
+  line: string;
+  /** Nothing is left to do after it. */
+  final: boolean;
+}
+
+/** Sets passed over with "Skip set", for one workout. */
+interface PassedSets {
+  logId: string;
+  setIds: string[];
+}
+
 const REST_KEY = 'mh-active-rest';
+const NO_SETS: ReadonlySet<string> = new Set();
+const PASSED_KEY = 'mh-passed-sets';
 
 /**
  * The workout in progress, across the app (Workouts R2, section 13). Nothing
@@ -76,7 +107,8 @@ export class ActiveSessionStore {
   private readonly _session = signal<ActiveSession | null>(null);
   private readonly _rest = signal<ActiveRest | null>(null);
   private readonly _next = signal('');
-  private readonly _liveNext = signal<LiveNext | null>(null);
+  private readonly _liveSteps = signal<readonly LiveStep[]>([]);
+  private readonly _passed = signal<PassedSets | null>(null);
   private readonly _checked = signal(false);
   private _restored = false;
 
@@ -84,13 +116,23 @@ export class ActiveSessionStore {
   readonly rest = this._rest.asReadonly();
   /** What the logger says comes next ("Set 3 · 62.5 kg × 8 · Bench press"), rest or not. */
   readonly next = this._next.asReadonly();
-  /** The same, in pieces, for the lock screen; null when nothing is left or the logger never opened. */
-  readonly liveNext = this._liveNext.asReadonly();
+  /** The sets to come, in pieces, for the lock screen; empty when nothing is left or the logger never opened. */
+  readonly liveSteps = this._liveSteps.asReadonly();
+  /** The sets of the running workout passed over with "Skip set": left unticked, and the focus goes past them. */
+  readonly passed = computed<ReadonlySet<string>>(() => {
+    const passed = this._passed();
+    const session = this._session();
+    if (!passed || !session || passed.logId !== session.id) {
+      return NO_SETS;
+    }
+    return new Set(passed.setIds);
+  });
   /** True once the API has said whether a workout is open: until then, null means unknown. */
   readonly checked = this._checked.asReadonly();
 
   constructor() {
     void this._restoreRest();
+    void this._restorePassed();
     this.refresh();
     if (Capacitor.isNativePlatform()) {
       const listener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
@@ -134,9 +176,44 @@ export class ActiveSessionStore {
     if (rest && rest.logId !== log.id) this.setRest(null);
   }
 
-  setNext(next: string, live: LiveNext | null = null): void {
+  setNext(next: string, steps: readonly LiveStep[] = []): void {
     this._next.set(next);
-    this._liveNext.set(live);
+    this._liveSteps.set(steps);
+  }
+
+  /**
+   * The lock screen moved on past `setId` (its ✓ or Skip set) while the
+   * logger was closed: what comes next is the step after it, as the lock
+   * screen already shows.
+   */
+  moveOnFrom(setId: string): LiveStep | null {
+    const steps = this._liveSteps();
+    const at = steps.findIndex((step) => step.setId === setId);
+    if (at < 0) {
+      return null;
+    }
+    const rest = steps.slice(at + 1);
+    let next = '';
+    if (rest.length > 0) {
+      next = rest[0].line;
+    }
+    this.setNext(next, rest);
+    return steps[at];
+  }
+
+  /** "Skip set" on the lock screen: the set stays unticked and the focus goes past it. */
+  pass(logId: string, setId: string): void {
+    const current = this._passed();
+    let setIds: string[] = [];
+    if (current && current.logId === logId) {
+      setIds = current.setIds;
+    }
+    if (setIds.includes(setId)) {
+      return;
+    }
+    const passed = { logId, setIds: [...setIds, setId] };
+    this._passed.set(passed);
+    void this._save(PASSED_KEY, passed);
   }
 
   setRest(rest: ActiveRest | null): void {
@@ -149,8 +226,10 @@ export class ActiveSessionStore {
     this._checked.set(true);
     this._session.set(null);
     this._next.set('');
-    this._liveNext.set(null);
+    this._liveSteps.set([]);
     this.setRest(null);
+    this._passed.set(null);
+    void this._save(PASSED_KEY, null);
   }
 
   private async _restoreRest(): Promise<void> {
@@ -167,11 +246,33 @@ export class ActiveSessionStore {
   }
 
   private async _persist(rest: ActiveRest | null): Promise<void> {
+    await this._save(REST_KEY, rest);
+  }
+
+  private async _restorePassed(): Promise<void> {
     try {
-      if (rest) await Preferences.set({ key: REST_KEY, value: JSON.stringify(rest) });
-      else await Preferences.remove({ key: REST_KEY });
+      const { value } = await Preferences.get({ key: PASSED_KEY });
+      if (!value || this._passed()) {
+        return;
+      }
+      const passed = JSON.parse(value) as PassedSets;
+      if (passed && typeof passed.logId === 'string' && Array.isArray(passed.setIds)) {
+        this._passed.set(passed);
+      }
     } catch {
-      // Storage refused: the rest still runs while the app is open.
+      // Nothing to restore: the focus is simply the first set left.
+    }
+  }
+
+  private async _save(key: string, value: unknown): Promise<void> {
+    try {
+      if (value) {
+        await Preferences.set({ key, value: JSON.stringify(value) });
+      } else {
+        await Preferences.remove({ key });
+      }
+    } catch {
+      // Storage refused: it still holds while the app is open.
     }
   }
 }

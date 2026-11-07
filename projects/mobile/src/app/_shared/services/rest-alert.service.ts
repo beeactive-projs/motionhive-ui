@@ -54,8 +54,9 @@ export class RestAlertService {
 
     const listener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
-        // Back on screen: the bar takes over, so nothing should be queued.
-        void this.clear();
+        // Back on screen: the bar takes over, so nothing should be queued,
+        // not even one the lock screen's ✓ scheduled while the app slept.
+        void this.clear(true);
       } else {
         void this.arm();
       }
@@ -115,9 +116,17 @@ export class RestAlertService {
     return this._translateService.instant('workouts.restAlert.body');
   }
 
-  /** Withdraw a scheduled alert. Cheap and safe when there is nothing queued. */
-  private async clear(): Promise<void> {
-    if (!this.available || !this.scheduled) return;
+  /**
+   * Withdraw a scheduled alert. Cheap and safe when there is nothing queued.
+   * `always`: one this side did not schedule too.
+   */
+  private async clear(always = false): Promise<void> {
+    if (!this.available) {
+      return;
+    }
+    if (!this.scheduled && !always) {
+      return;
+    }
     this.scheduled = false;
     try {
       await LocalNotifications.cancel({

@@ -83,15 +83,13 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @available(iOS 16.2, *)
-    private static func show(logId: String, state incoming: RestTimerAttributes.ContentState) async {
-        var state = incoming
+    private static func show(logId: String, state: RestTimerAttributes.ContentState) async {
         let running = Activity<RestTimerAttributes>.activities
         if let current = running.first(where: { $0.attributes.logId == logId }) {
-            // A button changed the rest and the web side has not taken the
-            // note yet: until it does, the rest on the lock screen is the true one.
+            // A button acted and the web side has not taken the note yet:
+            // until it does, what the lock screen shows is the true state.
             if !RestTimerActions.pending().isEmpty {
-                state.restStartedAt = current.content.state.restStartedAt
-                state.restEndsAt = current.content.state.restEndsAt
+                return
             }
             await current.update(ActivityContent(state: state, staleDate: staleDate(state)))
             return
@@ -149,6 +147,7 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
             planned: call.getString("planned"),
             kicker: call.getString("kicker"),
             order: call.getString("order"),
+            steps: (call.getArray("steps") ?? []).compactMap { step(from: $0) },
             labels: RestTimerAttributes.Labels(
                 go: label("go"),
                 skip: label("skip"),
@@ -159,8 +158,54 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
                 workout: label("workout"),
                 done: label("done"),
                 next: label("next"),
-                more: label("more")
+                more: label("more"),
+                open: label("open"),
+                skipSet: label("skipSet"),
+                otherValue: label("otherValue"),
+                resume: label("resume"),
+                allDone: label("allDone"),
+                alertTitle: label("alertTitle"),
+                alertBody: label("alertBody")
             )
+        )
+    }
+
+    /// One of the sets to come; nil when it lacks the ids the buttons need.
+    @available(iOS 16.1, *)
+    private static func step(from value: JSValue) -> RestTimerAttributes.Step? {
+        guard let object = value as? JSObject,
+              let setId = object["setId"] as? String,
+              let exerciseId = object["exerciseId"] as? String else {
+            return nil
+        }
+        func text(_ key: String) -> String? { object[key] as? String }
+        func number(_ key: String) -> Int? { (object[key] as? NSNumber)?.intValue }
+        var values: [String: Double] = [:]
+        if let raw = object["values"] as? JSObject {
+            for (key, value) in raw {
+                if let amount = value as? NSNumber {
+                    values[key] = amount.doubleValue
+                }
+            }
+        }
+        return RestTimerAttributes.Step(
+            setId: setId,
+            exerciseId: exerciseId,
+            values: values,
+            short: text("short") ?? "",
+            rest: number("rest"),
+            line: text("line") ?? "",
+            final: object["final"] as? Bool ?? false,
+            exercise: text("exercise"),
+            setName: text("set"),
+            target: text("target"),
+            aim: text("aim"),
+            last: text("last"),
+            done: number("done"),
+            total: number("total"),
+            progress: text("progress"),
+            kicker: text("kicker"),
+            order: text("order")
         )
     }
 }

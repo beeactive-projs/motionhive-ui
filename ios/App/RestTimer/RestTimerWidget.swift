@@ -6,8 +6,8 @@ import WidgetKit
 /// (Workouts R2, Active Workout, "Outside the app"; the Live Activity design:
 /// rich and standard layouts, the same states). Four states: the rest
 /// counting down, the rest over, between sets with the workout clock, and
-/// paused. The system draws every timer from the dates in the state, so it
-/// stays right with the app asleep.
+/// paused, each with its buttons. The system draws every timer from the
+/// dates in the state, so it stays right with the app asleep.
 ///
 @main
 struct RestTimerBundle: WidgetBundle {
@@ -59,11 +59,19 @@ private enum Phase {
 struct RestTimerLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: RestTimerAttributes.self) { context in
-            RichView(face: Face(state: context.state, phase: Phase(context.state, stale: context.isStale)))
+            RichView(face: Face(
+                state: context.state,
+                phase: Phase(context.state, stale: context.isStale),
+                logId: context.attributes.logId
+            ))
                 .activityBackgroundTint(Palette.card)
             .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
-            let face = Face(state: context.state, phase: Phase(context.state, stale: context.isStale))
+            let face = Face(
+                state: context.state,
+                phase: Phase(context.state, stale: context.isStale),
+                logId: context.attributes.logId
+            )
             return DynamicIsland {
                 DynamicIslandExpandedRegion(.center) {
                     Text(face.kicker)
@@ -96,7 +104,9 @@ struct RestTimerLiveActivity: Widget {
                                 }
                             }
                         }
-                        NextLine(face: face, size: 13)
+                        if face.showsNextLine {
+                            NextLine(face: face, size: 13)
+                        }
                         Actions(face: face, limit: 2)
                     }
                     .padding(.horizontal, 4)
@@ -117,6 +127,8 @@ struct RestTimerLiveActivity: Widget {
 private struct Face {
     let state: RestTimerAttributes.ContentState
     let phase: Phase
+    /// The workout, for the link that opens it on the next set.
+    let logId: String
 
     private func text(_ value: String?) -> String {
         value ?? ""
@@ -207,6 +219,34 @@ private struct Face {
         return joined([exercise, setName, target])
     }
 
+    /// The set the buttons act on: the next one, when the app sent it.
+    var step: RestTimerAttributes.Step? { state.steps?.first }
+
+    /// ✓ needs values to save, and says them on the button.
+    var canLog: Bool {
+        guard let step else { return false }
+        return !step.values.isEmpty && !step.short.isEmpty
+    }
+
+    var logLabel: String {
+        guard let step else { return "" }
+        return "✓ \(step.short)"
+    }
+
+    /// "Other value": the app, opened on the next set to type it.
+    var otherValueURL: URL? {
+        guard let step else { return nil }
+        var link = URLComponents()
+        link.scheme = "motionhive"
+        link.host = "log"
+        link.path = "/\(logId)"
+        link.queryItems = [URLQueryItem(name: "set", value: step.setId)]
+        return link.url
+    }
+
+    /// Nothing known to come and nothing to say: the line is left out.
+    var showsNextLine: Bool { hasPieces || !oneLine.isEmpty }
+
     var nextLabel: String { orFallback(state.labels.next, "Next") }
     var doneLabel: String { orFallback(state.labels.done, state.labels.go) }
 
@@ -272,7 +312,9 @@ private struct RichView: View {
                     }
                 }
             }
-            NextLine(face: face, size: 13)
+            if face.showsNextLine {
+                NextLine(face: face, size: 13)
+            }
             DetailRow(face: face)
             Actions(face: face, limit: 3)
         }
@@ -450,8 +492,11 @@ private struct SetDots: View {
     }
 }
 
-/// −15, +15 and Skip while resting; Start set and +30 s once it is over.
-/// Buttons need iOS 17; before that, a tap on the activity opens the app.
+/// Every state has its buttons, at most three (two in the Dynamic Island),
+/// the main one in honey. Resting: −15, +15, Skip. Rest over: Start set,
+/// +30 s and ✓ the next set as planned. Between sets: ✓, Other value (the
+/// app, on that set) and Skip set. Paused: Continue; Finish stays in the
+/// app. Buttons need iOS 17; before that, a tap on the activity opens the app.
 private struct Actions: View {
     let face: Face
     /// How many the layout has room for; the least needed go first.
@@ -477,15 +522,59 @@ private struct Actions: View {
                         Chip(text: face.state.labels.startSet, primary: true, stretch: true)
                     }
                     .buttonStyle(.plain)
-                    if let more = face.state.labels.more, !more.isEmpty {
+                    if let more = shown(face.state.labels.more), showsMore {
                         Button(intent: MoreRestIntent()) { Chip(text: more) }
                             .buttonStyle(.plain)
                     }
+                    if let step = face.step, face.canLog {
+                        Button(intent: LogSetIntent(setId: step.setId)) { Chip(text: face.logLabel, whole: true) }
+                            .buttonStyle(.plain)
+                    }
                 }
-            case .workout, .paused:
-                EmptyView()
+            case .workout:
+                if let step = face.step {
+                    HStack(spacing: 6) {
+                        if face.canLog {
+                            Button(intent: LogSetIntent(setId: step.setId)) {
+                                Chip(text: face.logLabel, primary: true, whole: true)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        if let url = face.otherValueURL, let text = shown(openText) {
+                            Link(destination: url) { Chip(text: text, primary: !face.canLog, stretch: true) }
+                        }
+                        if limit >= 3, let text = shown(face.state.labels.skipSet) {
+                            Button(intent: SkipSetIntent(setId: step.setId)) { Chip(text: text, stretch: true) }
+                                .buttonStyle(.plain)
+                        }
+                    }
+                }
+            case .paused:
+                if let text = shown(face.state.labels.resume) {
+                    Button(intent: ResumeWorkoutIntent()) { Chip(text: text, primary: true, stretch: true) }
+                        .buttonStyle(.plain)
+                }
             }
         }
+    }
+
+    /// "+30 s" gives way to ✓ where only two fit.
+    private var showsMore: Bool {
+        limit >= 3 || !face.canLog
+    }
+
+    /// "Other value" on the lock screen; "Open" where there is less room.
+    private var openText: String? {
+        if limit >= 3 {
+            return face.state.labels.otherValue
+        }
+        return face.state.labels.open
+    }
+
+    /// A label the app sent; nil when it sent none (an older app), so no blank button.
+    private func shown(_ text: String?) -> String? {
+        guard let text, !text.isEmpty else { return nil }
+        return text
     }
 }
 
@@ -494,8 +583,18 @@ private struct Chip: View {
     var primary = false
     /// Shares the row's width with the other buttons.
     var stretch = false
+    /// Never shortened, as the weight on ✓: the others give way to it.
+    var whole = false
 
     var body: some View {
+        if whole {
+            label.fixedSize().layoutPriority(1)
+        } else {
+            label
+        }
+    }
+
+    private var label: some View {
         Text(text)
             .font(.system(size: 13, weight: .semibold))
             .lineLimit(1)

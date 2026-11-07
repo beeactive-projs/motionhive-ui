@@ -12,9 +12,9 @@ import {
   RestLiveActionTypes,
   RestLiveState,
 } from '../../../_shared/native/rest-live';
-import { tappedRest } from '../logger/logger-flow';
+import { estimatedRest, tappedRest } from '../logger/logger-flow';
 import { ActiveSessionStore } from './active-session.store';
-import { liveState } from './lock-screen.config';
+import { liveState, liveValues } from './lock-screen.config';
 import { WorkoutSettingsStore } from './workout-settings.store';
 
 /** Who applies the lock screen's buttons while the logger is open. */
@@ -30,7 +30,8 @@ export type LockScreenHandler = (action: RestLiveAction) => void;
  * are taken here as soon as the app runs again. The open logger applies them
  * as if its own bar had been tapped (`attach`); with the logger closed, the
  * rest kept in the store is moved on or ended here, and an ended rest is
- * saved as an exact one.
+ * saved as an exact one. A ✓ is saved here too, at the moment of the tap,
+ * Skip set passes the set over, and Continue ends the pause when it was tapped.
  *
  * Off when the person turned "On the lock screen" off, and on the web.
  */
@@ -122,7 +123,7 @@ export class LockScreenService {
       this._store.next(),
       (key, params) => this._translateService.instant(key, params),
       Date.now(),
-      this._store.liveNext(),
+      this._store.liveSteps(),
     );
   }
 
@@ -150,6 +151,28 @@ export class LockScreenService {
       this._handler(action);
       return;
     }
+    const session = this._store.session();
+    if (!session) {
+      return;
+    }
+    if (action.type === RestLiveActionTypes.Log) {
+      this._logSet(session.id, action);
+      return;
+    }
+    if (action.type === RestLiveActionTypes.SkipSet) {
+      if (action.setId) {
+        this._store.pass(session.id, action.setId);
+        this._store.moveOnFrom(action.setId);
+      }
+      return;
+    }
+    if (action.type === RestLiveActionTypes.Resume) {
+      this._workoutLogService
+        .resume(session.id, action.at)
+        .pipe(take(1))
+        .subscribe({ next: (log) => this._store.track(log), error: () => undefined });
+      return;
+    }
     const rest = this._store.rest();
     if (!rest || rest.logId !== this._store.session()?.id) return;
     if (action.type === RestLiveActionTypes.Extend) {
@@ -163,5 +186,51 @@ export class LockScreenService {
       .logSet(rest.logId, rest.setId, { restAfterSeconds: measured.seconds, restSource: measured.source })
       .pipe(take(1))
       .subscribe({ error: () => undefined });
+  }
+
+  /**
+   * ✓ with the logger closed: the set saved as the button showed it, at the
+   * moment of the tap, the rest before it measured as a tick in the app
+   * would, and the rest after it running from then, as on the lock screen.
+   */
+  private _logSet(logId: string, action: RestLiveAction): void {
+    const setId = action.setId;
+    if (!setId) {
+      return;
+    }
+    const values = liveValues(action.values);
+    const before = this._store.rest();
+    if (before && before.logId === logId && before.setId !== setId) {
+      const gap = (action.at - before.startedAt) / 1000;
+      const measured = estimatedRest(gap, before.planned, {
+        reps: values.reps ?? null,
+        durationSeconds: values.durationSeconds ?? null,
+      });
+      if (measured) {
+        this._workoutLogService
+          .logSet(logId, before.setId, { restAfterSeconds: measured.seconds, restSource: measured.source })
+          .pipe(take(1))
+          .subscribe({ error: () => undefined });
+      }
+    }
+    this._workoutLogService
+      .logSet(logId, setId, { ...values, isCompleted: true, completedAt: new Date(action.at).toISOString() })
+      .pipe(take(1))
+      .subscribe({ error: () => undefined });
+
+    const step = this._store.moveOnFrom(setId);
+    if (!step || step.rest === null) {
+      this._store.setRest(null);
+      return;
+    }
+    this._store.setRest({
+      logId,
+      exerciseId: step.exerciseId,
+      setId,
+      startedAt: action.at,
+      endsAt: action.at + step.rest * 1000,
+      planned: step.rest,
+      next: this._store.next(),
+    });
   }
 }

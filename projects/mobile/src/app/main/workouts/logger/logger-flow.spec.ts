@@ -19,6 +19,7 @@ import {
   lastLine,
   loggingOrder,
   nextAfter,
+  withTicked,
   planLine,
   prefillValue,
   restAfterTick,
@@ -104,6 +105,21 @@ describe('focus order', () => {
     const b = exercise('b', [set({ id: 'b1', isCompleted: true })]);
     expect(nextAfter([a, b], { exerciseId: 'b', setId: 'b1' })?.set.id).toBe('a1');
     expect(nextAfter([b], { exerciseId: 'b', setId: 'b1' })).toBeNull();
+  });
+
+  it('goes on past sets passed over, and leaves them unticked', () => {
+    const a = exercise('a', [set({ id: 'a1' }), set({ id: 'a2' }), set({ id: 'a3' })]);
+    const passed = new Set(['a1']);
+    expect(focusOf([a], true, passed)).toEqual({ exerciseId: 'a', setId: 'a2' });
+    expect(nextAfter([a], { exerciseId: 'a', setId: 'a2' }, true, passed)?.set.id).toBe('a3');
+    expect(focusOf([a], true, new Set(['a1', 'a2', 'a3']))).toBeNull();
+  });
+
+  it('ticks a set in a copy, for what the lock screen shows next', () => {
+    const a = exercise('a', [set({ id: 'a1' }), set({ id: 'a2' })]);
+    const after = withTicked([a], 'a1');
+    expect(focusOf(after)).toEqual({ exerciseId: 'a', setId: 'a2' });
+    expect(a.sets?.[0].isCompleted).toBeFalsy();
   });
 });
 
