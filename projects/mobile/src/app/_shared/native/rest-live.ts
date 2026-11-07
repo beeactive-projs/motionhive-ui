@@ -151,7 +151,7 @@ export const RestLiveActionTypes = {
   Skip: 'skip',
   /** Start set, from zero on. */
   Start: 'start',
-  /** ✓ on the next set: `setId` ticked with `values`, at `at`; its rest started then. */
+  /** ✓ on the next set: `setId` ticked with `values`, at `at`; its rest runs to `endsAt`. */
   Log: 'log',
   /** Skip set: `setId` passed over, left unticked. */
   SkipSet: 'skipSet',
@@ -165,6 +165,9 @@ export interface RestLiveAction {
   type: RestLiveActionType;
   /** When the button was tapped. */
   at: number;
+  /** The workout whose lock screen it was; missing on notes from before it was sent. */
+  logId?: string;
+  /** +15: the rest's new end. ✓: the end of the rest it started; missing when none did. */
   endsAt?: number;
   /** ✓ and Skip set: the set. */
   setId?: string;

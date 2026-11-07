@@ -290,7 +290,7 @@ ion-card.superset .sets {
 
 /* The hint that the label opens something: the round's ⋯. */
 .round-more {
-  font-size: 1rem;
+  font-size: var(--mh-icon-sm);
 }
 
 /* A set row that swipes: the item carries no look of its own, the row

@@ -30,6 +30,11 @@ const REST_NOTIFICATION_ID = 1;
  * alternative — schedule always — fires an OS banner over a user who is
  * watching the countdown, on top of the haptic the bar already gives them.
  *
+ * It follows the workout's one rest, `ActiveSessionStore.rest()`, whether
+ * the logger or the lock screen started it: `LockScreenService` feeds it from
+ * sign-in on, so a rest begun on the lock screen still alerts after the app
+ * was opened and left again.
+ *
  * On the web there is no plugin, so every method is a no-op and the bar
  * behaves as it always did.
  */
@@ -69,9 +74,9 @@ export class RestAlertService {
   }
 
   /**
-   * Mirror the rest timer's deadline. Pass null when rest ends, is skipped,
-   * or the user leaves the workout. Safe to call on every change — nothing
-   * reaches the OS until the app is actually backgrounded.
+   * Mirror the rest's deadline (`LockScreenService`, from the store). Null
+   * when rest ends, is skipped, or the workout is left. Safe to call on
+   * every change — nothing reaches the OS until the app is backgrounded.
    */
   track(endsAt: number | null, next = ''): void {
     this.endsAt = endsAt;

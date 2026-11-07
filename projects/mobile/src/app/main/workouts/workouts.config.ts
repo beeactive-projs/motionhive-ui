@@ -49,7 +49,6 @@ import {
   closeOutline,
   copyOutline,
   createOutline,
-  ellipsisHorizontal,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
@@ -107,7 +106,6 @@ export const WORKOUT_ICONS = {
   closeOutline,
   copyOutline,
   createOutline,
-  ellipsisHorizontal,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
@@ -1579,6 +1577,25 @@ export function exerciseActions(
     },
   ];
 }
+
+/** What a round of a superset offers when its label is tapped. */
+export const RoundActionIds = {
+  Delete: 'delete',
+} as const;
+
+export type RoundActionId = (typeof RoundActionIds)[keyof typeof RoundActionIds];
+
+/** Deleting a round loses every set in it, of every exercise: destructive. */
+export const ROUND_ACTIONS: readonly SheetAction<RoundActionId>[] = [
+  {
+    id: RoundActionIds.Delete,
+    label: 'workouts.superset.deleteRound',
+    hint: 'workouts.superset.deleteRoundHint',
+    icon: 'trash-outline',
+    color: 'danger',
+    destructive: true,
+  },
+];
 
 // ─── Routine verbs ────────────────────────────────────────────────────────
 

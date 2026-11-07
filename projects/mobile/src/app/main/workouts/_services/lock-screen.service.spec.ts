@@ -77,7 +77,7 @@ function setup() {
 describe('LockScreenService, the lock screen buttons with the logger closed', () => {
   it('saves a ✓ at the moment of the tap and runs the rest after it, as the lock screen does', () => {
     const { store, logSet, apply } = setup();
-    store.setNext('set-2 · 62.5 kg × 8 · Bench press', [step('set-2'), step('set-3')]);
+    store.setNext('wl-1', 'set-2 · 62.5 kg × 8 · Bench press', [step('set-2'), step('set-3')]);
     store.setRest({
       logId: 'wl-1',
       exerciseId: 'ex-1',
@@ -113,7 +113,7 @@ describe('LockScreenService, the lock screen buttons with the logger closed', ()
 
   it('starts no rest after a ✓ that has none', () => {
     const { store, apply } = setup();
-    store.setNext('', [step('set-2', { rest: null, final: true })]);
+    store.setNext('wl-1', '', [step('set-2', { rest: null, final: true })]);
 
     apply({ type: RestLiveActionTypes.Log, at: START, setId: 'set-2', exerciseId: 'ex-1', values: { reps: 8 } });
 
@@ -123,7 +123,7 @@ describe('LockScreenService, the lock screen buttons with the logger closed', ()
 
   it('passes a skipped set over and leaves it unticked', () => {
     const { store, logSet, apply } = setup();
-    store.setNext('', [step('set-2'), step('set-3')]);
+    store.setNext('wl-1', '', [step('set-2'), step('set-3')]);
 
     apply({ type: RestLiveActionTypes.SkipSet, at: START, setId: 'set-2' });
 

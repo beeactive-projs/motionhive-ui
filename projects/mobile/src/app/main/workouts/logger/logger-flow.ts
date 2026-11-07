@@ -319,18 +319,37 @@ export function setBadge(
 }
 
 /** Which log column each set field writes to. */
-export const PAYLOAD_KEY: Record<
-  SetField,
-  'weightKg' | 'reps' | 'durationSeconds' | 'distanceMeters'
-> = {
+export const PAYLOAD_KEY = {
   [SetFields.Weight]: 'weightKg',
   [SetFields.Reps]: 'reps',
   [SetFields.Duration]: 'durationSeconds',
   [SetFields.Distance]: 'distanceMeters',
-};
+} as const satisfies Record<SetField, keyof LoggedSet>;
+
+/** A log column a set field writes to: what a set's values are keyed by. */
+export type PayloadKey = (typeof PAYLOAD_KEY)[SetField];
 
 export function cellValue(set: LoggedSet | null | undefined, field: SetField): number | null {
   return set?.[PAYLOAD_KEY[field]] ?? null;
+}
+
+/** A set as the list draws it, as much as `shownValue` reads. */
+export interface ShownSet {
+  set: LoggedSet;
+  prefill: Partial<Record<SetField, number | null>>;
+}
+
+/** What a set shows: what was typed, else its pre-fill. */
+export function shownValue(row: ShownSet, field: SetField): number | null {
+  const typed = cellValue(row.set, field);
+  if (typed !== null) {
+    return typed;
+  }
+  const prefill = row.prefill[field];
+  if (prefill === undefined) {
+    return null;
+  }
+  return prefill;
 }
 
 /**
@@ -429,6 +448,25 @@ export function setLine(
   return values.map((v) => fieldText(v.field, v.value, withUnit)).join(joiner);
 }
 
+/** The exercise has one set left to tick: the one about to be done is its last. */
+export function isLastLeft(sets: readonly LoggedSet[]): boolean {
+  return sets.filter((set) => !set.isCompleted).length === 1;
+}
+
+/**
+ * The set to do next in one line, what to load first: "Set 3 · 62.5 kg × 8
+ * · Bench press · Last set". The same on the rest bar, the lock screen and
+ * the rest-over alert. `lastSet` is the "Last set" words, or empty.
+ */
+export function nextSetLine(
+  set: string,
+  target: string,
+  exercise: string,
+  lastSet: string,
+): string {
+  return [set, target, exercise, lastSet].filter(Boolean).join(' · ');
+}
+
 /** "last 60 × 8": the same set last time, short. Empty when there was none. */
 export function lastLine(fields: readonly SetField[], previous: LoggedSet | null): string {
   if (!previous) return '';
@@ -475,6 +513,28 @@ export function restAfterTick(
     choices.personDefault ??
     DEFAULT_REST_SECONDS
   );
+}
+
+/**
+ * What follows ticking `done` (at `ref`): the rest after it, from the set
+ * after it in logging order (none within a superset round), and whether
+ * nothing is left to do after it.
+ */
+export function afterTick(
+  exercises: readonly LoggedExercise[],
+  ref: SetRef,
+  done: LoggedSet,
+  rounds: boolean,
+  passed: ReadonlySet<string>,
+  choices: Omit<RestChoices, 'sameRound'>,
+): { rest: number | null; final: boolean } {
+  const after = nextAfter(exercises, ref, rounds, passed);
+  if (!after) {
+    return { rest: restAfterTick(done, null, choices), final: true };
+  }
+  const afterRef = { exerciseId: after.exercise.id, setId: after.set.id };
+  const inRound = sameRound(exercises, ref, afterRef, rounds);
+  return { rest: restAfterTick(done, after.set, { ...choices, sameRound: inRound }), final: false };
 }
 
 /** A rest under this is not worth storing: it was a fumble, not a rest. */

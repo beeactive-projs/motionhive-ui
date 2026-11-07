@@ -6,6 +6,7 @@ import { AssignedSet, ExerciseKind, ExerciseSetType, LoggedExercise, LoggedSet, 
 import {
   BadgeTones,
   WARMUP_REST_SECONDS,
+  afterTick,
   asksEffort,
   effortTarget,
   estimatedRest,
@@ -16,15 +17,18 @@ import {
   tappedRest,
   focusOf,
   foldedSummary,
+  isLastLeft,
   lastLine,
   loggingOrder,
   nextAfter,
+  nextSetLine,
   withTicked,
   planLine,
   prefillValue,
   restAfterTick,
   setBadge,
   setLine,
+  shownValue,
 } from './logger-flow';
 
 function set(partial: Partial<LoggedSet> = {}): LoggedSet {
@@ -178,6 +182,24 @@ describe('set lines', () => {
     expect(lastLine(kgReps, set({ weightKg: 60, reps: 8 }))).toBe('last 60 × 8');
     expect(lastLine(kgReps, null)).toBe('');
   });
+
+  it('shows what was typed, else the pre-fill, else nothing', () => {
+    const row = { set: set({ reps: 10 }), prefill: { [SetFields.Weight]: 62.5, [SetFields.Reps]: 8 } };
+    expect(shownValue(row, SetFields.Reps)).toBe(10);
+    expect(shownValue(row, SetFields.Weight)).toBe(62.5);
+    expect(shownValue(row, SetFields.Duration)).toBeNull();
+    expect(shownValue({ ...row, prefill: { [SetFields.Weight]: null } }, SetFields.Weight)).toBeNull();
+  });
+
+  it('writes the next set in one line, with Last set on an exercise\'s last', () => {
+    expect(nextSetLine('Set 3', '62.5 kg × 8', 'Bench press', 'Last set')).toBe(
+      'Set 3 · 62.5 kg × 8 · Bench press · Last set',
+    );
+    expect(nextSetLine('Set 1', '', 'Push-ups', '')).toBe('Set 1 · Push-ups');
+    expect(isLastLeft([set({ isCompleted: true }), set()])).toBe(true);
+    expect(isLastLeft([set(), set()])).toBe(false);
+    expect(isLastLeft([set({ isCompleted: true })])).toBe(false);
+  });
 });
 
 describe('restAfterTick', () => {
@@ -203,6 +225,18 @@ describe('restAfterTick', () => {
   it('does not rest before a drop set, or after the last set', () => {
     expect(restAfterTick(set(), set({ setType: ExerciseSetType.Dropset }))).toBeNull();
     expect(restAfterTick(set(), null)).toBeNull();
+  });
+
+  it('rests after a tick by the set after it, and says when nothing is left', () => {
+    const a1 = set({ id: 'a1', plannedRestSeconds: 120 });
+    const list = [exercise('a', [a1, set({ id: 'a2' })])];
+    const ref = { exerciseId: 'a', setId: 'a1' };
+    expect(afterTick(list, ref, a1, true, new Set(), {})).toEqual({ rest: 120, final: false });
+    expect(afterTick(list, ref, a1, true, new Set(['a2']), {})).toEqual({ rest: null, final: true });
+    expect(afterTick(list, ref, set({ id: 'a1' }), true, new Set(), { personDefault: 75 })).toEqual({
+      rest: 75,
+      final: false,
+    });
   });
 });
 
@@ -299,6 +333,11 @@ describe('supersets', () => {
     expect(sameRound(list, { exerciseId: 'b', setId: 'b1' }, { exerciseId: 'a', setId: 'a2' })).toBe(false);
     expect(sameRound(list, { exerciseId: 'a', setId: 'a1' }, { exerciseId: 'b', setId: 'b1' }, false)).toBe(false);
     expect(restAfterTick(set(), set(), { sameRound: true })).toBeNull();
+    const first = set({ id: 'a1' });
+    const round = [exercise('a', [first, set({ id: 'a2' })], { supersetGroupId: 1 }), b()];
+    const ref = { exerciseId: 'a', setId: 'a1' };
+    expect(afterTick(round, ref, first, true, new Set(), {})).toEqual({ rest: null, final: false });
+    expect(afterTick(round, ref, first, false, new Set(), {})).toEqual({ rest: 90, final: false });
   });
 
   it('badges a member set with its tag', () => {

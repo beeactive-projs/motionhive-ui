@@ -19,7 +19,7 @@
         [disabled]="!store.log()"
         (click)="openOptions()"
       >
-        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+        <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
       </ion-button>
       <ion-button class="finish" fill="solid" shape="round" [disabled]="!store.log() || finishing()" (click)="finish()">
         {{ 'workouts.logger.finish' | translate }}
@@ -142,7 +142,7 @@
                 >
                   <span class="round-name">
                     {{ 'workouts.superset.round' | translate: { number: round.index + 1 } }}
-                    <ion-icon class="round-more" name="ellipsis-horizontal" aria-hidden="true" />
+                    <ion-icon class="round-more" name="ellipsis-horizontal-outline" aria-hidden="true" />
                   </span>
                   @if (round.done) {
                     <span class="round-done">{{ 'workouts.superset.done' | translate }}</span>

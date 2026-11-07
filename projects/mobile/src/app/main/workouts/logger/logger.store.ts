@@ -226,38 +226,11 @@ export class LoggerStore {
   }
 
   /**
-   * Optimistic like every write here, but a failed delete cannot be shrugged
-   * off — the row would be gone locally and back on the next load. So a
-   * failure re-reads the log and tells the caller.
-   */
-  removeSet(exerciseId: string, setId: string, onError?: () => void): void {
-    const log = this._log();
-    if (!log) return;
-    // Edits still waiting on an in-flight write would only 404 once it lands.
-    this._queued.delete(setId);
-    this._updateExercise(exerciseId, (ex) => ({
-      ...ex,
-      sets: (ex.sets ?? []).filter((s) => s.id !== setId),
-    }));
-    this._workoutLogService
-      .removeSet(log.id, setId)
-      .pipe(take(1))
-      .subscribe({
-        error: () => {
-          onError?.();
-          this._workoutLogService
-            .get(log.id)
-            .pipe(take(1), catchError(() => of(null)))
-            .subscribe((fresh) => {
-              if (fresh) this._log.set(fresh);
-            });
-        },
-      });
-  }
-
-  /**
-   * Several sets gone at once (a whole round of a superset): off the screen
-   * now, in one call to the server. If it fails, the workout is read again.
+   * One set or several (a whole round of a superset): off the screen now, in
+   * one call to the server, all or none. Optimistic like every write here,
+   * but a failed delete cannot be shrugged off — the rows would be gone
+   * locally and back on the next load. So a failure re-reads the log and
+   * tells the caller.
    */
   removeSets(sets: readonly { exerciseId: string; setId: string }[], onError?: () => void): void {
     const log = this._log();
@@ -267,6 +240,7 @@ export class LoggerStore {
     const gone = new Set<string>();
     for (const { setId } of sets) {
       gone.add(setId);
+      // Edits still waiting on an in-flight write would only 404 once it lands.
       this._queued.delete(setId);
     }
     const exerciseIds = new Set(sets.map((entry) => entry.exerciseId));

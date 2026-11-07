@@ -1,5 +1,6 @@
-import { RestLiveState, RestLiveStep } from '../../../_shared/native/rest-live';
+import { RestLiveAction, RestLiveState, RestLiveStep } from '../../../_shared/native/rest-live';
 import { OVERTIME_CEILING_SECONDS } from '../_components/rest-timer-bar/rest-timer-bar';
+import { PAYLOAD_KEY, PayloadKey } from '../logger/logger-flow';
 import { secondsToClock, workoutElapsedSeconds } from '../workouts.config';
 import { ActiveRest, ActiveSession, LiveNext, LiveStep, LiveValues } from './active-session.store';
 
@@ -16,8 +17,8 @@ const MORE_REST_SECONDS = 30;
  */
 export const STEPS_BUDGET_BYTES = 2400;
 
-/** The values ✓ may save, and nothing else. */
-const VALUE_KEYS: readonly (keyof LiveValues)[] = ['weightKg', 'reps', 'durationSeconds', 'distanceMeters'];
+/** The values ✓ may save, and nothing else: the columns a set's fields write to. */
+const VALUE_KEYS: readonly PayloadKey[] = Object.values(PAYLOAD_KEY);
 
 /**
  * What the lock screen shows for the workout in progress, from the same
@@ -101,6 +102,63 @@ export function liveValues(raw: Record<string, unknown> | null | undefined): Liv
     }
   }
   return values;
+}
+
+/**
+ * Whether a ✓ note is for the set the lock screen shows next. One for any
+ * other set was handed over twice, or is for a set already moved past.
+ * With no sets ahead kept, nothing tells them apart: it counts as next.
+ */
+export function isNextStep(steps: readonly LiveStep[], setId: string): boolean {
+  if (steps.length === 0) {
+    return true;
+  }
+  return steps[0].setId === setId;
+}
+
+/**
+ * The rest a ✓ on the lock screen started, as the lock screen started it:
+ * the step's own rest when the app knows the step, else the end the note
+ * carries (the app restarted without the sets ahead). Null when none started.
+ */
+export function liveTickRest(
+  logId: string,
+  action: RestLiveAction,
+  step: LiveStep | null,
+  next: string,
+): ActiveRest | null {
+  const setId = action.setId;
+  if (!setId) {
+    return null;
+  }
+  if (step) {
+    if (step.rest === null) {
+      return null;
+    }
+    return {
+      logId,
+      exerciseId: step.exerciseId,
+      setId,
+      startedAt: action.at,
+      endsAt: action.at + step.rest * 1000,
+      planned: step.rest,
+      next,
+    };
+  }
+  const endsAt = action.endsAt;
+  const exerciseId = action.exerciseId;
+  if (endsAt === undefined || !exerciseId || endsAt <= action.at) {
+    return null;
+  }
+  return {
+    logId,
+    exerciseId,
+    setId,
+    startedAt: action.at,
+    endsAt,
+    planned: Math.round((endsAt - action.at) / 1000),
+    next,
+  };
 }
 
 type NextPieces = Pick<

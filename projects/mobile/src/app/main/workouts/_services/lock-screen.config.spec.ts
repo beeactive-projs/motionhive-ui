@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import { RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { ActiveRest, ActiveSession, LiveStep } from './active-session.store';
-import { liveState, liveValues, STEPS_BUDGET_BYTES, Translate } from './lock-screen.config';
+import {
+  isNextStep,
+  liveState,
+  liveTickRest,
+  liveValues,
+  STEPS_BUDGET_BYTES,
+  Translate,
+} from './lock-screen.config';
 
 const START = Date.parse('2026-11-02T17:00:00Z');
 const NOW = START + 20 * 60_000;
@@ -140,5 +148,60 @@ describe('liveValues', () => {
       reps: 8,
     });
     expect(liveValues(undefined)).toEqual({});
+  });
+});
+
+describe('isNextStep', () => {
+  it('takes a ✓ for the set shown next, and none for a set already moved past', () => {
+    const after: LiveStep = { ...bench, setId: 'set-4' };
+    expect(isNextStep([bench, after], 'set-3')).toBe(true);
+    expect(isNextStep([after], 'set-3')).toBe(false);
+  });
+
+  it('takes it when no sets ahead were kept: nothing tells them apart', () => {
+    expect(isNextStep([], 'set-3')).toBe(true);
+  });
+});
+
+describe('liveTickRest', () => {
+  const tick = {
+    type: RestLiveActionTypes.Log,
+    at: NOW,
+    setId: 'set-3',
+    exerciseId: 'ex-1',
+    endsAt: NOW + 120_000,
+  };
+
+  it('runs the step’s own rest from the tap', () => {
+    expect(liveTickRest('log-1', tick, bench, 'Set 4 · Bench press')).toEqual({
+      logId: 'log-1',
+      exerciseId: 'ex-1',
+      setId: 'set-3',
+      startedAt: NOW,
+      endsAt: NOW + 90_000,
+      planned: 90,
+      next: 'Set 4 · Bench press',
+    });
+  });
+
+  it('starts none after a step that has no rest', () => {
+    expect(liveTickRest('log-1', tick, { ...bench, rest: null }, '')).toBeNull();
+  });
+
+  it('keeps the rest the lock screen started when the app no longer knows the step', () => {
+    expect(liveTickRest('log-1', tick, null, '')).toEqual({
+      logId: 'log-1',
+      exerciseId: 'ex-1',
+      setId: 'set-3',
+      startedAt: NOW,
+      endsAt: NOW + 120_000,
+      planned: 120,
+      next: '',
+    });
+  });
+
+  it('starts none when neither the step nor the note says one started', () => {
+    expect(liveTickRest('log-1', { ...tick, endsAt: undefined }, null, '')).toBeNull();
+    expect(liveTickRest('log-1', { ...tick, setId: undefined }, bench, '')).toBeNull();
   });
 });

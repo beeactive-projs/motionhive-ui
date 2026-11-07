@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { trophy } from 'ionicons/icons';
+import { trophyOutline } from 'ionicons/icons';
 
 import {
   APP_HEX_SHAPE,
@@ -78,7 +78,7 @@ export class HiveBoard {
 
   constructor() {
     // The record's trophy; the board is on three screens, so it brings its own.
-    addIcons({ trophy });
+    addIcons({ trophyOutline });
   }
 
   readonly Looks = BoardLooks;

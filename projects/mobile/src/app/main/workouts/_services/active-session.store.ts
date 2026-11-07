@@ -7,6 +7,8 @@ import { catchError, take } from 'rxjs/operators';
 
 import { WorkoutLog, WorkoutLogService, WorkoutLogStatus } from 'core';
 
+import type { PayloadKey } from '../logger/logger-flow';
+
 /** The running workout, as much as a screen outside the logger needs. */
 export interface ActiveSession {
   id: string;
@@ -60,7 +62,7 @@ export interface LiveNext {
 }
 
 /** What ✓ on the lock screen saves for a set: the values its button shows. */
-export type LiveValues = Partial<Record<'weightKg' | 'reps' | 'durationSeconds' | 'distanceMeters', number>>;
+export type LiveValues = Partial<Record<PayloadKey, number>>;
 
 /**
  * One set to come, for the lock screen: the pieces it shows, and what its
@@ -88,9 +90,21 @@ interface PassedSets {
   setIds: string[];
 }
 
+/**
+ * What comes next in one workout, as the logger last said: kept, so the
+ * lock screen keeps its ✓, Other value and Skip set after the app restarts.
+ */
+interface AheadSets {
+  logId: string;
+  next: string;
+  steps: LiveStep[];
+}
+
 const REST_KEY = 'mh-active-rest';
 const NO_SETS: ReadonlySet<string> = new Set();
+const NO_STEPS: readonly LiveStep[] = [];
 const PASSED_KEY = 'mh-passed-sets';
+const AHEAD_KEY = 'mh-live-steps';
 
 /**
  * The workout in progress, across the app (Workouts R2, section 13). Nothing
@@ -106,18 +120,33 @@ export class ActiveSessionStore {
 
   private readonly _session = signal<ActiveSession | null>(null);
   private readonly _rest = signal<ActiveRest | null>(null);
-  private readonly _next = signal('');
-  private readonly _liveSteps = signal<readonly LiveStep[]>([]);
+  private readonly _ahead = signal<AheadSets | null>(null);
+  /** The last `_ahead` saved, so an unchanged one is not written again. */
+  private _aheadSaved = '';
   private readonly _passed = signal<PassedSets | null>(null);
   private readonly _checked = signal(false);
+  /** True once what was kept on the phone (rest, passed sets, sets ahead) is back. */
+  private readonly _local = signal(false);
   private _restored = false;
 
   readonly session = this._session.asReadonly();
   readonly rest = this._rest.asReadonly();
   /** What the logger says comes next ("Set 3 · 62.5 kg × 8 · Bench press"), rest or not. */
-  readonly next = this._next.asReadonly();
+  readonly next = computed(() => {
+    const ahead = this._aheadOfSession();
+    if (!ahead) {
+      return '';
+    }
+    return ahead.next;
+  });
   /** The sets to come, in pieces, for the lock screen; empty when nothing is left or the logger never opened. */
-  readonly liveSteps = this._liveSteps.asReadonly();
+  readonly liveSteps = computed<readonly LiveStep[]>(() => {
+    const ahead = this._aheadOfSession();
+    if (!ahead) {
+      return NO_STEPS;
+    }
+    return ahead.steps;
+  });
   /** The sets of the running workout passed over with "Skip set": left unticked, and the focus goes past them. */
   readonly passed = computed<ReadonlySet<string>>(() => {
     const passed = this._passed();
@@ -129,10 +158,16 @@ export class ActiveSessionStore {
   });
   /** True once the API has said whether a workout is open: until then, null means unknown. */
   readonly checked = this._checked.asReadonly();
+  /**
+   * Checked, and what was kept on the phone is back: only then can a note
+   * from the lock screen be applied, or the lock screen be redrawn.
+   */
+  readonly ready = computed(() => this._checked() && this._local());
 
   constructor() {
-    void this._restoreRest();
-    void this._restorePassed();
+    // Each restore keeps its own failures, so this always arrives.
+    const restores = [this._restoreRest(), this._restorePassed(), this._restoreAhead()];
+    void Promise.all(restores).then(() => this._local.set(true));
     this.refresh();
     if (Capacitor.isNativePlatform()) {
       const listener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
@@ -176,9 +211,16 @@ export class ActiveSessionStore {
     if (rest && rest.logId !== log.id) this.setRest(null);
   }
 
-  setNext(next: string, steps: readonly LiveStep[] = []): void {
-    this._next.set(next);
-    this._liveSteps.set(steps);
+  /** What comes next in workout `logId`, kept for after a restart. */
+  setNext(logId: string, next: string, steps: readonly LiveStep[] = []): void {
+    const ahead: AheadSets = { logId, next, steps: [...steps] };
+    const saved = JSON.stringify(ahead);
+    if (saved === this._aheadSaved) {
+      return;
+    }
+    this._aheadSaved = saved;
+    this._ahead.set(ahead);
+    void this._save(AHEAD_KEY, ahead);
   }
 
   /**
@@ -187,7 +229,11 @@ export class ActiveSessionStore {
    * screen already shows.
    */
   moveOnFrom(setId: string): LiveStep | null {
-    const steps = this._liveSteps();
+    const ahead = this._aheadOfSession();
+    if (!ahead) {
+      return null;
+    }
+    const steps = ahead.steps;
     const at = steps.findIndex((step) => step.setId === setId);
     if (at < 0) {
       return null;
@@ -197,7 +243,7 @@ export class ActiveSessionStore {
     if (rest.length > 0) {
       next = rest[0].line;
     }
-    this.setNext(next, rest);
+    this.setNext(ahead.logId, next, rest);
     return steps[at];
   }
 
@@ -225,11 +271,22 @@ export class ActiveSessionStore {
   end(): void {
     this._checked.set(true);
     this._session.set(null);
-    this._next.set('');
-    this._liveSteps.set([]);
+    this._ahead.set(null);
+    this._aheadSaved = '';
+    void this._save(AHEAD_KEY, null);
     this.setRest(null);
     this._passed.set(null);
     void this._save(PASSED_KEY, null);
+  }
+
+  /** The sets ahead, when they are the running workout's. */
+  private _aheadOfSession(): AheadSets | null {
+    const ahead = this._ahead();
+    const session = this._session();
+    if (!ahead || !session || ahead.logId !== session.id) {
+      return null;
+    }
+    return ahead;
   }
 
   private async _restoreRest(): Promise<void> {
@@ -261,6 +318,26 @@ export class ActiveSessionStore {
       }
     } catch {
       // Nothing to restore: the focus is simply the first set left.
+    }
+  }
+
+  private async _restoreAhead(): Promise<void> {
+    try {
+      const { value } = await Preferences.get({ key: AHEAD_KEY });
+      if (!value || this._ahead()) {
+        return;
+      }
+      const ahead = JSON.parse(value) as AheadSets;
+      const valid =
+        !!ahead &&
+        typeof ahead.logId === 'string' &&
+        typeof ahead.next === 'string' &&
+        Array.isArray(ahead.steps);
+      if (valid) {
+        this._ahead.set(ahead);
+      }
+    } catch {
+      // Nothing to restore: the lock screen shows the next set once the logger opens.
     }
   }
 

@@ -24,14 +24,21 @@ enum RestTimerActions {
     static let nudgeSeconds: TimeInterval = 15
     /// "+30 s" once the rest is over (`MORE_REST_SECONDS`).
     static let moreSeconds: TimeInterval = 30
+    /// The intents add notes on their own thread while the plugin takes them
+    /// on its queue: one at a time, so none is lost or handed over twice.
+    private static let queueLock = NSLock()
 
     static func pending() -> [[String: Any]] {
-        UserDefaults.standard.array(forKey: queueKey) as? [[String: Any]] ?? []
+        queueLock.lock()
+        defer { queueLock.unlock() }
+        return queue()
     }
 
     /// The notes, handed over once.
     static func take() -> [[String: Any]] {
-        let actions = pending()
+        queueLock.lock()
+        defer { queueLock.unlock() }
+        let actions = queue()
         UserDefaults.standard.removeObject(forKey: queueKey)
         return actions
     }
@@ -40,8 +47,19 @@ enum RestTimerActions {
         (date.timeIntervalSince1970 * 1000).rounded()
     }
 
-    private static func record(_ action: [String: Any]) {
-        UserDefaults.standard.set(pending() + [action], forKey: queueKey)
+    /// Only under `queueLock`.
+    private static func queue() -> [[String: Any]] {
+        UserDefaults.standard.array(forKey: queueKey) as? [[String: Any]] ?? []
+    }
+
+    /// A note for the web side, with the workout it was left on, so one
+    /// from another workout's lock screen is not applied to this one.
+    private static func record(_ action: [String: Any], logId: String) {
+        var note = action
+        note["logId"] = logId
+        queueLock.lock()
+        UserDefaults.standard.set(queue() + [note], forKey: queueKey)
+        queueLock.unlock()
         NotificationCenter.default.post(name: changed, object: nil)
     }
 
@@ -84,7 +102,10 @@ enum RestTimerActions {
         state.restEndsAt = endsAt
         await activity.update(ActivityContent(state: state, staleDate: endsAt))
         await moveRestAlert(to: endsAt)
-        record(["type": "extend", "at": milliseconds(Date()), "endsAt": milliseconds(endsAt)])
+        record(
+            ["type": "extend", "at": milliseconds(Date()), "endsAt": milliseconds(endsAt)],
+            logId: activity.attributes.logId
+        )
     }
 
     /// Skip (before zero) or Start set (after): the rest ends now, and that is its length.
@@ -97,12 +118,13 @@ enum RestTimerActions {
         state.restEndsAt = nil
         await activity.update(ActivityContent(state: state, staleDate: nil))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [restAlertId])
-        record(["type": type, "at": milliseconds(Date())])
+        record(["type": type, "at": milliseconds(Date())], logId: activity.attributes.logId)
     }
 
     /// ✓ on the next set: it is done as the button showed it. The set after
     /// it shows at once, with its rest counting down and the rest-over
-    /// alert set for its end; the web side saves the set when it runs.
+    /// alert set for its end; the web side saves the set when it runs, and
+    /// takes the rest's end from the note when it no longer knows the set.
     @available(iOS 16.2, *)
     static func logSet(_ setId: String) async {
         guard let activity = Activity<RestTimerAttributes>.activities.first else { return }
@@ -125,13 +147,17 @@ enum RestTimerActions {
         if let endsAt {
             await scheduleRestAlert(at: endsAt, state: state)
         }
-        record([
+        var note: [String: Any] = [
             "type": "log",
             "at": milliseconds(now),
             "setId": step.setId,
             "exerciseId": step.exerciseId,
             "values": step.values
-        ])
+        ]
+        if let endsAt {
+            note["endsAt"] = milliseconds(endsAt)
+        }
+        record(note, logId: activity.attributes.logId)
     }
 
     /// Skip set: the next set is passed over, left unticked, and the one after shows.
@@ -141,7 +167,10 @@ enum RestTimerActions {
         var state = activity.content.state
         guard state.steps?.first?.setId == setId, state.moveOn(past: setId) != nil else { return }
         await activity.update(ActivityContent(state: state, staleDate: activity.content.staleDate))
-        record(["type": "skipSet", "at": milliseconds(Date()), "setId": setId])
+        record(
+            ["type": "skipSet", "at": milliseconds(Date()), "setId": setId],
+            logId: activity.attributes.logId
+        )
     }
 
     /// Continue on a paused workout: the clock runs again from where it stood.
@@ -154,7 +183,7 @@ enum RestTimerActions {
         state.clockFrom = now.addingTimeInterval(-TimeInterval(seconds))
         state.pausedSeconds = nil
         await activity.update(ActivityContent(state: state, staleDate: nil))
-        record(["type": "resume", "at": milliseconds(now)])
+        record(["type": "resume", "at": milliseconds(now)], logId: activity.attributes.logId)
     }
 
     /// The rest-over alert for a rest the lock screen started: the next set
