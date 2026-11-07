@@ -1,13 +1,15 @@
-/* No box of its own, so a Home with nothing to ask keeps its rhythm: the
-   card is the block in the page's column, or nothing is. */
+/* A block Home places in its column, or no box at all while there is
+   nothing to ask, so a Home without it keeps its rhythm. */
 :host {
-  display: contents;
+  display: block;
 }
 
-/* A card on the page like every card: the fill is its edge. It sits on the
-   row gutter, in line with the hive card above it. */
+:host:not(:has(> .welcome-card)) {
+  display: none;
+}
+
+/* A card on the page like every card: the fill is its edge. */
 .welcome-card {
-  margin-inline: var(--mh-row-gutter);
   display: flex;
   align-items: flex-start;
   border-radius: var(--mh-radius-card);

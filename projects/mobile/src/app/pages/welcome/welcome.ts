@@ -1,4 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -43,13 +44,22 @@ import type {
   OnboardingState,
   OnboardingStep,
   PickedLocation,
+  SetCoachDetailsPayload,
+  User,
 } from 'core';
 
+import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { ACTIVITY_ICONS, categoryIcon } from '../../_shared/config/category-icons.config';
-import { parseWelcomeSteps, welcomeReturnUrl } from '../../_shared/config/onboarding.config';
+import {
+  WELCOME_FALLBACK_URL,
+  parseWelcomeSteps,
+  welcomeReturnUrl,
+} from '../../_shared/config/onboarding.config';
 import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
+import { toggleValue } from '../../_shared/utils/list.utils';
+import { AccountStore } from '../../main/account/account.store';
 import {
   LEVEL_CHOICES,
   MAX_OTHER_WORD_LENGTH,
@@ -58,9 +68,9 @@ import {
   WELCOME_ICONS,
   canGoBack,
   coachDetailsPayload,
+  needsCategories,
   remainingSteps,
   splitOtherWords,
-  toggleId,
   welcomeProgress,
 } from './welcome.config';
 
@@ -80,6 +90,7 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
 @Component({
   selector: 'mh-welcome',
   imports: [
+    EmptyState,
     HexAvatar,
     IonButton,
     IonButtons,
@@ -96,6 +107,7 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
     IonSpinner,
     IonToggle,
     IonToolbar,
+    NgTemplateOutlet,
     SearchbarLabelDirective,
     TranslatePipe,
   ],
@@ -113,6 +125,7 @@ export class Welcome implements OnInit {
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _profileService = inject(ProfileService);
   private readonly _placeSearchService = inject(PlaceSearchService);
+  private readonly _accountStore = inject(AccountStore);
   readonly categoryStore = inject(CategoryStore);
 
   readonly Steps = OnboardingSteps;
@@ -121,7 +134,12 @@ export class Welcome implements OnInit {
   readonly maxWordLength = MAX_OTHER_WORD_LENGTH;
   readonly categoryIcon = categoryIcon;
 
-  private _returnUrl = '/tabs/home';
+  private _returnUrl: string = WELCOME_FALLBACK_URL;
+  /**
+   * The page is on its way out (or gone): an answer that comes back now lands
+   * in the stores, and never moves a screen that is not there.
+   */
+  private _gone = false;
   /** The steps a link asked for; null when the flow opened by itself. */
   private readonly _picked = signal<OnboardingStep[] | null>(null);
 
@@ -142,6 +160,9 @@ export class Welcome implements OnInit {
   readonly otherWords = signal('');
   readonly accepting = signal(true);
   private readonly _acceptingBefore = signal(true);
+  /** The switch was flipped here: the saved value, when it comes, no longer overwrites it. */
+  private _acceptingTouched = false;
+  private _coachProfileAsked = false;
   readonly place = signal<PickedLocation | null>(null);
 
   // ─── Coach details: the place search ──────────────────────────────────
@@ -202,7 +223,12 @@ export class Welcome implements OnInit {
   readonly canSkip = computed(() => this._picked() === null);
 
   readonly canContinue = computed(() => {
-    switch (this.step()) {
+    const step = this.step();
+    // Saved before the category list came, these would wipe the picks.
+    if (needsCategories(step) && !this.categoryStore.loaded()) {
+      return false;
+    }
+    switch (step) {
       case OnboardingSteps.Role:
         return this.role() !== null;
       case OnboardingSteps.CoachCategories:
@@ -214,6 +240,9 @@ export class Welcome implements OnInit {
 
   constructor() {
     addIcons({ ...WELCOME_ICONS, ...ACTIVITY_ICONS });
+    inject(DestroyRef).onDestroy(() => {
+      this._gone = true;
+    });
   }
 
   async ngOnInit(): Promise<void> {
@@ -230,6 +259,9 @@ export class Welcome implements OnInit {
     this.categoryStore.ensureLoaded();
 
     const state = await this._onboarding.ensureLoaded();
+    if (this._gone) {
+      return;
+    }
     if (!state) {
       this._leave();
       return;
@@ -254,7 +286,7 @@ export class Welcome implements OnInit {
   }
 
   toggleInterest(id: string): void {
-    this.interestIds.update((ids) => toggleId(ids, id));
+    this.interestIds.update((ids) => toggleValue(ids, id));
   }
 
   pickLevel(level: FitnessLevel): void {
@@ -268,7 +300,7 @@ export class Welcome implements OnInit {
   }
 
   toggleCoachCategory(id: string): void {
-    this.coachCategoryIds.update((ids) => toggleId(ids, id));
+    this.coachCategoryIds.update((ids) => toggleValue(ids, id));
   }
 
   onOtherWords(value: string | null | undefined): void {
@@ -285,7 +317,13 @@ export class Welcome implements OnInit {
   }
 
   onAccepting(checked: boolean): void {
+    this._acceptingTouched = true;
     this.accepting.set(checked);
+  }
+
+  /** The category list's retry, after a failed load. */
+  retryCategories(): void {
+    this.categoryStore.reload();
   }
 
   // ─── Moving on ────────────────────────────────────────────────────────
@@ -295,13 +333,22 @@ export class Welcome implements OnInit {
     if (!step || !this.canContinue() || this.saving()) {
       return;
     }
-    const save = this._save(step);
+    const coachDetails = this._coachDetails();
+    const save = this._save(step, coachDetails);
     if (!save) {
       return;
     }
     this.saving.set(true);
     save.pipe(take(1)).subscribe({
       next: (state) => {
+        if (step === OnboardingSteps.CoachDetails) {
+          this._afterCoachDetails(coachDetails);
+        }
+        // Gone mid save: the answer lands in the state and moves no screen.
+        if (this._gone) {
+          this._onboarding.set(state);
+          return;
+        }
         if (step === OnboardingSteps.Role) {
           this._afterRole(state);
         }
@@ -350,6 +397,10 @@ export class Welcome implements OnInit {
    * a Home card); opened on some steps, nothing is saved.
    */
   close(): void {
+    // Mid save the answer decides what is left; Back and Skip wait too.
+    if (this.saving()) {
+      return;
+    }
     const step = this.step();
     if (this._picked() === null && step) {
       const steps = [step, ...this._left()];
@@ -366,7 +417,10 @@ export class Welcome implements OnInit {
 
   // ─── Inside ───────────────────────────────────────────────────────────
 
-  private _save(step: OnboardingStep): Observable<OnboardingState> | null {
+  private _save(
+    step: OnboardingStep,
+    coachDetails: SetCoachDetailsPayload,
+  ): Observable<OnboardingState> | null {
     switch (step) {
       case OnboardingSteps.Role: {
         const role = this.role();
@@ -390,9 +444,7 @@ export class Welcome implements OnInit {
           otherSpecializations: splitOtherWords(this.otherWords()),
         });
       case OnboardingSteps.CoachDetails:
-        return this._onboardingService.setCoachDetails(
-          coachDetailsPayload(this.place(), this.accepting(), this._acceptingBefore()),
-        );
+        return this._onboardingService.setCoachDetails(coachDetails);
       default:
         return null;
     }
@@ -401,6 +453,9 @@ export class Welcome implements OnInit {
   /** The next step, or the way out when none is left. */
   private _advance(state: OnboardingState): void {
     this._onboarding.set(state);
+    if (this._gone) {
+      return;
+    }
     const current = this.step();
     const left = remainingSteps(state, this._picked(), current);
     this._state.set(state);
@@ -425,11 +480,45 @@ export class Welcome implements OnInit {
     }
     const user = this._authStore.user();
     if (user && !user.roles.includes(UserRoles.Instructor)) {
-      const coach = { ...user, roles: [...user.roles, UserRoles.Instructor] };
-      this._authStore.setUser(coach);
-      this._tokenService.setUser(coach);
+      this._patchUser({ roles: [...user.roles, UserRoles.Instructor] });
     }
     this._appModeStore.setMode(NavModes.Coach);
+  }
+
+  /** What the coach details screen saves, read once so the save and its echo agree. */
+  private _coachDetails(): SetCoachDetailsPayload {
+    return coachDetailsPayload(this.place(), this.accepting(), this._acceptingBefore());
+  }
+
+  /**
+   * The saved city on the signed-in user and the account's copy, as the
+   * account's location sheet leaves them (`AccountStore.syncAuthUser`), so
+   * Home, Discover and Account say the new one without a restart.
+   */
+  private _afterCoachDetails(saved: SetCoachDetailsPayload): void {
+    if (saved.isAcceptingClients !== undefined) {
+      this._accountStore.patchInstructor({ isAcceptingClients: saved.isAcceptingClients });
+    }
+    if (saved.city === undefined) {
+      return;
+    }
+    const place: Pick<User, 'city' | 'countryCode'> = { city: saved.city };
+    if (saved.countryCode !== undefined) {
+      place.countryCode = saved.countryCode;
+    }
+    this._accountStore.patchAccount(place);
+    this._patchUser(place);
+  }
+
+  /** The signed-in user changed here: in the app now, and in the copy it starts from. */
+  private _patchUser(patch: Partial<User>): void {
+    const user = this._authStore.user();
+    if (!user) {
+      return;
+    }
+    const next = { ...user, ...patch };
+    this._authStore.setUser(next);
+    this._tokenService.setUser(next);
   }
 
   private _show(step: OnboardingStep): void {
@@ -439,20 +528,34 @@ export class Welcome implements OnInit {
     }
   }
 
-  /** Whether they take clients now, so Continue never flips it by accident. */
+  /**
+   * Whether they take clients now, so Continue never flips it by accident.
+   * Asked once, however often Back returns here, and a flip made before the
+   * answer came stays.
+   */
   private _loadCoachProfile(): void {
+    if (this._coachProfileAsked) {
+      return;
+    }
+    this._coachProfileAsked = true;
     this._profileService
       .getMyProfile({ silent: true })
       .pipe(take(1))
       .subscribe({
         next: (profile) => {
           const accepting = profile.instructorProfile?.isAcceptingClients;
-          if (typeof accepting === 'boolean') {
+          if (typeof accepting !== 'boolean') {
+            return;
+          }
+          this._acceptingBefore.set(accepting);
+          if (!this._acceptingTouched) {
             this.accepting.set(accepting);
-            this._acceptingBefore.set(accepting);
           }
         },
-        error: () => undefined,
+        // Asked again on the next visit: nothing was learned.
+        error: () => {
+          this._coachProfileAsked = false;
+        },
       });
   }
 
@@ -472,6 +575,10 @@ export class Welcome implements OnInit {
   }
 
   private _leave(): void {
+    if (this._gone) {
+      return;
+    }
+    this._gone = true;
     void this._navController.navigateRoot(this._returnUrl, { animationDirection: 'forward' });
   }
 }

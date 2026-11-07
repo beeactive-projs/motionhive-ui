@@ -8,11 +8,11 @@ import { CategoryService } from '../services/onboarding/category.service';
 /**
  * MotionHive's category list, loaded once and kept: twenty rows that change
  * only with a deploy. Like `ExerciseTaxonomyStore`, callers run
- * `ensureLoaded()` and read the signals; a failure leaves the list empty and
- * the next `ensureLoaded()` tries again.
+ * `ensureLoaded()` and read the signals; a failure leaves the list empty,
+ * says so in `failed`, and the next `ensureLoaded()` tries again.
  *
- * Names arrive in the reader's language, so a language switch calls
- * `reload()`.
+ * Names arrive in the reader's language. A language switch reloads the
+ * whole app, so the list is never asked for twice in one language.
  */
 @Injectable({ providedIn: 'root' })
 export class CategoryStore {
@@ -21,9 +21,13 @@ export class CategoryStore {
   private readonly _categories = signal<Category[]>([]);
   private readonly _loaded = signal(false);
   private readonly _loading = signal(false);
+  private readonly _failed = signal(false);
 
   readonly categories = this._categories.asReadonly();
   readonly loaded = this._loaded.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  /** The last load failed: a screen that needs the list offers a retry. */
+  readonly failed = this._failed.asReadonly();
 
   /** What people train, in the list's order. */
   readonly activities = computed(() =>
@@ -49,6 +53,7 @@ export class CategoryStore {
       return;
     }
     this._loading.set(true);
+    this._failed.set(false);
     this._categoryService
       .list()
       .pipe(take(1))
@@ -58,19 +63,17 @@ export class CategoryStore {
           this._loaded.set(true);
           this._loading.set(false);
         },
-        error: () => this._loading.set(false),
+        error: () => {
+          this._loading.set(false);
+          this._failed.set(true);
+        },
       });
   }
 
-  /** After a language change: the names come from the API in the reader's language. */
+  /** Ask the API again: the retry on a screen whose load failed. */
   reload(): void {
     this._loaded.set(false);
     this.ensureLoaded();
-  }
-
-  /** The names of these ids, in the list's order; unknown ids are left out. */
-  namesOf(ids: readonly string[] | null | undefined): string[] {
-    return categoryNames(ids, this.byId());
   }
 }
 

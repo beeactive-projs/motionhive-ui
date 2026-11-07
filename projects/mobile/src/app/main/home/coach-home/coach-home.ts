@@ -17,6 +17,7 @@ import {
   AuthStore,
   formatRelativeShort,
   localDayKey,
+  NavModes,
   OnboardingSteps,
   sentenceCase,
 } from 'core';
@@ -32,7 +33,6 @@ import { HOME_STACK, HomePages } from '../home-stack.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { NeedRowItem } from '../_components/need-row/need-row';
-import { welcomeLink } from '../../../_shared/config/onboarding.config';
 import { OnboardingStateService } from '../../../_shared/services/onboarding-state.service';
 import { WelcomeCard } from '../_components/welcome-card/welcome-card';
 import {
@@ -144,6 +144,7 @@ export class CoachHome implements OnInit {
   // ─── The hive ────────────────────────────────────────────────
 
   readonly LoadStates = LoadStates;
+  readonly NavModes = NavModes;
 
   /** Set once a first load has run `SLOW_LOAD_MS`; reset by each new one. */
   private readonly _slow = signal(false);
@@ -327,8 +328,7 @@ export class CoachHome implements OnInit {
       this.createOpen.set(true);
       return;
     }
-    const link = welcomeLink([OnboardingSteps.CoachCategories], '/tabs/home');
-    void this._router.navigate([link.path], { queryParams: link.queryParams });
+    this._onboarding.open([OnboardingSteps.CoachCategories]);
   }
 
   /** The whole hive, every client a cell, in Home's stack (C1). */

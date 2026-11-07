@@ -85,15 +85,18 @@
         @if (isInstructor()) {
         <mh-settings-row [label]="'account.rows.coachingProfile' | translate" icon="ribbon-outline" iconColor="info" iconTone="shade"
           [badge]="acceptingBadge()" (select)="go('coaching')" />
-        <mh-settings-row [label]="'account.rows.coachCategories' | translate" icon="trophy-outline" iconColor="success"
-          (select)="openWelcome('COACH_CATEGORIES')" />
+        <!-- Honey: a row that edits something. -->
+        <mh-settings-row [label]="'account.rows.coachCategories' | translate" icon="trophy-outline" iconColor="primary"
+          (select)="openWelcome(WelcomeSteps.coachCategories)" />
         }
-        <!-- The welcome flow's own screens, as editors: what you like, your level and goals. -->
-        <mh-settings-row [label]="'account.rows.interests' | translate" icon="compass-outline" iconColor="teal"
-          (select)="openWelcome('INTERESTS,LEVEL')" />
+        <!-- The welcome flow's own screens, as editors: what you like, your level
+             and goals. Violet: part of the profile people see. -->
+        <mh-settings-row [label]="'account.rows.interests' | translate" icon="compass-outline" iconColor="violet"
+          (select)="openWelcome(WelcomeSteps.interests)" />
         @if (!isInstructor()) {
-        <mh-settings-row [label]="'account.rows.becomeCoach' | translate" icon="people-outline" iconColor="violet"
-          (select)="openWelcome('ROLE')" />
+        <!-- The coach role's own hue (ROLES), and never violet beside the row above. -->
+        <mh-settings-row [label]="'account.rows.becomeCoach' | translate" icon="people-outline" iconColor="primary"
+          (select)="openWelcome(WelcomeSteps.role)" />
         }
       </ion-list>
     </section>

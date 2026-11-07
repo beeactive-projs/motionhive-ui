@@ -273,3 +273,78 @@ ion-content.mh-flat-page > .mh-note-block {
 .mh-section-head ion-button + ion-button {
   margin-inline-start: 0;
 }
+
+/* ─── Stepped forms ────────────────────────────────────────────────
+   A form asked one screen at a time (the welcome flow, a new exercise):
+   "Step 2 of 3" in the header, marks above the footer's buttons, Back
+   beside the way on, and choices picked with a tap. Each form keeps its own
+   spacing around these and lays out its own tiles. */
+
+/* "Step 2 of 3" in the toolbar's end slot: a label, not a button, so it
+   sheds the button metrics `ion-buttons` would otherwise impose. */
+.mh-step-count {
+  padding-inline-end: 0.75rem;
+  color: var(--ion-color-medium);
+  white-space: nowrap;
+}
+
+/* Progress as marks, one a step. The current step is a bar rather than a
+   dot, so the place reads at a glance without counting. Decorative: the
+   header says it in words. */
+.mh-step-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+.mh-step-dots span {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-border-color);
+  transition: width 0.2s ease;
+}
+
+.mh-step-dots span.done {
+  background: var(--ion-color-primary);
+}
+
+.mh-step-dots span.on {
+  width: 1.125rem;
+  background: var(--ion-color-primary);
+}
+
+/* Back yields to the way on: going on is the common case, going back the
+   escape. `.single` when there is nothing to go back to. */
+.mh-step-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+}
+
+.mh-step-actions.single {
+  grid-template-columns: 1fr;
+}
+
+.mh-step-actions ion-button {
+  margin: 0;
+}
+
+/* A choice picked with a tap: a card whose border shows the selection, the
+   one place a card keeps an outline (surfaces-and-sheets.md). Honey marks
+   the pick, the one job the brand colour has here; each form inks its own
+   glyph and secondary line on a picked tile. */
+.mh-pick-tile {
+  border: var(--mh-hairline) solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  font-family: var(--ion-font-family);
+  text-align: start;
+  cursor: pointer;
+}
+
+.mh-pick-tile.on {
+  border-color: var(--ion-color-primary);
+  background: var(--ion-color-primary-wash);
+}

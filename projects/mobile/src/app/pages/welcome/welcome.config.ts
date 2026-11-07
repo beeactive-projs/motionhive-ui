@@ -1,4 +1,4 @@
-import { FitnessLevels, OnboardingRoles, OnboardingSteps, foldForSearch } from 'core';
+import { FitnessLevels, NavModes, OnboardingRoles, OnboardingSteps, foldForSearch } from 'core';
 import type {
   FitnessLevel,
   OnboardingRole,
@@ -8,7 +8,7 @@ import type {
   SetCoachDetailsPayload,
 } from 'core';
 import {
-  arrowBackOutline,
+  alertCircleOutline,
   barbellOutline,
   checkmarkOutline,
   closeOutline,
@@ -16,10 +16,11 @@ import {
   peopleOutline,
 } from 'ionicons/icons';
 
+import { ROLES } from '../../_shared/config/roles.config';
 
 /** The glyphs the flow draws beside the categories' own (`CATEGORY_ICONS`). */
 export const WELCOME_ICONS = {
-  arrowBackOutline,
+  alertCircleOutline,
   barbellOutline,
   checkmarkOutline,
   closeOutline,
@@ -49,8 +50,8 @@ export interface RoleChoice {
   role: OnboardingRole;
   label: string;
   detail: string;
+  /** The role's glyph and hue, as the role pill and the switch-role page draw it (`ROLES`). */
   icon: string;
-  /** The role's hue, as the role pill and the switch-role page paint it. */
   color: string;
 }
 
@@ -60,15 +61,15 @@ export const ROLE_CHOICES: readonly RoleChoice[] = [
     role: OnboardingRoles.Train,
     label: 'welcome.role.train.label',
     detail: 'welcome.role.train.detail',
-    icon: 'barbell-outline',
-    color: 'secondary',
+    icon: ROLES[NavModes.Train].icon,
+    color: ROLES[NavModes.Train].color,
   },
   {
     role: OnboardingRoles.Coach,
     label: 'welcome.role.coach.label',
     detail: 'welcome.role.coach.detail',
-    icon: 'people-outline',
-    color: 'primary',
+    icon: ROLES[NavModes.Coach].icon,
+    color: ROLES[NavModes.Coach].color,
   },
 ];
 
@@ -122,12 +123,23 @@ export function splitOtherWords(text: string): string[] {
   return words;
 }
 
-/** Adds or removes one id, keeping the rest in the order they were picked. */
-export function toggleId(ids: readonly string[], id: string): string[] {
-  if (ids.includes(id)) {
-    return ids.filter((existing) => existing !== id);
+/**
+ * The steps that pick from the category list, which wait for it. Interests
+ * and Level build their save from it (each kind saves its own), so saved
+ * before it came they would send nothing and wipe what the person had; the
+ * coach's step has nothing to pick until then.
+ */
+const CATEGORY_STEPS: readonly OnboardingStep[] = [
+  OnboardingSteps.Interests,
+  OnboardingSteps.Level,
+  OnboardingSteps.CoachCategories,
+];
+
+export function needsCategories(step: OnboardingStep | null): boolean {
+  if (!step) {
+    return false;
   }
-  return [...ids, id];
+  return CATEGORY_STEPS.includes(step);
 }
 
 /**

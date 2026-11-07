@@ -1,13 +1,14 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { Router } from '@angular/router';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
+import { NavModes } from 'core';
+import type { NavMode } from 'core';
+
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { welcomeLink } from '../../../../_shared/config/onboarding.config';
 import { OnboardingStateService } from '../../../../_shared/services/onboarding-state.service';
-import { WELCOME_CARDS, WelcomeCardKind } from '../../home.config';
+import { WELCOME_CARDS } from '../../home.config';
 import { HOME_ICONS } from '../../home.icons';
 
 /**
@@ -24,14 +25,14 @@ import { HOME_ICONS } from '../../home.icons';
 })
 export class WelcomeCard {
   private readonly _onboarding = inject(OnboardingStateService);
-  private readonly _router = inject(Router);
 
-  readonly kind = input.required<WelcomeCardKind>();
+  /** The Home it sits on. */
+  readonly kind = input.required<NavMode>();
 
   readonly copy = computed(() => WELCOME_CARDS[this.kind()]);
 
   readonly steps = computed(() => {
-    if (this.kind() === 'coach') {
+    if (this.kind() === NavModes.Coach) {
       return this._onboarding.coachCard();
     }
     return this._onboarding.trainCard();
@@ -43,8 +44,7 @@ export class WelcomeCard {
   }
 
   open(): void {
-    const link = welcomeLink(this.steps(), '/tabs/home');
-    void this._router.navigate([link.path], { queryParams: link.queryParams });
+    this._onboarding.open(this.steps());
   }
 
   dismiss(): void {

@@ -1,10 +1,16 @@
 import { Service, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, firstValueFrom, of, take, timeout } from 'rxjs';
 
 import { AuthStore, OnboardingService, TokenService } from 'core';
 import type { OnboardingState, OnboardingStep } from 'core';
 
-import { WELCOME_STATE_TIMEOUT_MS, withoutCardSteps } from '../config/onboarding.config';
+import {
+  WELCOME_FALLBACK_URL,
+  WELCOME_STATE_TIMEOUT_MS,
+  welcomeLink,
+  withoutCardSteps,
+} from '../config/onboarding.config';
 
 /**
  * The reader's welcome flow state for the whole app: the guard that opens the
@@ -17,6 +23,7 @@ export class OnboardingStateService {
   private readonly _authStore = inject(AuthStore);
   private readonly _onboardingService = inject(OnboardingService);
   private readonly _tokenService = inject(TokenService);
+  private readonly _router = inject(Router);
 
   private readonly _state = signal<OnboardingState | null>(null);
   /** The account the state belongs to, so a new sign in on this phone starts over. */
@@ -74,6 +81,15 @@ export class OnboardingStateService {
 
   markShown(): void {
     this._shownFor = this._currentUserId();
+  }
+
+  /**
+   * The flow on these steps only, as an editor (a Home card, an Account
+   * row), ending on `returnUrl`: Home unless the caller says otherwise.
+   */
+  open(steps: readonly OnboardingStep[], returnUrl: string = WELCOME_FALLBACK_URL): void {
+    const link = welcomeLink(steps, returnUrl);
+    void this._router.navigate([link.path], { queryParams: link.queryParams });
   }
 
   /**

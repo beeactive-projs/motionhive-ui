@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CoachActivityItem,
+  NavModes,
   Post,
   ProgramAssignment,
   ProgressRecord,
@@ -890,12 +891,12 @@ describe('coachLatest and traineeLatest', () => {
 
 describe('welcome cards', () => {
   it('has words and a registered glyph for both homes', () => {
-    for (const kind of ['train', 'coach'] as const) {
+    for (const kind of Object.values(NavModes)) {
       expect(WELCOME_CARDS[kind].title).toMatch(/^home\.welcomeCard\./);
       expect(WELCOME_CARDS[kind].detail).toMatch(/^home\.welcomeCard\./);
     }
     // Registered in HOME_ICONS (`home.icons.spec.ts` checks the templates).
-    expect(WELCOME_CARDS.train.icon).toBe('compass-outline');
-    expect(WELCOME_CARDS.coach.icon).toBe('ribbon-outline');
+    expect(WELCOME_CARDS[NavModes.Train].icon).toBe('compass-outline');
+    expect(WELCOME_CARDS[NavModes.Coach].icon).toBe('ribbon-outline');
   });
 });

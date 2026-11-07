@@ -1,11 +1,13 @@
 import { isInAppPath, OnboardingSteps } from 'core';
 import type { OnboardingState, OnboardingStep } from 'core';
 
+import { ProfileStacks } from '../utils/stack-paths';
+
 /** The welcome flow's address: a full screen of its own, outside the tabs. */
 export const WELCOME_URL = '/welcome';
 
-/** Where the flow ends when nothing better is known. */
-export const WELCOME_FALLBACK_URL = '/tabs/home';
+/** Where the flow ends when nothing better is known: Home. */
+export const WELCOME_FALLBACK_URL = ProfileStacks.Home;
 
 /** How long app start waits for the flow's state before going straight in. */
 export const WELCOME_STATE_TIMEOUT_MS = 4000;

@@ -31,8 +31,6 @@ export const HomePages = {
   Search: `${HOME_STACK}/search`,
   /** The invite page, from the first week's "Invite clients". */
   Invite: `${HOME_STACK}/invite`,
-  /** The coaching profile, from "Add your specialties". */
-  Coaching: `${HOME_STACK}/coaching`,
   /** The role switch, from the header's role pill. */
   SwitchRole: `${HOME_STACK}/switch-role`,
   /** The coach's whole hive, every client a cell, from the hive card. */

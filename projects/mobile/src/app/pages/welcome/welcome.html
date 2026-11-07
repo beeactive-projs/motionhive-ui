@@ -3,13 +3,13 @@
     <ion-buttons slot="start">
       <!-- Close, not Back: every answer is already saved, and leaving skips
            what is left, so a chevron would promise an undo that is not there. -->
-      <ion-button [attr.aria-label]="'a11y.close' | translate" (click)="close()">
+      <ion-button [attr.aria-label]="'a11y.close' | translate" [disabled]="saving()" (click)="close()">
         <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
       @if (ready() && progress().total > 1) {
-        <span class="mh-kicker step-count">
+        <span class="mh-kicker mh-step-count">
           {{ 'welcome.stepOf' | translate: { step: progress().position, total: progress().total } }}
         </span>
       }
@@ -40,7 +40,7 @@
               <button
                 type="button"
                 role="radio"
-                class="choice"
+                class="choice mh-pick-tile"
                 [class.on]="role() === choice.role"
                 [attr.aria-checked]="role() === choice.role"
                 (click)="pickRole(choice.role)"
@@ -62,7 +62,7 @@
               @for (category of categoryStore.interestActivities(); track category.id) {
                 <button
                   type="button"
-                  class="tile"
+                  class="tile mh-pick-tile"
                   [class.on]="interestIds().includes(category.id)"
                   [attr.aria-pressed]="interestIds().includes(category.id)"
                   (click)="toggleInterest(category.id)"
@@ -73,7 +73,7 @@
               }
             </div>
           } @else {
-            <div class="loading"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+            <ng-container [ngTemplateOutlet]="categoriesPending" />
           }
         }
 
@@ -83,7 +83,7 @@
               <button
                 type="button"
                 role="radio"
-                class="choice compact"
+                class="choice compact mh-pick-tile"
                 [class.on]="level() === choice.level"
                 [attr.aria-checked]="level() === choice.level"
                 (click)="pickLevel(choice.level)"
@@ -99,7 +99,9 @@
             }
           </div>
 
-          @if (categoryStore.goals().length) {
+          @if (!categoryStore.loaded()) {
+            <ng-container [ngTemplateOutlet]="categoriesPending" />
+          } @else if (categoryStore.goals().length) {
             <section class="mh-section">
               <div class="mh-section-head">
                 <h2 class="mh-kicker">{{ 'welcome.level.goals' | translate }}</h2>
@@ -130,7 +132,7 @@
               @for (category of categoryStore.activities(); track category.id) {
                 <button
                   type="button"
-                  class="tile"
+                  class="tile mh-pick-tile"
                   [class.on]="coachCategoryIds().includes(category.id)"
                   [attr.aria-pressed]="coachCategoryIds().includes(category.id)"
                   (click)="toggleCoachCategory(category.id)"
@@ -161,7 +163,7 @@
               <ion-note class="mh-note-block">{{ 'welcome.coachCategories.otherHint' | translate }}</ion-note>
             </section>
           } @else {
-            <div class="loading"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+            <ng-container [ngTemplateOutlet]="categoriesPending" />
           }
         }
 
@@ -220,6 +222,22 @@
       }
     </div>
   }
+
+  <!-- The category list on its way, or a retry when it could not be had:
+       the steps that pick from it wait for it (Continue stays off). -->
+  <ng-template #categoriesPending>
+    @if (categoryStore.failed()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'welcome.categoriesFailed' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="retryCategories()"
+      />
+    } @else {
+      <div class="loading"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+    }
+  </ng-template>
 </ion-content>
 
 @if (ready()) {
@@ -228,13 +246,13 @@
       <div class="mh-cta-bar">
         @if (dots().length > 1) {
           <!-- Decorative: the header says "Step 2 of 3" in words. -->
-          <div class="dots" aria-hidden="true">
+          <div class="mh-step-dots" aria-hidden="true">
             @for (dot of dots(); track dot) {
               <span [class.on]="dot === progress().position" [class.done]="dot < progress().position"></span>
             }
           </div>
         }
-        <div class="actions" [class.single]="!canGoBack()">
+        <div class="mh-step-actions" [class.single]="!canGoBack()">
           @if (canGoBack()) {
             <ion-button fill="outline" color="medium" [disabled]="saving()" (click)="back()">
               {{ 'button.back' | translate }}

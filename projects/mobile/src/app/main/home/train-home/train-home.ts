@@ -19,6 +19,7 @@ import {
   formatRelativeShort,
   GroupWithMyRole,
   MyInstructor,
+  NavModes,
   sentenceCase,
   weekdayNames,
 } from 'core';
@@ -128,6 +129,7 @@ export class TrainHome implements OnInit {
   // ─── The week ────────────────────────────────────────────────
 
   readonly LoadStates = LoadStates;
+  readonly NavModes = NavModes;
 
   /** Set once a first load has run `SLOW_LOAD_MS`; reset by each new one. */
   private readonly _slow = signal(false);

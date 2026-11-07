@@ -106,7 +106,7 @@
 </div>
 
 <!-- The welcome questions passed over, offered once more; gone when answered or closed. -->
-<mh-welcome-card kind="train" />
+<mh-welcome-card [kind]="NavModes.Train" />
 
 <!-- A session booked for today, only on a day that has one: one small row. -->
 @if (todayFirst(); as first) {

@@ -35,19 +35,21 @@ import {
   languageName,
   timezonePlace,
 } from 'core';
+import type { OnboardingStep } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { ProfileShareSheet } from '../../_shared/components/profile-share-sheet/profile-share-sheet';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../_shared/services/feedback.service';
+import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
 import {
   ThemePreference,
   ThemePreferences,
   ThemeService,
 } from '../../_shared/services/theme.service';
-import { parseWelcomeSteps, welcomeLink } from '../../_shared/config/onboarding.config';
-import { ACCOUNT_ICONS } from './account.config';
+import { ProfileStacks } from '../../_shared/utils/stack-paths';
+import { ACCOUNT_ICONS, ACCOUNT_WELCOME_STEPS } from './account.config';
 import { AccountStore } from './account.store';
 import { ChoiceOption, ChoiceSheet } from '../../_shared/components/choice-sheet/choice-sheet';
 import { PhotoSheet } from './_sheets/photo-sheet/photo-sheet';
@@ -97,6 +99,7 @@ export const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
 })
 export class Account implements OnInit, ViewWillEnter {
   readonly Tiles = DETAIL_TILES;
+  readonly WelcomeSteps = ACCOUNT_WELCOME_STEPS;
 
   private readonly _router = inject(Router);
   private readonly _navController = inject(NavController);
@@ -107,6 +110,7 @@ export class Account implements OnInit, ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _languageService = inject(LanguageService);
+  private readonly _onboarding = inject(OnboardingStateService);
 
   readonly store = inject(AccountStore);
 
@@ -221,13 +225,12 @@ export class Account implements OnInit, ViewWillEnter {
   }
 
   go(path: string): void {
-    void this._router.navigateByUrl(`/tabs/more/account/${path}`);
+    void this._router.navigateByUrl(`${ProfileStacks.Account}/${path}`);
   }
 
-  /** The welcome flow on these steps (comma separated), back here after. */
-  openWelcome(steps: string): void {
-    const link = welcomeLink(parseWelcomeSteps(steps), '/tabs/more/account');
-    void this._router.navigate([link.path], { queryParams: link.queryParams });
+  /** The welcome flow on these steps, back here after. */
+  openWelcome(steps: readonly OnboardingStep[]): void {
+    this._onboarding.open(steps, ProfileStacks.Account);
   }
 
   onThemePicked(value: string): void {
@@ -320,7 +323,7 @@ export class Account implements OnInit, ViewWillEnter {
   openPublicProfile(): void {
     const handle = this.handle();
     if (!handle) return;
-    void this._router.navigate(['/tabs/more/account/person', handle]);
+    void this._router.navigate([ProfileStacks.Account, 'person', handle]);
   }
 
   onSignOut(): void {

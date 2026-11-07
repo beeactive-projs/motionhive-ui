@@ -1,5 +1,7 @@
 import {
   CoachActivityItem,
+  NavMode,
+  NavModes,
   Post,
   ProgramAssignment,
   ProgramAssignmentStatus,
@@ -1212,23 +1214,23 @@ export function latestRow(entry: LatestEntry, copy: LatestCopy): LatestRow {
 
 // ─── Welcome card ───────────────────────────────────────────────────────────
 
-/** Which Home the card sits on: the questions about training, or the coach's own. */
-export type WelcomeCardKind = 'train' | 'coach';
-
 export interface WelcomeCardCopy {
   title: string;
   detail: string;
   icon: string;
 }
 
-/** The welcome flow's passed over questions, offered again on each Home. */
-export const WELCOME_CARDS: Readonly<Record<WelcomeCardKind, WelcomeCardCopy>> = {
-  train: {
+/**
+ * The welcome flow's passed over questions, offered again on each Home: the
+ * questions about training in Train mode, the coach's own in Coach mode.
+ */
+export const WELCOME_CARDS: Readonly<Record<NavMode, WelcomeCardCopy>> = {
+  [NavModes.Train]: {
     title: 'home.welcomeCard.train.title',
     detail: 'home.welcomeCard.train.detail',
     icon: 'compass-outline',
   },
-  coach: {
+  [NavModes.Coach]: {
     title: 'home.welcomeCard.coach.title',
     detail: 'home.welcomeCard.coach.detail',
     icon: 'ribbon-outline',

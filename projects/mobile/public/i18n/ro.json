@@ -3752,6 +3752,7 @@
   "welcome": {
     "stepOf": "Pasul {step} din {total}",
     "optional": "Opțional",
+    "categoriesFailed": "Nu am putut încărca opțiunile",
     "role": {
       "title": "Cum vei folosi MotionHive?",
       "intro": "Îți arătăm mai întâi ce ți se potrivește. Poți schimba oricând.",

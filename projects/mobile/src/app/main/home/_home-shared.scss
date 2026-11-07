@@ -3,9 +3,9 @@
 
 // ─── The page ────────────────────────────────────────────────────
 // Calm: the greeting, then at most three blocks, separated by space alone.
-// The greeting and the hive card sit on the row gutter, in line with the
-// header's logo and the avatars of the rows below; the lists run edge to
-// edge as flat lists (`lists.md`), straight on the white page.
+// The greeting, the hive card and the welcome card sit on the row gutter, in
+// line with the header's logo and the avatars of the rows below; the lists
+// run edge to edge as flat lists (`lists.md`), straight on the white page.
 :host {
   display: flex;
   flex-direction: column;
@@ -14,7 +14,8 @@
 }
 
 .greeting,
-.hive-wrap {
+.hive-wrap,
+mh-welcome-card {
   padding-inline: var(--mh-row-gutter);
 }
 

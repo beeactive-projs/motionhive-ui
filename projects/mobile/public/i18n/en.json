@@ -3752,6 +3752,7 @@
   "welcome": {
     "stepOf": "Step {step} of {total}",
     "optional": "Optional",
+    "categoriesFailed": "We couldn't load the choices",
     "role": {
       "title": "How will you use MotionHive?",
       "intro": "We show you what fits first. You can change it later.",

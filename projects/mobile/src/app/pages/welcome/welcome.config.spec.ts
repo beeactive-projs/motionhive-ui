@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { OnboardingState, PickedLocation } from 'core';
 
+import { ROLES } from '../../_shared/config/roles.config';
 import {
   LEVEL_CHOICES,
   MAX_OTHER_WORDS,
@@ -10,9 +11,9 @@ import {
   WELCOME_ICONS,
   canGoBack,
   coachDetailsPayload,
+  needsCategories,
   remainingSteps,
   splitOtherWords,
-  toggleId,
   welcomeProgress,
 } from './welcome.config';
 
@@ -75,6 +76,26 @@ describe('welcome copy and choices', () => {
     for (const choice of ROLE_CHOICES) {
       expect(registered.has(choice.icon)).toBe(true);
     }
+    // The category list's failure state.
+    expect(registered.has('alert-circle-outline')).toBe(true);
+  });
+
+  it('draws each role as the role pill does', () => {
+    expect(ROLE_CHOICES.map((choice) => [choice.icon, choice.color])).toEqual([
+      [ROLES.train.icon, ROLES.train.color],
+      [ROLES.coach.icon, ROLES.coach.color],
+    ]);
+  });
+});
+
+describe('needsCategories', () => {
+  it('holds back the steps that pick from the category list', () => {
+    expect(needsCategories('INTERESTS')).toBe(true);
+    expect(needsCategories('LEVEL')).toBe(true);
+    expect(needsCategories('COACH_CATEGORIES')).toBe(true);
+    expect(needsCategories('ROLE')).toBe(false);
+    expect(needsCategories('COACH_DETAILS')).toBe(false);
+    expect(needsCategories(null)).toBe(false);
   });
 });
 
@@ -92,13 +113,6 @@ describe('splitOtherWords', () => {
     const many = Array.from({ length: 15 }, (_, index) => `word${index}`).join(',');
     expect(splitOtherWords(many)).toHaveLength(MAX_OTHER_WORDS);
     expect(splitOtherWords('x'.repeat(80))[0]).toHaveLength(50);
-  });
-});
-
-describe('toggleId', () => {
-  it('adds and removes, keeping the picking order', () => {
-    expect(toggleId(['a'], 'b')).toEqual(['a', 'b']);
-    expect(toggleId(['a', 'b'], 'a')).toEqual(['b']);
   });
 });
 
