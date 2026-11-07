@@ -106,7 +106,10 @@
       "resendVerification": "Resend verification email",
       "unverified": "{email} isn't verified yet.",
       "deleteAccount": "Delete account",
-      "workouts": "Workouts"
+      "workouts": "Workouts",
+      "coachCategories": "What you coach",
+      "interests": "What you like to train",
+      "becomeCoach": "Become a coach"
     },
     "sections": {
       "account": "Account",
@@ -735,13 +738,7 @@
       "loadError": "Couldn't load groups"
     },
     "browse": {
-      "beginners": "Total beginner",
-      "fatLoss": "Lose fat",
-      "mobility": "Move better",
-      "online": "Online coaching",
-      "running": "Start running",
-      "strength": "Get stronger",
-      "title": "Browse by goal"
+      "title": "Browse by activity"
     },
     "city": {
       "everywhere": "Everywhere",
@@ -798,12 +795,9 @@
       "title": "Filter sessions"
     },
     "goals": {
-      "beginners": "Beginners",
-      "label": "Goals",
-      "mobility": "Mobility",
+      "label": "Activities",
       "online": "Online",
-      "running": "Running",
-      "strength": "Strength"
+      "forYou": "For you"
     },
     "groupsRail": {
       "all": "All",
@@ -819,7 +813,7 @@
     "search": {
       "accents": "Showing matches for “{typed}” and “{variant}”. Accents don't matter.",
       "clear": "Clear",
-      "clearGoal": "{goal}, clear this goal",
+      "clearGoal": "{goal}, clear this filter",
       "coaches": "Coaches",
       "empty": "No coaches, groups or sessions match that. Try fewer words.",
       "error": {
@@ -828,7 +822,7 @@
       },
       "fieldPlaceholder": "Search",
       "filterLabel": "Filter results",
-      "goalEmpty": "No coaches, groups or sessions for this goal yet.",
+      "goalEmpty": "No coaches, groups or sessions for this yet.",
       "groups": "Groups",
       "hint": "Type at least two letters to search coaches, groups and sessions.",
       "join": "Join",
@@ -1445,8 +1439,8 @@
           "title": "Create your first program"
         },
         "specialties": {
-          "detail": "They help people find you in Discover.",
-          "title": "Add your specializations"
+          "detail": "It helps people find you in Discover.",
+          "title": "Say what you coach"
         },
         "steps": "Next steps",
         "sub": "The first ring has room for six.",
@@ -1599,6 +1593,17 @@
         "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}",
         "todayMakes": "Today would make it {count}."
       }
+    },
+    "welcomeCard": {
+      "train": {
+        "title": "Tell us what you like to train",
+        "detail": "We will suggest coaches, groups and sessions that fit."
+      },
+      "coach": {
+        "title": "Finish your coach profile",
+        "detail": "Say what you coach and where, so people find you."
+      },
+      "dismiss": "Hide this"
     }
   },
   "messages": {
@@ -1990,7 +1995,8 @@
     "clientHive": "Your hive",
     "monthHive": "Your month",
     "workoutSettings": "Workout settings",
-    "archivedRoutines": "Archived routines"
+    "archivedRoutines": "Archived routines",
+    "welcome": "Welcome"
   },
   "payments": {
     "badge": {
@@ -3742,5 +3748,57 @@
     "takenDown": "Removed from your profile after a report, so it can't be public or shared.",
     "visibleTo": "Visible to",
     "youAndCoach": "You and {name}"
+  },
+  "welcome": {
+    "stepOf": "Step {step} of {total}",
+    "optional": "Optional",
+    "role": {
+      "title": "How will you use MotionHive?",
+      "intro": "We show you what fits first. You can change it later.",
+      "note": "Coaches can train too, and switch between the two any time.",
+      "train": {
+        "label": "To train",
+        "detail": "Follow plans, log workouts and find coaches, groups and sessions."
+      },
+      "coach": {
+        "label": "To coach",
+        "detail": "Work with clients, run groups and sessions, and get paid."
+      }
+    },
+    "interests": {
+      "title": "What do you like to train?",
+      "intro": "Pick as many as you like. We use them to suggest coaches, groups and sessions."
+    },
+    "level": {
+      "title": "Where are you starting from?",
+      "intro": "So the plans and coaches we suggest fit you.",
+      "goals": "What are you after?",
+      "beginner": {
+        "label": "Just starting",
+        "detail": "New to training, or back after a long break."
+      },
+      "intermediate": {
+        "label": "Training now and then",
+        "detail": "I know the basics and train when I can."
+      },
+      "advanced": {
+        "label": "Training regularly",
+        "detail": "I train most weeks and know my way around."
+      }
+    },
+    "coachCategories": {
+      "title": "What do you coach?",
+      "intro": "People find you in Discover by these. Pick all that apply.",
+      "other": "Anything else?",
+      "otherPlaceholder": "Kettlebells, calisthenics",
+      "otherHint": "Your own words, separated by commas. They show on your profile."
+    },
+    "coachDetails": {
+      "title": "Where do you coach?",
+      "intro": "Your city helps people near you find you.",
+      "currentCity": "Now: {city}",
+      "accepting": "Taking new clients",
+      "acceptingHint": "People can ask you to coach them. Turn it off when you are full."
+    }
   }
 }

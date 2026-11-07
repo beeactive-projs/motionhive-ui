@@ -106,7 +106,10 @@
       "resendVerification": "Retrimite emailul de verificare",
       "unverified": "Adresa {email} nu este încă verificată.",
       "deleteAccount": "Șterge contul",
-      "workouts": "Antrenamente"
+      "workouts": "Antrenamente",
+      "coachCategories": "Ce antrenezi",
+      "interests": "Ce îți place să practici",
+      "becomeCoach": "Devino antrenor"
     },
     "sections": {
       "account": "Cont",
@@ -735,13 +738,7 @@
       "loadError": "Nu am putut încărca grupurile"
     },
     "browse": {
-      "beginners": "De la zero",
-      "fatLoss": "Slăbește",
-      "mobility": "Mișcă-te mai bine",
-      "online": "Antrenament online",
-      "running": "Începe să alergi",
-      "strength": "Mai multă forță",
-      "title": "Caută după obiectiv"
+      "title": "Caută după activitate"
     },
     "city": {
       "everywhere": "Peste tot",
@@ -798,12 +795,9 @@
       "title": "Filtrează sesiunile"
     },
     "goals": {
-      "beginners": "Începători",
-      "label": "Obiective",
-      "mobility": "Mobilitate",
+      "label": "Activități",
       "online": "Online",
-      "running": "Alergare",
-      "strength": "Forță"
+      "forYou": "Pentru tine"
     },
     "groupsRail": {
       "all": "Toate",
@@ -819,7 +813,7 @@
     "search": {
       "accents": "Rezultate pentru „{typed}” și „{variant}”. Diacriticele nu contează.",
       "clear": "Șterge",
-      "clearGoal": "{goal}, renunță la obiectiv",
+      "clearGoal": "{goal}, renunță la filtru",
       "coaches": "Antrenori",
       "empty": "Nu am găsit antrenori, grupuri sau sesiuni. Încearcă mai puține cuvinte.",
       "error": {
@@ -828,7 +822,7 @@
       },
       "fieldPlaceholder": "Caută",
       "filterLabel": "Filtrează rezultatele",
-      "goalEmpty": "Încă nu sunt antrenori, grupuri sau sesiuni pentru acest obiectiv.",
+      "goalEmpty": "Încă nu sunt antrenori, grupuri sau sesiuni pentru asta.",
       "groups": "Grupuri",
       "hint": "Scrie cel puțin două litere ca să cauți antrenori, grupuri și sesiuni.",
       "join": "Alătură-te",
@@ -1445,8 +1439,8 @@
           "title": "Creează primul tău program"
         },
         "specialties": {
-          "detail": "Ajută oamenii să te găsească în Descoperă.",
-          "title": "Adaugă-ți specializările"
+          "detail": "Așa te găsesc oamenii în Descoperă.",
+          "title": "Spune ce antrenezi"
         },
         "steps": "Pașii următori",
         "sub": "Primul inel are loc pentru șase.",
@@ -1599,6 +1593,17 @@
         "streak": "{count, plural, one {# săptămână la rând} few {# săptămâni la rând} other {# de săptămâni la rând}}",
         "todayMakes": "Cu cel de azi ajungi la {count}."
       }
+    },
+    "welcomeCard": {
+      "train": {
+        "title": "Spune-ne ce îți place să practici",
+        "detail": "Îți sugerăm antrenori, grupuri și sesiuni potrivite."
+      },
+      "coach": {
+        "title": "Termină profilul de antrenor",
+        "detail": "Spune ce antrenezi și unde, ca să te găsească oamenii."
+      },
+      "dismiss": "Ascunde"
     }
   },
   "messages": {
@@ -1990,7 +1995,8 @@
     "clientHive": "Stupul tău",
     "monthHive": "Luna ta",
     "workoutSettings": "Setări pentru antrenamente",
-    "archivedRoutines": "Rutine arhivate"
+    "archivedRoutines": "Rutine arhivate",
+    "welcome": "Bun venit"
   },
   "payments": {
     "badge": {
@@ -3742,5 +3748,57 @@
     "takenDown": "Scos de pe profilul tău după o raportare, deci nu mai poate fi public sau distribuit.",
     "visibleTo": "Vizibil pentru",
     "youAndCoach": "Tu și {name}"
+  },
+  "welcome": {
+    "stepOf": "Pasul {step} din {total}",
+    "optional": "Opțional",
+    "role": {
+      "title": "Cum vei folosi MotionHive?",
+      "intro": "Îți arătăm mai întâi ce ți se potrivește. Poți schimba oricând.",
+      "note": "Antrenorii se pot antrena și ei și pot trece oricând de la un rol la altul.",
+      "train": {
+        "label": "Ca să mă antrenez",
+        "detail": "Urmezi planuri, îți notezi antrenamentele și găsești antrenori, grupuri și sesiuni."
+      },
+      "coach": {
+        "label": "Ca să antrenez alți oameni",
+        "detail": "Lucrezi cu clienți, organizezi grupuri și sesiuni și primești plata."
+      }
+    },
+    "interests": {
+      "title": "Ce îți place să practici?",
+      "intro": "Alege oricâte vrei. Pe baza lor îți sugerăm antrenori, grupuri și sesiuni."
+    },
+    "level": {
+      "title": "De unde pornești?",
+      "intro": "Ca planurile și antrenorii pe care ți-i sugerăm să ți se potrivească.",
+      "goals": "Ce urmărești?",
+      "beginner": {
+        "label": "Abia încep",
+        "detail": "Sunt la început sau revin după o pauză lungă."
+      },
+      "intermediate": {
+        "label": "Mă antrenez din când în când",
+        "detail": "Știu lucrurile de bază și mă antrenez când pot."
+      },
+      "advanced": {
+        "label": "Mă antrenez constant",
+        "detail": "Mă antrenez aproape în fiecare săptămână și știu ce fac."
+      }
+    },
+    "coachCategories": {
+      "title": "Ce antrenezi?",
+      "intro": "După acestea te găsesc oamenii în Descoperă. Alege tot ce se potrivește.",
+      "other": "Altceva?",
+      "otherPlaceholder": "Kettlebell, calistenie",
+      "otherHint": "Cu cuvintele tale, despărțite prin virgulă. Apar pe profilul tău."
+    },
+    "coachDetails": {
+      "title": "Unde antrenezi?",
+      "intro": "Orașul tău îi ajută pe cei din apropiere să te găsească.",
+      "currentCity": "Acum: {city}",
+      "accepting": "Primesc clienți noi",
+      "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Oprește când nu mai ai locuri."
+    }
   }
 }

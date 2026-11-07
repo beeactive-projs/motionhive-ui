@@ -319,6 +319,14 @@ export const API_ENDPOINTS = {
   MUSCLES: {
     BASE: '/muscles',
   },
+  /** What people train and why (migration 081); open to guests. */
+  CATEGORIES: {
+    BASE: '/categories',
+  },
+  /** The reader's welcome flow: state, answers, skip and dismiss. */
+  ONBOARDING: {
+    BASE: '/users/me/onboarding',
+  },
   EQUIPMENT: {
     BASE: '/equipment',
   },

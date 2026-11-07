@@ -2,7 +2,13 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
 
-import { CoachDirectoryFacets, InstructorSearchResult, ProfileService } from 'core';
+import {
+  CategoryStore,
+  CoachDirectoryFacets,
+  InstructorSearchResult,
+  ProfileService,
+  withCategorySpecialties,
+} from 'core';
 
 import {
   CoachFilterId,
@@ -48,6 +54,7 @@ type LoadOptions = { force?: boolean; done?: (error?: unknown) => void };
 @Injectable()
 export class CoachDirectoryStore {
   private readonly _profileService = inject(ProfileService);
+  private readonly _categoryStore = inject(CategoryStore);
   /** The page's, since the store is provided by it. */
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -116,7 +123,10 @@ export class CoachDirectoryStore {
    */
   readonly visibleCoaches = computed(() => {
     const query = this.query().trim();
-    const coaches = this._coaches();
+    // A coach who picked categories and wrote no specializations shows the
+    // categories' names on their row (and is found by them).
+    const byId = this._categoryStore.byId();
+    const coaches = this._coaches().map((coach) => withCategorySpecialties(coach, byId));
     if (!query || query === this._appliedQuery()) return coaches;
     return coaches.filter((coach) => matchesCoachQuery(coach, query));
   });
@@ -148,6 +158,7 @@ export class CoachDirectoryStore {
 
   /** Page 1 for what is on screen. `force` restarts even mid-flight. */
   load(opts: LoadOptions = {}): void {
+    this._categoryStore.ensureLoaded();
     if (!opts.force && (this._loading() || this._loaded())) {
       opts.done?.();
       return;

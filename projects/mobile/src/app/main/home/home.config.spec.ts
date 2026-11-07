@@ -15,6 +15,7 @@ import {
 import { HexShape, HexShapes } from '../../_shared/config/hexagon.config';
 import {
   COACH_SHORTCUTS,
+  WELCOME_CARDS,
   ClientHiveStates,
   EndDays,
   GreetingPeriods,
@@ -884,5 +885,17 @@ describe('coachLatest and traineeLatest', () => {
       const first = traineeLatest([], [record('2026-10-31T09:00:00Z', 104.5)], now)[0]!;
       expect(latestRow(first, copy).parts).toHaveLength(1);
     });
+  });
+});
+
+describe('welcome cards', () => {
+  it('has words and a registered glyph for both homes', () => {
+    for (const kind of ['train', 'coach'] as const) {
+      expect(WELCOME_CARDS[kind].title).toMatch(/^home\.welcomeCard\./);
+      expect(WELCOME_CARDS[kind].detail).toMatch(/^home\.welcomeCard\./);
+    }
+    // Registered in HOME_ICONS (`home.icons.spec.ts` checks the templates).
+    expect(WELCOME_CARDS.train.icon).toBe('compass-outline');
+    expect(WELCOME_CARDS.coach.icon).toBe('ribbon-outline');
   });
 });

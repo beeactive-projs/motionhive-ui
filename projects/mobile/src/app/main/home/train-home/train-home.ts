@@ -31,6 +31,7 @@ import { COACHES_URL, COACHES_YOURS_URL } from '../../coaches/coaches.filters';
 import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
+import { WelcomeCard } from '../_components/welcome-card/welcome-card';
 import { HOME_STACK, HomePages } from '../home-stack.config';
 import {
   buildingCells,
@@ -88,6 +89,7 @@ interface HiveMember {
     LatestRowItem,
     RowSkeleton,
     TranslatePipe,
+    WelcomeCard,
   ],
   templateUrl: './train-home.html',
   styleUrl: './train-home.scss',

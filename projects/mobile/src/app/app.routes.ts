@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from 'core';
 
 import { coachGuard } from './_shared/guards/coach.guard';
+import { welcomeGuard } from './_shared/guards/welcome.guard';
 import { TabIds } from './_shared/models/tab.model';
 import { MY_COACHES_URL } from './_shared/utils/stack-paths';
 
@@ -36,8 +37,18 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/auth/auth.routes').then((m) => m.authRoutes),
   },
   {
-    path: 'tabs',
+    // The welcome flow, full screen and outside the tabs: a few questions
+    // after the first sign in. `welcomeGuard` opens it on the way into the
+    // tabs while it has something to ask; Home cards and Account rows open it
+    // on chosen steps (`?steps=`).
+    path: 'welcome',
     canActivate: [authGuard],
+    loadComponent: () => import('./pages/welcome/welcome').then((m) => m.Welcome),
+    title: 'pageTitle.welcome',
+  },
+  {
+    path: 'tabs',
+    canActivate: [authGuard, welcomeGuard],
     loadComponent: () => import('./layouts/tabs/tabs').then((m) => m.Tabs),
     children: [
       ...notificationRoutes,

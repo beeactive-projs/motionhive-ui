@@ -9,6 +9,7 @@ import {
   checkmarkCircle,
   closeOutline,
   colorPaletteOutline,
+  compassOutline,
   copyOutline,
   eyeOutline,
   globeOutline,
@@ -25,11 +26,13 @@ import {
   logOutOutline,
   mailOutline,
   openOutline,
+  peopleOutline,
   personOutline,
   qrCodeOutline,
   shareSocialOutline,
   timeOutline,
   trashOutline,
+  trophyOutline,
 } from 'ionicons/icons';
 
 import { CATEGORY_ICONS } from '../../_shared/config/notification-categories.config';
@@ -51,6 +54,7 @@ export const ACCOUNT_ICONS = {
   checkmarkCircle,
   closeOutline,
   colorPaletteOutline,
+  compassOutline,
   copyOutline,
   eyeOutline,
   globeOutline,
@@ -67,11 +71,13 @@ export const ACCOUNT_ICONS = {
   logoYoutube,
   mailOutline,
   openOutline,
+  peopleOutline,
   personOutline,
   qrCodeOutline,
   shareSocialOutline,
   timeOutline,
   trashOutline,
+  trophyOutline,
 };
 
 /** ionicons name for each social platform core knows about. */

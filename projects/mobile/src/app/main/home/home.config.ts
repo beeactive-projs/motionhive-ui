@@ -1209,3 +1209,28 @@ export function latestRow(entry: LatestEntry, copy: LatestCopy): LatestRow {
     }
   }
 }
+
+// ─── Welcome card ───────────────────────────────────────────────────────────
+
+/** Which Home the card sits on: the questions about training, or the coach's own. */
+export type WelcomeCardKind = 'train' | 'coach';
+
+export interface WelcomeCardCopy {
+  title: string;
+  detail: string;
+  icon: string;
+}
+
+/** The welcome flow's passed over questions, offered again on each Home. */
+export const WELCOME_CARDS: Readonly<Record<WelcomeCardKind, WelcomeCardCopy>> = {
+  train: {
+    title: 'home.welcomeCard.train.title',
+    detail: 'home.welcomeCard.train.detail',
+    icon: 'compass-outline',
+  },
+  coach: {
+    title: 'home.welcomeCard.coach.title',
+    detail: 'home.welcomeCard.coach.detail',
+    icon: 'ribbon-outline',
+  },
+};

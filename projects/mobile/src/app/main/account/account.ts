@@ -46,6 +46,7 @@ import {
   ThemePreferences,
   ThemeService,
 } from '../../_shared/services/theme.service';
+import { parseWelcomeSteps, welcomeLink } from '../../_shared/config/onboarding.config';
 import { ACCOUNT_ICONS } from './account.config';
 import { AccountStore } from './account.store';
 import { ChoiceOption, ChoiceSheet } from '../../_shared/components/choice-sheet/choice-sheet';
@@ -221,6 +222,12 @@ export class Account implements OnInit, ViewWillEnter {
 
   go(path: string): void {
     void this._router.navigateByUrl(`/tabs/more/account/${path}`);
+  }
+
+  /** The welcome flow on these steps (comma separated), back here after. */
+  openWelcome(steps: string): void {
+    const link = welcomeLink(parseWelcomeSteps(steps), '/tabs/more/account');
+    void this._router.navigate([link.path], { queryParams: link.queryParams });
   }
 
   onThemePicked(value: string): void {

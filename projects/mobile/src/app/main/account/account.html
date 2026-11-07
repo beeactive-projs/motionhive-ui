@@ -85,6 +85,15 @@
         @if (isInstructor()) {
         <mh-settings-row [label]="'account.rows.coachingProfile' | translate" icon="ribbon-outline" iconColor="info" iconTone="shade"
           [badge]="acceptingBadge()" (select)="go('coaching')" />
+        <mh-settings-row [label]="'account.rows.coachCategories' | translate" icon="trophy-outline" iconColor="success"
+          (select)="openWelcome('COACH_CATEGORIES')" />
+        }
+        <!-- The welcome flow's own screens, as editors: what you like, your level and goals. -->
+        <mh-settings-row [label]="'account.rows.interests' | translate" icon="compass-outline" iconColor="teal"
+          (select)="openWelcome('INTERESTS,LEVEL')" />
+        @if (!isInstructor()) {
+        <mh-settings-row [label]="'account.rows.becomeCoach' | translate" icon="people-outline" iconColor="violet"
+          (select)="openWelcome('ROLE')" />
         }
       </ion-list>
     </section>

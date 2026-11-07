@@ -1,0 +1,22 @@
+@if (steps().length) {
+  <!-- Two controls side by side, never one inside the other: the card opens
+       the questions, the X closes it for good. -->
+  <div class="welcome-card">
+    <button type="button" class="open" (click)="open()">
+      <mh-hex-avatar size="lg" color="primary" tone="wash" aria-hidden="true" [icon]="copy().icon" />
+      <span class="copy">
+        <span class="title">{{ copy().title | translate }}</span>
+        <span class="detail">{{ copy().detail | translate }}</span>
+      </span>
+    </button>
+    <ion-button
+      class="close"
+      fill="clear"
+      color="medium"
+      [attr.aria-label]="'home.welcomeCard.dismiss' | translate"
+      (click)="dismiss()"
+    >
+      <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
+    </ion-button>
+  </div>
+}

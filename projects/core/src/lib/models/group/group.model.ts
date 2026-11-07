@@ -121,6 +121,8 @@ export interface DiscoverGroupsQuery {
 export interface DiscoverGroup extends Group {
   /** 'PENDING' if the current user has an outstanding join request, else null. */
   myJoinRequestStatus?: 'PENDING' | null;
+  /** What the group trains, ids from `GET /categories`. Older APIs omit it. */
+  categoryIds?: string[];
 }
 
 export type DiscoverGroupListResponse = PaginatedResponse<DiscoverGroup>;

@@ -12,7 +12,14 @@ import {
   IonSkeletonText,
 } from '@ionic/angular/standalone';
 
-import { appLocale, AuthStore, formatRelativeShort, localDayKey, sentenceCase } from 'core';
+import {
+  appLocale,
+  AuthStore,
+  formatRelativeShort,
+  localDayKey,
+  OnboardingSteps,
+  sentenceCase,
+} from 'core';
 
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skeleton';
@@ -25,6 +32,9 @@ import { HOME_STACK, HomePages } from '../home-stack.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { NeedRowItem } from '../_components/need-row/need-row';
+import { welcomeLink } from '../../../_shared/config/onboarding.config';
+import { OnboardingStateService } from '../../../_shared/services/onboarding-state.service';
+import { WelcomeCard } from '../_components/welcome-card/welcome-card';
 import {
   buildingCells,
   coachHiveCells,
@@ -86,6 +96,7 @@ interface FirstStep {
     NeedRowItem,
     RowSkeleton,
     TranslatePipe,
+    WelcomeCard,
   ],
   templateUrl: './coach-home.html',
   styleUrl: './coach-home.scss',
@@ -96,6 +107,7 @@ export class CoachHome implements OnInit {
   private readonly _translateService = inject(TranslateService);
   private readonly _authStore = inject(AuthStore);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _onboarding = inject(OnboardingStateService);
 
   readonly store = inject(CoachHomeStore);
   readonly act = injectActOnNeed();
@@ -240,7 +252,11 @@ export class CoachHome implements OnInit {
         icon: 'add-outline',
       });
     }
-    if (this.store.hasSpecialties() === false) {
+    // What Discover matches a coach on is their categories now; their own
+    // words count too. The welcome card asks the same while it shows.
+    const coachCategories = this._onboarding.state()?.coachCategoryIds.length ?? 0;
+    const cardAsks = this._onboarding.coachCard().length > 0;
+    if (this.store.hasSpecialties() === false && coachCategories === 0 && !cardAsks) {
       steps.push({
         key: 'specialties',
         title: this._translateService.instant('home.coach.firstWeek.specialties.title'),
@@ -305,10 +321,14 @@ export class CoachHome implements OnInit {
     void this._router.navigate(row.link, row.state ? { state: row.state } : {});
   }
 
-  /** The coaching profile in Home's stack, so back returns here. */
+  /** What they coach: the welcome flow's category step, back here after. */
   openStep(step: FirstStep): void {
-    if (step.key === 'program') this.createOpen.set(true);
-    else void this._router.navigateByUrl(HomePages.Coaching);
+    if (step.key === 'program') {
+      this.createOpen.set(true);
+      return;
+    }
+    const link = welcomeLink([OnboardingSteps.CoachCategories], '/tabs/home');
+    void this._router.navigate([link.path], { queryParams: link.queryParams });
   }
 
   /** The whole hive, every client a cell, in Home's stack (C1). */

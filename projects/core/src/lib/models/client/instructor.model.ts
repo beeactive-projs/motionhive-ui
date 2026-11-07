@@ -17,6 +17,8 @@ export interface SuggestedCoach {
   avatarUrl: string | null;
   displayName: string | null;
   specializations: string[] | null;
+  /** What they coach, ids from `GET /categories` (`CategoryStore`). Older APIs omit it. */
+  categoryIds?: string[];
   yearsOfExperience: number | null;
   city: string | null;
   countryCode: string | null;
@@ -57,6 +59,8 @@ export interface InstructorSearchResult {
   displayName: string | null;
   bio: string | null;
   specializations: string[] | null;
+  /** What they coach, ids from `GET /categories` (`CategoryStore`). Older APIs omit it. */
+  categoryIds?: string[];
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
   /** Has an active online venue (a meeting link): what "Online" means everywhere. */
@@ -90,6 +94,8 @@ export interface CoachDirectoryParams {
   requested?: boolean;
   /** Any of them, matched whole, blind to accents and case. */
   specializations?: readonly string[];
+  /** Coaches of any of these categories. */
+  categoryIds?: readonly string[];
   minYears?: number;
   sort?: CoachDirectorySort;
 }
@@ -119,6 +125,8 @@ export interface PublicInstructorProfile {
   displayName: string | null;
   bio: string | null;
   specializations: string[];
+  /** What they coach, ids from `GET /categories` (`CategoryStore`). Older APIs omit it. */
+  categoryIds?: string[];
   certifications: InstructorCertification[];
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;

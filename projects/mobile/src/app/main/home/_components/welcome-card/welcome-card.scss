@@ -1,0 +1,56 @@
+/* No box of its own, so a Home with nothing to ask keeps its rhythm: the
+   card is the block in the page's column, or nothing is. */
+:host {
+  display: contents;
+}
+
+/* A card on the page like every card: the fill is its edge. It sits on the
+   row gutter, in line with the hive card above it. */
+.welcome-card {
+  margin-inline: var(--mh-row-gutter);
+  display: flex;
+  align-items: flex-start;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  min-height: var(--mh-tap-target);
+  padding: 0.875rem 0 0.875rem var(--mh-row-gutter);
+  border: 0;
+  background: none;
+  color: var(--ion-text-color);
+  font-family: var(--ion-font-family);
+  text-align: start;
+  cursor: pointer;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.detail {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
+}
+
+.close {
+  flex-shrink: 0;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  margin: 0.25rem;
+}
