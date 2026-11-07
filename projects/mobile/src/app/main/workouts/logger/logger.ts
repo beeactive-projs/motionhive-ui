@@ -21,6 +21,9 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
   IonProgressBar,
   IonSkeletonText,
@@ -51,13 +54,15 @@ import {
   appLocale,
 } from 'core';
 
+import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
+import { SheetAction } from '../../../_shared/components/action-sheet/action-sheet.model';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { RestLiveAction, RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
-import { ActiveSessionStore } from '../_services/active-session.store';
+import { ActiveSessionStore, LiveNext } from '../_services/active-session.store';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { LockScreenService } from '../_services/lock-screen.service';
 import { RestCueService } from '../_services/rest-cue.service';
@@ -177,6 +182,23 @@ interface RoundView {
   rows: { tag: string; view: ExerciseView; row: SetView }[];
 }
 
+/** What a round of a superset offers when its label is tapped. */
+const RoundActionIds = {
+  Delete: 'delete',
+} as const;
+type RoundActionId = (typeof RoundActionIds)[keyof typeof RoundActionIds];
+
+const ROUND_ACTIONS: readonly SheetAction<RoundActionId>[] = [
+  {
+    id: RoundActionIds.Delete,
+    label: 'workouts.superset.deleteRound',
+    hint: 'workouts.superset.deleteRoundHint',
+    icon: 'trash-outline',
+    color: 'danger',
+    destructive: true,
+  },
+];
+
 /** An exercise on its own, or a superset: what the list draws, in order. */
 type BlockView =
   | { kind: 'single'; key: string; view: ExerciseView }
@@ -192,6 +214,21 @@ type BlockView =
       names: string;
       restLine: string;
     };
+
+type SupersetBlock = Extract<BlockView, { kind: 'superset' }>;
+
+/** What a set shows: what was typed, else its pre-fill. */
+function shownValue(row: SetView, field: SetField): number | null {
+  const typed = cellValue(row.set, field);
+  if (typed !== null) {
+    return typed;
+  }
+  const prefill = row.prefill[field];
+  if (prefill === undefined) {
+    return null;
+  }
+  return prefill;
+}
 
 /** Programmatic scrolls fire scroll events too; ignore them for this long. */
 const PROGRAMMATIC_SCROLL_MS = 900;
@@ -242,7 +279,11 @@ const COLUMN_LABELS: Record<SetField, string> = {
     IonFooter,
     IonHeader,
     IonIcon,
+    ActionSheet,
     IonItem,
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
     IonLabel,
     IonProgressBar,
     IonSkeletonText,
@@ -335,6 +376,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   /** The set whose badge menu is open. */
   readonly menuOpen = signal(false);
+  /** The superset round whose label was tapped, and its sheet. */
+  readonly roundMenu = signal<RoundView | null>(null);
+  readonly roundMenuOpen = signal(false);
+  readonly roundActions = ROUND_ACTIONS;
+  readonly roundMenuTitle = computed(() => {
+    const round = this.roundMenu();
+    if (!round) {
+      return '';
+    }
+    return this._translateService.instant('workouts.superset.round', { number: round.index + 1 });
+  });
   readonly menuSet = signal<{ exerciseId: string; set: LoggedSet; badge: SetBadge } | null>(null);
 
   /**
@@ -405,6 +457,72 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly nextLine = computed(() => {
     const next = this.nextUp();
     return next ? [next.title, next.detail].filter(Boolean).join(' · ') : '';
+  });
+
+  /**
+   * The same next set in pieces, for the lock screen: it lays them out on
+   * its own and cuts the exercise's name before the weight. In a superset,
+   * the whole round in order ("A1 Incline press 22 × 10 → A2 Push-ups × 15").
+   */
+  readonly liveNext = computed<LiveNext | null>(() => {
+    const focus = this.focus();
+    if (!focus) {
+      return null;
+    }
+    const view = this.views().find((v) => v.exercise.id === focus.exerciseId);
+    if (!view) {
+      return null;
+    }
+    const row = view.rows.find((r) => r.set.id === focus.setId);
+    if (!row) {
+      return null;
+    }
+    const everySet = this.store
+      .exercises()
+      .filter((exercise) => !exercise.isSkipped)
+      .flatMap((exercise) => exercise.sets ?? []);
+    const sets = view.exercise.sets ?? [];
+    const next: LiveNext = {
+      exercise: view.exercise.exerciseNameSnapshot,
+      set: row.badge.short ?? row.badge.name,
+      target: setLine(view.fields, (field) => shownValue(row, field), true),
+      last: row.last,
+      done: sets.filter((set) => set.isCompleted).length,
+      total: sets.length,
+      workoutDone: everySet.filter((set) => set.isCompleted).length,
+      workoutTotal: everySet.length,
+      kicker: '',
+      order: '',
+    };
+    const block = this.blocks().find(
+      (b): b is SupersetBlock =>
+        b.kind === 'superset' && b.members.some((m) => m.view.exercise.id === view.exercise.id),
+    );
+    if (!block) {
+      return next;
+    }
+    const round = block.rounds.find((r) => r.rows.some((r2) => r2.row.set.id === row.set.id));
+    const order = (round ? round.rows : [])
+      .map((member) =>
+        [
+          member.tag,
+          member.view.exercise.exerciseNameSnapshot,
+          setLine(member.view.fields, (field) => shownValue(member.row, field), false),
+        ]
+          .filter(Boolean)
+          .join(' '),
+      )
+      .join(' → ');
+    return {
+      ...next,
+      done: block.rounds.filter((r) => r.done).length,
+      total: block.total,
+      kicker: this._translateService.instant('workouts.superset.kicker', {
+        round: block.current,
+        total: block.total,
+      }),
+      order,
+    };
   });
 
   readonly pickerOpen = signal(false);
@@ -754,7 +872,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     // extends, skips or abandons rest already routes through `restEndsAt`,
     // so the alert follows it without a call at each of those sites. The
     // service only reaches the OS once the app is backgrounded.
-    effect(() => this._restAlertService.track(this.restEndsAt()));
+    effect(() => this._restAlertService.track(this.restEndsAt(), this.nextLine()));
 
     // The screen stays on while the workout is in front, if the person wants.
     effect(() => {
@@ -781,7 +899,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     // What comes next, for the lock screen between rests too.
     effect(() => {
       const next = this.nextLine();
-      untracked(() => this._activeSession.setNext(next));
+      const live = this.liveNext();
+      untracked(() => this._activeSession.setNext(next, live));
     });
 
     // Follow the focus: whenever it moves (a tick, the list loading), bring
@@ -1290,13 +1409,60 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   removeSet(exercise: LoggedExercise, set: LoggedSet): void {
-    if (this.editing()?.setId === set.id) this.editing.set(null);
+    this._forgetSets([set.id]);
     this.store.removeSet(exercise.id, set.id, () => {
       void this._feedbackService.error(
         null,
         this._translateService.instant('workouts.logger.toast.removeSetFailed'),
       );
     });
+  }
+
+  /** Swipe left, then Delete: the row closes and the set goes. */
+  swipeDelete(sliding: IonItemSliding, exercise: LoggedExercise, set: LoggedSet): void {
+    void sliding.close();
+    this.removeSet(exercise, set);
+  }
+
+  /** A round's label was tapped: what can be done with the whole round. */
+  openRoundMenu(round: RoundView): void {
+    this._keepTyped();
+    this.editing.set(null);
+    this.dismissEffort();
+    this.roundMenu.set(round);
+    this.roundMenuOpen.set(true);
+  }
+
+  onRoundAction(id: RoundActionId): void {
+    const round = this.roundMenu();
+    if (id === RoundActionIds.Delete && round) {
+      this.deleteRound(round);
+    }
+  }
+
+  /** Every set of the round, of every exercise in it, in one go. */
+  deleteRound(round: RoundView): void {
+    const sets = round.rows.map((item) => ({ exerciseId: item.view.exercise.id, setId: item.row.set.id }));
+    this._forgetSets(sets.map((entry) => entry.setId));
+    this.store.removeSets(sets, () => {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('workouts.logger.toast.removeRoundFailed'),
+      );
+    });
+  }
+
+  /** Sets about to go: nothing may keep editing them or timing a rest after them. */
+  private _forgetSets(setIds: readonly string[]): void {
+    const editingId = this.editing()?.setId;
+    if (editingId && setIds.includes(editingId)) {
+      this.editing.set(null);
+    }
+    const restSetId = this._rest()?.setId;
+    if (restSetId && setIds.includes(restSetId)) {
+      this.restEndsAt.set(null);
+      this._rest.set(null);
+    }
   }
 
   // ─── Rest ─────────────────────────────────────────────────────

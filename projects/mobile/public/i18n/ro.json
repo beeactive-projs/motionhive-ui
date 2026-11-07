@@ -3128,7 +3128,8 @@
         "pauseFailed": "Nu am putut pune antrenamentul pe pauză",
         "removeSetFailed": "Nu am putut elimina seria",
         "removed": "Am eliminat {name}",
-        "repeatFailed": "Nu am putut încărca antrenamentul de repetat"
+        "repeatFailed": "Nu am putut încărca antrenamentul de repetat",
+        "removeRoundFailed": "Nu am putut șterge runda"
       },
       "last": "data trecută {value}",
       "best": "cea mai bună {value}",
@@ -3579,7 +3580,10 @@
       "addRound": "Adaugă o rundă",
       "restAfterRound": "Pauză după rundă: {value}",
       "rounds": "{count, plural, one {# rundă} few {# runde} other {# de runde}}",
-      "summary": "Superset · {count, plural, one {# rundă} few {# runde} other {# de runde}}"
+      "summary": "Superset · {count, plural, one {# rundă} few {# runde} other {# de runde}}",
+      "deleteRound": "Șterge runda",
+      "deleteRoundHint": "Toate seriile din rundă, de la fiecare exercițiu",
+      "roundActions": "Runda {number}: opțiuni"
     },
     "loggerOptions": {
       "title": "Acest antrenament",
@@ -3679,7 +3683,11 @@
     "live": {
       "next": "Urmează: {next}",
       "workout": "Antrenament",
-      "plus": "+{seconds} s"
+      "plus": "+{seconds} s",
+      "done": "Gata",
+      "target": "Ținta {value}",
+      "progress": "{done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
+      "planned": "din {total}"
     }
   },
   "feedback": {

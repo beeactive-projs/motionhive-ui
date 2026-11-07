@@ -22,6 +22,8 @@ enum RestTimerActions {
     static let restAlertId = "1"
     /// The same nudge as the rest bar's (`NUDGE_SECONDS`).
     static let nudgeSeconds: TimeInterval = 15
+    /// "+30 s" once the rest is over (`MORE_REST_SECONDS`).
+    static let moreSeconds: TimeInterval = 30
 
     static func pending() -> [[String: Any]] {
         UserDefaults.standard.array(forKey: queueKey) as? [[String: Any]] ?? []
@@ -46,10 +48,39 @@ enum RestTimerActions {
     /// +15: the rest ends 15 seconds later, never before now (as the bar's +15).
     @available(iOS 16.2, *)
     static func extend() async {
+        guard let end = currentEnd() else { return }
+        await moveRest(to: max(Date(), end.addingTimeInterval(nudgeSeconds)))
+    }
+
+    /// −15: the rest ends 15 seconds sooner; at or past now, it is over, as Skip.
+    @available(iOS 16.2, *)
+    static func shorten() async {
+        guard let end = currentEnd() else { return }
+        let endsAt = end.addingTimeInterval(-nudgeSeconds)
+        if endsAt <= Date().addingTimeInterval(1) {
+            await endRest("skip")
+            return
+        }
+        await moveRest(to: endsAt)
+    }
+
+    /// "+30 s" with the rest over: a little more, counted from now.
+    @available(iOS 16.2, *)
+    static func more() async {
+        guard currentEnd() != nil else { return }
+        await moveRest(to: Date().addingTimeInterval(moreSeconds))
+    }
+
+    @available(iOS 16.2, *)
+    private static func currentEnd() -> Date? {
+        Activity<RestTimerAttributes>.activities.first?.content.state.restEndsAt
+    }
+
+    /// The rest now ends at `endsAt`: shown at once, the alert moved, the web side told.
+    @available(iOS 16.2, *)
+    private static func moveRest(to endsAt: Date) async {
         guard let activity = Activity<RestTimerAttributes>.activities.first else { return }
         var state = activity.content.state
-        guard let end = state.restEndsAt else { return }
-        let endsAt = max(Date(), end.addingTimeInterval(nudgeSeconds))
         state.restEndsAt = endsAt
         await activity.update(ActivityContent(state: state, staleDate: endsAt))
         await moveRestAlert(to: endsAt)
@@ -69,17 +100,29 @@ enum RestTimerActions {
         record(["type": type, "at": milliseconds(Date())])
     }
 
-    /// The alert keeps what Capacitor put in it (its text, its data); only the moment changes.
+    /// The alert keeps what Capacitor put in it (its text, its data); only the
+    /// moment changes. After "+30 s" it has already gone off: the one shown is
+    /// taken down and comes again at the new end.
     private static func moveRestAlert(to date: Date) async {
         let center = UNUserNotificationCenter.current()
-        let requests = await center.pendingNotificationRequests()
-        guard let request = requests.first(where: { $0.identifier == restAlertId }) else { return }
+        var content: UNNotificationContent?
+        let pending = await center.pendingNotificationRequests()
+        if let request = pending.first(where: { $0.identifier == restAlertId }) {
+            content = request.content
+        } else {
+            let shown = await center.deliveredNotifications()
+            if let notification = shown.first(where: { $0.request.identifier == restAlertId }) {
+                content = notification.request.content
+                center.removeDeliveredNotifications(withIdentifiers: [restAlertId])
+            }
+        }
+        guard let content else { return }
         let trigger = UNTimeIntervalNotificationTrigger(
             timeInterval: max(1, date.timeIntervalSinceNow),
             repeats: false
         )
         try? await center.add(
-            UNNotificationRequest(identifier: request.identifier, content: request.content, trigger: trigger)
+            UNNotificationRequest(identifier: restAlertId, content: content, trigger: trigger)
         )
     }
 }
@@ -93,6 +136,28 @@ struct ExtendRestIntent: LiveActivityIntent {
 
     func perform() async throws -> some IntentResult {
         await RestTimerActions.extend()
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
+struct ShortenRestIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Take 15 seconds off the rest"
+    static var isDiscoverable: Bool = false
+
+    func perform() async throws -> some IntentResult {
+        await RestTimerActions.shorten()
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
+struct MoreRestIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Rest 30 seconds more"
+    static var isDiscoverable: Bool = false
+
+    func perform() async throws -> some IntentResult {
+        await RestTimerActions.more()
         return .result()
     }
 }

@@ -33,6 +33,32 @@ export interface ActiveRest {
   next: string;
 }
 
+/**
+ * The set to do next, in pieces, for the lock screen (Live Activity, R
+ * layouts): it lays them out itself and cuts the name, never the weight.
+ * Every text is already in the person's language.
+ */
+export interface LiveNext {
+  /** "Bench press". */
+  exercise: string;
+  /** "Set 2", "Warm-up", or "Round 2" in a superset. */
+  set: string;
+  /** "62.5 kg × 8"; empty when nothing is planned or pre-filled. */
+  target: string;
+  /** "last time 60 × 8"; empty the first time. */
+  last: string;
+  /** Sets of this exercise ticked, of how many (rounds, in a superset). */
+  done: number;
+  total: number;
+  /** Sets ticked in the whole workout, of how many. */
+  workoutDone: number;
+  workoutTotal: number;
+  /** In a superset: "Superset · round 2 of 3"; empty otherwise. */
+  kicker: string;
+  /** In a superset: "A1 Incline press 22 × 10 → A2 Push-ups × 15". */
+  order: string;
+}
+
 const REST_KEY = 'mh-active-rest';
 
 /**
@@ -50,6 +76,7 @@ export class ActiveSessionStore {
   private readonly _session = signal<ActiveSession | null>(null);
   private readonly _rest = signal<ActiveRest | null>(null);
   private readonly _next = signal('');
+  private readonly _liveNext = signal<LiveNext | null>(null);
   private readonly _checked = signal(false);
   private _restored = false;
 
@@ -57,6 +84,8 @@ export class ActiveSessionStore {
   readonly rest = this._rest.asReadonly();
   /** What the logger says comes next ("Set 3 · 62.5 kg × 8 · Bench press"), rest or not. */
   readonly next = this._next.asReadonly();
+  /** The same, in pieces, for the lock screen; null when nothing is left or the logger never opened. */
+  readonly liveNext = this._liveNext.asReadonly();
   /** True once the API has said whether a workout is open: until then, null means unknown. */
   readonly checked = this._checked.asReadonly();
 
@@ -105,8 +134,9 @@ export class ActiveSessionStore {
     if (rest && rest.logId !== log.id) this.setRest(null);
   }
 
-  setNext(next: string): void {
+  setNext(next: string, live: LiveNext | null = null): void {
     this._next.set(next);
+    this._liveNext.set(live);
   }
 
   setRest(rest: ActiveRest | null): void {
@@ -119,6 +149,7 @@ export class ActiveSessionStore {
     this._checked.set(true);
     this._session.set(null);
     this._next.set('');
+    this._liveNext.set(null);
     this.setRest(null);
   }
 

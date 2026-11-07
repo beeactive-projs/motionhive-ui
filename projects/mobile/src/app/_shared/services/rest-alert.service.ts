@@ -40,6 +40,8 @@ export class RestAlertService {
 
   /** Epoch ms the current rest ends, or null when nothing is resting. */
   private endsAt: number | null = null;
+  /** What comes next ("Set 3 · 62.5 kg × 8 · Bench press"), for the alert's text. */
+  private next = '';
   /** True once something is actually scheduled with the OS. */
   private scheduled = false;
   /** null until we have asked; false means the user said no and we stop trying. */
@@ -70,8 +72,9 @@ export class RestAlertService {
    * or the user leaves the workout. Safe to call on every change — nothing
    * reaches the OS until the app is actually backgrounded.
    */
-  track(endsAt: number | null): void {
+  track(endsAt: number | null, next = ''): void {
     this.endsAt = endsAt;
+    this.next = next;
     if (endsAt === null) void this.clear();
   }
 
@@ -87,7 +90,7 @@ export class RestAlertService {
           {
             id: REST_NOTIFICATION_ID,
             title: this._translateService.instant('workouts.restAlert.title'),
-            body: this._translateService.instant('workouts.restAlert.body'),
+            body: this._body(),
             schedule: {
               at: new Date(endsAt),
               // Android throttles inexact alarms into batches, which for a
@@ -102,6 +105,14 @@ export class RestAlertService {
       // A denied or unavailable notification must never break a workout.
       this.scheduled = false;
     }
+  }
+
+  /** The set to do now, so the alert alone says what to load; the old sentence when nothing is known. */
+  private _body(): string {
+    if (this.next) {
+      return this.next;
+    }
+    return this._translateService.instant('workouts.restAlert.body');
   }
 
   /** Withdraw a scheduled alert. Cheap and safe when there is nothing queued. */

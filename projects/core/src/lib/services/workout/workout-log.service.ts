@@ -391,6 +391,17 @@ export class WorkoutLogService {
   }
 
   /**
+   * Several sets of the running workout in one transaction (a whole round
+   * of a superset): all of them go, or none does.
+   */
+  removeSets(workoutLogId: string, setIds: string[]): Observable<void> {
+    return this._http.post<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.REMOVE_SETS(workoutLogId)}`,
+      { setIds },
+    );
+  }
+
+  /**
    * "Last time you did this" — most-recent completed log's actuals for
    * a catalog exercise. Returns up to 6 sets (one workout's worth).
    * Powers the `LastTimeHint` component on the active log.

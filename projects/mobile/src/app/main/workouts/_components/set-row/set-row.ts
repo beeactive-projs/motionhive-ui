@@ -5,6 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LoggedSet, SetField, SetFields } from 'core';
 
 import {
+  BadgeTones,
   SetBadge,
   SetRowMode,
   SetRowModes,
@@ -73,6 +74,19 @@ export class SetRow {
   readonly open = output<void>();
 
   readonly Modes = SetRowModes;
+
+  /**
+   * The label on the open card. A plain set's number goes: its name already
+   * says it ("Set 2"). A typed set keeps its letter (W, D) and a superset
+   * member its tag (A1), which the name doesn't carry (`short` marks those).
+   */
+  readonly headBadge = computed(() => {
+    const badge = this.badge();
+    if (badge.tone !== BadgeTones.Plain) {
+      return true;
+    }
+    return badge.short !== undefined;
+  });
 
   /** A finished set reads with its units: "62.5 kg × 8". */
   readonly doneLine = computed(() =>

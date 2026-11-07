@@ -286,6 +286,8 @@ export const API_ENDPOINTS = {
     PAUSE_GAP: (id: string) => `/workout-logs/${id}/pause-gap`,
     LOG_SET: (id: string, setId: string) =>
       `/workout-logs/${id}/sets/${setId}`,
+    /** Several sets at once, such as a whole round of a superset. */
+    REMOVE_SETS: (id: string) => `/workout-logs/${id}/sets/remove`,
     ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,
     REMOVE_EXERCISE: (id: string, exId: string) =>
       `/workout-logs/${id}/exercises/${exId}`,

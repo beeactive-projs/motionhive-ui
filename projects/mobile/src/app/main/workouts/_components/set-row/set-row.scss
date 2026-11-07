@@ -111,6 +111,10 @@
 }
 
 .name {
+  /* Takes the free space, so last time and the ⋯ sit at the card's end
+     whether or not there is a last time. */
+  flex: 1 1 auto;
+  min-width: 0;
   overflow: hidden;
   color: var(--ion-color-primary-wash-contrast);
   font-size: var(--mh-text-sm);
@@ -119,12 +123,31 @@
   white-space: nowrap;
 }
 
+/* Last time stays whole ("last time 100 × 12"): the name gives way first. */
 .last {
   flex: none;
-  margin-inline-start: auto;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The set's ⋯, in the card's corner: a full tap target, the icon small. */
+.more {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  margin: -0.625rem -0.5rem -0.625rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ion-color-medium);
+  font-size: 1.25rem;
+  cursor: pointer;
 }
 
 .fields {

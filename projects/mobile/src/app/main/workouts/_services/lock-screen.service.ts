@@ -122,6 +122,7 @@ export class LockScreenService {
       this._store.next(),
       (key, params) => this._translateService.instant(key, params),
       Date.now(),
+      this._store.liveNext(),
     );
   }
 

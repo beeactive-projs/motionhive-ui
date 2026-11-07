@@ -1,20 +1,15 @@
 @switch (mode()) {
   @case (Modes.Done) {
     <div class="line done">
-      <button
-        type="button"
-        [class]="'badge tone-' + badge().tone"
-        [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
-        (click)="menu.emit()"
-      >
-        {{ badge().text }}
-      </button>
+      <!-- The number is a label, not a button: tap the line to open the set,
+           where its ⋯ is; swipe it left to delete. -->
       <button
         type="button"
         class="text"
         [attr.aria-label]="'workouts.setRow.edit' | translate: { name: badge().name }"
         (click)="open.emit()"
       >
+        <span [class]="'badge tone-' + badge().tone" aria-hidden="true">{{ badge().text }}</span>
         <span class="value">{{ doneLine() || '–' }}</span>
         @if (rpe(); as value) {
           <span class="rpe">{{ 'workouts.effort.rpe' | translate: { value } }}</span>
@@ -31,14 +26,9 @@
     <!-- The set you are on: big targets where the finger is. -->
     <div class="focus" [class.reopened]="set().isCompleted">
       <div class="head">
-        <button
-          type="button"
-          [class]="'badge tone-' + badge().tone"
-          [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
-          (click)="menu.emit()"
-        >
-          {{ badge().text }}
-        </button>
+        @if (headBadge()) {
+          <span [class]="'badge tone-' + badge().tone" aria-hidden="true">{{ badge().text }}</span>
+        }
         <span class="name">
           {{ badge().name }}
           @if (set().isCompleted) {
@@ -48,6 +38,15 @@
         @if (last()) {
           <span class="last">{{ last() }}</span>
         }
+        <!-- The set's options (type, note, delete), on their own button. -->
+        <button
+          type="button"
+          class="more"
+          [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
+          (click)="menu.emit()"
+        >
+          <ion-icon name="ellipsis-horizontal" aria-hidden="true" />
+        </button>
       </div>
 
       <div class="fields">
@@ -94,18 +93,11 @@
     <div class="line future">
       <button
         type="button"
-        [class]="'badge tone-' + badge().tone"
-        [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
-        (click)="menu.emit()"
-      >
-        {{ badge().text }}
-      </button>
-      <button
-        type="button"
         class="text"
         [attr.aria-label]="'workouts.setRow.edit' | translate: { name: badge().name }"
         (click)="open.emit()"
       >
+        <span [class]="'badge tone-' + badge().tone" aria-hidden="true">{{ badge().text }}</span>
         <span class="value">{{ futureLine() }}</span>
       </button>
     </div>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ActiveRest, ActiveSession } from './active-session.store';
+import { ActiveRest, ActiveSession, LiveNext } from './active-session.store';
 import { liveState, Translate } from './lock-screen.config';
 
 const START = Date.parse('2026-11-02T17:00:00Z');
@@ -65,5 +65,33 @@ describe('liveState', () => {
     expect(state.restLine).toBe('workouts.restTimer.rest');
     expect(state.goLine).toBe('workouts.restTimer.restOver');
     expect(state.workoutLine).toBe('');
+  });
+
+  it('sends the next set in pieces, with the rest as planned', () => {
+    const live: LiveNext = {
+      exercise: 'Bench press',
+      set: 'Set 3',
+      target: '62.5 kg × 8',
+      last: 'last 60 × 8',
+      done: 2,
+      total: 4,
+      workoutDone: 7,
+      workoutTotal: 13,
+      kicker: '',
+      order: '',
+    };
+    const state = liveState(session, rest, '', translate, NOW, live);
+    expect(state.exercise).toBe('Bench press');
+    expect(state.set).toBe('Set 3');
+    expect(state.aim).toBe('workouts.live.target {"value":"62.5 kg × 8"}');
+    expect(state.progress).toBe('workouts.live.progress {"done":7,"total":13}');
+    expect(state.planned).toBe('workouts.live.planned {"total":"1:30"}');
+    expect([state.done, state.total]).toEqual([2, 4]);
+  });
+
+  it('leaves the pieces empty when the logger has not said, and the plan out between sets', () => {
+    const state = liveState(session, null, 'Set 1 · Squat', translate, NOW);
+    expect([state.exercise, state.aim, state.progress, state.planned]).toEqual(['', '', '', '']);
+    expect([state.done, state.total]).toEqual([0, 0]);
   });
 });

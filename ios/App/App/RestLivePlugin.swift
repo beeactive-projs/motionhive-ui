@@ -34,6 +34,7 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+
     deinit {
         if let observer { NotificationCenter.default.removeObserver(observer) }
     }
@@ -137,11 +138,28 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
             restLine: call.getString("restLine") ?? "",
             goLine: call.getString("goLine") ?? "",
             workoutLine: call.getString("workoutLine") ?? "",
+            exercise: call.getString("exercise"),
+            setName: call.getString("set"),
+            target: call.getString("target"),
+            aim: call.getString("aim"),
+            last: call.getString("last"),
+            done: call.getInt("done"),
+            total: call.getInt("total"),
+            progress: call.getString("progress"),
+            planned: call.getString("planned"),
+            kicker: call.getString("kicker"),
+            order: call.getString("order"),
             labels: RestTimerAttributes.Labels(
                 go: label("go"),
                 skip: label("skip"),
                 startSet: label("startSet"),
-                paused: label("paused")
+                paused: label("paused"),
+                rest: label("rest"),
+                restOver: label("restOver"),
+                workout: label("workout"),
+                done: label("done"),
+                next: label("next"),
+                more: label("more")
             )
         )
     }

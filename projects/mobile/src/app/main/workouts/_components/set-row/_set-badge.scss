@@ -1,5 +1,6 @@
 /* The set badge (number, or W / D / F / A), shared by the set row and the
-   set menu so a type looks the same in both. */
+   set menu so a type looks the same in both. A label only: the set's
+   options have their own ⋯ button. */
 
 .badge {
   display: inline-flex;
@@ -13,7 +14,6 @@
   border-radius: var(--mh-radius-control);
   background: transparent;
   color: var(--ion-color-medium);
-  cursor: pointer;
   font-size: var(--mh-text-sm);
   font-weight: 700;
   font-variant-numeric: tabular-nums;

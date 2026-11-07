@@ -133,12 +133,21 @@
 
             <div class="sets">
               @for (round of block.rounds; track round.index) {
-                <div class="round-label">
-                  <span>{{ 'workouts.superset.round' | translate: { number: round.index + 1 } }}</span>
+                <!-- The label is the round's handle: tap it to delete the whole round. -->
+                <button
+                  type="button"
+                  class="round-label"
+                  [attr.aria-label]="'workouts.superset.roundActions' | translate: { number: round.index + 1 }"
+                  (click)="openRoundMenu(round)"
+                >
+                  <span class="round-name">
+                    {{ 'workouts.superset.round' | translate: { number: round.index + 1 } }}
+                    <ion-icon class="round-more" name="ellipsis-horizontal" aria-hidden="true" />
+                  </span>
                   @if (round.done) {
                     <span class="round-done">{{ 'workouts.superset.done' | translate }}</span>
                   }
-                </div>
+                </button>
                 @if (round.summary !== null) {
                   <button type="button" class="round-summary" [class.done]="round.done" (click)="openRound(round)">
                     {{ round.summary }}
@@ -302,23 +311,35 @@
 </ng-template>
 
 <ng-template #rowTpl let-row let-view="view">
-  <mh-set-row
-    [attr.data-focus]="row.focus ? '' : null"
-    [attr.data-editing]="row.editing ? '' : null"
-    [set]="row.set"
-    [mode]="row.mode"
-    [badge]="row.badge"
-    [fields]="view.fields"
-    [prefill]="row.prefill"
-    [last]="row.last"
-    [unilateral]="isUnilateral(view.exercise)"
-    [editing]="row.editing"
-    [draft]="row.editing ? typed() : null"
-    (tick)="tick(view.exercise, row.set)"
-    (edit)="editCell(view.exercise, row.set, $event)"
-    (menu)="openMenu(view.exercise, row.set, row.badge)"
-    (open)="openSet(view.exercise, row.set)"
-  />
+  <!-- Swipe left for Delete, as everywhere on a phone. Never while typing
+       into the set, and a full swipe does not delete: Delete waits for a tap. -->
+  <ion-item-sliding #sliding class="set-slide" [disabled]="row.editing">
+    <ion-item lines="none" class="set-item">
+      <mh-set-row
+        [attr.data-focus]="row.focus ? '' : null"
+        [attr.data-editing]="row.editing ? '' : null"
+        [set]="row.set"
+        [mode]="row.mode"
+        [badge]="row.badge"
+        [fields]="view.fields"
+        [prefill]="row.prefill"
+        [last]="row.last"
+        [unilateral]="isUnilateral(view.exercise)"
+        [editing]="row.editing"
+        [draft]="row.editing ? typed() : null"
+        (tick)="tick(view.exercise, row.set)"
+        (edit)="editCell(view.exercise, row.set, $event)"
+        (menu)="openMenu(view.exercise, row.set, row.badge)"
+        (open)="openSet(view.exercise, row.set)"
+      />
+    </ion-item>
+    <ion-item-options side="end">
+      <ion-item-option color="danger" (click)="swipeDelete(sliding, view.exercise, row.set)">
+        <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
+        {{ 'button.delete' | translate }}
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
   @if (effortFor() === row.set.id) {
     <mh-effort-prompt
       [target]="row.effortTarget"
@@ -372,6 +393,13 @@
   [exerciseName]="restExerciseName()"
   [initialScope]="restSheetScope()"
   (apply)="applyRest($event)"
+/>
+
+<mh-action-sheet
+  [(open)]="roundMenuOpen"
+  [title]="roundMenuTitle()"
+  [actions]="roundActions"
+  (chosen)="onRoundAction($event)"
 />
 
 <mh-set-menu-sheet

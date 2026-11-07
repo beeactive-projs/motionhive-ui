@@ -27,6 +27,28 @@ struct RestTimerAttributes: ActivityAttributes {
         var goLine: String
         /// "Next: Set 3 · Bench press", under the workout clock.
         var workoutLine: String
+        /// The next set in pieces, for the layouts that cut the name before
+        /// the weight. Nil or empty when the app has not said: the lines
+        /// above stand in. Optional, so a state from an older app still reads.
+        var exercise: String?
+        /// "Set 2", "Warm-up", "Round 2".
+        var setName: String?
+        /// "62.5 kg × 8".
+        var target: String?
+        /// "Target 62.5 kg × 8", between sets.
+        var aim: String?
+        /// "last 60 × 8".
+        var last: String?
+        /// Sets of this exercise ticked, of how many (rounds, in a superset).
+        var done: Int?
+        var total: Int?
+        /// "7 of 13 sets", beside the workout clock.
+        var progress: String?
+        /// "of 2:00", beside the countdown.
+        var planned: String?
+        /// In a superset: "Superset · round 2 of 3", and the round in order.
+        var kicker: String?
+        var order: String?
         var labels: Labels
     }
 
@@ -36,6 +58,13 @@ struct RestTimerAttributes: ActivityAttributes {
         var skip: String
         var startSet: String
         var paused: String
+        /// Optional, as the fields above.
+        var rest: String?
+        var restOver: String?
+        var workout: String?
+        var done: String?
+        var next: String?
+        var more: String?
     }
 
     /// The workout log it belongs to: another workout starts another activity.

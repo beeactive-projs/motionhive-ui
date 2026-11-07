@@ -3128,7 +3128,8 @@
         "pauseFailed": "Could not pause the workout",
         "removeSetFailed": "Could not remove that set",
         "removed": "Removed {name}",
-        "repeatFailed": "Could not load that workout to repeat"
+        "repeatFailed": "Could not load that workout to repeat",
+        "removeRoundFailed": "Could not delete that round"
       },
       "last": "last {value}",
       "best": "best {value}",
@@ -3579,7 +3580,10 @@
       "addRound": "Add round",
       "restAfterRound": "Rest after the round: {value}",
       "rounds": "{count, plural, one {# round} other {# rounds}}",
-      "summary": "Superset · {count, plural, one {# round} other {# rounds}}"
+      "summary": "Superset · {count, plural, one {# round} other {# rounds}}",
+      "deleteRound": "Delete round",
+      "deleteRoundHint": "Every set in this round, of every exercise",
+      "roundActions": "Round {number}: options"
     },
     "loggerOptions": {
       "title": "This workout",
@@ -3679,7 +3683,11 @@
     "live": {
       "next": "Next: {next}",
       "workout": "Workout",
-      "plus": "+{seconds} s"
+      "plus": "+{seconds} s",
+      "done": "Done",
+      "target": "Target {value}",
+      "progress": "{done} of {total, plural, one {# set} other {# sets}}",
+      "planned": "of {total}"
     }
   },
   "feedback": {

@@ -250,6 +250,45 @@ export class LoggerStore {
       });
   }
 
+  /**
+   * Several sets gone at once (a whole round of a superset): off the screen
+   * now, in one call to the server. If it fails, the workout is read again.
+   */
+  removeSets(sets: readonly { exerciseId: string; setId: string }[], onError?: () => void): void {
+    const log = this._log();
+    if (!log || sets.length === 0) {
+      return;
+    }
+    const gone = new Set<string>();
+    for (const { setId } of sets) {
+      gone.add(setId);
+      this._queued.delete(setId);
+    }
+    const exerciseIds = new Set(sets.map((entry) => entry.exerciseId));
+    for (const exerciseId of exerciseIds) {
+      this._updateExercise(exerciseId, (ex) => ({
+        ...ex,
+        sets: (ex.sets ?? []).filter((s) => !gone.has(s.id)),
+      }));
+    }
+    this._workoutLogService
+      .removeSets(log.id, [...gone])
+      .pipe(take(1))
+      .subscribe({
+        error: () => {
+          onError?.();
+          this._workoutLogService
+            .get(log.id)
+            .pipe(take(1), catchError(() => of(null)))
+            .subscribe((fresh) => {
+              if (fresh) {
+                this._log.set(fresh);
+              }
+            });
+        },
+      });
+  }
+
   // ─── Exercises ────────────────────────────────────────────────
 
   setSkipped(exerciseId: string, skipped: boolean): void {

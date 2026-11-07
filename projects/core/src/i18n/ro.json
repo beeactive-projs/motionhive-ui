@@ -330,7 +330,7 @@
       "AMRAP": "AMRAP",
       "CLUSTER": "Cluster",
       "DROPSET": "Drop set",
-      "FAILURE": "Până la cedare",
+      "FAILURE": "Până la epuizare",
       "NORMAL": "Normală",
       "REST_PAUSE": "Rest-pause",
       "WARMUP": "Încălzire",

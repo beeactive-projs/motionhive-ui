@@ -3,10 +3,12 @@ import SwiftUI
 import WidgetKit
 
 /// The lock screen and Dynamic Island face of the workout in progress
-/// (Workouts R2, Active Workout, "Outside the app"): a draining hexagon and
-/// the countdown while resting, a green Go at zero, an outlined hexagon and
-/// the workout clock between sets. The system draws every timer from the
-/// dates in the state, so it stays right with the app asleep.
+/// (Workouts R2, Active Workout, "Outside the app"; the Live Activity design:
+/// rich and standard layouts, the same states). Four states: the rest
+/// counting down, the rest over, between sets with the workout clock, and
+/// paused. The system draws every timer from the dates in the state, so it
+/// stays right with the app asleep.
+///
 @main
 struct RestTimerBundle: WidgetBundle {
     var body: some Widget {
@@ -17,26 +19,35 @@ struct RestTimerBundle: WidgetBundle {
 private enum Palette {
     /// The app's honey, `--mh-honey`.
     static let honey = Color(red: 245 / 255, green: 158 / 255, blue: 11 / 255)
+    /// The next set's dot, a lighter honey.
+    static let honeyLight = Color(red: 253 / 255, green: 230 / 255, blue: 138 / 255)
     static let go = Color(red: 34 / 255, green: 197 / 255, blue: 94 / 255)
-    static let card = Color(red: 28 / 255, green: 29 / 255, blue: 32 / 255)
+    /// "Done" on navy, lighter than the hexagon's green so it reads as text.
+    static let goText = Color(red: 74 / 255, green: 222 / 255, blue: 128 / 255)
+    /// The app's navy, opaque in light and dark, so no wallpaper shows through.
+    static let card = Color(red: 14 / 255, green: 27 / 255, blue: 49 / 255)
     static let chip = Color.white.opacity(0.14)
-    static let muted = Color.white.opacity(0.62)
+    static let muted = Color(red: 159 / 255, green: 179 / 255, blue: 200 / 255)
     /// Text on honey, as on the app's honey buttons.
-    static let ink = Color(red: 14 / 255, green: 27 / 255, blue: 49 / 255)
+    static let ink = card
 }
 
 /// Which face to show, worked out from the dates when the system draws it.
-/// The rest turns to Go when its end passes (the state's stale date).
+/// The rest turns to "Done" when its end passes (the state's stale date).
 private enum Phase {
     case rest(ClosedRange<Date>)
-    case go
+    case go(since: Date)
     case workout(from: Date)
     case paused(seconds: Int)
 
     init(_ state: RestTimerAttributes.ContentState, stale: Bool) {
         if let end = state.restEndsAt {
             let start = min(state.restStartedAt ?? end, end)
-            self = stale || end <= Date() ? .go : .rest(start...end)
+            if stale || end <= Date() {
+                self = .go(since: end)
+            } else {
+                self = .rest(start...end)
+            }
         } else if let from = state.clockFrom {
             self = .workout(from: from)
         } else {
@@ -48,58 +59,169 @@ private enum Phase {
 struct RestTimerLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: RestTimerAttributes.self) { context in
-            LockScreenView(state: context.state, phase: Phase(context.state, stale: context.isStale))
+            RichView(face: Face(state: context.state, phase: Phase(context.state, stale: context.isStale)))
                 .activityBackgroundTint(Palette.card)
-                .activitySystemActionForegroundColor(.white)
+            .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
-            let state = context.state
-            let phase = Phase(state, stale: context.isStale)
+            let face = Face(state: context.state, phase: Phase(context.state, stale: context.isStale))
             return DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) {
-                    TimerHex(phase: phase, size: 34).padding(.leading, 6).padding(.top, 2)
-                }
-                DynamicIslandExpandedRegion(.trailing) {
-                    Clock(state: state, phase: phase)
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.trailing, 6)
-                }
                 DynamicIslandExpandedRegion(.center) {
-                    Text(state.title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
+                    Text(face.kicker)
+                        .font(.system(size: 11, weight: .semibold))
+                        .tracking(0.6)
+                        .foregroundStyle(Palette.muted)
                         .lineLimit(1)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    HStack(spacing: 10) {
-                        Text(line(state, phase))
-                            .font(.system(size: 13))
-                            .foregroundStyle(Palette.muted)
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Actions(state: state, phase: phase)
+                    // The time goes down here, across the island: beside the
+                    // camera there is no room for a clock past ten minutes.
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .center, spacing: 12) {
+                            TimerHex(phase: face.phase, size: 32)
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                    BigNumber(face: face, size: 26)
+                                        .multilineTextAlignment(.leading)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    if !face.aside.isEmpty {
+                                        Text(face.aside)
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundStyle(Palette.muted)
+                                            .lineLimit(1)
+                                            .fixedSize()
+                                    }
+                                }
+                                if case let .rest(range) = face.phase {
+                                    RestBar(range: range)
+                                }
+                            }
+                        }
+                        NextLine(face: face, size: 13)
+                        Actions(face: face, limit: 2)
                     }
-                    .padding(.horizontal, 6)
+                    .padding(.horizontal, 4)
                 }
             } compactLeading: {
-                TimerHex(phase: phase, size: 20).padding(.leading, 2)
+                TimerHex(phase: face.phase, size: 18).padding(.leading, 2)
             } compactTrailing: {
-                CompactClock(state: state, phase: phase)
+                CompactClock(face: face)
             } minimal: {
-                TimerHex(phase: phase, size: 20)
+                TimerHex(phase: face.phase, size: 18)
             }
             .keylineTint(Palette.honey)
         }
     }
 }
 
-/// The line under the big text.
-private func line(_ state: RestTimerAttributes.ContentState, _ phase: Phase) -> String {
-    switch phase {
-    case .rest: return state.restLine
-    case .go: return state.goLine
-    case .workout: return state.workoutLine
-    case .paused: return state.labels.paused
+/// What every layout reads: the state, the phase, and the texts worked out once.
+private struct Face {
+    let state: RestTimerAttributes.ContentState
+    let phase: Phase
+
+    private func text(_ value: String?) -> String {
+        value ?? ""
+    }
+
+    var exercise: String { text(state.exercise) }
+    var setName: String { text(state.setName) }
+    var target: String { text(state.target) }
+    /// True when the app sent the next set in pieces; otherwise the old lines stand in.
+    var hasPieces: Bool { !exercise.isEmpty }
+    var order: String { text(state.order) }
+    var isSuperset: Bool { !order.isEmpty }
+
+    /// The small line above the big number.
+    var kicker: String {
+        switch phase {
+        case .rest:
+            let superset = text(state.kicker)
+            if !superset.isEmpty {
+                return superset.uppercased()
+            }
+            return orFallback(state.labels.rest, "Rest").uppercased()
+        case .go:
+            return orFallback(state.labels.restOver, "Rest over").uppercased()
+        case .workout:
+            return joined([state.title, text(state.labels.workout)]).uppercased()
+        case .paused:
+            return joined([state.title, state.labels.paused]).uppercased()
+        }
+    }
+
+    /// Beside the big number: "of 2:00", or "7 of 13 sets".
+    var aside: String {
+        switch phase {
+        case .rest:
+            return text(state.planned)
+        case .go:
+            return ""
+        case .workout, .paused:
+            return text(state.progress)
+        }
+    }
+
+    /// The line under it, at the smaller size: last time, or the target and last time.
+    var detail: String {
+        if !hasPieces {
+            return ""
+        }
+        switch phase {
+        case .rest, .go:
+            if isSuperset {
+                return ""
+            }
+            return text(state.last)
+        case .workout, .paused:
+            return joined([text(state.aim), text(state.last)])
+        }
+    }
+
+    /// One line, for the standard layout, the Dynamic Island and an app that sent no pieces.
+    var oneLine: String {
+        switch phase {
+        case .rest:
+            if hasPieces {
+                return "\(nextLabel): \(theSet)"
+            }
+            return state.restLine
+        case .go:
+            if hasPieces {
+                return theSet
+            }
+            return state.goLine
+        case .workout:
+            if hasPieces {
+                return joined([setName, text(state.progress)])
+            }
+            return state.workoutLine
+        case .paused:
+            return state.labels.paused
+        }
+    }
+
+    /// The set to do, on one line: the round in order, in a superset.
+    private var theSet: String {
+        if isSuperset {
+            return order
+        }
+        return joined([exercise, setName, target])
+    }
+
+    var nextLabel: String { orFallback(state.labels.next, "Next") }
+    var doneLabel: String { orFallback(state.labels.done, state.labels.go) }
+
+    /// The dots: sets (or rounds) done, the next one lit, as many as fit.
+    var dots: (done: Int, total: Int) {
+        (state.done ?? 0, state.total ?? 0)
+    }
+
+    private func orFallback(_ value: String?, _ fallback: String) -> String {
+        guard let value, !value.isEmpty else { return fallback }
+        return value
+    }
+
+    private func joined(_ parts: [String]) -> String {
+        parts.filter { !$0.isEmpty }.joined(separator: " · ")
     }
 }
 
@@ -108,117 +230,258 @@ private func clockText(_ seconds: Int) -> String {
     let hours = seconds / 3600
     let minutes = (seconds / 60) % 60
     let rest = seconds % 60
-    return hours > 0
-        ? String(format: "%d:%02d:%02d", hours, minutes, rest)
-        : String(format: "%d:%02d", minutes, rest)
+    if hours > 0 {
+        return String(format: "%d:%02d:%02d", hours, minutes, rest)
+    }
+    return String(format: "%d:%02d", minutes, rest)
 }
 
-private struct LockScreenView: View {
-    let state: RestTimerAttributes.ContentState
-    let phase: Phase
+// MARK: - Lock screen
+
+/// Three lines and up to three buttons: what the rest needs at a glance.
+/// Fixed type sizes, so its height is known whatever the person's text size:
+/// at most about 150 points, under the 160 the lock screen allows. Long
+/// names give way on the line; the weight and the time never do.
+private struct RichView: View {
+    let face: Face
 
     var body: some View {
-        HStack(spacing: 12) {
-            TimerHex(phase: phase, size: 40)
-            VStack(alignment: .leading, spacing: 2) {
-                Headline(state: state, phase: phase)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                let text = line(state, phase)
-                if !text.isEmpty {
-                    Text(text)
-                        .font(.system(size: 13))
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .center, spacing: 12) {
+                TimerHex(phase: face.phase, size: 38)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(face.kicker)
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .tracking(0.8)
                         .foregroundStyle(Palette.muted)
                         .lineLimit(1)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        BigNumber(face: face, size: 26)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if !face.aside.isEmpty {
+                            Text(face.aside)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Palette.muted)
+                                .lineLimit(1)
+                                .fixedSize()
+                        }
+                    }
+                    if case let .rest(range) = face.phase {
+                        RestBar(range: range).padding(.top, 3)
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            Actions(state: state, phase: phase)
+            NextLine(face: face, size: 13)
+            DetailRow(face: face)
+            Actions(face: face, limit: 3)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
     }
 }
 
-/// The big text: the countdown, Go, or the workout's name and clock.
-private struct Headline: View {
-    let state: RestTimerAttributes.ContentState
-    let phase: Phase
-
-    var body: some View {
-        switch phase {
-        case .rest, .go:
-            Clock(state: state, phase: phase)
-        case .workout, .paused:
-            HStack(spacing: 0) {
-                Text(state.title).lineLimit(1)
-                Text(" · ")
-                Clock(state: state, phase: phase).fixedSize()
-            }
-        }
-    }
-}
-
-/// The time alone: what is left of the rest, Go, or the workout's time.
-private struct Clock: View {
-    let state: RestTimerAttributes.ContentState
-    let phase: Phase
-
-    var body: some View {
-        switch phase {
-        case let .rest(range):
-            Text(timerInterval: range, countsDown: true).monospacedDigit()
-        case .go:
-            Text(state.labels.go)
-        case let .workout(from):
-            Text(from, style: .timer).monospacedDigit()
-        case let .paused(seconds):
-            Text(clockText(seconds)).monospacedDigit()
-        }
-    }
-}
-
-/// Beside the camera: narrow, so the timer is held to a width it fits.
-private struct CompactClock: View {
-    let state: RestTimerAttributes.ContentState
-    let phase: Phase
+/// The big text: the countdown, "Done" and the time past it, or the workout's clock.
+/// A timer takes all the width it is given, so it always sits in a bounded frame.
+private struct BigNumber: View {
+    let face: Face
+    let size: CGFloat
 
     var body: some View {
         Group {
-            switch phase {
-            case .rest:
-                Clock(state: state, phase: phase).foregroundStyle(Palette.honey)
-            case .go:
-                Clock(state: state, phase: phase).foregroundStyle(Palette.go)
-            case .workout, .paused:
-                Clock(state: state, phase: phase).foregroundStyle(.white)
+            switch face.phase {
+            case let .rest(range):
+                Text(timerInterval: range, countsDown: true)
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            case let .go(since):
+                // "Done +0:25": the date counts up once it has passed.
+                (Text(face.doneLabel).foregroundColor(Palette.goText)
+                    + Text("  +").foregroundColor(Palette.muted)
+                    + Text(since, style: .timer).foregroundColor(Palette.muted))
+                    .monospacedDigit()
+            case let .workout(from):
+                Text(from, style: .timer)
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            case let .paused(seconds):
+                Text(clockText(seconds))
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.muted)
             }
         }
-        .font(.system(size: 15, weight: .semibold, design: .rounded))
-        .multilineTextAlignment(.trailing)
-        .frame(maxWidth: 52, alignment: .trailing)
+        .font(.system(size: size, weight: .bold, design: .rounded))
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
 }
 
-/// +15 and Skip while resting, Start set at zero. Buttons need iOS 17;
-/// before that, a tap on the activity opens the app.
+/// The rest draining, honey on a faint track.
+private struct RestBar: View {
+    let range: ClosedRange<Date>
+
+    var body: some View {
+        ProgressView(timerInterval: range, countsDown: true) {
+            EmptyView()
+        } currentValueLabel: {
+            EmptyView()
+        }
+        .progressViewStyle(.linear)
+        .tint(Palette.honey)
+        .frame(height: 5)
+    }
+}
+
+/// "Next: Bench press · Set 2 · 62.5 kg × 8": the name gives way first, the
+/// weight never. In a superset, the whole round in order.
+private struct NextLine: View {
+    let face: Face
+    let size: CGFloat
+
+    private var prefix: String {
+        if case .rest = face.phase {
+            return "\(face.nextLabel): "
+        }
+        return ""
+    }
+
+    var body: some View {
+        Group {
+            if !face.hasPieces || face.isPausedOnly {
+                Text(face.oneLine)
+                    .foregroundStyle(Palette.muted)
+                    .lineLimit(1)
+            } else if face.isSuperset {
+                Text(prefix + face.order)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            } else {
+                HStack(spacing: 0) {
+                    Text(prefix + face.exercise)
+                        .lineLimit(1)
+                    if !face.setName.isEmpty {
+                        Text(" · \(face.setName)").lineLimit(1).fixedSize()
+                    }
+                    if face.showsTarget && !face.target.isEmpty {
+                        Text(" · ").fixedSize()
+                        Text(face.target)
+                            .foregroundStyle(Palette.honey)
+                            .lineLimit(1)
+                            .fixedSize()
+                    }
+                }
+                .foregroundStyle(.white)
+            }
+        }
+        .font(.system(size: size, weight: .semibold))
+    }
+}
+
+private extension Face {
+    /// During and after the rest the weight goes on this line; between sets it is in the detail.
+    var showsTarget: Bool {
+        switch phase {
+        case .rest, .go: return true
+        case .workout, .paused: return false
+        }
+    }
+
+    /// A paused workout with nothing known to come still says so.
+    var isPausedOnly: Bool {
+        if case .paused = phase {
+            return !hasPieces
+        }
+        return false
+    }
+}
+
+/// Last time (or the target) on the left, the dots on the right.
+private struct DetailRow: View {
+    let face: Face
+
+    var body: some View {
+        let dots = face.dots
+        if !face.detail.isEmpty || dots.total > 0 {
+            HStack(spacing: 8) {
+                Text(face.detail)
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(Palette.muted)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                SetDots(done: dots.done, total: dots.total)
+            }
+        }
+    }
+}
+
+/// One small hexagon per set: done in honey, the next one lighter, the rest
+/// faint. Past eight, "3/10" in their place.
+private struct SetDots: View {
+    let done: Int
+    let total: Int
+
+    private static let most = 8
+
+    var body: some View {
+        if total > Self.most {
+            Text("\(min(done + 1, total))/\(total)")
+                .font(.system(size: 11.5, weight: .semibold))
+                .monospacedDigit()
+                .foregroundStyle(Palette.muted)
+        } else if total > 0 {
+            HStack(spacing: 3) {
+                ForEach(0..<total, id: \.self) { index in
+                    LogoHexagon()
+                        .fill(color(index))
+                        .frame(width: 9, height: 10)
+                }
+            }
+        }
+    }
+
+    private func color(_ index: Int) -> Color {
+        if index < done {
+            return Palette.honey
+        }
+        if index == done {
+            return Palette.honeyLight
+        }
+        return Palette.chip
+    }
+}
+
+/// −15, +15 and Skip while resting; Start set and +30 s once it is over.
+/// Buttons need iOS 17; before that, a tap on the activity opens the app.
 private struct Actions: View {
-    let state: RestTimerAttributes.ContentState
-    let phase: Phase
+    let face: Face
+    /// How many the layout has room for; the least needed go first.
+    let limit: Int
 
     var body: some View {
         if #available(iOS 17.0, *) {
-            switch phase {
+            switch face.phase {
             case .rest:
                 HStack(spacing: 6) {
-                    Button(intent: ExtendRestIntent()) { Chip(text: "+15") }
+                    if limit >= 3 {
+                        Button(intent: ShortenRestIntent()) { Chip(text: "−15", stretch: true) }
+                            .buttonStyle(.plain)
+                    }
+                    Button(intent: ExtendRestIntent()) { Chip(text: "+15", stretch: true) }
                         .buttonStyle(.plain)
-                    Button(intent: SkipRestIntent()) { Chip(text: state.labels.skip) }
+                    Button(intent: SkipRestIntent()) { Chip(text: face.state.labels.skip, stretch: true) }
                         .buttonStyle(.plain)
                 }
             case .go:
-                Button(intent: StartSetIntent()) { Chip(text: state.labels.startSet, primary: true) }
+                HStack(spacing: 6) {
+                    Button(intent: StartSetIntent()) {
+                        Chip(text: face.state.labels.startSet, primary: true, stretch: true)
+                    }
                     .buttonStyle(.plain)
+                    if let more = face.state.labels.more, !more.isEmpty {
+                        Button(intent: MoreRestIntent()) { Chip(text: more) }
+                            .buttonStyle(.plain)
+                    }
+                }
             case .workout, .paused:
                 EmptyView()
             }
@@ -229,23 +492,83 @@ private struct Actions: View {
 private struct Chip: View {
     let text: String
     var primary = false
+    /// Shares the row's width with the other buttons.
+    var stretch = false
 
     var body: some View {
         Text(text)
             .font(.system(size: 13, weight: .semibold))
             .lineLimit(1)
-            .foregroundStyle(primary ? Palette.ink : .white)
-            .padding(.horizontal, 11)
-            .padding(.vertical, 8)
+            .minimumScaleFactor(0.85)
+            .foregroundStyle(ink)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .frame(maxWidth: width)
             .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(primary ? Palette.honey : Palette.chip)
+                RoundedRectangle(cornerRadius: 11, style: .continuous).fill(fill)
             )
+    }
+
+    private var ink: Color {
+        if primary {
+            return Palette.ink
+        }
+        return .white
+    }
+
+    private var fill: Color {
+        if primary {
+            return Palette.honey
+        }
+        return Palette.chip
+    }
+
+    private var width: CGFloat? {
+        if stretch {
+            return .infinity
+        }
+        return nil
     }
 }
 
-/// The timer hexagon (the logo's, as the rest bar's): filled and draining
-/// while resting, green with a tick at Go, an outline for the workout clock.
+// MARK: - Dynamic Island
+
+/// Beside the camera: narrow, so the timer is held to a width it fits.
+private struct CompactClock: View {
+    let face: Face
+
+    var body: some View {
+        Group {
+            switch face.phase {
+            case let .rest(range):
+                Text(timerInterval: range, countsDown: true)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.honey)
+            case .go:
+                Image(systemName: "checkmark")
+                    .font(.system(size: 13, weight: .heavy))
+                    .foregroundStyle(Palette.goText)
+            case let .workout(from):
+                Text(from, style: .timer)
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            case let .paused(seconds):
+                Text(clockText(seconds))
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.muted)
+            }
+        }
+        .font(.system(size: 15, weight: .semibold, design: .rounded))
+        .multilineTextAlignment(.trailing)
+        .frame(maxWidth: 52, alignment: .trailing)
+    }
+}
+
+// MARK: - The hexagon
+
+/// The logo's hexagon as a status: honey while resting, green with a tick
+/// once the rest is over, an outline between sets, grey with a pause sign
+/// while paused. Static: the countdown and the bar carry the time.
 private struct TimerHex: View {
     let phase: Phase
     /// Point to point.
@@ -256,22 +579,8 @@ private struct TimerHex: View {
     var body: some View {
         ZStack {
             switch phase {
-            case let .rest(range):
-                LogoHexagon().fill(Palette.chip)
-                // The system's own progress, turned upright and cut to the
-                // hexagon: it drains from the top with nothing running.
-                ProgressView(timerInterval: range, countsDown: true) {
-                    EmptyView()
-                } currentValueLabel: {
-                    EmptyView()
-                }
-                .progressViewStyle(.linear)
-                .tint(Palette.honey)
-                .frame(width: size)
-                .scaleEffect(x: 1, y: width, anchor: .center)
-                .rotationEffect(.degrees(-90))
-                .frame(width: width, height: size)
-                .mask(LogoHexagon())
+            case .rest:
+                LogoHexagon().fill(Palette.honey)
             case .go:
                 LogoHexagon().fill(Palette.go)
                 Image(systemName: "checkmark")
@@ -280,7 +589,10 @@ private struct TimerHex: View {
             case .workout:
                 LogoHexagon().strokeBorder(Palette.honey, lineWidth: max(1.5, size * 0.07))
             case .paused:
-                LogoHexagon().strokeBorder(Palette.muted, lineWidth: max(1.5, size * 0.07))
+                LogoHexagon().fill(Palette.chip)
+                Image(systemName: "pause.fill")
+                    .font(.system(size: size * 0.32, weight: .bold))
+                    .foregroundStyle(.white)
             }
         }
         .frame(width: width, height: size)
