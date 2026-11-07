@@ -2,12 +2,14 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
 import {
+  CategoryStore,
   DiscoverGroup,
   GroupService,
   InstructorSearchResult,
   ProfileService,
   PublicSessionInstance,
   SessionService,
+  withCategorySpecialties,
 } from 'core';
 
 /**
@@ -23,18 +25,27 @@ import {
 @Injectable()
 export class DiscoverCoachesStore {
   private readonly _profileService = inject(ProfileService);
+  private readonly _categoryStore = inject(CategoryStore);
 
   private readonly _coaches = signal<InstructorSearchResult[]>([]);
   private readonly _loading = signal(false);
   private readonly _error = signal(false);
   private readonly _loaded = signal(false);
 
-  readonly coaches = this._coaches.asReadonly();
+  /**
+   * Each line under a coach's name reads their specializations; a coach who
+   * picked categories and wrote none shows the categories' names there.
+   */
+  readonly coaches = computed(() => {
+    const byId = this._categoryStore.byId();
+    return this._coaches().map((coach) => withCategorySpecialties(coach, byId));
+  });
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly loaded = this._loaded.asReadonly();
 
   load(opts: { force?: boolean; done?: () => void } = {}): void {
+    this._categoryStore.ensureLoaded();
     if (this._loading() || (this._loaded() && !opts.force)) {
       opts.done?.();
       return;

@@ -1,10 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthStore } from 'core';
 
+import { APP_HEX_SHAPE, HexShape } from '../../config/hexagon.config';
 import { HexAvatar } from '../hex-avatar/hex-avatar';
 
 /**
@@ -22,6 +23,12 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
 })
 export class AvatarButton {
   private readonly _authStore = inject(AuthStore);
+
+  /**
+   * The avatar's hexagon: the app's, or the pointy one Discover's page draws.
+   * `hexShape`, not `shape`: the button wears Ionic's `shape="round"`.
+   */
+  readonly hexShape = input<HexShape>(APP_HEX_SHAPE);
 
   readonly userName = this._authStore.userName;
   readonly avatarUrl = computed(() => this._authStore.user()?.avatarUrl ?? null);

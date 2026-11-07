@@ -23,6 +23,7 @@ import { addIcons } from 'ionicons';
 
 import {
   AuthStore,
+  CategoryStore,
   InstructorSearchResult,
   MyBookingsIndexStore,
   PublicSessionInstance,
@@ -38,7 +39,7 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
-import { APP_HEX_SHAPE, combFigure } from '../../_shared/config/hexagon.config';
+import { DISCOVER_HEX_SHAPE, cornerPrintPath } from '../../_shared/config/hexagon.config';
 import { ClockService } from '../../_shared/services/clock.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { COACHES_URL } from '../coaches/coaches.filters';
@@ -48,32 +49,33 @@ import { FeaturedCoach } from './_components/featured-coach/featured-coach';
 import { GroupCard } from './_components/group-card/group-card';
 import { DiscoverFilterSheet } from './_sheets/discover-filter-sheet/discover-filter-sheet';
 import {
-  DISCOVER_GOALS,
   DISCOVER_ICONS,
-  DiscoverGoalId,
   DiscoverSheetFilters,
+  DiscoverTopic,
+  DiscoverTopicIds,
   EVERYWHERE,
-  GOAL_CHIPS,
   NO_SHEET_FILTERS,
   QUICK_FILTERS,
   QuickFilterId,
-  coachMatchesGoal,
+  coachMatchesTopic,
   coachNearLine,
   coachOfTheWeek,
   compileDatePreset,
   discoverCities,
   discoverLinks,
-  groupMatchesGoal,
+  discoverTopicChips,
+  groupMatchesTopic,
   inCity,
   quickFilterSelected,
   resolveCity,
   sessionInCity,
-  sessionMatchesGoal,
+  sessionMatchesTopic,
   sheetBeyondQuickChips,
   sheetFilterCount,
   sortCoaches,
   withoutReader,
 } from './discover.config';
+import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
 import { DiscoverPrefs } from './discover-prefs';
 import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
 
@@ -84,30 +86,23 @@ const NEAR_LIMIT = 3;
 const GROUP_CARD_LIMIT = 4;
 
 /**
- * The band's honeycomb: seven of the app's hexagons on their points, two
- * over three over two, as `[column, row]` (a half column shifts a row).
- * `combFigure` draws them in the app's shape, the cells `COMB_GAP` apart
- * in units where a cell is 100 from point to point.
+ * The corner print's box and cells, in px at the default text size, as the
+ * design drew them: 170 × 120, cells 22 from the centre to a point. The svg
+ * is sized in rem, so it grows with the phone's text size like the rest.
  */
-const COMB_PLACES: readonly (readonly [number, number])[] = [
-  [0.5, 0],
-  [1.5, 0],
-  [0, 1],
-  [1, 1],
-  [2, 1],
-  [0.5, 2],
-  [1.5, 2],
-];
-const COMB_GAP = 8;
+const PRINT_WIDTH = 170;
+const PRINT_HEIGHT = 120;
+const PRINT_RADIUS = 22;
 
 /**
- * Discover, a tab in both modes, after the canvas design: a band at the top
- * in the brand's light colours, the Home hive card's cream (the toolbar is
- * part of it; the grey card step in dark, never navy), with the city, the
- * way into search and the goal chips; then the coach of the week, the
- * coaches near you, the groups to join and the sessions coming up. The city
- * and the goal filter every section. Coach and trainee see the same page,
- * so it carries no role branches, and never shows the reader to themselves.
+ * Discover, a tab in both modes, after the canvas design "Discover Header
+ * Clean", A, as drawn (owner, 2026-11-07): a white header whose only brand
+ * mark is the corner print, with the city, the way into search and the
+ * topic chips under a hairline; then the coach of the week, the coaches
+ * near you, the groups to join and the sessions coming up, with pointy
+ * avatars. The city and the topic filter every section. Coach and trainee
+ * see the same page, so it carries no role branches, and never shows the
+ * reader to themselves.
  *
  * Search is its own screen (`search/discover-search-page.ts`), pushed from
  * the band's field so back returns here.
@@ -156,16 +151,26 @@ export class Discover implements ViewWillEnter {
   private readonly _clockService = inject(ClockService);
   private readonly _router = inject(Router);
   private readonly _openDirectMessage = injectOpenDirectMessage();
+  private readonly _categoryStore = inject(CategoryStore);
+  private readonly _onboarding = inject(OnboardingStateService);
 
   /** This page lives only in Discover's own stack. */
   private readonly _links = discoverLinks('/tabs/discover');
 
-  readonly comb = combFigure(APP_HEX_SHAPE, COMB_PLACES, COMB_GAP);
-  readonly goalChips = GOAL_CHIPS.map((id) => DISCOVER_GOALS[id]);
+  readonly print = {
+    viewBox: `0 0 ${PRINT_WIDTH} ${PRINT_HEIGHT}`,
+    d: cornerPrintPath(PRINT_WIDTH, PRINT_HEIGHT, PRINT_RADIUS),
+  };
+  /** Discover's avatars stand on a point, as its design draws them. */
+  readonly hexShape = DISCOVER_HEX_SHAPE;
   readonly quickFilters = QUICK_FILTERS;
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
-  readonly selectedGoal = signal<DiscoverGoalId | null>(null);
+  /**
+   * The chip the reader picked: an id, null for none, undefined until they
+   * pick (then For you is lit when there is one, see `selectedTopic`).
+   */
+  private readonly _pickedTopicId = signal<string | null | undefined>(undefined);
   readonly citySheetOpen = signal(false);
   readonly filterSheetOpen = signal(false);
   /** What the sheet last applied — kept so reopening it shows reality. */
@@ -179,6 +184,8 @@ export class Discover implements ViewWillEnter {
     this._clockService.bump();
     this._myBookingsIndexStore.ensureLoaded();
     this._prefs.ensureAccountCity();
+    this._categoryStore.ensureLoaded();
+    void this._onboarding.ensureLoaded();
     this.coachesStore.load();
     this.groupsStore.load();
     // Filters survive re-entry; stale rows refresh in place (no blank flash).
@@ -241,11 +248,41 @@ export class Discover implements ViewWillEnter {
     this._prefs.setCity(value);
   }
 
-  // ─── Goal ───────────────────────────────────────────────────────────────
+  // ─── Topic ──────────────────────────────────────────────────────────────
 
-  /** One goal at a time; tapping the lit one turns it off. */
-  toggleGoal(id: DiscoverGoalId): void {
-    this.selectedGoal.update((current) => (current === id ? null : id));
+  /**
+   * The chips, over what the city shows: For you (the reader's interests),
+   * the activities with something here, then Online.
+   */
+  readonly topics = computed<DiscoverTopic[]>(() => {
+    const key = this._cityKey();
+    return discoverTopicChips(this._categoryStore.categories(), this._onboarding.interestIds(), {
+      coaches: this._coaches().filter((coach) => inCity(coach.city, key)),
+      groups: this.groupsStore.groups().filter((group) => inCity(group.city, key)),
+      sessions: this._sessions().filter((instance) => sessionInCity(instance, key)),
+    });
+  });
+
+  /** What narrows the tab: the reader's pick, else For you while it is on offer. */
+  readonly selectedTopic = computed<DiscoverTopic | null>(() => {
+    const picked = this._pickedTopicId();
+    const topics = this.topics();
+    if (picked === undefined) {
+      return topics.find((topic) => topic.id === DiscoverTopicIds.ForYou) ?? null;
+    }
+    if (picked === null) {
+      return null;
+    }
+    return topics.find((topic) => topic.id === picked) ?? null;
+  });
+
+  /** One topic at a time; tapping the lit one turns it off. */
+  toggleTopic(id: string): void {
+    if (this.selectedTopic()?.id === id) {
+      this._pickedTopicId.set(null);
+    } else {
+      this._pickedTopicId.set(id);
+    }
   }
 
   // ─── Coaches ────────────────────────────────────────────────────────────
@@ -260,7 +297,7 @@ export class Discover implements ViewWillEnter {
     coachOfTheWeek(this.coachesStore.coaches(), {
       cityKey: this._cityKey(),
       readerId: this._readerId(),
-      goal: this.selectedGoal(),
+      topic: this.selectedTopic(),
       now: new Date(this._clockService.now()),
     }),
   );
@@ -275,11 +312,11 @@ export class Discover implements ViewWillEnter {
   readonly nearCoaches = computed(() => {
     const featuredId = this.featured()?.id;
     const key = this._cityKey();
-    const goal = this.selectedGoal();
+    const topic = this.selectedTopic();
     return sortCoaches(
       this._coaches().filter(
         (coach) =>
-          coach.id !== featuredId && inCity(coach.city, key) && coachMatchesGoal(coach, goal),
+          coach.id !== featuredId && inCity(coach.city, key) && coachMatchesTopic(coach, topic),
       ),
     ).slice(0, NEAR_LIMIT);
   });
@@ -303,10 +340,10 @@ export class Discover implements ViewWillEnter {
 
   readonly groupCards = computed(() => {
     const key = this._cityKey();
-    const goal = this.selectedGoal();
+    const topic = this.selectedTopic();
     return this.groupsStore
       .groups()
-      .filter((group) => inCity(group.city, key) && groupMatchesGoal(group, goal))
+      .filter((group) => inCity(group.city, key) && groupMatchesTopic(group, topic))
       .slice(0, GROUP_CARD_LIMIT);
   });
 
@@ -314,9 +351,9 @@ export class Discover implements ViewWillEnter {
 
   private readonly _agenda = computed(() => {
     const key = this._cityKey();
-    const goal = this.selectedGoal();
+    const topic = this.selectedTopic();
     return this._sessions().filter(
-      (instance) => sessionInCity(instance, key) && sessionMatchesGoal(instance, goal),
+      (instance) => sessionInCity(instance, key) && sessionMatchesTopic(instance, topic),
     );
   });
 
@@ -338,7 +375,7 @@ export class Discover implements ViewWillEnter {
       !this.sessionsStore.loading() && !this.showLoadError() && this._agenda().length === 0,
   );
 
-  /** The chips, the dates or a goal narrowed it, as opposed to the city alone. */
+  /** The chips, the dates or a topic narrowed it, as opposed to the city alone. */
   readonly feedFiltered = computed(() => {
     const filters = this.sessionsStore.filters();
     return !!(
@@ -346,7 +383,7 @@ export class Discover implements ViewWillEnter {
       filters.locationKind ||
       filters.dateFrom ||
       filters.dateTo ||
-      this.selectedGoal()
+      this.selectedTopic()
     );
   });
 
@@ -408,9 +445,9 @@ export class Discover implements ViewWillEnter {
     });
   }
 
-  /** The agenda's filters and the goal; the city is a choice of its own. */
+  /** The agenda's filters and the topic; the city is a choice of its own. */
   clearFilters(): void {
-    this.selectedGoal.set(null);
+    this._pickedTopicId.set(null);
     this.sheetFilters.set({ ...NO_SHEET_FILTERS });
     this._keptSheet.set(null);
     this.sessionsStore.setFilters({

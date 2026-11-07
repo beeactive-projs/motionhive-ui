@@ -23,6 +23,7 @@ import { take } from 'rxjs';
 
 import {
   AuthStore,
+  CategoryStore,
   DiscoverGroup,
   GroupService,
   GroupsRefreshService,
@@ -44,29 +45,31 @@ import { CoachRow } from '../_components/coach-row/coach-row';
 import { DiscoverGroupRow } from '../_components/group-row/group-row';
 import { SessionResultRow } from '../_components/session-result-row/session-result-row';
 import {
-  BROWSE_GOALS,
-  DISCOVER_GOALS,
   DISCOVER_ICONS,
-  DiscoverGoalId,
   DiscoverRecent,
+  DiscoverTopic,
   GroupVerb,
   RecentKinds,
   SEARCH_KIND_OPTIONS,
   SearchKind,
   SearchKinds,
   accentVariant,
-  coachMatchesGoal,
+  browseTopics,
+  coachMatchesTopic,
   coachName,
   coachSubline,
   discoverLinks,
   discoverTitle,
-  groupMatchesGoal,
+  forYouTopic,
+  groupMatchesTopic,
   groupVerb,
   recentKey,
-  sessionMatchesGoal,
+  sessionMatchesTopic,
   sortCoaches,
   withoutReader,
 } from '../discover.config';
+import { ACTIVITY_ICONS } from '../../../_shared/config/category-icons.config';
+import { OnboardingStateService } from '../../../_shared/services/onboarding-state.service';
 import { DiscoverPrefs } from '../discover-prefs';
 import { DiscoverCoachesStore, DiscoverGroupsStore, DiscoverUpcomingStore } from '../discover.store';
 import { injectDiscoverSearch } from './discover-search';
@@ -131,6 +134,8 @@ export class DiscoverSearchPage implements ViewWillEnter {
   private readonly _coachesStore = inject(DiscoverCoachesStore);
   private readonly _groupsStore = inject(DiscoverGroupsStore);
   private readonly _upcomingStore = inject(DiscoverUpcomingStore);
+  private readonly _categoryStore = inject(CategoryStore);
+  private readonly _onboarding = inject(OnboardingStateService);
   private readonly _prefs = inject(DiscoverPrefs);
   private readonly _authStore = inject(AuthStore);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
@@ -148,9 +153,23 @@ export class DiscoverSearchPage implements ViewWillEnter {
   readonly Kinds = SearchKinds;
   readonly RecentKinds = RecentKinds;
   readonly kindOptions = SEARCH_KIND_OPTIONS;
-  readonly browseGoals = BROWSE_GOALS.map((id) => DISCOVER_GOALS[id]);
+  /**
+   * "Browse by activity": For you first when the reader picked some, then
+   * every activity on the list, then Online. The lists behind them load only
+   * once one is opened, so every activity is offered.
+   */
+  readonly browse = computed<DiscoverTopic[]>(() => {
+    const categories = this._categoryStore.categories();
+    const forYou = forYouTopic(categories, this._onboarding.interestIds());
+    const topics = browseTopics(categories, null);
+    if (forYou) {
+      return [forYou, ...topics];
+    }
+    return topics;
+  });
 
-  readonly goal = signal<DiscoverGoalId | null>(null);
+  /** The topic the results are narrowed to, from a browse card. */
+  readonly topic = signal<DiscoverTopic | null>(null);
   readonly kind = signal<SearchKind>(SearchKinds.All);
   /** The group whose Join is on its way. */
   readonly busyGroupId = signal<string | null>(null);
@@ -159,11 +178,13 @@ export class DiscoverSearchPage implements ViewWillEnter {
   private readonly _joined = signal<ReadonlySet<string>>(new Set());
 
   constructor() {
-    addIcons(DISCOVER_ICONS);
+    addIcons({ ...DISCOVER_ICONS, ...ACTIVITY_ICONS });
   }
 
   ionViewWillEnter(): void {
     this._myBookingsIndexStore.ensureLoaded();
+    this._categoryStore.ensureLoaded();
+    void this._onboarding.ensureLoaded();
   }
 
   // ─── Mode ───────────────────────────────────────────────────────────────
@@ -171,14 +192,11 @@ export class DiscoverSearchPage implements ViewWillEnter {
   readonly mode = computed<SearchMode>(() => {
     if (this.search.isActive()) return SearchModes.Query;
     if (this.search.query().trim()) return SearchModes.Short;
-    if (this.goal()) return SearchModes.Goal;
+    if (this.topic()) return SearchModes.Goal;
     return SearchModes.Start;
   });
 
-  readonly goalLabel = computed(() => {
-    const goal = this.goal();
-    return goal ? translate(DISCOVER_GOALS[goal].card) : '';
-  });
+  readonly goalLabel = computed(() => this.topic()?.label ?? '');
 
   // ─── Results ────────────────────────────────────────────────────────────
 
@@ -192,7 +210,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
       case SearchModes.Goal:
         return sortCoaches(
           withoutReader(this._coachesStore.coaches(), me).filter((coach) =>
-            coachMatchesGoal(coach, this.goal()),
+            coachMatchesTopic(coach, this.topic()),
           ),
         );
       default:
@@ -206,7 +224,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
       this.mode() === SearchModes.Query
         ? this.search.groups()
         : this.mode() === SearchModes.Goal
-          ? this._groupsStore.groups().filter((group) => groupMatchesGoal(group, this.goal()))
+          ? this._groupsStore.groups().filter((group) => groupMatchesTopic(group, this.topic()))
           : [];
     // A request sent from this screen shows as one, as the server will say
     // on the next search.
@@ -223,7 +241,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
         : this.mode() === SearchModes.Goal
           ? this._upcomingStore
               .sessions()
-              .filter((instance) => sessionMatchesGoal(instance, this.goal()))
+              .filter((instance) => sessionMatchesTopic(instance, this.topic()))
           : [];
     return source.filter((instance) => instance.instructorId !== me);
   });
@@ -407,8 +425,8 @@ export class DiscoverSearchPage implements ViewWillEnter {
   // ─── Input ──────────────────────────────────────────────────────────────
 
   onQueryChange(value: string): void {
-    // Typing leaves a goal: the field and the goal are two ways to ask.
-    if (value.trim()) this.goal.set(null);
+    // Typing leaves a topic: the field and the topic are two ways to ask.
+    if (value.trim()) this.topic.set(null);
     this.search.setQuery(value);
   }
 
@@ -418,16 +436,16 @@ export class DiscoverSearchPage implements ViewWillEnter {
     (event.target as HTMLElement | null)?.blur();
   }
 
-  openGoal(goal: DiscoverGoalId): void {
+  openTopic(topic: DiscoverTopic): void {
     this.kind.set(SearchKinds.All);
-    this.goal.set(goal);
+    this.topic.set(topic);
     this._coachesStore.load();
     this._groupsStore.load();
     this._upcomingStore.load();
   }
 
   clearGoal(): void {
-    this.goal.set(null);
+    this.topic.set(null);
   }
 
   setKind(kind: SearchKind): void {
@@ -436,7 +454,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
 
   clearSearch(): void {
     this.search.clear();
-    this.goal.set(null);
+    this.topic.set(null);
   }
 
   retry(): void {

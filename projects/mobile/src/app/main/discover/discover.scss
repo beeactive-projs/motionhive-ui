@@ -2,43 +2,69 @@
    skins (the flat list, .chip, ion-card, .mh-session-row, .mh-day-header),
    sections from layout.css. Sizes follow the calm Home (HOME_CALM_SPEC):
    the fluid tokens where the page breathes, rem everywhere else, so the
-   phone's text size carries through. */
+   phone's text size carries through.
 
-/* The band's surfaces, in the brand's light colours (user decision,
-   2026-11-01). Light: the hive card's cream on the white page, with the
-   search field and the idle chips on white, as the design puts white
-   panels on the cream. Dark: never navy; the band is the grey card step
-   and its field and chips a step above it (the soft fill). The hive token
-   turns navy in dark for the Home card, so dark names its own pair here:
-   no token says "the cream, or the grey card", hence the palette context. */
-:host {
-  --band: var(--mh-color-hive);
-  --band-raised: var(--ion-background-color);
+   The header is design "Discover Header Clean", A, built as drawn (owner,
+   2026-11-07), Discover only: the page's white (the grey page in dark) with
+   the corner print as its one brand mark, a hairline under the chips,
+   neutral city pill, search field and idle chips, navy section titles. On
+   this screen it sets aside three app rules on purpose (a bar has no
+   hairline, a card has no outline, idle chips are light navy); every other
+   screen keeps them (surfaces-and-sheets.md, "Discover's header"). */
+
+/* ── The bar and the corner print ───────────────────────────────────── */
+
+/* The print sits behind the toolbar, from the top of the screen, so the bar
+   is see-through on the header's own page colour. Clipped to the header:
+   the print has faded out by its lower edge. */
+.print-header {
+  overflow: hidden;
+  background: var(--ion-background-color);
 }
 
-:host-context(.ion-palette-dark) {
-  --band: var(--ion-card-background);
-  --band-raised: var(--mh-color-divider);
+.print-header ion-toolbar {
+  --background: transparent;
 }
 
-/* ── The bar, the top of the band ───────────────────────────────────── */
-
-/* The band from the top of the screen: the toolbar is its first row, in
-   the page's own ink (navy on the cream, light on the grey), so the bell,
-   the avatar and the status bar's dark icons read as on any light page. */
-.band-header {
-  --ion-toolbar-background: var(--band);
+/* Outlined honeycomb from the top right corner, fading towards the middle:
+   amber 600 at about 30% in light, the honey at about 45% in dark (the
+   corner print tokens). Lines 1.3 in the design's px. The box is the
+   header's height, up to the design's 120, so the fade ends inside the
+   header on a phone with a short one too (no notch); the cells keep their
+   size and the bottom of the print is what gives way ("slice"). */
+.print {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  width: 10.625rem;
+  height: 100%;
+  max-height: 7.5rem;
+  fill: none;
+  stroke: var(--mh-color-corner-print);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  opacity: var(--mh-corner-print-opacity);
+  mask-image: radial-gradient(100% 100% at 100% 0, black 0%, rgb(0 0 0 / 0.5) 55%, transparent 100%);
+  pointer-events: none;
 }
 
-.band-header ion-toolbar {
-  --background: var(--band);
-}
-
-/* The tab's display title: 22 to 26 with the screen, like Home's greeting. */
-.band-header ion-title {
+/* The tab's display title, the design's 28. */
+.print-header ion-title {
   font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-greeting);
+  font-size: var(--mh-text-3xl);
   font-weight: 600;
+}
+
+/* On a narrow bar (an SE from about 117% text, any phone at 130%) it steps
+   down, as every bar's title does (ion-title.css, "Narrow bars"), and
+   gives up its end padding to the buttons' own margins, so "Descoperă"
+   stays whole beside the bell and the avatar (measured: 142 of 161px on an
+   SE at 130%). */
+@container (max-width: 22rem) {
+  .print-header ion-title {
+    padding-inline-end: 0;
+    font-size: var(--mh-text-xl);
+  }
 }
 
 /* ── Page ───────────────────────────────────────────────────────────── */
@@ -65,60 +91,48 @@
   z-index: 2;
 }
 
-/* A long label (Romanian, large text) ellipses before it pushes the action
-   off. */
+/* The design's section titles: navy Poppins at 16, not the muted kicker
+   other pages label a list with. A long one ("Antrenorul săptămânii ·
+   Cluj-Napoca" at large text) wraps, words whole, rather than losing the
+   city or pushing the action off. */
 .discover .mh-section-head .mh-kicker {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--ion-text-color);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
+  text-wrap: balance;
 }
 
-/* ── The band ───────────────────────────────────────────────────────── */
+/* ── The rest of the header ─────────────────────────────────────────── */
 
+/* The city, the search and the chips, on the page's colour and closed by
+   the hairline the design draws under them. */
 .band {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.875rem;
-  padding: 0.25rem var(--mh-row-gutter) 0.375rem;
-  overflow: hidden;
-  background: var(--band);
+  gap: 0.75rem;
+  padding: 0.25rem var(--mh-row-gutter) 0.25rem;
+  border-block-end: var(--mh-hairline) solid var(--mh-color-divider);
+  background: var(--ion-background-color);
   color: var(--ion-text-color);
-  isolation: isolate;
 }
 
-/* The honeycomb in the corner: the app's own hexagon drawn as honey lines,
-   the hive card's pattern colour (deep honey on the cream, honey on the
-   grey). Lines, not a see-through fill, so it stays warm on either. */
-.comb {
-  position: absolute;
-  z-index: -1;
-  inset-block-start: -1.5rem;
-  inset-inline-end: -1.75rem;
-  width: 7.5rem;
-  fill: none;
-  stroke: var(--mh-color-hive-pattern);
-  stroke-width: 3;
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-/* The city: a honey capsule that is not a selection (the role pill's
-   recipe: the honey tint, a hairline in the accent ink), its label in the
-   deep honey and ellipsing before it outgrows the band. Small to the eye,
-   a finger's 44px to press. It stays `fill="clear"`, which honours
+/* The city: a neutral capsule, a hairline and the body ink, its glyphs
+   muted, its label ellipsing before it outgrows the line. Small to the
+   eye, a finger's 44px to press. It stays `fill="outline"`, which honours
    `--background`; pressed, the fill holds rather than fading. */
 .city {
-  --background: var(--mh-color-honey-tint);
-  --background-hover: var(--mh-color-honey-tint);
-  --background-activated: var(--mh-color-honey-tint);
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: var(--ion-card-background);
   --border-width: var(--mh-hairline);
   --border-style: solid;
-  --border-color: var(--mh-color-honey-deep);
-  --color: var(--mh-color-honey-deep);
+  --border-color: var(--mh-color-divider);
+  --color: var(--ion-text-color);
   --padding-start: 0.625rem;
   --padding-end: 0.625rem;
   position: relative;
@@ -140,6 +154,7 @@
 
 .city ion-icon {
   flex: none;
+  color: var(--ion-color-medium);
   font-size: var(--mh-icon-sm);
 }
 
@@ -165,12 +180,12 @@
   border-radius: var(--mh-radius-pill);
 }
 
-/* The field-look search entry: white on the cream, the soft fill on the
-   grey, a tap target tall, its words on one line. */
+/* The field-look search entry: the card fill, no outline, a tap target
+   tall, its words on one line in the muted ink. */
 .search-entry {
-  --background: var(--band-raised);
-  --background-hover: var(--band-raised);
-  --background-activated: var(--band-raised);
+  --background: var(--ion-card-background);
+  --background-hover: var(--ion-card-background);
+  --background-activated: var(--mh-color-divider);
   --color: var(--ion-color-medium);
   --padding-start: 0.875rem;
   --padding-end: 0.875rem;
@@ -201,22 +216,20 @@
   white-space: nowrap;
 }
 
-/* The goal chips scroll sideways to the band's edges. Idle on the field's
-   white (the soft fill in dark) in the idle chip's navy ink, so they read
-   as the search field's family on the cream; the picked one takes the
-   honey, as every selection does (the theme's selected chip, restated over
-   the band's idle fill). */
+/* The topic chips scroll sideways to the screen's edges. Idle on the
+   search field's fill in the body ink, so they read as its family; the
+   picked one takes the honey, as every selection does. */
 .goals {
   align-self: stretch;
   margin-inline: calc(-1 * var(--mh-row-gutter));
-  padding: 0.375rem var(--mh-row-gutter) 0.625rem;
+  padding: 0.125rem var(--mh-row-gutter) 0.625rem;
 }
 
 .goals .chip {
-  --background: var(--band-raised);
-  --background-hover: var(--band-raised);
-  --background-activated: var(--band-raised);
-  --color: var(--mh-color-chip-idle-contrast);
+  --background: var(--ion-card-background);
+  --background-hover: var(--ion-card-background);
+  --background-activated: var(--mh-color-divider);
+  --color: var(--ion-text-color);
 }
 
 .goals .chip.selected {

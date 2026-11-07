@@ -1,31 +1,37 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import type { DiscoverGroup, InstructorSearchResult, PublicSessionInstance } from 'core';
+import type {
+  Category,
+  DiscoverGroup,
+  InstructorSearchResult,
+  PublicSessionInstance,
+} from 'core';
 import { GroupMemberPostPolicies, JoinPolicies, SessionLocationKind, SessionType } from 'core';
 
 import { bookingPriceLabel } from '../user/sessions/my-sessions.config';
 import {
-  BROWSE_GOALS,
-  DISCOVER_GOALS,
+  CATEGORY_WORDS,
   DISCOVER_ICONS,
   DiscoverDatePresets,
-  DiscoverGoalIds,
   DiscoverRecent,
   DiscoverTones,
+  DiscoverTopicIds,
   EVERYWHERE,
-  GOAL_CHIPS,
   GroupVerbs,
+  TOPIC_CHIP_LIMIT,
   NO_SHEET_FILTERS,
   QuickFilterIds,
   RECENT_LIMIT,
   RecentKinds,
   accentVariant,
   bioQuote,
+  browseTopics,
+  categoryTopic,
   cityKey,
   coachBadge,
   coachFacts,
-  coachMatchesGoal,
+  coachMatchesTopic,
   coachName,
   coachNearLine,
   coachOfTheWeek,
@@ -37,8 +43,10 @@ import {
   discoverLinks,
   discoverMeta,
   discoverTone,
+  discoverTopicChips,
+  forYouTopic,
   fullChip,
-  groupMatchesGoal,
+  groupMatchesTopic,
   groupVerb,
   highlightParts,
   inCity,
@@ -48,14 +56,15 @@ import {
   pushRecent,
   quickFilterSelected,
   resolveCity,
+  onlineTopic,
   sessionInCity,
-  sessionMatchesGoal,
+  sessionMatchesTopic,
   sessionPriceParts,
   sheetBeyondQuickChips,
   sheetFilterCount,
   sortCoaches,
   spotsLabel,
-  textMatchesGoal,
+  textMatchesWords,
   withoutReader,
 } from './discover.config';
 
@@ -126,6 +135,20 @@ describe('DISCOVER_ICONS', () => {
 });
 
 // ─── Fixtures ──────────────────────────────────────────────────────────────
+
+function category(
+  slug: string,
+  kind: Category['kind'],
+  displayOrder: number,
+  icon = 'barbell-outline',
+): Category {
+  return { id: `id-${slug}`, slug, kind, name: slug, icon, displayOrder, coachesOnly: false };
+}
+
+const running = category('running', 'ACTIVITY', 2, 'footsteps-outline');
+const yoga = category('yoga', 'ACTIVITY', 3, 'flower-outline');
+const loseFat = category('lose-fat', 'GOAL', 2, 'flame-outline');
+const CATEGORIES: Category[] = [running, yoga, loseFat];
 
 function instance(
   overrides: Partial<{
@@ -590,63 +613,129 @@ describe('coach of the week', () => {
 
   it('picks by the week among coaches taking clients, the same for everyone', () => {
     // Ordered by id: c1, c2, c3. Week 44 → 44 % 3 = 2 → c3.
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', goal: null, now: saturday })?.id).toBe('c3');
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u8', goal: null, now: saturday })?.id).toBe('c3');
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', topic: null, now: saturday })?.id).toBe('c3');
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u8', topic: null, now: saturday })?.id).toBe('c3');
     // Changes on Monday: week 45 → 0 → c1.
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', goal: null, now: monday })?.id).toBe('c1');
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', topic: null, now: monday })?.id).toBe('c1');
   });
 
   it('never picks the reader: their week goes to the next coach', () => {
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u3', goal: null, now: saturday })?.id).toBe('c1');
-    expect(coachOfTheWeek([pool[0]], { cityKey: null, readerId: 'u3', goal: null, now: saturday })).toBeNull();
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u3', topic: null, now: saturday })?.id).toBe('c1');
+    expect(coachOfTheWeek([pool[0]], { cityKey: null, readerId: 'u3', topic: null, now: saturday })).toBeNull();
   });
 
   it('keeps to the city, and falls back to every city when it has nobody', () => {
     const cluj = cityKey('Cluj-Napoca');
     // Cluj: c1, c3. Week 44 → 0 → c1.
-    expect(coachOfTheWeek(pool, { cityKey: cluj, readerId: null, goal: null, now: saturday })?.id).toBe('c1');
+    expect(coachOfTheWeek(pool, { cityKey: cluj, readerId: null, topic: null, now: saturday })?.id).toBe('c1');
     const bucharest = cityKey('București');
-    expect(coachOfTheWeek(pool, { cityKey: bucharest, readerId: null, goal: null, now: saturday })?.id).toBe('c3');
+    expect(coachOfTheWeek(pool, { cityKey: bucharest, readerId: null, topic: null, now: saturday })?.id).toBe('c3');
     // Only the reader in the city counts as nobody.
     const timisoara = cityKey('Timisoara');
-    expect(coachOfTheWeek(pool, { cityKey: timisoara, readerId: 'u2', goal: null, now: saturday })?.id).toBe('c3');
+    expect(coachOfTheWeek(pool, { cityKey: timisoara, readerId: 'u2', topic: null, now: saturday })?.id).toBe('c3');
   });
 
-  it('narrows to the goal, and is null when no coach fits', () => {
-    const runner = coach({ id: 'c5', userId: 'u5', specializations: ['Alergare'] });
-    expect(coachOfTheWeek([...pool, runner], { cityKey: null, readerId: null, goal: DiscoverGoalIds.Running, now: saturday })?.id).toBe('c5');
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: null, goal: DiscoverGoalIds.Online, now: saturday })).toBeNull();
+  it('narrows to the topic, and is null when no coach fits', () => {
+    const runner = coach({ id: 'c5', userId: 'u5', categoryIds: [running.id] });
+    expect(coachOfTheWeek([...pool, runner], { cityKey: null, readerId: null, topic: categoryTopic(running), now: saturday })?.id).toBe('c5');
+    expect(coachOfTheWeek(pool, { cityKey: null, readerId: null, topic: onlineTopic(), now: saturday })).toBeNull();
   });
 });
 
-describe('goals', () => {
-  it('the band shows five chips and search six cards, every one translated', () => {
-    expect(GOAL_CHIPS).toEqual(['strength', 'running', 'beginners', 'online', 'mobility']);
-    expect(BROWSE_GOALS).toHaveLength(6);
-    for (const id of BROWSE_GOALS) expect(DISCOVER_GOALS[id].icon.endsWith('-outline')).toBe(true);
-    for (const id of GOAL_CHIPS) expect(DISCOVER_GOALS[id].chip).not.toBeNull();
+describe('topics', () => {
+  it('knows the words of every activity the list seeds', () => {
+    for (const slug of [
+      'strength', 'running', 'yoga', 'pilates', 'hiit', 'cycling', 'swimming',
+      'combat', 'dance', 'mobility', 'outdoor', 'team-sports', 'prenatal', 'nutrition',
+    ]) {
+      expect(CATEGORY_WORDS[slug]?.length, slug).toBeGreaterThan(0);
+    }
   });
 
   it('matches the start of a word, accents and case aside, in both languages', () => {
-    expect(textMatchesGoal(['Forță pentru începători'], DiscoverGoalIds.Strength)).toBe(true);
-    expect(textMatchesGoal(['Forță pentru începători'], DiscoverGoalIds.Beginners)).toBe(true);
-    expect(textMatchesGoal(['Alergăm în Cluj'], DiscoverGoalIds.Running)).toBe(true);
-    expect(textMatchesGoal(['1-on-1 Strength'], DiscoverGoalIds.Strength)).toBe(true);
-    expect(textMatchesGoal(['Brunch club'], DiscoverGoalIds.Running)).toBe(false);
-    expect(textMatchesGoal([null, ''], DiscoverGoalIds.Running)).toBe(false);
+    expect(textMatchesWords(['Forță pentru începători'], CATEGORY_WORDS['strength'])).toBe(true);
+    expect(textMatchesWords(['Alergăm în Cluj'], CATEGORY_WORDS['running'])).toBe(true);
+    expect(textMatchesWords(['1-on-1 Strength'], CATEGORY_WORDS['strength'])).toBe(true);
+    expect(textMatchesWords(['Brunch club'], CATEGORY_WORDS['running'])).toBe(false);
+    expect(textMatchesWords([null, ''], CATEGORY_WORDS['running'])).toBe(false);
+    expect(textMatchesWords(['Yoga'], [])).toBe(false);
   });
 
-  it('a coach by specialties, a group by name and tags, a session by title or online', () => {
-    expect(coachMatchesGoal(coach({ specializations: ['Powerlifting'] }), DiscoverGoalIds.Strength)).toBe(true);
-    expect(coachMatchesGoal(coach(), DiscoverGoalIds.Strength)).toBe(false);
-    expect(coachMatchesGoal(coach(), null)).toBe(true);
-    expect(coachMatchesGoal(coach({ isOnline: true }), DiscoverGoalIds.Online)).toBe(true);
-    expect(coachMatchesGoal(coach({ specializations: ['Online'] }), DiscoverGoalIds.Online)).toBe(false);
-    expect(groupMatchesGoal(group({ name: 'Club', tags: ['mobilitate'] }), DiscoverGoalIds.Mobility)).toBe(true);
-    expect(groupMatchesGoal(group(), DiscoverGoalIds.Running)).toBe(false);
-    expect(sessionMatchesGoal(instance(), DiscoverGoalIds.Online)).toBe(true);
-    expect(sessionMatchesGoal(instance({ locationKind: SessionLocationKind.InPerson }), DiscoverGoalIds.Online)).toBe(false);
-    expect(sessionMatchesGoal(instance(), DiscoverGoalIds.Mobility)).toBe(true); // "Evening yoga flow"
+  it('goes by categories when an item has them, by its words when it has none', () => {
+    const topic = categoryTopic(running);
+    expect(coachMatchesTopic(coach({ categoryIds: [running.id] }), topic)).toBe(true);
+    // Categories decide once there are some: the word alone no longer counts.
+    expect(coachMatchesTopic(coach({ categoryIds: [yoga.id], specializations: ['Alergare'] }), topic)).toBe(false);
+    expect(coachMatchesTopic(coach({ specializations: ['Alergare'] }), topic)).toBe(true);
+    expect(coachMatchesTopic(coach(), topic)).toBe(false);
+    expect(coachMatchesTopic(coach(), null)).toBe(true);
+    expect(groupMatchesTopic(group({ categoryIds: [running.id] }), topic)).toBe(true);
+    expect(groupMatchesTopic(group({ name: 'Alergăm în Cluj' }), topic)).toBe(true);
+    expect(groupMatchesTopic(group(), topic)).toBe(false);
+    expect(sessionMatchesTopic(instance(), categoryTopic(yoga))).toBe(true); // "Evening yoga flow"
+  });
+
+  it('online is a venue for a coach, where it happens for a session, words for a group', () => {
+    const online = onlineTopic();
+    expect(coachMatchesTopic(coach({ isOnline: true }), online)).toBe(true);
+    expect(coachMatchesTopic(coach({ specializations: ['Online'] }), online)).toBe(false);
+    expect(groupMatchesTopic(group({ name: 'Online run club' }), online)).toBe(true);
+    expect(sessionMatchesTopic(instance(), online)).toBe(true);
+    expect(sessionMatchesTopic(instance({ locationKind: SessionLocationKind.InPerson }), online)).toBe(false);
+  });
+
+  it('For you is the activities the reader picked, never their goals', () => {
+    const forYou = forYouTopic(CATEGORIES, [running.id, loseFat.id]);
+    expect(forYou?.id).toBe(DiscoverTopicIds.ForYou);
+    expect(forYou?.categoryIds).toEqual([running.id]);
+    expect(forYouTopic(CATEGORIES, [loseFat.id])).toBeNull();
+    expect(forYouTopic(CATEGORIES, [])).toBeNull();
+  });
+
+  it('offers only chips that leave something to show, Online last', () => {
+    const pool = {
+      coaches: [coach({ categoryIds: [running.id] })],
+      groups: [],
+      sessions: [],
+    };
+    const chips = discoverTopicChips(CATEGORIES, [running.id], pool);
+    expect(chips.map((chip) => chip.id)).toEqual([DiscoverTopicIds.ForYou, 'running', DiscoverTopicIds.Online]);
+    // No For you when what the reader likes is not here.
+    expect(discoverTopicChips(CATEGORIES, [yoga.id], pool).map((chip) => chip.id)).toEqual([
+      'running',
+      DiscoverTopicIds.Online,
+    ]);
+  });
+
+  it('caps the activity chips', () => {
+    const many: Category[] = Array.from({ length: TOPIC_CHIP_LIMIT + 3 }, (_, index) =>
+      category(`a${index}`, 'ACTIVITY', index),
+    );
+    const pool = {
+      coaches: many.map((c) => coach({ categoryIds: [c.id] })),
+      groups: [],
+      sessions: [],
+    };
+    // The activities, then Online.
+    expect(discoverTopicChips(many, [], pool)).toHaveLength(TOPIC_CHIP_LIMIT + 1);
+  });
+
+  it('browses every activity until the lists are known, then those with something', () => {
+    expect(browseTopics(CATEGORIES, null).map((topic) => topic.id)).toEqual([
+      'running',
+      'yoga',
+      DiscoverTopicIds.Online,
+    ]);
+    const pool = { coaches: [coach({ categoryIds: [yoga.id] })], groups: [], sessions: [] };
+    expect(browseTopics(CATEGORIES, pool).map((topic) => topic.id)).toEqual([
+      'yoga',
+      DiscoverTopicIds.Online,
+    ]);
+  });
+
+  it('draws a registered glyph for a category whatever the API names', () => {
+    expect(categoryTopic(category('x', 'ACTIVITY', 1, 'rocket-outline')).icon).toBe('ellipse-outline');
+    expect(categoryTopic(running).icon).toBe('footsteps-outline');
   });
 });
 

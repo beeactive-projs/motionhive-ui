@@ -37,6 +37,10 @@ Light mirrors dark (user decision, 2026-10-27): one page colour for every screen
 - A tinted (wash) card gets its colour from the fill alone; don't add a matching `border-color`.
 - Radii come from tokens: `--mh-radius-card` for cards, `--mh-radius-control` for controls and boxes inside a card, `--mh-radius-sheet` for sheet tops, `--mh-radius-pill` for chips.
 
+## Discover's header (the one exception)
+
+Discover's page is design "Discover Header Clean", A, built as drawn (owner, 2026-11-07). On that page only it sets aside three rules above, on purpose: a hairline closes the header (under the city, search and topic chips), the coach of the week is a white card (the page's colour) with a hairline, and the idle topic chips sit on the card fill in the body ink instead of light navy. Its avatars stand on a point (`DISCOVER_HEX_SHAPE`). The corner print, the outlined honeycomb behind the bar (`cornerPrintPath`, `--mh-color-corner-print`, `--mh-corner-print-opacity`), lives there and nowhere else. Don't copy any of it to another screen, and don't "fix" it back on Discover; whether it spreads is the owner's call once it has been seen on a phone.
+
 ## Sheets
 
 - Every bottom sheet is built on `mh-sheet-shell` (or `mh-action-sheet`, `mh-confirm-sheet`, `mh-choice-sheet`, which use it). Don't use `ActionSheetController` or a bare `ion-modal`.

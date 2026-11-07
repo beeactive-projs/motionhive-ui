@@ -1,64 +1,41 @@
-/* A card like any other on the page (ion-card.css): its fill is its edge,
-   no outline. Only the band, the portrait's place and the type are set
-   here. */
+/* Design "Discover Header Clean", A, as drawn (owner, 2026-11-07, Discover
+   only): the page's own white (the grey page in dark) with a hairline, where
+   every other card is a slate fill with no outline. No band, no honeycomb:
+   the corner print in the header is the page's one brand mark. */
 :host {
-  --strip: var(--mh-color-hive);
-
   display: block;
 }
 
-:host-context(.ion-palette-dark) {
-  --strip: var(--mh-color-divider);
-}
-
 .card {
-  position: relative;
-  margin: 0;
-}
+  --background: var(--ion-background-color);
 
-/* The hive card's honeycomb band, as a mask so its colour stays a token:
-   the cream with honey lines in light, a grey step above the card with
-   honey lines in dark (never navy: the hive token turns navy in dark for
-   the Home card, so dark picks the soft fill here). No glow. */
-.top {
-  position: relative;
-  height: 4.5rem;
-  background: var(--strip);
-  isolation: isolate;
-}
-
-.top::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--mh-color-hive-pattern);
-  opacity: 0.12;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cpath d='M0 28L16 0h32l16 28-16 28H16zM64 28h32' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E");
-  mask-size: 6rem 3.5rem;
-  pointer-events: none;
-}
-
-/* The portrait rides half over the band, lifted off it by a ring of the
-   card's own fill. */
-.portrait {
-  position: absolute;
-  inset-inline-start: var(--mh-card-pad);
-  inset-block-end: -2.25rem;
-  filter: drop-shadow(0 0 0.125rem var(--ion-card-background));
-}
-
-.status {
-  position: absolute;
-  inset-block-start: 0.75rem;
-  inset-inline-end: 0.75rem;
-}
-
-.body {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 2.75rem var(--mh-card-pad) var(--mh-card-pad);
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+  border: var(--mh-hairline) solid var(--mh-color-divider);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+/* The design's 58 × 65 portrait: a 4rem frame holds the pointy hexagon at
+   57 × 64. */
+.portrait {
+  width: 4rem;
+  font-size: var(--mh-text-lg);
+}
+
+.who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
 }
 
 .name {
@@ -68,20 +45,24 @@
 }
 
 .facts {
-  margin: 0;
+  margin: 0.125rem 0 0;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-tight);
 }
 
+.status {
+  margin-top: 0.375rem;
+}
+
 /* Their own words, three lines at most. */
 .quote {
   display: -webkit-box;
-  margin: 0.25rem 0 0;
+  margin: 0;
   overflow: hidden;
   color: var(--ion-text-color);
-  font-size: var(--mh-text-sm);
-  line-height: var(--mh-leading-body);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-tight);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -93,12 +74,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.5rem;
 }
 
 .actions ion-button {
   flex: 1 1 8rem;
   min-height: var(--mh-tap-target);
   margin: 0;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }

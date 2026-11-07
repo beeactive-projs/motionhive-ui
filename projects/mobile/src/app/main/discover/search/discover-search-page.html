@@ -96,10 +96,10 @@
         <section class="mh-section">
           <div class="mh-section-label browse-label">{{ 'discover.browse.title' | translate }}</div>
           <div class="browse">
-            @for (goal of browseGoals; track goal.id) {
-              <ion-card button class="goal" (click)="openGoal(goal.id)">
-                <mh-hex-avatar size="sm" color="primary" tone="wash" aria-hidden="true" [icon]="goal.icon" />
-                <span class="goal-label">{{ goal.card | translate }}</span>
+            @for (topic of browse(); track topic.id) {
+              <ion-card button class="goal" (click)="openTopic(topic)">
+                <mh-hex-avatar size="sm" color="primary" tone="wash" aria-hidden="true" [icon]="topic.icon" />
+                <span class="goal-label">{{ topic.label }}</span>
               </ion-card>
             }
           </div>

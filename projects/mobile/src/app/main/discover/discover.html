@@ -1,12 +1,21 @@
-<!-- A tab root: no back button, the bell and the avatar at the end. The bar
-     is the top of the cream band, not a bar above it, so it is opaque: a
-     translucent one let the page show through the band. -->
-<ion-header class="band-header">
+<!-- A tab root: no back button, the bell and the avatar at the end. The
+     corner print sits behind the bar, from the top of the screen: the
+     page's one brand mark (design "Discover Header Clean", A). -->
+<ion-header class="print-header">
+  <svg
+    class="print"
+    [attr.viewBox]="print.viewBox"
+    preserveAspectRatio="xMaxYMin slice"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path [attr.d]="print.d" />
+  </svg>
   <ion-toolbar>
     <ion-title>{{ 'nav.discover' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
-      <mh-avatar-button />
+      <mh-avatar-button [hexShape]="hexShape" />
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -17,12 +26,9 @@
   </ion-refresher>
 
   <div class="discover">
-    <!-- The band: where, the way into search, and what for. -->
+    <!-- The rest of the header: where, the way into search, and what for,
+         closed by a hairline. -->
     <section class="band">
-      <svg class="comb" [attr.viewBox]="comb.viewBox" aria-hidden="true" focusable="false">
-        <path [attr.d]="comb.d" />
-      </svg>
-
       @if (cityReady()) {
         <ion-button
           class="city"
@@ -51,17 +57,17 @@
       </ion-button>
 
       <div class="mh-chip-row goals" role="group" [attr.aria-label]="'discover.goals.label' | translate">
-        @for (goal of goalChips; track goal.id) {
+        @for (topic of topics(); track topic.id) {
           <ion-button
             class="chip"
             fill="clear"
             shape="round"
             size="small"
-            [class.selected]="selectedGoal() === goal.id"
-            [attr.aria-pressed]="selectedGoal() === goal.id"
-            (click)="toggleGoal(goal.id)"
+            [class.selected]="selectedTopic()?.id === topic.id"
+            [attr.aria-pressed]="selectedTopic()?.id === topic.id"
+            (click)="toggleTopic(topic.id)"
           >
-            {{ (goal.chip ?? goal.card) | translate }}
+            {{ topic.label }}
           </ion-button>
         }
       </div>
@@ -90,7 +96,7 @@
     } @else {
       @if (featured(); as coach) {
         <section class="mh-section">
-          <div class="mh-section-head warm">
+          <div class="mh-section-head">
             <h2 class="mh-kicker">{{ featuredKicker() }}</h2>
             <!-- With nobody else to list under it, the way to every coach
                  rides on this head instead. -->
@@ -120,7 +126,12 @@
           </div>
           <ion-list class="mh-flat-list">
             @for (coach of nearCoaches(); track coach.id) {
-              <mh-coach-row [coach]="coach" [line]="nearLine(coach)" (select)="openCoach(coach)" />
+              <mh-coach-row
+                [coach]="coach"
+                [line]="nearLine(coach)"
+                [shape]="hexShape"
+                (select)="openCoach(coach)"
+              />
             }
           </ion-list>
         </section>
@@ -148,7 +159,7 @@
         </div>
         <div class="gutter groups">
           @for (group of groupCards(); track group.id) {
-            <mh-group-card [group]="group" (select)="openGroup(group.id)" />
+            <mh-group-card [group]="group" [shape]="hexShape" (select)="openGroup(group.id)" />
           }
         </div>
       </section>

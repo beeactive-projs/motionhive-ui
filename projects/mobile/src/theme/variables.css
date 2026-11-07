@@ -397,6 +397,16 @@
   --mh-color-hive-honey-top: var(--mh-warning-200);
 
   /*
+   * The corner print (design "Discover Header Clean", A; owner, 2026-11-07):
+   * the outlined honeycomb in the top right of Discover's header, and
+   * nowhere else. Its line colour and how strongly it shows: amber 600 at
+   * about 30% on the white page, the honey at about 45% on the grey (the
+   * dark block below). The page fades it out towards the middle.
+   */
+  --mh-color-corner-print: var(--mh-primary-600);
+  --mh-corner-print-opacity: 0.32;
+
+  /*
    * The navy card: the brand's navy as a surface on a light page (the next
    * session tile, a client with no plan, the rest timer, a memory card, a
    * profile's navy band). In dark it is simply the card step, since navy
@@ -742,6 +752,8 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --mh-color-hive-cell: var(--mh-navy-600);
   --mh-color-hive-ghost: var(--mh-navy-700);
   --mh-color-hive-pattern: var(--ion-color-primary);
+  --mh-color-corner-print: var(--ion-color-primary);
+  --mh-corner-print-opacity: 0.45;
 
   /* The navy card matches the hive card's step, with its track a step up
      (navy 600, 1.2:1 on it), light ink and the honey accent. */

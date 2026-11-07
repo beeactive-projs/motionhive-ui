@@ -4,6 +4,7 @@ import { IonBadge, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { InstructorSearchResult } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { APP_HEX_SHAPE, HexShape } from '../../../../_shared/config/hexagon.config';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { coachBadge, coachName, coachSubline } from '../../discover.config';
 import { Highlight } from '../highlight/highlight';
@@ -33,6 +34,8 @@ export class CoachRow {
   readonly highlight = input('');
   /** The reader already trains with this coach. */
   readonly mine = input(false);
+  /** The avatar's hexagon: the app's, or the pointy one Discover's page draws. */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
 
   readonly select = output<void>();
 
