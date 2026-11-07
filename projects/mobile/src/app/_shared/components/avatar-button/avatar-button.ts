@@ -24,11 +24,8 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
 export class AvatarButton {
   private readonly _authStore = inject(AuthStore);
 
-  /**
-   * The avatar's hexagon: the app's, or the pointy one Discover's page draws.
-   * `hexShape`, not `shape`: the button wears Ionic's `shape="round"`.
-   */
-  readonly hexShape = input<HexShape>(APP_HEX_SHAPE);
+  /** The avatar's hexagon: the app's, or the pointy one Discover's page draws. */
+  readonly shape = input<HexShape>(APP_HEX_SHAPE);
 
   readonly userName = this._authStore.userName;
   readonly avatarUrl = computed(() => this._authStore.user()?.avatarUrl ?? null);

@@ -97,9 +97,9 @@
           <div class="mh-section-label browse-label">{{ 'discover.browse.title' | translate }}</div>
           <div class="browse">
             @for (topic of browse(); track topic.id) {
-              <ion-card button class="goal" (click)="openTopic(topic)">
+              <ion-card button class="topic" (click)="openTopic(topic)">
                 <mh-hex-avatar size="sm" color="primary" tone="wash" aria-hidden="true" [icon]="topic.icon" />
-                <span class="goal-label">{{ topic.label }}</span>
+                <span class="topic-label">{{ topic.label }}</span>
               </ion-card>
             }
           </div>
@@ -118,16 +118,16 @@
     }
 
     @default {
-      @if (mode() === Modes.Goal) {
-        <!-- The goal the results are narrowed to, with the way back to the
+      @if (mode() === Modes.Topic) {
+        <!-- The topic the results are narrowed to, with the way back to the
              start: the honey pill a list narrowed from its calendar wears. -->
-        <div class="goal-pill">
+        <div class="topic-pill">
           <ion-button
             class="mh-day-chip"
-            [attr.aria-label]="'discover.search.clearGoal' | translate: { goal: goalLabel() }"
-            (click)="clearGoal()"
+            [attr.aria-label]="'discover.search.clearGoal' | translate: { goal: topicLabel() }"
+            (click)="clearTopic()"
           >
-            {{ goalLabel() }}
+            {{ topicLabel() }}
             <ion-icon slot="end" name="close-outline" aria-hidden="true" />
           </ion-button>
         </div>
@@ -157,7 +157,7 @@
         <mh-empty-state
           icon="search-outline"
           [heading]="'empty.noResults' | translate"
-          [message]="(mode() === Modes.Goal ? 'discover.search.goalEmpty' : 'discover.search.empty') | translate"
+          [message]="(mode() === Modes.Topic ? 'discover.search.goalEmpty' : 'discover.search.empty') | translate"
           [actionLabel]="'button.clearSearch' | translate"
           (action)="clearSearch()"
         />

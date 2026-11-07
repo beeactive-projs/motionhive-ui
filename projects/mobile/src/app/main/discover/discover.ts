@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
@@ -171,6 +171,8 @@ export class Discover implements ViewWillEnter {
    * pick (then For you is lit when there is one, see `selectedTopic`).
    */
   private readonly _pickedTopicId = signal<string | null | undefined>(undefined);
+  /** The reader's welcome answers came, or could not be had in time. */
+  private readonly _interestsSettled = signal(false);
   readonly citySheetOpen = signal(false);
   readonly filterSheetOpen = signal(false);
   /** What the sheet last applied — kept so reopening it shows reality. */
@@ -185,7 +187,7 @@ export class Discover implements ViewWillEnter {
     this._myBookingsIndexStore.ensureLoaded();
     this._prefs.ensureAccountCity();
     this._categoryStore.ensureLoaded();
-    void this._onboarding.ensureLoaded();
+    void this._onboarding.ensureLoaded().then(() => this._interestsSettled.set(true));
     this.coachesStore.load();
     this.groupsStore.load();
     // Filters survive re-entry; stale rows refresh in place (no blank flash).
@@ -204,6 +206,39 @@ export class Discover implements ViewWillEnter {
   private readonly _sessions = computed(() => {
     const me = this._readerId();
     return this.sessionsStore.items().filter((instance) => instance.instructorId !== me);
+  });
+
+  /** A quick chip or the sheet narrows the agenda (the city and the topic aside). */
+  private readonly _agendaFiltered = computed(() => {
+    const filters = this.sessionsStore.filters();
+    return !!(filters.type || filters.locationKind || filters.dateFrom || filters.dateTo);
+  });
+
+  /**
+   * The sessions as they stood the last time no quick chip or sheet pick
+   * narrowed them, kept while one does or while a page loads: what the topic
+   * chips are counted over, so an agenda filter never takes a topic chip
+   * away, nor turns For you off under the coaches.
+   */
+  private readonly _openSessions = linkedSignal<
+    PublicSessionInstance[] | null,
+    PublicSessionInstance[]
+  >({
+    source: () => {
+      if (this._agendaFiltered() || this.sessionsStore.loading()) {
+        return null;
+      }
+      return this._sessions();
+    },
+    computation: (sessions, previous) => {
+      if (sessions) {
+        return sessions;
+      }
+      if (previous) {
+        return previous.value;
+      }
+      return [];
+    },
   });
 
   // ─── City ───────────────────────────────────────────────────────────────
@@ -251,16 +286,59 @@ export class Discover implements ViewWillEnter {
   // ─── Topic ──────────────────────────────────────────────────────────────
 
   /**
-   * The chips, over what the city shows: For you (the reader's interests),
-   * the activities with something here, then Online.
+   * The chips, over what the city shows, the agenda's own filters aside:
+   * For you (the reader's interests), the activities with something here,
+   * then Online when something is. The picked one stays while it is picked.
    */
   readonly topics = computed<DiscoverTopic[]>(() => {
     const key = this._cityKey();
-    return discoverTopicChips(this._categoryStore.categories(), this._onboarding.interestIds(), {
-      coaches: this._coaches().filter((coach) => inCity(coach.city, key)),
-      groups: this.groupsStore.groups().filter((group) => inCity(group.city, key)),
-      sessions: this._sessions().filter((instance) => sessionInCity(instance, key)),
-    });
+    return discoverTopicChips(
+      this._categoryStore.activities(),
+      this._onboarding.interestIds(),
+      {
+        coaches: this._coaches().filter((coach) => inCity(coach.city, key)),
+        groups: this.groupsStore.groups().filter((group) => inCity(group.city, key)),
+        sessions: this._openSessions().filter((instance) => sessionInCity(instance, key)),
+      },
+      this._pickedTopicId(),
+    );
+  });
+
+  /**
+   * Whether the topic the tab opens on is known: the reader picked one, or
+   * what For you is made of is in (their interests, then the lists the city
+   * is read from, `cityReady`). Once known it stays known for the visit.
+   * Until then the coach sections keep their skeletons, so the coach of the
+   * week and the near list are not drawn and then swapped when For you
+   * arrives. The category list is not waited on by itself: it is asked for
+   * first and is tiny, so it is in by the time those lists are, and its
+   * store has no error to say it failed, so waiting on `loaded()` could hold
+   * the skeletons for good.
+   */
+  private readonly _topicReady = linkedSignal<boolean, boolean>({
+    source: () => {
+      if (this._pickedTopicId() !== undefined) {
+        return true;
+      }
+      if (!this._interestsSettled()) {
+        return false;
+      }
+      if (this._onboarding.interestIds().length === 0) {
+        return true;
+      }
+      // For you is built from the category list: wait for it (or its failure,
+      // so the coaches never wait for good).
+      if (!this._categoryStore.loaded() && !this._categoryStore.failed()) {
+        return false;
+      }
+      return this.cityReady();
+    },
+    computation: (ready, previous) => {
+      if (previous) {
+        return ready || previous.value;
+      }
+      return ready;
+    },
   });
 
   /** What narrows the tab: the reader's pick, else For you while it is on offer. */
@@ -287,8 +365,11 @@ export class Discover implements ViewWillEnter {
 
   // ─── Coaches ────────────────────────────────────────────────────────────
 
+  /** Their first load, or the wait for the topic the tab opens on (`_topicReady`). */
   readonly coachesLoading = computed(
-    () => this.coachesStore.loading() && !this.coachesStore.loaded(),
+    () =>
+      (this.coachesStore.loading() && !this.coachesStore.loaded()) ||
+      (!this._topicReady() && !this.coachesStore.error()),
   );
 
   /** Picked from every coach, the reader included, so the week's pick is the
@@ -349,12 +430,15 @@ export class Discover implements ViewWillEnter {
 
   // ─── Coming up ──────────────────────────────────────────────────────────
 
-  private readonly _agenda = computed(() => {
+  /** The city's sessions under the quick chips and the sheet, before the topic. */
+  private readonly _cityAgenda = computed(() => {
     const key = this._cityKey();
+    return this._sessions().filter((instance) => sessionInCity(instance, key));
+  });
+
+  private readonly _agenda = computed(() => {
     const topic = this.selectedTopic();
-    return this._sessions().filter(
-      (instance) => sessionInCity(instance, key) && sessionMatchesTopic(instance, topic),
-    );
+    return this._cityAgenda().filter((instance) => sessionMatchesTopic(instance, topic));
   });
 
   readonly days = computed<SessionGroup<PublicSessionInstance>[]>(() =>
@@ -375,21 +459,17 @@ export class Discover implements ViewWillEnter {
       !this.sessionsStore.loading() && !this.showLoadError() && this._agenda().length === 0,
   );
 
-  /** The chips, the dates or a topic narrowed it, as opposed to the city alone. */
-  readonly feedFiltered = computed(() => {
-    const filters = this.sessionsStore.filters();
-    return !!(
-      filters.type ||
-      filters.locationKind ||
-      filters.dateFrom ||
-      filters.dateTo ||
-      this.selectedTopic()
-    );
-  });
+  /**
+   * The chips, the dates or the topic emptied it, as opposed to the city: a
+   * quick chip or the sheet is on, or the city had sessions until the topic
+   * took them. Read off the list before the topic, since For you is lit by
+   * default and would otherwise turn every empty feed into "nothing matches".
+   */
+  readonly feedFiltered = computed(() => this._agendaFiltered() || this._cityAgenda().length > 0);
 
-  /** Nothing anywhere, before any filter: the catalogue is empty. */
+  /** Nothing anywhere, before any chip or sheet pick: the catalogue is empty. */
   readonly feedNothingAtAll = computed(
-    () => this._sessions().length === 0 && !this.feedFiltered(),
+    () => this._sessions().length === 0 && !this._agendaFiltered(),
   );
 
   /**

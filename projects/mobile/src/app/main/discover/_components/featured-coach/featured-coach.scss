@@ -14,7 +14,7 @@
   gap: 0.75rem;
   margin: 0;
   padding: 1rem;
-  border: var(--mh-hairline) solid var(--mh-color-divider);
+  border: var(--mh-hairline) solid var(--mh-color-separator);
 }
 
 .head {
@@ -24,8 +24,9 @@
 }
 
 /* The design's 58 × 65 portrait: a 4rem frame holds the pointy hexagon at
-   57 × 64. */
-.portrait {
+   57 × 64. Under `:host`, so it outweighs the avatar's own size step
+   (`:host([data-size='lg'])`), which it would otherwise only tie. */
+:host .portrait {
   width: 4rem;
   font-size: var(--mh-text-lg);
 }

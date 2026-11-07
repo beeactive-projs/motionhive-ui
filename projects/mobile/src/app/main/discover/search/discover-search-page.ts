@@ -32,6 +32,7 @@ import {
   PublicSessionInstance,
   SelfJoinResult,
   translate,
+  withCategorySpecialties,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
@@ -60,7 +61,6 @@ import {
   coachSubline,
   discoverLinks,
   discoverTitle,
-  forYouTopic,
   groupMatchesTopic,
   groupVerb,
   recentKey,
@@ -76,14 +76,14 @@ import { injectDiscoverSearch } from './discover-search';
 
 /** What the screen is showing. */
 const SearchModes = {
-  /** Nothing typed, no goal: Recent, Browse by goal, the privacy line. */
+  /** Nothing typed, no topic: Recent, Browse by activity, the privacy line. */
   Start: 'start',
   /** Something typed, too short to send. */
   Short: 'short',
   /** The server's answer to what was typed. */
   Query: 'query',
-  /** A goal from Browse by goal, matched on the phone. */
-  Goal: 'goal',
+  /** A topic from Browse by activity, matched on the phone. */
+  Topic: 'topic',
 } as const;
 
 type SearchMode = (typeof SearchModes)[keyof typeof SearchModes];
@@ -91,9 +91,9 @@ type SearchMode = (typeof SearchModes)[keyof typeof SearchModes];
 /**
  * Discover's search, after the canvas design (3b, 3c): the field with its
  * caret already in it and Cancel; before anything is typed, Recent and
- * Browse by goal; then coaches, groups and sessions in three labelled flat
- * lists with chips to narrow them, the matched part marked (accents aside,
- * as the server matches them) and a group's Join beside its row.
+ * Browse by activity; then coaches, groups and sessions in three labelled
+ * flat lists with chips to narrow them, the matched part marked (accents
+ * aside, as the server matches them) and a group's Join beside its row.
  *
  * Mounted in Discover (`/tabs/discover/search`) and in Home
  * (`/tabs/home/search`): every row opens in the stack the screen is in, so
@@ -154,19 +154,13 @@ export class DiscoverSearchPage implements ViewWillEnter {
   readonly RecentKinds = RecentKinds;
   readonly kindOptions = SEARCH_KIND_OPTIONS;
   /**
-   * "Browse by activity": For you first when the reader picked some, then
-   * every activity on the list, then Online. The lists behind them load only
-   * once one is opened, so every activity is offered.
+   * "Browse by activity": For you when the reader picked some, every
+   * activity on the list, then Online (`browseTopics`). The lists behind
+   * them load only once one is opened, so every activity is offered.
    */
-  readonly browse = computed<DiscoverTopic[]>(() => {
-    const categories = this._categoryStore.categories();
-    const forYou = forYouTopic(categories, this._onboarding.interestIds());
-    const topics = browseTopics(categories, null);
-    if (forYou) {
-      return [forYou, ...topics];
-    }
-    return topics;
-  });
+  readonly browse = computed<DiscoverTopic[]>(() =>
+    browseTopics(this._categoryStore.activities(), this._onboarding.interestIds()),
+  );
 
   /** The topic the results are narrowed to, from a browse card. */
   readonly topic = signal<DiscoverTopic | null>(null);
@@ -192,11 +186,11 @@ export class DiscoverSearchPage implements ViewWillEnter {
   readonly mode = computed<SearchMode>(() => {
     if (this.search.isActive()) return SearchModes.Query;
     if (this.search.query().trim()) return SearchModes.Short;
-    if (this.topic()) return SearchModes.Goal;
+    if (this.topic()) return SearchModes.Topic;
     return SearchModes.Start;
   });
 
-  readonly goalLabel = computed(() => this.topic()?.label ?? '');
+  readonly topicLabel = computed(() => this.topic()?.label ?? '');
 
   // ─── Results ────────────────────────────────────────────────────────────
 
@@ -205,9 +199,15 @@ export class DiscoverSearchPage implements ViewWillEnter {
   readonly coaches = computed<InstructorSearchResult[]>(() => {
     const me = this._readerId();
     switch (this.mode()) {
-      case SearchModes.Query:
-        return withoutReader(this.search.coaches(), me);
-      case SearchModes.Goal:
+      case SearchModes.Query: {
+        // Mapped as Discover's own list is (`DiscoverCoachesStore.coaches`):
+        // a coach who picked categories and wrote none reads them instead.
+        const byId = this._categoryStore.byId();
+        return withoutReader(this.search.coaches(), me).map((coach) =>
+          withCategorySpecialties(coach, byId),
+        );
+      }
+      case SearchModes.Topic:
         return sortCoaches(
           withoutReader(this._coachesStore.coaches(), me).filter((coach) =>
             coachMatchesTopic(coach, this.topic()),
@@ -223,7 +223,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
     const source =
       this.mode() === SearchModes.Query
         ? this.search.groups()
-        : this.mode() === SearchModes.Goal
+        : this.mode() === SearchModes.Topic
           ? this._groupsStore.groups().filter((group) => groupMatchesTopic(group, this.topic()))
           : [];
     // A request sent from this screen shows as one, as the server will say
@@ -238,7 +238,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
     const source =
       this.mode() === SearchModes.Query
         ? this.search.sessions()
-        : this.mode() === SearchModes.Goal
+        : this.mode() === SearchModes.Topic
           ? this._upcomingStore
               .sessions()
               .filter((instance) => sessionMatchesTopic(instance, this.topic()))
@@ -276,7 +276,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
 
   readonly hasResults = computed(
     () =>
-      (this.mode() === SearchModes.Query || this.mode() === SearchModes.Goal) &&
+      (this.mode() === SearchModes.Query || this.mode() === SearchModes.Topic) &&
       this.counts().all > 0,
   );
 
@@ -284,7 +284,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
     switch (this.mode()) {
       case SearchModes.Query:
         return this.search.isSearching() && this.counts().all === 0;
-      case SearchModes.Goal:
+      case SearchModes.Topic:
         return (
           this.counts().all === 0 &&
           (this._coachesStore.loading() ||
@@ -300,7 +300,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
     switch (this.mode()) {
       case SearchModes.Query:
         return this.search.hasError();
-      case SearchModes.Goal:
+      case SearchModes.Topic:
         return (
           !this.loading() &&
           this._coachesStore.error() &&
@@ -320,14 +320,14 @@ export class DiscoverSearchPage implements ViewWillEnter {
           this.search.isEmpty() ||
           (!this.search.isSearching() && !this.failed() && this.counts().all === 0)
         );
-      case SearchModes.Goal:
+      case SearchModes.Topic:
         return !this.loading() && !this.failed() && this.counts().all === 0;
       default:
         return false;
     }
   });
 
-  /** What to mark in the rows: the typed term, never a goal. */
+  /** What to mark in the rows: the typed term, never a topic. */
   readonly term = computed(() => (this.mode() === SearchModes.Query ? this.search.query().trim() : ''));
 
   /** "forță" when "forta" was typed: the footnote says accents don't matter. */
@@ -444,7 +444,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
     this._upcomingStore.load();
   }
 
-  clearGoal(): void {
+  clearTopic(): void {
     this.topic.set(null);
   }
 
@@ -458,7 +458,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
   }
 
   retry(): void {
-    if (this.mode() === SearchModes.Goal) {
+    if (this.mode() === SearchModes.Topic) {
       this._coachesStore.load({ force: true });
       this._groupsStore.load({ force: true });
       this._upcomingStore.load();

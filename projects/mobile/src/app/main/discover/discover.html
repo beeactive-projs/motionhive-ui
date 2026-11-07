@@ -15,7 +15,7 @@
     <ion-title>{{ 'nav.discover' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
-      <mh-avatar-button [hexShape]="hexShape" />
+      <mh-avatar-button [shape]="hexShape" />
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -56,7 +56,7 @@
         <span class="search-entry-label">{{ 'discover.search.placeholder' | translate }}</span>
       </ion-button>
 
-      <div class="mh-chip-row goals" role="group" [attr.aria-label]="'discover.goals.label' | translate">
+      <div class="mh-chip-row topics" role="group" [attr.aria-label]="'discover.goals.label' | translate">
         @for (topic of topics(); track topic.id) {
           <ion-button
             class="chip"

@@ -16,7 +16,6 @@ import {
 } from 'ionicons/icons';
 
 import {
-  CategoryKinds,
   DiscoverFilters,
   DiscoverGroup,
   InstructorSearchResult,
@@ -605,13 +604,15 @@ export const CATEGORY_WORDS: Readonly<Record<string, readonly string[]>> = {
     'forta',
     'power',
     'lift',
+    'weightlift',
     'haltere',
     'putere',
     'musculat',
     'bodybuild',
     'culturism',
-    'weight',
-    'greutat',
+    // Lifting weights ("greutăți"), never "weight" or "greutate" alone:
+    // "Weight loss" and "Pierdere în greutate" are not strength (API 082).
+    'greutati',
   ],
   running: ['run', 'alerg', 'jog', 'marathon', 'maraton', 'sprint'],
   yoga: ['yoga'],
@@ -672,14 +673,14 @@ export function onlineTopic(): DiscoverTopic {
 /**
  * "For you": every activity the reader picked, as one topic. Null when they
  * picked none (goals alone say why, not what, so nothing matches on them).
+ * `activities` is the list's activities (`CategoryStore.activities`), so a
+ * goal among the interests finds nothing here.
  */
 export function forYouTopic(
-  categories: readonly Category[],
+  activities: readonly Category[],
   interestIds: readonly string[],
 ): DiscoverTopic | null {
-  const liked = categories.filter(
-    (category) => category.kind === CategoryKinds.Activity && interestIds.includes(category.id),
-  );
+  const liked = activities.filter((category) => interestIds.includes(category.id));
   if (liked.length === 0) {
     return null;
   }
@@ -788,40 +789,58 @@ export function topicHasMatches(topic: DiscoverTopic, pool: DiscoverPool): boole
 
 /**
  * The band's chips: For you when the reader likes something on screen, then
- * the activities that have something to show (their list order, at most
- * `TOPIC_CHIP_LIMIT`), then Online. A chip that would empty the tab is never
- * offered.
+ * the activities that have something to show (the list's order, at most
+ * `TOPIC_CHIP_LIMIT`), then Online when something is online. A chip that
+ * would empty the tab is never offered, except the one the reader picked
+ * (`pickedId`): it stays while it is picked, past the cap too, so the lit
+ * chip never leaves the strip.
  */
 export function discoverTopicChips(
-  categories: readonly Category[],
+  activities: readonly Category[],
   interestIds: readonly string[],
   pool: DiscoverPool,
+  pickedId?: string | null,
 ): DiscoverTopic[] {
   const chips: DiscoverTopic[] = [];
-  const forYou = forYouTopic(categories, interestIds);
-  if (forYou && topicHasMatches(forYou, pool)) {
+  const forYou = forYouTopic(activities, interestIds);
+  if (forYou && (forYou.id === pickedId || topicHasMatches(forYou, pool))) {
     chips.push(forYou);
   }
-  const activities = categories
-    .filter((category) => category.kind === CategoryKinds.Activity)
-    .map(categoryTopic)
-    .filter((topic) => topicHasMatches(topic, pool));
-  chips.push(...activities.slice(0, TOPIC_CHIP_LIMIT));
-  chips.push(onlineTopic());
+  let shown = 0;
+  for (const category of activities) {
+    const topic = categoryTopic(category);
+    if (topic.id === pickedId || (shown < TOPIC_CHIP_LIMIT && topicHasMatches(topic, pool))) {
+      chips.push(topic);
+      shown++;
+    }
+  }
+  const online = onlineTopic();
+  if (online.id === pickedId || topicHasMatches(online, pool)) {
+    chips.push(online);
+  }
   return chips;
 }
 
 /**
- * Search's "Browse by activity" cards: every activity with something to
- * show, then Online. Before anything has loaded every activity is offered,
- * so the cards never flash in one by one.
+ * Search's "Browse by activity" cards: For you when the reader picked some
+ * (built as the band's chips build it), then every activity on the list,
+ * then Online. The lists behind them load only once one is opened, so every
+ * activity is offered.
  */
-export function browseTopics(categories: readonly Category[], pool: DiscoverPool | null): DiscoverTopic[] {
-  const activities = categories
-    .filter((category) => category.kind === CategoryKinds.Activity)
-    .map(categoryTopic);
-  const shown = pool ? activities.filter((topic) => topicHasMatches(topic, pool)) : activities;
-  return [...shown, onlineTopic()];
+export function browseTopics(
+  activities: readonly Category[],
+  interestIds: readonly string[],
+): DiscoverTopic[] {
+  const topics: DiscoverTopic[] = [];
+  const forYou = forYouTopic(activities, interestIds);
+  if (forYou) {
+    topics.push(forYou);
+  }
+  for (const category of activities) {
+    topics.push(categoryTopic(category));
+  }
+  topics.push(onlineTopic());
+  return topics;
 }
 
 // ─── Cities ────────────────────────────────────────────────────────────────

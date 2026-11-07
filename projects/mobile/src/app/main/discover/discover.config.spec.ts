@@ -148,7 +148,8 @@ function category(
 const running = category('running', 'ACTIVITY', 2, 'footsteps-outline');
 const yoga = category('yoga', 'ACTIVITY', 3, 'flower-outline');
 const loseFat = category('lose-fat', 'GOAL', 2, 'flame-outline');
-const CATEGORIES: Category[] = [running, yoga, loseFat];
+/** What `CategoryStore.activities` hands the topic helpers: the goal is not among them. */
+const ACTIVITIES: Category[] = [running, yoga];
 
 function instance(
   overrides: Partial<{
@@ -685,29 +686,49 @@ describe('topics', () => {
   });
 
   it('For you is the activities the reader picked, never their goals', () => {
-    const forYou = forYouTopic(CATEGORIES, [running.id, loseFat.id]);
+    const forYou = forYouTopic(ACTIVITIES, [running.id, loseFat.id]);
     expect(forYou?.id).toBe(DiscoverTopicIds.ForYou);
     expect(forYou?.categoryIds).toEqual([running.id]);
-    expect(forYouTopic(CATEGORIES, [loseFat.id])).toBeNull();
-    expect(forYouTopic(CATEGORIES, [])).toBeNull();
+    expect(forYouTopic(ACTIVITIES, [loseFat.id])).toBeNull();
+    expect(forYouTopic(ACTIVITIES, [])).toBeNull();
   });
 
-  it('offers only chips that leave something to show, Online last', () => {
+  it('offers only chips with something to show, Online only when something is online', () => {
     const pool = {
       coaches: [coach({ categoryIds: [running.id] })],
       groups: [],
       sessions: [],
     };
-    const chips = discoverTopicChips(CATEGORIES, [running.id], pool);
-    expect(chips.map((chip) => chip.id)).toEqual([DiscoverTopicIds.ForYou, 'running', DiscoverTopicIds.Online]);
+    const chips = discoverTopicChips(ACTIVITIES, [running.id], pool);
+    expect(chips.map((chip) => chip.id)).toEqual([DiscoverTopicIds.ForYou, 'running']);
     // No For you when what the reader likes is not here.
-    expect(discoverTopicChips(CATEGORIES, [yoga.id], pool).map((chip) => chip.id)).toEqual([
+    expect(discoverTopicChips(ACTIVITIES, [yoga.id], pool).map((chip) => chip.id)).toEqual([
+      'running',
+    ]);
+    const online = { ...pool, coaches: [coach({ categoryIds: [running.id], isOnline: true })] };
+    expect(discoverTopicChips(ACTIVITIES, [], online).map((chip) => chip.id)).toEqual([
       'running',
       DiscoverTopicIds.Online,
     ]);
   });
 
-  it('caps the activity chips', () => {
+  it('keeps the picked chip while it is picked, even with nothing left to show', () => {
+    const empty = { coaches: [], groups: [], sessions: [] };
+    expect(discoverTopicChips(ACTIVITIES, [running.id], empty)).toEqual([]);
+    expect(discoverTopicChips(ACTIVITIES, [], empty, 'yoga').map((chip) => chip.id)).toEqual([
+      'yoga',
+    ]);
+    expect(
+      discoverTopicChips(ACTIVITIES, [running.id], empty, DiscoverTopicIds.ForYou).map(
+        (chip) => chip.id,
+      ),
+    ).toEqual([DiscoverTopicIds.ForYou]);
+    expect(
+      discoverTopicChips(ACTIVITIES, [], empty, DiscoverTopicIds.Online).map((chip) => chip.id),
+    ).toEqual([DiscoverTopicIds.Online]);
+  });
+
+  it('caps the activity chips, and keeps a picked one past the cap', () => {
     const many: Category[] = Array.from({ length: TOPIC_CHIP_LIMIT + 3 }, (_, index) =>
       category(`a${index}`, 'ACTIVITY', index),
     );
@@ -716,18 +737,23 @@ describe('topics', () => {
       groups: [],
       sessions: [],
     };
-    // The activities, then Online.
-    expect(discoverTopicChips(many, [], pool)).toHaveLength(TOPIC_CHIP_LIMIT + 1);
+    // The activities alone: nobody here is online.
+    expect(discoverTopicChips(many, [], pool)).toHaveLength(TOPIC_CHIP_LIMIT);
+    const late = many[TOPIC_CHIP_LIMIT + 1].slug;
+    const chips = discoverTopicChips(many, [], pool, late);
+    expect(chips).toHaveLength(TOPIC_CHIP_LIMIT + 1);
+    expect(chips.at(-1)?.id).toBe(late);
   });
 
-  it('browses every activity until the lists are known, then those with something', () => {
-    expect(browseTopics(CATEGORIES, null).map((topic) => topic.id)).toEqual([
+  it('browses For you when the reader picked some, then every activity, then Online', () => {
+    expect(browseTopics(ACTIVITIES, []).map((topic) => topic.id)).toEqual([
       'running',
       'yoga',
       DiscoverTopicIds.Online,
     ]);
-    const pool = { coaches: [coach({ categoryIds: [yoga.id] })], groups: [], sessions: [] };
-    expect(browseTopics(CATEGORIES, pool).map((topic) => topic.id)).toEqual([
+    expect(browseTopics(ACTIVITIES, [yoga.id, loseFat.id]).map((topic) => topic.id)).toEqual([
+      DiscoverTopicIds.ForYou,
+      'running',
       'yoga',
       DiscoverTopicIds.Online,
     ]);

@@ -116,7 +116,7 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 0.25rem var(--mh-row-gutter) 0.25rem;
-  border-block-end: var(--mh-hairline) solid var(--mh-color-divider);
+  border-block-end: var(--mh-hairline) solid var(--mh-color-separator);
   background: var(--ion-background-color);
   color: var(--ion-text-color);
 }
@@ -131,7 +131,7 @@
   --background-activated: var(--ion-card-background);
   --border-width: var(--mh-hairline);
   --border-style: solid;
-  --border-color: var(--mh-color-divider);
+  --border-color: var(--mh-color-separator);
   --color: var(--ion-text-color);
   --padding-start: 0.625rem;
   --padding-end: 0.625rem;
@@ -216,27 +216,23 @@
   white-space: nowrap;
 }
 
-/* The topic chips scroll sideways to the screen's edges. Idle on the
-   search field's fill in the body ink, so they read as its family; the
-   picked one takes the honey, as every selection does. */
-.goals {
+/* The topic chips scroll sideways to the screen's edges. The strip clips
+   what overflows it, so its top padding holds the 0.375rem a chip's 44px
+   target reaches above the pill (ion-button.css); it takes that from the
+   band's gap, so the chips sit where the design draws them. */
+.topics {
   align-self: stretch;
-  margin-inline: calc(-1 * var(--mh-row-gutter));
-  padding: 0.125rem var(--mh-row-gutter) 0.625rem;
+  margin: -0.25rem calc(-1 * var(--mh-row-gutter)) 0;
+  padding: 0.375rem var(--mh-row-gutter) 0.625rem;
 }
 
-.goals .chip {
+/* Idle on the search field's fill in the body ink, so they read as its
+   family; the picked one keeps the theme's honey, as every selection does. */
+.topics .chip:not(.selected) {
   --background: var(--ion-card-background);
   --background-hover: var(--ion-card-background);
   --background-activated: var(--mh-color-divider);
   --color: var(--ion-text-color);
-}
-
-.goals .chip.selected {
-  --background: var(--ion-color-primary);
-  --background-hover: var(--ion-color-primary);
-  --background-activated: var(--ion-color-primary-shade);
-  --color: var(--ion-color-primary-contrast);
 }
 
 /* ── Skeletons ──────────────────────────────────────────────────────── */
