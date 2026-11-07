@@ -113,16 +113,23 @@ svg {
   color: var(--mh-color-hive-muted);
 }
 
-// A record: a small white light at the top of the day.
+// A record: a trophy in the deep honey, as a record wears everywhere, on
+// the top point of the day. Ringed and cut out in the card's own colour, so
+// it stands clear of a honey cell and an empty one, in light and in dark.
 .dot {
   position: absolute;
-  top: 0.25rem;
+  top: -0.375rem;
   left: 50%;
-  width: 0.375rem;
-  height: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
   border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-hive-ink);
-  box-shadow: 0 0 0.375rem var(--mh-color-hive-ink);
+  background: var(--mh-color-honey-deep);
+  box-shadow: 0 0 0 0.125rem var(--mh-color-hive);
+  color: var(--mh-color-hive);
+  font-size: 0.625rem;
   transform: translateX(-50%);
 }
 

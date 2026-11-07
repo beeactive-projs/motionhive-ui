@@ -7,6 +7,7 @@ import {
   input,
   viewChildren,
 } from '@angular/core';
+import { IonIcon } from '@ionic/angular/standalone';
 
 import {
   APP_HEX_SHAPE,
@@ -46,6 +47,7 @@ let seq = 0;
  */
 @Component({
   selector: 'mh-hive',
+  imports: [IonIcon],
   templateUrl: './hive.html',
   styleUrl: './hive.scss',
   host: {

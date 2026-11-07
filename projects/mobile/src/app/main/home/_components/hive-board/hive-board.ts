@@ -1,6 +1,8 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
-import { IonButton } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { trophy } from 'ionicons/icons';
 
 import {
   APP_HEX_SHAPE,
@@ -39,7 +41,7 @@ const RING = 'translate(50 50) scale(0.985) translate(-50 -50)';
  * hidden from a screen reader. A cell can hold honey rising from the
  * bottom, a person (their photo, or their initials in their avatar tone,
  * as `mh-hex-avatar` draws them), a photo filling it, a day's number, a
- * ring and a record's dot.
+ * ring and a record's trophy.
  *
  * The comb sizes its cells from its own width, between `--cell-min` and
  * `--cell-max` (set by the page), and scrolls sideways inside itself when
@@ -49,7 +51,7 @@ const RING = 'translate(50 50) scale(0.985) translate(-50 -50)';
  */
 @Component({
   selector: 'mh-hive-board',
-  imports: [IonButton, NgTemplateOutlet],
+  imports: [IonButton, IonIcon, NgTemplateOutlet],
   templateUrl: './hive-board.html',
   styleUrl: './hive-board.scss',
   host: {
@@ -73,6 +75,11 @@ export class HiveBoard {
 
   /** Classic, the app's hexagon; `logo` for the brand's own. */
   readonly shape = input<HexShape>(APP_HEX_SHAPE);
+
+  constructor() {
+    // The record's trophy; the board is on three screens, so it brings its own.
+    addIcons({ trophy });
+  }
 
   readonly Looks = BoardLooks;
   readonly hex = computed(() => cellFigure(this.shape()));

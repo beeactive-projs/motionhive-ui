@@ -13,6 +13,7 @@ import {
   playOutline,
   searchOutline,
   sparklesOutline,
+  trophy,
   trophyOutline,
 } from 'ionicons/icons';
 
@@ -38,5 +39,6 @@ export const HOME_ICONS = {
   playOutline,
   searchOutline,
   sparklesOutline,
+  trophy,
   trophyOutline,
 };
