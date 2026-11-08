@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
+  CategoryStore,
   CreateGroupPayload,
   Group,
   GroupService,
@@ -23,6 +24,7 @@ import { ButtonDirective } from 'primeng/button';
 import { Chip } from 'primeng/chip';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
+import { MultiSelect } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
@@ -35,6 +37,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
     Chip,
     Dialog,
     InputText,
+    MultiSelect,
     Select,
     TextareaModule,
     ToggleSwitch,
@@ -47,6 +50,7 @@ export class GroupFormDialog {
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
   private readonly _translateService = inject(TranslateService);
+  readonly categoryStore = inject(CategoryStore);
 
   readonly visible = model(false);
   readonly group = input<Group | null>(null);
@@ -58,7 +62,13 @@ export class GroupFormDialog {
   formIsPublic = true;
   formTags: string[] = [];
   formTagInput = '';
+  /** What the group trains: activity ids from the category list, how Discover finds it. */
+  formCategoryIds: string[] = [];
   readonly saving = signal(false);
+
+  readonly categoryOptions = computed<SelectItem<string>[]>(() =>
+    this.categoryStore.activities().map((category) => ({ label: category.name, value: category.id })),
+  );
 
   readonly dialogHeader = computed(() =>
     this._translateService.instant(this.group() ? 'groups.common.editGroup' : 'groups.formDialog.create'),
@@ -73,6 +83,7 @@ export class GroupFormDialog {
   private readonly _syncFormEffect = effect(() => {
     const group = this.group();
     if (this.visible()) {
+      this.categoryStore.ensureLoaded();
       if (group) {
         this.formName = group.name;
         this.formDescription = group.description || '';
@@ -80,6 +91,7 @@ export class GroupFormDialog {
         this.formIsPublic = group.isPublic;
         this.formTags = [...(group.tags || [])];
         this.formTagInput = '';
+        this.formCategoryIds = [...(group.categoryIds ?? [])];
       } else {
         this._resetForm();
       }
@@ -99,6 +111,7 @@ export class GroupFormDialog {
         joinPolicy: this.formJoinPolicy,
         isPublic: this.formIsPublic,
         tags: this.formTags.length > 0 ? this.formTags : undefined,
+        categoryIds: this.formCategoryIds,
       };
 
       this._groupService.create(payload).subscribe({
@@ -128,6 +141,7 @@ export class GroupFormDialog {
         joinPolicy: this.formJoinPolicy,
         isPublic: this.formIsPublic,
         tags: this.formTags,
+        categoryIds: this.formCategoryIds,
       };
 
       this._groupService.update(group.id, payload).subscribe({
@@ -179,5 +193,6 @@ export class GroupFormDialog {
     this.formIsPublic = true;
     this.formTags = [];
     this.formTagInput = '';
+    this.formCategoryIds = [];
   }
 }

@@ -66,6 +66,7 @@ import {
   recentKey,
   sessionMatchesTopic,
   sortCoaches,
+  topicCategoryIds,
   withoutReader,
 } from '../discover.config';
 import { ACTIVITY_ICONS } from '../../../_shared/config/category-icons.config';
@@ -82,7 +83,7 @@ const SearchModes = {
   Short: 'short',
   /** The server's answer to what was typed. */
   Query: 'query',
-  /** A topic from Browse by activity, matched on the phone. */
+  /** A topic from Browse by activity, each kind narrowed to it by the API. */
   Topic: 'topic',
 } as const;
 
@@ -209,7 +210,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
       }
       case SearchModes.Topic:
         return sortCoaches(
-          withoutReader(this._coachesStore.coaches(), me).filter((coach) =>
+          withoutReader(this._topicCoaches(), me).filter((coach) =>
             coachMatchesTopic(coach, this.topic()),
           ),
         );
@@ -218,14 +219,43 @@ export class DiscoverSearchPage implements ViewWillEnter {
     }
   });
 
+  /**
+   * A topic's coaches: by its categories from the API, or the tab's list
+   * for Online (a venue, which `coachMatchesTopic` reads).
+   */
+  private readonly _topicCoaches = computed(() => {
+    if (topicCategoryIds(this.topic())) {
+      return this._coachesStore.topicCoaches();
+    }
+    return this._coachesStore.coaches();
+  });
+
+  /** What a mode lists of each kind, before the reader's own and the asked are sorted out. */
+  private readonly _groupSource = computed<DiscoverGroup[]>(() => {
+    if (this.mode() === SearchModes.Query) {
+      return this.search.groups();
+    }
+    if (this.mode() === SearchModes.Topic) {
+      return this._groupsStore.topicGroups().filter((group) => groupMatchesTopic(group, this.topic()));
+    }
+    return [];
+  });
+
+  private readonly _sessionSource = computed<PublicSessionInstance[]>(() => {
+    if (this.mode() === SearchModes.Query) {
+      return this.search.sessions();
+    }
+    if (this.mode() === SearchModes.Topic) {
+      return this._upcomingStore
+        .sessions()
+        .filter((instance) => sessionMatchesTopic(instance, this.topic()));
+    }
+    return [];
+  });
+
   readonly groups = computed<DiscoverGroup[]>(() => {
     const asked = this._asked();
-    const source =
-      this.mode() === SearchModes.Query
-        ? this.search.groups()
-        : this.mode() === SearchModes.Topic
-          ? this._groupsStore.groups().filter((group) => groupMatchesTopic(group, this.topic()))
-          : [];
+    const source = this._groupSource();
     // A request sent from this screen shows as one, as the server will say
     // on the next search.
     return source.map((group) =>
@@ -235,15 +265,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
 
   readonly sessions = computed<PublicSessionInstance[]>(() => {
     const me = this._readerId();
-    const source =
-      this.mode() === SearchModes.Query
-        ? this.search.sessions()
-        : this.mode() === SearchModes.Topic
-          ? this._upcomingStore
-              .sessions()
-              .filter((instance) => sessionMatchesTopic(instance, this.topic()))
-          : [];
-    return source.filter((instance) => instance.instructorId !== me);
+    return this._sessionSource().filter((instance) => instance.instructorId !== me);
   });
 
   readonly counts = computed(() => {
@@ -288,7 +310,8 @@ export class DiscoverSearchPage implements ViewWillEnter {
         return (
           this.counts().all === 0 &&
           (this._coachesStore.loading() ||
-            this._groupsStore.loading() ||
+            this._coachesStore.topicLoading() ||
+            this._groupsStore.topicLoading() ||
             this._upcomingStore.loading())
         );
       default:
@@ -303,13 +326,29 @@ export class DiscoverSearchPage implements ViewWillEnter {
       case SearchModes.Topic:
         return (
           !this.loading() &&
-          this._coachesStore.error() &&
-          this._groupsStore.error() &&
-          !this._upcomingStore.loaded()
+          this._coachesFailed() &&
+          this._groupsFailed() &&
+          this._upcomingStore.error()
         );
       default:
         return false;
     }
+  });
+
+  /** The coaches a topic reads could not be had. */
+  private readonly _coachesFailed = computed(() => {
+    if (topicCategoryIds(this.topic())) {
+      return this._coachesStore.topicError();
+    }
+    return this._coachesStore.error();
+  });
+
+  /** Online lists no group, which is not a failure. */
+  private readonly _groupsFailed = computed(() => {
+    if (topicCategoryIds(this.topic())) {
+      return this._groupsStore.topicError();
+    }
+    return true;
   });
 
   readonly empty = computed(() => {
@@ -436,12 +475,18 @@ export class DiscoverSearchPage implements ViewWillEnter {
     (event.target as HTMLElement | null)?.blur();
   }
 
+  /** A browse card: every kind narrowed to it on the server. */
   openTopic(topic: DiscoverTopic): void {
     this.kind.set(SearchKinds.All);
     this.topic.set(topic);
-    this._coachesStore.load();
-    this._groupsStore.load();
-    this._upcomingStore.load();
+    const categoryIds = topicCategoryIds(topic);
+    if (!categoryIds) {
+      // Online reads the coaches' own list for their venue.
+      this._coachesStore.load();
+    }
+    this._coachesStore.useTopic(categoryIds);
+    this._groupsStore.useTopic(categoryIds);
+    this._upcomingStore.useTopic(topic);
   }
 
   clearTopic(): void {
@@ -460,8 +505,9 @@ export class DiscoverSearchPage implements ViewWillEnter {
   retry(): void {
     if (this.mode() === SearchModes.Topic) {
       this._coachesStore.load({ force: true });
-      this._groupsStore.load({ force: true });
-      this._upcomingStore.load();
+      this._coachesStore.refreshTopic();
+      this._groupsStore.refreshTopic();
+      this._upcomingStore.retry();
       return;
     }
     this.search.setQuery(this.search.query());

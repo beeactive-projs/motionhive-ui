@@ -300,6 +300,14 @@
       "tooLarge": "Imaginile trebuie să aibă sub {size} MB."
     }
   },
+  "chipInput": {
+    "added": "Ai adăugat {value}",
+    "duplicate": "Ai adăugat deja {value}.",
+    "excluded": "{value} e deja pe listă.",
+    "full": "Ai ajuns la limita de {max}. Elimină ceva ca să faci loc.",
+    "removed": "Ai eliminat {value}",
+    "tooLong": "Fiecare poate avea cel mult {max, plural, one {# caracter} few {# caractere} other {# de caractere}}."
+  },
   "clientHive": {
     "board": "Clienții tăi",
     "cell": "{name}, {status}",
@@ -764,8 +772,6 @@
       "title": "Antrenori"
     },
     "featured": {
-      "kicker": "Antrenorul săptămânii",
-      "kickerCity": "Antrenorul săptămânii · {city}",
       "message": "Mesaj",
       "quote": "„{text}”",
       "viewProfile": "Vezi profilul"
@@ -777,8 +783,13 @@
       },
       "loadError": "Nu am putut încărca sesiunile",
       "noMatches": "Nicio sesiune viitoare nu se potrivește acestor filtre.",
+      "noneForTopic": "Nimic programat pentru {topic}",
+      "noneForTopicMessage": "Vezi toate sesiunile programate sau alege altă activitate.",
+      "noneForYou": "Încă nimic programat pentru tine",
       "noneInCity": "Nimic programat în {city}",
       "noneInCityMessage": "Încearcă alt oraș sau caută peste tot.",
+      "noneOnline": "Nicio sesiune online programată",
+      "seeAll": "Vezi toate sesiunile",
       "title": "Urmează"
     },
     "filterSheet": {
@@ -836,6 +847,14 @@
       "request": "Cere acces",
       "sessions": "Sesiuni",
       "title": "Căutare"
+    },
+    "spotlight": {
+      "pause": "Pune pe pauză prim-planul",
+      "play": "Pornește prim-planul",
+      "position": "{position} din {total}",
+      "show": "Treci la {name}",
+      "slide": "antrenor",
+      "title": "În prim-plan"
     }
   },
   "exercises": {
@@ -1183,6 +1202,9 @@
     },
     "edit": {
       "addTag": "Adaugă etichetă",
+      "categories": "Ce se antrenează în grup",
+      "categoriesFailed": "Nu am putut încărca activitățile.",
+      "categoriesHint": "Oamenii găsesc grupul după ele în Descoperă.",
       "delete": {
         "body": "Postările, membrii și comentariile dispar odată cu el.",
         "button": "Șterge grupul",
@@ -1204,7 +1226,7 @@
         "hint": "Oricine îl poate găsi în Descoperă.",
         "label": "Grup public"
       },
-      "removeTag": "Elimină eticheta {tag}",
+      "removeTag": "Elimină eticheta {name}",
       "saveCreate": "Creează grupul",
       "tagLabel": "Adaugă o etichetă",
       "tagPlaceholder": "forță",
@@ -3756,14 +3778,14 @@
     "role": {
       "title": "Cum vei folosi MotionHive?",
       "intro": "Îți arătăm mai întâi ce ți se potrivește. Poți schimba oricând.",
-      "note": "Antrenorii se pot antrena și ei și pot trece oricând de la un rol la altul.",
+      "note": "Și antrenorii se antrenează și pot trece oricând de la un rol la altul.",
       "train": {
         "label": "Ca să mă antrenez",
         "detail": "Urmezi planuri, îți notezi antrenamentele și găsești antrenori, grupuri și sesiuni."
       },
       "coach": {
         "label": "Ca să antrenez alți oameni",
-        "detail": "Lucrezi cu clienți, organizezi grupuri și sesiuni și primești plata."
+        "detail": "Lucrezi cu clienți, organizezi grupuri și sesiuni și încasezi plăți."
       }
     },
     "interests": {
@@ -3791,15 +3813,23 @@
       "title": "Ce antrenezi?",
       "intro": "După acestea te găsesc oamenii în Descoperă. Alege tot ce se potrivește.",
       "other": "Altceva?",
-      "otherPlaceholder": "Kettlebell, calistenie",
-      "otherHint": "Cu cuvintele tale, despărțite prin virgulă. Apar pe profilul tău."
+      "otherAdd": "Adaugă specializarea",
+      "otherHint": "Adaugă-le pe rând. Apar pe profilul tău.",
+      "otherLabel": "Adaugă ce lipsește",
+      "otherList": "Specializările tale",
+      "otherOnList": "Am ales {value} din lista de mai sus.",
+      "otherPlaceholder": "Kettlebell"
     },
     "coachDetails": {
       "title": "Unde antrenezi?",
       "intro": "Orașul tău îi ajută pe cei din apropiere să te găsească.",
-      "currentCity": "Acum: {city}",
+      "addCity": "Adaugă orașul tău",
+      "changeCity": "Schimbă orașul",
+      "cityHint": "Apare pe profilul tău. Adresa exactă nu apare niciodată.",
+      "citySearch": "Caută orașul tău",
+      "noPlaces": "Nu am găsit orașul. Verifică scrierea sau încearcă unul din apropiere.",
       "accepting": "Primesc clienți noi",
-      "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Oprește când nu mai ai locuri."
+      "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Dezactivează opțiunea când nu mai ai locuri."
     }
   }
 }

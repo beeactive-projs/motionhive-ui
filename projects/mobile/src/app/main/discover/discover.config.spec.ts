@@ -11,7 +11,6 @@ import { GroupMemberPostPolicies, JoinPolicies, SessionLocationKind, SessionType
 
 import { bookingPriceLabel } from '../user/sessions/my-sessions.config';
 import {
-  CATEGORY_WORDS,
   DISCOVER_ICONS,
   DiscoverDatePresets,
   DiscoverRecent,
@@ -34,7 +33,6 @@ import {
   coachMatchesTopic,
   coachName,
   coachNearLine,
-  coachOfTheWeek,
   coachSubline,
   compileDatePreset,
   discoverCities,
@@ -52,6 +50,9 @@ import {
   inCity,
   isSessionFull,
   isoWeek,
+  SPOTLIGHT_LIMIT,
+  spotlightCoaches,
+  topicCategoryIds,
   parseRecents,
   pushRecent,
   quickFilterSelected,
@@ -64,7 +65,6 @@ import {
   sheetFilterCount,
   sortCoaches,
   spotsLabel,
-  textMatchesWords,
   withoutReader,
 } from './discover.config';
 
@@ -595,7 +595,7 @@ describe('bioQuote', () => {
   });
 });
 
-describe('coach of the week', () => {
+describe('coach spotlight', () => {
   it('isoWeek follows ISO 8601', () => {
     expect(isoWeek(new Date(2026, 9, 31))).toBe(44); // Saturday
     expect(isoWeek(new Date(2026, 10, 2))).toBe(45); // the Monday after
@@ -611,78 +611,77 @@ describe('coach of the week', () => {
   ];
   const saturday = new Date(2026, 9, 31);
   const monday = new Date(2026, 10, 2);
+  const ids = (coaches: { id: string }[]) => coaches.map((c) => c.id);
 
-  it('picks by the week among coaches taking clients, the same for everyone', () => {
-    // Ordered by id: c1, c2, c3. Week 44 → 44 % 3 = 2 → c3.
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', topic: null, now: saturday })?.id).toBe('c3');
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u8', topic: null, now: saturday })?.id).toBe('c3');
-    // Changes on Monday: week 45 → 0 → c1.
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u9', topic: null, now: monday })?.id).toBe('c1');
+  it('starts at the week among coaches taking clients, the same for everyone, then takes turns', () => {
+    // Ordered by id: c1, c2, c3. Week 44 → 44 % 3 = 2 → c3 first.
+    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u9', topic: null, now: saturday }))).toEqual(['c3', 'c1', 'c2']);
+    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u8', topic: null, now: saturday }))).toEqual(['c3', 'c1', 'c2']);
+    // Changes on Monday: week 45 → 0 → c1 first.
+    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u9', topic: null, now: monday }))).toEqual(['c1', 'c2', 'c3']);
   });
 
-  it('never picks the reader: their week goes to the next coach', () => {
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: 'u3', topic: null, now: saturday })?.id).toBe('c1');
-    expect(coachOfTheWeek([pool[0]], { cityKey: null, readerId: 'u3', topic: null, now: saturday })).toBeNull();
+  it('never shows the reader', () => {
+    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u3', topic: null, now: saturday }))).toEqual(['c1', 'c2']);
+    expect(spotlightCoaches([pool[0]], { cityKey: null, readerId: 'u3', topic: null, now: saturday })).toEqual([]);
   });
 
   it('keeps to the city, and falls back to every city when it has nobody', () => {
     const cluj = cityKey('Cluj-Napoca');
-    // Cluj: c1, c3. Week 44 → 0 → c1.
-    expect(coachOfTheWeek(pool, { cityKey: cluj, readerId: null, topic: null, now: saturday })?.id).toBe('c1');
+    // Cluj: c1, c3. Week 44 → 0 → c1 first.
+    expect(ids(spotlightCoaches(pool, { cityKey: cluj, readerId: null, topic: null, now: saturday }))).toEqual(['c1', 'c3']);
     const bucharest = cityKey('București');
-    expect(coachOfTheWeek(pool, { cityKey: bucharest, readerId: null, topic: null, now: saturday })?.id).toBe('c3');
+    expect(ids(spotlightCoaches(pool, { cityKey: bucharest, readerId: null, topic: null, now: saturday }))[0]).toBe('c3');
     // Only the reader in the city counts as nobody.
     const timisoara = cityKey('Timisoara');
-    expect(coachOfTheWeek(pool, { cityKey: timisoara, readerId: 'u2', topic: null, now: saturday })?.id).toBe('c3');
+    expect(ids(spotlightCoaches(pool, { cityKey: timisoara, readerId: 'u2', topic: null, now: saturday }))[0]).toBe('c3');
   });
 
-  it('narrows to the topic, and is null when no coach fits', () => {
+  it('narrows to the topic, and is empty when no coach fits', () => {
     const runner = coach({ id: 'c5', userId: 'u5', categoryIds: [running.id] });
-    expect(coachOfTheWeek([...pool, runner], { cityKey: null, readerId: null, topic: categoryTopic(running), now: saturday })?.id).toBe('c5');
-    expect(coachOfTheWeek(pool, { cityKey: null, readerId: null, topic: onlineTopic(), now: saturday })).toBeNull();
+    expect(ids(spotlightCoaches([...pool, runner], { cityKey: null, readerId: null, topic: categoryTopic(running), now: saturday }))).toEqual(['c5']);
+    expect(spotlightCoaches(pool, { cityKey: null, readerId: null, topic: onlineTopic(), now: saturday })).toEqual([]);
+  });
+
+  it('shows a few faces, not the directory', () => {
+    const many = Array.from({ length: SPOTLIGHT_LIMIT + 4 }, (_, index) =>
+      coach({ id: `m${index}`, userId: `mu${index}` }),
+    );
+    expect(spotlightCoaches(many, { cityKey: null, readerId: null, topic: null, now: saturday })).toHaveLength(SPOTLIGHT_LIMIT);
   });
 });
 
 describe('topics', () => {
-  it('knows the words of every activity the list seeds', () => {
-    for (const slug of [
-      'strength', 'running', 'yoga', 'pilates', 'hiit', 'cycling', 'swimming',
-      'combat', 'dance', 'mobility', 'outdoor', 'team-sports', 'prenatal', 'nutrition',
-    ]) {
-      expect(CATEGORY_WORDS[slug]?.length, slug).toBeGreaterThan(0);
-    }
-  });
-
-  it('matches the start of a word, accents and case aside, in both languages', () => {
-    expect(textMatchesWords(['Forță pentru începători'], CATEGORY_WORDS['strength'])).toBe(true);
-    expect(textMatchesWords(['Alergăm în Cluj'], CATEGORY_WORDS['running'])).toBe(true);
-    expect(textMatchesWords(['1-on-1 Strength'], CATEGORY_WORDS['strength'])).toBe(true);
-    expect(textMatchesWords(['Brunch club'], CATEGORY_WORDS['running'])).toBe(false);
-    expect(textMatchesWords([null, ''], CATEGORY_WORDS['running'])).toBe(false);
-    expect(textMatchesWords(['Yoga'], [])).toBe(false);
-  });
-
-  it('goes by categories when an item has them, by its words when it has none', () => {
+  it('goes by categories only, never by words in a name', () => {
     const topic = categoryTopic(running);
     expect(coachMatchesTopic(coach({ categoryIds: [running.id] }), topic)).toBe(true);
-    // Categories decide once there are some: the word alone no longer counts.
     expect(coachMatchesTopic(coach({ categoryIds: [yoga.id], specializations: ['Alergare'] }), topic)).toBe(false);
-    expect(coachMatchesTopic(coach({ specializations: ['Alergare'] }), topic)).toBe(true);
+    expect(coachMatchesTopic(coach({ specializations: ['Alergare'] }), topic)).toBe(false);
     expect(coachMatchesTopic(coach(), topic)).toBe(false);
     expect(coachMatchesTopic(coach(), null)).toBe(true);
     expect(groupMatchesTopic(group({ categoryIds: [running.id] }), topic)).toBe(true);
-    expect(groupMatchesTopic(group({ name: 'Alergăm în Cluj' }), topic)).toBe(true);
-    expect(groupMatchesTopic(group(), topic)).toBe(false);
-    expect(sessionMatchesTopic(instance(), categoryTopic(yoga))).toBe(true); // "Evening yoga flow"
+    expect(groupMatchesTopic(group({ name: 'Alergăm în Cluj' }), topic)).toBe(false);
+    expect(groupMatchesTopic(group(), null)).toBe(true);
+    const tagged = instance();
+    tagged.template = { ...tagged.template!, categoryIds: [yoga.id] };
+    expect(sessionMatchesTopic(tagged, categoryTopic(yoga))).toBe(true);
+    expect(sessionMatchesTopic(instance(), categoryTopic(yoga))).toBe(false);
   });
 
-  it('online is a venue for a coach, where it happens for a session, words for a group', () => {
+  it('online is a venue for a coach and where it happens for a session; a group has no place', () => {
     const online = onlineTopic();
     expect(coachMatchesTopic(coach({ isOnline: true }), online)).toBe(true);
     expect(coachMatchesTopic(coach({ specializations: ['Online'] }), online)).toBe(false);
-    expect(groupMatchesTopic(group({ name: 'Online run club' }), online)).toBe(true);
+    expect(groupMatchesTopic(group({ name: 'Online run club' }), online)).toBe(false);
     expect(sessionMatchesTopic(instance(), online)).toBe(true);
     expect(sessionMatchesTopic(instance({ locationKind: SessionLocationKind.InPerson }), online)).toBe(false);
+  });
+
+  it('asks the API for a topic by its categories, and for nothing under Online or no topic', () => {
+    expect(topicCategoryIds(categoryTopic(running))).toEqual([running.id]);
+    expect(topicCategoryIds(forYouTopic(ACTIVITIES, [running.id, yoga.id]))).toEqual([running.id, yoga.id]);
+    expect(topicCategoryIds(onlineTopic())).toBeNull();
+    expect(topicCategoryIds(null)).toBeNull();
   });
 
   it('For you is the activities the reader picked, never their goals', () => {

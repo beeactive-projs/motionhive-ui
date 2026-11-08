@@ -1,3 +1,4 @@
+import type { OnboardingState } from '../onboarding/onboarding.model';
 import type { UserRole } from './role.enums';
 
 export interface User {
@@ -23,6 +24,12 @@ export interface User {
    * /profile/details surfaces this.
    */
   exerciseCatalogOptIn?: boolean;
+  /**
+   * The welcome flow's state, sent with `GET /users/me` so the app has it
+   * with the profile it loads anyway. Absent on every other answer that
+   * returns a user (sign in, profile edits).
+   */
+  onboarding?: OnboardingState;
   createdAt: string;
   updatedAt: string;
 }

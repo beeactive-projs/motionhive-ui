@@ -300,6 +300,14 @@
       "tooLarge": "Images must be under {size} MB."
     }
   },
+  "chipInput": {
+    "added": "Added {value}",
+    "duplicate": "You already added {value}.",
+    "excluded": "{value} is already on the list.",
+    "full": "You've reached the limit of {max}. Remove one to make room.",
+    "removed": "Removed {value}",
+    "tooLong": "Keep each one to {max, plural, one {# character} other {# characters}}."
+  },
   "clientHive": {
     "board": "Your clients",
     "cell": "{name}, {status}",
@@ -764,8 +772,6 @@
       "title": "Coaches"
     },
     "featured": {
-      "kicker": "Coach of the week",
-      "kickerCity": "Coach of the week · {city}",
       "message": "Message",
       "quote": "“{text}”",
       "viewProfile": "View profile"
@@ -777,8 +783,13 @@
       },
       "loadError": "Couldn't load sessions",
       "noMatches": "No upcoming sessions match these filters.",
+      "noneForTopic": "Nothing coming up for {topic}",
+      "noneForTopicMessage": "See every session coming up, or pick another activity.",
+      "noneForYou": "Nothing coming up for you yet",
       "noneInCity": "Nothing coming up in {city}",
       "noneInCityMessage": "Try another city, or look everywhere.",
+      "noneOnline": "No online sessions coming up",
+      "seeAll": "See all sessions",
       "title": "Coming up"
     },
     "filterSheet": {
@@ -836,6 +847,14 @@
       "request": "Request",
       "sessions": "Sessions",
       "title": "Search"
+    },
+    "spotlight": {
+      "pause": "Pause the spotlight",
+      "play": "Play the spotlight",
+      "position": "{position} of {total}",
+      "show": "Show {name}",
+      "slide": "coach",
+      "title": "In the spotlight"
     }
   },
   "exercises": {
@@ -1183,6 +1202,9 @@
     },
     "edit": {
       "addTag": "Add tag",
+      "categories": "What the group trains",
+      "categoriesFailed": "Couldn't load the activities.",
+      "categoriesHint": "People find the group by these in Discover.",
       "delete": {
         "body": "Its posts, members and comments go with it.",
         "button": "Delete group",
@@ -1204,7 +1226,7 @@
         "hint": "Anyone can find it in Discover.",
         "label": "Public group"
       },
-      "removeTag": "Remove tag {tag}",
+      "removeTag": "Remove tag {name}",
       "saveCreate": "Create group",
       "tagLabel": "Add a tag",
       "tagPlaceholder": "strength",
@@ -3791,13 +3813,21 @@
       "title": "What do you coach?",
       "intro": "People find you in Discover by these. Pick all that apply.",
       "other": "Anything else?",
-      "otherPlaceholder": "Kettlebells, calisthenics",
-      "otherHint": "Your own words, separated by commas. They show on your profile."
+      "otherAdd": "Add speciality",
+      "otherHint": "Add them one at a time. They show on your profile.",
+      "otherLabel": "Add what's missing",
+      "otherList": "Your own specialities",
+      "otherOnList": "{value} is already on the list above, so we picked it there.",
+      "otherPlaceholder": "Kettlebells"
     },
     "coachDetails": {
       "title": "Where do you coach?",
       "intro": "Your city helps people near you find you.",
-      "currentCity": "Now: {city}",
+      "addCity": "Add your city",
+      "changeCity": "Change city",
+      "cityHint": "It shows on your profile. Your exact address never does.",
+      "citySearch": "Search for your city",
+      "noPlaces": "No city found. Check the spelling or try one nearby.",
       "accepting": "Taking new clients",
       "acceptingHint": "People can ask you to coach them. Turn it off when you are full."
     }

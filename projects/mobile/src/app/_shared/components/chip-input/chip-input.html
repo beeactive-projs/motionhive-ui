@@ -1,0 +1,58 @@
+<ion-list [inset]="true" class="mh-card-list">
+  <ion-item>
+    <ion-input
+      [label]="label()"
+      labelPlacement="stacked"
+      [placeholder]="placeholder()"
+      [autocapitalize]="autocapitalize()"
+      [maxlength]="fieldMaxLength()"
+      [value]="draft()"
+      (ionInput)="onInput($event.detail.value)"
+      (keydown.enter)="onEnter($event)"
+    />
+    <!-- mousedown keeps focus in the field: adding one must not close the
+         keyboard before the next. Not pointerdown: cancelled on a touch,
+         WebKit drops the tap's click, and the + would do nothing. -->
+    <ion-button
+      slot="end"
+      fill="clear"
+      class="add"
+      data-mh-keeps-keyboard
+      [disabled]="!canAdd()"
+      [attr.aria-label]="addLabel()"
+      (mousedown)="keepFocus($event)"
+      (click)="add()"
+    >
+      <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
+    </ion-button>
+  </ion-item>
+</ion-list>
+
+@if (values().length > 0) {
+  <div class="mh-chip-cloud chips" role="group" [attr.aria-label]="chipsLabel()">
+    @for (value of values(); track value) {
+      <!-- A control, so a button: the whole chip removes it, as group tags do. -->
+      <ion-button
+        #chip
+        class="chip"
+        fill="clear"
+        shape="round"
+        size="small"
+        data-mh-keeps-keyboard
+        [attr.aria-label]="removeLabel() | translate: { name: value }"
+        (mousedown)="keepFocus($event)"
+        (click)="remove(value, $index)"
+      >
+        <span class="text">{{ value }}</span>
+        <ion-icon slot="end" name="close-outline" aria-hidden="true" />
+      </ion-button>
+    }
+  </div>
+}
+
+<div aria-live="polite">
+  @if (notice(); as line) {
+    <p class="notice" [class.over]="line.over">{{ line.key | translate: line.params }}</p>
+  }
+</div>
+<p class="mh-visually-hidden" role="status">{{ announcement() }}</p>

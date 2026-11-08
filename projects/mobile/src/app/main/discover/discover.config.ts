@@ -51,7 +51,7 @@ import {
  * The Discover surface's pure brain: spine tones, price parts, spots and
  * full/waitlist chips, the date-preset compiler, the quick-filter chip
  * model, the coach and group lines, the topics and cities that filter the
- * tab, the coach of the week, search's recents and highlights, and the
+ * tab, the spotlight, search's recents and highlights, and the
  * links that keep Discover's screens in whichever stack mounts them.
  *
  * Everything derives from a `PublicSessionInstance` / `InstructorSearchResult`
@@ -518,7 +518,7 @@ export function bioQuote(bio: string | null | undefined, max = 140): string | nu
   return `${(space > max / 2 ? cut.slice(0, space) : cut).replace(/[\s,;:]+$/, '')}…`;
 }
 
-// ─── Coach of the week ─────────────────────────────────────────────────────
+// ─── Coach spotlight ───────────────────────────────────────────────────────
 
 /** The ISO 8601 week number (weeks start on Monday; week 1 holds the
     year's first Thursday), in the reader's local calendar. */
@@ -530,7 +530,17 @@ export function isoWeek(date: Date): number {
   return Math.ceil(((day.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
 }
 
-export interface CoachOfTheWeekOptions {
+/** At most this many coaches take turns in the spotlight: a few faces, not the directory. */
+export const SPOTLIGHT_LIMIT = 5;
+
+/**
+ * How long each coach stays in the spotlight before the next one comes in:
+ * time to read a name, a line and two facts (about 25 words at a relaxed
+ * pace), well past the 5 s under which moving content needs no pause.
+ */
+export const SPOTLIGHT_INTERVAL_MS = 7000;
+
+export interface SpotlightOptions {
   /** The city Discover shows (`cityKey`), or null for everywhere. */
   cityKey: string | null;
   readerId: string | null | undefined;
@@ -539,31 +549,41 @@ export interface CoachOfTheWeekOptions {
 }
 
 /**
- * One coach taking clients, chosen by the week of the year so it changes
- * every Monday and is the same for everyone looking at the same city that
- * week. Among the city's coaches first, and every city's when that one has
- * nobody; a topic narrows the pool like it narrows the rest of the tab. The
- * pool is ordered by id and counts the reader, so the pick does not depend
- * on who is looking; landing on the reader moves on to the next coach.
+ * The coaches who take turns in Discover's spotlight: coaches taking
+ * clients, the city's first and every city's when that one has nobody, a
+ * topic narrowing them like the rest of the tab. Ordered by id and started
+ * at the week of the year, so the first face changes every Monday and is
+ * the same for everyone looking at the same city that week; the reader is
+ * never shown to themselves. Today every coach can be in it; promoted
+ * coaches would be a different pool through the same component.
  */
-export function coachOfTheWeek(
+export function spotlightCoaches(
   coaches: readonly InstructorSearchResult[],
-  options: CoachOfTheWeekOptions,
-): InstructorSearchResult | null {
+  options: SpotlightOptions,
+): InstructorSearchResult[] {
   const open = coaches
     .filter((coach) => coach.isAcceptingClients && coachMatchesTopic(coach, options.topic))
     .sort((a, b) => a.id.localeCompare(b.id));
-  const local = options.cityKey
-    ? open.filter((coach) => cityKey(coach.city) === options.cityKey)
-    : open;
-  const pool = local.some((coach) => coach.userId !== options.readerId) ? local : open;
-  if (pool.length === 0) return null;
-  const start = isoWeek(options.now) % pool.length;
-  for (let step = 0; step < pool.length; step++) {
-    const pick = pool[(start + step) % pool.length];
-    if (pick.userId !== options.readerId) return pick;
+  let local = open;
+  if (options.cityKey) {
+    local = open.filter((coach) => cityKey(coach.city) === options.cityKey);
   }
-  return null;
+  let pool = open;
+  if (local.some((coach) => coach.userId !== options.readerId)) {
+    pool = local;
+  }
+  if (pool.length === 0) {
+    return [];
+  }
+  const start = isoWeek(options.now) % pool.length;
+  const turns: InstructorSearchResult[] = [];
+  for (let step = 0; step < pool.length && turns.length < SPOTLIGHT_LIMIT; step++) {
+    const coach = pool[(start + step) % pool.length];
+    if (coach.userId !== options.readerId) {
+      turns.push(coach);
+    }
+  }
+  return turns;
 }
 
 // ─── Topics ────────────────────────────────────────────────────────────────
@@ -581,8 +601,6 @@ export interface DiscoverTopic {
   icon: string;
   /** The categories it matches; empty for Online. */
   categoryIds: readonly string[];
-  /** How a word starts when it means one of them, for an item with no categories yet. */
-  words: readonly string[];
   online: boolean;
 }
 
@@ -590,58 +608,6 @@ export const DiscoverTopicIds = {
   ForYou: 'for-you',
   Online: 'online',
 } as const;
-
-/**
- * How a word starts when it means an activity, folded (no accents, lower
- * case), in English and Romanian: "alerg" finds "Alergare" and "Alergăm".
- * The same lists migration 081 tagged existing coaches and groups with. Only
- * an item that has no categories yet is matched by its words (a group made
- * before groups picked any, a coach who never set theirs).
- */
-export const CATEGORY_WORDS: Readonly<Record<string, readonly string[]>> = {
-  strength: [
-    'strength',
-    'forta',
-    'power',
-    'lift',
-    'weightlift',
-    'haltere',
-    'putere',
-    'musculat',
-    'bodybuild',
-    'culturism',
-    // Lifting weights ("greutăți"), never "weight" or "greutate" alone:
-    // "Weight loss" and "Pierdere în greutate" are not strength (API 082).
-    'greutati',
-  ],
-  running: ['run', 'alerg', 'jog', 'marathon', 'maraton', 'sprint'],
-  yoga: ['yoga'],
-  pilates: ['pilates'],
-  hiit: ['hiit', 'functional', 'crossfit', 'cross', 'circuit', 'cardio', 'conditioning', 'tabata'],
-  cycling: ['cycl', 'ciclism', 'bike', 'bicicl', 'spinning'],
-  swimming: ['swim', 'inot', 'aqua', 'acva'],
-  combat: ['box', 'kickbox', 'mma', 'martial', 'karate', 'judo', 'jiu', 'muay', 'krav', 'lupte'],
-  dance: ['dance', 'dans', 'zumba', 'salsa', 'balet', 'ballet'],
-  mobility: ['mobil', 'stretch', 'flexib', 'postur', 'intinder'],
-  outdoor: ['hik', 'drumet', 'trail', 'outdoor', 'munte', 'trek'],
-  'team-sports': [
-    'football',
-    'fotbal',
-    'basket',
-    'baschet',
-    'volei',
-    'volley',
-    'handbal',
-    'tenis',
-    'tennis',
-    'rugby',
-  ],
-  prenatal: ['prenatal', 'postnatal', 'pregnan', 'sarcin', 'gravid', 'postpartum'],
-  nutrition: ['nutrit', 'diet', 'alimenta'],
-};
-
-/** What "online" is called in a group's name or tags (a group has no venue). */
-const ONLINE_WORDS: readonly string[] = ['online', 'remote', 'virtual'];
 
 /** At most this many activity chips after For you and Online: a strip, not a catalogue. */
 export const TOPIC_CHIP_LIMIT = 8;
@@ -654,7 +620,6 @@ export function categoryTopic(category: Category): DiscoverTopic {
     // A glyph this build registered (`CATEGORY_ICONS`), never a blank box.
     icon: categoryIcon(category.icon),
     categoryIds: [category.id],
-    words: CATEGORY_WORDS[category.slug] ?? [],
     online: false,
   };
 }
@@ -665,7 +630,6 @@ export function onlineTopic(): DiscoverTopic {
     label: translate('discover.goals.online'),
     icon: 'desktop-outline',
     categoryIds: [],
-    words: ONLINE_WORDS,
     online: true,
   };
 }
@@ -684,52 +648,44 @@ export function forYouTopic(
   if (liked.length === 0) {
     return null;
   }
-  const words: string[] = [];
-  for (const category of liked) {
-    words.push(...(CATEGORY_WORDS[category.slug] ?? []));
-  }
   return {
     id: DiscoverTopicIds.ForYou,
     label: translate('discover.goals.forYou'),
     icon: 'sparkles-outline',
     categoryIds: liked.map((category) => category.id),
-    words,
     online: false,
   };
 }
 
-/** Whether any of `texts` has a word that starts like one of `starts`. */
-export function textMatchesWords(
-  texts: readonly (string | null | undefined)[],
-  starts: readonly string[],
-): boolean {
-  if (starts.length === 0) {
-    return false;
+/**
+ * What the API narrows a list to for a topic: its categories, or null for
+ * no topic and for Online, which no category says (a coach's online venue,
+ * where a session happens).
+ */
+export function topicCategoryIds(topic: DiscoverTopic | null): readonly string[] | null {
+  if (!topic || topic.categoryIds.length === 0) {
+    return null;
   }
-  return texts.some((text) =>
-    foldForSearch(text ?? '')
-      .split(/[^a-z0-9]+/)
-      .some((word) => word !== '' && starts.some((start) => word.startsWith(start))),
-  );
+  return topic.categoryIds;
 }
 
-/** By its categories when it has some, else by its words. */
-function matchesTopicCategories(
+/**
+ * Whether an item holds one of the topic's categories. Categories are the
+ * only thing a topic matches on: the API tags coaches, groups and sessions
+ * and filters by the same ids (`categoryIds`), so the phone never guesses
+ * from words in a name.
+ */
+function inTopicCategories(
   itemCategoryIds: readonly string[] | undefined,
-  texts: readonly (string | null | undefined)[],
   topic: DiscoverTopic,
 ): boolean {
   const ids = itemCategoryIds ?? [];
-  if (ids.length > 0) {
-    return ids.some((id) => topic.categoryIds.includes(id));
-  }
-  return textMatchesWords(texts, topic.words);
+  return ids.some((id) => topic.categoryIds.includes(id));
 }
 
 /**
  * A coach by what they coach, and Online by an online venue (the API's
- * `isOnline`), never by a word in their specializations. No topic matches
- * everyone.
+ * `isOnline`). No topic matches everyone.
  */
 export function coachMatchesTopic(c: InstructorSearchResult, topic: DiscoverTopic | null): boolean {
   if (!topic) {
@@ -738,19 +694,21 @@ export function coachMatchesTopic(c: InstructorSearchResult, topic: DiscoverTopi
   if (topic.online) {
     return c.isOnline;
   }
-  return matchesTopicCategories(c.categoryIds, c.specializations ?? [], topic);
+  return inTopicCategories(c.categoryIds, topic);
 }
 
-/** A group by its categories, else its name and tags. */
+/**
+ * A group by what it trains. Online is where a session happens, and a
+ * group has no place of its own, so no group is shown under it.
+ */
 export function groupMatchesTopic(g: DiscoverGroup, topic: DiscoverTopic | null): boolean {
   if (!topic) {
     return true;
   }
-  const texts = [g.name, ...(g.tags ?? [])];
   if (topic.online) {
-    return textMatchesWords(texts, topic.words);
+    return false;
   }
-  return matchesTopicCategories(g.categoryIds, texts, topic);
+  return inTopicCategories(g.categoryIds, topic);
 }
 
 /** A session by its categories (its group's, else its coach's), and Online by where it happens. */
@@ -764,11 +722,7 @@ export function sessionMatchesTopic(
   if (topic.online) {
     return isOnlineSession(i);
   }
-  return matchesTopicCategories(
-    i.template?.categoryIds,
-    [discoverTitle(i), i.template?.group?.name],
-    topic,
-  );
+  return inTopicCategories(i.template?.categoryIds, topic);
 }
 
 /** What Discover has on screen, for deciding which topics are worth a chip. */

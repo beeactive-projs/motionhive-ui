@@ -37,3 +37,9 @@ Each of these has caused a real bug or a false QA finding in this app.
 
 - Ionic moves `aria-label` from the `ion-button` / `ion-fab-button` host onto the shadow `<button>`. A host query (`ion-button[aria-label]`) finds nothing; that is not a missing label. Check the shadow button (`host.shadowRoot.querySelector('button')`), and in Playwright target `button[aria-label="…"]`.
 - Every `ion-back-button` carries `[attr.aria-label]="'a11y.back' | translate"`. Without it Ionic names the button with its English default "back" (`backButtonText` is empty in `app.config.ts`, so there is no text to fall back on).
+
+## The keyboard
+
+- A page with text fields over a footer of buttons carries `mhKeyboardFooter` on its `ion-footer` (`_shared/directives/keyboard-footer.directive.ts`, first used on the welcome flow). On iOS the bar rides up with the keyboard on `keyboardWillShow` (the plugin's late body resize is held off while the page is shown, as in the chat), and the focused field, with whatever is marked `data-mh-keyboard-block` around it (its chips, its results), is kept above the raised bar. On both platforms the bar keeps only its buttons while the keyboard is up (`mh-keyboard-open`), and the keyboard closes on a tap outside a field, a drag of the content, and leaving the page. Call its `dismiss()` before a footer or header button acts. The chat keeps its own, built on the same helpers (`_shared/utils/keyboard.ts`).
+- A control that must keep the keyboard up (an Add, a chip's remove) keeps the field's focus by cancelling `mousedown`, and carries `data-mh-keeps-keyboard`. Not `pointerdown`: cancelled on a touch, WebKit drops the tap's click and the button does nothing.
+- Words that become chips (a coach's own specialities, a group's tags) are `mh-chip-input` (`_shared/components/chip-input/`), not a comma separated field. The coaching sheet's specialities field is still to move.

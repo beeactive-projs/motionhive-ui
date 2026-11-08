@@ -148,18 +148,18 @@
                 <h2 class="mh-kicker">{{ 'welcome.coachCategories.other' | translate }}</h2>
                 <ion-note>{{ 'welcome.optional' | translate }}</ion-note>
               </div>
-              <ion-list [inset]="true" class="mh-card-list">
-                <ion-item>
-                  <ion-input
-                    [attr.aria-label]="'welcome.coachCategories.other' | translate"
-                    [placeholder]="'welcome.coachCategories.otherPlaceholder' | translate"
-                    autocapitalize="sentences"
-                    [maxlength]="maxWordLength * 4"
-                    [value]="otherWords()"
-                    (ionInput)="onOtherWords($event.detail.value)"
-                  />
-                </ion-item>
-              </ion-list>
+              <mh-chip-input
+                [(values)]="otherWords"
+                [label]="'welcome.coachCategories.otherLabel' | translate"
+                [placeholder]="'welcome.coachCategories.otherPlaceholder' | translate"
+                [addLabel]="'welcome.coachCategories.otherAdd' | translate"
+                [listLabel]="'welcome.coachCategories.otherList' | translate"
+                [max]="maxWords"
+                [maxLength]="maxWordLength"
+                [exclude]="otherExclusions()"
+                excludedNote="welcome.coachCategories.otherOnList"
+                (excluded)="onOtherWordsOnList($event)"
+              />
               <ion-note class="mh-note-block">{{ 'welcome.coachCategories.otherHint' | translate }}</ion-note>
             </section>
           } @else {
@@ -168,39 +168,69 @@
         }
 
         @case (Steps.CoachDetails) {
-          <section class="mh-section">
+          <!-- The city as a row with its value; the search opens only on a
+               tap, with the caret in it, so nobody lands on a field. Cancel
+               sits in the head, not beside the field: at 130% text on a small
+               phone the field beside it had no room left to type in. The
+               section is the block kept above the keyboard: field and results. -->
+          <section class="mh-section" data-mh-keyboard-block>
             <div class="mh-section-head">
               <h2 class="mh-kicker">{{ 'form.label.city' | translate }}</h2>
+              @if (changingCity()) {
+                <ion-button fill="clear" size="small" (click)="keepCity()">
+                  {{ 'button.cancel' | translate }}
+                </ion-button>
+              }
             </div>
-            <ion-searchbar
-              searchIcon="search-outline"
-              clearIcon="close-outline"
-              [placeholder]="'accountSheets.location.searchPlaceholder' | translate"
-              [attr.aria-label]="'accountSheets.location.searchPlaceholder' | translate"
-              [debounce]="0"
-              (ionInput)="onPlaceSearch($event.detail.value)"
-            />
-            @if (searchingPlaces()) {
-              <div class="loading small"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
-            } @else if (places().length && !place()) {
+            @if (changingCity()) {
+              <ion-searchbar
+                mhAutofocus
+                searchIcon="search-outline"
+                clearIcon="close-outline"
+                showCancelButton="never"
+                [placeholder]="'welcome.coachDetails.citySearch' | translate"
+                [attr.aria-label]="'welcome.coachDetails.citySearch' | translate"
+                [debounce]="0"
+                (ionInput)="onPlaceSearch($event.detail.value)"
+              />
+              @if (searchingPlaces() && !places().length) {
+                <div class="loading small"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+              } @else if (places().length) {
+                <ion-list [inset]="true" class="mh-card-list">
+                  @for (option of places(); track option.displayName) {
+                    <ion-item button [detail]="false" (click)="pickPlace(option)">
+                      <mh-hex-avatar slot="start" size="sm" [icon]="locationTile.icon" [color]="locationTile.color" />
+                      <ion-label class="ion-text-wrap">
+                        {{ option.city }}
+                        <p>{{ option.country }}</p>
+                      </ion-label>
+                    </ion-item>
+                  }
+                </ion-list>
+              } @else if (noPlaces()) {
+                <ion-note class="mh-note-block">{{ 'welcome.coachDetails.noPlaces' | translate }}</ion-note>
+              }
+            } @else {
               <ion-list [inset]="true" class="mh-card-list">
-                @for (option of places(); track option.displayName) {
-                  <ion-item button [detail]="false" (click)="pickPlace(option)">
-                    <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" />
-                    <ion-label class="ion-text-wrap">
-                      {{ option.city ?? option.displayName }}
-                      <p>{{ option.country }}</p>
-                    </ion-label>
-                  </ion-item>
-                }
+                <!-- The city itself is the row's text, wrapping rather than cut
+                     short like a trailing value; the tile names the action. -->
+                <ion-item button [detail]="true" (click)="changeCity()">
+                  @if (cityValue(); as city) {
+                    <mh-hex-avatar
+                      slot="start"
+                      size="sm"
+                      [icon]="locationTile.icon"
+                      [color]="locationTile.color"
+                      [name]="'welcome.coachDetails.changeCity' | translate"
+                    />
+                    <ion-label class="ion-text-wrap">{{ city }}</ion-label>
+                  } @else {
+                    <mh-hex-avatar slot="start" size="sm" [icon]="locationTile.icon" [color]="locationTile.color" />
+                    <ion-label class="ion-text-wrap">{{ 'welcome.coachDetails.addCity' | translate }}</ion-label>
+                  }
+                </ion-item>
               </ion-list>
-            }
-            @if (place(); as picked) {
-              <ion-note class="mh-note-block">
-                {{ 'accountSheets.location.selected' | translate: { place: picked.city ?? picked.displayName, country: picked.country } }}
-              </ion-note>
-            } @else if (currentCity(); as city) {
-              <ion-note class="mh-note-block">{{ 'welcome.coachDetails.currentCity' | translate: { city: city } }}</ion-note>
+              <ion-note class="mh-note-block">{{ 'welcome.coachDetails.cityHint' | translate }}</ion-note>
             }
           </section>
 
@@ -212,7 +242,8 @@
                   [checked]="accepting()"
                   (ionChange)="onAccepting($event.detail.checked)"
                 >
-                  {{ 'welcome.coachDetails.accepting' | translate }}
+                  <!-- Wraps at 130% text rather than ending in "…". -->
+                  <ion-label class="ion-text-wrap">{{ 'welcome.coachDetails.accepting' | translate }}</ion-label>
                 </ion-toggle>
               </ion-item>
             </ion-list>
@@ -241,7 +272,9 @@
 </ion-content>
 
 @if (ready()) {
-  <ion-footer>
+  <!-- Rides up with the keyboard on iOS and keeps only its buttons while it
+       is up; the dots and Skip step aside (`mhKeyboardFooter`). -->
+  <ion-footer mhKeyboardFooter>
     <ion-toolbar>
       <div class="mh-cta-bar">
         @if (dots().length > 1) {

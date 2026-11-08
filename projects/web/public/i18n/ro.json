@@ -1343,6 +1343,9 @@
     },
     "formDialog": {
       "addTag": "Adaugă etichetă",
+      "categories": "Ce se antrenează în grup",
+      "categoriesHint": "Oamenii găsesc grupul după ele în Descoperă.",
+      "categoriesPlaceholder": "Alege activități",
       "create": "Creează grupul",
       "descriptionPlaceholder": "Descrie scopul acestui grup...",
       "joinPolicyPlaceholder": "Alege cine se poate alătura",

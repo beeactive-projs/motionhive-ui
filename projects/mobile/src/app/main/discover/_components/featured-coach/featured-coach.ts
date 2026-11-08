@@ -10,7 +10,7 @@ import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { bioQuote, coachFacts, coachName } from '../../discover.config';
 
 /**
- * Discover's coach of the week (`coachOfTheWeek` picks who): the portrait
+ * One coach in Discover's spotlight (`CoachSpotlight` turns them): the portrait
  * beside the name, specialties and years, the Taking clients badge, the
  * first sentence of their bio, then View profile and Message. The page
  * decides where both go, so the card only reports the press.

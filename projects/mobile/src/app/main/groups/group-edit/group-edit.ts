@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -29,6 +29,7 @@ import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
 import {
+  CategoryStore,
   GroupMemberPostPolicies,
   GroupMemberPostPolicy,
   GroupService,
@@ -37,9 +38,13 @@ import {
   JoinPolicy,
 } from 'core';
 
+import { ChipInput } from '../../../_shared/components/chip-input/chip-input';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { ACTIVITY_ICONS, categoryIcon } from '../../../_shared/config/category-icons.config';
+import { KeyboardFooterDirective } from '../../../_shared/directives/keyboard-footer.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { toggleValue } from '../../../_shared/utils/list.utils';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
 import {
   GROUP_DESCRIPTION_MAX_LENGTH,
@@ -59,12 +64,17 @@ import { GROUP_ICONS } from '../groups.icons';
  * says — a separate create wizard would ask the same five questions in a
  * longer way, and none of them depend on each other.
  *
+ * What the group trains is picked from MotionHive's category list, the
+ * same one coaches and people pick from: Discover's topics find the group
+ * by it, on the server. Tags stay the owner's own words.
+ *
  * Delete sits last and red, after everything else, because it is the one
  * action here that cannot be walked back.
  */
 @Component({
   selector: 'mh-group-edit',
   imports: [
+    ChipInput,
     ConfirmSheet,
     EmptyState,
     IonBackButton,
@@ -86,6 +96,7 @@ import { GROUP_ICONS } from '../groups.icons';
     IonTitle,
     IonToggle,
     IonToolbar,
+    KeyboardFooterDirective,
     TranslatePipe,
   ],
   templateUrl: './group-edit.html',
@@ -103,6 +114,7 @@ export class GroupEdit implements ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
+  readonly categoryStore = inject(CategoryStore);
 
   readonly joinPolicyOptions = JOIN_POLICY_OPTIONS;
   readonly postPolicyOptions = POST_POLICY_OPTIONS;
@@ -143,7 +155,11 @@ export class GroupEdit implements ViewWillEnter {
   readonly postPolicy = signal<GroupMemberPostPolicy>(GroupMemberPostPolicies.Open);
   readonly city = signal('');
   readonly tags = signal<string[]>([]);
-  readonly tagDraft = signal('');
+  /** Activity ids from the category list. */
+  readonly categoryIds = signal<string[]>([]);
+
+  private readonly _tagInput = viewChild(ChipInput);
+  private readonly _keyboard = viewChild(KeyboardFooterDirective);
 
   readonly deleteOpen = signal(false);
   readonly deleting = signal(false);
@@ -151,16 +167,6 @@ export class GroupEdit implements ViewWillEnter {
   readonly canSave = computed(
     () => this.name().trim().length > 0 && !this.saving() && !this.loading(),
   );
-
-  readonly canAddTag = computed(() => {
-    const tag = this.tagDraft().trim();
-    return (
-      tag.length > 0 &&
-      tag.length <= this.tagMaxLength &&
-      this.tags().length < this.maxTags &&
-      !this.tags().includes(tag)
-    );
-  });
 
   /**
    * A private group cannot be found, so an open join policy on one is a
@@ -176,6 +182,8 @@ export class GroupEdit implements ViewWillEnter {
 
   constructor() {
     addIcons(GROUP_ICONS);
+    addIcons(ACTIVITY_ICONS);
+    this.categoryStore.ensureLoaded();
 
     this._route.paramMap.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params) => {
       const groupId = params.get('groupId');
@@ -201,18 +209,36 @@ export class GroupEdit implements ViewWillEnter {
     if (match) this.postPolicy.set(match.value);
   }
 
-  addTag(): void {
-    if (!this.canAddTag()) return;
-    this.tags.update((list) => [...list, this.tagDraft().trim()]);
-    this.tagDraft.set('');
+  hasCategory(id: string): boolean {
+    return this.categoryIds().includes(id);
   }
 
-  removeTag(tag: string): void {
-    this.tags.update((list) => list.filter((row) => row !== tag));
+  toggleCategory(id: string): void {
+    this.categoryIds.update((ids) => toggleValue(ids, id));
+  }
+
+  categoryIcon(name: string): string {
+    return categoryIcon(name);
+  }
+
+  retryCategories(): void {
+    this.categoryStore.ensureLoaded();
   }
 
   save(): void {
-    if (!this.canSave()) return;
+    if (!this.canSave()) {
+      return;
+    }
+    const keyboard = this._keyboard();
+    if (keyboard) {
+      keyboard.dismiss();
+    }
+    // A tag typed and not yet added goes in with the rest; one that cannot
+    // (too long, no room) stays in the field with the line saying why.
+    const tagInput = this._tagInput();
+    if (tagInput && !tagInput.commit()) {
+      return;
+    }
     this.saving.set(true);
 
     const payload = {
@@ -223,6 +249,8 @@ export class GroupEdit implements ViewWillEnter {
       memberPostPolicy: this.postPolicy(),
       city: this.city().trim() || undefined,
       tags: this.tags().length > 0 ? this.tags() : undefined,
+      // Always sent: on an edit, an emptied pick clears what was there.
+      categoryIds: this.categoryIds(),
     };
 
     const request = this.isEdit()
@@ -315,6 +343,7 @@ export class GroupEdit implements ViewWillEnter {
           this.postPolicy.set(group.memberPostPolicy);
           this.city.set(group.city ?? '');
           this.tags.set(group.tags ?? []);
+          this.categoryIds.set(group.categoryIds ?? []);
           this.loading.set(false);
         },
         error: () => {

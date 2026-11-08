@@ -103,8 +103,20 @@ export class ProfileService {
     return this._http.patch<InstructorProfile>(`${this._baseUrl}/instructor`, payload);
   }
 
-  discoverInstructors(query?: string): Observable<InstructorSearchResult[]> {
-    const params = query ? new HttpParams().set('search', query) : undefined;
+  /**
+   * The top 30 coaches, one array. `search` narrows by name; `categoryIds`
+   * to the coaches of any of those categories.
+   */
+  discoverInstructors(
+    query: { search?: string; categoryIds?: readonly string[] } = {},
+  ): Observable<InstructorSearchResult[]> {
+    let params = new HttpParams();
+    if (query.search) {
+      params = params.set('search', query.search);
+    }
+    for (const id of query.categoryIds ?? []) {
+      params = params.append('categoryIds', id);
+    }
     return this._http.get<InstructorSearchResult[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROFILE.DISCOVER_INSTRUCTORS}`,
       { params },

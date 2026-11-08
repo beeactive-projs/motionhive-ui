@@ -7,10 +7,8 @@ import type {
   DiscoverQuery,
   PublicSessionInstance,
 } from '../models/session/session.model';
-import type {
-  SessionLocationKind,
-  SessionType,
-} from '../models/session/session.enums';
+import { SessionLocationKind } from '../models/session/session.enums';
+import type { SessionType } from '../models/session/session.enums';
 
 /**
  * Discover store — drives the public "find a session" page.
@@ -37,6 +35,17 @@ export interface DiscoverFilters {
   dateTo?: string;
 }
 
+/**
+ * What a topic narrows the list to, on top of the filters and apart from
+ * them: its categories, or only online sessions. Kept apart so a filter
+ * that sets or clears `locationKind` never undoes the topic, and the topic
+ * never reads as a filter the reader set.
+ */
+export interface DiscoverTopicFilter {
+  categoryIds?: readonly string[];
+  online?: boolean;
+}
+
 @Injectable()
 export class SessionsDiscoverStore {
   private readonly _svc = inject(SessionService);
@@ -47,6 +56,7 @@ export class SessionsDiscoverStore {
   private readonly _loading = signal(false);
   private readonly _error = signal<string | null>(null);
   private readonly _filters = signal<DiscoverFilters>({});
+  private readonly _topic = signal<DiscoverTopicFilter>({});
   private readonly _page = signal(1);
   private readonly _pageSize = signal(20);
 
@@ -61,6 +71,7 @@ export class SessionsDiscoverStore {
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly filters = this._filters.asReadonly();
+  readonly topic = this._topic.asReadonly();
   readonly page = this._page.asReadonly();
   readonly pageSize = this._pageSize.asReadonly();
 
@@ -85,6 +96,19 @@ export class SessionsDiscoverStore {
             page: this._page(),
             limit: this._pageSize(),
           };
+          const topic = this._topic();
+          if (topic.categoryIds && topic.categoryIds.length > 0) {
+            query.categoryIds = topic.categoryIds;
+          }
+          if (topic.online) {
+            // Online and an in-person filter together leave nothing to ask for.
+            if (query.locationKind === SessionLocationKind.InPerson) {
+              this._items.set([]);
+              this._total.set(0);
+              return of(null);
+            }
+            query.locationKind = SessionLocationKind.Online;
+          }
           return this._svc.discover(query).pipe(
             tap((res) => {
               // Append on subsequent pages, replace on page 1.
@@ -112,6 +136,20 @@ export class SessionsDiscoverStore {
 
   setFilters(patch: Partial<DiscoverFilters>): void {
     this._filters.set({ ...this._filters(), ...patch });
+    this._page.set(1);
+    this._items.set([]);
+    this.load();
+  }
+
+  /**
+   * Narrow to a topic (`{}` for none) and load page 1. The same topic again
+   * does nothing, so a caller can hand it over on every change.
+   */
+  setTopic(topic: DiscoverTopicFilter): void {
+    if (sameTopic(topic, this._topic())) {
+      return;
+    }
+    this._topic.set(topic);
     this._page.set(1);
     this._items.set([]);
     this.load();
@@ -146,4 +184,10 @@ export class SessionsDiscoverStore {
     this.load(done);
   }
 
+}
+
+function sameTopic(a: DiscoverTopicFilter, b: DiscoverTopicFilter): boolean {
+  const aIds = [...(a.categoryIds ?? [])].sort().join(',');
+  const bIds = [...(b.categoryIds ?? [])].sort().join(',');
+  return aIds === bIds && !!a.online === !!b.online;
 }

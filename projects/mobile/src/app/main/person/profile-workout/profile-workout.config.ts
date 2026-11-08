@@ -1,9 +1,9 @@
 import { ProfileWorkout, translate } from 'core';
-import { ellipsisHorizontal, flagOutline, lockClosedOutline } from 'ionicons/icons';
+import { ellipsisHorizontalOutline, flagOutline, lockClosedOutline } from 'ionicons/icons';
 
 /** Every icon this screen renders, registered in one place. */
 export const PROFILE_WORKOUT_ICONS = {
-  ellipsisHorizontal,
+  ellipsisHorizontalOutline,
   flagOutline,
   lockClosedOutline,
 };

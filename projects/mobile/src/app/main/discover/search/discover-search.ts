@@ -90,7 +90,7 @@ export function injectDiscoverSearch(): DiscoverSearch {
         isSearching.set(true);
         return forkJoin({
           coaches: profileService
-            .discoverInstructors(term)
+            .discoverInstructors({ search: term })
             .pipe(catchError(() => of<InstructorSearchResult[] | null>(null))),
           groups: groupService.discoverGroups({ search: term, limit: GROUP_LIMIT }).pipe(
             map((page) => page.items),

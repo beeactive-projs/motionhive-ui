@@ -1,4 +1,4 @@
-import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
@@ -16,6 +16,7 @@ import {
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
+  ViewDidLeave,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -44,8 +45,8 @@ import { ClockService } from '../../_shared/services/clock.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { COACHES_URL } from '../coaches/coaches.filters';
 import { CoachRow } from './_components/coach-row/coach-row';
+import { CoachSpotlight } from './_components/coach-spotlight/coach-spotlight';
 import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
-import { FeaturedCoach } from './_components/featured-coach/featured-coach';
 import { GroupCard } from './_components/group-card/group-card';
 import { DiscoverFilterSheet } from './_sheets/discover-filter-sheet/discover-filter-sheet';
 import {
@@ -59,7 +60,6 @@ import {
   QuickFilterId,
   coachMatchesTopic,
   coachNearLine,
-  coachOfTheWeek,
   compileDatePreset,
   discoverCities,
   discoverLinks,
@@ -73,6 +73,8 @@ import {
   sheetBeyondQuickChips,
   sheetFilterCount,
   sortCoaches,
+  spotlightCoaches,
+  topicCategoryIds,
   withoutReader,
 } from './discover.config';
 import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
@@ -84,6 +86,17 @@ const NEAR_LIMIT = 3;
 
 /** Group cards, two to a row, before "All" takes over. */
 const GROUP_CARD_LIMIT = 4;
+
+/** Why the agenda came back empty (`feedEmptyReason`). */
+const FeedEmptyReasons = {
+  Filtered: 'filtered',
+  ForYou: 'for-you',
+  Online: 'online',
+  Topic: 'topic',
+  City: 'city',
+  Nothing: 'nothing',
+} as const;
+type FeedEmptyReason = (typeof FeedEmptyReasons)[keyof typeof FeedEmptyReasons];
 
 /**
  * The corner print's box and cells, in px at the default text size, as the
@@ -98,7 +111,7 @@ const PRINT_RADIUS = 22;
  * Discover, a tab in both modes, after the canvas design "Discover Header
  * Clean", A, as drawn (owner, 2026-11-07): a white header whose only brand
  * mark is the corner print, with the city, the way into search and the
- * topic chips under a hairline; then the coach of the week, the coaches
+ * topic chips under a hairline; then the coach spotlight, the coaches
  * near you, the groups to join and the sessions coming up, with pointy
  * avatars. The city and the topic filter every section. Coach and trainee
  * see the same page, so it carries no role branches, and never shows the
@@ -113,10 +126,10 @@ const PRINT_RADIUS = 22;
     AvatarButton,
     ChoiceSheet,
     CoachRow,
+    CoachSpotlight,
     DiscoverFilterSheet,
     DiscoverSessionRow,
     EmptyState,
-    FeaturedCoach,
     GroupCard,
     IonButton,
     IonButtons,
@@ -141,7 +154,7 @@ const PRINT_RADIUS = 22;
   host: { class: 'mh-whole-words' },
   providers: [SessionsDiscoverStore, DiscoverCoachesStore, DiscoverGroupsStore],
 })
-export class Discover implements ViewWillEnter {
+export class Discover implements ViewWillEnter, ViewDidLeave {
   readonly sessionsStore = inject(SessionsDiscoverStore);
   readonly coachesStore = inject(DiscoverCoachesStore);
   readonly groupsStore = inject(DiscoverGroupsStore);
@@ -177,12 +190,44 @@ export class Discover implements ViewWillEnter {
   readonly filterSheetOpen = signal(false);
   /** What the sheet last applied — kept so reopening it shows reality. */
   readonly sheetFilters = signal<DiscoverSheetFilters>(NO_SHEET_FILTERS);
+  /** The page is the one on screen: the spotlight's turns wait while it is not. */
+  readonly onScreen = signal(true);
+  /** The agenda had its first topic and asked for it (see the effect below). */
+  private readonly _agendaStarted = signal(false);
 
   constructor() {
     addIcons(DISCOVER_ICONS);
+
+    // The topic narrows every list on the server, once the tab knows which
+    // topic it opens on (`_topicReady`), so nothing is asked for twice. The
+    // coach and group previews read the topic's own lists; the agenda
+    // pages through it.
+    effect(() => {
+      if (!this._topicReady()) {
+        return;
+      }
+      const topic = this.selectedTopic();
+      untracked(() => {
+        const categoryIds = topicCategoryIds(topic);
+        this.coachesStore.useTopic(categoryIds);
+        this.groupsStore.useTopic(categoryIds);
+        const agendaTopic = { categoryIds: categoryIds ?? undefined, online: !!topic?.online };
+        if (this._agendaStarted()) {
+          this.sessionsStore.setTopic(agendaTopic);
+          return;
+        }
+        this._agendaStarted.set(true);
+        this.sessionsStore.setTopic(agendaTopic);
+        if (!categoryIds && !agendaTopic.online) {
+          // No topic: the same as the store's own, so it asks here.
+          this.sessionsStore.reload();
+        }
+      });
+    });
   }
 
   ionViewWillEnter(): void {
+    this.onScreen.set(true);
     this._clockService.bump();
     this._myBookingsIndexStore.ensureLoaded();
     this._prefs.ensureAccountCity();
@@ -191,7 +236,14 @@ export class Discover implements ViewWillEnter {
     this.coachesStore.load();
     this.groupsStore.load();
     // Filters survive re-entry; stale rows refresh in place (no blank flash).
-    this.sessionsStore.reload();
+    // The first entry waits for its topic instead.
+    if (this._agendaStarted()) {
+      this.sessionsStore.reload();
+    }
+  }
+
+  ionViewDidLeave(): void {
+    this.onScreen.set(false);
   }
 
   // ─── What the reader may see ────────────────────────────────────────────
@@ -215,17 +267,19 @@ export class Discover implements ViewWillEnter {
   });
 
   /**
-   * The sessions as they stood the last time no quick chip or sheet pick
-   * narrowed them, kept while one does or while a page loads: what the topic
-   * chips are counted over, so an agenda filter never takes a topic chip
-   * away, nor turns For you off under the coaches.
+   * The sessions as they stood the last time no quick chip, sheet pick or
+   * topic narrowed them, kept while one does or while a page loads: what the
+   * topic chips are counted over, so an agenda filter never takes a topic
+   * chip away, nor turns For you off under the coaches.
    */
   private readonly _openSessions = linkedSignal<
     PublicSessionInstance[] | null,
     PublicSessionInstance[]
   >({
     source: () => {
-      if (this._agendaFiltered() || this.sessionsStore.loading()) {
+      const topic = this.sessionsStore.topic();
+      const narrowed = !!topic.online || (topic.categoryIds?.length ?? 0) > 0;
+      if (this._agendaFiltered() || narrowed || this.sessionsStore.loading()) {
         return null;
       }
       return this._sessions();
@@ -243,8 +297,9 @@ export class Discover implements ViewWillEnter {
 
   // ─── City ───────────────────────────────────────────────────────────────
 
+  /** Read from the tab's own lists, never a topic's, so picking a topic never moves the city. */
   private readonly _cities = computed(() =>
-    discoverCities(this._coaches(), this.groupsStore.groups(), this._sessions()),
+    discoverCities(this._coaches(), this.groupsStore.groups(), this._openSessions()),
   );
 
   readonly city = computed(() =>
@@ -308,8 +363,8 @@ export class Discover implements ViewWillEnter {
    * Whether the topic the tab opens on is known: the reader picked one, or
    * what For you is made of is in (their interests, then the lists the city
    * is read from, `cityReady`). Once known it stays known for the visit.
-   * Until then the coach sections keep their skeletons, so the coach of the
-   * week and the near list are not drawn and then swapped when For you
+   * Until then the coach sections keep their skeletons, so the spotlight
+   * and the near list are not drawn and then swapped when For you
    * arrives. The category list is not waited on by itself: it is asked for
    * first and is tiny, so it is in by the time those lists are, and its
    * store has no error to say it failed, so waiting on `loaded()` could hold
@@ -365,17 +420,39 @@ export class Discover implements ViewWillEnter {
 
   // ─── Coaches ────────────────────────────────────────────────────────────
 
-  /** Their first load, or the wait for the topic the tab opens on (`_topicReady`). */
-  readonly coachesLoading = computed(
-    () =>
-      (this.coachesStore.loading() && !this.coachesStore.loaded()) ||
-      (!this._topicReady() && !this.coachesStore.error()),
-  );
+  /**
+   * The coaches the sections read: the topic's own, from the API, while a
+   * topic with categories is on; else the tab's list (Online is a venue,
+   * which `coachMatchesTopic` reads off it).
+   */
+  private readonly _topicCoaches = computed(() => {
+    if (topicCategoryIds(this.selectedTopic())) {
+      return this.coachesStore.topicCoaches();
+    }
+    return this.coachesStore.coaches();
+  });
 
-  /** Picked from every coach, the reader included, so the week's pick is the
-      same whoever looks; the reader is then passed over. */
-  readonly featured = computed(() =>
-    coachOfTheWeek(this.coachesStore.coaches(), {
+  /** Their first load, the topic's, or the wait for the topic the tab opens on (`_topicReady`). */
+  readonly coachesLoading = computed(() => {
+    if (this.coachesStore.loading() && !this.coachesStore.loaded()) {
+      return true;
+    }
+    if (!this._topicReady()) {
+      return !this.coachesStore.error();
+    }
+    if (topicCategoryIds(this.selectedTopic())) {
+      return this.coachesStore.topicLoading() && !this.coachesStore.topicLoaded();
+    }
+    return false;
+  });
+
+  /**
+   * The coaches who take turns in the spotlight. Picked from every coach,
+   * the reader included, so the week's order is the same whoever looks;
+   * the reader is then passed over.
+   */
+  readonly spotlight = computed(() =>
+    spotlightCoaches(this._topicCoaches(), {
       cityKey: this._cityKey(),
       readerId: this._readerId(),
       topic: this.selectedTopic(),
@@ -383,28 +460,25 @@ export class Discover implements ViewWillEnter {
     }),
   );
 
-  readonly featuredKicker = computed(() => {
-    const city = this.featured()?.city?.trim();
-    return city
-      ? translate('discover.featured.kickerCity', { city })
-      : translate('discover.featured.kicker');
-  });
-
+  /** Everyone in the spotlight stays out of the list under it, so nobody shows twice. */
   readonly nearCoaches = computed(() => {
-    const featuredId = this.featured()?.id;
+    const inSpotlight = new Set(this.spotlight().map((coach) => coach.id));
     const key = this._cityKey();
     const topic = this.selectedTopic();
     return sortCoaches(
-      this._coaches().filter(
+      withoutReader(this._topicCoaches(), this._readerId()).filter(
         (coach) =>
-          coach.id !== featuredId && inCity(coach.city, key) && coachMatchesTopic(coach, topic),
+          !inSpotlight.has(coach.id) && inCity(coach.city, key) && coachMatchesTopic(coach, topic),
       ),
     ).slice(0, NEAR_LIMIT);
   });
 
-  readonly nearTitle = computed(() =>
-    this._cityKey() ? 'discover.coaches.near' : 'discover.coaches.title',
-  );
+  readonly nearTitle = computed(() => {
+    if (this._cityKey()) {
+      return 'discover.coaches.near';
+    }
+    return 'discover.coaches.title';
+  });
 
   /** What "All" opens: every coach but the reader. */
   readonly allCoachesCount = computed(() => this._coaches().length);
@@ -415,38 +489,56 @@ export class Discover implements ViewWillEnter {
 
   // ─── Groups ─────────────────────────────────────────────────────────────
 
-  readonly groupsLoading = computed(
-    () => this.groupsStore.loading() && !this.groupsStore.loaded(),
-  );
+  /** As the coaches: the topic's own groups from the API, else the tab's. */
+  private readonly _topicGroups = computed(() => {
+    if (topicCategoryIds(this.selectedTopic())) {
+      return this.groupsStore.topicGroups();
+    }
+    return this.groupsStore.groups();
+  });
+
+  readonly groupsLoading = computed(() => {
+    if (this.groupsStore.loading() && !this.groupsStore.loaded()) {
+      return true;
+    }
+    if (topicCategoryIds(this.selectedTopic())) {
+      return this.groupsStore.topicLoading() && !this.groupsStore.topicLoaded();
+    }
+    return false;
+  });
 
   readonly groupCards = computed(() => {
     const key = this._cityKey();
     const topic = this.selectedTopic();
-    return this.groupsStore
-      .groups()
+    return this._topicGroups()
       .filter((group) => inCity(group.city, key) && groupMatchesTopic(group, topic))
       .slice(0, GROUP_CARD_LIMIT);
   });
 
-  // ─── Coming up ──────────────────────────────────────────────────────────
+  // ─── Coming up ─────────────────────────────────────────────────────────
 
-  /** The city's sessions under the quick chips and the sheet, before the topic. */
-  private readonly _cityAgenda = computed(() => {
-    const key = this._cityKey();
-    return this._sessions().filter((instance) => sessionInCity(instance, key));
-  });
-
+  /**
+   * The agenda in the city. The API already narrowed it to the topic; the
+   * check here only keeps a session shown while a new topic's first page is
+   * on its way, and makes Online and an in-person filter meet in nothing.
+   */
   private readonly _agenda = computed(() => {
+    const key = this._cityKey();
     const topic = this.selectedTopic();
-    return this._cityAgenda().filter((instance) => sessionMatchesTopic(instance, topic));
+    return this._sessions().filter(
+      (instance) => sessionInCity(instance, key) && sessionMatchesTopic(instance, topic),
+    );
   });
 
   readonly days = computed<SessionGroup<PublicSessionInstance>[]>(() =>
     groupSessionsByBucket(this._agenda(), (i) => i.startAt, 'future'),
   );
 
+  /** Its first page, or the wait for the topic it opens on. */
   readonly showSkeleton = computed(
-    () => this.sessionsStore.loading() && this.sessionsStore.items().length === 0,
+    () =>
+      !this._agendaStarted() ||
+      (this.sessionsStore.loading() && this.sessionsStore.items().length === 0),
   );
 
   readonly showLoadError = computed(
@@ -456,21 +548,46 @@ export class Discover implements ViewWillEnter {
   /** Settled, and nothing left to show after every filter. */
   readonly feedEmpty = computed(
     () =>
-      !this.sessionsStore.loading() && !this.showLoadError() && this._agenda().length === 0,
+      this._agendaStarted() &&
+      !this.sessionsStore.loading() &&
+      !this.showLoadError() &&
+      this._agenda().length === 0,
   );
 
   /**
-   * The chips, the dates or the topic emptied it, as opposed to the city: a
-   * quick chip or the sheet is on, or the city had sessions until the topic
-   * took them. Read off the list before the topic, since For you is lit by
-   * default and would otherwise turn every empty feed into "nothing matches".
+   * Why the agenda is empty, which decides what it says and offers: a quick
+   * chip or the sheet (clear them), the topic, For you included since it is
+   * lit by default (see everything), the city while other cities have
+   * something (show everywhere), or nothing anywhere.
    */
-  readonly feedFiltered = computed(() => this._agendaFiltered() || this._cityAgenda().length > 0);
+  readonly feedEmptyReason = computed<FeedEmptyReason>(() => {
+    if (this._agendaFiltered()) {
+      return FeedEmptyReasons.Filtered;
+    }
+    const topic = this.selectedTopic();
+    if (topic) {
+      if (topic.id === DiscoverTopicIds.ForYou) {
+        return FeedEmptyReasons.ForYou;
+      }
+      if (topic.online) {
+        return FeedEmptyReasons.Online;
+      }
+      return FeedEmptyReasons.Topic;
+    }
+    if (this._sessions().length > 0) {
+      return FeedEmptyReasons.City;
+    }
+    return FeedEmptyReasons.Nothing;
+  });
 
-  /** Nothing anywhere, before any chip or sheet pick: the catalogue is empty. */
-  readonly feedNothingAtAll = computed(
-    () => this._sessions().length === 0 && !this._agendaFiltered(),
-  );
+  readonly feedEmptyReasons = FeedEmptyReasons;
+
+  readonly topicLabel = computed(() => this.selectedTopic()?.label ?? '');
+
+  /** The topic off, every session back. The chips and the city stay as they are. */
+  showAllTopics(): void {
+    this._pickedTopicId.set(null);
+  }
 
   /**
    * The number on the Filters chip, only while the sheet holds more than a
@@ -562,6 +679,8 @@ export class Discover implements ViewWillEnter {
     this._prefs.ensureAccountCity(true);
     this.coachesStore.load({ force: true });
     this.groupsStore.load({ force: true });
+    this.coachesStore.refreshTopic();
+    this.groupsStore.refreshTopic();
     // The spinner hangs on the feed — the other sections settle on their own.
     this.sessionsStore.reload(() => void event.target.complete());
   }

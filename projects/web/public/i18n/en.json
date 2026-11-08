@@ -1343,6 +1343,9 @@
     },
     "formDialog": {
       "addTag": "Add tag",
+      "categories": "What the group trains",
+      "categoriesHint": "People find the group by these in Discover.",
+      "categoriesPlaceholder": "Pick activities",
       "create": "Create group",
       "descriptionPlaceholder": "Describe the purpose of this group...",
       "joinPolicyPlaceholder": "Select join policy",

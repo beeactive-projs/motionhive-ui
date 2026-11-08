@@ -314,6 +314,14 @@ ion-content.mh-flat-page > .mh-note-block {
   background: var(--ion-color-primary);
 }
 
+/* While the keyboard is up (`mhKeyboardFooter` on the footer) the bar keeps
+   only its buttons, so the field being typed in has the screen: the marks
+   and the quiet Skip come back with the keyboard down. */
+ion-footer.mh-keyboard-open .mh-step-dots,
+ion-footer.mh-keyboard-open .mh-quiet-actions {
+  display: none;
+}
+
 /* Back yields to the way on: going on is the common case, going back the
    escape. `.single` when there is nothing to go back to. */
 .mh-step-actions {

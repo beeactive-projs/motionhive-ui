@@ -1,0 +1,47 @@
+<!-- The ARIA carousel pattern: the cards are slides, the dots pick one, and
+     Pause / Play is the visible control for the turns. Only the shown card
+     can be reached; the others are inert until their turn. -->
+<div
+  class="stage"
+  [attr.aria-live]="live()"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerCancel()"
+>
+  @for (coach of coaches(); track coach.id; let position = $index) {
+    <div
+      class="slide"
+      role="group"
+      [class.on]="isShown(position)"
+      [inert]="!isShown(position)"
+      [attr.aria-hidden]="!isShown(position)"
+      [attr.aria-roledescription]="'discover.spotlight.slide' | translate"
+      [attr.aria-label]="'discover.spotlight.position' | translate: { position: position + 1, total: coaches().length }"
+    >
+      <mh-featured-coach [coach]="coach" (viewProfile)="open(coach)" (message)="write(coach)" />
+    </div>
+  }
+</div>
+
+@if (coaches().length > 1) {
+  <div class="controls">
+    <div class="dots">
+      @for (coach of coaches(); track coach.id; let position = $index) {
+        <button
+          type="button"
+          class="dot"
+          [class.on]="isShown(position)"
+          [class.playing]="isShown(position) && playing()"
+          [attr.aria-current]="isShown(position)"
+          [attr.aria-label]="'discover.spotlight.show' | translate: { name: dotLabel(coach) }"
+          (click)="show(position)"
+        >
+          <span class="pip"></span>
+        </button>
+      }
+    </div>
+    <ion-button class="toggle" fill="clear" color="medium" [attr.aria-label]="toggleLabel() | translate" (click)="toggle()">
+      <ion-icon slot="icon-only" [name]="toggleIcon()" aria-hidden="true" />
+    </ion-button>
+  </div>
+}

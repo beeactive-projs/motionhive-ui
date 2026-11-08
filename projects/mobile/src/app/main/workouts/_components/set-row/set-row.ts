@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, output } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { LoggedSet, SetField, SetFields } from 'core';
@@ -44,7 +44,7 @@ interface FocusCell {
  */
 @Component({
   selector: 'mh-set-row',
-  imports: [IonIcon, TranslatePipe],
+  imports: [IonButton, IonIcon, TranslatePipe],
   templateUrl: './set-row.html',
   styleUrl: './set-row.scss',
 })

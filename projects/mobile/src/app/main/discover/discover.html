@@ -73,7 +73,7 @@
       </div>
     </section>
 
-    <!-- Coach of the week, then the coaches near you. Hidden on error: an
+    <!-- The spotlight, then the coaches near you. Hidden on error: an
          empty section is a claim about the catalogue. -->
     @if (coachesLoading()) {
       <section class="mh-section" aria-busy="true">
@@ -94,10 +94,10 @@
         </ion-list>
       </section>
     } @else {
-      @if (featured(); as coach) {
-        <section class="mh-section">
+      @if (spotlight().length > 0) {
+        <section class="mh-section" [attr.aria-label]="'discover.spotlight.title' | translate">
           <div class="mh-section-head">
-            <h2 class="mh-kicker">{{ featuredKicker() }}</h2>
+            <h2 class="mh-kicker">{{ 'discover.spotlight.title' | translate }}</h2>
             <!-- With nobody else to list under it, the way to every coach
                  rides on this head instead. -->
             @if (nearCoaches().length === 0) {
@@ -107,10 +107,11 @@
             }
           </div>
           <div class="gutter">
-            <mh-featured-coach
-              [coach]="coach"
-              (viewProfile)="openCoach(coach)"
-              (message)="messageCoach(coach)"
+            <mh-coach-spotlight
+              [coaches]="spotlight()"
+              [active]="onScreen()"
+              (viewProfile)="openCoach($event)"
+              (message)="messageCoach($event)"
             />
           </div>
         </section>
@@ -226,28 +227,59 @@
             }
           </div>
         } @else if (feedEmpty()) {
-          @if (feedNothingAtAll()) {
-            <mh-empty-state
-              icon="compass-outline"
-              [heading]="'discover.feed.empty.heading' | translate"
-              [message]="'discover.feed.empty.message' | translate"
-            />
-          } @else if (feedFiltered()) {
-            <mh-empty-state
-              icon="calendar-outline"
-              [heading]="'empty.nothingMatches' | translate"
-              [message]="'discover.feed.noMatches' | translate"
-              [actionLabel]="'button.clearFilters' | translate"
-              (action)="clearFilters()"
-            />
-          } @else {
-            <mh-empty-state
-              icon="location-outline"
-              [heading]="'discover.feed.noneInCity' | translate: { city: cityLabel() }"
-              [message]="'discover.feed.noneInCityMessage' | translate"
-              [actionLabel]="'discover.city.showEverywhere' | translate"
-              (action)="showEverywhere()"
-            />
+          @switch (feedEmptyReason()) {
+            @case (feedEmptyReasons.Filtered) {
+              <mh-empty-state
+                icon="calendar-outline"
+                [heading]="'empty.nothingMatches' | translate"
+                [message]="'discover.feed.noMatches' | translate"
+                [actionLabel]="'button.clearFilters' | translate"
+                (action)="clearFilters()"
+              />
+            }
+            @case (feedEmptyReasons.ForYou) {
+              <mh-empty-state
+                icon="sparkles-outline"
+                [heading]="'discover.feed.noneForYou' | translate"
+                [message]="'discover.feed.noneForTopicMessage' | translate"
+                [actionLabel]="'discover.feed.seeAll' | translate"
+                (action)="showAllTopics()"
+              />
+            }
+            @case (feedEmptyReasons.Online) {
+              <mh-empty-state
+                icon="desktop-outline"
+                [heading]="'discover.feed.noneOnline' | translate"
+                [message]="'discover.feed.noneForTopicMessage' | translate"
+                [actionLabel]="'discover.feed.seeAll' | translate"
+                (action)="showAllTopics()"
+              />
+            }
+            @case (feedEmptyReasons.Topic) {
+              <mh-empty-state
+                icon="calendar-outline"
+                [heading]="'discover.feed.noneForTopic' | translate: { topic: topicLabel() }"
+                [message]="'discover.feed.noneForTopicMessage' | translate"
+                [actionLabel]="'discover.feed.seeAll' | translate"
+                (action)="showAllTopics()"
+              />
+            }
+            @case (feedEmptyReasons.City) {
+              <mh-empty-state
+                icon="location-outline"
+                [heading]="'discover.feed.noneInCity' | translate: { city: cityLabel() }"
+                [message]="'discover.feed.noneInCityMessage' | translate"
+                [actionLabel]="'discover.city.showEverywhere' | translate"
+                (action)="showEverywhere()"
+              />
+            }
+            @default {
+              <mh-empty-state
+                icon="compass-outline"
+                [heading]="'discover.feed.empty.heading' | translate"
+                [message]="'discover.feed.empty.message' | translate"
+              />
+            }
           }
         } @else {
           <div class="agenda">

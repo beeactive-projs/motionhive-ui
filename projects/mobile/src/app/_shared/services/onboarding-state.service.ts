@@ -1,4 +1,4 @@
-import { Service, computed, inject, signal } from '@angular/core';
+import { Service, computed, inject, linkedSignal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, firstValueFrom, of, take, timeout } from 'rxjs';
 
@@ -12,11 +12,23 @@ import {
   withoutCardSteps,
 } from '../config/onboarding.config';
 
+/** The state as it arrived for one account. */
+interface HeldState {
+  userId: string | null;
+  state: OnboardingState | null;
+}
+
 /**
  * The reader's welcome flow state for the whole app: the guard that opens the
  * flow on entry, the flow itself, the Home cards and Discover's "For you" all
- * read this one copy. Loaded once per account per app session; every
- * onboarding write hands back the new state and lands here.
+ * read this one copy.
+ *
+ * It travels with the user: `GET /users/me`, which the app loads on every
+ * start anyway, carries it as `onboarding`, and the stored user it starts
+ * from holds the last copy, so a cold start decides at once with no request
+ * of its own. Every onboarding write hands back the new state, which lands
+ * here and in that stored user, so the next start reads what was answered.
+ * Only a user stored before the API sent it costs one `GET` (`ensureLoaded`).
  */
 @Service()
 export class OnboardingStateService {
@@ -25,31 +37,49 @@ export class OnboardingStateService {
   private readonly _tokenService = inject(TokenService);
   private readonly _router = inject(Router);
 
-  private readonly _state = signal<OnboardingState | null>(null);
-  /** The account the state belongs to, so a new sign in on this phone starts over. */
-  private _userId: string | null = null;
+  /**
+   * The signed-in account and its state from the user. A user answer that
+   * carries none (a profile edit, a sign in) keeps what the same account
+   * had; another account starts over.
+   */
+  private readonly _held = linkedSignal<HeldState, HeldState>({
+    source: () => ({
+      userId: this._currentUserId(),
+      state: this._authStore.user()?.onboarding ?? null,
+    }),
+    computation: (next, previous) => {
+      if (next.state || !previous || previous.value.userId !== next.userId) {
+        return next;
+      }
+      return { userId: next.userId, state: previous.value.state };
+    },
+  });
+
   private _shownFor: string | null = null;
   private _pending: Promise<OnboardingState | null> | null = null;
+  private _pendingFor: string | null = null;
 
-  readonly state = this._state.asReadonly();
+  readonly state = computed(() => this._held().state);
 
   /** Category ids the reader likes: what Discover's "For you" narrows to. */
-  readonly interestIds = computed(() => this._state()?.interestIds ?? []);
+  readonly interestIds = computed(() => this.state()?.interestIds ?? []);
 
-  readonly trainCard = computed<OnboardingStep[]>(() => this._state()?.trainCard ?? []);
-  readonly coachCard = computed<OnboardingStep[]>(() => this._state()?.coachCard ?? []);
+  readonly trainCard = computed<OnboardingStep[]>(() => this.state()?.trainCard ?? []);
+  readonly coachCard = computed<OnboardingStep[]>(() => this.state()?.coachCard ?? []);
 
   /**
-   * The state, read once for this account. Null when it cannot be had in
-   * time (offline, a slow API): the caller goes on without it.
+   * The state for this account: at once when the user brought it, else read
+   * once. Null when it cannot be had in time (offline, a slow API): the
+   * caller goes on without it.
    */
   ensureLoaded(): Promise<OnboardingState | null> {
-    this._forgetOtherAccount();
-    const state = this._state();
+    const state = this.state();
     if (state) {
       return Promise.resolve(state);
     }
-    if (!this._pending) {
+    const userId = this._currentUserId();
+    if (!this._pending || this._pendingFor !== userId) {
+      this._pendingFor = userId;
       this._pending = firstValueFrom(
         this._onboardingService.getState().pipe(
           take(1),
@@ -58,8 +88,8 @@ export class OnboardingStateService {
         ),
       ).then((loaded) => {
         this._pending = null;
-        if (loaded) {
-          this._state.set(loaded);
+        if (loaded && this._currentUserId() === userId) {
+          this.set(loaded);
         }
         return loaded;
       });
@@ -67,10 +97,15 @@ export class OnboardingStateService {
     return this._pending;
   }
 
-  /** What a write sent back. */
+  /** What a write sent back: here, and in the stored user the next start reads. */
   set(state: OnboardingState): void {
-    this._userId = this._currentUserId();
-    this._state.set(state);
+    this._held.set({ userId: this._currentUserId(), state });
+    const user = this._authStore.user();
+    if (user) {
+      const next = { ...user, onboarding: state };
+      this._authStore.setUser(next);
+      this._tokenService.setUser(next);
+    }
   }
 
   /** Whether the flow already opened by itself this session (it does once). */
@@ -97,15 +132,15 @@ export class OnboardingStateService {
    * its answer, when it comes, replaces the local guess.
    */
   dismiss(steps: OnboardingStep[]): void {
-    const state = this._state();
+    const state = this.state();
     if (state) {
-      this._state.set(withoutCardSteps(state, steps));
+      this.set(withoutCardSteps(state, steps));
     }
     this._onboardingService
       .dismiss(steps)
       .pipe(take(1))
       .subscribe({
-        next: (next) => this._state.set(next),
+        next: (next) => this.set(next),
         error: () => undefined,
       });
   }
@@ -117,15 +152,5 @@ export class OnboardingStateService {
       return user.id;
     }
     return this._tokenService.getUser()?.id ?? null;
-  }
-
-  private _forgetOtherAccount(): void {
-    const userId = this._currentUserId();
-    if (userId === this._userId) {
-      return;
-    }
-    this._userId = userId;
-    this._state.set(null);
-    this._pending = null;
   }
 }

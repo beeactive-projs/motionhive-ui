@@ -15,6 +15,8 @@ export interface Group {
   joinPolicy: JoinPolicy;
   memberPostPolicy: GroupMemberPostPolicy;
   tags: string[] | null;
+  /** What the group trains, activity ids from `GET /categories`, in the list's order. */
+  categoryIds?: string[];
   contactEmail: string | null;
   contactPhone: string | null;
   address: string | null;
@@ -56,6 +58,8 @@ export interface CreateGroupPayload {
   joinPolicy?: JoinPolicy;
   memberPostPolicy?: GroupMemberPostPolicy;
   tags?: string[];
+  /** What the group trains: activity ids from `GET /categories`. */
+  categoryIds?: string[];
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
@@ -71,6 +75,8 @@ export interface UpdateGroupPayload {
   joinPolicy?: JoinPolicy;
   memberPostPolicy?: GroupMemberPostPolicy;
   tags?: string[];
+  /** Replaces what the group trains; an empty list clears it, absent leaves it. */
+  categoryIds?: string[];
   logoUrl?: string;
   contactEmail?: string;
   contactPhone?: string;
@@ -108,6 +114,8 @@ export type GroupMemberListResponse = PaginatedResponse<GroupMember>;
 export interface DiscoverGroupsQuery {
   search?: string;
   tags?: string[];
+  /** Groups that train any of these categories. */
+  categoryIds?: readonly string[];
   city?: string;
   country?: string;
   page?: number;
@@ -121,8 +129,6 @@ export interface DiscoverGroupsQuery {
 export interface DiscoverGroup extends Group {
   /** 'PENDING' if the current user has an outstanding join request, else null. */
   myJoinRequestStatus?: 'PENDING' | null;
-  /** What the group trains, ids from `GET /categories`. Older APIs omit it. */
-  categoryIds?: string[];
 }
 
 export type DiscoverGroupListResponse = PaginatedResponse<DiscoverGroup>;
@@ -194,6 +200,7 @@ export interface PublicGroupProfile {
     | 'logoUrl'
     | 'joinPolicy'
     | 'tags'
+    | 'categoryIds'
     | 'contactEmail'
     | 'contactPhone'
     | 'address'

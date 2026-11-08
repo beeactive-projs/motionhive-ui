@@ -13,6 +13,16 @@
         [placeholder]="'groups.formDialog.descriptionPlaceholder' | translate"></textarea>
     </div>
 
+    <!-- What it trains: the shared category list, how Discover's topics find the group -->
+    <div class="flex flex-col gap-2">
+      <label for="groupCategories" class="text-sm font-medium">{{ 'groups.formDialog.categories' | translate }}</label>
+      <p-multiselect inputId="groupCategories" [options]="categoryOptions()" [(ngModel)]="formCategoryIds"
+        optionLabel="label" optionValue="value" display="chip" [showToggleAll]="false" [filter]="false"
+        [loading]="!categoryStore.loaded()" [placeholder]="'groups.formDialog.categoriesPlaceholder' | translate"
+        [appendTo]="'body'" fluid />
+      <small class="text-xs">{{ 'groups.formDialog.categoriesHint' | translate }}</small>
+    </div>
+
     <!-- Join Policy -->
     <div class="flex flex-col gap-2">
       <label for="joinPolicy" class="text-sm font-medium">{{ 'groups.common.joinPolicy' | translate }}</label>

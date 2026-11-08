@@ -329,6 +329,8 @@ export interface DiscoverQuery {
   locationKind?: SessionLocationKind;
   instructorId?: string;
   groupId?: string;
+  /** Sessions in any of these categories: their group's, else their coach's. */
+  categoryIds?: readonly string[];
   dateFrom?: string;
   dateTo?: string;
   page?: number;

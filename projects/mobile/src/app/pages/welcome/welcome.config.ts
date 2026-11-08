@@ -1,5 +1,6 @@
-import { FitnessLevels, NavModes, OnboardingRoles, OnboardingSteps, foldForSearch } from 'core';
+import { FitnessLevels, NavModes, OnboardingRoles, OnboardingSteps } from 'core';
 import type {
+  Category,
   FitnessLevel,
   OnboardingRole,
   OnboardingState,
@@ -16,6 +17,7 @@ import {
   peopleOutline,
 } from 'ionicons/icons';
 
+import { chipKey } from '../../_shared/components/chip-input/chip-input.config';
 import { ROLES } from '../../_shared/config/roles.config';
 
 /** The glyphs the flow draws beside the categories' own (`CATEGORY_ICONS`). */
@@ -102,25 +104,36 @@ export const MAX_OTHER_WORDS = 10;
 export const MAX_OTHER_WORD_LENGTH = 50;
 
 /**
- * "Kettlebells, calisthenics" as the words to add: split on commas, trimmed,
- * each once (blind to case and accents), cut to the API's caps.
+ * Every name the categories go by here: the name in the reader's language
+ * and the English one. A coach's own word that only repeats one is left to
+ * the category (the API drops it too), so the chip field leaves these out.
  */
-export function splitOtherWords(text: string): string[] {
-  const words: string[] = [];
-  const seen = new Set<string>();
-  for (const part of text.split(',')) {
-    const word = part.trim().slice(0, MAX_OTHER_WORD_LENGTH).trim();
-    const key = foldForSearch(word);
-    if (word === '' || seen.has(key)) {
-      continue;
-    }
-    seen.add(key);
-    words.push(word);
-    if (words.length === MAX_OTHER_WORDS) {
-      break;
+export function categoryNames(categories: readonly Category[]): string[] {
+  const names: string[] = [];
+  for (const category of categories) {
+    names.push(category.name);
+    if (category.originalName) {
+      names.push(category.originalName);
     }
   }
-  return words;
+  return names;
+}
+
+/** The ids of the categories `words` name, in the list's order, case and accents aside. */
+export function categoriesNamed(
+  words: readonly string[],
+  categories: readonly Category[],
+): string[] {
+  const keys = new Set(words.map(chipKey));
+  const ids: string[] = [];
+  for (const category of categories) {
+    if (keys.has(chipKey(category.name))) {
+      ids.push(category.id);
+    } else if (category.originalName && keys.has(chipKey(category.originalName))) {
+      ids.push(category.id);
+    }
+  }
+  return ids;
 }
 
 /**

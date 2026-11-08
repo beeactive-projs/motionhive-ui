@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -9,7 +9,6 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonInput,
   IonItem,
   IonLabel,
   IonList,
@@ -22,7 +21,16 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { Observable, Subject, debounceTime, distinctUntilChanged, switchMap, take, tap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 
 import {
   AppModeStore,
@@ -48,29 +56,35 @@ import type {
   User,
 } from 'core';
 
+import { ChipInput } from '../../_shared/components/chip-input/chip-input';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { ACTIVITY_ICONS, categoryIcon } from '../../_shared/config/category-icons.config';
+import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 import {
   WELCOME_FALLBACK_URL,
   parseWelcomeSteps,
   welcomeReturnUrl,
 } from '../../_shared/config/onboarding.config';
+import { KeyboardFooterDirective } from '../../_shared/directives/keyboard-footer.directive';
+import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
 import { toggleValue } from '../../_shared/utils/list.utils';
 import { AccountStore } from '../../main/account/account.store';
 import {
   LEVEL_CHOICES,
+  MAX_OTHER_WORDS,
   MAX_OTHER_WORD_LENGTH,
   ROLE_CHOICES,
   WELCOME_COPY,
   WELCOME_ICONS,
   canGoBack,
+  categoriesNamed,
+  categoryNames,
   coachDetailsPayload,
   needsCategories,
   remainingSteps,
-  splitOtherWords,
   welcomeProgress,
 } from './welcome.config';
 
@@ -90,6 +104,7 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
 @Component({
   selector: 'mh-welcome',
   imports: [
+    ChipInput,
     EmptyState,
     HexAvatar,
     IonButton,
@@ -98,7 +113,6 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
     IonFooter,
     IonHeader,
     IonIcon,
-    IonInput,
     IonItem,
     IonLabel,
     IonList,
@@ -107,7 +121,9 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
     IonSpinner,
     IonToggle,
     IonToolbar,
+    KeyboardFooterDirective,
     NgTemplateOutlet,
+    SearchbarAutofocusDirective,
     SearchbarLabelDirective,
     TranslatePipe,
   ],
@@ -131,8 +147,13 @@ export class Welcome implements OnInit {
   readonly Steps = OnboardingSteps;
   readonly roleChoices = ROLE_CHOICES;
   readonly levelChoices = LEVEL_CHOICES;
+  readonly maxWords = MAX_OTHER_WORDS;
   readonly maxWordLength = MAX_OTHER_WORD_LENGTH;
+  readonly locationTile = DETAIL_TILES.location;
   readonly categoryIcon = categoryIcon;
+
+  private readonly _keyboard = viewChild(KeyboardFooterDirective);
+  private readonly _otherWordsField = viewChild(ChipInput);
 
   private _returnUrl: string = WELCOME_FALLBACK_URL;
   /**
@@ -157,7 +178,8 @@ export class Welcome implements OnInit {
   readonly interestIds = signal<string[]>([]);
   readonly level = signal<FitnessLevel | null>(null);
   readonly coachCategoryIds = signal<string[]>([]);
-  readonly otherWords = signal('');
+  /** The coach's own words, as chips; kept here so they outlive the step (Back, then on again). */
+  readonly otherWords = signal<string[]>([]);
   readonly accepting = signal(true);
   private readonly _acceptingBefore = signal(true);
   /** The switch was flipped here: the saved value, when it comes, no longer overwrites it. */
@@ -165,24 +187,76 @@ export class Welcome implements OnInit {
   private _coachProfileAsked = false;
   readonly place = signal<PickedLocation | null>(null);
 
-  // ─── Coach details: the place search ──────────────────────────────────
+  /** Names the coach's own words may not repeat: the list above already has them. */
+  readonly otherExclusions = computed(() => categoryNames(this.categoryStore.activities()));
 
+  // ─── Coach details: the city ──────────────────────────────────────────
+
+  /**
+   * The city is a row with its value; the search opens only when they choose
+   * to change it, so nobody lands on a field asking them to type.
+   */
+  readonly changingCity = signal(false);
+  /** What is typed in the city search now. */
+  readonly placeQuery = signal('');
   private readonly _placeQuery$ = new Subject<string>();
   readonly searchingPlaces = signal(false);
-  readonly places = toSignal(
+  private readonly _placeAnswer = toSignal(
     this._placeQuery$.pipe(
       debounceTime(PLACE_SEARCH_DEBOUNCE_MS),
       distinctUntilChanged(),
       tap(() => this.searchingPlaces.set(true)),
-      switchMap((query) => this._placeSearchService.search(query)),
+      switchMap((query) =>
+        this._placeSearchService.search(query).pipe(map((found) => ({ query, found }))),
+      ),
       tap(() => this.searchingPlaces.set(false)),
       takeUntilDestroyed(),
     ),
-    { initialValue: [] as PickedLocation[] },
+    { initialValue: { query: '', found: [] as PickedLocation[] } },
   );
 
+  /**
+   * The places to pick from: only ones that name a city, since that is what
+   * is saved. The last answer stays while the next keystroke's is on its way;
+   * an emptied field shows none.
+   */
+  readonly places = computed(() => {
+    if (this.placeQuery().trim() === '') {
+      return [];
+    }
+    return this._placeAnswer().found.filter((found) => !!found.city);
+  });
+
+  /** The search answered what is typed now, and found nothing to pick. */
+  readonly noPlaces = computed(() => {
+    const answer = this._placeAnswer();
+    if (this.searchingPlaces() || answer.query !== this.placeQuery()) {
+      return false;
+    }
+    return answer.query.trim().length >= 2 && this.places().length === 0;
+  });
+
   /** The city on the account, said until another is picked. */
-  readonly currentCity = computed(() => this._authStore.user()?.city?.trim() || null);
+  readonly currentCity = computed(() => {
+    const user = this._authStore.user();
+    if (!user || !user.city) {
+      return null;
+    }
+    const city = user.city.trim();
+    if (city === '') {
+      return null;
+    }
+    return city;
+  });
+
+  /** The city the row shows: the one just picked, else the account's. */
+  readonly cityValue = computed(() => {
+    const picked = this.place();
+    if (picked && picked.city) {
+      return picked.city;
+    }
+    return this.currentCity();
+  });
 
   // ─── What the screen shows ────────────────────────────────────────────
 
@@ -303,17 +377,43 @@ export class Welcome implements OnInit {
     this.coachCategoryIds.update((ids) => toggleValue(ids, id));
   }
 
-  onOtherWords(value: string | null | undefined): void {
-    this.otherWords.set(value ?? '');
+  /** Words that only named a category on the list: that category is picked instead. */
+  onOtherWordsOnList(words: string[]): void {
+    const named = categoriesNamed(words, this.categoryStore.activities());
+    this.coachCategoryIds.update((ids) => {
+      const next = [...ids];
+      for (const id of named) {
+        if (!next.includes(id)) {
+          next.push(id);
+        }
+      }
+      return next;
+    });
+  }
+
+  /** The tap that opens the city search, which takes the caret from it. */
+  changeCity(): void {
+    this.placeQuery.set('');
+    this._placeQuery$.next('');
+    this.changingCity.set(true);
+  }
+
+  /** The search's Cancel: the city stays as it was. */
+  keepCity(): void {
+    this._dismissKeyboard();
+    this.changingCity.set(false);
   }
 
   onPlaceSearch(value: string | null | undefined): void {
-    this.place.set(null);
-    this._placeQuery$.next(value ?? '');
+    const query = value ?? '';
+    this.placeQuery.set(query);
+    this._placeQuery$.next(query);
   }
 
   pickPlace(place: PickedLocation): void {
+    this._dismissKeyboard();
     this.place.set(place);
+    this.changingCity.set(false);
   }
 
   onAccepting(checked: boolean): void {
@@ -331,6 +431,13 @@ export class Welcome implements OnInit {
   next(): void {
     const step = this.step();
     if (!step || !this.canContinue() || this.saving()) {
+      return;
+    }
+    this._dismissKeyboard();
+    // A word typed and not yet added goes in with the rest; one that cannot
+    // (too long, no room) stays in the field with the line saying why.
+    const otherWordsField = this._otherWordsField();
+    if (step === OnboardingSteps.CoachCategories && otherWordsField && !otherWordsField.commit()) {
       return;
     }
     const coachDetails = this._coachDetails();
@@ -367,6 +474,7 @@ export class Welcome implements OnInit {
     if (!step || !state || this.saving()) {
       return;
     }
+    this._dismissKeyboard();
     this.saving.set(true);
     this._onboardingService
       .skip([step])
@@ -387,6 +495,7 @@ export class Welcome implements OnInit {
     if (!this.canGoBack()) {
       return;
     }
+    this._dismissKeyboard();
     const seen = this.seen().slice(0, -1);
     this.seen.set(seen);
     this._show(seen[seen.length - 1]);
@@ -401,6 +510,7 @@ export class Welcome implements OnInit {
     if (this.saving()) {
       return;
     }
+    this._dismissKeyboard();
     const step = this.step();
     if (this._picked() === null && step) {
       const steps = [step, ...this._left()];
@@ -441,7 +551,7 @@ export class Welcome implements OnInit {
       case OnboardingSteps.CoachCategories:
         return this._onboardingService.setCoachCategories({
           categoryIds: this.coachCategoryIds(),
-          otherSpecializations: splitOtherWords(this.otherWords()),
+          otherSpecializations: this.otherWords(),
         });
       case OnboardingSteps.CoachDetails:
         return this._onboardingService.setCoachDetails(coachDetails);
@@ -483,6 +593,9 @@ export class Welcome implements OnInit {
       this._patchUser({ roles: [...user.roles, UserRoles.Instructor] });
     }
     this._appModeStore.setMode(NavModes.Coach);
+    // The coach profile the answer created: Account's coach rows read it,
+    // and a flow opened from Account goes back there.
+    this._accountStore.refresh();
   }
 
   /** What the coach details screen saves, read once so the save and its echo agree. */
@@ -523,6 +636,8 @@ export class Welcome implements OnInit {
 
   private _show(step: OnboardingStep): void {
     this.step.set(step);
+    // Every visit to the city starts on its row, never on the search.
+    this.changingCity.set(false);
     if (step === OnboardingSteps.CoachDetails) {
       this._loadCoachProfile();
     }
@@ -571,6 +686,14 @@ export class Welcome implements OnInit {
     this.coachCategoryIds.set(state.coachCategoryIds);
     if (state.role) {
       this.role.set(state.role);
+    }
+  }
+
+  /** Before a button acts, the keyboard goes: Continue, Back, Skip and Close never act under it. */
+  private _dismissKeyboard(): void {
+    const keyboard = this._keyboard();
+    if (keyboard) {
+      keyboard.dismiss();
     }
   }
 

@@ -140,6 +140,10 @@ export class GroupService {
         params = params.append('tags', tag);
       }
     }
+    // Ids hold no comma, but the param repeats like `tags` for one style.
+    for (const id of query.categoryIds ?? []) {
+      params = params.append('categoryIds', id);
+    }
     return this._http.get<DiscoverGroupListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.GROUPS.DISCOVER}`,
       { params },

@@ -41,6 +41,39 @@
       </ion-item>
     </ion-list>
 
+    <!-- What it trains, from the one category list: how Discover's topics
+         find the group. Optional, so a group can start without it. -->
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <h2 class="mh-kicker">{{ 'groups.edit.categories' | translate }}</h2>
+        <ion-note>{{ 'form.placeholder.optional' | translate }}</ion-note>
+      </div>
+      @if (categoryStore.loaded()) {
+      <div class="mh-chip-cloud" role="group" [attr.aria-label]="'groups.edit.categories' | translate">
+        @for (category of categoryStore.activities(); track category.id) {
+        <ion-button class="chip" fill="clear" shape="round" size="small"
+          [class.selected]="hasCategory(category.id)" [attr.aria-pressed]="hasCategory(category.id)"
+          (click)="toggleCategory(category.id)">
+          <ion-icon slot="start" [name]="categoryIcon(category.icon)" aria-hidden="true" />
+          {{ category.name }}
+        </ion-button>
+        }
+      </div>
+      <ion-note class="mh-note-block">{{ 'groups.edit.categoriesHint' | translate }}</ion-note>
+      } @else if (categoryStore.failed()) {
+      <div class="categories-failed">
+        <ion-note>{{ 'groups.edit.categoriesFailed' | translate }}</ion-note>
+        <ion-button fill="clear" size="small" (click)="retryCategories()">
+          {{ 'button.tryAgain' | translate }}
+        </ion-button>
+      </div>
+      } @else {
+      <div class="categories-loading" aria-busy="true">
+        <ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" />
+      </div>
+      }
+    </section>
+
     <ion-list [inset]="true" class="mh-card-list">
       <ion-item>
         <ion-toggle [checked]="isPublic()" (ionChange)="isPublic.set($event.detail.checked)">
@@ -93,34 +126,20 @@
       </ion-list>
     </section>
 
-    <section class="mh-section">
+    <!-- The owner's own words, kept beside the field while it is typed in. -->
+    <section class="mh-section" data-mh-keyboard-block>
       <h2 class="mh-kicker">{{ 'groups.edit.tags' | translate }}</h2>
-      <ion-list [inset]="true" class="mh-card-list">
-        <ion-item>
-          <ion-input [label]="'groups.edit.tagLabel' | translate" labelPlacement="stacked"
-            [placeholder]="'groups.edit.tagPlaceholder' | translate"
-            [maxlength]="tagMaxLength" [value]="tagDraft()"
-            (ionInput)="tagDraft.set($event.detail.value ?? '')"
-            (keydown.enter)="addTag()" />
-          <ion-button slot="end" fill="clear" [disabled]="!canAddTag()"
-            [attr.aria-label]="'groups.edit.addTag' | translate"
-            (click)="addTag()">
-            <ion-icon slot="icon-only" name="add-outline" />
-          </ion-button>
-        </ion-item>
-      </ion-list>
-      @if (tags().length > 0) {
-      <div class="mh-chip-row" role="group" [attr.aria-label]="'groups.common.groupTags' | translate">
-        @for (tag of tags(); track tag) {
-        <!-- A control, so a button: the whole chip removes the tag. -->
-        <ion-button class="chip" fill="clear" shape="round" size="small"
-          [attr.aria-label]="'groups.edit.removeTag' | translate: { tag }" (click)="removeTag(tag)">
-          {{ tag }}
-          <ion-icon slot="end" name="close-outline" aria-hidden="true" />
-        </ion-button>
-        }
-      </div>
-      }
+      <mh-chip-input
+        [(values)]="tags"
+        [label]="'groups.edit.tagLabel' | translate"
+        [placeholder]="'groups.edit.tagPlaceholder' | translate"
+        [addLabel]="'groups.edit.addTag' | translate"
+        removeLabel="groups.edit.removeTag"
+        [listLabel]="'groups.common.groupTags' | translate"
+        [max]="maxTags"
+        [maxLength]="tagMaxLength"
+        autocapitalize="off"
+      />
     </section>
 
     @if (isEdit()) {
@@ -137,7 +156,8 @@
 </ion-content>
 
 @if (!loadError() && !notAllowed()) {
-<ion-footer [translucent]="true">
+<!-- Rides on the keyboard while a field is typed in, as the chat's bar does. -->
+<ion-footer [translucent]="true" mhKeyboardFooter>
   <ion-toolbar class="save-bar">
     <ion-button expand="block" color="primary" [disabled]="!canSave()" (click)="save()">
       @if (saving()) {

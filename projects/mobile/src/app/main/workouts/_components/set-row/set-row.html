@@ -39,14 +39,16 @@
           <span class="last">{{ last() }}</span>
         }
         <!-- The set's options (type, note, delete), on their own button. -->
-        <button
-          type="button"
+        <ion-button
           class="more"
+          fill="clear"
+          shape="round"
+          color="medium"
           [attr.aria-label]="'workouts.setRow.menu' | translate: { name: badge().name }"
           (click)="menu.emit()"
         >
-          <ion-icon name="ellipsis-horizontal-outline" aria-hidden="true" />
-        </button>
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        </ion-button>
       </div>
 
       <div class="fields">

@@ -1,0 +1,60 @@
+/* The field over its chips over the line about them, bound by the section
+   gap, like a label to its list. Placement on the page is the page's. */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mh-section-gap);
+}
+
+/* The + takes a finger's 44px inside the row, which is 3rem. */
+.add {
+  min-width: var(--mh-tap-target);
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}
+
+/* The chip skin is the filter chips' (`.mh-chip-cloud .chip`, ion-button.css),
+   which wraps rather than scrolls so every word stays in sight. The block
+   padding keeps the first and last rows' 44px hit boxes inside the block. */
+.chips {
+  padding-block: calc((var(--mh-tap-target) - 2rem) / 2);
+}
+
+/* A chip never runs past the screen: a long word ellipsises, and the button's
+   name still says it whole. */
+.chip {
+  max-width: 100%;
+}
+
+.chip::part(native) {
+  min-width: 0;
+}
+
+.chip .text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The chips double as their own remove button, so the whole chip is the
+   target; the × is the chips' small glyph (as on group tags). */
+.chip ion-icon {
+  flex-shrink: 0;
+  margin-inline: 0.25rem -0.25rem;
+  font-size: var(--mh-icon-sm);
+}
+
+/* The line under the chips: muted, on the row gutter like a note under a
+   list; deep red when the entry has to change before it can go in. */
+.notice {
+  margin: 0;
+  padding-inline: var(--mh-row-gutter);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.notice.over {
+  color: var(--mh-color-danger-deep);
+  font-weight: 600;
+}

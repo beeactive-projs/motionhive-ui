@@ -134,20 +134,14 @@
 
 /* The set's ⋯, in the card's corner: a full tap target, the icon small. */
 .more {
-  display: inline-flex;
+  --padding-start: 0;
+  --padding-end: 0;
+
   flex: none;
-  align-items: center;
-  justify-content: center;
   width: var(--mh-tap-target);
   height: var(--mh-tap-target);
   margin: -0.625rem -0.5rem -0.625rem 0;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--ion-color-medium);
   font-size: var(--mh-icon-md);
-  cursor: pointer;
 }
 
 .fields {

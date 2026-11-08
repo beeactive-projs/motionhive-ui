@@ -1,19 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
-import type { OnboardingState, PickedLocation } from 'core';
+import type { Category, OnboardingState, PickedLocation } from 'core';
 
 import { ROLES } from '../../_shared/config/roles.config';
 import {
   LEVEL_CHOICES,
   MAX_OTHER_WORDS,
+  MAX_OTHER_WORD_LENGTH,
   ROLE_CHOICES,
   WELCOME_COPY,
   WELCOME_ICONS,
   canGoBack,
+  categoriesNamed,
+  categoryNames,
   coachDetailsPayload,
   needsCategories,
   remainingSteps,
-  splitOtherWords,
   welcomeProgress,
 } from './welcome.config';
 
@@ -99,20 +101,36 @@ describe('needsCategories', () => {
   });
 });
 
-describe('splitOtherWords', () => {
-  it('splits on commas, trims and keeps each word once', () => {
-    expect(splitOtherWords(' Kettlebells, calistenie ,, kettlebells, Calistenie ')).toEqual([
-      'Kettlebells',
-      'calistenie',
-    ]);
-    expect(splitOtherWords('Forță, forta')).toEqual(['Forță']);
-    expect(splitOtherWords('')).toEqual([]);
+const category = (overrides: Partial<Category>): Category => ({
+  id: 'id',
+  slug: 'slug',
+  kind: 'ACTIVITY',
+  name: 'Name',
+  icon: 'barbell-outline',
+  displayOrder: 1,
+  coachesOnly: false,
+  ...overrides,
+});
+
+describe('the coach’s own words', () => {
+  const list = [
+    category({ id: 'strength', name: 'Antrenament de forță', originalName: 'Strength training' }),
+    category({ id: 'yoga', name: 'Yoga' }),
+  ];
+
+  it('keeps to the API’s caps', () => {
+    expect(MAX_OTHER_WORDS).toBe(10);
+    expect(MAX_OTHER_WORD_LENGTH).toBe(50);
   });
 
-  it('stops at the API caps', () => {
-    const many = Array.from({ length: 15 }, (_, index) => `word${index}`).join(',');
-    expect(splitOtherWords(many)).toHaveLength(MAX_OTHER_WORDS);
-    expect(splitOtherWords('x'.repeat(80))[0]).toHaveLength(50);
+  it('names every category in the reader’s language and in English', () => {
+    expect(categoryNames(list)).toEqual(['Antrenament de forță', 'Strength training', 'Yoga']);
+  });
+
+  it('finds the categories a word only repeats, case and accents aside', () => {
+    expect(categoriesNamed(['antrenament de forta', 'YOGA'], list)).toEqual(['strength', 'yoga']);
+    expect(categoriesNamed(['strength training'], list)).toEqual(['strength']);
+    expect(categoriesNamed(['Kettlebells'], list)).toEqual([]);
   });
 });
 
