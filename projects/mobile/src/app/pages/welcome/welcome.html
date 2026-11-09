@@ -234,6 +234,19 @@
             }
           </section>
 
+          <!-- Where the coach works: a gym, a studio, online. Optional, and
+               each place is saved as its sheet saves (Continue sends only the
+               city and the switch below). The same list as the coaching
+               profile's, so a place added here is there. -->
+          <section class="mh-section">
+            <div class="mh-section-head">
+              <h2 class="mh-kicker">{{ 'welcome.coachDetails.places' | translate }}</h2>
+              <ion-note>{{ 'welcome.optional' | translate }}</ion-note>
+            </div>
+            <mh-venue-list />
+            <ion-note class="mh-note-block">{{ 'venues.list.hint' | translate }}</ion-note>
+          </section>
+
           <section class="mh-section">
             <ion-list [inset]="true" class="mh-card-list">
               <ion-item>

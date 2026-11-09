@@ -45,12 +45,7 @@
         "notAccepting": "Nu accepți clienți"
       },
       "venues": {
-        "clientHome": "Acasă la client",
-        "empty": "Încă nu ai locații. Locațiile se gestionează în aplicația web.",
-        "loadFailed": "Locațiile nu au putut fi încărcate.",
-        "managedOnWeb": "Locațiile se gestionează în aplicația web.",
-        "online": "Online",
-        "title": "Locații"
+        "title": "Locurile unde antrenezi"
       }
     },
     "hero": {
@@ -228,11 +223,15 @@
       "acceptingHint": "Apare pe profilul tău public, ca oamenii să știe că te pot contacta.",
       "showSocialLinks": "Arată linkurile sociale",
       "showSocialLinksHint": "Linkurile tale rămân ascunse cât timp opțiunea e oprită.",
-      "specializationsHint": "Separă-le prin virgulă.",
       "title": "Profil de antrenor",
       "toast": {
         "failed": "Profilul de antrenor nu a putut fi actualizat.",
         "updated": "Profil de antrenor actualizat"
+      },
+      "specializations": {
+        "placeholder": "Adaugă una, de exemplu Kettlebell",
+        "add": "Adaugă specializarea",
+        "list": "Specializările tale"
       }
     },
     "handle": {
@@ -3829,7 +3828,80 @@
       "citySearch": "Caută orașul tău",
       "noPlaces": "Nu am găsit orașul. Verifică scrierea sau încearcă unul din apropiere.",
       "accepting": "Primesc clienți noi",
-      "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Dezactivează opțiunea când nu mai ai locuri."
+      "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Dezactivează opțiunea când nu mai ai locuri.",
+      "places": "Locurile unde antrenezi"
+    }
+  },
+  "venues": {
+    "kind": {
+      "GYM": "Sală",
+      "STUDIO": "Studio",
+      "PARK": "Parc",
+      "OUTDOOR": "În aer liber",
+      "CLIENT_HOME": "La clienți acasă",
+      "ONLINE": "Online",
+      "OTHER": "Altceva"
+    },
+    "provider": {
+      "OTHER": "Alta"
+    },
+    "defaultName": {
+      "online": "Online",
+      "clientHome": "La clienți acasă"
+    },
+    "list": {
+      "add": "Adaugă un loc",
+      "more": "Mai multe pentru {name}",
+      "loadFailed": "Locurile tale nu au putut fi încărcate.",
+      "hint": "Sala sau studioul tău, ori online pe Zoom. Profilul arată numele și orașul fiecăruia, niciodată strada sau linkul de întâlnire."
+    },
+    "sheet": {
+      "addTitle": "Adaugă un loc",
+      "editTitle": "Modifică locul",
+      "kind": "Ce fel de loc?",
+      "platform": "Unde vă întâlniți online",
+      "name": "Nume",
+      "namePlaceholder": {
+        "GYM": "De exemplu FitZone Centru",
+        "STUDIO": "De exemplu Studio Ana",
+        "PARK": "De exemplu Parcul Herăstrău",
+        "OUTDOOR": "De exemplu traseul de lângă lac",
+        "CLIENT_HOME": "La clienți acasă",
+        "ONLINE": "Online",
+        "OTHER": "De exemplu sala școlii"
+      },
+      "address": "Adresă",
+      "searchAddress": "Caută adresa",
+      "addressSearch": "Stradă, loc sau oraș",
+      "addressHint": "Pe profil apare doar orașul.",
+      "area": "Zona în care lucrezi",
+      "addArea": "Adaugă zona în care lucrezi",
+      "areaSearch": "Caută un oraș",
+      "areaHint": "Orașul prin care te deplasezi.",
+      "clearArea": "Elimină zona",
+      "noResults": "Nu am găsit nimic. Încearcă strada și orașul, sau doar orașul.",
+      "link": "Link de întâlnire",
+      "linkHint": "Opțional și nu apare niciodată pe profilul tău.",
+      "linkInvalid": "Nu pare un link web. Verifică-l sau lasă câmpul gol.",
+      "travel": "Cât de departe te deplasezi (km)",
+      "travelPlaceholder": "De exemplu 15",
+      "travelHint": "Opțional. Până la {max} km."
+    },
+    "actions": {
+      "edit": "Modifică detaliile",
+      "remove": "Elimină"
+    },
+    "remove": {
+      "title": "Elimini {name}?",
+      "body": "{name} dispare de pe profilul tău. Sesiunile deja planificate acolo își păstrează detaliile.",
+      "confirm": "Elimină"
+    },
+    "toast": {
+      "added": "Loc adăugat",
+      "updated": "Loc actualizat",
+      "removed": "Loc eliminat",
+      "saveFailed": "Locul nu a putut fi salvat.",
+      "removeFailed": "Locul nu a putut fi eliminat."
     }
   }
 }

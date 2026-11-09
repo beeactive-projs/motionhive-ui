@@ -1,9 +1,7 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { VenueKind } from 'core';
-
-import { COACHING_PROFILE_ICONS, priceLine, venueLine } from './coaching-profile.config';
+import { COACHING_PROFILE_ICONS, priceLine } from './coaching-profile.config';
 
 /** The screen's templates, inlined at build time by Vite. */
 const templates = import.meta.glob('./*.html', {
@@ -32,49 +30,6 @@ describe('COACHING_PROFILE_ICONS', () => {
     for (const name of used) {
       expect(registered, `${name} is used but not registered`).toContain(toCamelCase(name));
     }
-  });
-
-  it('registers every venue tile', () => {
-    for (const kind of Object.values(VenueKind)) {
-      for (const isOnline of [true, false]) {
-        const { icon } = venueLine({ kind, isOnline, city: 'Cluj' });
-        expect(registered, `${icon} is not registered`).toContain(toCamelCase(icon));
-      }
-    }
-  });
-});
-
-describe('venueLine', () => {
-  it('says Online for an online venue, whatever its kind', () => {
-    expect(venueLine({ kind: VenueKind.ONLINE, isOnline: true, city: null })).toEqual({
-      icon: 'videocam-outline',
-      key: 'account.coachingProfile.venues.online',
-      city: null,
-    });
-    expect(venueLine({ kind: VenueKind.OTHER, isOnline: true, city: 'Cluj' }).key).toBe(
-      'account.coachingProfile.venues.online',
-    );
-  });
-
-  it("says the coach comes to you for a client's home, never Online", () => {
-    expect(venueLine({ kind: VenueKind.CLIENT_HOME, isOnline: false, city: null })).toEqual({
-      icon: 'home-outline',
-      key: 'account.coachingProfile.venues.clientHome',
-      city: null,
-    });
-  });
-
-  it('gives a place its city, and nothing when it has none', () => {
-    expect(venueLine({ kind: VenueKind.GYM, isOnline: false, city: ' Bucharest ' })).toEqual({
-      icon: 'location-outline',
-      key: null,
-      city: 'Bucharest',
-    });
-    expect(venueLine({ kind: VenueKind.PARK, isOnline: false, city: null })).toEqual({
-      icon: 'location-outline',
-      key: null,
-      city: null,
-    });
   });
 });
 

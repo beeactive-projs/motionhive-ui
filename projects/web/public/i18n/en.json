@@ -4685,7 +4685,8 @@
       "providerOther": "Other",
       "travelRadius": "Travel radius (km)",
       "travelRadiusHint": "How far you're willing to travel to the client.",
-      "travelRadiusPlaceholder": "e.g. 15"
+      "travelRadiusPlaceholder": "e.g. 15",
+      "meetingUrlHint": "Optional, and never shown on your public profile."
     },
     "kind": {
       "CLIENT_HOME": "Client's place",
@@ -4724,10 +4725,6 @@
       "meetingUrlInvalid": {
         "detail": "Use something like zoom.us/j/123 or https://meet.google.com/...",
         "summary": "Meeting link looks invalid"
-      },
-      "meetingUrlRequired": {
-        "detail": "Paste the meeting URL for online venues.",
-        "summary": "Meeting link required"
       },
       "nameRequired": {
         "detail": "Give this venue a short name.",

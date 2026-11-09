@@ -1,0 +1,178 @@
+<ng-template #body>
+  <!-- The kind first: it decides which fields follow. One at a time, as a
+       filter strip lights one choice. -->
+  <section class="group">
+    <h3 class="mh-kicker">{{ 'venues.sheet.kind' | translate }}</h3>
+    <div class="mh-chip-cloud" role="group" [attr.aria-label]="'venues.sheet.kind' | translate">
+      @for (option of kindOptions; track option.kind) {
+        <ion-button class="chip" fill="clear" shape="round" size="small"
+          [class.selected]="isKind(option.kind)" [attr.aria-pressed]="isKind(option.kind)"
+          (click)="pickKind(option.kind)">
+          <ion-icon slot="start" [name]="option.icon" aria-hidden="true" />
+          {{ option.label | translate }}
+        </ion-button>
+      }
+    </div>
+  </section>
+
+  @if (isOnline()) {
+    <section class="group">
+      <div class="head">
+        <h3 class="mh-kicker">{{ 'venues.sheet.platform' | translate }}</h3>
+        <span class="optional">{{ 'form.placeholder.optional' | translate }}</span>
+      </div>
+      <div class="mh-chip-cloud" role="group" [attr.aria-label]="'venues.sheet.platform' | translate">
+        @for (option of providerOptions; track option.provider) {
+          <ion-button class="chip" fill="clear" shape="round" size="small"
+            [class.selected]="isProvider(option.provider)" [attr.aria-pressed]="isProvider(option.provider)"
+            (click)="pickProvider(option.provider)">
+            @if (option.brand) {
+              {{ option.brand }}
+            } @else {
+              {{ option.label | translate }}
+            }
+          </ion-button>
+        }
+      </div>
+    </section>
+  }
+
+  <ion-input mode="md"
+    class="field"
+    [label]="'venues.sheet.name' | translate"
+    labelPlacement="stacked"
+    fill="outline"
+    autocapitalize="words"
+    [maxlength]="nameMaxLength"
+    [placeholder]="namePlaceholder() | translate"
+    [value]="draft().name"
+    (ionInput)="onName($event.detail.value)"
+  />
+
+  @if (showPlaceRow()) {
+    <!-- The address as a row with its value; the search opens only on a tap,
+         with the caret in it. Cancel sits in the head, not beside the field,
+         as on the welcome city step. -->
+    <section class="group field" data-mh-keyboard-block>
+      <div class="head">
+        @if (isClientHome()) {
+          <h3 class="mh-kicker">{{ 'venues.sheet.area' | translate }}</h3>
+          @if (!searchingAddress()) {
+            <span class="optional">{{ 'form.placeholder.optional' | translate }}</span>
+          }
+        } @else {
+          <h3 class="mh-kicker">{{ 'venues.sheet.address' | translate }}</h3>
+        }
+        @if (searchingAddress()) {
+          <ion-button class="cancel" fill="clear" size="small" (click)="keepAddress()">
+            {{ 'button.cancel' | translate }}
+          </ion-button>
+        }
+      </div>
+
+      @if (searchingAddress()) {
+        <ion-searchbar
+          mhAutofocus
+          searchIcon="search-outline"
+          clearIcon="close-outline"
+          showCancelButton="never"
+          [placeholder]="searchPlaceholder() | translate"
+          [debounce]="0"
+          (ionInput)="onAddressSearch($event.detail.value)"
+        />
+        @if (searching() && !results().length) {
+          <div class="searching"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+        } @else if (results().length) {
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (option of results(); track option.displayName) {
+              <ion-item button [detail]="false" (click)="pickAddress(option)">
+                <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" />
+                <ion-label class="ion-text-wrap">
+                  {{ resultTitle(option) }}
+                  <p>{{ option.country }}</p>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        } @else if (noResults()) {
+          <p class="mh-helper">{{ 'venues.sheet.noResults' | translate }}</p>
+        }
+      } @else {
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item button [detail]="true" (click)="openAddressSearch()">
+            <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" />
+            @if (placeLabel(); as label) {
+              <ion-label class="ion-text-wrap">{{ label }}</ion-label>
+            } @else if (isClientHome()) {
+              <ion-label class="ion-text-wrap">{{ 'venues.sheet.addArea' | translate }}</ion-label>
+            } @else {
+              <ion-label class="ion-text-wrap">{{ 'venues.sheet.searchAddress' | translate }}</ion-label>
+            }
+          </ion-item>
+          @if (isClientHome() && placeLabel()) {
+            <ion-item button [detail]="false" (click)="clearArea()">
+              <ion-label color="medium">{{ 'venues.sheet.clearArea' | translate }}</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+        @if (isClientHome()) {
+          <p class="mh-helper">{{ 'venues.sheet.areaHint' | translate }}</p>
+        } @else {
+          <p class="mh-helper">{{ 'venues.sheet.addressHint' | translate }}</p>
+        }
+      }
+    </section>
+  }
+
+  @if (isOnline()) {
+    <ion-input mode="md"
+      class="field"
+      type="url"
+      inputmode="url"
+      autocapitalize="off"
+      autocorrect="off"
+      [spellcheck]="false"
+      [label]="'venues.sheet.link' | translate"
+      labelPlacement="stacked"
+      fill="outline"
+      placeholder="https://zoom.us/j/…"
+      [maxlength]="linkMaxLength"
+      [value]="draft().meetingUrl"
+      (ionInput)="onLink($event.detail.value)"
+      (ionBlur)="onLinkBlur()"
+    />
+    @if (linkInvalid()) {
+      <p class="mh-helper over">{{ 'venues.sheet.linkInvalid' | translate }}</p>
+    } @else {
+      <p class="mh-helper">{{ 'venues.sheet.linkHint' | translate }}</p>
+    }
+  }
+
+  @if (isClientHome()) {
+    <ion-input mode="md"
+      class="field"
+      type="number"
+      inputmode="numeric"
+      [min]="0"
+      [max]="travelMaxKm"
+      [label]="'venues.sheet.travel' | translate"
+      labelPlacement="stacked"
+      fill="outline"
+      [placeholder]="'venues.sheet.travelPlaceholder' | translate"
+      [value]="draft().travelRadiusKm"
+      (ionInput)="onTravel($event.detail.value)"
+    />
+    <p class="mh-helper">{{ 'venues.sheet.travelHint' | translate: { max: travelMaxKm } }}</p>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title() | translate"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.9, 0.95]"
+  [initialBreakpoint]="0.9"
+  (save)="submit()"
+/>

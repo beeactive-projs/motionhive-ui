@@ -45,12 +45,7 @@
         "notAccepting": "Not accepting clients"
       },
       "venues": {
-        "clientHome": "At the client's home",
-        "empty": "No venues yet. Venues are managed on the web app.",
-        "loadFailed": "Could not load your venues.",
-        "managedOnWeb": "Venues are managed on the web app.",
-        "online": "Online",
-        "title": "Venues"
+        "title": "Places you coach"
       }
     },
     "hero": {
@@ -228,11 +223,15 @@
       "acceptingHint": "Shows on your public profile so people know they can reach out.",
       "showSocialLinks": "Show social links",
       "showSocialLinksHint": "Your links stay hidden while this is off.",
-      "specializationsHint": "Separate each one with a comma.",
       "title": "Coaching profile",
       "toast": {
         "failed": "Could not update your coaching profile.",
         "updated": "Coaching profile updated"
+      },
+      "specializations": {
+        "placeholder": "Add one, like Kettlebell",
+        "add": "Add specialization",
+        "list": "Your specializations"
       }
     },
     "handle": {
@@ -3829,7 +3828,80 @@
       "citySearch": "Search for your city",
       "noPlaces": "No city found. Check the spelling or try one nearby.",
       "accepting": "Taking new clients",
-      "acceptingHint": "People can ask you to coach them. Turn it off when you are full."
+      "acceptingHint": "People can ask you to coach them. Turn it off when you are full.",
+      "places": "Places you coach"
+    }
+  },
+  "venues": {
+    "kind": {
+      "GYM": "Gym",
+      "STUDIO": "Studio",
+      "PARK": "Park",
+      "OUTDOOR": "Outdoors",
+      "CLIENT_HOME": "At clients' homes",
+      "ONLINE": "Online",
+      "OTHER": "Other"
+    },
+    "provider": {
+      "OTHER": "Other"
+    },
+    "defaultName": {
+      "online": "Online",
+      "clientHome": "At clients' homes"
+    },
+    "list": {
+      "add": "Add a place",
+      "more": "More for {name}",
+      "loadFailed": "Could not load your places.",
+      "hint": "Your gym or studio, or online on Zoom. Your profile shows each name and city, never the street or a meeting link."
+    },
+    "sheet": {
+      "addTitle": "Add a place",
+      "editTitle": "Edit place",
+      "kind": "What kind of place?",
+      "platform": "Where you meet online",
+      "name": "Name",
+      "namePlaceholder": {
+        "GYM": "For example FitZone Downtown",
+        "STUDIO": "For example Studio Ana",
+        "PARK": "For example Herăstrău Park",
+        "OUTDOOR": "For example the lake trail",
+        "CLIENT_HOME": "At clients' homes",
+        "ONLINE": "Online",
+        "OTHER": "For example the school gym"
+      },
+      "address": "Address",
+      "searchAddress": "Search the address",
+      "addressSearch": "Street, place or city",
+      "addressHint": "Only the city shows on your profile.",
+      "area": "Area you cover",
+      "addArea": "Add the area you cover",
+      "areaSearch": "Search for a city",
+      "areaHint": "The city you travel around.",
+      "clearArea": "Remove the area",
+      "noResults": "Nothing found. Try the street and city, or just the city.",
+      "link": "Meeting link",
+      "linkHint": "Optional, and never shown on your profile.",
+      "linkInvalid": "This is not a web link. Check it or leave the field empty.",
+      "travel": "How far you travel (km)",
+      "travelPlaceholder": "For example 15",
+      "travelHint": "Optional. Up to {max} km."
+    },
+    "actions": {
+      "edit": "Edit details",
+      "remove": "Remove"
+    },
+    "remove": {
+      "title": "Remove {name}?",
+      "body": "{name} leaves your profile. Sessions already planned there keep their details.",
+      "confirm": "Remove"
+    },
+    "toast": {
+      "added": "Place added",
+      "updated": "Place updated",
+      "removed": "Place removed",
+      "saveFailed": "Could not save this place.",
+      "removeFailed": "Could not remove this place."
     }
   }
 }

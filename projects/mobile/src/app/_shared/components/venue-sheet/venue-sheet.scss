@@ -1,0 +1,50 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mh-section-gap);
+}
+
+.group + .group {
+  margin-top: 1.25rem;
+}
+
+.field {
+  margin-top: 1.25rem;
+}
+
+// A kicker and its quiet "Optional", or the search's Cancel, on one line.
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mh-section-gap);
+  min-height: var(--mh-tap-target);
+}
+
+.optional {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+// The search's Cancel keeps a finger's 44px inside the head's own height.
+.cancel {
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}
+
+// Ionic pads the searchbar for a toolbar; inside a padded sheet body the
+// field should span like the outline inputs do.
+ion-searchbar {
+  padding-inline: 0;
+}
+
+.searching {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.mh-helper {
+  margin-inline: 0.25rem;
+  margin-bottom: 0;
+}

@@ -58,4 +58,14 @@ export interface CreateVenuePayload {
   displayOrder?: number;
 }
 
-export type UpdateVenuePayload = Partial<CreateVenuePayload>;
+/**
+ * A PATCH: a field left out keeps its stored value. The meeting link and
+ * platform also take `null`, which clears them (an online place may have
+ * neither); for every other field `null` is the same as leaving it out.
+ */
+export type UpdateVenuePayload = Partial<
+  Omit<CreateVenuePayload, 'meetingUrl' | 'meetingProvider'>
+> & {
+  meetingUrl?: string | null;
+  meetingProvider?: MeetingProvider | null;
+};

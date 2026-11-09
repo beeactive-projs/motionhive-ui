@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+h3 {
+  font-weight: 600;
+}
+
+p {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+// The ⋯ keeps a finger's 44px inside the row.
+ion-button.more {
+  min-width: var(--mh-tap-target);
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}

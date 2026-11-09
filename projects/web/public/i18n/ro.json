@@ -4685,7 +4685,8 @@
       "providerOther": "Alta",
       "travelRadius": "Rază de deplasare (km)",
       "travelRadiusHint": "Cât de departe ești dispus să te deplasezi la client.",
-      "travelRadiusPlaceholder": "ex. 15"
+      "travelRadiusPlaceholder": "ex. 15",
+      "meetingUrlHint": "Opțional și nu apare niciodată pe profilul tău public."
     },
     "kind": {
       "CLIENT_HOME": "La client",
@@ -4724,10 +4725,6 @@
       "meetingUrlInvalid": {
         "detail": "Folosește ceva de genul zoom.us/j/123 sau https://meet.google.com/...",
         "summary": "Linkul întâlnirii pare invalid"
-      },
-      "meetingUrlRequired": {
-        "detail": "Lipește URL-ul întâlnirii pentru locațiile online.",
-        "summary": "Linkul întâlnirii e obligatoriu"
       },
       "nameRequired": {
         "detail": "Dă-i locației un nume scurt.",

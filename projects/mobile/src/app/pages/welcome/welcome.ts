@@ -57,6 +57,7 @@ import type {
 } from 'core';
 
 import { ChipInput } from '../../_shared/components/chip-input/chip-input';
+import { VenueList } from '../../_shared/components/venue-list/venue-list';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { ACTIVITY_ICONS, categoryIcon } from '../../_shared/config/category-icons.config';
@@ -126,6 +127,7 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
     SearchbarAutofocusDirective,
     SearchbarLabelDirective,
     TranslatePipe,
+    VenueList,
   ],
   templateUrl: './welcome.html',
   styleUrl: './welcome.scss',
