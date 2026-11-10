@@ -100,7 +100,8 @@
     </form>
 
     <mh-social-sign-in [disabled]="isLoading()" (googleCredential)="onGoogleCredential($event)"
-      (googleFailed)="onGoogleFailed()" />
+      (googleFailed)="onGoogleFailed()" (appleCredential)="onAppleCredential($event)"
+      (appleFailed)="onAppleFailed()" />
 
     <mh-terms-notice intro="auth.signUp.termsIntro" />
     }

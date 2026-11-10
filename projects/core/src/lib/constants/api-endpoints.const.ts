@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
     REFRESH: '/auth/refresh',
     GOOGLE: '/auth/google',
     FACEBOOK: '/auth/facebook',
+    APPLE: '/auth/apple',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
     RESEND_VERIFICATION: '/auth/resend-verification',

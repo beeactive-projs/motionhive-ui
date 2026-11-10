@@ -20,6 +20,7 @@ import { Observable, finalize } from 'rxjs';
 import {
   APP_HOME_URL,
   AUTH_FIELD_ERRORS,
+  AppleLoginRequest,
   AuthService,
   ClientInviteService,
   FieldErrorPipe,
@@ -138,7 +139,15 @@ export class Login {
     this.errorMessage.set(this._translateService.instant('auth.common.googleFailed'));
   }
 
-  /** Email and password or Google: both may hit the deletion cooling-off. */
+  protected onAppleCredential(request: AppleLoginRequest): void {
+    this.signIn(this._authService.appleLogin(request), 'auth.common.appleFailed');
+  }
+
+  protected onAppleFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
+  }
+
+  /** Email and password, Apple or Google: each may hit the deletion cooling-off. */
   private signIn(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);

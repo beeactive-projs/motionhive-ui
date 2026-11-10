@@ -15,5 +15,12 @@
 	<array>
 		<string>applinks:$(APP_LINK_HOST)</string>
 	</array>
+	<!-- Sign in with Apple (AppleSignInService). The App ID fit.motionhive.app
+	     must have the capability on developer.apple.com, and the provisioning
+	     profile must be made after it was turned on, or signing fails. -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
 </dict>
 </plist>

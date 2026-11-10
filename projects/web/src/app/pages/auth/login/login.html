@@ -57,8 +57,9 @@
     </button>
   </form>
 
-  <mh-social-sign-in (googleCredential)="onGoogleCredential($event)"
-    (googleFailed)="onGoogleFailed()" />
+  <mh-social-sign-in [disabled]="isLoading()" (googleCredential)="onGoogleCredential($event)"
+    (googleFailed)="onGoogleFailed()" (appleCredential)="onAppleCredential($event)"
+    (appleFailed)="onAppleFailed()" />
 
   <mh-terms-notice intro="auth.login.termsIntro" />
 </div>

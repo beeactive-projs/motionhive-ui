@@ -29,6 +29,8 @@
   },
   "auth": {
     "common": {
+      "appleFailed": "Autentificarea cu Apple a eșuat. Încearcă din nou.",
+      "continueWithApple": "Continuă cu Apple",
       "continueWithGoogle": "Continuă cu Google",
       "createOneFree": "Creează unul gratuit",
       "emailAddress": "Adresă de email",
