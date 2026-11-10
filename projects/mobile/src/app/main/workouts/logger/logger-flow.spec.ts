@@ -8,6 +8,7 @@ import {
   WARMUP_REST_SECONDS,
   afterTick,
   asksEffort,
+  copiedValues,
   effortTarget,
   estimatedRest,
   exerciseBlocks,
@@ -125,6 +126,15 @@ describe('focus order', () => {
     expect(focusOf(after)).toEqual({ exerciseId: 'a', setId: 'a2' });
     expect(a.sets?.[0].isCompleted).toBeFalsy();
   });
+
+  // The copy carries what the ✓ logged, so the next step pre-fills from it.
+  it('ticks the copy with the values the lock screen logs', () => {
+    const a = exercise('a', [set({ id: 'a1' }), set({ id: 'a2' })]);
+    const [ticked] = withTicked([a], 'a1', { weightKg: 60, reps: 8 });
+    const first = ticked.sets?.[0];
+    expect(first).toMatchObject({ isCompleted: true, weightKg: 60, reps: 8 });
+    expect(prefillValue(set({ id: 'a2' }), SetFields.Weight, null, first ?? null)).toBe(60);
+  });
 });
 
 describe('setBadge', () => {
@@ -147,8 +157,18 @@ describe('prefillValue', () => {
     const planned = set({ assignedSet: plan({ targetWeightKg: 62.5 }) });
     expect(prefillValue(planned, SetFields.Weight, set({ weightKg: 60 }), null)).toBe(62.5);
     expect(prefillValue(set(), SetFields.Weight, set({ weightKg: 60 }), set({ weightKg: 55 }))).toBe(60);
-    expect(prefillValue(set(), SetFields.Weight, null, set({ weightKg: 55 }))).toBe(55);
+    expect(prefillValue(set(), SetFields.Weight, null, set({ weightKg: 55, isCompleted: true }))).toBe(55);
     expect(prefillValue(set(), SetFields.Weight, null, null)).toBeNull();
+  });
+
+  // Typing kg into set 1 and moving on to its reps must not fill set 2: the
+  // set before lends its numbers only once it is ticked.
+  it('takes nothing from the set before until it is ticked', () => {
+    const typed = set({ weightKg: 55, reps: 8 });
+    expect(prefillValue(set(), SetFields.Weight, null, typed)).toBeNull();
+    expect(prefillValue(set(), SetFields.Reps, null, typed)).toBeNull();
+    // Last time still pre-fills, ticked or not.
+    expect(prefillValue(set(), SetFields.Weight, set({ weightKg: 60 }), typed)).toBe(60);
   });
 
   it('reads a routine target the same way as a coach plan', () => {
@@ -189,6 +209,23 @@ describe('set lines', () => {
     expect(shownValue(row, SetFields.Weight)).toBe(62.5);
     expect(shownValue(row, SetFields.Duration)).toBeNull();
     expect(shownValue({ ...row, prefill: { [SetFields.Weight]: null } }, SetFields.Weight)).toBeNull();
+  });
+
+  // A plan day's unticked set shows the plan's 60 × 8 in grey; its copy has no
+  // plan, so it has to carry those numbers itself or it shows "– –".
+  it('copies the numbers a set shows, typed or grey', () => {
+    const kgReps = [SetFields.Weight, SetFields.Reps];
+    const grey = { set: set(), prefill: { [SetFields.Weight]: 60, [SetFields.Reps]: 8 } };
+    expect(copiedValues(grey, kgReps)).toEqual({ weightKg: 60, reps: 8 });
+
+    const typed = { set: set({ reps: 10 }), prefill: { [SetFields.Weight]: 60, [SetFields.Reps]: 8 } };
+    expect(copiedValues(typed, kgReps)).toEqual({ weightKg: 60, reps: 10 });
+  });
+
+  it('copies only the fields the exercise records, and leaves empty ones out', () => {
+    const row = { set: set({ weightKg: 20, durationSeconds: 45 }), prefill: {} };
+    expect(copiedValues(row, [SetFields.Duration])).toEqual({ durationSeconds: 45 });
+    expect(copiedValues({ set: set(), prefill: { [SetFields.Reps]: null } }, [SetFields.Reps])).toEqual({});
   });
 
   it('writes the next set in one line, with Last set on an exercise\'s last', () => {

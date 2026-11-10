@@ -9,6 +9,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { SessionRowSkeleton } from '../../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { HistoryFilter, HistoryFilters, HistoryStore } from '../../history/history.store';
+import { ActiveWorkoutService } from '../../_services/active-workout.service';
 import { logMonths, logWeeks, shortDayLabel } from '../../workouts.config';
 import { HistoryCalendar } from '../history-calendar/history-calendar';
 import { LogRow } from '../log-row/log-row';
@@ -54,6 +55,7 @@ import { PhotoTile } from '../photo-tile/photo-tile';
 export class HistoryBody {
   readonly store = inject(HistoryStore);
   private readonly _router = inject(Router);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly Filters = HistoryFilters;
@@ -113,8 +115,6 @@ export class HistoryBody {
    * routine per repeat would silently fill the library with near-duplicates.
    */
   repeat(log: WorkoutLog): void {
-    void this._router.navigate(['/tabs/workouts/log', 'new'], {
-      queryParams: { from: log.id },
-    });
+    this._activeWorkoutService.startFreestyle(log.id);
   }
 }

@@ -247,8 +247,11 @@ export class RoutineBuilder implements ViewWillEnter {
   /** The target cell the keypad is editing, or null when it is closed. */
   readonly editing = signal<TargetEdit | null>(null);
   readonly draft = signal('');
-  /** What the keypad has typed so far, echoed into the open target cell. */
-  readonly typed = signal('');
+  /**
+   * What the keypad has typed so far, echoed into the open target cell; null
+   * until it is touched.
+   */
+  readonly typed = signal<string | null>(null);
 
   /** Read when focus jumps to another target, so what was typed is kept. */
   private readonly _keypad = viewChild(NumericKeypad);
@@ -650,7 +653,7 @@ export class RoutineBuilder implements ViewWillEnter {
     // Tapping another target is a Done for this one: what was typed stays.
     const keypad = this._keypad();
     if (this.editing() && keypad) this._applyTarget(keypad.committed());
-    this.typed.set('');
+    this.typed.set(null);
     this.editing.set({ index, field });
     const row = this.exercises()[index];
     const current = field === TargetFields.Weight ? row?.targetWeightKg : row?.targetRepsMin;
@@ -685,6 +688,16 @@ export class RoutineBuilder implements ViewWillEnter {
           : { ...row, targetRepsMin: value, targetRepsMax: value };
       }),
     );
+  }
+
+  /**
+   * What a target shows: the pad's echo while it is typed into (a dash once
+   * cleared), else its value.
+   */
+  targetText(index: number, row: DraftExercise, field: TargetField): string {
+    const typed = this.typed();
+    if (this.isEditing(index, field) && typed !== null) return typed || '–';
+    return this.targetLabel(row, field);
   }
 
   targetLabel(row: DraftExercise, field: TargetField): string {

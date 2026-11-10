@@ -155,6 +155,60 @@ left holds Unarchive alone, and a full swipe unarchives too: it happens at once,
 Routines). Who made it (Mine, MotionHive, All) is in the Filters sheet, and the Filters chip
 counts it when it is not the default (Mine).
 
+## As built: the workout logger
+
+**A set** (`workouts/logger`, `mh-set-row`): one row of the set table, `badge | previous | fields |
+tick`, under the exercise's column headings (`mh-set-table-head`).
+
+| Where                         | Verb                         | Then                                                                                   |
+| ----------------------------- | ---------------------------- | -------------------------------------------------------------------------------------- |
+| Swipe right                   | Copy (teal)                  | at once: a set of the same type with the same numbers, unticked, last on the exercise (the API appends) |
+| Swipe left                    | Delete (red)                 | at once                                                                                 |
+| The badge (`mh-set-menu-sheet`) | the set's type, Copy set, Note, Remove set | the type applies and closes; the note opens in the same sheet with its own Save; Copy set is the swipe's copy |
+| Previous                      | tap                          | the set takes last time's numbers, not ticked: the tick still confirms it               |
+| A field                       | tap                          | the number pad on that field                                                            |
+
+A full swipe does the verb at once, either way (`expandable` with `ionSwipe`, user decision,
+2026-11-09); a short swipe leaves the option to tap. A set open in the pad does not slide. The swipe
+options carry the lists' skin through `mh-swipe-row` (they sit in an exercise card, not an
+`ion-list`), rounded on their outer corners only. The logger turns the stack's swipe back off while
+it is on screen (iOS's drag from the left edge outranks the row's swipe right, and skipped the leave
+sheet); the ⌄ is the way out. Too narrow for the Previous column (a small phone, or large text),
+Previous is a line under the fields, "last 60 × 8", with the same tap.
+
+**The ⋯** (`mh-logger-options-sheet`, titled with the workout's name, "This workout" while it has
+none): this workout's switches and Rest for every exercise, then Add exercises (honey) and Pause
+workout (coral), then Discard workout alone in the last card. Rest is a workout setting; a
+per-exercise rest is an optional override (the rest sheet's exercise scope), shown only where one
+is set. Rest for every exercise opens under its row (an `ion-accordion`, its chevron turning from
+forward to down): a ±15 s stepper and five presets (1:00, 1:30, 2:00, 3:00, 4:00), each tap applied
+at once, with nothing to confirm. The rest running now keeps its length; the next one takes the new
+one. The workout cannot be renamed mid-session: the API has no call for it.
+
+**Finish** adapts to what is ticked:
+
+| Ticked   | Then                                                                                         |
+| -------- | -------------------------------------------------------------------------------------------- |
+| every set | straight to the summary                                                                     |
+| some     | "Finish early?" (`mh-action-sheet`, the unticked count in its note): Finish and save, Discard workout |
+| none     | "Nothing logged yet", with Discard workout alone: there is nothing to save               |
+
+Discard workout always asks again in red (`tone="danger"`, "This cannot be undone"); Finish and
+save completes the workout as it stands. With nothing ticked it is not offered (`finishOptions`, as
+in dba74362): completing would mark a coach's plan day done with no sets in it, and tell the coach.
+
+**Under the exercises** (user decisions, 2026-11-10): Add exercise is an option row, a one-row
+`mh-card-list` with the ⋯ sheet's honey tile, not a dashed button. Last comes "Finish workout early
+· 1/3 exercises", a line of text that is Finish itself (the same sheet as above), in Finish's honey
+ink: it destroys nothing, so it is not red. It shows only while something is unticked; the page has no
+Discard of its own, which lives in the ⋯ sheet and the finish sheet. Add set, Add weight and Add
+round are honey text at regular weight.
+
+**Folding**: an exercise folds to its check row when its last set is ticked, and a tap on the row
+opens it again. Opened again, its ⋯ leads with Collapse exercise (green), which folds it back; an
+exercise still being worked has no Collapse. The folded row sits on the open card's grid: the mark
+over the tile, the chevron over the ⋮ and the tick column.
+
 ## Other screens already on this pattern
 
 Sessions (`SESSION_ACTIONS`), clients (`visibleClientActions`, `visibleRequestActions`), messages

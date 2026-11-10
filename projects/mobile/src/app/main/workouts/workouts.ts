@@ -61,6 +61,7 @@ import { HistoryBody } from './_components/history-body/history-body';
 import { ProgressBody } from './_components/progress-body/progress-body';
 import { RoutineRow } from './_components/routine-row/routine-row';
 import { TodayHero } from './_components/today-hero/today-hero';
+import { ActiveWorkoutService } from './_services/active-workout.service';
 import { RoutineActionsService } from './_services/routine-actions.service';
 import { HistoryStore } from './history/history.store';
 import {
@@ -147,6 +148,7 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   private readonly _historyStore = inject(HistoryStore);
   private readonly _exercisesStore = inject(ExercisesStore);
   private readonly _router = inject(Router);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _routineActionsService = inject(RoutineActionsService);
@@ -358,8 +360,9 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
       });
   }
 
+  /** Started first, then the logger opens once on it. */
   startEmpty(): void {
-    void this._router.navigate(['/tabs/workouts/log', 'new']);
+    this._activeWorkoutService.startFreestyle();
   }
 
   openRoutine(routine: Routine): void {

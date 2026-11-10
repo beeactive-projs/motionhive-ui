@@ -3,6 +3,7 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import {
+  ExerciseSetType,
   LogSetPayload,
   LoggedExercise,
   LoggedSet,
@@ -226,13 +227,45 @@ export class LoggerStore {
   }
 
   /**
+   * A second set of `setType` holding `values`, unticked, so the next set is
+   * one tap away. The API appends, so the copy lands last on the exercise.
+   * `onError` gets the server's refusal, so the page can show its message
+   * and take down the error dialog the interceptor opened for it.
+   */
+  copySet(
+    exerciseId: string,
+    setType: ExerciseSetType,
+    values: LogSetPayload,
+    onError?: (error: unknown) => void,
+  ): void {
+    const log = this._log();
+    if (!log) return;
+    this._workoutLogService
+      .addSet(log.id, exerciseId, { setType })
+      .pipe(take(1))
+      .subscribe({
+        next: (set) => {
+          this._updateExercise(exerciseId, (ex) => ({
+            ...ex,
+            sets: [...(ex.sets ?? []), set],
+          }));
+          if (Object.keys(values).length) this.logSet(exerciseId, set.id, values);
+        },
+        error: (error: unknown) => onError?.(error),
+      });
+  }
+
+  /**
    * One set or several (a whole round of a superset): off the screen now, in
    * one call to the server, all or none. Optimistic like every write here,
    * but a failed delete cannot be shrugged off — the rows would be gone
    * locally and back on the next load. So a failure re-reads the log and
-   * tells the caller.
+   * tells the caller why.
    */
-  removeSets(sets: readonly { exerciseId: string; setId: string }[], onError?: () => void): void {
+  removeSets(
+    sets: readonly { exerciseId: string; setId: string }[],
+    onError?: (error: unknown) => void,
+  ): void {
     const log = this._log();
     if (!log || sets.length === 0) {
       return;
@@ -254,8 +287,8 @@ export class LoggerStore {
       .removeSets(log.id, [...gone])
       .pipe(take(1))
       .subscribe({
-        error: () => {
-          onError?.();
+        error: (error: unknown) => {
+          onError?.(error);
           this._workoutLogService
             .get(log.id)
             .pipe(take(1), catchError(() => of(null)))

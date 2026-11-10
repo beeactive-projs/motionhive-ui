@@ -5,15 +5,31 @@ ion-modal {
   --border-radius: var(--mh-radius-sheet) var(--mh-radius-sheet) 0 0;
 }
 
-// The sheet header: title over its optional subtitle, start-aligned.
-// `min-width: 0` lets a long subtitle ellipsize instead of pushing the close
-// button out of the toolbar.
+// Every part of a sheet keeps one inset, the body's `--ion-padding`: the
+// title's text, the close X's glyph, the pinned strip and the body. The
+// toolbar gives up its own padding, which differs by mode (iOS put the title
+// 12px further in than the rows below it: 8px of the toolbar's own padding
+// on the host, besides the variables), so the parts below set it alone. The
+// safe areas stay, for a phone on its side.
+ion-header ion-toolbar {
+  --padding-start: 0;
+  --padding-end: 0;
+  padding-inline: var(--ion-safe-area-left, 0px) var(--ion-safe-area-right, 0px);
+}
+
+ion-header ion-buttons {
+  margin: 0;
+}
+
+// The sheet header: title over its optional subtitle, start-aligned, its
+// text on the body's inset. `min-width: 0` lets a long subtitle ellipsize
+// instead of pushing the close button out of the toolbar.
 .heading {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   min-width: 0;
-  padding: 1rem;
+  padding: 1rem var(--ion-padding, 16px);
 }
 
 .heading-title {
@@ -36,14 +52,20 @@ ion-modal {
 // button, which supplies the press ripple. `shape=round` keeps that ripple a
 // circle, clear of the global control-radius pin. The hit area is still a
 // full tap target: it sits in the hardest corner to reach, so it must not be
-// small too.
-.close {
+// small too. Its end margin puts the glyph's edge, not the button's, on the
+// body's inset: the inset less the space beside the glyph. Specific enough
+// to beat the iOS header rule that turns icon buttons into 48px circles
+// with no margin (ion-toolbar.css), which moved the X in by 12px.
+ion-header ion-buttons ion-button.close {
   --color: var(--ion-text-color);
   --padding-start: 0;
   --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
   width: var(--mh-tap-target);
   height: var(--mh-tap-target);
-  margin-inline-end: 0.375rem;
+  margin: 0;
+  margin-inline-end: calc(var(--ion-padding, 16px) - (var(--mh-tap-target) - var(--mh-icon-lg)) / 2);
 }
 
 .close ion-icon {
@@ -56,10 +78,13 @@ ion-modal {
 ion-footer ion-toolbar {
   --border-width: var(--mh-hairline) 0 0;
   --border-color: var(--ion-border-color);
-  --padding-start: 1rem;
-  --padding-end: 1rem;
+  --padding-start: var(--ion-padding, 16px);
+  --padding-end: var(--ion-padding, 16px);
   --padding-top: 0.625rem;
   --padding-bottom: 0.625rem;
+  // On the body's inset in both modes, as the header: iOS adds 8px of its
+  // own on the host.
+  padding-inline: var(--ion-safe-area-left, 0px) var(--ion-safe-area-right, 0px);
 }
 
 // Side by side while both labels fit on one line each; when they do not
@@ -114,10 +139,11 @@ ion-footer ion-toolbar {
 
 /* The pinned strip between header and body. Sits outside ion-content so it
    never scrolls, and carries the page background so the rows sliding under
-   it do not show through. */
+   it do not show through. On the body's inset, like the header: a field in
+   it is as wide as the cards under it. */
 .sticky {
   flex: none;
-  padding: 0 1.25rem 0.5rem;
+  padding: 0 var(--ion-padding, 16px) 0.5rem;
   background: var(--ion-background-color);
 }
 

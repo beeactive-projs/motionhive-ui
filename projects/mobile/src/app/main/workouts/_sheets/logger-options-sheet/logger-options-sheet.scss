@@ -1,0 +1,79 @@
+// A long label (Romanian, 130% text) wraps rather than ellipsising. Not
+// `ion-text-wrap`: in iOS mode that also drops the label to 14px, under the
+// switches' labels above it.
+.rest-label {
+  white-space: normal;
+}
+
+// The rest at the row's end: the muted ink at the label's size, like every
+// trailing value, set in figures that keep their width as it steps.
+.rest-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+// The opened rest, on the row's gutter and closing the card with it.
+.rest-panel {
+  padding: 0 var(--mh-row-gutter) var(--mh-row-gutter);
+}
+
+// The stepper and the presets sit sunk into the card on the sheet's own
+// colour, as the workout prototype draws them (the set row's fields do the
+// same on the page), so they read as the row's controls, not as more rows.
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-background-color);
+}
+
+.stepper button {
+  display: grid;
+  width: 3.25rem;
+  height: var(--mh-tap-target);
+  place-items: center;
+  border: 0;
+  border-radius: var(--mh-radius-control);
+  background: none;
+  color: var(--ion-text-color);
+  cursor: pointer;
+  font-size: var(--mh-icon-md);
+}
+
+.stepper strong {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.presets {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.preset {
+  min-width: 0;
+  height: var(--mh-tap-target);
+  border: 0;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-background-color);
+  color: var(--ion-text-color);
+  cursor: pointer;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+// The rest in use, if it is one of these: a selection, so honey.
+.preset.on {
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+}
+
+button:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
+}

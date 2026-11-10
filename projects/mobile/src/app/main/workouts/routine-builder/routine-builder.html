@@ -113,7 +113,7 @@
                 (click)="editTarget(i, Targets.Reps)"
               >
                 <span class="mh-kicker">{{ 'workouts.routineBuilder.targets.reps' | translate }}</span>
-                <strong>{{ (isEditing(i, Targets.Reps) && typed()) || targetLabel(row, Targets.Reps) }}</strong>
+                <strong>{{ targetText(i, row, Targets.Reps) }}</strong>
               </button>
               <button
                 type="button"
@@ -123,7 +123,7 @@
                 (click)="editTarget(i, Targets.Weight)"
               >
                 <span class="mh-kicker">{{ 'workouts.routineBuilder.targets.weight' | translate }}</span>
-                <strong>{{ (isEditing(i, Targets.Weight) && typed()) || targetLabel(row, Targets.Weight) }}<em>{{ 'workouts.units.kgShort' | translate }}</em></strong>
+                <strong>{{ targetText(i, row, Targets.Weight) }}<em>{{ 'workouts.units.kgShort' | translate }}</em></strong>
               </button>
             </div>
 

@@ -1044,7 +1044,8 @@
         "confirmSingle": "Create and swap",
         "hint": "“{query}” · only you can see it",
         "title": "Can't find it? Create it"
-      }
+      },
+      "noFilterMatch": "No exercise matches these filters."
     },
     "row": {
       "equipmentMore": "{name} +{count}",
@@ -2915,6 +2916,7 @@
       "unskip": "Unskip exercise",
       "history": "Exercise history",
       "addNote": "Add your note",
+      "collapse": "Collapse exercise",
       "editNote": "Edit your note"
     },
     "exerciseCard": {
@@ -3110,7 +3112,6 @@
       "discard": {
         "irreversible": "This cannot be undone",
         "message": "Everything logged in this session is deleted. Skipping a planned workout is a different thing: that keeps the record.",
-        "nothingTicked": "No sets are ticked, so there is nothing to finish yet. Discard the workout, or keep going and tick what you did.",
         "title": "Discard workout"
       },
       "empty": {
@@ -3119,13 +3120,16 @@
       },
       "expand": "Show the sets for {name}",
       "finish": "Finish",
-      "finishConfirm": {
-        "message": "{count, plural, one {# set is still unticked. Finishing now records the workout as it stands.} other {# sets are still unticked. Finishing now records the workout as it stands.}}",
-        "title": "Finish workout"
-      },
+      "finishEarly": "{total, plural, one {Finish workout early · {done}/# exercise} other {Finish workout early · {done}/# exercises}}",
       "gridHead": {
-        "prev": "Prev",
-        "set": "Set"
+        "distance": "m",
+        "done": "Done",
+        "previous": "Previous",
+        "reps": "Reps",
+        "repsEach": "Reps each",
+        "set": "Set",
+        "time": "Time",
+        "weight": "kg"
       },
       "leave": "Leave the workout",
       "leaveSheet": {
@@ -3156,11 +3160,11 @@
         "removeSetFailed": "Could not remove that set",
         "removed": "Removed {name}",
         "repeatFailed": "Could not load that workout to repeat",
-        "removeRoundFailed": "Could not delete that round"
+        "removeRoundFailed": "Could not delete that round",
+        "copySetFailed": "Could not copy that set"
       },
       "last": "last {value}",
       "best": "best {value}",
-      "editing": "editing",
       "backTo": "Back to {value}",
       "plan": {
         "effort": "effort {value}",
@@ -3171,6 +3175,17 @@
         "message": "Pause the workout for that time? It won't count toward the duration.",
         "pause": "Pause it",
         "keep": "Keep it"
+      },
+      "finishSheet": {
+        "early": {
+          "message": "{count, plural, one {# set still unticked. Finish the workout now?} other {# sets still unticked. Finish the workout now?}}",
+          "title": "Finish early?"
+        },
+        "nothing": {
+          "message": "You haven't ticked any sets, so there is nothing to save yet. Discard the workout, or keep going and tick what you did.",
+          "title": "Nothing logged yet"
+        },
+        "save": "Finish and save"
       }
     },
     "meta": {
@@ -3353,8 +3368,9 @@
       "lastTime": "Last time: {value}",
       "options": "Options for set {number}",
       "menu": "Options for {name}",
-      "edit": "Edit {name}",
-      "untick": "Mark {name} as not done"
+      "untick": "Mark {name} as not done",
+      "usePrevious": "Use last time for {name}: {value}",
+      "noPrevious": "{name}, nothing from last time"
     },
     "setTypeMark": {
       "DROPSET": "Dropset",
@@ -3572,7 +3588,8 @@
       "note": "Note on this set",
       "addNote": "Add a note",
       "notePlaceholder": "For example: the last rep was assisted",
-      "remove": "Remove set"
+      "remove": "Remove set",
+      "copy": "Copy set"
     },
     "effort": {
       "title": "How hard?",
@@ -3617,7 +3634,8 @@
       "restForAll": "Rest for every exercise",
       "pause": "Pause workout",
       "footnote": "Only this workout changes. Your defaults are in Settings › Workouts.",
-      "more": "More for this workout"
+      "more": "More for this workout",
+      "addExercises": "Add exercises"
     },
     "archived": {
       "link": "{count, plural, one {# archived routine} other {# archived routines}}",

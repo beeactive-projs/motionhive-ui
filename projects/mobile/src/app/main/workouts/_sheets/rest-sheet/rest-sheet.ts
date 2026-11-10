@@ -5,7 +5,7 @@ import { addIcons } from 'ionicons';
 import { addOutline, removeOutline } from 'ionicons/icons';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-import { secondsToClock } from '../../workouts.config';
+import { nudgeRest, REST_STEP_SECONDS, secondsToClock } from '../../workouts.config';
 
 /** Who a new rest applies to, for the rest of this workout. */
 export const RestScopes = {
@@ -23,9 +23,6 @@ export interface RestChange {
 
 /** The common rests, one tap each. */
 export const REST_PRESETS = [45, 60, 90, 120, 180] as const;
-const STEP_SECONDS = 15;
-const MIN_SECONDS = 15;
-const MAX_SECONDS = 600;
 
 /**
  * Tap the timer: change the rest. A preset or ±15, then who it is for: this
@@ -44,8 +41,6 @@ export class RestSheet {
   readonly seconds = input(90);
   /** The exercise "This exercise" means; without one, only "every exercise" is offered. */
   readonly exerciseName = input('');
-  /** Which choice the sheet opens on. */
-  readonly initialScope = input<RestScope>(RestScopes.Exercise);
 
   readonly apply = output<RestChange>();
 
@@ -53,7 +48,7 @@ export class RestSheet {
   readonly scope = signal<RestScope>(RestScopes.Exercise);
   readonly presets = REST_PRESETS;
   readonly Scopes = RestScopes;
-  readonly step = STEP_SECONDS;
+  readonly step = REST_STEP_SECONDS;
 
   readonly display = computed(() => secondsToClock(this.value()));
 
@@ -63,7 +58,7 @@ export class RestSheet {
       if (!this.open()) return;
       untracked(() => {
         this.value.set(this.seconds());
-        this.scope.set(this.exerciseName() ? this.initialScope() : RestScopes.Workout);
+        this.scope.set(this.exerciseName() ? RestScopes.Exercise : RestScopes.Workout);
       });
     });
   }
@@ -73,7 +68,7 @@ export class RestSheet {
   }
 
   nudge(direction: 1 | -1): void {
-    this.value.update((v) => Math.min(MAX_SECONDS, Math.max(MIN_SECONDS, v + direction * STEP_SECONDS)));
+    this.value.update((v) => nudgeRest(v, direction));
   }
 
   save(): void {

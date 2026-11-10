@@ -1044,7 +1044,8 @@
         "confirmSingle": "Creează și înlocuiește",
         "hint": "„{query}” · doar tu îl poți vedea",
         "title": "Nu-l găsești? Creează-l"
-      }
+      },
+      "noFilterMatch": "Niciun exercițiu nu se potrivește filtrelor."
     },
     "row": {
       "equipmentMore": "{name} +{count}",
@@ -2915,6 +2916,7 @@
       "unskip": "Reia exercițiul",
       "history": "Istoricul exercițiului",
       "addNote": "Adaugă nota ta",
+      "collapse": "Restrânge exercițiul",
       "editNote": "Editează nota ta"
     },
     "exerciseCard": {
@@ -3110,7 +3112,6 @@
       "discard": {
         "irreversible": "Acțiunea nu poate fi anulată",
         "message": "Tot ce ai înregistrat în acest antrenament se șterge. Dacă sari peste un antrenament planificat e altceva: acela rămâne în istoric.",
-        "nothingTicked": "Nu ai bifat încă nicio serie, așa că nu ai ce termina. Renunță la antrenament sau continuă și bifează ce ai făcut.",
         "title": "Renunță la antrenament"
       },
       "empty": {
@@ -3119,13 +3120,16 @@
       },
       "expand": "Arată seriile pentru {name}",
       "finish": "Termină",
-      "finishConfirm": {
-        "message": "{count, plural, one {# serie nu e bifată încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.} few {# serii nu sunt bifate încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.} other {# de serii nu sunt bifate încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.}}",
-        "title": "Termină antrenamentul"
-      },
+      "finishEarly": "{total, plural, one {Termină antrenamentul mai devreme · {done}/# exercițiu} few {Termină antrenamentul mai devreme · {done}/# exerciții} other {Termină antrenamentul mai devreme · {done}/# de exerciții}}",
       "gridHead": {
-        "prev": "Anterior",
-        "set": "Serie"
+        "distance": "m",
+        "done": "Gata",
+        "previous": "Anterior",
+        "reps": "Repetări",
+        "repsEach": "Rep./parte",
+        "set": "Serie",
+        "time": "Timp",
+        "weight": "kg"
       },
       "leave": "Ieși din antrenament",
       "leaveSheet": {
@@ -3156,11 +3160,11 @@
         "removeSetFailed": "Nu am putut elimina seria",
         "removed": "Am eliminat {name}",
         "repeatFailed": "Nu am putut încărca antrenamentul de repetat",
-        "removeRoundFailed": "Nu am putut șterge runda"
+        "removeRoundFailed": "Nu am putut șterge runda",
+        "copySetFailed": "Nu am putut copia seria"
       },
       "last": "data trecută {value}",
       "best": "cea mai bună {value}",
-      "editing": "editezi",
       "backTo": "Înapoi la {value}",
       "plan": {
         "effort": "efort {value}",
@@ -3171,6 +3175,17 @@
         "message": "Pui antrenamentul pe pauză pentru timpul acesta? Nu va intra în durată.",
         "pause": "Pune pe pauză",
         "keep": "Lasă așa"
+      },
+      "finishSheet": {
+        "early": {
+          "message": "{count, plural, one {# serie nu e bifată încă. Termini antrenamentul acum?} few {# serii nu sunt bifate încă. Termini antrenamentul acum?} other {# de serii nu sunt bifate încă. Termini antrenamentul acum?}}",
+          "title": "Termini mai devreme?"
+        },
+        "nothing": {
+          "message": "Nu ai bifat nicio serie, așa că nu ai ce salva încă. Renunță la antrenament sau continuă și bifează ce ai făcut.",
+          "title": "Nu ai înregistrat nimic"
+        },
+        "save": "Termină și salvează"
       }
     },
     "meta": {
@@ -3353,8 +3368,9 @@
       "lastTime": "Data trecută: {value}",
       "options": "Opțiuni pentru seria {number}",
       "menu": "Opțiuni pentru {name}",
-      "edit": "Editează {name}",
-      "untick": "Marchează {name} ca nefăcută"
+      "untick": "Marchează {name} ca nefăcută",
+      "usePrevious": "Folosește data trecută pentru {name}: {value}",
+      "noPrevious": "{name}, nimic de data trecută"
     },
     "setTypeMark": {
       "DROPSET": "Drop set",
@@ -3572,7 +3588,8 @@
       "note": "Notă pentru serie",
       "addNote": "Adaugă o notă",
       "notePlaceholder": "De exemplu: ultima repetare a fost cu ajutor",
-      "remove": "Șterge seria"
+      "remove": "Șterge seria",
+      "copy": "Copiază seria"
     },
     "effort": {
       "title": "Cât de greu?",
@@ -3617,7 +3634,8 @@
       "restForAll": "Pauza pentru toate exercițiile",
       "pause": "Pune antrenamentul pe pauză",
       "footnote": "Se schimbă doar acest antrenament. Setările tale sunt în Setări › Antrenamente.",
-      "more": "Mai multe pentru acest antrenament"
+      "more": "Mai multe pentru acest antrenament",
+      "addExercises": "Adaugă exerciții"
     },
     "archived": {
       "link": "{count, plural, one {# rutină arhivată} few {# rutine arhivate} other {# de rutine arhivate}}",

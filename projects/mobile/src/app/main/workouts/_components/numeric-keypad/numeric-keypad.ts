@@ -8,6 +8,8 @@ import {
   KeypadFields,
   clockDigitsToDisplay,
   clockDigitsToSeconds,
+  fitsKeypadLimit,
+  secondsToClockDigits,
 } from '../../workouts.config';
 
 /** Per-field stepper increments. Weight steps by the smallest plate pair. */
@@ -38,8 +40,10 @@ const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
  *
  * The keys are plain buttons on theme tokens, not `ion-button`s: a keypad is
  * a grid of same-sized targets, and Ionic's button chrome fights that at
- * every key. Done and the close chevron are ordinary actions, so they are
- * Ionic's.
+ * every key. They are drawn as the phone's own keypad is: digits lifted off
+ * the pad, the keys that change rather than type (±step, backspace, clear)
+ * one darker family. Done and the close chevron are ordinary actions, so
+ * they are Ionic's.
  *
  * The buffer lives HERE rather than in the parent. Round-tripping every
  * keystroke through an input/output pair means each tap reads whatever the
@@ -63,6 +67,10 @@ export class NumericKeypad {
   private readonly _translateService = inject(TranslateService);
 
   readonly field = input.required<KeypadField>();
+  /**
+   * The seed, as the field stores it: seconds for a clock (what `commit`
+   * gives back), the number otherwise. Empty for nothing.
+   */
   readonly value = input('');
   /**
    * Which cell the pad is bound to. Two cells can hold the same value — two
@@ -83,9 +91,10 @@ export class NumericKeypad {
   readonly actionIcon = input<string | null>(null);
   readonly actionIconSlot = input<'start' | 'end'>('start');
   /**
-   * The first key typed replaces what the field was seeded with, later keys
-   * append: the seed is a pre-fill to confirm or overwrite, not a number to
-   * extend. Steppers work from the seed.
+   * The first digit typed replaces what the field was seeded with, later
+   * digits append: the seed is a pre-fill to confirm or overwrite, not a
+   * number to extend. Backspace and the steppers work from the seed, so 80
+   * backspaced is 8 (user decision, 2026-11-10).
    */
   readonly replaceOnType = input(false);
 
@@ -95,19 +104,27 @@ export class NumericKeypad {
   /** Commit this value and move to the next cell. */
   readonly next = output<string>();
   /**
-   * What the cell being edited should show while typing — formatted, and
-   * empty until something is typed so the cell keeps its placeholder. One
-   * way only: the parent never feeds it back into `value`.
+   * What the cell being edited should show while typing, formatted. `null`
+   * until the first key or step, so the cell keeps its own look: a
+   * suggested seed stays a suggestion until it is typed over or confirmed.
+   * `''` once the buffer is backspaced or cleared down to nothing, so the
+   * cell shows what an empty field shows: its grey pre-fill, which is what a
+   * tick then saves, or nothing. Telling the two apart is what makes clear
+   * and backspace visible on a typed value. One way only: the parent never
+   * feeds it back into `value`.
    */
-  readonly preview = output<string>();
+  readonly preview = output<string | null>();
 
   /** The decimal key's face: "." in English, "," in Romanian. */
   readonly decimalMark = decimalSeparator();
 
   /** What the user has typed so far. Seeded from `value` when the cell changes. */
   readonly draft = signal('');
-  /** True from a re-seed until the first key or step: see `replaceOnType`. */
-  private _fresh = false;
+  /**
+   * False from a re-seed until the first key or step: see `replaceOnType`
+   * and `preview`. A signal so the preview hears a clear on an empty seed.
+   */
+  private readonly _touched = signal(false);
 
   /** What `commit` should carry — seconds once a clock is resolved. */
   readonly committed = computed(() => {
@@ -138,56 +155,66 @@ export class NumericKeypad {
   );
 
   constructor() {
-    // Re-seed whenever the parent points the pad at a different cell.
+    // Re-seed whenever the parent points the pad at a different cell. A clock
+    // is seeded in seconds but built from digits: 150 seeds "230", or the
+    // pad would read it as 1:50 and save that unchanged.
     effect(() => {
       this.cell();
-      this.draft.set(this.value());
-      this._fresh = true;
+      const seed = this.value();
+      this.draft.set(this.isClock() && seed !== '' ? secondsToClockDigits(Number(seed)) : seed);
+      this._touched.set(false);
     });
-    effect(() => this.preview.emit(this.draft() ? this.display() : ''));
+    // Reads the cell too: the parent drops its echo on every cell change, and
+    // a seed equal to the last draft would otherwise not re-emit.
+    effect(() => {
+      this.cell();
+      this.preview.emit(this._touched() ? (this.draft() ? this.display() : '') : null);
+    });
   }
 
   press(key: string): void {
-    if (this._fresh && this.replaceOnType()) this.draft.set('');
-    this._fresh = false;
+    if (!this._touched() && this.replaceOnType()) this.draft.set('');
+    this._touched.set(true);
     if (this.isClock()) {
       // Digits only, and capped at four so the clock cannot run past 99:59.
       if (key === '.') return;
       this.draft.update((current) => (current + key).replace(/^0+/, '').slice(0, 4));
       return;
     }
-    // One decimal point, and never a leading run of zeros.
+    // One decimal point, never a leading run of zeros, and no longer than the
+    // field holds (`KEYPAD_LIMITS`): a key past it is ignored.
     if (key === '.' && this.draft().includes('.')) return;
-    this.draft.update((current) => (current + key).replace(/^0+(?=\d)/, ''));
+    const next = (this.draft() + key).replace(/^0+(?=\d)/, '');
+    if (fitsKeypadLimit(this.field(), next)) this.draft.set(next);
   }
 
+  /** One character off what is shown, the seed included: 80 becomes 8. */
   backspace(): void {
-    if (this._fresh && this.replaceOnType()) this.draft.set('');
-    this._fresh = false;
+    this._touched.set(true);
     this.draft.update((current) => current.slice(0, -1));
   }
 
   clear(): void {
+    this._touched.set(true);
     this.draft.set('');
   }
 
   step(direction: 1 | -1): void {
-    this._fresh = false;
+    this._touched.set(true);
     const step = STEP[this.field()];
 
     if (this.isClock()) {
       const seconds = clockDigitsToSeconds(this.draft()) ?? 0;
-      const next = Math.max(0, seconds + step * direction);
       // Back to digits so further typing continues from what is on screen.
-      this.draft.set(
-        `${Math.floor(next / 60)}${String(next % 60).padStart(2, '0')}`.replace(/^0+(?=\d)/, ''),
-      );
+      this.draft.set(secondsToClockDigits(seconds + step * direction));
       return;
     }
 
     const current = parseFloat(this.draft() || '0');
     const next = Math.max(0, (Number.isNaN(current) ? 0 : current) + step * direction);
     // Trim the float noise 2.5 increments produce (0.30000000000000004).
-    this.draft.set(String(Math.round(next * 100) / 100));
+    const text = String(Math.round(next * 100) / 100);
+    // A step past the cap does nothing, as a key past it does.
+    if (fitsKeypadLimit(this.field(), text)) this.draft.set(text);
   }
 }

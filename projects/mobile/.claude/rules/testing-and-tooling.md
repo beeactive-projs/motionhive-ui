@@ -8,8 +8,15 @@ paths:
 
 ## Specs
 
-- Mobile specs are **config-only**: pure helpers in `*.config.ts`, tested in the matching `*.config.spec.ts`. Don't scaffold specs for components, services or stores (Ionic web components are flaky in jsdom).
-- When you change a helper an existing config spec covers, extend that spec.
+- **Every change ships with its specs** (user decision, 2026-11-10; it replaces the config-only rule). A component, service, store or function that is added or changed gets a spec for what changed, in the same change: a new `<name>.spec.ts` beside the file, or new cases in the one already there. A bug fix comes with the case that fails without it.
+- Logic a page holds can be tested where it lives: a pure helper in `*.config.ts` or in a module of functions (`logger-flow.ts`) in its matching spec. Moving logic out of a component only to test it is fine when the helper reads well on its own; don't contort a component for it.
+- Services and stores: `TestBed` with the core services they call stubbed (`{ provide: WorkoutLogService, useValue: { logSet } }`), and a `Subject` per reply when the order of the answers matters (`logger.store.spec.ts`).
+- Components: test the class, never Ionic's rendering. Ionic web components are flaky in jsdom, so a component spec renders no template:
+  - without inputs, build it in an injection context: `TestBed.runInInjectionContext(() => new VenueList())` (`venue-list.spec.ts`);
+  - with inputs, blank the template first: `TestBed.overrideComponent(SetRow, { set: { template: '', imports: [] } })`, then `TestBed.createComponent`, `fixture.componentRef.setInput(...)` and `fixture.detectChanges()`, which also runs the effects (`set-row.spec.ts`). Override once per test, in a `beforeEach` when a test builds several: TestBed refuses an override after the first component is created;
+  - assert signals, computeds and outputs (`instance.tick.subscribe(...)`), not the DOM.
+- Stub `TranslateService` as `{ instant: (key) => key }`, so a component or service spec asserts keys. Core's `translate()` returns the real English (`test-setup.ts`), so a config spec asserts what a user reads.
+- Stylesheets and the theme have no specs: check them in the running app (below).
 - `ng test mobile` resolves `core` from `dist/core` first. After any change under `projects/core`, run `npx ng build core` before `npx ng test mobile --watch=false`, or the tests fail on members that do exist.
 - A change is done when `npx ng build mobile`, `npx ng test mobile --watch=false` and `npm run i18n:check` all pass.
 

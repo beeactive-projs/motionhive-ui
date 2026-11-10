@@ -6,7 +6,9 @@ import { ExerciseSetType, OneRepMaxSource, ProgramAssignmentKind, WorkoutLogStat
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   CalendarDayStates,
+  FinishChoices,
   HeroStates,
+  KeypadFields,
   LogSources,
   RoutineActionIds,
   WORKOUT_ICONS,
@@ -25,6 +27,8 @@ import {
   exerciseSessionLine,
   exerciseDoneSummary,
   exerciseSetSummary,
+  finishOptions,
+  fitsKeypadLimit,
   isExerciseDone,
   lastTimeSummary,
   setPlaceholder,
@@ -50,7 +54,9 @@ import {
   routineActions,
   routineTileColor,
   secondsToClock,
+  secondsToClockDigits,
   niceBounds,
+  nudgeRest,
   trendGeometry,
   unbreakable,
   volumeGainPercent,
@@ -635,6 +641,15 @@ describe('workouts config', () => {
     expect(secondsToClock(0)).toBe('0:00');
   });
 
+  // A rest's − and + move 15 seconds and stop at 0:15 and 10:00.
+  it('nudges a rest a step at a time, within its bounds', () => {
+    expect(nudgeRest(90, 1)).toBe(105);
+    expect(nudgeRest(90, -1)).toBe(75);
+    expect(nudgeRest(15, -1)).toBe(15);
+    expect(nudgeRest(20, -1)).toBe(15);
+    expect(nudgeRest(600, 1)).toBe(600);
+  });
+
   // Keypad digits fill right to left, the way every timer input works —
   // typing 1,3,0 means a minute and a half, not a hundred and thirty seconds.
   it('reads keypad digits right to left into seconds', () => {
@@ -645,11 +660,38 @@ describe('workouts config', () => {
     expect(clockDigitsToSeconds('')).toBeNull();
   });
 
+  // A stored 2:30 is 150 seconds; read as digits it would be 1:50. The pad is
+  // seeded in digits, so the round trip has to come back to the same seconds.
+  it('turns seconds into the digits the pad builds, and back', () => {
+    expect(secondsToClockDigits(150)).toBe('230');
+    expect(secondsToClockDigits(45)).toBe('45');
+    expect(secondsToClockDigits(5)).toBe('5');
+    expect(secondsToClockDigits(0)).toBe('0');
+    expect(secondsToClockDigits(1200)).toBe('2000');
+    for (const seconds of [0, 5, 45, 100, 150, 599, 1200, 5999]) {
+      expect(clockDigitsToSeconds(secondsToClockDigits(seconds))).toBe(seconds);
+    }
+  });
+
   it('shows those digits back as the clock they are building', () => {
     expect(clockDigitsToDisplay('1')).toBe('0:01');
     expect(clockDigitsToDisplay('13')).toBe('0:13');
     expect(clockDigitsToDisplay('130')).toBe('1:30');
     expect(clockDigitsToDisplay('')).toBe('0:00');
+  });
+
+  // A weight holds four whole digits and two decimals, reps three digits: a
+  // key that would go past that is ignored, so the cell never overflows.
+  it('caps what the keypad builds per field', () => {
+    expect(fitsKeypadLimit(KeypadFields.Weight, '9999.99')).toBe(true);
+    expect(fitsKeypadLimit(KeypadFields.Weight, '9999.')).toBe(true);
+    expect(fitsKeypadLimit(KeypadFields.Weight, '10000')).toBe(false);
+    expect(fitsKeypadLimit(KeypadFields.Weight, '82.555')).toBe(false);
+    expect(fitsKeypadLimit(KeypadFields.Reps, '999')).toBe(true);
+    expect(fitsKeypadLimit(KeypadFields.Reps, '1000')).toBe(false);
+    expect(fitsKeypadLimit(KeypadFields.Reps, '')).toBe(true);
+    // No cap where none is set: a distance in metres runs to a marathon.
+    expect(fitsKeypadLimit(KeypadFields.Distance, '42195')).toBe(true);
   });
 
   // One formatter for a workout's length, delegating to core's.
@@ -750,6 +792,21 @@ describe('the finish summary', () => {
     expect(volumeGainPercent(5000, null)).toBeNull();
     // Under half a percent rounds to nothing worth saying.
     expect(volumeGainPercent(5020, 5000)).toBeNull();
+  });
+});
+
+describe('finishOptions', () => {
+  it('offers to save what is ticked, or discard it', () => {
+    expect(finishOptions(3).map((option) => option.id)).toEqual([
+      FinishChoices.Save,
+      FinishChoices.Discard,
+    ]);
+  });
+
+  // Completing an empty workout would mark a coach's plan day done with no
+  // sets and tell the coach so: with nothing ticked, the only verb is Discard.
+  it('offers only Discard with nothing ticked', () => {
+    expect(finishOptions(0).map((option) => option.id)).toEqual([FinishChoices.Discard]);
   });
 });
 

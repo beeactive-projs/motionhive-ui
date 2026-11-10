@@ -1,56 +1,79 @@
-import { Component, computed, inject, input, output } from '@angular/core';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Component, computed, input, output } from '@angular/core';
+import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { LoggedSet, SetField, SetFields } from 'core';
 
-import {
-  BadgeTones,
-  SetBadge,
-  SetRowMode,
-  SetRowModes,
-  cellValue,
-  fieldText,
-  setLine,
-} from '../../logger/logger-flow';
+import { SetBadge, SetRowMode, SetRowModes, cellValue, fieldText } from '../../logger/logger-flow';
 import { formatMeasure } from '../../workouts.config';
 
-/** One input field of the focus card, as drawn. */
-interface FocusCell {
+/** One field of the row, as drawn. */
+interface SetCell {
   field: SetField;
   text: string;
   /** The grey pre-fill, not a value: shown until confirmed or typed over. */
   prefill: boolean;
   active: boolean;
-  unit: string;
+  /** Longer than `LONG_CELL`: one text size down, so it still fits. */
+  long: boolean;
+  /** The unit's key, drawn after the value, when no heading names the column. */
+  unit: string | null;
 }
 
 /**
- * One set of the logger, in the three looks of direction C:
+ * The units a cell names when its column has no heading. Reps and a clock
+ * read as what they are beside a weight or a distance, so only these two.
+ */
+const CELL_UNITS: Partial<Record<SetField, string>> = {
+  [SetFields.Weight]: 'workouts.units.kgShort',
+  [SetFields.Distance]: 'workouts.units.metersShort',
+};
+
+/**
+ * Past six characters a value steps down a size: the keypad's longest
+ * weight, 9999.99, otherwise clips by a few pixels on an SE at 130% text,
+ * where Previous has dropped and the fields are at their narrowest.
+ */
+const LONG_CELL = 6;
+
+/**
+ * One set of the logger, as a row of the set table:
  *
- * - **Done**: one line, "62.5 kg × 8", the effort chip if rated, a check.
- *   Tapping the line opens it to edit in place; the focus and the rest timer
- *   stay where they are.
- * - **Focus**: the set you are on (or one opened to edit), as a honey card
- *   with big fields and the tick. The numbers come pre-filled in grey from
- *   the plan or from last time; a tick with them untouched saves them.
- * - **Future**: a grey line with what the set will be and what it was.
+ *     [badge] [previous] [kg] [reps] [✓]
  *
- * The badge (number, or W / D / F / A for a typed set) is its own button: it
- * opens the set's menu (type, note, remove), in every look.
+ * Every set reads the same way, so the eye runs down a column, as the
+ * workout prototype draws it. **Done** is a soft green behind the row and
+ * the filled tick (its fields stay fields). **Selected**, the set open in
+ * the number pad, takes the selection fill, with the honey ring on the
+ * field being typed: one selected line at a time. A set not done yet shows
+ * its pre-fill in grey, whether it is the next one or further ahead.
  *
+ * - The badge (number, or W / D / F / A) opens the set's menu.
+ * - Previous is what this set held last time; tapping it copies those
+ *   numbers in, the quickest way to repeat a session.
+ * - A field opens the number pad on it. A tick alone is a valid log: the
+ *   grey pre-fill is saved as it stands. So a field cleared on the pad
+ *   shows its pre-fill again, as an empty field does: that is what the tick
+ *   will save.
+ *
+ * The column headings live in `mh-set-table-head`, on the same grid. A row
+ * without one over it (a superset round, whose rows belong to different
+ * exercises) sets `units`, and weight and distance name their unit in the
+ * cell. Too narrow for the Previous column, Previous moves under the fields
+ * as "last 60 × 8" (`set-row.scss`).
  * Plain buttons on theme tokens rather than Ionic's: these are grid cells
  * sized for a thumb between sets, and Ionic's button chrome fights them.
  */
 @Component({
   selector: 'mh-set-row',
-  imports: [IonButton, IonIcon, TranslatePipe],
+  imports: [IonIcon, TranslatePipe],
   templateUrl: './set-row.html',
   styleUrl: './set-row.scss',
+  host: {
+    '[style.--mh-set-fields]': 'fields().length',
+  },
 })
 export class SetRow {
-  private readonly _translateService = inject(TranslateService);
-
   readonly set = input.required<LoggedSet>();
   readonly mode = input.required<SetRowMode>();
   readonly badge = input.required<SetBadge>();
@@ -58,92 +81,54 @@ export class SetRow {
   readonly fields = input.required<readonly SetField[]>();
   /** What each empty field is pre-filled with. */
   readonly prefill = input<Partial<Record<SetField, number | null>>>({});
-  /** "last 60 × 8", or empty. */
-  readonly last = input('');
-  /** Split squats and single-arm work: reps read as per side. */
-  readonly unilateral = input(false);
+  /** The same set last time, "60 × 8", or empty when there was none. */
+  readonly previous = input('');
   /** The field open in the number pad, when it belongs to this set. */
   readonly editing = input<SetField | null>(null);
-  /** What the pad has built so far for that field, already formatted. */
+  /**
+   * What the pad has built so far for that field, already formatted: `null`
+   * until something is typed (the field shows its own value), `''` once it
+   * is cleared (the field shows empty).
+   */
   readonly draft = input<string | null>(null);
+  /** No column heading over this row: weight and distance carry their unit. */
+  readonly units = input(false);
 
   readonly tick = output<void>();
   readonly edit = output<SetField>();
   readonly menu = output<void>();
-  /** The line was tapped: open this set to edit in place. */
-  readonly open = output<void>();
+  /** Previous was tapped: fill this set with last time's numbers. */
+  readonly usePrevious = output<void>();
 
   readonly Modes = SetRowModes;
-
-  /**
-   * The label on the open card. A plain set's number goes: its name already
-   * says it ("Set 2"). A typed set keeps its letter (W, D) and a superset
-   * member its tag (A1), which the name doesn't carry (`short` marks those).
-   */
-  readonly headBadge = computed(() => {
-    const badge = this.badge();
-    if (badge.tone !== BadgeTones.Plain) {
-      return true;
-    }
-    return badge.short !== undefined;
-  });
-
-  /** A finished set reads with its units: "62.5 kg × 8". */
-  readonly doneLine = computed(() =>
-    setLine(this.fields(), (field) => cellValue(this.set(), field), true),
-  );
-
-  /** A set ahead: its values or its pre-fill, then last time. */
-  readonly futureLine = computed(() => {
-    const set = this.set();
-    const prefill = this.prefill();
-    const line = setLine(
-      this.fields(),
-      (field) => cellValue(set, field) ?? prefill[field] ?? null,
-      false,
-    );
-    // "22 × 10 · last 22 × 10" says one thing twice: keep the last time only
-    // when the pre-fill differs from it.
-    const last = this.last();
-    const sameAsLast = !!line && last.endsWith(` ${line}`);
-    return [line || '–', sameAsLast ? '' : last].filter(Boolean).join(' · ');
-  });
 
   readonly rpe = computed(() => {
     const rpe = this.set().rpe;
     return rpe == null ? '' : formatMeasure(Number(rpe), 1);
   });
 
-  readonly cells = computed<FocusCell[]>(() => {
+  readonly cells = computed<SetCell[]>(() => {
     const set = this.set();
     const prefill = this.prefill();
+    const draft = this.draft();
+    const units = this.units();
     return this.fields().map((field) => {
       const active = this.editing() === field;
-      const draft = this.draft();
-      const value = cellValue(set, field);
+      // Something typed on the pad is shown as typed; cleared to nothing, the
+      // field is empty, so it shows what an empty field shows.
+      const typing = active && draft !== null && draft !== '';
+      const cleared = active && draft === '';
+      const value = cleared ? null : cellValue(set, field);
       const shown = value ?? prefill[field] ?? null;
+      const text = typing ? draft : shown == null ? '' : fieldText(field, shown, false);
       return {
         field,
         active,
-        prefill: value == null && !(active && draft),
-        text: active && draft ? draft : shown == null ? '' : fieldText(field, shown, false),
-        unit: this._unit(field),
+        prefill: value == null && !typing,
+        text,
+        long: text.length > LONG_CELL,
+        unit: units && text ? (CELL_UNITS[field] ?? null) : null,
       };
     });
   });
-
-  private _unit(field: SetField): string {
-    switch (field) {
-      case SetFields.Weight:
-        return this._translateService.instant('workouts.units.kgShort');
-      case SetFields.Reps:
-        return this._translateService.instant(
-          this.unilateral() ? 'workouts.logger.columns.repsEach' : 'workouts.logger.columns.reps',
-        );
-      case SetFields.Distance:
-        return this._translateService.instant('workouts.units.metersShort');
-      case SetFields.Duration:
-        return '';
-    }
-  }
 }

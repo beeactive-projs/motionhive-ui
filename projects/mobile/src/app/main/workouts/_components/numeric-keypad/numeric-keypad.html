@@ -15,33 +15,34 @@
   </div>
 
   <!-- Four columns: the digits, and the ±step keys and backspace down the
-       right edge, where the thumb already is. -->
+       right edge, where the thumb already is. `fn` marks the keys that change
+       the number rather than type it. -->
   <div class="keys">
     <button type="button" (click)="press('1')">1</button>
     <button type="button" (click)="press('2')">2</button>
     <button type="button" (click)="press('3')">3</button>
-    <button type="button" class="side" [attr.aria-label]="'workouts.keypad.plus' | translate: { step: stepLabel() }" (click)="step(1)">
+    <button type="button" class="fn" [attr.aria-label]="'workouts.keypad.plus' | translate: { step: stepLabel() }" (click)="step(1)">
       +{{ stepLabel() }}
     </button>
 
     <button type="button" (click)="press('4')">4</button>
     <button type="button" (click)="press('5')">5</button>
     <button type="button" (click)="press('6')">6</button>
-    <button type="button" class="side" [attr.aria-label]="'workouts.keypad.minus' | translate: { step: stepLabel() }" (click)="step(-1)">
+    <button type="button" class="fn" [attr.aria-label]="'workouts.keypad.minus' | translate: { step: stepLabel() }" (click)="step(-1)">
       −{{ stepLabel() }}
     </button>
 
     <button type="button" (click)="press('7')">7</button>
     <button type="button" (click)="press('8')">8</button>
     <button type="button" (click)="press('9')">9</button>
-    <button type="button" class="side" [attr.aria-label]="'workouts.keypad.backspace' | translate" (click)="backspace()">
+    <button type="button" class="fn" [attr.aria-label]="'workouts.keypad.backspace' | translate" (click)="backspace()">
       <ion-icon name="backspace-outline" aria-hidden="true" />
     </button>
 
     @if (allowsDecimal() && !isClock()) {
       <button type="button" [attr.aria-label]="'workouts.keypad.decimal' | translate" (click)="press('.')">{{ decimalMark }}</button>
     } @else {
-      <button type="button" class="ghost" [attr.aria-label]="'button.clear' | translate" (click)="clear()">C</button>
+      <button type="button" class="fn clear" [attr.aria-label]="'button.clear' | translate" (click)="clear()">C</button>
     }
     <button type="button" (click)="press('0')">0</button>
     <ion-button class="done" (click)="commit.emit(committed())">

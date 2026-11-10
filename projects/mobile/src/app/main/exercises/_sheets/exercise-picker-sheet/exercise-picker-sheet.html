@@ -1,7 +1,39 @@
 <ng-template #sticky>
-  <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'exercises.library.search' | translate" inputmode="search"
+  <!-- The Messages field: a thin pill on the soft fill, no outline. -->
+  <ion-searchbar class="mh-search-pill" searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'exercises.library.search' | translate" inputmode="search"
     [debounce]="0"
     [value]="query()" (ionInput)="onQuery($any($event).detail.value ?? '')" />
+
+  <!-- Filters · All · the major muscles, as one sideways strip so the first
+       result stays above the fold. The sheet holds every muscle and the
+       equipment; a chip here is one muscle alone. One of the two is lit. -->
+  @if (quickMuscles().length) {
+    <div class="mh-chip-row" role="group" [attr.aria-label]="'exercises.library.filterBar' | translate">
+      <ion-button class="chip filters" fill="clear" shape="round" size="small" aria-haspopup="dialog"
+        [class.selected]="sheetCount() > 0"
+        [attr.aria-label]="'a11y.filters' | translate: { count: sheetCount() }"
+        (click)="openFilters()">
+        <ion-icon name="options-outline" aria-hidden="true" />
+        @if (sheetCount() > 0) {
+          <span class="count">{{ sheetCount() }}</span>
+        }
+      </ion-button>
+      <!-- `ion-button`, not `ion-chip`: the chip has no role, so a screen
+           reader reads it as text and never says which one is on. -->
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="!isFiltering()" [attr.aria-pressed]="!isFiltering()"
+        (click)="pickMuscle(null)">
+        {{ 'common.all' | translate }}
+      </ion-button>
+      @for (chip of quickMuscles(); track chip.value) {
+        <ion-button class="chip" fill="clear" shape="round" size="small"
+          [class.selected]="chip.value === quickMuscleId()" [attr.aria-pressed]="chip.value === quickMuscleId()"
+          (click)="pickMuscle(chip.value)">
+          {{ chip.label }}
+        </ion-button>
+      }
+    </div>
+  }
 </ng-template>
 
 <ng-template #body>
@@ -72,6 +104,11 @@
 <mh-exercise-preview-sheet [(open)]="previewOpen" [exercise]="previewing()"
   [selected]="previewing() ? isOn(previewing()!.id) : false" (toggle)="toggle($event)" />
 
+<!-- The library's filter sheet, muscles and equipment only, over the picker
+     like the preview. Its counts come with the list's first page. -->
+<mh-exercise-filter-sheet [(open)]="filterOpen" [filters]="sheetDraft()" [facets]="facets()"
+  [search]="query()" [muscleAndEquipmentOnly]="true" (applied)="applyFilters($event)" />
+
 <!-- The short form, over the picker like the preview: closing it without
      saving leaves the search and the ticks exactly as they were. -->
 <mh-exercise-form-sheet [(open)]="createOpen" [name]="createName()"
@@ -80,4 +117,4 @@
 
 <mh-sheet-shell [(open)]="open" [title]="sheetTitle()" [subtitle]="context()"
   [sticky]="sticky" [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"
-  [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9" (save)="add()" />
+  [breakpoints]="[0, 0.95]" [initialBreakpoint]="0.95" (save)="add()" />

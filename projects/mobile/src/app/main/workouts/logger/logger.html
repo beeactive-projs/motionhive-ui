@@ -7,21 +7,34 @@
         <ion-icon slot="icon-only" name="chevron-down-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
+    <!-- The name over one line: the clock in honey (this moment), then the
+         volume lifted so far, as the workout prototype draws it. -->
     <ion-title>
       <span class="name">{{ store.log()?.name ?? ('workouts.common.workout' | translate) }}</span>
-      @if (elapsed()) {
-        <span class="timer" role="timer">{{ elapsed() }}</span>
+      @if (elapsed() || volumeLabel()) {
+        <span class="meta">
+          @if (elapsed()) {
+            <span class="timer" role="timer">{{ elapsed() }}</span>
+          }
+          @if (elapsed() && volumeLabel()) {
+            <span aria-hidden="true"> · </span>
+          }
+          @if (volumeLabel()) {
+            <span>{{ volumeLabel() }}</span>
+          }
+        </span>
       }
     </ion-title>
     <ion-buttons slot="end">
       <ion-button
+        shape="round"
         [attr.aria-label]="'workouts.loggerOptions.more' | translate"
         [disabled]="!store.log()"
         (click)="openOptions()"
       >
         <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
       </ion-button>
-      <ion-button class="finish" fill="solid" shape="round" [disabled]="!store.log() || finishing()" (click)="finish()">
+      <ion-button class="finish" color="primary" fill="solid" shape="round" [disabled]="!store.log() || finishing()" (click)="finish()">
         {{ 'workouts.logger.finish' | translate }}
       </ion-button>
     </ion-buttons>
@@ -31,7 +44,7 @@
   <ion-toolbar class="progress">
     <div class="progress-row">
       <ion-progress-bar [value]="progressRatio()" />
-      <span class="mh-kicker">{{ 'workouts.meta.setsDone' | translate: { done: store.progress().done, total: store.progress().total } }}</span>
+      <span class="count">{{ 'workouts.meta.setsDone' | translate: { done: store.progress().done, total: store.progress().total } }}</span>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -153,9 +166,11 @@
                     {{ round.summary }}
                   </button>
                 } @else {
+                  <!-- No heading over a round: its rows are different
+                       exercises, so the cells name their units. -->
                   @for (item of round.rows; track item.row.set.id) {
                     <ng-container
-                      *ngTemplateOutlet="rowTpl; context: { $implicit: item.row, view: item.view }"
+                      *ngTemplateOutlet="rowTpl; context: { $implicit: item.row, view: item.view, units: true }"
                     />
                   }
                 }
@@ -176,10 +191,14 @@
       }
 
       @if (store.exercises().length) {
-        <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="addExercise()">
-          <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-          {{ 'workouts.logger.addExercise' | translate }}
-        </ion-button>
+        <!-- An option on the workout, the ⋯ sheet's row with its honey tile,
+             rather than a second button competing with Finish. -->
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item button [detail]="false" (click)="addExercise()">
+            <mh-hex-avatar slot="start" size="sm" icon="add-outline" color="primary" />
+            <ion-label>{{ 'workouts.logger.addExercise' | translate }}</ion-label>
+          </ion-item>
+        </ion-list>
       } @else {
         <!-- An empty workout is the freestyle on-ramp: the whole screen is one
              instruction and one button, because there is nothing else to do
@@ -193,22 +212,25 @@
         />
       }
 
-      <!-- Last and quiet: throwing the session away is the rare path, and
-           leaving the page is not it. -->
-      @if (store.log()) {
-        <ion-button class="discard" expand="block" fill="clear" color="danger" size="small" (click)="openDiscard()">
-          {{ 'workouts.logger.discard.title' | translate }}
+      <!-- Last: stopping before every set is ticked. It is Finish, so it opens
+           the same sheet (save what is ticked, or discard), in Finish's honey:
+           it destroys nothing, so it is not red. Gone once everything is
+           ticked: then it is not early, and Finish says it. Discard on its
+           own stays in the ⋯ sheet. -->
+      @if (store.log() && exerciseProgress().total && !store.allDone()) {
+        <ion-button class="finish-early" expand="block" fill="clear" (click)="finish()">
+          {{ 'workouts.logger.finishEarly' | translate: exerciseProgress() }}
         </ion-button>
       }
     </div>
   }
 
   <!-- Scrolled away from the set you are on: the list stops following it,
-       and this takes you back. -->
+       and this takes you back. The chevron points the way it will scroll. -->
   @if (userScrolled() && backToLabel() && !editing()) {
     <div slot="fixed" class="back-to">
       <button type="button" class="back-to-pill" (click)="backToFocus()">
-        <ion-icon name="arrow-down-outline" aria-hidden="true" />
+        <ion-icon [name]="focusAbove() ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true" />
         <span>{{ backToLabel() }}</span>
       </button>
     </div>
@@ -274,10 +296,11 @@
     <mh-exercise-card
       [name]="view.exercise.exerciseNameSnapshot"
       [kind]="view.exercise.exercise?.kind ?? null"
+      [imageUrl]="view.exercise.exercise?.thumbnailUrl || view.exercise.exerciseThumbnailUrlSnapshot || null"
       [skipped]="view.exercise.isSkipped"
       [showActions]="true"
+      [meta]="view.plan || null"
       [note]="view.note || null"
-      [plan]="view.plan || null"
       [planNote]="view.planNote || null"
       (open)="openExercise(view.exercise)"
       (actions)="openActions(view.exercise)"
@@ -285,6 +308,9 @@
     >
       @if (!view.exercise.isSkipped) {
         <div class="sets">
+          @if (view.rows.length) {
+            <mh-set-table-head [fields]="view.fields" [unilateral]="isUnilateral(view.exercise)" />
+          }
           @for (row of view.rows; track row.set.id) {
             <ng-container *ngTemplateOutlet="rowTpl; context: { $implicit: row, view: view }" />
           }
@@ -310,10 +336,13 @@
   }
 </ng-template>
 
-<ng-template #rowTpl let-row let-view="view">
-  <!-- Swipe left for Delete, as everywhere on a phone. Never while typing
-       into the set, and a full swipe does not delete: Delete waits for a tap. -->
-  <ion-item-sliding #sliding class="set-slide" [disabled]="row.editing">
+<ng-template #rowTpl let-row let-view="view" let-units="units">
+  <!-- Swipe left for Delete, as everywhere on a phone; swipe right for Copy,
+       another set like this one (teal, the colour of a copy). A full swipe
+       does it at once, or a tap on the option (user decision, 2026-11-09).
+       Never while typing into the set. `mh-swipe-row` gives the options
+       the lists' swipe skin. -->
+  <ion-item-sliding #sliding class="set-slide mh-swipe-row" [disabled]="row.editing">
     <ion-item lines="none" class="set-item">
       <mh-set-row
         [attr.data-focus]="row.focus ? '' : null"
@@ -323,18 +352,24 @@
         [badge]="row.badge"
         [fields]="view.fields"
         [prefill]="row.prefill"
-        [last]="row.last"
-        [unilateral]="isUnilateral(view.exercise)"
+        [previous]="row.previous"
         [editing]="row.editing"
         [draft]="row.editing ? typed() : null"
+        [units]="!!units"
         (tick)="tick(view.exercise, row.set)"
         (edit)="editCell(view.exercise, row.set, $event)"
         (menu)="openMenu(view.exercise, row.set, row.badge)"
-        (open)="openSet(view.exercise, row.set)"
+        (usePrevious)="usePrevious(view.exercise, row.set, row.previousSet)"
       />
     </ion-item>
-    <ion-item-options side="end">
-      <ion-item-option color="danger" (click)="swipeDelete(sliding, view.exercise, row.set)">
+    <ion-item-options side="start" (ionSwipe)="swipeCopy(sliding, view.exercise, row.set)">
+      <ion-item-option color="teal" [expandable]="true" (click)="swipeCopy(sliding, view.exercise, row.set)">
+        <ion-icon slot="top" name="copy-outline" aria-hidden="true" />
+        {{ 'button.copy' | translate }}
+      </ion-item-option>
+    </ion-item-options>
+    <ion-item-options side="end" (ionSwipe)="swipeDelete(sliding, view.exercise, row.set)">
+      <ion-item-option color="danger" [expandable]="true" (click)="swipeDelete(sliding, view.exercise, row.set)">
         <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
         {{ 'button.delete' | translate }}
       </ion-item-option>
@@ -381,9 +416,11 @@
 
 <mh-logger-options-sheet
   [(open)]="optionsOpen"
+  [name]="store.log()?.name ?? ''"
   [prefs]="prefs()"
-  [restForAll]="restForAllLabel()"
+  [restForAll]="restForAllSeconds()"
   (prefsChange)="onPrefs($event)"
+  (restChange)="onRestForAll($event)"
   (chosen)="onOption($event)"
 />
 
@@ -391,7 +428,6 @@
   [(open)]="restSheetOpen"
   [seconds]="restSheetSeconds()"
   [exerciseName]="restExerciseName()"
-  [initialScope]="restSheetScope()"
   (apply)="applyRest($event)"
 />
 
@@ -409,11 +445,13 @@
   (typeChange)="onSetType($event)"
   (noteChange)="onSetNote($event)"
   (remove)="onSetRemove()"
+  (duplicate)="onSetCopy()"
 />
 
 <mh-exercise-actions-sheet
   [(open)]="actionsOpen"
   [exercise]="actionsFor()"
+  [canCollapse]="actionsCanCollapse()"
   (action)="onAction($event)"
 />
 
@@ -441,7 +479,7 @@
   #discardSheet
   [(open)]="discardConfirmOpen"
   [title]="'workouts.logger.discard.title' | translate"
-  [body]="discardBody()"
+  [body]="'workouts.logger.discard.message' | translate"
   [confirmLabel]="'button.discard' | translate"
   [cancelLabel]="'workouts.common.keepGoing' | translate"
   tone="danger"
@@ -450,13 +488,13 @@
   (confirm)="confirmDiscard()"
 />
 
-<mh-confirm-sheet
-  #finishSheet
-  [(open)]="finishConfirmOpen"
-  [title]="'workouts.logger.finishConfirm.title' | translate"
-  [body]="finishBody()"
-  [confirmLabel]="'workouts.logger.finish' | translate"
-  [cancelLabel]="'workouts.common.keepGoing' | translate"
-  [saving]="finishing()"
-  (confirm)="confirmFinish()"
+<!-- Finish with sets still unticked: save it as it stands, or discard it.
+     With none ticked, discard alone: there is nothing to save. With every
+     set ticked, Finish goes straight to the summary. -->
+<mh-action-sheet
+  [(open)]="finishSheetOpen"
+  [title]="finishTitle()"
+  [note]="finishNote()"
+  [actions]="finishActions()"
+  (chosen)="onFinishChoice($event)"
 />

@@ -1,8 +1,20 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   InfiniteScrollCustomEvent,
+  IonButton,
+  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonItem,
@@ -13,9 +25,16 @@ import {
   IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Subject, debounceTime } from 'rxjs';
+import { addIcons } from 'ionicons';
+import { Subject, debounceTime, tap } from 'rxjs';
 
-import { Exercise, ExerciseService, ExerciseSortKey } from 'core';
+import {
+  Exercise,
+  ExerciseFacets,
+  ExerciseService,
+  ExerciseSortKey,
+  ExerciseTaxonomyStore,
+} from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
@@ -23,8 +42,17 @@ import { SearchbarAutofocusDirective } from '../../../../_shared/directives/sear
 import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { PagedList } from '../../../../_shared/utils/paged-list';
 import { ExerciseRow } from '../../_components/exercise-row/exercise-row';
-import { hasExactNameMatch } from '../../exercises.config';
+import {
+  EXERCISE_ICONS,
+  FEATURED_MUSCLE_SLUGS,
+  featuredFirst,
+  hasExactNameMatch,
+  muscleChip,
+  quickMuscleOf,
+} from '../../exercises.config';
+import { ExerciseFilters, NO_FILTERS, filterCount, filtersToQuery } from '../../exercises.store';
 import { RecentExercisesStore } from '../../recent-exercises.store';
+import { ExerciseFilterSheet } from '../exercise-filter-sheet/exercise-filter-sheet';
 import { ExerciseFormSheet } from '../exercise-form-sheet/exercise-form-sheet';
 import { CreateExerciseRow } from '../../_components/create-exercise-row/create-exercise-row';
 import { ExercisePreviewSheet } from '../exercise-preview-sheet/exercise-preview-sheet';
@@ -46,7 +74,13 @@ const PAGE_SIZE = 20;
  * Nothing in this sheet navigates.
  *
  * Idle shows the movements you actually use, then the catalog underneath.
- * Typing replaces both with server-side results, paginated the same way.
+ * Typing, a muscle chip or the filter sheet replaces both with server-side
+ * results, paginated the same way. The filters narrow the search too.
+ *
+ * The strip under the search is the Filters chip, All and the major
+ * muscles. A muscle chip is that muscle alone; the sheet (the library's,
+ * muscles and equipment only) holds any mix. One of the two is lit at a
+ * time, as on every filter strip.
  *
  * Recents are per-device and local: the last picks, in the order they were
  * made. The catalog under them comes the most used first (this person's own
@@ -57,10 +91,13 @@ const PAGE_SIZE = 20;
   selector: 'mh-exercise-picker-sheet',
   imports: [
     CreateExerciseRow,
+    ExerciseFilterSheet,
     ExerciseFormSheet,
     ExerciseRow,
     ExercisePreviewSheet,
     HexAvatar,
+    IonButton,
+    IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonItem,
@@ -101,8 +138,46 @@ export class ExercisePickerSheet {
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _recentExercisesStore = inject(RecentExercisesStore);
   private readonly _translateService = inject(TranslateService);
+  private readonly _exerciseTaxonomyStore = inject(ExerciseTaxonomyStore);
 
   readonly query = signal('');
+  /**
+   * The filter sheet's picks: muscles and equipment. A muscle chip in the
+   * strip writes its muscle into them, alone.
+   */
+  readonly filters = signal<ExerciseFilters>(NO_FILTERS);
+  /** Picks a strip chip set aside, offered again the next time the sheet opens. */
+  private readonly _keptFilters = signal<ExerciseFilters | null>(null);
+  readonly filterOpen = signal(false);
+  /** The sheet's counts, from the first page of the list on screen. */
+  readonly facets = signal<ExerciseFacets | undefined>(undefined);
+
+  /**
+   * The major muscles, one tap away: the ones the short form features too.
+   * Every other muscle, and the equipment, are in the sheet.
+   */
+  readonly quickMuscles = computed(() =>
+    featuredFirst(
+      this._exerciseTaxonomyStore.muscles().map(muscleChip),
+      FEATURED_MUSCLE_SLUGS,
+    ).slice(0, FEATURED_MUSCLE_SLUGS.length),
+  );
+
+  /** The muscle chip the picks amount to; null while the sheet's picks are the view. */
+  readonly quickMuscleId = computed(() =>
+    quickMuscleOf(this.filters(), this.quickMuscles().map((chip) => chip.value)),
+  );
+
+  /** The number on the Filters chip: only what no chip beside it can say. */
+  readonly sheetCount = computed(() => (this.quickMuscleId() ? 0 : filterCount(this.filters())));
+
+  /** What the sheet opens on: the picks on screen, or the ones a chip set aside. */
+  readonly sheetDraft = computed(() =>
+    this.sheetCount() > 0 ? this.filters() : (this._keptFilters() ?? this.filters()),
+  );
+
+  /** Something narrows the list: it is a filtered answer, not the browse view. */
+  readonly isFiltering = computed(() => filterCount(this.filters()) > 0);
   readonly skeletonRows = [1, 2, 3, 4];
 
   /**
@@ -111,16 +186,28 @@ export class ExercisePickerSheet {
    * a failed page is asked for again, and a short page is the end.
    */
   private readonly _list = new PagedList<Exercise>(PAGE_SIZE, (page, limit) =>
-    this._exerciseService.list({
-      ...(this._term ? { search: this._term } : {}),
-      page,
-      limit,
-      // Best match first while searching; the most used first while browsing.
-      sort: ExerciseSortKey.Relevance,
-    }),
+    this._exerciseService
+      .list({
+        ...(this._term ? { search: this._term } : {}),
+        ...filtersToQuery(this._filters),
+        page,
+        limit,
+        // Best match first while searching; the most used first while browsing.
+        sort: ExerciseSortKey.Relevance,
+        // The sheet's counts ride on a first page only: a later one would
+        // recount the catalogue for numbers nobody is looking at.
+        withFacets: page === 1,
+      })
+      .pipe(
+        tap(({ facets }) => {
+          if (facets) this.facets.set(facets);
+        }),
+      ),
   );
   /** What `_list` reads: the term of the rows on screen, or of the read replacing them. */
   private _term = '';
+  /** The picks `_list` reads, set with the term by `_read`. */
+  private _filters: ExerciseFilters = NO_FILTERS;
   private readonly _search = new Subject<{ term: string; generation: number }>();
   /** The term the rows on screen answer, which lags `query` while a search is in flight. */
   private readonly _shownTerm = signal('');
@@ -143,9 +230,9 @@ export class ExercisePickerSheet {
 
   readonly isSearching = computed(() => this._shownTerm().length > 0);
 
-  /** Your own last picks, hidden while searching. */
+  /** Your own last picks, hidden while searching or filtering. */
   readonly recents = computed(() =>
-    this.isSearching() ? [] : this._recentExercisesStore.exercises(),
+    this.isSearching() || this.isFiltering() ? [] : this._recentExercisesStore.exercises(),
   );
 
   /** The answer to the shown term. A failed one has none: the rows left are an older term's. */
@@ -177,7 +264,9 @@ export class ExercisePickerSheet {
 
   readonly sectionLabel = computed<string>(() =>
     this._translateService.instant(
-      this.isSearching() ? 'exercises.picker.results' : 'exercises.picker.allExercises',
+      this.isSearching() || this.isFiltering()
+        ? 'exercises.picker.results'
+        : 'exercises.picker.allExercises',
     ),
   );
 
@@ -185,14 +274,23 @@ export class ExercisePickerSheet {
     () => !this.loading() && this.rows().length === 0 && this.recents().length === 0,
   );
 
-  /** A failed search says so: "No match" would offer to create one that exists. */
-  readonly emptyMessage = computed<string>(() =>
-    this._translateService.instant(
-      this.isSearching() && !this._list.failed()
-        ? 'exercises.picker.noMatch'
-        : 'exercises.picker.loadError',
-    ),
-  );
+  /**
+   * Why nothing is listed. A failed read says so: "No match" would offer to
+   * create one that exists. Under a filter, the filter is what found nothing,
+   * typed or not: Chest, then "squat", finds nothing because squats are not
+   * chest work, not because there is no squat.
+   */
+  readonly emptyMessage = computed<string>(() => {
+    if (this._list.failed()) {
+      return this._translateService.instant('exercises.picker.loadError');
+    }
+    if (this.isFiltering()) {
+      return this._translateService.instant('exercises.picker.noFilterMatch');
+    }
+    return this._translateService.instant(
+      this.isSearching() ? 'exercises.picker.noMatch' : 'exercises.picker.loadError',
+    );
+  });
 
   readonly hasMore = computed(() => !this._list.failed() && this._list.hasMore());
 
@@ -218,10 +316,18 @@ export class ExercisePickerSheet {
    * While the next term is on its way the row stays if the last answer
    * offered it, so it does not blink under a finger still typing. An exact
    * name already on screen takes it away at once, and a failed search
-   * never offers it: the exercise may well exist.
+   * never offers it: the exercise may well exist. Nor does a search under a
+   * filter, for the same reason: the name may be just outside it, and a
+   * create there makes a private duplicate. All brings the row back.
    */
   readonly canCreate = computed(() => {
-    if (!this.isSearching() || this.loading() || this._list.failed() || !this.createName()) {
+    if (
+      !this.isSearching() ||
+      this.isFiltering() ||
+      this.loading() ||
+      this._list.failed() ||
+      !this.createName()
+    ) {
       return false;
     }
     const onScreen = [...this._results(), ...this._recentExercisesStore.exercises()];
@@ -235,16 +341,27 @@ export class ExercisePickerSheet {
   readonly createOpen = signal(false);
 
   constructor() {
+    addIcons(EXERCISE_ICONS);
+    this._exerciseTaxonomyStore.ensureLoaded();
+
     // Every opening is a fresh pick — a selection carried over from the last
-    // time would be added to this list by accident.
+    // time would be added to this list by accident. Only `open` is tracked:
+    // `_read` reads the filters, and tracking them here would undo every
+    // chip tap with a fresh opening.
     effect(() => {
       if (!this.open()) return;
-      const generation = ++this._generation;
-      this.query.set('');
-      this._selected.set(new Map());
-      this._shownTerm.set('');
-      this._list.clear();
-      this._read('', generation);
+      untracked(() => {
+        // The chips' muscles, again if the load on building the sheet failed.
+        this._exerciseTaxonomyStore.ensureLoaded();
+        const generation = ++this._generation;
+        this.query.set('');
+        this.filters.set(NO_FILTERS);
+        this._keptFilters.set(null);
+        this._selected.set(new Map());
+        this._shownTerm.set('');
+        this._list.clear();
+        this._read('', generation);
+      });
     });
 
     this._search
@@ -258,6 +375,32 @@ export class ExercisePickerSheet {
     // they answer is out of date now.
     this._pending.set(true);
     this._search.next({ term: value.trim(), generation: ++this._generation });
+  }
+
+  /**
+   * A muscle chip, or All (null): that muscle alone, or nothing, and the
+   * list reads again at once. Picks the sheet held are set aside rather than
+   * dropped: the sheet reopens on them, so Apply brings them back. The lit
+   * chip does nothing, unless its read failed: then a tap is the retry.
+   */
+  pickMuscle(id: string | null): void {
+    const lit = id === null ? !this.isFiltering() : id === this.quickMuscleId();
+    if (lit && !this._list.failed()) return;
+    const picks = this.sheetCount() > 0 ? this.filters() : this._keptFilters();
+    this.filters.set({ ...NO_FILTERS, muscleIds: id === null ? [] : [id] });
+    this._keptFilters.set(picks);
+    this._read(this.query().trim(), ++this._generation);
+  }
+
+  openFilters(): void {
+    this.filterOpen.set(true);
+  }
+
+  /** The sheet's picks are the view now, and nothing is set aside any more. */
+  applyFilters(filters: ExerciseFilters): void {
+    this._keptFilters.set(null);
+    this.filters.set({ ...filters });
+    this._read(this.query().trim(), ++this._generation);
   }
 
   loadMore(event: InfiniteScrollCustomEvent): void {
@@ -345,6 +488,7 @@ export class ExercisePickerSheet {
   private _read(term: string, generation: number): void {
     if (generation !== this._generation) return;
     this._term = term;
+    this._filters = this.filters();
     this._pending.set(true);
     this._list.reset(() => {
       if (generation !== this._generation) return;

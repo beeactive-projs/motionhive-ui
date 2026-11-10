@@ -36,6 +36,7 @@ import {
   keepPlaces,
   normalizeExerciseName,
   ownershipChip,
+  quickMuscleOf,
   recentFromExercise,
   resultMetaLabel,
   toggleCapped,
@@ -180,6 +181,25 @@ describe('collapsed chip clouds', () => {
     const expanded = featuredFirst(all, ['glutes', 'chest']).map((c) => c.slug);
     expect(expanded.slice(0, collapsed.length)).toEqual(collapsed);
     expect(expanded).toHaveLength(all.length);
+  });
+});
+
+// The picker's strip is one choice: a muscle chip, or the sheet's picks.
+describe('quickMuscleOf', () => {
+  const none = { kinds: [], levels: [], muscleIds: [], equipmentIds: [] };
+  const quick = ['id-chest', 'id-lats'];
+
+  it('names the strip muscle the filters hold alone', () => {
+    expect(quickMuscleOf({ ...none, muscleIds: ['id-lats'] }, quick)).toBe('id-lats');
+  });
+
+  it('is null for All, a muscle off the strip, two muscles or any equipment', () => {
+    expect(quickMuscleOf(none, quick)).toBeNull();
+    expect(quickMuscleOf({ ...none, muscleIds: ['id-forearms'] }, quick)).toBeNull();
+    expect(quickMuscleOf({ ...none, muscleIds: ['id-chest', 'id-lats'] }, quick)).toBeNull();
+    expect(
+      quickMuscleOf({ ...none, muscleIds: ['id-chest'], equipmentIds: ['id-barbell'] }, quick),
+    ).toBeNull();
   });
 });
 

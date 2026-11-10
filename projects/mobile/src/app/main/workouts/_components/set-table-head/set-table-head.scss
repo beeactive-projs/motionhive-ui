@@ -1,0 +1,33 @@
+﻿@use '../set-row/set-grid';
+
+/* A size container like the row, so the two drop Previous together. */
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
+.head {
+  padding-block: 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+.head span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.center {
+  justify-self: center;
+}
+
+/* No Previous column at this width (`_set-grid.scss`): its label goes with
+   it, and the rows say "last 60 × 8" under their fields instead. */
+@container (max-width: #{set-grid.$narrow}) {
+  .head > .previous {
+    display: none;
+  }
+}

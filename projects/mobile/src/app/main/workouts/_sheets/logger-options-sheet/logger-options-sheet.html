@@ -1,48 +1,101 @@
 <ng-template #body>
   <div class="mh-stack">
+    <!-- This workout's switches, laid out as Settings › Workouts lays out
+         the defaults: bare toggles, then the rest, which opens under its row
+         (a stepper and the usual rests, each tap applied at once). The
+         footnote speaks to this card, so it sits under it. -->
+    <section class="mh-section">
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="prefs().sound" (ionChange)="toggle('sound', $event)">
+            {{ 'account.workoutSettings.sound' | translate }}
+          </ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="prefs().vibration" (ionChange)="toggle('vibration', $event)">
+            {{ 'account.workoutSettings.vibration' | translate }}
+          </ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-toggle justify="space-between" [checked]="prefs().askEffort" (ionChange)="toggle('askEffort', $event)">
+            {{ 'account.workoutSettings.askEffort' | translate }}
+          </ion-toggle>
+        </ion-item>
+        <ion-accordion-group>
+          <ion-accordion value="rest" class="mh-disclosure" toggleIcon="chevron-forward-outline">
+            <ion-item slot="header">
+              <ion-label class="rest-label">
+                {{ 'workouts.loggerOptions.restForAll' | translate }}
+                <p>{{ 'workouts.restSheet.workoutHint' | translate }}</p>
+              </ion-label>
+              <ion-note slot="end" class="rest-value">{{ restLabel() }}</ion-note>
+            </ion-item>
+
+            <div slot="content" class="rest-panel mh-stack">
+              <div class="stepper">
+                <button
+                  type="button"
+                  [attr.aria-label]="'workouts.restSheet.less' | translate: { seconds: step }"
+                  (click)="nudge(-1)"
+                >
+                  <ion-icon name="remove-outline" aria-hidden="true" />
+                </button>
+                <strong aria-live="polite">{{ restLabel() }}</strong>
+                <button
+                  type="button"
+                  [attr.aria-label]="'workouts.restSheet.more' | translate: { seconds: step }"
+                  (click)="nudge(1)"
+                >
+                  <ion-icon name="add-outline" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div class="presets" role="group" [attr.aria-label]="'workouts.loggerOptions.restForAll' | translate">
+                @for (preset of presets; track preset) {
+                  <button
+                    type="button"
+                    class="preset"
+                    [class.on]="restForAll() === preset"
+                    [attr.aria-pressed]="restForAll() === preset"
+                    (click)="pickRest(preset)"
+                  >
+                    {{ clock(preset) }}
+                  </button>
+                }
+              </div>
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+      </ion-list>
+      <p class="mh-footnote">{{ 'workouts.loggerOptions.footnote' | translate }}</p>
+    </section>
+
+    <!-- Verb tiles by concept: adding edits the workout (honey), a pause is
+         about the clock (coral, as in the leave sheet). -->
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item>
-        <ion-toggle justify="space-between" [checked]="prefs().sound" (ionChange)="toggle('sound', $event)">
-          {{ 'account.workoutSettings.sound' | translate }}
-        </ion-toggle>
+      <ion-item button [detail]="false" (click)="choose(Ids.AddExercises)">
+        <mh-hex-avatar slot="start" size="sm" icon="add-outline" color="primary" />
+        <ion-label>{{ 'workouts.loggerOptions.addExercises' | translate }}</ion-label>
       </ion-item>
-      <ion-item>
-        <ion-toggle justify="space-between" [checked]="prefs().vibration" (ionChange)="toggle('vibration', $event)">
-          {{ 'account.workoutSettings.vibration' | translate }}
-        </ion-toggle>
-      </ion-item>
-      <ion-item>
-        <ion-toggle justify="space-between" [checked]="prefs().askEffort" (ionChange)="toggle('askEffort', $event)">
-          {{ 'account.workoutSettings.askEffort' | translate }}
-        </ion-toggle>
-      </ion-item>
-      <ion-item button [detail]="true" (click)="choose(Ids.RestForAll)">
-        <ion-label>
-          {{ 'workouts.loggerOptions.restForAll' | translate }}
-          <p>{{ 'workouts.restSheet.workoutHint' | translate }}</p>
-        </ion-label>
-        <ion-note slot="end">{{ restForAll() }}</ion-note>
+      <ion-item button [detail]="false" (click)="choose(Ids.Pause)">
+        <mh-hex-avatar slot="start" size="sm" icon="pause-outline" color="coral" />
+        <ion-label>{{ 'workouts.loggerOptions.pause' | translate }}</ion-label>
       </ion-item>
     </ion-list>
 
+    <!-- The one verb that loses work, in a card of its own. -->
     <ion-list [inset]="true" class="mh-card-list">
-      <ion-item button [detail]="false" (click)="choose(Ids.Pause)">
-        <ion-icon slot="start" name="pause-outline" color="medium" aria-hidden="true" />
-        <ion-label>{{ 'workouts.loggerOptions.pause' | translate }}</ion-label>
-      </ion-item>
       <ion-item button [detail]="false" (click)="choose(Ids.Discard)">
-        <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+        <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
         <ion-label color="danger">{{ 'workouts.logger.discard.title' | translate }}</ion-label>
       </ion-item>
     </ion-list>
-
-    <p class="mh-helper">{{ 'workouts.loggerOptions.footnote' | translate }}</p>
   </div>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  [title]="'workouts.loggerOptions.title' | translate"
+  [title]="name() || ('workouts.loggerOptions.title' | translate)"
   [body]="body"
   [fit]="true"
   [showFooter]="false"

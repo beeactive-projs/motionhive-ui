@@ -115,7 +115,7 @@ Markdown in the scratchpad (offer to move it to `docs/`). Sections, in order:
    - measured numbers (`4.23:1`, `73.031px`);
    - a tag, `[verified]` or `[from code]`.
 4. What was verified fine, briefly, so nobody re-checks it.
-5. Tests worth adding: mobile specs are config-only (`testing-and-tooling.md`).
+5. Tests worth adding: for each fix, the spec case that would have caught it (`testing-and-tooling.md`, "Specs": every change ships with its specs; component specs test the class, not the template).
 6. Not covered: devices, screen readers, gestures, writes.
 
 ## 10. After fixes

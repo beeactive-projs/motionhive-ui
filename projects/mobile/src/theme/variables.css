@@ -356,6 +356,51 @@
   --mh-color-selected-background: var(--mh-primary-50);
 
   /*
+   * The fill behind something done, a ticked set in the logger. The success
+   * wash in light; in dark the wash (emerald 900) read as a heavy band, so
+   * the dark block lifts it (user decision, 2026-11-09). Status, not
+   * selection.
+   */
+  --mh-color-done-background: var(--ion-color-success-wash);
+
+  /*
+   * A selected row in a table of rows, the logger's set open in the number
+   * pad: the selection fill in light. Its own role because dark lifts it the
+   * way it lifts the done row (user decision, 2026-11-09), while a selected
+   * chip, tile or day keeps the deep honey there.
+   */
+  --mh-color-selected-row: var(--mh-color-selected-background);
+
+  /*
+   * The logger's number pad, drawn as the phone's own keypad is: the pad a
+   * slate step below the white digit keys, each key on a 1px darker base,
+   * and the keys that change rather than type (±step, backspace, clear) a
+   * step darker again. Navy ink is 17:1 on a digit, 11.6:1 on a function
+   * key; the base is 2.1:1 on the pad. Dark lifts the keys off the card
+   * instead (the dark block).
+   */
+  --mh-color-keypad: var(--mh-slate-200);
+  --mh-color-keypad-key: #ffffff;
+  --mh-color-keypad-key-function: var(--mh-slate-300);
+  --mh-color-keypad-key-edge: var(--mh-slate-400);
+
+  /*
+   * A suggested value, not a typed one: a set's pre-fill in the logger,
+   * drawn as a placeholder is (this ink, regular weight) so it never reads
+   * as a number someone entered. Slate 500 is 4.8:1 on the white field,
+   * against the navy semibold of a typed value.
+   */
+  --mh-color-prefill: var(--mh-slate-500);
+
+  /*
+   * A control floating over a list, the logger's "Back to…" pill: the
+   * raised surface iOS and WhatsApp draw their jump buttons on, with a
+   * hairline and `--mh-shadow-overlay` to lift it. White in light (navy ink
+   * 17:1, deep honey glyph 5:1); dark lifts it a step above the cards.
+   */
+  --mh-color-floating: #ffffff;
+
+  /*
    * A honey-tinted capsule that is not a selection: Home's role pill,
    * Discover's city. Honey at 12% over the white page in light. Over
    * navy any see-through honey mixes to a grey, so dark uses the honey wash
@@ -733,6 +778,37 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
 
   /* Selection inverts like the washes: deep honey fill, light ink. */
   --mh-color-selected-background: var(--mh-warning-950);
+
+  /* Done is lighter than the grey card, not darker, as the workout prototype
+     draws it: emerald at 18% over the card mixes to a muted green a step
+     above it (about #27453d), where the 900 wash sat below it as a heavy
+     band. See-through is safe here, unlike on navy: over grey the green
+     stays green. White ink on it is about 10:1. */
+  --mh-color-done-background: rgba(var(--ion-color-success-rgb), 0.18);
+
+  /* The selected row the same way, in honey: 8% over the card mixes to a
+     warm step above it (about #3c352b), where the deep honey sat below the
+     card as a heavy band. No more than 8%: the row's muted Previous
+     (slate-400) is 4.7:1 on it, and at 16% (#4c3e28) it fell to 4.0:1, under
+     AA. White ink on it is about 12:1. */
+  --mh-color-selected-row: rgba(var(--ion-color-primary-rgb), 0.08);
+
+  /* The number pad keeps the card's grey; its keys are the lighter greys
+     above it, digits brightest (2.3:1 on the pad), function keys a step
+     under them (1.5:1). Light ink is 5.4:1 on a digit, 8.3:1 on a function
+     key. The base is a black edge, never mixed from the light ink. */
+  --mh-color-keypad: #2c2c2e;
+  --mh-color-keypad-key: #636366;
+  --mh-color-keypad-key-function: #48484a;
+  --mh-color-keypad-key-edge: rgba(0, 0, 0, 0.4);
+
+  /* The suggestion ink a neutral grey, dimmer than the muted slate: 5:1 on
+     the page-grey field, where slate 500 would be 3.5:1. */
+  --mh-color-prefill: #8e8e93;
+
+  /* The floating control a step above the cards (#2c2c2e), as a sheet's
+     cards sit: light ink 10:1, the honey 300 glyph 7.9:1. */
+  --mh-color-floating: #3a3a3c;
 
   /* The honey capsule takes the honey wash's fill, opaque, so it stays warm
      on the grey. Honey ink on it is 7:1. */

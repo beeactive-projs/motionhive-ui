@@ -195,8 +195,14 @@ export function nextAfter(
 /**
  * The exercises as they would be once `setId` is ticked: for working out
  * what the lock screen shows after its ✓, before the app has saved it.
+ * `values` are what that ✓ logs, so the set after it pre-fills from them
+ * as it would after a real tick.
  */
-export function withTicked(exercises: readonly LoggedExercise[], setId: string): LoggedExercise[] {
+export function withTicked(
+  exercises: readonly LoggedExercise[],
+  setId: string,
+  values: Partial<Record<PayloadKey, number>> = {},
+): LoggedExercise[] {
   return exercises.map((exercise) => {
     const sets = exercise.sets ?? [];
     if (!sets.some((set) => set.id === setId)) {
@@ -208,7 +214,7 @@ export function withTicked(exercises: readonly LoggedExercise[], setId: string):
         if (set.id !== setId) {
           return set;
         }
-        return { ...set, isCompleted: true };
+        return { ...set, ...values, isCompleted: true };
       }),
     };
   });
@@ -353,18 +359,41 @@ export function shownValue(row: ShownSet, field: SetField): number | null {
 }
 
 /**
+ * What a copy of a set holds: the number each of `fields` shows, typed or
+ * grey, so the copy reads like the set it came from. An unticked set in a
+ * plan shows the plan's numbers, and the copy has no plan of its own to show
+ * them from. Fields showing nothing stay out.
+ */
+export function copiedValues(
+  row: ShownSet,
+  fields: readonly SetField[],
+): Partial<Record<PayloadKey, number>> {
+  const values: Partial<Record<PayloadKey, number>> = {};
+  for (const field of fields) {
+    const value = shownValue(row, field);
+    if (value !== null) values[PAYLOAD_KEY[field]] = value;
+  }
+  return values;
+}
+
+/**
  * What a set is pre-filled with, shown in grey until it is confirmed or typed
  * over: the plan's target, else what the same set held last time, else what
  * the set before it in this session holds. A rep range pre-fills last time's
  * reps when they fall inside it, otherwise its bottom: the floor you aim at.
+ *
+ * The set before counts only once it is ticked (user decision, 2026-11-10):
+ * a number typed into a set is still being decided, so it does not spill
+ * into the next set the moment the pad moves from kg to reps.
  */
 export function prefillValue(
   set: LoggedSet,
   field: SetField,
   previous: LoggedSet | null,
-  sessionBefore: LoggedSet | null,
+  setBefore: LoggedSet | null,
 ): number | null {
   const plan = planOf(set);
+  const sessionBefore = setBefore?.isCompleted ? setBefore : null;
   switch (field) {
     case SetFields.Weight:
       return (

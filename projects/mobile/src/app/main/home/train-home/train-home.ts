@@ -29,6 +29,7 @@ import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skelet
 import { avatarToneFor, GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupBase, personBase, ProfileStacks } from '../../../_shared/utils/stack-paths';
 import { COACHES_URL, COACHES_YOURS_URL } from '../../coaches/coaches.filters';
+import { ActiveWorkoutService } from '../../workouts/_services/active-workout.service';
 import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
@@ -99,6 +100,7 @@ interface HiveMember {
 export class TrainHome implements OnInit {
   private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -334,8 +336,9 @@ export class TrainHome implements OnInit {
     });
   }
 
+  /** Started first, then the logger opens once on it (in Workouts). */
   startEmpty(): void {
-    void this._router.navigate(['/tabs/workouts/log', 'new']);
+    this._activeWorkoutService.startFreestyle();
   }
 
   // ─── People and posts ────────────────────────────────────────

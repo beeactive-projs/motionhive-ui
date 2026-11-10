@@ -13,6 +13,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  Config,
   IonButton,
   IonButtons,
   IonCard,
@@ -26,7 +27,9 @@ import {
   IonItemOptions,
   IonItemSliding,
   IonLabel,
+  IonList,
   IonProgressBar,
+  IonRouterOutlet,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -58,10 +61,12 @@ import {
 import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { RestLiveAction, RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
+import { swipeBackDefault } from '../../../_shared/utils/swipe-back';
 import { ActiveSessionStore, LiveStep, LiveValues } from '../_services/active-session.store';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { liveValues } from '../_services/lock-screen.config';
@@ -77,9 +82,10 @@ import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
 import { RestTimerBar } from '../_components/rest-timer-bar/rest-timer-bar';
 import { SetRow } from '../_components/set-row/set-row';
+import { SetTableHead } from '../_components/set-table-head/set-table-head';
 import { ExerciseActionsSheet } from '../_sheets/exercise-actions-sheet/exercise-actions-sheet';
 import { LeaveWorkoutSheet } from '../_sheets/leave-workout-sheet/leave-workout-sheet';
-import { RestChange, RestScope, RestScopes, RestSheet } from '../_sheets/rest-sheet/rest-sheet';
+import { RestChange, RestScopes, RestSheet } from '../_sheets/rest-sheet/rest-sheet';
 import {
   LoggerOptionId,
   LoggerOptionIds,
@@ -90,6 +96,9 @@ import { SetMenuSheet } from '../_sheets/set-menu-sheet/set-menu-sheet';
 import {
   ExerciseActionId,
   ExerciseActionIds,
+  finishOptions,
+  FinishChoice,
+  FinishChoices,
   KeypadField,
   KeypadFields,
   LeaveChoice,
@@ -103,6 +112,7 @@ import {
   isExerciseDone,
   loggerRedirect,
   workoutClock,
+  workoutVolume,
 } from '../workouts.config';
 import {
   EFFORT_PROMPT_MS,
@@ -116,6 +126,7 @@ import {
   afterTick,
   asksEffort,
   cellValue,
+  copiedValues,
   effortTarget,
   estimatedRest,
   exerciseBlocks,
@@ -161,6 +172,10 @@ interface SetView {
   badge: SetBadge;
   prefill: Partial<Record<SetField, number | null>>;
   last: string;
+  /** The same set last time, "60 × 8", for the Previous column; empty when none. */
+  previous: string;
+  /** That set itself, so Previous can copy its numbers in. */
+  previousSet: LoggedSet | null;
   /** The set the screen points at: the next one to do. */
   focus: boolean;
   /** The field open in the pad, when it is this set's. */
@@ -258,6 +273,7 @@ const COLUMN_LABELS: Record<SetField, string> = {
     ExerciseCard,
     ExerciseNoteSheet,
     ExercisePickerSheet,
+    HexAvatar,
     IonButton,
     IonButtons,
     IonCard,
@@ -272,6 +288,7 @@ const COLUMN_LABELS: Record<SetField, string> = {
     IonItemOptions,
     IonItemSliding,
     IonLabel,
+    IonList,
     IonProgressBar,
     IonSkeletonText,
     IonTitle,
@@ -284,6 +301,7 @@ const COLUMN_LABELS: Record<SetField, string> = {
     RestTimerBar,
     SetMenuSheet,
     SetRow,
+    SetTableHead,
     TranslatePipe,
   ],
   providers: [LoggerStore],
@@ -299,6 +317,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _restAlertService = inject(RestAlertService);
   private readonly _translateService = inject(TranslateService);
   private readonly _navController = inject(NavController);
+  /** The stack's swipe back, held off while the logger is on screen: see `ionViewWillEnter`. */
+  private readonly _ionRouterOutlet = inject(IonRouterOutlet, { optional: true });
+  private readonly _config = inject(Config);
   private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _restCueService = inject(RestCueService);
   private readonly _activeSession = inject(ActiveSessionStore);
@@ -321,10 +342,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     return { sound, vibration, askEffort, ...this._workoutPrefs() };
   });
   readonly optionsOpen = signal(false);
-  /** Which choice the rest sheet opens on: the ⋯ asks for every exercise. */
-  readonly restSheetScope = signal<RestScope>(RestScopes.Exercise);
-  readonly restForAllLabel = computed(() =>
-    secondsToClock(this._restForAll() ?? this._settings().defaultRestSeconds),
+  readonly restForAllSeconds = computed(
+    () => this._restForAll() ?? this._settings().defaultRestSeconds,
   );
 
   /** Supersets go round by round unless the person turned that off. */
@@ -349,8 +368,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /** The cell bound to the keypad, or null when nothing is being edited. */
   readonly editing = signal<EditTarget | null>(null);
   readonly draft = signal('');
-  /** What the keypad has typed so far, echoed into the open cell. */
-  readonly typed = signal('');
+  /** What the keypad has typed so far, echoed into the open cell; null until it is touched. */
+  readonly typed = signal<string | null>(null);
 
   /** The next set to do: the one the list points at and scrolls to. */
   readonly focus = computed<SetRef | null>(() =>
@@ -381,6 +400,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
    * following it until the next tick or a tap on "Back to…".
    */
   readonly userScrolled = signal(false);
+  /** Which way "Back to…" points: the focus set went off the top, else off the bottom. */
+  readonly focusAbove = signal(false);
   private _programmaticScrollAt = 0;
   private _lastFocusId: string | null = null;
   private readonly _content = viewChild(IonContent);
@@ -430,12 +451,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly restSheetSeconds = computed(() => {
     const start = this.restStartedAt();
     const end = this.restEndsAt();
-    return start !== null && end !== null && this.restSheetScope() === RestScopes.Exercise
+    return start !== null && end !== null
       ? Math.round((end - start) / 1000)
-      : (this._restForAll() ?? this._settings().defaultRestSeconds);
+      : this.restForAllSeconds();
   });
   readonly restExerciseName = computed(() => {
-    if (this.restSheetScope() === RestScopes.Workout) return '';
     const id = this._rest()?.exerciseId;
     return this.store.exercises().find((e) => e.id === id)?.exerciseNameSnapshot ?? '';
   });
@@ -484,7 +504,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         break;
       }
       steps.push(step);
-      exercises = withTicked(exercises, ref.setId);
+      exercises = withTicked(exercises, ref.setId, step.values);
       ref = focusOf(exercises, rounds, passed);
     }
     return steps;
@@ -506,15 +526,21 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /** The exercise whose verb sheet is open. */
   readonly actionsFor = signal<LoggedExercise | null>(null);
   readonly actionsOpen = signal(false);
+  /** The ⋯ sheet's exercise can fold back to its check row: see `_foldKey`. */
+  readonly actionsCanCollapse = computed(() => {
+    const exercise = this.actionsFor();
+    return !!exercise && this._foldKey(exercise) !== null;
+  });
 
   /** Confirms that would otherwise lose logged work without asking. */
   readonly removeConfirmOpen = signal(false);
   readonly discardConfirmOpen = signal(false);
-  readonly finishConfirmOpen = signal(false);
+  /** Finish while sets are unticked, or none are: save as it stands, or discard. */
+  readonly finishSheetOpen = signal(false);
+  /** Finish early, or Discard alone when nothing is ticked: nothing to save. */
+  readonly finishActions = computed(() => finishOptions(this.store.progress().done));
   readonly discarding = signal(false);
   readonly finishing = signal(false);
-  /** The discard sheet was opened by Finish with nothing ticked. */
-  readonly discardFromFinish = signal(false);
   /** Asked on the way out: keep the clock running, or pause it. */
   readonly leaveOpen = signal(false);
 
@@ -522,13 +548,14 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
    * Finish and discard both navigate once confirmed, so those two sheets are
    * dismissed through their own `close()` rather than by flipping `open` —
    * routing away in the same turn would otherwise leave the sheet presented
-   * over the page it just opened. Named refs: the logger owns three confirm
+   * over the page it just opened. Named refs: the logger owns several confirm
    * sheets, so a bare `viewChild(ConfirmSheet)` would pick the wrong one.
+   * Finish's own sheet is an action sheet, which reports its choice only
+   * once it has gone, so it needs no ref.
    */
   private readonly _discardSheet = viewChild<ConfirmSheet>('discardSheet');
   /** Read when focus jumps to another cell, so what was typed is kept. */
   private readonly _keypad = viewChild(NumericKeypad);
-  private readonly _finishSheet = viewChild<ConfirmSheet>('finishSheet');
 
   /** Per-exercise "last time" sets, keyed by exercise id. */
   private readonly _previous = signal<Record<string, LoggedSet[]>>({});
@@ -570,6 +597,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             fields.map((field) => [field, prefillValue(set, field, prev, before)]),
           ),
           last: lastLine(fields, prev),
+          previous: prev ? setLine(fields, (field) => cellValue(prev, field), false) : '',
+          previousSet: prev,
           focus: isFocus,
           editing: isEditing ? (editing?.field ?? null) : null,
           effortTarget: effortTarget(set),
@@ -742,9 +771,33 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     return log ? workoutClock(log, this._now()) : '';
   });
 
+  /**
+   * "1,250 kg": the weight lifted in ticked sets so far (warm-ups count for
+   * nothing, as on the summary). Empty until something loaded is ticked, so
+   * a bodyweight session never shows "0 kg".
+   */
+  readonly volumeLabel = computed(() => {
+    const log = this.store.log();
+    const volume = log ? Math.round(workoutVolume(log)) : 0;
+    return volume > 0
+      ? this._translateService.instant('workouts.units.kg', {
+          value: new Intl.NumberFormat(appLocale()).format(volume),
+        })
+      : '';
+  });
+
   readonly progressRatio = computed(() => {
     const { done, total } = this.store.progress();
     return total > 0 ? done / total : 0;
+  });
+
+  /**
+   * "1/3 exercises" on the finish-early line: exercises with every set
+   * ticked, skipped ones left out.
+   */
+  readonly exerciseProgress = computed(() => {
+    const live = this.store.exercises().filter((exercise) => !exercise.isSkipped);
+    return { done: live.filter(isExerciseDone).length, total: live.length };
   });
 
   readonly pickerTitle = computed(() =>
@@ -781,19 +834,22 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       : this._translateService.instant('workouts.logger.remove.message', { name });
   });
 
-  readonly discardBody = computed(() =>
+  /** "Nothing logged yet" with no set ticked, else "Finish early?". */
+  readonly finishTitle = computed(() =>
     this._translateService.instant(
-      this.discardFromFinish()
-        ? 'workouts.logger.discard.nothingTicked'
-        : 'workouts.logger.discard.message',
+      this.store.progress().done === 0
+        ? 'workouts.logger.finishSheet.nothing.title'
+        : 'workouts.logger.finishSheet.early.title',
     ),
   );
 
-  readonly finishBody = computed(() => {
+  readonly finishNote = computed(() => {
     const { done, total } = this.store.progress();
-    return this._translateService.instant('workouts.logger.finishConfirm.message', {
-      count: total - done,
-    });
+    return done === 0
+      ? this._translateService.instant('workouts.logger.finishSheet.nothing.message')
+      : this._translateService.instant('workouts.logger.finishSheet.early.message', {
+          count: total - done,
+        });
   });
 
   readonly showKeypad = computed(() => this.editing() !== null);
@@ -887,6 +943,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   ionViewWillEnter(): void {
     this._onScreen.set(true);
+    // A set swipes right to Copy, and on iOS a drag from the left edge is the
+    // back gesture, which outranks the row's: a copy started on the set
+    // number popped the page instead, past the leave sheet's question. The
+    // way out is the ⌄, which asks it.
+    if (this._ionRouterOutlet) this._ionRouterOutlet.swipeGesture = false;
     // Catch the clock up at once rather than on the next tick.
     this._now.set(Date.now());
     this._settingsStore.load();
@@ -894,19 +955,30 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) return;
 
-    if (id === 'new') this._startFreestyle();
-    else
-      this.store.load(
-        id,
-        () => {
-          // Back at the workout is back to work: a paused clock starts again.
-          this.store.resumeClock();
-          this._loadLastTimes();
-          this._adoptRest();
-          void this._maybeAskNotifications();
-        },
-        (log) => this._toSummaryIfClosed(log),
+    // `new` is only a fallback now (an old link): every button starts the
+    // workout first (`ActiveWorkoutService.startFreestyle`) and opens this
+    // page once, on it. Here it starts one and replaces this page.
+    if (id === 'new') {
+      this._activeWorkoutService.startFreestyle(
+        this._route.snapshot.queryParamMap.get('from'),
+        true,
       );
+      return;
+    }
+    this.store.load(
+      id,
+      () => {
+        // Back at the workout is back to work: a paused clock starts again.
+        this.store.resumeClock();
+        this._loadLastTimes();
+        this._adoptRest();
+        // A Repeat just started: its movements, into this page's store.
+        const from = this._activeWorkoutService.takeCarryOver(id);
+        if (from) this._carryOver(from);
+        void this._maybeAskNotifications();
+      },
+      (log) => this._toSummaryIfClosed(log),
+    );
   }
 
   /** The first workout: say why notifications help, then let the system ask. */
@@ -1002,6 +1074,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   ionViewWillLeave(): void {
     this._onScreen.set(false);
+    // The pages after this one swipe back as the app does everywhere else.
+    if (this._ionRouterOutlet) this._ionRouterOutlet.swipeGesture = swipeBackDefault(this._config);
     // The rest carries on in the mini-bar; only what was being typed closes.
     this._keepTyped();
     this.editing.set(null);
@@ -1073,9 +1147,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       sets = exercise.sets;
     }
     const everySet = exercises.filter((e) => !e.isSkipped).flatMap((e) => e.sets ?? []);
+    const shown = (field: SetField) => this._stepValue(row, ref.exerciseId, exercises, field);
     const values: LiveValues = {};
     for (const field of view.fields) {
-      const value = shownValue(row, field);
+      const value = shown(field);
       if (value !== null) {
         values[PAYLOAD_KEY[field]] = value;
       }
@@ -1084,7 +1159,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     const { rest, final } = afterTick(exercises, ref, row.set, rounds, passed, choices);
     const name = view.exercise.exerciseNameSnapshot;
     const setName = row.badge.short ?? row.badge.name;
-    const target = setLine(view.fields, (field) => shownValue(row, field), true);
+    const target = setLine(view.fields, shown, true);
     const step: LiveStep = {
       exercise: name,
       set: setName,
@@ -1099,7 +1174,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       exerciseId: ref.exerciseId,
       setId: ref.setId,
       values,
-      short: setLine(view.fields, (field) => shownValue(row, field), false),
+      short: setLine(view.fields, shown, false),
       rest,
       line: nextSetLine(setName, target, name, this._lastSetWords(sets)),
       final,
@@ -1121,7 +1196,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         [
           member.tag,
           member.view.exercise.exerciseNameSnapshot,
-          setLine(member.view.fields, (field) => shownValue(member.row, field), false),
+          setLine(
+            member.view.fields,
+            (field) => this._stepValue(member.row, member.view.exercise.id, exercises, field),
+            false,
+          ),
         ]
           .filter(Boolean)
           .join(' '),
@@ -1137,6 +1216,26 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       }),
       order,
     };
+  }
+
+  /**
+   * What a set logs once the lock screen reaches it: its own value, else its
+   * pre-fill, read against `exercises`, where the steps before it are
+   * already ticked with the values their ✓ carried. So a later step still
+   * pre-fills from the set before, which a pre-fill only does once that set
+   * is ticked. For the first step this is the list's own `shownValue`.
+   */
+  private _stepValue(
+    row: SetView,
+    exerciseId: string,
+    exercises: readonly LoggedExercise[],
+    field: SetField,
+  ): number | null {
+    const own = cellValue(row.set, field);
+    if (own !== null) return own;
+    const sets = exercises.find((e) => e.id === exerciseId)?.sets ?? [];
+    const index = sets.findIndex((set) => set.id === row.set.id);
+    return prefillValue(row.set, field, row.previousSet, index > 0 ? sets[index - 1] : null);
   }
 
   /** What bends the rest after this exercise's sets: the rest sheet, the person's default. */
@@ -1235,7 +1334,23 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.userScrolled.set(false);
   }
 
-  /** The set's line was tapped: open it to edit in place, from its first field. */
+  /**
+   * Previous was tapped: this set takes last time's numbers, the fields this
+   * exercise records only. Not a tick: the person still confirms the set.
+   */
+  usePrevious(exercise: LoggedExercise, set: LoggedSet, previous: LoggedSet | null): void {
+    if (!previous || set.isCompleted) return;
+    this._keepTyped();
+    this.editing.set(null);
+    const payload: LogSetPayload = {};
+    for (const field of this._fieldsFor(exercise)) {
+      const value = cellValue(previous, field);
+      if (value !== null) payload[PAYLOAD_KEY[field]] = value;
+    }
+    if (Object.keys(payload).length) this.store.logSet(exercise.id, set.id, payload);
+  }
+
+  /** A summary line was tapped: open the set to edit in place, from its first field. */
   openSet(exercise: LoggedExercise, set: LoggedSet): void {
     const field = this._fieldsFor(exercise)[0];
     if (field) this.editCell(exercise, set, field);
@@ -1247,7 +1362,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.dismissEffort();
     const fresh = this._findSet(exercise.id, set.id) ?? set;
     this.editing.set({ exerciseId: exercise.id, setId: fresh.id, field });
-    this.typed.set('');
+    this.typed.set(null);
     // Seeded with the value, else its pre-fill: the steppers work from what
     // the field shows, and the first digit typed replaces it.
     const row = this.views()
@@ -1350,6 +1465,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (target) this.store.logSet(target.exerciseId, target.set.id, { notes: note });
   }
 
+  /** From the set's menu: another set like it. */
+  onSetCopy(): void {
+    const target = this.menuSet();
+    if (target) this.copySet(target.exerciseId, target.set);
+  }
+
   onSetRemove(): void {
     const target = this.menuSet();
     const exercise = target
@@ -1368,7 +1489,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!row || !content) return;
     const box = this._visibleBox(await content.getScrollElement());
     const rect = row.getBoundingClientRect();
-    const away = rect.bottom < box.top + 20 || rect.top > box.bottom - 20;
+    const above = rect.bottom < box.top + 20;
+    const away = above || rect.top > box.bottom - 20;
+    if (away) this.focusAbove.set(above);
     if (away !== this.userScrolled()) this.userScrolled.set(away);
   }
 
@@ -1507,6 +1630,45 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this._unfolded.update((set) => new Set(set).add(exercise.id));
   }
 
+  /**
+   * Folds a done exercise opened again back to its check row: the ⋯ sheet's
+   * Collapse. A set open in the pad there closes first, keeping what was
+   * typed, since an exercise being edited never folds.
+   */
+  fold(exercise: LoggedExercise): void {
+    const key = this._foldKey(exercise);
+    if (key === null) return;
+    const block = this.blocks().find((b) => b.key === key);
+    const ids =
+      block?.kind === 'superset' ? block.members.map((m) => m.view.exercise.id) : [exercise.id];
+    if (ids.includes(this.editing()?.exerciseId ?? '')) this.closePad();
+    this._unfolded.update((set) => {
+      const next = new Set(set);
+      next.delete(key);
+      next.delete(exercise.id);
+      return next;
+    });
+  }
+
+  /**
+   * What folds `exercise`'s card, or null while it cannot fold: its own id
+   * once every set is ticked, or a superset's first member once every member
+   * still in play is done, the same tests `views` and `blocks` fold by.
+   */
+  private _foldKey(exercise: LoggedExercise): string | null {
+    for (const block of this.blocks()) {
+      if (block.kind === 'single') {
+        if (block.view.exercise.id !== exercise.id) continue;
+        return isExerciseDone(exercise) ? block.key : null;
+      }
+      if (!block.members.some((m) => m.view.exercise.id === exercise.id)) continue;
+      const live = block.members.filter((m) => !m.view.exercise.isSkipped);
+      const done = live.length > 0 && live.every((m) => isExerciseDone(m.view.exercise));
+      return done ? block.key : null;
+    }
+    return null;
+  }
+
   addSet(exercise: LoggedExercise): void {
     this.store.addSet(exercise.id);
   }
@@ -1537,6 +1699,35 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.removeSet(exercise, set);
   }
 
+  /** Swipe right, then Copy: the row closes and a set like it is added. */
+  swipeCopy(sliding: IonItemSliding, exercise: LoggedExercise, set: LoggedSet): void {
+    void sliding.close();
+    this.copySet(exercise.id, set);
+  }
+
+  /**
+   * Adds a set like `set` to its exercise: its type and the numbers it shows,
+   * typed or grey, unticked. What was typed into it but not yet kept is kept
+   * first, so the copy carries the numbers on screen.
+   */
+  copySet(exerciseId: string, set: LoggedSet): void {
+    this._keepTyped();
+    this.editing.set(null);
+    const exercise = this.store.exercises().find((e) => e.id === exerciseId);
+    if (!exercise) return;
+    const row = this.views()
+      .find((v) => v.exercise.id === exerciseId)
+      ?.rows.find((r) => r.set.id === set.id);
+    const current = row?.set ?? exercise.sets?.find((s) => s.id === set.id) ?? set;
+    const values = copiedValues(row ?? { set: current, prefill: {} }, this._fieldsFor(exercise));
+    this.store.copySet(exerciseId, current.setType, values, (error) =>
+      void this._feedbackService.error(
+        error,
+        this._translateService.instant('workouts.logger.toast.copySetFailed'),
+      ),
+    );
+  }
+
   /** A round's label was tapped: what can be done with the whole round. */
   openRoundMenu(round: RoundView): void {
     this._keepTyped();
@@ -1565,8 +1756,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     failedKey: string,
   ): void {
     this._forgetSets(sets.map((entry) => entry.setId));
-    this.store.removeSets(sets, () => {
-      void this._feedbackService.error(null, this._translateService.instant(failedKey));
+    this.store.removeSets(sets, (error) => {
+      void this._feedbackService.error(error, this._translateService.instant(failedKey));
     });
   }
 
@@ -1621,7 +1812,6 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   openRestSheet(): void {
-    this.restSheetScope.set(RestScopes.Exercise);
     this.restSheetOpen.set(true);
   }
 
@@ -1637,11 +1827,18 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this._workoutPrefs.update((prefs) => ({ ...prefs, ...change }));
   }
 
+  /**
+   * The ⋯'s rest for every exercise, on each tap there. The rest running now
+   * keeps what its plan said; the next one takes the new length.
+   */
+  onRestForAll(seconds: number): void {
+    this._restForAll.set(seconds);
+  }
+
   onOption(id: LoggerOptionId): void {
     switch (id) {
-      case LoggerOptionIds.RestForAll:
-        this.restSheetScope.set(RestScopes.Workout);
-        this.restSheetOpen.set(true);
+      case LoggerOptionIds.AddExercises:
+        this.addExercise();
         return;
       case LoggerOptionIds.Pause:
         this.onLeaveChoice(LeaveChoices.Pause);
@@ -1652,7 +1849,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     }
   }
 
-  /** The new rest for this exercise or for all, and the running one with it. */
+  /** The timer's new rest for this exercise or for all, and the running one with it. */
   applyRest(change: RestChange): void {
     const rest = this._rest();
     if (change.scope === RestScopes.Exercise && rest) {
@@ -1660,11 +1857,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     } else {
       this._restForAll.set(change.seconds);
     }
-    // From the timer, the running rest takes the new length too. From the ⋯
-    // ("every exercise"), the rest running now keeps what its plan said.
-    const fromTimer = this.restSheetScope() === RestScopes.Exercise;
+    // The sheet opens from the timer, so the running rest takes the new
+    // length too, whoever it is for.
     const start = this.restStartedAt();
-    if (fromTimer && start !== null && this.restEndsAt() !== null) {
+    if (start !== null && this.restEndsAt() !== null) {
       this.restEndsAt.set(start + change.seconds * 1000);
       if (rest) this._rest.set({ ...rest, planned: change.seconds });
     }
@@ -1762,6 +1958,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!exercise) return;
 
     switch (id) {
+      case ExerciseActionIds.Collapse:
+        this.fold(exercise);
+        return;
       case ExerciseActionIds.History:
         this.openHistory(exercise);
         return;
@@ -1870,9 +2069,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /**
    * Finishing with sets still unticked is allowed — an explicit finish marks
    * the workout complete even when partial — but it is worth one question,
-   * because the alternative reading is "I tapped the wrong thing". With
-   * nothing ticked at all there is nothing to record, so the way out
-   * offered is discard.
+   * because the alternative reading is "I tapped the wrong thing". The same
+   * sheet answers a Finish with nothing ticked, with Discard alone: there is
+   * nothing to save (`finishOptions`). With every set ticked there is nothing
+   * to ask.
    */
   finish(): void {
     if (!this.store.log() || this.finishing()) return;
@@ -1881,24 +2081,24 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.editing.set(null);
 
     const { done, total } = this.store.progress();
-    if (done === 0) {
-      this.openDiscard(true);
-      return;
-    }
-    if (done < total) {
-      this.finishConfirmOpen.set(true);
+    if (done < total || done === 0) {
+      this.finishSheetOpen.set(true);
       return;
     }
     this._complete();
   }
 
-  confirmFinish(): void {
-    this._complete(() => this._finishSheet()?.close());
+  /** The finish sheet's answer, reported once the sheet has gone. */
+  onFinishChoice(choice: FinishChoice): void {
+    if (choice === FinishChoices.Save) {
+      this._complete();
+      return;
+    }
+    this.openDiscard();
   }
 
-  /** `fromFinish`: Finish found nothing ticked, so the sheet says why it is here. */
-  openDiscard(fromFinish = false): void {
-    this.discardFromFinish.set(fromFinish);
+  /** The red confirm, from the ⋯ sheet or the finish sheet. */
+  openDiscard(): void {
     this.discardConfirmOpen.set(true);
   }
 
@@ -1907,7 +2107,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
    * duration and records are only set by completing. Waits for set writes
    * still on their way first, or the last tick before Finish is refused.
    */
-  private _complete(closeSheet?: () => Promise<void> | undefined): void {
+  private _complete(): void {
     const log = this.store.log();
     if (!log || this.finishing()) return;
     this.finishing.set(true);
@@ -1918,9 +2118,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         .complete(log.id)
         .pipe(take(1))
         .subscribe({
-          next: async () => {
+          next: () => {
             this.finishing.set(false);
-            await closeSheet?.();
             // Replaced, so back from the summary returns to wherever the
             // workout was opened from rather than into a finished logger.
             this._activeSession.end();
@@ -1938,55 +2137,6 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             );
           },
         }),
-    );
-  }
-
-  private _startFreestyle(): void {
-    // `from` is a Repeat off the history list: same movements, new session.
-    const from = this._route.snapshot.queryParamMap.get('from');
-    const name = this._translateService.instant('workouts.logger.defaultName', {
-      date: new Date().toLocaleDateString(appLocale(), {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'short',
-      }),
-    });
-
-    // `new` means "start one", so with one already open this route becomes
-    // that one — replaced, so back does not land on `new` and try again.
-    this._activeWorkoutService.startOrResume(
-      () =>
-        this._workoutLogService
-          .start({ name })
-          .pipe(take(1))
-          .subscribe({
-            next: (log) => {
-              this.store.adopt(log);
-              this._restAdopted = true;
-              // Replace, so a back-swipe does not start a second empty workout.
-              void this._router.navigate(['/tabs/workouts/log', log.id], {
-                replaceUrl: true,
-              });
-              if (from) this._carryOver(from);
-            },
-            error: (err) =>
-              void this._feedbackService.error(
-                err,
-                this._translateService.instant('workouts.common.startFailed'),
-              ),
-          }),
-      {
-        onBlocked: (open) =>
-          this.store.load(
-            open.id,
-            () => {
-              this._loadLastTimes();
-              this._adoptRest();
-            },
-            (log) => this._toSummaryIfClosed(log),
-          ),
-        replaceUrl: true,
-      },
     );
   }
 
@@ -2035,7 +2185,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             );
             return;
           }
-          this.store.addExercises(ids);
+          // With their last times, as a pick from the picker gets.
+          this.store.addExercises(ids, () => this._loadLastTimes());
         },
         error: () =>
           void this._feedbackService.info(

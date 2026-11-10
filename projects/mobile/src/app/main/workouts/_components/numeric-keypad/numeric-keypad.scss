@@ -3,8 +3,8 @@
 :host {
   display: block;
   padding: 0.625rem 0.75rem calc(0.625rem + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--ion-border-color);
-  background: var(--ion-card-background);
+  border-top: var(--mh-hairline) solid var(--ion-border-color);
+  background: var(--mh-color-keypad);
 }
 
 /* "Back squat · Set 3 · kg" on the left, the way onward on the right. */
@@ -21,7 +21,6 @@
   min-width: 0;
   overflow: hidden;
   font-size: var(--mh-text-sm);
-  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -32,7 +31,7 @@
   height: 2rem;
   min-height: 0;
   margin: 0;
-  font-size: var(--mh-text-sm);
+  font-size: var(--mh-text-lg);
   font-weight: 600;
 }
 
@@ -47,12 +46,18 @@
 }
 
 /* Capped in points, not only rem: at large text sizes the pad would
-   otherwise take most of a small phone and hide the set being typed. */
+   otherwise take most of a small phone and hide the set being typed.
+   A digit is lifted off the pad on a 1px darker base, as the phone's own
+   keypad draws it. */
 .keys button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: min(3.25rem, 56px);
   border: 0;
   border-radius: var(--mh-radius-control);
-  background: var(--ion-color-medium-wash);
+  background: var(--mh-color-keypad-key);
+  box-shadow: 0 var(--mh-hairline) 0 var(--mh-color-keypad-key-edge);
   color: var(--ion-text-color);
   font-size: var(--mh-text-lg);
   font-weight: 600;
@@ -60,21 +65,29 @@
   cursor: pointer;
 }
 
+/* A press swaps a key to the other family's fill: feedback, not a
+   selection, so no honey. */
 .keys button:active {
-  background: var(--mh-color-selected-background);
+  background: var(--mh-color-keypad-key-function);
 }
 
-/* The ±step keys and backspace: outlined, so they read as adjustments
-   rather than digits. */
-.keys button.side {
-  border: 1px solid var(--ion-border-color);
-  background: var(--ion-card-background);
+/* The keys that change the number rather than type it (±step, backspace,
+   clear): one darker family, full ink, so none of them reads as disabled. */
+.keys button.fn {
+  background: var(--mh-color-keypad-key-function);
   font-size: var(--mh-text-sm);
 }
 
-.keys button.ghost {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-base);
+.keys button.fn:active {
+  background: var(--mh-color-keypad-key);
+}
+
+.keys button.fn ion-icon {
+  font-size: var(--mh-icon-lg);
+}
+
+.keys button.clear {
+  font-size: var(--mh-text-lg);
 }
 
 /* Done takes the last two columns of the bottom row. */

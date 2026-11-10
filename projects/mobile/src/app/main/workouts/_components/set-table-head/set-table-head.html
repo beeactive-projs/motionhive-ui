@@ -1,0 +1,8 @@
+<div class="mh-set-grid head">
+  <span class="center">{{ 'workouts.logger.gridHead.set' | translate }}</span>
+  <span class="previous">{{ 'workouts.logger.gridHead.previous' | translate }}</span>
+  @for (label of labels(); track $index) {
+    <span class="center">{{ label | translate }}</span>
+  }
+  <span class="center">{{ 'workouts.logger.gridHead.done' | translate }}</span>
+</div>

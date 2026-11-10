@@ -1,53 +1,60 @@
 <ion-card>
-  <!-- The name is the way into the movement itself: mid-session, or while
-       building, you often need to check what an exercise actually is. -->
-  <ion-item button detail="false" lines="none" (click)="open.emit()">
-    @if (tile(); as tile) {
-      <!-- Decorative: the name it would announce is the very next thing in the row. -->
-      <mh-hex-avatar slot="start" size="md" tone="wash" aria-hidden="true" [color]="tile.tone" [icon]="tile.icon" />
-    }
-    <ion-label>
-      <h2>
-        @if (tag(); as label) {
-          <span class="tag">{{ label }}</span>
-        }
-        {{ name() }}
-      </h2>
-      @if (meta(); as text) {
-        <p>{{ text }}</p>
+  <!-- The header: the tile, the name and its line, then the ⋮. The name is
+       the way into the movement itself (mid-session, or while building, you
+       often need to check what an exercise is); the ⋮ sits beside it, not
+       inside it, so each is one control. -->
+  <div class="head">
+    <ion-item button detail="false" lines="none" (click)="open.emit()">
+      @if (tile(); as tile) {
+        <!-- Decorative: the name it would announce is the very next thing in the row. -->
+        <mh-hex-avatar
+          slot="start"
+          size="md"
+          tone="wash"
+          aria-hidden="true"
+          [color]="tile.tone"
+          [icon]="tile.icon"
+          [imageUrl]="tile.imageUrl"
+        />
       }
-    </ion-label>
+      <ion-label>
+        <h2>
+          @if (tag(); as label) {
+            <span class="tag">{{ label }}</span>
+          }
+          {{ name() }}
+        </h2>
+        @if (meta(); as text) {
+          <p>{{ text }}</p>
+        }
+      </ion-label>
+      @if (!showActions()) {
+        <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
+      }
+    </ion-item>
 
     @if (showActions()) {
       <ion-button
-        slot="end"
+        class="more"
         fill="clear"
         shape="round"
         color="medium"
         [attr.aria-label]="'workouts.exerciseCard.actionsFor' | translate: { name: name() }"
-        (click)="onActions($event)"
+        (click)="actions.emit()"
       >
         <ion-icon slot="icon-only" name="ellipsis-vertical-outline" aria-hidden="true" />
       </ion-button>
-    } @else {
-      <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
     }
-  </ion-item>
+  </div>
 
-  <!-- Only what exists: your note, then the plan's line and its note. -->
-  @if (note() || plan() || planNote()) {
+  <!-- Only what exists, under the name: your note, then the plan's note. -->
+  @if (note() || planNote()) {
     <div class="lines">
       @if (note(); as text) {
         <button type="button" class="line note" (click)="noteTap.emit()">
           <ion-icon name="create-outline" aria-hidden="true" />
           <span>{{ text }}</span>
         </button>
-      }
-      @if (plan(); as text) {
-        <p class="line plan">
-          <ion-icon name="person-outline" aria-hidden="true" />
-          <span>{{ text }}</span>
-        </p>
       }
       @if (planNote(); as text) {
         <p class="line plan-note">{{ text }}</p>

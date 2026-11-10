@@ -51,6 +51,8 @@ import {
 } from '../../_shared/components/hex-avatar/hex-avatar';
 import { RecentPerson } from '../../_shared/config/recent-searches.config';
 
+import type { ExerciseFilters } from './exercises.store';
+
 /**
  * Every icon the exercise screens render. Each page calls
  * `addIcons(EXERCISE_ICONS)` once, so a name in a template can never
@@ -880,6 +882,23 @@ export function collapsedChips(
   const selected = new Set(selectedIds);
   const hidden = ordered.filter((chip) => selected.has(chip.value) && !shown.has(chip.value));
   return [...head, ...hidden];
+}
+
+/**
+ * The picker strip's muscle chip that says everything the filters do, or
+ * null when they hold more than one chip can: a muscle off the strip, two
+ * muscles, or any equipment. Then the Filters chip is the lit one and no
+ * muscle lights, as a filter strip shows one choice (colour-and-type.md).
+ */
+export function quickMuscleOf(
+  filters: ExerciseFilters,
+  quickIds: readonly string[],
+): string | null {
+  const { kinds, levels, muscleIds, equipmentIds } = filters;
+  if (kinds.length || levels.length || equipmentIds.length || muscleIds.length !== 1) {
+    return null;
+  }
+  return quickIds.includes(muscleIds[0]) ? muscleIds[0] : null;
 }
 
 /**

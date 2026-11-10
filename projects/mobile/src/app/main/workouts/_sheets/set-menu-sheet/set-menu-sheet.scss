@@ -1,9 +1,16 @@
 @use '../../_components/set-row/set-badge';
 
-ion-item.current {
-  --background: var(--ion-color-primary-wash);
+/* The type rows lead with the set badge rather than a tile: their label and
+   separator start after its width (lists.md, "Separators"). The skin gives
+   it the gap after a leading item. */
+ion-item:has(> .badge) {
+  --mh-row-lead: 1.75rem;
 }
 
-span.badge {
-  margin-inline-end: 0.875rem;
+/* The plain badge's fill is the divider grey, which is a sheet card's own
+   colour (slate-200 in light, #3a3a3c in dark), so its tile vanished here.
+   It sinks into the card on the sheet's surface instead, as the set row's
+   fields sink into theirs. */
+.badge.tone-plain {
+  background: var(--ion-background-color);
 }

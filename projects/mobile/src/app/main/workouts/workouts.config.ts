@@ -30,7 +30,6 @@ import {
   addOutline,
   alertCircleOutline,
   archiveOutline,
-  arrowDownOutline,
   arrowForwardOutline,
   arrowUndoOutline,
   backspaceOutline,
@@ -52,6 +51,7 @@ import {
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
+  flagOutline,
   flashOutline,
   globeOutline,
   imageOutline,
@@ -87,7 +87,6 @@ export const WORKOUT_ICONS = {
   addOutline,
   alertCircleOutline,
   archiveOutline,
-  arrowDownOutline,
   arrowForwardOutline,
   arrowUndoOutline,
   backspaceOutline,
@@ -109,6 +108,7 @@ export const WORKOUT_ICONS = {
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
+  flagOutline,
   flashOutline,
   globeOutline,
   imageOutline,
@@ -1150,6 +1150,17 @@ export function secondsToClock(seconds: number): string {
   return `${mins}:${String(total % 60).padStart(2, '0')}`;
 }
 
+/** One tap of a rest's − or +. */
+export const REST_STEP_SECONDS = 15;
+const REST_MIN_SECONDS = 15;
+const REST_MAX_SECONDS = 600;
+
+/** A rest one step shorter or longer, kept between 0:15 and 10:00. */
+export function nudgeRest(seconds: number, direction: 1 | -1): number {
+  const next = seconds + direction * REST_STEP_SECONDS;
+  return Math.min(REST_MAX_SECONDS, Math.max(REST_MIN_SECONDS, next));
+}
+
 /**
  * Digits typed on a keypad, read right to left into seconds — the way every
  * timer input works. "130" is 1:30, i.e. 90 seconds; "45" is 0:45.
@@ -1161,6 +1172,16 @@ export function clockDigitsToSeconds(digits: string): number | null {
   const secs = Number(padded.slice(-2));
   const mins = Number(padded.slice(0, -2));
   return mins * 60 + secs;
+}
+
+/**
+ * Seconds as the digits the pad builds a clock from: 150 is "230" (2:30), 45
+ * is "45", 0 is "0". The inverse of `clockDigitsToSeconds`, so a duration the
+ * pad is seeded with commits back as the seconds it came from.
+ */
+export function secondsToClockDigits(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  return `${Math.floor(total / 60)}${String(total % 60).padStart(2, '0')}`.replace(/^0+(?=\d)/, '');
 }
 
 /** The same digits, shown back as the clock they are building. */
@@ -1227,6 +1248,25 @@ export const KeypadFields = {
 } as const;
 
 export type KeypadField = (typeof KeypadFields)[keyof typeof KeypadFields];
+
+/**
+ * How long a number the keypad builds may get: whole digits, then decimals.
+ * 9999.99 kg and 999 reps are past any real set, and a cell in the set grid
+ * has room for that much and no more. Fields not listed have no cap (a
+ * clock caps itself at 99:59).
+ */
+export const KEYPAD_LIMITS: Partial<Record<KeypadField, { whole: number; decimals: number }>> = {
+  [KeypadFields.Weight]: { whole: 4, decimals: 2 },
+  [KeypadFields.Reps]: { whole: 3, decimals: 0 },
+};
+
+/** Whether `typed` ("82.5", the buffer's "." form) fits the field's cap. */
+export function fitsKeypadLimit(field: KeypadField, typed: string): boolean {
+  const limit = KEYPAD_LIMITS[field];
+  if (!limit) return true;
+  const [whole, decimals = ''] = typed.split('.');
+  return whole.length <= limit.whole && decimals.length <= limit.decimals;
+}
 
 // ─── Summary tiles ────────────────────────────────────────────────────────
 
@@ -1499,10 +1539,53 @@ export const LEAVE_OPTIONS: readonly LeaveOption[] = [
   },
 ];
 
+// ─── Finish ─────────────────────────────────────────────────────────────
+
+/** The answers to Finish while sets are still unticked, or none are. */
+export const FinishChoices = {
+  Save: 'save',
+  Discard: 'discard',
+} as const;
+
+export type FinishChoice = (typeof FinishChoices)[keyof typeof FinishChoices];
+
+/**
+ * Finishing early: keep the workout as it stands, or throw it away. Saving is
+ * the honey verb; discarding is the one red one and still asks again, because
+ * it cannot be undone.
+ */
+export const FINISH_OPTIONS: readonly SheetAction<FinishChoice>[] = [
+  {
+    id: FinishChoices.Save,
+    label: 'workouts.logger.finishSheet.save',
+    icon: 'flag-outline',
+    color: 'primary',
+  },
+  {
+    id: FinishChoices.Discard,
+    label: 'workouts.logger.discard.title',
+    icon: 'trash-outline',
+    color: 'danger',
+    destructive: true,
+  },
+];
+
+/**
+ * The finish sheet's verbs for `ticked` sets done. With none there is nothing
+ * to save, so Discard is the only one (as in dba74362): completing would mark
+ * a coach's plan day done with no sets in it, and tell the coach so.
+ */
+export function finishOptions(ticked: number): readonly SheetAction<FinishChoice>[] {
+  return ticked > 0
+    ? FINISH_OPTIONS
+    : FINISH_OPTIONS.filter((option) => option.id === FinishChoices.Discard);
+}
+
 // ─── Exercise verbs ───────────────────────────────────────────────────────
 
 /** The verbs for one exercise mid-workout, in priority order, destructive last. */
 export const ExerciseActionIds = {
+  Collapse: 'collapse',
   History: 'history',
   Note: 'note',
   Swap: 'swap',
@@ -1525,13 +1608,28 @@ export type ExerciseAction = SheetAction<ExerciseActionId>;
  * (sky), swapping edits the workout (honey), and skipping puts the exercise
  * aside until one tap brings it back (violet, green to unskip), as Archive /
  * Unarchive do.
+ *
+ * Collapse leads, and only on an exercise opened again with every set
+ * ticked (`canCollapse`): folding it back to its check row is why you came
+ * to the ⋯ (user decision, 2026-11-10). Green, the done row it folds into.
  */
 export function exerciseActions(
   skipped: boolean,
   hasHistory = true,
   /** Offer the person's own note: write one, or change the one there is. */
   note: 'add' | 'edit' | null = null,
+  canCollapse = false,
 ): ExerciseAction[] {
+  const collapse: ExerciseAction[] = canCollapse
+    ? [
+        {
+          id: ExerciseActionIds.Collapse,
+          label: 'workouts.exerciseActions.collapse',
+          icon: 'chevron-up-outline',
+          color: 'success',
+        },
+      ]
+    : [];
   const history: ExerciseAction[] = hasHistory
     ? [
         {
@@ -1554,6 +1652,7 @@ export function exerciseActions(
       ]
     : [];
   return [
+    ...collapse,
     ...history,
     ...noteAction,
     {

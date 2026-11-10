@@ -18,6 +18,8 @@ import { ExerciseActionId, exerciseActions } from '../../workouts.config';
 export class ExerciseActionsSheet {
   readonly open = model(false);
   readonly exercise = input<LoggedExercise | null>(null);
+  /** The exercise is done and open again, so it can fold back to its check row. */
+  readonly canCollapse = input(false);
 
   readonly action = output<ExerciseActionId>();
 
@@ -27,6 +29,6 @@ export class ExerciseActionsSheet {
     const exercise = this.exercise();
     const inCatalog = !!exercise?.exerciseId;
     const note = !inCatalog ? null : exercise?.personalNote?.trim() ? 'edit' : 'add';
-    return exerciseActions(exercise?.isSkipped ?? false, inCatalog, note);
+    return exerciseActions(exercise?.isSkipped ?? false, inCatalog, note, this.canCollapse());
   });
 }

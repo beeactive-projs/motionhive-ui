@@ -1,34 +1,54 @@
 /* ─── Header ──────────────────────────────────────────────────────
-   The name over the session clock. The clock is mono and tabular so it does
-   not jitter as it ticks, and honey because it is this moment, not a status. */
+   After the workout prototype: the name (Poppins, one line), and under it
+   the clock in honey (this moment, not a status; tabular so it does not
+   jitter as it ticks) and the volume so far, in the muted ink. */
 ion-title .name,
-ion-title .timer {
+ion-title .meta {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ion-title .name {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
+}
+
+ion-title .meta {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 ion-title .timer {
   color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-xs);
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 
-/* Finish is the one honey ask on the screen. Set through the variables: a
-   solid button inside a toolbar otherwise takes Ionic's inverted chip look. */
+/* Finish is the one honey ask on the screen: Ionic's own primary button,
+   solid and round (`color="primary"` in the template), the honey fill with
+   its black contrast ink, 9.8:1. The colour also keeps it out of the iOS
+   rule that gives header buttons the text colour (ion-toolbar.css), which
+   put white on the honey. Here only its size, a pill beside the ⋯. */
 ion-button.finish {
-  --background: var(--ion-color-primary);
-  --background-activated: var(--ion-color-primary-shade);
-  --color: var(--ion-color-primary-contrast);
-  --padding-start: 1.125rem;
-  --padding-end: 1.125rem;
-  height: 2.5rem;
-  margin-inline-end: 0.5rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --box-shadow: none;
+  position: relative;
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
+  letter-spacing: normal;
 }
 
-/* Sets done across the whole workout, under the bar. */
+/* Sets done across the whole workout, under the bar: a thin bar and the
+   count beside it. */
 ion-toolbar.progress {
   --min-height: 0;
 }
@@ -42,27 +62,52 @@ ion-toolbar.progress {
 
 .progress-row ion-progress-bar {
   flex: 1;
-  height: 0.375rem;
+  height: 0.25rem;
   border-radius: var(--mh-radius-pill);
 }
 
-.progress-row .mh-kicker {
+.progress-row .count {
   flex: none;
   color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
   font-variant-numeric: tabular-nums;
 }
 
+/* The set table pads its own rows (the grid's inset and ring), so the card
+   narrows to give the columns the room, and its header moves in by that
+   padding: the tile over the set numbers, the ⋮ over the ticks. A folded
+   row takes the same inset, so its mark and chevron sit where the open
+   card's tile and ⋮ do. */
+mh-exercise-card,
+ion-card.folded {
+  --mh-card-inset: 0.5rem;
+  --mh-card-lead: calc(0.25rem + var(--mh-ring-width));
+}
+
 /* ─── Folded exercise ─────────────────────────────────────────────
-   A finished exercise as one check row. The mark is the success shade: the
-   base emerald is under 3:1 against white for a glyph. */
+   A finished exercise as one check row, on the open card's grid: the mark
+   centred where the 2.5rem tile is, the name where its name is, and the
+   chevron at the ⋮'s size, centred over the tick column as the ⋮ is (a
+   tap target wide, `--mh-card-inset` + `--mh-card-lead` from the edge). The
+   mark is the success shade: the base emerald is under 3:1 against white
+   for a glyph. */
 .folded ion-item {
   --background: var(--ion-card-background);
+  --padding-start: calc(var(--mh-card-inset) + var(--mh-card-lead) + (2.5rem - var(--mh-icon-xl)) / 2);
+  --padding-end: 0;
+  --inner-padding-end: 0;
 }
 
 .folded .done-mark {
-  margin-inline-end: 0.875rem;
+  margin-inline-end: calc(0.625rem + (2.5rem - var(--mh-icon-xl)) / 2);
   color: var(--mh-color-success-deep);
   font-size: var(--mh-icon-xl);
+}
+
+.folded ion-icon[slot='end'] {
+  margin-inline: 0.5rem
+    calc(var(--mh-card-inset) + var(--mh-card-lead) + (var(--mh-tap-target) - var(--mh-icon-md)) / 2);
+  font-size: var(--mh-icon-md);
 }
 
 .folded h2 {
@@ -70,15 +115,17 @@ ion-toolbar.progress {
   font-weight: 600;
 }
 
-/* The sets: done ones as lines, the one you are on as a card, the rest as
-   grey lines (set-row draws all three). */
+/* The set table: its heading, then one row per set (set-row draws the done,
+   focus and ahead looks on one grid). */
 .sets {
   display: flex;
   flex-direction: column;
 }
 
 /* Add set / Add weight under the sets — quiet text actions in the honey ink,
-   centred under the rows they add to. */
+   centred under the rows they add to. Regular weight (user decision,
+   2026-11-10): the honey and the plus already say it is an action, and
+   semibold made it shout over the sets. */
 .ex-actions {
   display: flex;
   justify-content: center;
@@ -91,23 +138,32 @@ ion-toolbar.progress {
   --padding-start: 0.25rem;
   --padding-end: 0.5rem;
   margin: 0;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 ion-card ion-skeleton-text {
   margin: 0.375rem 0;
 }
 
-/* Discard sits at the very end, small and quiet: rare, and never the way out. */
-ion-button.discard {
+/* Finish early sits at the very end as a line of text, not a button shape:
+   body size, regular weight, in the honey ink of the page's other text
+   actions. */
+ion-button.finish-early {
+  --color: var(--mh-color-honey-deep);
   margin: 0.5rem 0 0;
-  font-weight: 600;
+  font-size: var(--mh-text-base);
+  font-weight: 400;
 }
 
-/* Room under the last exercise, so its last sets can still rise to a third
-   of the way down, above the pad and the rest bar. */
+/* Room under the last line for the floating "Back to…" pill (a tap target
+   tall, 1rem off the bottom), so the end of the list can always scroll
+   clear of it. The pad and the rest bar need none: the footer takes its
+   height from the list rather than covering it, so a set is never hidden
+   behind them. The last exercise's sets stop where the list ends rather
+   than rising to a third of the way down; 16rem of blank space at the end
+   was too high a price for that. */
 .mh-page {
-  padding-bottom: 16rem;
+  padding-bottom: calc(var(--mh-tap-target) + 1rem + var(--mh-page-gutter));
 }
 
 /* "Back to Bench press · Set 3": floats over the list, above the bars. */
@@ -121,18 +177,22 @@ ion-button.discard {
   pointer-events: none;
 }
 
+/* A floating control on the raised surface, as iOS and WhatsApp draw their
+   jump buttons (user decision, 2026-11-10): neutral, so it never competes
+   with the honey Finish, and lifted by the overlay shadow. The honey is
+   only on the chevron. */
 .back-to-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
   max-width: 100%;
   min-height: var(--mh-tap-target);
-  padding: 0 1rem;
-  border: 0;
+  padding: 0 1rem 0 0.75rem;
+  border: var(--mh-hairline) solid var(--ion-border-color);
   border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-navy-card);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  color: var(--mh-color-navy-card-ink);
+  background: var(--mh-color-floating);
+  box-shadow: var(--mh-shadow-overlay);
+  color: var(--ion-text-color);
   cursor: pointer;
   font-size: var(--mh-text-sm);
   font-weight: 600;
@@ -141,7 +201,8 @@ ion-button.discard {
 
 .back-to-pill ion-icon {
   flex: none;
-  color: var(--ion-color-primary);
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-icon-md);
 }
 
 .back-to-pill span {
@@ -153,7 +214,7 @@ ion-button.discard {
 /* ─── Superset: one card with a honey rail, in rounds ───────────── */
 
 ion-card.superset {
-  border-inline-start: 3px solid var(--ion-color-primary);
+  border-inline-start: var(--mh-spine-width) solid var(--ion-color-primary);
 }
 
 .ss-head {
@@ -177,7 +238,7 @@ ion-card.superset {
   flex: none;
   color: var(--mh-color-honey-deep);
   font-size: var(--mh-text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .ss-name {
@@ -293,14 +354,19 @@ ion-card.superset .sets {
   font-size: var(--mh-icon-sm);
 }
 
-/* A set row that swipes: the item carries no look of its own, the row
-   inside keeps the card's. The red Delete shows from behind it. */
+/* A set row that swipes. The teal Copy and the red Delete wait behind it
+   (their skin is the lists', `mh-swipe-row` in ion-list.css). */
 .set-slide {
   display: block;
 }
 
+/* The item paints the card's own fill, so it reads as the card, and so it
+   hides the options until the swipe uncovers them: Ionic lays them out as
+   wide as the row, and a transparent item let the Delete show through
+   mid-drag with the tick over its label. The row's done and focus looks
+   paint on top of it. */
 .set-item {
-  --background: transparent;
+  --background: var(--ion-card-background);
   --background-hover: transparent;
   --background-activated: transparent;
   --background-focused: transparent;
@@ -314,6 +380,26 @@ ion-card.superset .sets {
 
 .set-item mh-set-row {
   width: 100%;
+}
+
+/* An option is drawn like the row it belongs to: inset by the row's own
+   0.125rem margin above and below, with the row's radius on its outer
+   corners, so the table keeps its rhythm while a row is open. The inner
+   edge, where the row slides off it, stays square. */
+.set-slide ion-item-option {
+  overflow: hidden;
+  margin-block: 0.125rem;
+  border-radius: var(--mh-radius-control);
+}
+
+.set-slide ion-item-options[side='end'] ion-item-option {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+.set-slide ion-item-options[side='start'] ion-item-option {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
 }
 
 .round-done {
@@ -352,12 +438,13 @@ ion-card.superset .sets {
   padding: 0.25rem 0.75rem 0.75rem 1rem;
 }
 
+/* Add round is a superset's Add set: the same regular weight. */
 .ss-foot ion-button {
   --color: var(--mh-color-honey-deep);
   --padding-start: 0.25rem;
   --padding-end: 0.5rem;
   margin: 0;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .ss-rest {

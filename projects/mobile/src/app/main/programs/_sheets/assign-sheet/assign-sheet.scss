@@ -55,11 +55,6 @@ ion-item:has(> .week) {
   }
 }
 
-/* Flush with the inset lists above and below it. */
-.program-search {
-  padding-inline: 0;
-}
-
 /* Mine / MotionHive above the list, the library's own pills. */
 .program-origins {
   padding: 0 0.25rem 0.25rem;

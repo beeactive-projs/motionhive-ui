@@ -1,53 +1,120 @@
 /* The card chrome comes from the ion-card skin (theme/components/ion-card.css);
-   only what is specific to an exercise card lives here. */
+   only what is specific to an exercise card lives here.
+
+   One inset for the header and the body, `--mh-card-inset` (1rem unless the
+   host narrows it). A body whose rows pad themselves (the logger's set
+   table) also sets `--mh-card-lead`, that padding, so the header's tile
+   sits over the body's first column and its ⋮ over the last. */
 
 :host {
   display: block;
 }
 
-/* The header item sits on the card's own surface, and its chevron at full
-   strength — Ionic dims it to 25% by default, below the 3:1 a control needs. */
-ion-item {
+/* ─── Header ──────────────────────────────────────────────────────── */
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.875rem calc(var(--mh-card-inset, 1rem) + var(--mh-card-lead, 0rem)) 0.25rem;
+}
+
+/* The name and its tile: one tap target, the header's own padding outside
+   it, so its highlight hugs what it opens. The chevron at full strength:
+   Ionic dims it to 25%, below the 3:1 a control needs. */
+.head ion-item {
   --background: var(--ion-card-background);
+  --border-radius: var(--mh-radius-control);
+  --padding-start: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --inner-padding-end: 0;
+  --min-height: var(--mh-tap-target);
   --detail-icon-color: var(--ion-color-medium);
   --detail-icon-opacity: 1;
+
+  flex: 1;
+  min-width: 0;
+}
+
+.head mh-hex-avatar {
+  margin-block: 0;
+  margin-inline-end: 0.625rem;
+}
+
+.head ion-label {
+  margin-block: 0;
 }
 
 /* Two lines at most: a long Romanian name at large text would otherwise
    push the sets off the screen. */
-ion-item h2 {
+.head h2 {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  margin: 0;
   font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
   font-weight: 600;
+  line-height: var(--mh-leading-heading);
   white-space: normal;
 }
 
-mh-hex-avatar {
-  margin-inline-end: 0.875rem;
+/* The line under the name: what the plan asks, or what the screen counts. */
+.head ion-label p {
+  margin: 0.125rem 0 0;
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* The header already pads the top; the body only needs air below the rows. */
-ion-card-content {
-  padding-top: 0;
+/* The exercise's verbs: a full tap target, as wide as the tick column it
+   sits over, its glyph inline size. */
+.more {
+  --padding-start: 0;
+  --padding-end: 0;
+
+  flex: none;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  margin: 0;
 }
 
-/* A skipped exercise stays readable — it is a decision the user made, and
+.more ion-icon {
+  font-size: var(--mh-icon-md);
+}
+
+/* A skipped exercise stays readable: it is a decision the user made, and
    hiding it would make the workout look shorter than it was. */
-:host(.skipped) ion-item h2 {
+:host(.skipped) .head h2 {
   color: var(--ion-color-medium);
   text-decoration: line-through;
 }
 
-/* Under the name, indented to it: your note, the plan's line, its note. */
+/* A superset member: the honey rail and its tag, like the logger's card. */
+:host(.linked) ion-card {
+  border-inline-start: var(--mh-spine-width) solid var(--ion-color-primary);
+}
+
+.tag {
+  margin-inline-end: 0.375rem;
+  color: var(--mh-color-honey-deep);
+  font-weight: 600;
+}
+
+/* ─── Under the name: your note, the plan's note ──────────────────── */
+
+/* Indented to the name: the header's inset, the tile and its gap. */
 .lines {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
-  margin: -0.5rem 0 0.375rem;
-  padding-inline: calc(var(--ion-padding, 16px) + 2.75rem + 0.875rem) var(--ion-padding, 16px);
+  margin: 0;
+  padding: 0 calc(var(--mh-card-inset, 1rem) + var(--mh-card-lead, 0rem)) 0.25rem
+    calc(var(--mh-card-inset, 1rem) + var(--mh-card-lead, 0rem) + 2.5rem + 0.625rem);
 }
 
 .line {
@@ -92,13 +159,9 @@ ion-card-content {
   font-style: italic;
 }
 
-/* A superset member: the honey rail and its tag, like the logger's card. */
-:host(.linked) ion-card {
-  border-inline-start: 3px solid var(--ion-color-primary);
-}
+/* ─── Body ────────────────────────────────────────────────────────── */
 
-.tag {
-  margin-inline-end: 0.375rem;
-  color: var(--mh-color-honey-deep);
-  font-weight: 700;
+/* The same inset in both modes (Ionic pads iOS wider than md). */
+ion-card-content {
+  padding: 0.375rem var(--mh-card-inset, 1rem) var(--mh-card-inset, 1rem);
 }

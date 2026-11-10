@@ -1,44 +1,6 @@
 <ng-template #body>
-  <div class="mh-section-label">{{ 'exercises.fields.kind' | translate }}</div>
-  <div class="mh-chip-cloud">
-    @for (chip of kindChips(); track chip.value) {
-      <ion-button
-        class="chip"
-        fill="clear"
-        shape="round"
-        size="small"
-        [class.selected]="isKindOn(chip.value)"
-        [attr.aria-pressed]="isKindOn(chip.value)"
-        (click)="toggleKind(chip.value)"
-      >
-        {{ chip.label }}
-        @if (chip.count !== null) {
-          <span class="count">{{ chip.count }}</span>
-        }
-      </ion-button>
-    }
-  </div>
-
-  <div class="mh-section-label">{{ 'exercises.fields.level' | translate }}</div>
-  <div class="mh-chip-cloud">
-    @for (chip of levelChips(); track chip.value) {
-      <ion-button
-        class="chip"
-        fill="clear"
-        shape="round"
-        size="small"
-        [class.selected]="isLevelOn(chip.value)"
-        [attr.aria-pressed]="isLevelOn(chip.value)"
-        (click)="toggleLevel(chip.value)"
-      >
-        {{ chip.label }}
-        @if (chip.count !== null) {
-          <span class="count">{{ chip.count }}</span>
-        }
-      </ion-button>
-    }
-  </div>
-
+  <!-- What something trains and what it needs lead: they are what people
+       filter a catalogue by. Level and kind come after them. -->
   <div class="mh-section-label">{{ 'exercises.filterSheet.primaryMuscle' | translate }}</div>
   <div class="mh-chip-cloud">
     @for (chip of muscleChips(); track chip.value) {
@@ -86,9 +48,51 @@
     }
   </div>
 
-  <ion-note class="mh-footnote">
-    {{ 'exercises.filterSheet.webOnly' | translate }}
-  </ion-note>
+  @if (!muscleAndEquipmentOnly()) {
+    <div class="mh-section-label">{{ 'exercises.fields.level' | translate }}</div>
+    <div class="mh-chip-cloud">
+      @for (chip of levelChips(); track chip.value) {
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="isLevelOn(chip.value)"
+          [attr.aria-pressed]="isLevelOn(chip.value)"
+          (click)="toggleLevel(chip.value)"
+        >
+          {{ chip.label }}
+          @if (chip.count !== null) {
+            <span class="count">{{ chip.count }}</span>
+          }
+        </ion-button>
+      }
+    </div>
+
+    <div class="mh-section-label">{{ 'exercises.fields.kind' | translate }}</div>
+    <div class="mh-chip-cloud">
+      @for (chip of kindChips(); track chip.value) {
+        <ion-button
+          class="chip"
+          fill="clear"
+          shape="round"
+          size="small"
+          [class.selected]="isKindOn(chip.value)"
+          [attr.aria-pressed]="isKindOn(chip.value)"
+          (click)="toggleKind(chip.value)"
+        >
+          {{ chip.label }}
+          @if (chip.count !== null) {
+            <span class="count">{{ chip.count }}</span>
+          }
+        </ion-button>
+      }
+    </div>
+
+    <ion-note class="mh-footnote">
+      {{ 'exercises.filterSheet.webOnly' | translate }}
+    </ion-note>
+  }
 </ng-template>
 
 <mh-sheet-shell

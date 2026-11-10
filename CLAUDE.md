@@ -33,6 +33,8 @@ npm run i18n:check         # Translation files: en/ro parity, ICU syntax, missin
 
 Package manager is **npm**. Prettier config is inline in `package.json`. Angular selector prefix is `mh` (see `angular.json`).
 
+**Every change ships with its specs** (user decision, 2026-11-10): a component, service, store or function that is added or changed gets a spec for what changed in the same change, and a bug fix comes with the case that fails without it. How to write them for the Ionic app (component specs render no template) is in `projects/mobile/.claude/rules/testing-and-tooling.md`.
+
 ## Architecture
 
 ### Monorepo Structure — what goes where

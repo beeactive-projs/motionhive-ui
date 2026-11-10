@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { Subject } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 
-import { LoggedSet, WorkoutLog, WorkoutLogService } from 'core';
+import { ExerciseSetType, LoggedSet, WorkoutLog, WorkoutLogService } from 'core';
 
 import { LoggerStore } from './logger.store';
 
@@ -74,5 +74,77 @@ describe('LoggerStore.whenSettled — Finish waits for the last tick', () => {
 
     answer(1);
     expect(then).toHaveBeenCalledOnce();
+  });
+});
+
+describe('LoggerStore.copySet — Copy set', () => {
+  function copySetup(addSet: ReturnType<typeof vi.fn>) {
+    const logSet = vi.fn(() => of({ id: 's-2', isCompleted: false } as LoggedSet));
+    TestBed.configureTestingModule({
+      providers: [LoggerStore, { provide: WorkoutLogService, useValue: { addSet, logSet } }],
+    });
+    const store = TestBed.inject(LoggerStore);
+    store.adopt(log());
+    return { store, logSet };
+  }
+
+  it('adds a set of the same type, last, with the numbers it was given', () => {
+    const addSet = vi.fn(() => of({ id: 's-2', isCompleted: false } as LoggedSet));
+    const { store, logSet } = copySetup(addSet);
+
+    store.copySet('ex-1', ExerciseSetType.Warmup, { weightKg: 60, reps: 8 });
+
+    expect(addSet).toHaveBeenCalledWith('wl-1', 'ex-1', { setType: ExerciseSetType.Warmup });
+    expect(store.exercises()[0].sets?.map((s) => s.id)).toEqual(['s-1', 's-2']);
+    expect(logSet).toHaveBeenCalledWith('wl-1', 's-2', { weightKg: 60, reps: 8 });
+  });
+
+  it('writes no numbers when the set it copies shows none', () => {
+    const addSet = vi.fn(() => of({ id: 's-2', isCompleted: false } as LoggedSet));
+    const { store, logSet } = copySetup(addSet);
+
+    store.copySet('ex-1', ExerciseSetType.Normal, {});
+
+    expect(store.exercises()[0].sets).toHaveLength(2);
+    expect(logSet).not.toHaveBeenCalled();
+  });
+
+  // The page shows the refusal through FeedbackService.error(error, …), which
+  // only takes down the interceptor's dialog when it gets the error itself.
+  it('hands the server refusal to the caller, adding nothing', () => {
+    const refusal = { status: 0 };
+    const addSet = vi.fn(() => throwError(() => refusal));
+    const { store } = copySetup(addSet);
+    const onError = vi.fn();
+
+    store.copySet('ex-1', ExerciseSetType.Normal, { reps: 8 }, onError);
+
+    expect(onError).toHaveBeenCalledWith(refusal);
+    expect(store.exercises()[0].sets).toHaveLength(1);
+  });
+});
+
+describe('LoggerStore.removeSets — a delete the server refused', () => {
+  it('hands the refusal to the caller and reads the log again', () => {
+    const refusal = { status: 404 };
+    const get = vi.fn(() => of(log()));
+    TestBed.configureTestingModule({
+      providers: [
+        LoggerStore,
+        {
+          provide: WorkoutLogService,
+          useValue: { removeSets: vi.fn(() => throwError(() => refusal)), get },
+        },
+      ],
+    });
+    const store = TestBed.inject(LoggerStore);
+    store.adopt(log());
+    const onError = vi.fn();
+
+    store.removeSets([{ exerciseId: 'ex-1', setId: 's-1' }], onError);
+
+    expect(onError).toHaveBeenCalledWith(refusal);
+    expect(get).toHaveBeenCalledWith('wl-1');
+    expect(store.exercises()[0].sets).toHaveLength(1);
   });
 });

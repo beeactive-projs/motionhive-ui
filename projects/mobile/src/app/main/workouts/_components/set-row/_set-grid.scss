@@ -1,0 +1,49 @@
+/* The set table's columns, shared by the rows and their heading so the two
+   line up: the badge, last time, one column per field, the tick. The field
+   count comes in as `--mh-set-fields` on the host. Every column may shrink,
+   so a small phone at 130% text still fits two fields and the tick.
+
+   Last time and the fields share what is left 3 : 4, so a field is always
+   the wider column and holds the keypad's longest weight (9999.99), and
+   last time stops taking every spare pixel on a wide phone or a one-field
+   exercise (user decision, 2026-11-10).
+
+   The ring is part of the grid, transparent until a row wears it (the set
+   you are on), so the heading's columns sit exactly over the rows'.
+
+   Both hosts are size containers (set-row, set-table-head), so they drop
+   the Previous column together at `$narrow`. */
+
+/* Too narrow for Previous to keep about 3rem beside two fields. The rem
+   follows the phone's text size, so this is an SE from about 110% text and
+   a 390pt iPhone one size up, not only small phones. At 19.25rem the badge,
+   the tick, the gaps, the inset and the ring leave 11.5rem: about 3.1rem of
+   Previous and 4.2rem per field. */
+$narrow: 19.25rem;
+
+.mh-set-grid {
+  display: grid;
+  grid-template-columns:
+    2.25rem
+    minmax(0, 3fr)
+    repeat(var(--mh-set-fields, 2), minmax(0, 4fr))
+    var(--mh-tap-target);
+  align-items: center;
+  column-gap: 0.5rem;
+  padding-inline: 0.25rem;
+  border: var(--mh-ring-width) solid transparent;
+  border-radius: var(--mh-radius-control);
+}
+
+/* Narrower than that the column goes, rather than shrinking to a button too
+   small to read, and the fields take its room. The heading drops its label;
+   a row moves Previous under its fields as a line (`set-row.scss`), so last
+   time and its tap stay. */
+@container (max-width: #{$narrow}) {
+  .mh-set-grid {
+    grid-template-columns:
+      2.25rem
+      repeat(var(--mh-set-fields, 2), minmax(0, 1fr))
+      var(--mh-tap-target);
+  }
+}

@@ -1,6 +1,8 @@
 /* The set badge (number, or W / D / F / A), shared by the set row and the
-   set menu so a type looks the same in both. A label only: the set's
-   options have their own ⋯ button. */
+   set menu so a type looks the same in both. In the row it sits inside the
+   button that opens the set's menu; the badge itself is only the label.
+   Every tone is a soft tile, a plain set's number included, so the badge
+   reads as the row's handle. */
 
 .badge {
   display: inline-flex;
@@ -15,8 +17,15 @@
   background: transparent;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* The neutral soft fill and the full ink: grey in dark, like the cards
+   (the medium wash is navy there). */
+.tone-plain {
+  background: var(--mh-color-divider);
+  color: var(--ion-text-color);
 }
 
 .tone-warmup {

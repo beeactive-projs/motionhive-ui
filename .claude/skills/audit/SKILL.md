@@ -28,7 +28,7 @@ The user pushes by hand right after this. The job is to leave the working tree i
 
 The diff alone is not enough. For each changed file, also read:
 
-- the whole file (not only the hunks), its template/style/config siblings, and its `*.config.spec.ts` if one exists;
+- the whole file (not only the hunks), its template/style/config siblings, and its spec (`<name>.spec.ts`, `*.config.spec.ts`) if one exists;
 - the consumers and the shared pieces it relies on (the theme skins in `projects/mobile/src/theme/components/`, `layout.css`, `typography.css`, shared components such as `mh-action-sheet` / `mh-sheet-shell`, core utils);
 - for a **rename** (class, token, icon, identifier): Grep the whole of `projects/` for leftovers of the old name: CSS classes, TS identifiers, comments, rule docs, CLAUDE.md files.
 
@@ -71,7 +71,7 @@ Work through every item for the touched code. Cite the rule when you fix somethi
 
 **Docs and specs stay true**
 - If the change sets or alters a convention, the matching rule file / CLAUDE.md says so, and nothing in them still describes the old way.
-- New or changed pure helpers in a `*.config.ts` get a case in the matching `*.config.spec.ts`. Mobile adds **no** component, service or store specs.
+- Every added or changed component, service, store or function has a spec for what changed: new cases in its existing spec, or a new `<name>.spec.ts` beside it (`testing-and-tooling.md`, "Specs"). Component specs blank the template and test the class; a bug fix has the case that fails without it. Write the missing ones; stylesheets and the theme have none.
 
 **Formatting**
 - Hand-format to match the file: 2-space indent, `@if` / `@for` contents indented one level, trailing commas, ~100-column wrap. **Never run the repo's local prettier** (v2 de-indents control-flow blocks). Fix stray indentation by hand.

@@ -2,10 +2,11 @@ import { Component, computed, effect, input, model, output, signal, untracked } 
 import { IonIcon, IonItem, IonLabel, IonList, IonTextarea } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline, createOutline, trashOutline } from 'ionicons/icons';
+import { checkmarkOutline, copyOutline, createOutline, trashOutline } from 'ionicons/icons';
 
 import { ExerciseSetType, LoggedSet, enumLabel, translate } from 'core';
 
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { BadgeTone, BadgeTones, SetBadge } from '../../logger/logger-flow';
 
@@ -45,7 +46,12 @@ const TONES: Partial<Record<ExerciseSetType, BadgeTone>> = {
 };
 
 /**
- * Tap a set's badge: what kind of set it is, a note on it, or take it out.
+ * Tap a set's badge: what kind of set it is, a copy of it, a note on it, or
+ * take it out.
+ *
+ * The type picked now carries the honey check (and `aria-current`), as on
+ * every choice sheet. The verbs wear their concept's tiles: Copy teal, the
+ * note sky, Remove red in a card of its own.
  *
  * Picking a type applies it and closes, the common case in one tap. The note
  * opens in the same sheet with its own Save. Warm-ups say up front that they
@@ -53,7 +59,7 @@ const TONES: Partial<Record<ExerciseSetType, BadgeTone>> = {
  */
 @Component({
   selector: 'mh-set-menu-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, IonTextarea, SheetShell, TranslatePipe],
+  imports: [HexAvatar, IonIcon, IonItem, IonLabel, IonList, IonTextarea, SheetShell, TranslatePipe],
   templateUrl: './set-menu-sheet.html',
   styleUrl: './set-menu-sheet.scss',
 })
@@ -65,6 +71,8 @@ export class SetMenuSheet {
   readonly typeChange = output<ExerciseSetType>();
   readonly noteChange = output<string | null>();
   readonly remove = output<void>();
+  /** Another set like this one, added to the exercise. */
+  readonly duplicate = output<void>();
 
   /** The menu, or the note being written. */
   readonly writing = signal(false);
@@ -93,7 +101,7 @@ export class SetMenuSheet {
   readonly hasNote = computed(() => !!this.set()?.notes?.trim());
 
   constructor() {
-    addIcons({ checkmarkOutline, createOutline, trashOutline });
+    addIcons({ checkmarkOutline, copyOutline, createOutline, trashOutline });
     // Each opening starts on the menu, with the note as the set holds it.
     effect(() => {
       if (!this.open()) return;
@@ -116,6 +124,12 @@ export class SetMenuSheet {
   saveNote(): void {
     const text = this.note().trim();
     if (text !== (this.set()?.notes ?? '').trim()) this.noteChange.emit(text || null);
+    this.open.set(false);
+  }
+
+  /** Adds a set like this one and closes, the same as the swipe right. */
+  copySet(): void {
+    this.duplicate.emit();
     this.open.set(false);
   }
 

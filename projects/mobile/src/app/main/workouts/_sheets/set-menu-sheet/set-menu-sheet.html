@@ -17,7 +17,12 @@
     <div class="mh-stack">
       <ion-list [inset]="true" class="mh-card-list">
         @for (choice of choices(); track choice.type) {
-          <ion-item button [detail]="false" [class.current]="choice.type === current()" (click)="pick(choice.type)">
+          <ion-item
+            button
+            [detail]="false"
+            [attr.aria-current]="choice.type === current() ? 'true' : null"
+            (click)="pick(choice.type)"
+          >
             <span slot="start" [class]="'badge tone-' + choice.tone" aria-hidden="true">{{ choice.badge }}</span>
             <ion-label class="ion-text-wrap">
               {{ choice.label }}
@@ -32,9 +37,15 @@
         }
       </ion-list>
 
+      <!-- Verb tiles by concept, as on every action sheet: a copy is teal, a
+           note sky; the red one sits in its own card. -->
       <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="false" (click)="copySet()">
+          <mh-hex-avatar slot="start" size="sm" icon="copy-outline" color="teal" />
+          <ion-label>{{ 'workouts.setMenu.copy' | translate }}</ion-label>
+        </ion-item>
         <ion-item button [detail]="false" (click)="startNote()">
-          <ion-icon slot="start" name="create-outline" color="medium" aria-hidden="true" />
+          <mh-hex-avatar slot="start" size="sm" icon="create-outline" color="info" tone="shade" />
           <ion-label class="ion-text-wrap">
             {{ (hasNote() ? 'workouts.setMenu.note' : 'workouts.setMenu.addNote') | translate }}
             @if (set()?.notes; as text) {
@@ -46,7 +57,7 @@
 
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item button [detail]="false" class="destructive" (click)="removeSet()">
-          <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+          <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
           <ion-label color="danger">{{ 'workouts.setMenu.remove' | translate }}</ion-label>
         </ion-item>
       </ion-list>

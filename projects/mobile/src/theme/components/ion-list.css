@@ -263,23 +263,33 @@ ion-list.mh-flat-list ion-label p {
 
 /* Swipe options, WhatsApp style, in either kind of list (the inbox's rows,
    the Workouts routines card): icon over label (`slot="top"` on the icon),
-   wide enough that the longest label (RO "Mai multe") stays on one line. */
-ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option {
+   wide enough that the longest label (RO "Mai multe") stays on one line.
+   A sliding row outside a list (the logger's set rows, inside an exercise
+   card) opts in with `mh-swipe-row` on its `ion-item-sliding`. */
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-option {
   min-width: 5rem;
   font-size: var(--mh-text-sm);
   font-weight: 600;
   text-transform: none;
 }
 
-ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option ion-icon {
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-option ion-icon {
   font-size: var(--mh-icon-lg);
+}
+
+/* iOS mode closes the end options with a hairline of its own
+   (`.item-options-ios.item-options-end`), as wide as the row, drawn while a
+   row is open. The skin draws the lines, so it goes, like the items' own.
+   `[side]` lifts this over Ionic's two classes. */
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-options[side] {
+  border-bottom-width: 0;
 }
 
 /* A swipe label is 12px text, so it needs 4.5:1, and white misses it on
    violet 500 (4.2:1). Violet swipes from its shade step instead (600,
-   5.7:1). The other hues already pass: the red slot is 600 (4.8:1), honey
-   and green take black ink, slate and navy are dark enough. `!important`
+   5.7:1). The other hues already pass: the red slot is 600 (4.8:1), honey,
+   green and teal take dark ink, slate and navy are dark enough. `!important`
    because Ionic's own `.ion-color-*` slots are. */
-ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option.ion-color-violet {
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-option.ion-color-violet {
   --ion-color-base: var(--ion-color-shade) !important;
 }

@@ -31,10 +31,20 @@ ion-searchbar .searchbar-input-container {
   min-height: 3.5rem;
 }
 
+/* In a sheet the field sits on the sheet's one inset (the pinned strip or
+   the body pads it, surfaces-and-sheets.md), so Ionic's own host padding,
+   meant for a toolbar, would indent it a second time. Every sheet, once,
+   here: a sheet's own stylesheet never pads its searchbar. */
+ion-modal.mh-sheet ion-searchbar {
+  padding-inline: 0;
+}
+
 /* `.mh-search-pill`: the inbox's WhatsApp-style field — a thin pill on a
    soft fill, always on screen above the list rather than opened on a tap.
    No ring, idle or focused: focusing it switches the header into search
-   mode (back arrow, title and pills gone), which is the focus state. */
+   mode (back arrow, title and pills gone), which is the focus state. The
+   exercise picker sheet wears it too, focused as it opens: the caret is
+   the focus state there. */
 ion-searchbar.mh-search-pill,
 ion-searchbar.mh-search-pill.searchbar-has-focus {
   --border-radius: var(--mh-radius-pill) !important;
