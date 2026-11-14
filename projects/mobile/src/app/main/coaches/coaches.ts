@@ -72,7 +72,9 @@ import {
   CoachFilterIds,
   CoachSheetFilters,
   MIN_SEARCH_LENGTH,
+  NO_SHEET_FILTERS,
   backHrefFrom,
+  categoriesFromUrl,
   filterFromUrl,
   nearYouCity,
   sheetFilterCount,
@@ -558,7 +560,19 @@ export class Coaches implements ViewWillEnter {
     this.backHref.set(backHrefFrom(url, this.backHref()));
   }
 
+  /**
+   * A chip (`?filter=`, the Menu's Yours, Discover's Online) or what they
+   * coach (`?categories=`, Discover's "All" on a topic) passed in the URL.
+   */
   private _applyUrlFilter(url: string): void {
+    const categoryIds = categoriesFromUrl(url);
+    if (categoryIds) {
+      if (this.searchOpen()) {
+        this.closeSearch();
+      }
+      this.directory.setSheet({ ...NO_SHEET_FILTERS, categoryIds });
+      return;
+    }
     const id = filterFromUrl(url);
     if (!id) return;
     if (this.searchOpen()) this.closeSearch();

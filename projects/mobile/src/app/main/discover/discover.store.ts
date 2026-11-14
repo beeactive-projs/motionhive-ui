@@ -1,8 +1,11 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, Subscription, map, take } from 'rxjs';
+import { Injectable, WritableSignal, computed, inject, signal } from '@angular/core';
+import { Observable, Subscription, map, of, switchMap, take } from 'rxjs';
 
 import {
   CategoryStore,
+  CoachDirectoryFacets,
+  CoachDirectoryParams,
+  CoachDirectorySorts,
   DiscoverGroup,
   GroupService,
   InstructorSearchResult,
@@ -13,7 +16,7 @@ import {
   withCategorySpecialties,
 } from 'core';
 
-import { DiscoverTopic, topicCategoryIds } from './discover.config';
+import { DiscoverTopic, SPOTLIGHT_LIMIT, topicCategoryIds } from './discover.config';
 
 /**
  * One list the API narrows to a topic, kept beside a store's own list: the
@@ -90,91 +93,299 @@ function categoriesKey(categoryIds: readonly string[] | null): string | null {
   return [...categoryIds].sort().join(',');
 }
 
+/** What Discover asks the directory for: a city (online coaches count in it) and a topic. */
+export interface DiscoverCoachQuery {
+  /** The city Discover shows, as people write it; null for everywhere. */
+  city: string | null;
+  /** The topic's categories; null for none. */
+  categoryIds: readonly string[] | null;
+  /** The Online topic: coaches with an online place. */
+  online: boolean;
+}
+
+/** Coaches for a city, or for every city when that one has nobody. */
+export interface CoachPick {
+  coaches: InstructorSearchResult[];
+  /** The city had nobody, so these are every city's. */
+  everywhere: boolean;
+  /** How many there are in all for what was asked. */
+  total: number;
+}
+
+const NO_PICK: CoachPick = { coaches: [], everywhere: false, total: 0 };
+
+/** Coaches past these come from the Coaches screen ("All"). */
+export const NEAR_LIMIT = 3;
+
+/** A topic's coaches on the search screen, the most relevant first. */
+const TOPIC_COACH_LIMIT = 30;
+
 /**
- * The coaches behind Discover: the spotlight, "Coaches near you" and
- * search's topics. Page-scoped (`providers: [DiscoverCoachesStore]`) so each
- * surface owns its instance and refetch policy.
+ * One value fetched for a key: the latest key asked for wins, an answer for
+ * an earlier one is dropped, and a refresh asks again for the same key while
+ * the value on screen stays until the answer replaces it.
+ */
+class KeyedValue<T> {
+  private readonly _value: WritableSignal<T>;
+  private readonly _loading = signal(false);
+  private readonly _loaded = signal(false);
+  private readonly _error = signal(false);
+  private _key: string | null = null;
+  private _fetch: (() => Observable<T>) | null = null;
+  private _subscription: Subscription | null = null;
+
+  constructor(private readonly _empty: T) {
+    this._value = signal<T>(_empty);
+  }
+
+  readonly value = computed(() => this._value());
+  readonly loading = this._loading.asReadonly();
+  readonly loaded = this._loaded.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  use(key: string, fetch: () => Observable<T>): void {
+    if (key === this._key) {
+      return;
+    }
+    this._key = key;
+    this._fetch = fetch;
+    this._value.set(this._empty);
+    this._loaded.set(false);
+    this._run();
+  }
+
+  refresh(done?: () => void): void {
+    this._run(done);
+  }
+
+  private _run(done?: () => void): void {
+    this._subscription?.unsubscribe();
+    this._subscription = null;
+    const fetch = this._fetch;
+    if (!fetch) {
+      done?.();
+      return;
+    }
+    this._loading.set(true);
+    this._error.set(false);
+    this._subscription = fetch()
+      .pipe(take(1))
+      .subscribe({
+        next: (value) => {
+          this._value.set(value);
+          this._loaded.set(true);
+          this._loading.set(false);
+          done?.();
+        },
+        error: () => {
+          this._error.set(true);
+          this._loading.set(false);
+          done?.();
+        },
+      });
+  }
+}
+
+/**
+ * The coaches behind Discover and its search, all from the paged directory
+ * (`/profile/instructors/directory`), which already leaves out the reader,
+ * anyone on either side of a block and accounts that no longer coach. Every
+ * filter is the server's, over every coach, so nobody past a first page is
+ * missed. Page-scoped (`providers: [DiscoverCoachesStore]`): each surface
+ * owns its instance.
  *
- * `/profile/instructors/discover` returns its top 30 as one plain array (no
- * paging, no total): `coaches` is that list (the tab's city list, chips and
- * Online), and `topicCoaches` the same endpoint narrowed to a topic's
- * categories on the server. The full, paged list is the Coaches screen's
- * (`CoachDirectoryStore`).
+ * - `facets`: the cities coaches are in, the categories they coach and how
+ *   many coach online, over the whole directory: the tab's city list and
+ *   chips.
+ * - `spotlight`: today's few coaches taking clients for the city and topic
+ *   (the server's `spotlight` order turns every day, the same for
+ *   everyone), every city's when the city has nobody. Promoted coaches will
+ *   be a pool of their own through the same carousel.
+ * - `near`: the city's coaches for the topic, the most relevant to the
+ *   reader first (`recommended`), every city's when the city has nobody.
+ * - `allTotal`: how many coaches the topic has anywhere: what "All" opens.
+ * - `topicCoaches`: the search screen's coaches for a browse card.
  */
 @Injectable()
 export class DiscoverCoachesStore {
   private readonly _profileService = inject(ProfileService);
   private readonly _categoryStore = inject(CategoryStore);
 
-  private readonly _coaches = signal<InstructorSearchResult[]>([]);
-  private readonly _loading = signal(false);
-  private readonly _error = signal(false);
-  private readonly _loaded = signal(false);
+  private readonly _facets = signal<CoachDirectoryFacets>(NO_FACETS);
+  private readonly _facetsLoading = signal(false);
+  private readonly _facetsLoaded = signal(false);
+  private readonly _facetsError = signal(false);
 
-  /**
-   * Each line under a coach's name reads their specializations; a coach who
-   * picked categories and wrote none shows the categories' names there.
-   */
-  readonly coaches = computed(() => {
-    const byId = this._categoryStore.byId();
-    return this._coaches().map((coach) => withCategorySpecialties(coach, byId));
-  });
-  readonly loading = this._loading.asReadonly();
-  readonly error = this._error.asReadonly();
-  readonly loaded = this._loaded.asReadonly();
+  readonly facets = this._facets.asReadonly();
+  readonly loaded = this._facetsLoaded.asReadonly();
+  readonly error = this._facetsError.asReadonly();
+  readonly loading = this._facetsLoading.asReadonly();
 
-  /** The coaches of the topic's categories, from the API (`useTopic`), mapped like `coaches`. */
-  private readonly _topic = new TopicList<InstructorSearchResult>();
+  private readonly _spotlight = new KeyedValue<CoachPick>(NO_PICK);
+  private readonly _near = new KeyedValue<CoachPick>(NO_PICK);
+  private readonly _allTotal = new KeyedValue<number>(0);
+  private readonly _topic = new KeyedValue<InstructorSearchResult[]>([]);
+
+  /** Each line under a coach's name reads their words, else their categories' names. */
+  readonly spotlight = computed(() => this._mapPick(this._spotlight.value()));
+  readonly near = computed(() => this._mapPick(this._near.value()));
+  readonly allTotal = this._allTotal.value;
   readonly topicCoaches = computed(() => {
     const byId = this._categoryStore.byId();
-    return this._topic.items().map((coach) => withCategorySpecialties(coach, byId));
+    return this._topic.value().map((coach) => withCategorySpecialties(coach, byId));
   });
+
+  /** The tab's coach sections have their first answer for the query on screen. */
+  readonly sectionsLoaded = computed(() => this._spotlight.loaded() && this._near.loaded());
+  readonly sectionsLoading = computed(() => this._spotlight.loading() || this._near.loading());
+  readonly sectionsError = computed(() => this._spotlight.error() && this._near.error());
+
   readonly topicLoading = this._topic.loading;
   readonly topicLoaded = this._topic.loaded;
   readonly topicError = this._topic.error;
 
-  /**
-   * Narrow `topicCoaches` to any of these categories, on the server, so a
-   * coach past the top 30 is not missed; null for no topic.
-   */
-  useTopic(categoryIds: readonly string[] | null): void {
-    this._topic.use(categoriesKey(categoryIds), () =>
-      this._profileService.discoverInstructors({ categoryIds: categoryIds ?? [] }),
-    );
-  }
-
-  /** Pull to refresh for the topic's coaches. */
-  refreshTopic(done?: () => void): void {
-    this._topic.refresh(done);
-  }
-
+  /** The facets, once per visit; `force` on pull to refresh. */
   load(opts: { force?: boolean; done?: () => void } = {}): void {
     this._categoryStore.ensureLoaded();
-    if (this._loading() || (this._loaded() && !opts.force)) {
+    if (this._facetsLoading() || (this._facetsLoaded() && !opts.force)) {
       opts.done?.();
       return;
     }
-    this._loading.set(true);
-    this._error.set(false);
-
+    this._facetsLoading.set(true);
+    this._facetsError.set(false);
     this._profileService
-      .discoverInstructors()
+      .coachDirectoryFacets({ silent: true })
       .pipe(take(1))
       .subscribe({
-        next: (coaches) => {
-          this._coaches.set(coaches);
-          this._loaded.set(true);
-          this._loading.set(false);
+        next: (facets) => {
+          this._facets.set(facets);
+          this._facetsLoaded.set(true);
+          this._facetsLoading.set(false);
           opts.done?.();
         },
         // A failed load does not latch `loaded`, so the next view entry retries.
         error: () => {
-          this._error.set(true);
-          this._loading.set(false);
+          this._facetsError.set(true);
+          this._facetsLoading.set(false);
           opts.done?.();
         },
       });
   }
+
+  /** The tab's coach sections for this city and topic, each asked once per query. */
+  useQuery(query: DiscoverCoachQuery): void {
+    const key = queryKey(query);
+    this._spotlight.use(key, () =>
+      this._pick(query, {
+        sort: CoachDirectorySorts.Spotlight,
+        accepting: true,
+        limit: SPOTLIGHT_LIMIT,
+      }),
+    );
+    // Enough to leave out the spotlight's and still fill the list.
+    this._near.use(key, () =>
+      this._pick(query, {
+        sort: CoachDirectorySorts.Recommended,
+        limit: NEAR_LIMIT + SPOTLIGHT_LIMIT,
+      }),
+    );
+    const anyCity = queryKey({ ...query, city: null });
+    this._allTotal.use(anyCity, () =>
+      this._profileService
+        .coachDirectory({ ...topicParams(query), limit: 1 }, { silent: true })
+        .pipe(map((page) => page.total)),
+    );
+  }
+
+  /** The search screen's coaches for a browse card; null for none. */
+  useTopic(topic: { categoryIds: readonly string[] | null; online: boolean } | null): void {
+    if (!topic) {
+      return;
+    }
+    const query = { city: null, ...topic };
+    this._topic.use(queryKey(query), () =>
+      this._profileService
+        .coachDirectory(
+          {
+            ...topicParams(query),
+            sort: CoachDirectorySorts.Recommended,
+            limit: TOPIC_COACH_LIMIT,
+          },
+          { silent: true },
+        )
+        .pipe(map((page) => page.items)),
+    );
+  }
+
+  /** Pull to refresh: the facets and whatever the tab shows. */
+  refresh(done?: () => void): void {
+    this.load({ force: true });
+    this._spotlight.refresh();
+    this._allTotal.refresh();
+    this._near.refresh(done);
+  }
+
+  refreshTopic(done?: () => void): void {
+    this._topic.refresh(done);
+  }
+
+  /**
+   * The city's coaches (online ones included), or every city's when it has
+   * nobody for this topic: Discover never shows an empty coach section
+   * while somebody coaches it somewhere.
+   */
+  private _pick(query: DiscoverCoachQuery, base: CoachDirectoryParams): Observable<CoachPick> {
+    const params: CoachDirectoryParams = { ...base, ...topicParams(query) };
+    const everywhere = this._profileService.coachDirectory(params, { silent: true }).pipe(
+      map((page) => ({ coaches: page.items, everywhere: !!query.city, total: page.total })),
+    );
+    if (!query.city) {
+      return everywhere.pipe(map((pick) => ({ ...pick, everywhere: false })));
+    }
+    return this._profileService
+      .coachDirectory({ ...params, city: query.city, includeOnline: true }, { silent: true })
+      .pipe(
+        switchMap((page) => {
+          if (page.total > 0) {
+            return of({ coaches: page.items, everywhere: false, total: page.total });
+          }
+          return everywhere;
+        }),
+      );
+  }
+
+  private _mapPick(pick: CoachPick): CoachPick {
+    const byId = this._categoryStore.byId();
+    return {
+      ...pick,
+      coaches: pick.coaches.map((coach) => withCategorySpecialties(coach, byId)),
+    };
+  }
+}
+
+const NO_FACETS: CoachDirectoryFacets = {
+  cities: [],
+  specializations: [],
+  categories: [],
+  online: 0,
+};
+
+/** The directory params a topic narrows to: its categories, or online coaches. */
+function topicParams(query: DiscoverCoachQuery): CoachDirectoryParams {
+  const params: CoachDirectoryParams = {};
+  if (query.categoryIds && query.categoryIds.length > 0) {
+    params.categoryIds = query.categoryIds;
+  }
+  if (query.online) {
+    params.online = true;
+  }
+  return params;
+}
+
+/** One key per query, whatever the order of its categories. */
+function queryKey(query: DiscoverCoachQuery): string {
+  const categories = categoriesKey(query.categoryIds) ?? '';
+  return `${query.city ?? ''}|${categories}|${query.online ? 'online' : ''}`;
 }
 
 /** One request's worth by default: Discover's cards, its city list and its

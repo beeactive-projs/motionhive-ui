@@ -35,7 +35,7 @@ const ON_SCREEN_RATIO = 0.5;
 
 /**
  * Discover's spotlight: a few coaches taking turns in one card
- * (`spotlightCoaches` picks who and in what order).
+ * (the directory's `spotlight` order picks who and in what order).
  *
  * Built to the usual rules for content that moves by itself (WCAG 2.2.2,
  * the ARIA carousel pattern, NN/g on auto-forwarding): a turn lasts long

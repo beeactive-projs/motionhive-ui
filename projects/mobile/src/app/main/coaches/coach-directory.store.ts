@@ -31,7 +31,7 @@ const PAGE_SIZE = 20;
  */
 const FRESH_MS = 15_000;
 
-const NO_FACETS: CoachDirectoryFacets = { cities: [], specializations: [] };
+const NO_FACETS: CoachDirectoryFacets = { cities: [], specializations: [], categories: [], online: 0 };
 
 /**
  * `done` carries what went wrong, or nothing when the load settled. A

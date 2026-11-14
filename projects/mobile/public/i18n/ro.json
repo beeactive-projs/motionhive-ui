@@ -677,7 +677,7 @@
         "name": "Nume",
         "recommended": "Recomandați"
       },
-      "speciality": "Specializare",
+      "coaches": "Ce antrenează",
       "yearsPlus": "{count, plural, one {#+ an} few {#+ ani} other {#+ de ani}}"
     },
     "filters": {
@@ -760,7 +760,7 @@
       "years": "{count, plural, one {# an} few {# ani} other {# de ani}}"
     },
     "coachRow": {
-      "online": "Online",
+      "online": "Antrenează online",
       "requestSent": "Cerere trimisă",
       "takingClients": "Primește clienți",
       "yourCoach": "Antrenorul tău"

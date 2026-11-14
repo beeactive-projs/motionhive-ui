@@ -43,7 +43,7 @@ import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleto
 import { DISCOVER_HEX_SHAPE, cornerPrintPath } from '../../_shared/config/hexagon.config';
 import { ClockService } from '../../_shared/services/clock.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
-import { COACHES_URL } from '../coaches/coaches.filters';
+import { coachesTopicUrl } from '../coaches/coaches.filters';
 import { CoachRow } from './_components/coach-row/coach-row';
 import { CoachSpotlight } from './_components/coach-spotlight/coach-spotlight';
 import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
@@ -58,8 +58,8 @@ import {
   NO_SHEET_FILTERS,
   QUICK_FILTERS,
   QuickFilterId,
-  coachMatchesTopic,
   coachNearLine,
+  coachPool,
   compileDatePreset,
   discoverCities,
   discoverLinks,
@@ -72,17 +72,12 @@ import {
   sessionMatchesTopic,
   sheetBeyondQuickChips,
   sheetFilterCount,
-  sortCoaches,
-  spotlightCoaches,
   topicCategoryIds,
   withoutReader,
 } from './discover.config';
 import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
 import { DiscoverPrefs } from './discover-prefs';
-import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
-
-/** Rows under "Coaches near you" before "All" takes over. */
-const NEAR_LIMIT = 3;
+import { DiscoverCoachesStore, DiscoverGroupsStore, NEAR_LIMIT } from './discover.store';
 
 /** Group cards, two to a row, before "All" takes over. */
 const GROUP_CARD_LIMIT = 4;
@@ -209,7 +204,6 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
       const topic = this.selectedTopic();
       untracked(() => {
         const categoryIds = topicCategoryIds(topic);
-        this.coachesStore.useTopic(categoryIds);
         this.groupsStore.useTopic(categoryIds);
         const agendaTopic = { categoryIds: categoryIds ?? undefined, online: !!topic?.online };
         if (this._agendaStarted()) {
@@ -223,6 +217,23 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
           this.sessionsStore.reload();
         }
       });
+    });
+
+    // The coach sections are the directory's for the city and the topic,
+    // asked again whenever either changes.
+    effect(() => {
+      if (!this._topicReady()) {
+        return;
+      }
+      const topic = this.selectedTopic();
+      const city = this.city()?.label ?? null;
+      untracked(() =>
+        this.coachesStore.useQuery({
+          city,
+          categoryIds: topicCategoryIds(topic),
+          online: !!topic?.online,
+        }),
+      );
     });
   }
 
@@ -249,10 +260,6 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   // ─── What the reader may see ────────────────────────────────────────────
 
   private readonly _readerId = computed(() => this._authStore.user()?.id ?? null);
-
-  private readonly _coaches = computed(() =>
-    withoutReader(this.coachesStore.coaches(), this._readerId()),
-  );
 
   /** Their own sessions are not pitched to a coach either. */
   private readonly _sessions = computed(() => {
@@ -297,9 +304,17 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
 
   // ─── City ───────────────────────────────────────────────────────────────
 
-  /** Read from the tab's own lists, never a topic's, so picking a topic never moves the city. */
+  /**
+   * Every city a coach is in (the directory's, over every coach), and the
+   * tab's own groups and sessions, never a topic's, so picking a topic
+   * never moves the city.
+   */
   private readonly _cities = computed(() =>
-    discoverCities(this._coaches(), this.groupsStore.groups(), this._openSessions()),
+    discoverCities(
+      this.coachesStore.facets().cities.map((city) => city.label),
+      this.groupsStore.groups(),
+      this._openSessions(),
+    ),
   );
 
   readonly city = computed(() =>
@@ -341,9 +356,11 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   // ─── Topic ──────────────────────────────────────────────────────────────
 
   /**
-   * The chips, over what the city shows, the agenda's own filters aside:
-   * For you (the reader's interests), the activities with something here,
-   * then Online when something is. The picked one stays while it is picked.
+   * The chips, the agenda's own filters aside: For you (the reader's
+   * interests), the activities somebody coaches or the city's groups and
+   * sessions hold, then Online when something is. Coaches count anywhere:
+   * a topic with nobody in the city shows every city's coaches. The picked
+   * one stays while it is picked.
    */
   readonly topics = computed<DiscoverTopic[]>(() => {
     const key = this._cityKey();
@@ -351,7 +368,7 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
       this._categoryStore.activities(),
       this._onboarding.interestIds(),
       {
-        coaches: this._coaches().filter((coach) => inCity(coach.city, key)),
+        ...coachPool(this.coachesStore.facets()),
         groups: this.groupsStore.groups().filter((group) => inCity(group.city, key)),
         sessions: this._openSessions().filter((instance) => sessionInCity(instance, key)),
       },
@@ -420,19 +437,7 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
 
   // ─── Coaches ────────────────────────────────────────────────────────────
 
-  /**
-   * The coaches the sections read: the topic's own, from the API, while a
-   * topic with categories is on; else the tab's list (Online is a venue,
-   * which `coachMatchesTopic` reads off it).
-   */
-  private readonly _topicCoaches = computed(() => {
-    if (topicCategoryIds(this.selectedTopic())) {
-      return this.coachesStore.topicCoaches();
-    }
-    return this.coachesStore.coaches();
-  });
-
-  /** Their first load, the topic's, or the wait for the topic the tab opens on (`_topicReady`). */
+  /** The first answer for the city and topic on screen, or the wait for the topic the tab opens on (`_topicReady`). */
   readonly coachesLoading = computed(() => {
     if (this.coachesStore.loading() && !this.coachesStore.loaded()) {
       return true;
@@ -440,51 +445,48 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     if (!this._topicReady()) {
       return !this.coachesStore.error();
     }
-    if (topicCategoryIds(this.selectedTopic())) {
-      return this.coachesStore.topicLoading() && !this.coachesStore.topicLoaded();
-    }
-    return false;
+    return !this.coachesStore.sectionsLoaded() && !this.coachesStore.sectionsError();
   });
 
   /**
-   * The coaches who take turns in the spotlight. Picked from every coach,
-   * the reader included, so the week's order is the same whoever looks;
-   * the reader is then passed over.
+   * The coaches who take turns in the spotlight: today's few for the city
+   * and topic, picked by the server (a new order every day, the same for
+   * everyone), every city's when the city has nobody.
    */
   readonly spotlight = computed(() =>
-    spotlightCoaches(this._topicCoaches(), {
-      cityKey: this._cityKey(),
-      readerId: this._readerId(),
-      topic: this.selectedTopic(),
-      now: new Date(this._clockService.now()),
-    }),
+    withoutReader(this.coachesStore.spotlight().coaches, this._readerId()),
   );
 
-  /** Everyone in the spotlight stays out of the list under it, so nobody shows twice. */
+  /**
+   * The coaches under it, the most relevant to the reader first (the
+   * server's `recommended`): those taking clients, then the most of their
+   * interests coached. Everyone in the spotlight stays out, so nobody
+   * shows twice.
+   */
   readonly nearCoaches = computed(() => {
     const inSpotlight = new Set(this.spotlight().map((coach) => coach.id));
-    const key = this._cityKey();
-    const topic = this.selectedTopic();
-    return sortCoaches(
-      withoutReader(this._topicCoaches(), this._readerId()).filter(
-        (coach) =>
-          !inSpotlight.has(coach.id) && inCity(coach.city, key) && coachMatchesTopic(coach, topic),
-      ),
-    ).slice(0, NEAR_LIMIT);
+    return withoutReader(this.coachesStore.near().coaches, this._readerId())
+      .filter((coach) => !inSpotlight.has(coach.id))
+      .slice(0, NEAR_LIMIT);
   });
 
+  /** The city's own coaches are "near you"; every city's (the city had nobody) are just "Coaches". */
+  private readonly _nearInCity = computed(
+    () => !!this._cityKey() && !this.coachesStore.near().everywhere,
+  );
+
   readonly nearTitle = computed(() => {
-    if (this._cityKey()) {
+    if (this._nearInCity()) {
       return 'discover.coaches.near';
     }
     return 'discover.coaches.title';
   });
 
-  /** What "All" opens: every coach but the reader. */
-  readonly allCoachesCount = computed(() => this._coaches().length);
+  /** What "All" opens: every coach of the topic, in any city. */
+  readonly allCoachesCount = computed(() => this.coachesStore.allTotal());
 
   nearLine(coach: InstructorSearchResult): string {
-    return coachNearLine(coach, !this._cityKey());
+    return coachNearLine(coach, !this._nearInCity());
   }
 
   // ─── Groups ─────────────────────────────────────────────────────────────
@@ -677,9 +679,8 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     this._clockService.bump();
     this._myBookingsIndexStore.ensureLoaded(true);
     this._prefs.ensureAccountCity(true);
-    this.coachesStore.load({ force: true });
+    this.coachesStore.refresh();
     this.groupsStore.load({ force: true });
-    this.coachesStore.refreshTopic();
     this.groupsStore.refreshTopic();
     // The spinner hangs on the feed — the other sections settle on their own.
     this.sessionsStore.reload(() => void event.target.complete());
@@ -708,9 +709,15 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     });
   }
 
-  /** The coach directory, a stack of its own; back returns here. */
+  /**
+   * The coach directory, a stack of its own, on the topic Discover shows
+   * (its categories in the sheet, or the Online chip); back returns here.
+   */
   openAllCoaches(): void {
-    void this._router.navigateByUrl(COACHES_URL);
+    const topic = this.selectedTopic();
+    void this._router.navigateByUrl(
+      coachesTopicUrl({ categoryIds: topicCategoryIds(topic), online: !!topic?.online }),
+    );
   }
 
   openGroup(groupId: string): void {

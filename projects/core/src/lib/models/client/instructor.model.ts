@@ -86,6 +86,8 @@ export interface CoachDirectoryParams {
   search?: string;
   /** Contains, blind to accents and case. */
   city?: string;
+  /** With `city`: also the coaches who coach online, wherever they live. */
+  includeOnline?: boolean;
   /** ISO 3166-1 alpha-2. */
   country?: string;
   accepting?: boolean;
@@ -109,9 +111,19 @@ export interface CoachFacet {
 }
 
 /** `GET /profile/instructors/directory/facets`, the most common first. */
+/** A category the directory's coaches coach (id from `GET /categories`), with how many. */
+export interface CoachCategoryFacet {
+  id: string;
+  count: number;
+}
+
 export interface CoachDirectoryFacets {
   cities: CoachFacet[];
   specializations: CoachFacet[];
+  /** Every category coached, with its coaches. Older APIs omit it. */
+  categories?: CoachCategoryFacet[];
+  /** How many coaches have an active online venue. Older APIs omit it. */
+  online?: number;
 }
 
 export interface PublicInstructorProfile {

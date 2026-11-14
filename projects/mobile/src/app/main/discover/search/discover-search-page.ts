@@ -56,7 +56,6 @@ import {
   SearchKinds,
   accentVariant,
   browseTopics,
-  coachMatchesTopic,
   coachName,
   coachSubline,
   discoverLinks,
@@ -65,7 +64,6 @@ import {
   groupVerb,
   recentKey,
   sessionMatchesTopic,
-  sortCoaches,
   topicCategoryIds,
   withoutReader,
 } from '../discover.config';
@@ -209,25 +207,12 @@ export class DiscoverSearchPage implements ViewWillEnter {
         );
       }
       case SearchModes.Topic:
-        return sortCoaches(
-          withoutReader(this._topicCoaches(), me).filter((coach) =>
-            coachMatchesTopic(coach, this.topic()),
-          ),
-        );
+        // Narrowed and ordered by the server: the most relevant to the
+        // reader first.
+        return withoutReader(this._coachesStore.topicCoaches(), me);
       default:
         return [];
     }
-  });
-
-  /**
-   * A topic's coaches: by its categories from the API, or the tab's list
-   * for Online (a venue, which `coachMatchesTopic` reads).
-   */
-  private readonly _topicCoaches = computed(() => {
-    if (topicCategoryIds(this.topic())) {
-      return this._coachesStore.topicCoaches();
-    }
-    return this._coachesStore.coaches();
   });
 
   /** What a mode lists of each kind, before the reader's own and the asked are sorted out. */
@@ -309,8 +294,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
       case SearchModes.Topic:
         return (
           this.counts().all === 0 &&
-          (this._coachesStore.loading() ||
-            this._coachesStore.topicLoading() ||
+          (this._coachesStore.topicLoading() ||
             this._groupsStore.topicLoading() ||
             this._upcomingStore.loading())
         );
@@ -336,12 +320,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
   });
 
   /** The coaches a topic reads could not be had. */
-  private readonly _coachesFailed = computed(() => {
-    if (topicCategoryIds(this.topic())) {
-      return this._coachesStore.topicError();
-    }
-    return this._coachesStore.error();
-  });
+  private readonly _coachesFailed = computed(() => this._coachesStore.topicError());
 
   /** Online lists no group, which is not a failure. */
   private readonly _groupsFailed = computed(() => {
@@ -480,11 +459,8 @@ export class DiscoverSearchPage implements ViewWillEnter {
     this.kind.set(SearchKinds.All);
     this.topic.set(topic);
     const categoryIds = topicCategoryIds(topic);
-    if (!categoryIds) {
-      // Online reads the coaches' own list for their venue.
-      this._coachesStore.load();
-    }
-    this._coachesStore.useTopic(categoryIds);
+    // Online is a coach's online place, which the directory filters on too.
+    this._coachesStore.useTopic({ categoryIds, online: topic.online });
     this._groupsStore.useTopic(categoryIds);
     this._upcomingStore.useTopic(topic);
   }
@@ -504,7 +480,6 @@ export class DiscoverSearchPage implements ViewWillEnter {
 
   retry(): void {
     if (this.mode() === SearchModes.Topic) {
-      this._coachesStore.load({ force: true });
       this._coachesStore.refreshTopic();
       this._groupsStore.refreshTopic();
       this._upcomingStore.retry();

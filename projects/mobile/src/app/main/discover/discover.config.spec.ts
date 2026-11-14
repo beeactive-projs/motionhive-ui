@@ -30,8 +30,8 @@ import {
   cityKey,
   coachBadge,
   coachFacts,
-  coachMatchesTopic,
   coachName,
+  coachPool,
   coachNearLine,
   coachSubline,
   compileDatePreset,
@@ -49,9 +49,8 @@ import {
   highlightParts,
   inCity,
   isSessionFull,
-  isoWeek,
+  SPOTLIGHT_INTERVAL_MS,
   SPOTLIGHT_LIMIT,
-  spotlightCoaches,
   topicCategoryIds,
   parseRecents,
   pushRecent,
@@ -63,7 +62,6 @@ import {
   sessionPriceParts,
   sheetBeyondQuickChips,
   sheetFilterCount,
-  sortCoaches,
   spotsLabel,
   withoutReader,
 } from './discover.config';
@@ -497,15 +495,6 @@ describe('coach helpers', () => {
     expect(coachSubline(coach({ ...bare, yearsOfExperience: 0 }))).toBe('New coach');
     expect(coachSubline(coach({ ...bare, yearsOfExperience: null }))).toBe('New coach');
   });
-
-  it('sortCoaches puts accepting coaches first, then names', () => {
-    const closed = coach({ id: 'p2', firstName: 'Ana', isAcceptingClients: false });
-    const acceptingZ = coach({ id: 'p3', firstName: 'Zoe', lastName: 'Marin' });
-    const acceptingA = coach({ id: 'p1', firstName: 'Ana' });
-    expect(
-      sortCoaches([closed, acceptingZ, acceptingA]).map((c) => c.id),
-    ).toEqual(['p1', 'p3', 'p2']);
-  });
 });
 
 // ─── Groups ────────────────────────────────────────────────────────────────
@@ -541,7 +530,7 @@ describe('coach lines and badge', () => {
   });
 
   it('coachBadge says Online for an online coach, else Taking clients, else nothing', () => {
-    expect(coachBadge(coach({ isOnline: true }))).toEqual({ label: 'Online', tone: 'teal' });
+    expect(coachBadge(coach({ isOnline: true }))).toEqual({ label: 'Coaches online', tone: 'teal' });
     expect(coachBadge(coach())).toEqual({ label: 'Taking clients', tone: 'success' });
     expect(coachBadge(coach({ isAcceptingClients: false }))).toBeNull();
   });
@@ -596,69 +585,17 @@ describe('bioQuote', () => {
 });
 
 describe('coach spotlight', () => {
-  it('isoWeek follows ISO 8601', () => {
-    expect(isoWeek(new Date(2026, 9, 31))).toBe(44); // Saturday
-    expect(isoWeek(new Date(2026, 10, 2))).toBe(45); // the Monday after
-    expect(isoWeek(new Date(2027, 0, 1))).toBe(53); // 2026 has 53 weeks
-    expect(isoWeek(new Date(2024, 11, 30))).toBe(1); // a Monday in 2025's week 1
-  });
-
-  const pool = [
-    coach({ id: 'c3', userId: 'u3', city: 'Cluj-Napoca' }),
-    coach({ id: 'c1', userId: 'u1', city: 'Cluj-Napoca' }),
-    coach({ id: 'c2', userId: 'u2', city: 'Timișoara' }),
-    coach({ id: 'c4', userId: 'u4', isAcceptingClients: false }),
-  ];
-  const saturday = new Date(2026, 9, 31);
-  const monday = new Date(2026, 10, 2);
-  const ids = (coaches: { id: string }[]) => coaches.map((c) => c.id);
-
-  it('starts at the week among coaches taking clients, the same for everyone, then takes turns', () => {
-    // Ordered by id: c1, c2, c3. Week 44 → 44 % 3 = 2 → c3 first.
-    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u9', topic: null, now: saturday }))).toEqual(['c3', 'c1', 'c2']);
-    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u8', topic: null, now: saturday }))).toEqual(['c3', 'c1', 'c2']);
-    // Changes on Monday: week 45 → 0 → c1 first.
-    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u9', topic: null, now: monday }))).toEqual(['c1', 'c2', 'c3']);
-  });
-
-  it('never shows the reader', () => {
-    expect(ids(spotlightCoaches(pool, { cityKey: null, readerId: 'u3', topic: null, now: saturday }))).toEqual(['c1', 'c2']);
-    expect(spotlightCoaches([pool[0]], { cityKey: null, readerId: 'u3', topic: null, now: saturday })).toEqual([]);
-  });
-
-  it('keeps to the city, and falls back to every city when it has nobody', () => {
-    const cluj = cityKey('Cluj-Napoca');
-    // Cluj: c1, c3. Week 44 → 0 → c1 first.
-    expect(ids(spotlightCoaches(pool, { cityKey: cluj, readerId: null, topic: null, now: saturday }))).toEqual(['c1', 'c3']);
-    const bucharest = cityKey('București');
-    expect(ids(spotlightCoaches(pool, { cityKey: bucharest, readerId: null, topic: null, now: saturday }))[0]).toBe('c3');
-    // Only the reader in the city counts as nobody.
-    const timisoara = cityKey('Timisoara');
-    expect(ids(spotlightCoaches(pool, { cityKey: timisoara, readerId: 'u2', topic: null, now: saturday }))[0]).toBe('c3');
-  });
-
-  it('narrows to the topic, and is empty when no coach fits', () => {
-    const runner = coach({ id: 'c5', userId: 'u5', categoryIds: [running.id] });
-    expect(ids(spotlightCoaches([...pool, runner], { cityKey: null, readerId: null, topic: categoryTopic(running), now: saturday }))).toEqual(['c5']);
-    expect(spotlightCoaches(pool, { cityKey: null, readerId: null, topic: onlineTopic(), now: saturday })).toEqual([]);
-  });
-
-  it('shows a few faces, not the directory', () => {
-    const many = Array.from({ length: SPOTLIGHT_LIMIT + 4 }, (_, index) =>
-      coach({ id: `m${index}`, userId: `mu${index}` }),
-    );
-    expect(spotlightCoaches(many, { cityKey: null, readerId: null, topic: null, now: saturday })).toHaveLength(SPOTLIGHT_LIMIT);
+  it('shows a few faces, long enough to read each', () => {
+    // The server picks who (the directory's daily spotlight order).
+    expect(SPOTLIGHT_LIMIT).toBeGreaterThan(1);
+    expect(SPOTLIGHT_LIMIT).toBeLessThanOrEqual(5);
+    expect(SPOTLIGHT_INTERVAL_MS).toBeGreaterThan(5000);
   });
 });
 
 describe('topics', () => {
   it('goes by categories only, never by words in a name', () => {
     const topic = categoryTopic(running);
-    expect(coachMatchesTopic(coach({ categoryIds: [running.id] }), topic)).toBe(true);
-    expect(coachMatchesTopic(coach({ categoryIds: [yoga.id], specializations: ['Alergare'] }), topic)).toBe(false);
-    expect(coachMatchesTopic(coach({ specializations: ['Alergare'] }), topic)).toBe(false);
-    expect(coachMatchesTopic(coach(), topic)).toBe(false);
-    expect(coachMatchesTopic(coach(), null)).toBe(true);
     expect(groupMatchesTopic(group({ categoryIds: [running.id] }), topic)).toBe(true);
     expect(groupMatchesTopic(group({ name: 'Alergăm în Cluj' }), topic)).toBe(false);
     expect(groupMatchesTopic(group(), null)).toBe(true);
@@ -668,10 +605,8 @@ describe('topics', () => {
     expect(sessionMatchesTopic(instance(), categoryTopic(yoga))).toBe(false);
   });
 
-  it('online is a venue for a coach and where it happens for a session; a group has no place', () => {
+  it('online is where a session happens; a group has no place', () => {
     const online = onlineTopic();
-    expect(coachMatchesTopic(coach({ isOnline: true }), online)).toBe(true);
-    expect(coachMatchesTopic(coach({ specializations: ['Online'] }), online)).toBe(false);
     expect(groupMatchesTopic(group({ name: 'Online run club' }), online)).toBe(false);
     expect(sessionMatchesTopic(instance(), online)).toBe(true);
     expect(sessionMatchesTopic(instance({ locationKind: SessionLocationKind.InPerson }), online)).toBe(false);
@@ -694,7 +629,7 @@ describe('topics', () => {
 
   it('offers only chips with something to show, Online only when something is online', () => {
     const pool = {
-      coaches: [coach({ categoryIds: [running.id] })],
+      ...coachPool({ categories: [{ id: running.id, count: 2 }], online: 0 }),
       groups: [],
       sessions: [],
     };
@@ -704,7 +639,7 @@ describe('topics', () => {
     expect(discoverTopicChips(ACTIVITIES, [yoga.id], pool).map((chip) => chip.id)).toEqual([
       'running',
     ]);
-    const online = { ...pool, coaches: [coach({ categoryIds: [running.id], isOnline: true })] };
+    const online = { ...pool, onlineCoaches: 1 };
     expect(discoverTopicChips(ACTIVITIES, [], online).map((chip) => chip.id)).toEqual([
       'running',
       DiscoverTopicIds.Online,
@@ -712,7 +647,7 @@ describe('topics', () => {
   });
 
   it('keeps the picked chip while it is picked, even with nothing left to show', () => {
-    const empty = { coaches: [], groups: [], sessions: [] };
+    const empty = { ...coachPool({}), groups: [], sessions: [] };
     expect(discoverTopicChips(ACTIVITIES, [running.id], empty)).toEqual([]);
     expect(discoverTopicChips(ACTIVITIES, [], empty, 'yoga').map((chip) => chip.id)).toEqual([
       'yoga',
@@ -732,7 +667,7 @@ describe('topics', () => {
       category(`a${index}`, 'ACTIVITY', index),
     );
     const pool = {
-      coaches: many.map((c) => coach({ categoryIds: [c.id] })),
+      ...coachPool({ categories: many.map((c) => ({ id: c.id, count: 1 })), online: 0 }),
       groups: [],
       sessions: [],
     };
@@ -742,6 +677,19 @@ describe('topics', () => {
     const chips = discoverTopicChips(many, [], pool, late);
     expect(chips).toHaveLength(TOPIC_CHIP_LIMIT + 1);
     expect(chips.at(-1)?.id).toBe(late);
+  });
+
+  it('reads the coaches side of the chips from the facets, skipping empty counts', () => {
+    const pool = coachPool({
+      categories: [
+        { id: running.id, count: 3 },
+        { id: yoga.id, count: 0 },
+      ],
+      online: 2,
+    });
+    expect([...pool.coachCategoryIds]).toEqual([running.id]);
+    expect(pool.onlineCoaches).toBe(2);
+    expect(coachPool({}).onlineCoaches).toBe(0);
   });
 
   it('browses For you when the reader picked some, then every activity, then Online', () => {
@@ -778,7 +726,7 @@ describe('cities', () => {
     inPerson.template = { ...inPerson.template!, venue: { id: 'v', name: 'Park', city: 'Iași', kind: 'PARK' } };
     expect(
       discoverCities(
-        [coach({ city: 'Bucharest' }), coach({ id: 'p2', city: null })],
+        ['Bucharest', null],
         [group({ city: 'București' }), group({ id: 'g2', city: 'Cluj-Napoca' })],
         [inPerson, instance()],
       ),

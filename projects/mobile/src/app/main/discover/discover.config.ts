@@ -488,16 +488,6 @@ export function coachBadge(
   return null;
 }
 
-/** Accepting-first, then by name — the only honest sort the payload offers. */
-export function sortCoaches(list: InstructorSearchResult[]): InstructorSearchResult[] {
-  return [...list].sort((a, b) => {
-    if (a.isAcceptingClients !== b.isAcceptingClients) {
-      return a.isAcceptingClients ? -1 : 1;
-    }
-    return coachName(a).localeCompare(coachName(b));
-  });
-}
-
 /** Everyone but the reader: Discover never pitches a coach to themselves. */
 export function withoutReader<T extends { userId: string }>(list: readonly T[], readerId: string | null | undefined): T[] {
   return readerId ? list.filter((item) => item.userId !== readerId) : [...list];
@@ -520,17 +510,11 @@ export function bioQuote(bio: string | null | undefined, max = 140): string | nu
 
 // ─── Coach spotlight ───────────────────────────────────────────────────────
 
-/** The ISO 8601 week number (weeks start on Monday; week 1 holds the
-    year's first Thursday), in the reader's local calendar. */
-export function isoWeek(date: Date): number {
-  const day = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const weekday = day.getUTCDay() || 7;
-  day.setUTCDate(day.getUTCDate() + 4 - weekday);
-  const yearStart = new Date(Date.UTC(day.getUTCFullYear(), 0, 1));
-  return Math.ceil(((day.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
-}
-
-/** At most this many coaches take turns in the spotlight: a few faces, not the directory. */
+/**
+ * At most this many coaches take turns in the spotlight: a few faces, not
+ * the directory. The server picks them (the directory's `spotlight` order,
+ * a new one every day, the same for everyone), so every coach gets turns.
+ */
 export const SPOTLIGHT_LIMIT = 5;
 
 /**
@@ -539,52 +523,6 @@ export const SPOTLIGHT_LIMIT = 5;
  * pace), well past the 5 s under which moving content needs no pause.
  */
 export const SPOTLIGHT_INTERVAL_MS = 7000;
-
-export interface SpotlightOptions {
-  /** The city Discover shows (`cityKey`), or null for everywhere. */
-  cityKey: string | null;
-  readerId: string | null | undefined;
-  topic: DiscoverTopic | null;
-  now: Date;
-}
-
-/**
- * The coaches who take turns in Discover's spotlight: coaches taking
- * clients, the city's first and every city's when that one has nobody, a
- * topic narrowing them like the rest of the tab. Ordered by id and started
- * at the week of the year, so the first face changes every Monday and is
- * the same for everyone looking at the same city that week; the reader is
- * never shown to themselves. Today every coach can be in it; promoted
- * coaches would be a different pool through the same component.
- */
-export function spotlightCoaches(
-  coaches: readonly InstructorSearchResult[],
-  options: SpotlightOptions,
-): InstructorSearchResult[] {
-  const open = coaches
-    .filter((coach) => coach.isAcceptingClients && coachMatchesTopic(coach, options.topic))
-    .sort((a, b) => a.id.localeCompare(b.id));
-  let local = open;
-  if (options.cityKey) {
-    local = open.filter((coach) => cityKey(coach.city) === options.cityKey);
-  }
-  let pool = open;
-  if (local.some((coach) => coach.userId !== options.readerId)) {
-    pool = local;
-  }
-  if (pool.length === 0) {
-    return [];
-  }
-  const start = isoWeek(options.now) % pool.length;
-  const turns: InstructorSearchResult[] = [];
-  for (let step = 0; step < pool.length && turns.length < SPOTLIGHT_LIMIT; step++) {
-    const coach = pool[(start + step) % pool.length];
-    if (coach.userId !== options.readerId) {
-      turns.push(coach);
-    }
-  }
-  return turns;
-}
 
 // ─── Topics ────────────────────────────────────────────────────────────────
 
@@ -684,20 +622,6 @@ function inTopicCategories(
 }
 
 /**
- * A coach by what they coach, and Online by an online venue (the API's
- * `isOnline`). No topic matches everyone.
- */
-export function coachMatchesTopic(c: InstructorSearchResult, topic: DiscoverTopic | null): boolean {
-  if (!topic) {
-    return true;
-  }
-  if (topic.online) {
-    return c.isOnline;
-  }
-  return inTopicCategories(c.categoryIds, topic);
-}
-
-/**
  * A group by what it trains. Online is where a session happens, and a
  * group has no place of its own, so no group is shown under it.
  */
@@ -725,17 +649,42 @@ export function sessionMatchesTopic(
   return inTopicCategories(i.template?.categoryIds, topic);
 }
 
-/** What Discover has on screen, for deciding which topics are worth a chip. */
+/**
+ * What Discover knows is there, for deciding which topics are worth a chip:
+ * the categories coached anywhere and how many coach online (the
+ * directory's facets, over every coach), and the groups and sessions on
+ * screen.
+ */
 export interface DiscoverPool {
-  coaches: readonly InstructorSearchResult[];
+  coachCategoryIds: ReadonlySet<string>;
+  onlineCoaches: number;
   groups: readonly DiscoverGroup[];
   sessions: readonly PublicSessionInstance[];
 }
 
+/** The pool's coach side from the directory's facets. */
+export function coachPool(
+  facets: { categories?: readonly { id: string; count: number }[]; online?: number },
+): Pick<DiscoverPool, 'coachCategoryIds' | 'onlineCoaches'> {
+  const ids = new Set<string>();
+  for (const facet of facets.categories ?? []) {
+    if (facet.count > 0) {
+      ids.add(facet.id);
+    }
+  }
+  return { coachCategoryIds: ids, onlineCoaches: facets.online ?? 0 };
+}
+
 /** Whether anything in the pool matches the topic. */
 export function topicHasMatches(topic: DiscoverTopic, pool: DiscoverPool): boolean {
+  let coaches = false;
+  if (topic.online) {
+    coaches = pool.onlineCoaches > 0;
+  } else {
+    coaches = topic.categoryIds.some((id) => pool.coachCategoryIds.has(id));
+  }
   return (
-    pool.coaches.some((coach) => coachMatchesTopic(coach, topic)) ||
+    coaches ||
     pool.groups.some((group) => groupMatchesTopic(group, topic)) ||
     pool.sessions.some((instance) => sessionMatchesTopic(instance, topic))
   );
@@ -830,16 +779,16 @@ export interface DiscoverCity {
   label: string;
 }
 
-/** The cities Discover can show: every city a coach, group or session is
-    in, one row each, by name. */
+/** The cities Discover can show: every city a coach (the directory's
+    facet cities), group or session is in, one row each, by name. */
 export function discoverCities(
-  coaches: readonly InstructorSearchResult[],
+  coachCities: readonly (string | null | undefined)[],
   groups: readonly DiscoverGroup[],
   sessions: readonly PublicSessionInstance[],
 ): DiscoverCity[] {
   const byKey = new Map<string, string>();
   const names = [
-    ...coaches.map((coach) => coach.city),
+    ...coachCities,
     ...groups.map((group) => group.city),
     ...sessions.map(sessionCity),
   ];

@@ -677,7 +677,7 @@
         "name": "Name",
         "recommended": "Recommended"
       },
-      "speciality": "Speciality",
+      "coaches": "What they coach",
       "yearsPlus": "{count, plural, one {#+ year} other {#+ years}}"
     },
     "filters": {
@@ -760,7 +760,7 @@
       "years": "{count, plural, one {# yr} other {# yrs}}"
     },
     "coachRow": {
-      "online": "Online",
+      "online": "Coaches online",
       "requestSent": "Request sent",
       "takingClients": "Taking clients",
       "yourCoach": "Your coach"
