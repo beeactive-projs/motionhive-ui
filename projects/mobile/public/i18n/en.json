@@ -1104,6 +1104,15 @@
     }
   },
   "groups": {
+    "actions": {
+      "edit": "Edit group",
+      "invite": "Invite people",
+      "requests": "Join requests",
+      "reviewPosts": "Review posts",
+      "youAreIn": "You're in this group",
+      "youModerate": "You moderate this group",
+      "youRun": "You run this group"
+    },
     "addMembers": {
       "empty": {
         "message": "Everyone you coach is already in this group.",
@@ -1132,6 +1141,7 @@
       "nobodyMatches": "Nobody matches",
       "postContent": "Post content",
       "posts": "Posts",
+      "runBy": "Run by",
       "where": "Where"
     },
     "compose": {
@@ -1159,6 +1169,7 @@
     "detail": {
       "a11y": {
         "manage": "Review requests and posts",
+        "options": "Group options",
         "settings": "Group settings"
       },
       "announce": {
@@ -1195,6 +1206,7 @@
         },
         "loadError": "Couldn't load posts"
       },
+      "postsToReview": "Posts to review",
       "toast": {
         "leaveFailed": "Could not leave this group.",
         "left": "You left the group"
@@ -1244,6 +1256,34 @@
       "openPhoto": "Open photo {index} of {total}",
       "openPhotoBy": "Open photo {index} of {total} by {name}"
     },
+    "invite": {
+      "invitedYou": "{name} invited you",
+      "invitedYouNoName": "You're invited",
+      "join": "Join group",
+      "notNow": "Not now",
+      "privacy": "Members see your name, photo and the workouts you choose to post. You can leave at any time.",
+      "toast": {
+        "declineFailed": "Could not decline that invitation.",
+        "declined": "Invitation declined",
+        "joinFailed": "Could not join this group.",
+        "joined": "You joined {group}"
+      }
+    },
+    "invitePeople": {
+      "clients": "Your clients",
+      "empty": {
+        "title": "Nobody left to invite"
+      },
+      "note": "They get an invite and join only if they accept. Members see each other's names and photos.",
+      "save": "{count, plural, =0 {Invite} other {Invite #}}",
+      "selectAll": "Select all",
+      "selectNone": "Select none",
+      "toast": {
+        "alreadyInvited": "They're already invited or in the group",
+        "failed": "Could not send those invites.",
+        "sent": "{count, plural, one {# invite sent} other {# invites sent}}"
+      }
+    },
     "join": {
       "closed": "Invite only",
       "pending": "Request pending"
@@ -1279,6 +1319,9 @@
       "OPEN": "Anyone can join instantly."
     },
     "list": {
+      "a11y": {
+        "waiting": "{count, plural, one {# thing waiting for you} other {# things waiting for you}}"
+      },
       "announce": {
         "count": "{count, plural, one {# group} other {# groups}}.",
         "none": "No groups match that."
@@ -1299,6 +1342,8 @@
         },
         "seeGroups": "See your groups"
       },
+      "joinedHeading": "Groups you joined",
+      "lastPost": "last post {time}",
       "loadError": "Couldn't load groups",
       "mine": {
         "empty": {
@@ -1306,18 +1351,26 @@
           "title": "You're not in any groups"
         }
       },
+      "needsYou": "Needs you",
       "noGroups": {
         "coachMessage": "Create a group to bring your clients together in one place.",
         "memberMessage": "Join a group and posts from it show up here.",
         "title": "No groups yet"
       },
+      "noPosts": "no posts yet",
       "private": "Private",
+      "runBy": "Run by {name}",
+      "runHeading": "Groups you run",
       "search": "Search groups",
       "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search.",
       "segments": {
         "discover": "Discover",
         "feed": "Feed",
         "mine": "Your groups"
+      },
+      "waiting": {
+        "posts": "{count, plural, one {# post to review} other {# posts to review}}",
+        "requests": "{count, plural, one {# join request} other {# join requests}}"
       }
     },
     "manage": {
@@ -1358,6 +1411,25 @@
       },
       "written": "Written {time}"
     },
+    "members": {
+      "makeModerator": "Make moderator",
+      "makeModeratorHint": "Can review and remove posts",
+      "message": "Message",
+      "remove": "Remove from group",
+      "removeConfirm": {
+        "body": "They stop seeing the group's posts and members. You can invite them again later.",
+        "title": "Remove {name} from the group?"
+      },
+      "removeModerator": "Remove as moderator",
+      "removeModeratorHint": "Stays in the group as a member",
+      "toast": {
+        "moderatorMade": "{name} is now a moderator",
+        "moderatorRemoved": "{name} is no longer a moderator",
+        "removeFailed": "Could not remove that member.",
+        "removed": "{name} is no longer in the group",
+        "roleFailed": "Could not change that role."
+      }
+    },
     "photos": {
       "alt": "Photo {index} of {total}",
       "counter": "{index} of {total}",
@@ -1378,14 +1450,17 @@
         "editThis": "Edit this post",
         "like": "Like post by {name}",
         "likeThis": "Like this post",
+        "more": "Options for the post by {name}",
         "openBy": "Open post by {name}",
         "openByMember": "Open post by a member",
+        "options": "Post options",
         "postComment": "Post comment",
         "unlike": "Unlike post by {name}",
         "unlikeThis": "Unlike this post",
         "viewProfile": "View {name}’s profile"
       },
       "addComment": "Add a comment",
+      "comment": "Comment",
       "commentCount": "{count, plural, one {# comment} other {# comments}}",
       "comments": "Comments",
       "commentsLoadError": "Couldn't load comments",
@@ -1397,11 +1472,13 @@
         "body": "It will be removed for everyone, along with its comments.",
         "title": "Delete this post?"
       },
+      "deleteVerb": "Delete post",
       "editTitle": "Edit post",
       "empty": {
         "message": "Be the first to say something.",
         "title": "No comments yet"
       },
+      "like": "Like",
       "loadError": {
         "message": "It may have been deleted, or you may be offline.",
         "title": "Couldn't load this post"
@@ -1450,6 +1527,18 @@
         "withdrawn": "Request withdrawn"
       },
       "withdraw": "Withdraw"
+    },
+    "setup": {
+      "defaultName": "{name}'s crew",
+      "inviteClients": "Invite your clients",
+      "save": "{count, plural, =0 {Create group} other {Create and invite #}}",
+      "subtitle": "You can change all of this later",
+      "title": "Your client group",
+      "toast": {
+        "created": "{count, plural, =0 {Group created} one {Group created, # invite sent} other {Group created, # invites sent}}",
+        "invitesFailed": "The group is ready, but the invites did not go out. Try Invite people on the group."
+      },
+      "whoCanPost": "Who can post"
     }
   },
   "home": {
@@ -1546,6 +1635,11 @@
       "afternoon": "Good afternoon.",
       "evening": "Good evening.",
       "morning": "Good morning."
+    },
+    "groupSetup": {
+      "detail": "A private group where they share workouts and cheer each other on.",
+      "notNow": "Not now",
+      "title": "Bring your clients together"
     },
     "latest": {
       "capped": "{count, plural, one {The most recent workout} other {The # most recent workouts}}",
@@ -3219,6 +3313,21 @@
       "title": "Plan",
       "yourCoach": "your coach"
     },
+    "postToGroup": {
+      "caption": "Caption",
+      "captionPlaceholder": "Say something about it",
+      "card": "Workout card",
+      "cardHint": "The name and a summary, as a card",
+      "changePhoto": "Change photo",
+      "kindLabel": "What to post",
+      "noGroups": "None of your groups takes posts from you right now.",
+      "photoHint": "The details float on your photo",
+      "privacyCard": "The group sees the name and a summary. Never your notes, weights or photo.",
+      "privacyPhoto": "The group sees your photo, the name and a summary. Never your notes or weights.",
+      "submit": "Post to {group}",
+      "title": "Post to a group",
+      "yourPhoto": "Your photo"
+    },
     "prescription": {
       "compact": "{sets} × {reps}",
       "compactHold": "{sets} × {seconds} s",
@@ -3437,7 +3546,7 @@
       "group": {
         "done": "Posted in {group}",
         "failed": "Could not post it in the group",
-        "hint": "Members see a card with the workout's name and the numbers. Never your note, weights or photo.",
+        "hint": "Pick a group to post your photo or the workout card. Never your note or weights.",
         "pending": "Sent to {group}. It shows once the group approves it.",
         "posting": "Posting in {group}",
         "title": "Or post it in a group"

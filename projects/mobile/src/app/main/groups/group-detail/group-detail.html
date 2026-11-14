@@ -1,37 +1,88 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" [text]="backLabel | translate" />
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backHref" />
     </ion-buttons>
-    <ion-title>{{ store.group()?.name ?? ('groups.common.group' | translate) }}</ion-title>
+    <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="end">
-      @if (canManage()) {
-      <!-- Two separate destinations rather than one kebab: the queues are
-           work that arrives, settings are a thing you go and change. -->
-      <ion-button shape="round" [attr.aria-label]="'groups.detail.a11y.settings' | translate" (click)="editGroup()">
-        <ion-icon slot="icon-only" name="settings-outline" />
-      </ion-button>
-      <ion-button shape="round" [attr.aria-label]="'groups.detail.a11y.manage' | translate" (click)="manage()">
-        <ion-icon slot="icon-only" name="shield-checkmark-outline" />
+      @if (groupActions().length > 0) {
+      <!-- One ⋯ for every verb about the group, by role. -->
+      <ion-button shape="round" [attr.aria-label]="'groups.detail.a11y.options' | translate"
+        (click)="openGroupActions()">
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" />
       </ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
+</ion-header>
 
-  @if (store.group(); as group) {
-  <!-- Compact: the name is already in the toolbar above, so this carries
-       only what the toolbar cannot — how many people, and how you get in. -->
-  <ion-toolbar class="hero-bar">
+<ion-content [fullscreen]="true">
+  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.isStale()) {
+  <mh-stale-bar (retry)="retry()" />
+  }
+
+  @if (store.showGroupError()) {
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.common.loadGroupError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
+  } @else if (store.showGroupSkeleton()) {
+  <div class="mh-page" aria-busy="true">
     <div class="hero">
-      <mh-hex-avatar size="md" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
-      <div class="hero-meta">
-        <span class="count">{{ memberCountLabel() }}</span>
+      <mh-hex-avatar size="xl" color="medium" tone="wash" />
+      <ion-skeleton-text [animated]="true" style="width: 45%; height: 1.5rem" />
+      <ion-skeleton-text [animated]="true" style="width: 35%" />
+    </div>
+  </div>
+  } @else if (store.group(); as group) {
+  <div class="mh-page">
+    <!-- Who the group is, centred like a person's page: every "thing" page
+         leads with its identity. -->
+    <div class="hero">
+      <mh-hex-avatar size="xl" aria-hidden="true" [color]="groupTone" [name]="group.name"
+        [imageUrl]="group.logoUrl" />
+      <h1>{{ group.name }}</h1>
+
+      @if (group.owner; as owner) {
+      @if (owner.handle) {
+      <button type="button" class="run-by"
+        [attr.aria-label]="'groups.post.a11y.viewProfile' | translate: { name: ownerName() }" (click)="openOwner()">
+        <mh-hex-avatar size="xs" aria-hidden="true" [name]="ownerName()" [imageUrl]="owner.avatarUrl"
+          [color]="ownerTone()" />
+        <span>{{ 'groups.common.runBy' | translate }} <strong>{{ ownerName() }}</strong></span>
+        <ion-icon name="chevron-forward-outline" aria-hidden="true" />
+      </button>
+      } @else {
+      <p class="run-by">
+        <mh-hex-avatar size="xs" aria-hidden="true" [name]="ownerName()" [imageUrl]="owner.avatarUrl"
+          [color]="ownerTone()" />
+        <span>{{ 'groups.common.runBy' | translate }} <strong>{{ ownerName() }}</strong></span>
+      </p>
+      }
+      }
+
+      @if (categories().length > 0) {
+      <div class="categories" role="list" [attr.aria-label]="'groups.edit.categories' | translate">
+        @for (category of categories(); track category.id) {
+        <ion-chip class="category" role="listitem">
+          <ion-icon [name]="categoryIcon(category.icon)" aria-hidden="true" />
+          <ion-label>{{ category.name }}</ion-label>
+        </ion-chip>
+        }
+      </div>
+      }
+
+      <div class="facts">
+        <span>{{ memberCountLabel() }}</span>
         <ion-badge class="policy" [attr.data-tone]="policyTone()">{{ policyLabel() }}</ion-badge>
       </div>
     </div>
-  </ion-toolbar>
 
-  <ion-toolbar>
     <ion-segment class="mh-tabs" mode="md" [value]="store.tab()" (ionChange)="setTab($event.detail.value)">
       <ion-segment-button [value]="Tabs.Posts">
         <ion-icon name="newspaper-outline" aria-hidden="true" />
@@ -46,63 +97,45 @@
         <ion-label>{{ 'groups.common.about' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>
-  </ion-toolbar>
-  }
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <!-- `ion-title` is not a heading, so a screen reader had nothing to land
-       on and the outline began at h2. -->
-  <h1 class="mh-visually-hidden">{{ store.group()?.name ?? ('groups.common.group' | translate) }}</h1>
-  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
-
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
-    <ion-refresher-content />
-  </ion-refresher>
-
-  @if (store.isStale()) {
-  <div class="stale" role="status">
-    <div class="stale-bar">
-      <ion-icon name="cloud-offline-outline" aria-hidden="true" />
-      <span>{{ 'error.staleData' | translate }}</span>
-      <ion-button size="small" fill="clear" (click)="retry()">{{ 'button.tryAgain' | translate }}</ion-button>
-    </div>
-  </div>
-  }
-  @if (store.showGroupError()) {
-  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.common.loadGroupError' | translate"
-    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
-    (action)="retry()" />
-  } @else if (store.showGroupSkeleton()) {
-  <div class="mh-page" aria-busy="true">
+    @if (isPosts()) {
+    @if (isStaff() && (pendingRequests() > 0 || pendingPosts() > 0)) {
+    <!-- The work waiting on staff, seen without opening the ⋯. -->
     <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index) {
-      <ion-item>
-        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-        </ion-label>
+      @if (pendingRequests() > 0) {
+      <ion-item button [detail]="true" (click)="openQueue('requests')">
+        <mh-hex-avatar slot="start" size="sm" icon="people-outline" color="violet" />
+        <ion-label>{{ 'groups.actions.requests' | translate }}</ion-label>
+        <ion-note slot="end">{{ pendingRequests() }}</ion-note>
+      </ion-item>
+      }
+      @if (pendingPosts() > 0) {
+      <ion-item button [detail]="true" (click)="openQueue('posts')">
+        <mh-hex-avatar slot="start" size="sm" icon="shield-checkmark-outline" color="info" tone="shade" />
+        <ion-label>{{ 'groups.detail.postsToReview' | translate }}</ion-label>
+        <ion-note slot="end">{{ pendingPosts() }}</ion-note>
       </ion-item>
       }
     </ion-list>
-  </div>
-  } @else if (isPosts()) {
-  <div class="mh-page">
+    }
+
     @if (canCompose()) {
-    <!-- A prompt, not a FAB: the composer is the main verb here and a
-         floating button would sit on top of the newest post. -->
+    <!-- A prompt, not a floating button: composing is the main verb here and
+         a floating button would sit on top of the newest post. -->
     <button type="button" class="compose" (click)="compose()">
-      <ion-icon name="add-outline" aria-hidden="true" />
+      <mh-hex-avatar size="xs" aria-hidden="true" [name]="viewerName()" [imageUrl]="viewerAvatar()"
+        [color]="viewerTone()" />
       <span>{{ 'groups.compose.placeholder' | translate }}</span>
+      <ion-icon name="camera-outline" aria-hidden="true" />
     </button>
     }
+
     @if (store.showLoadError()) {
     <mh-empty-state icon="alert-circle-outline" [heading]="'groups.detail.posts.loadError' | translate"
       [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()" />
     } @else if (store.showSkeleton()) {
-    <div aria-busy="true">
+    <div class="mh-stack" aria-busy="true">
       @for (_ of skeletonRows; track $index) {
       <article class="post-skeleton">
         <div class="post-skeleton-head">
@@ -121,59 +154,15 @@
     <mh-empty-state icon="chatbubble-outline" [heading]="'groups.detail.posts.empty.title' | translate"
       [message]="(canCompose() ? 'groups.detail.posts.empty.canPost' : 'groups.detail.posts.empty.message') | translate" />
     } @else {
-    @for (post of store.posts(); track post.id) {
-    <article class="post-card">
-      <div class="post-head">
-        <mh-hex-avatar size="md" [name]="authorName(post)" [imageUrl]="post.author?.avatarUrl ?? null" />
-        <div class="who">
-          <h2>{{ authorName(post) }}</h2>
-          <p>{{ postedAt(post.postedAt) }}</p>
-        </div>
-        @if (mayDelete(post)) {
-        <ion-button fill="clear" shape="round" class="post-action" [attr.aria-label]="'groups.post.a11y.deleteBy' | translate: { name: authorName(post) }"
-          (click)="confirmDeletePost(post)">
-          <ion-icon slot="icon-only" name="trash-outline" />
-        </ion-button>
-        }
-      </div>
-
-      <!-- The body opens the post; the buttons below it do their own thing,
-           so the whole card is not one tap target. -->
-      <button type="button" class="post-body-button" [attr.aria-label]="'groups.post.a11y.openBy' | translate: { name: authorName(post) }"
-        (click)="openPost(post.id)">
-        <span class="post-body">{{ post.content }}</span>
-      </button>
-
-            @if (post.workout; as workout) {
-              <mh-post-workout [workout]="workout" [handle]="post.author?.handle" />
-            }
-      @if (post.mediaUrls; as photos) {
-      <!-- A photo opens the viewer, not the post: tapping a picture to read
-           the comments under it is not what the tap meant. -->
-      <mh-post-gallery [urls]="photos" [authorName]="authorName(post)"
-        (openPhoto)="openPhoto(post, $event)" />
+    <div class="mh-stack">
+      @for (post of store.posts(); track post.id) {
+      <mh-post-card [post]="post" [showMore]="hasPostActions(post)" (open)="openPost(post.id)"
+        (openPhoto)="openPhoto(post, $event)" (like)="like(post)" (comment)="commentOn(post.id)"
+        (more)="openPostActions(post)" />
       }
-
-      <div class="post-meta">
-        <ion-button fill="clear" size="small" class="meta-button"
-          [class.reacted]="post.myReaction"
-          [attr.aria-label]="(post.myReaction ? 'groups.post.a11y.unlike' : 'groups.post.a11y.like') | translate: { name: authorName(post) }"
-          [attr.aria-pressed]="!!post.myReaction" (click)="like(post)">
-          <ion-icon slot="start" [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'" />
-          {{ post.reactionCount }}
-        </ion-button>
-        <ion-button fill="clear" size="small" class="meta-button"
-          [attr.aria-label]="'groups.post.a11y.comments' | translate: { name: authorName(post) }" (click)="openPost(post.id)">
-          <ion-icon slot="start" name="chatbubble-outline" />
-          {{ post.commentCount }}
-        </ion-button>
-      </div>
-    </article>
+    </div>
     }
-    }
-  </div>
-  } @else if (isMembers()) {
-  <div class="mh-page">
+    } @else if (isMembers()) {
     @if (store.showLoadError()) {
     <mh-empty-state icon="alert-circle-outline" [heading]="'groups.detail.members.loadError' | translate"
       [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
@@ -190,21 +179,14 @@
       }
     </ion-list>
     } @else {
-    @if (canManage()) {
-    <ion-button expand="block" fill="outline" class="add-members" (click)="openAddMembers()">
-      <ion-icon slot="start" name="person-add-outline" />
-      {{ 'groups.addMembers.title' | translate }}
-    </ion-button>
-    }
-
-    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" [placeholder]="'groups.detail.members.search' | translate"
+    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline"
+      [placeholder]="'groups.detail.members.search' | translate"
       [attr.aria-label]="'groups.detail.members.search' | translate" inputmode="search"
       [value]="store.memberQuery()" (ionInput)="onMemberQuery($event.detail.value ?? '')" />
 
     @if (store.searchNeedsMore()) {
     <!-- The search only sees rows already fetched, so in a big group the
-         person may simply not be loaded yet. Saying "nobody matches" here
-         would be wrong. -->
+         person may simply not be loaded yet. -->
     <mh-empty-state icon="people-outline" [heading]="'groups.detail.members.needsMore.title' | translate"
       [message]="'groups.detail.members.needsMore.message' | translate"
       [actionLabel]="'button.loadMore' | translate" (action)="loadMoreMembers()" />
@@ -217,18 +199,14 @@
     } @else {
     <ion-list [inset]="true" class="mh-card-list">
       @for (member of store.visibleMembers(); track member.id) {
-      <!-- Tappable only when the account has a handle: a profile is addressed
-           by handle, so without one there is nowhere to go. -->
-      <ion-item [button]="hasProfile(member)"
-        [detail]="false" (click)="openMember(member)">
-        <mh-hex-avatar slot="start" size="md" [name]="memberName(member)"
-          [imageUrl]="member.user?.avatarUrl ?? null" />
+      <!-- A row opens that member's verbs: profile and message for anyone,
+           moderator and remove for the owner. No email here: this is a
+           social list, not an admin one. -->
+      <ion-item [button]="hasMemberActions(member)" [detail]="false" (click)="openMember(member)">
+        <mh-hex-avatar slot="start" size="md" aria-hidden="true" [name]="memberName(member)"
+          [imageUrl]="member.user?.avatarUrl ?? null" [color]="memberTone(member)" />
         <ion-label>
           <h2>{{ memberName(member) }}</h2>
-          <!-- No email here: this is a social list, not an admin one. The
-               owner's member-management screen is where contact details
-               belong. Search still matches on email, since an owner may
-               well type one. -->
         </ion-label>
         <ion-badge slot="end" class="role" [attr.data-tone]="roleTone(member)">{{ roleLabel(member) }}</ion-badge>
       </ion-item>
@@ -236,9 +214,7 @@
     </ion-list>
     }
     }
-  </div>
-  } @else if (store.group(); as group) {
-  <div class="mh-page about">
+    } @else {
     @if (group.description) {
     <section class="mh-section">
       <h2 class="mh-kicker">{{ 'groups.common.about' | translate }}</h2>
@@ -276,32 +252,10 @@
       }
     </div>
     }
-    @if (canShareJoinLink()) {
-    <!-- The only way into an invite-only group for someone who is not your
-         client, so it sits with the group's own settings rather than under
-         the member list. -->
-    <ion-list [inset]="true" class="mh-card-list">
-      <ion-item button [detail]="true" (click)="openJoinLink()">
-        <mh-hex-avatar slot="start" size="sm" icon="link-outline" color="info" />
-        <ion-label>
-          <h2>{{ 'groups.joinLink.title' | translate }}</h2>
-          <p>{{ (group.joinToken ? 'groups.detail.inviteLink.active' : 'groups.detail.inviteLink.none') | translate }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-    }
-    @if (canLeaveGroup()) {
-    <!-- The owner never sees this: the API answers "Group owner cannot
-         leave. Transfer ownership first or delete the group." -->
-    <div class="leave-row">
-      <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeave()">
-        <ion-icon slot="start" name="exit-outline" />
-        {{ 'groups.detail.leave.button' | translate }}
-      </ion-button>
-    </div>
     }
   </div>
   }
+
   @if ((isPosts() && store.postsHasMore()) || (isMembers() && store.membersHasMore())) {
   <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
     <ion-infinite-scroll-content />
@@ -309,18 +263,32 @@
   }
 </ion-content>
 
-<mh-confirm-sheet [(open)]="leaveOpen" [title]="'groups.detail.leave.title' | translate"
-  [body]="'groups.detail.leave.body' | translate" [confirmLabel]="'button.leave' | translate"
-  tone="danger" [saving]="leaving()" (confirm)="leave()" />
-
-<mh-confirm-sheet [(open)]="deletePostOpen" [title]="'groups.post.deletePost.title' | translate"
-  [body]="'groups.post.deletePost.body' | translate" [confirmLabel]="'button.delete' | translate"
-  tone="danger" [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deletingPost()"
-  (confirm)="deletePost()" />
-
 @if (store.group(); as group) {
-<mh-add-members-sheet [(open)]="addMembersOpen" [groupId]="group.id"
-  (added)="onMembersAdded()" />
+<mh-action-sheet [(open)]="groupActionsOpen" [title]="group.name" [subtitle]="roleLine()"
+  [actions]="groupActions()" (chosen)="onGroupAction($event)" />
+
+<mh-invite-people-sheet [groupId]="group.id" [groupName]="group.name" [showLink]="canShareJoinLink()"
+  [hasLink]="!!group.joinToken" (invited)="onInvited()" (link)="openJoinLink()" />
+
 <mh-join-link-sheet [(open)]="joinLinkOpen" [groupId]="group.id" [groupName]="group.name"
   [token]="group.joinToken" (changed)="onJoinLinkChanged()" />
+
+<mh-confirm-sheet [(open)]="deleteOpen" [title]="'groups.edit.delete.title' | translate"
+  [body]="'groups.edit.delete.body' | translate" [confirmLabel]="'groups.edit.delete.button' | translate"
+  [cancelLabel]="'button.keepIt' | translate" tone="danger"
+  [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deleting()" (confirm)="deleteGroup()" />
 }
+
+<mh-action-sheet [(open)]="memberActionsOpen" [title]="memberInFocusName()" [actions]="memberActions()"
+  (chosen)="onMemberAction($event)" />
+
+<mh-confirm-sheet [(open)]="removeMemberOpen" [title]="'groups.members.removeConfirm.title' | translate: { name: memberInFocusName() }"
+  [body]="'groups.members.removeConfirm.body' | translate" [confirmLabel]="'groups.members.remove' | translate"
+  [cancelLabel]="'button.keepIt' | translate" tone="danger" [saving]="removingMember()"
+  (confirm)="removeMember()" />
+
+<mh-confirm-sheet [(open)]="leaveOpen" [title]="'groups.detail.leave.title' | translate"
+  [body]="'groups.detail.leave.body' | translate" [confirmLabel]="'groups.detail.leave.button' | translate"
+  [cancelLabel]="'button.keepIt' | translate" tone="danger" [saving]="leaving()" (confirm)="leave()" />
+
+<mh-post-actions (updated)="onPostUpdated($event)" (deleted)="onPostDeleted($event)" />

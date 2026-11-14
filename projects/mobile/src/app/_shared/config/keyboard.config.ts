@@ -50,6 +50,22 @@ export function revealDistance(geometry: RevealGeometry, gap = KEYBOARD_REVEAL_G
 }
 
 /**
+ * How close to the end counts as reading the end: the chat's own measure, so
+ * a comment thread follows the keyboard the way a conversation does.
+ */
+export const FOLLOW_END_THRESHOLD_PX = 120;
+
+/** Whether the content is scrolled to its end, or near enough to be reading it. */
+export function isAtEnd(
+  scrollTop: number,
+  scrollHeight: number,
+  clientHeight: number,
+  threshold = FOLLOW_END_THRESHOLD_PX,
+): boolean {
+  return scrollHeight - scrollTop - clientHeight <= threshold;
+}
+
+/**
  * Where the scroll can stay once `room` is taken off the bottom again: the
  * same place, or the new end of the content when it was in the room.
  */

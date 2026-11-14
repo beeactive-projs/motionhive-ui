@@ -1,0 +1,19 @@
+<mh-action-sheet [(open)]="sheetOpen" [title]="authorName()" [subtitle]="subtitle()" [actions]="actions()"
+  (chosen)="onChosen($event)" />
+
+<!-- Content only: photos are not editable, the same as on web. -->
+<ng-template #editBody>
+  <ion-textarea class="edit-body" [autoGrow]="true" [rows]="6" [maxlength]="postMaxLength"
+    [attr.aria-label]="'groups.common.postContent' | translate" [value]="editDraft()"
+    (ionInput)="onEditDraft($event.detail.value ?? '')" />
+</ng-template>
+
+<mh-sheet-shell [(open)]="editOpen" [title]="'groups.post.editTitle' | translate" [body]="editBody"
+  [saveLabel]="'button.save' | translate" [initialBreakpoint]="0.95" [breakpoints]="[0, 0.95]"
+  [canSave]="canSaveEdit()" [saving]="saving()" (save)="saveEdit()" />
+
+<mh-confirm-sheet [(open)]="deleteOpen" [title]="'groups.post.deletePost.title' | translate"
+  [body]="'groups.post.deletePost.body' | translate" [confirmLabel]="'groups.post.deleteVerb' | translate"
+  [cancelLabel]="'button.keepIt' | translate" tone="danger"
+  [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deleting()"
+  (confirm)="confirmDelete()" />

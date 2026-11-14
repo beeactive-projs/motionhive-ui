@@ -11,7 +11,7 @@
     @for (group of groups(); track $index) {
     <ion-list [inset]="true" class="mh-card-list">
       @for (action of group; track action.id) {
-      <ion-item button [detail]="false" [disabled]="action.disabled ?? false"
+      <ion-item button [detail]="!!action.value" [disabled]="action.disabled ?? false"
         [class.destructive]="action.destructive" (click)="choose(action.id)">
         @if (action.icon) {
         <mh-hex-avatar slot="start" size="sm" [icon]="action.icon" [color]="tileColor(action)"
@@ -23,6 +23,9 @@
           <p>{{ action.hint | translate }}</p>
           }
         </ion-label>
+        @if (action.value) {
+        <ion-note slot="end">{{ action.value }}</ion-note>
+        }
       </ion-item>
       }
     </ion-list>

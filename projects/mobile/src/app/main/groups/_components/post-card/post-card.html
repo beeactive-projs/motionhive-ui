@@ -1,0 +1,48 @@
+<article class="post-card">
+  <div class="post-head">
+    <mh-hex-avatar size="md" aria-hidden="true" [name]="authorName()" [imageUrl]="avatarUrl()" [color]="tone()" />
+    <div class="who">
+      <h2>{{ authorName() }}</h2>
+      <p>{{ meta() }}</p>
+    </div>
+    @if (showMore()) {
+    <ion-button fill="clear" shape="round" class="post-more"
+      [attr.aria-label]="'groups.post.a11y.more' | translate: { name: authorName() }" (click)="more.emit()">
+      <ion-icon slot="icon-only" name="ellipsis-horizontal" />
+    </ion-button>
+    }
+  </div>
+
+  @if (post().content) {
+  <button type="button" class="post-body-button"
+    [attr.aria-label]="'groups.post.a11y.openBy' | translate: { name: authorName() }" (click)="open.emit()">
+    <span class="post-body">{{ post().content }}</span>
+  </button>
+  }
+
+  @if (post().workout; as workout) {
+  <mh-post-workout [workout]="workout" [handle]="handle()" />
+  }
+
+  @if (post().mediaUrls; as photos) {
+  <!-- A photo opens the viewer, not the post: tapping a picture to read the
+       comments under it is not what the tap meant. -->
+  <mh-post-gallery [urls]="photos" [authorName]="authorName()" (openPhoto)="openPhoto.emit($event)" />
+  }
+
+  <div class="post-meta">
+    <ion-button fill="clear" size="small" class="meta-button" [class.reacted]="liked()"
+      [attr.aria-label]="(liked() ? 'groups.post.a11y.unlike' : 'groups.post.a11y.like') | translate: { name: authorName() }"
+      [attr.aria-pressed]="liked()" (click)="like.emit()">
+      <ion-icon slot="start" [name]="liked() ? 'thumbs-up' : 'thumbs-up-outline'" aria-hidden="true" />
+      <span class="verb">{{ 'groups.post.like' | translate }}</span>
+      <span class="count">{{ post().reactionCount }}</span>
+    </ion-button>
+    <ion-button fill="clear" size="small" class="meta-button"
+      [attr.aria-label]="'groups.post.a11y.comments' | translate: { name: authorName() }" (click)="comment.emit()">
+      <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
+      <span class="verb">{{ 'groups.post.comment' | translate }}</span>
+      <span class="count">{{ post().commentCount }}</span>
+    </ion-button>
+  </div>
+</article>

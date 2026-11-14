@@ -326,6 +326,8 @@
       [log]="log"
       [photoUrl]="photoUrl()"
       (logChange)="onLogChange($event)"
+      (postToGroup)="openPostToGroup($event)"
     />
+    <mh-post-workout-sheet [log]="log" [photoUrl]="photoUrl()" />
   }
 }

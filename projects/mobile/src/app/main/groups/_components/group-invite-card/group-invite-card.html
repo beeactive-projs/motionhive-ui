@@ -1,0 +1,37 @@
+<section class="invite" [attr.aria-label]="invitation().group.name">
+  <div class="head">
+    <mh-hex-avatar size="lg" aria-hidden="true" [color]="groupTone" [name]="invitation().group.name"
+      [imageUrl]="invitation().group.logoUrl" />
+    <div class="who">
+      <p class="kicker">{{ kicker() }}</p>
+      <h2>{{ invitation().group.name }}</h2>
+      <p class="facts">{{ facts() }}</p>
+    </div>
+  </div>
+
+  @if (invitation().group.description; as description) {
+  <p class="description">{{ description }}</p>
+  }
+
+  <p class="privacy">
+    <ion-icon name="lock-closed-outline" aria-hidden="true" />
+    <span>{{ 'groups.invite.privacy' | translate }}</span>
+  </p>
+
+  <div class="actions">
+    <ion-button class="mh-quiet" fill="outline" expand="block" [disabled]="busy()" (click)="later.emit()">
+      @if (answering() === 'later') {
+      <ion-spinner name="crescent" />
+      } @else {
+      {{ laterLabel() | translate }}
+      }
+    </ion-button>
+    <ion-button expand="block" [disabled]="busy()" (click)="join.emit()">
+      @if (answering() === 'join') {
+      <ion-spinner name="crescent" />
+      } @else {
+      {{ 'groups.invite.join' | translate }}
+      }
+    </ion-button>
+  </div>
+</section>

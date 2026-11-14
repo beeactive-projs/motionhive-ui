@@ -65,7 +65,10 @@
 </ion-content>
 
 @if (!loadError() && !cannotPost()) {
-<ion-footer [translucent]="true">
+<!-- Rides up with the keyboard as the chat's send bar does, so Photo and the
+     counts stay on the keys while the post is typed; the line being typed
+     stays above it, however long the post grows. -->
+<ion-footer [translucent]="true" mhKeyboardFooter>
   <ion-toolbar class="tools">
     <ion-button fill="clear" [disabled]="!canAddImage()" (click)="pickImage()">
       <ion-icon slot="start" name="image-outline" />

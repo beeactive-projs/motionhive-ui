@@ -1,0 +1,106 @@
+<ng-template #body>
+  <div class="mh-stack">
+    @if (hasPhoto()) {
+    <!-- Two ways to post, as selectable tiles: the border turns honey on the
+         picked one, the only outline a card may wear. -->
+    <div class="kinds" role="radiogroup" [attr.aria-label]="'workouts.postToGroup.kindLabel' | translate">
+      <button type="button" class="kind" role="radio" [attr.aria-checked]="kind() === Kinds.Photo"
+        [class.picked]="kind() === Kinds.Photo" (click)="setKind(Kinds.Photo)">
+        <span class="frame">
+          @if (preview(); as src) {
+          <img [src]="src" alt="" />
+          } @else {
+          <ion-spinner name="crescent" aria-hidden="true" />
+          }
+        </span>
+        <span class="label">{{ 'workouts.postToGroup.yourPhoto' | translate }}</span>
+      </button>
+      <button type="button" class="kind" role="radio" [attr.aria-checked]="kind() === Kinds.Card"
+        [class.picked]="kind() === Kinds.Card" (click)="setKind(Kinds.Card)">
+        <span class="frame card">
+          <mh-hex-avatar size="lg" color="primary" icon="barbell-outline" aria-hidden="true" />
+          <span class="card-name">{{ log().name }}</span>
+        </span>
+        <span class="label">{{ 'workouts.postToGroup.card' | translate }}</span>
+      </button>
+    </div>
+    <div class="photo-line">
+      <p class="mh-helper">{{ kindHint() | translate }}</p>
+      @if (kind() === Kinds.Photo) {
+      <ion-button fill="clear" size="small" class="mh-text-link" (click)="changePhoto()">
+        {{ 'workouts.postToGroup.changePhoto' | translate }}
+      </ion-button>
+      }
+    </div>
+    }
+
+    <!-- Which group: opens in place, so no sheet stacks on this one. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      @if (groups(); as list) {
+      @if (list.length === 0) {
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{ 'workouts.postToGroup.noGroups' | translate }}</ion-label>
+      </ion-item>
+      } @else {
+      <ion-accordion-group>
+        <ion-accordion value="group" class="mh-disclosure" toggleIcon="chevron-forward-outline">
+          <ion-item slot="header">
+            <mh-hex-avatar slot="start" size="sm" color="violet" aria-hidden="true" [name]="groupName()"
+              [imageUrl]="group()?.logoUrl ?? null" />
+            <ion-label>
+              <h2>{{ groupName() }}</h2>
+              <p>{{ 'count.members' | translate: { count: group()?.memberCount ?? 0 } }}</p>
+            </ion-label>
+            @if (list.length > 1) {
+            <ion-note slot="end">{{ 'button.change' | translate }}</ion-note>
+            }
+          </ion-item>
+          <div slot="content">
+            <ion-radio-group [value]="groupId()" (ionChange)="setGroup($event.detail.value)">
+              @for (option of list; track option.id) {
+              <ion-item>
+                <ion-radio [value]="option.id" justify="start" labelPlacement="end">{{ option.name }}</ion-radio>
+              </ion-item>
+              }
+            </ion-radio-group>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+      }
+      } @else {
+      <ion-item>
+        <ion-label><ion-skeleton-text [animated]="true" style="width: 50%" /></ion-label>
+      </ion-item>
+      }
+    </ion-list>
+
+    <section class="mh-section">
+      <h2 class="mh-kicker">{{ 'workouts.postToGroup.caption' | translate }}</h2>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <ion-textarea [autoGrow]="true" [rows]="3" [maxlength]="maxLength"
+            [placeholder]="'workouts.postToGroup.captionPlaceholder' | translate"
+            [attr.aria-label]="'workouts.postToGroup.caption' | translate" [value]="caption()"
+            (ionInput)="caption.set($event.detail.value ?? '')" />
+        </ion-item>
+      </ion-list>
+      @if (needsApproval()) {
+      <p class="mh-footnote">{{ 'groups.compose.reviewNote' | translate }}</p>
+      }
+    </section>
+
+    <p class="privacy">
+      <ion-icon name="lock-closed-outline" aria-hidden="true" />
+      <span>{{ privacyLine() | translate }}</span>
+    </p>
+  </div>
+</ng-template>
+
+<mh-sheet-shell [(open)]="open" [title]="'workouts.postToGroup.title' | translate" [subtitle]="subtitle()"
+  [body]="body" [saveLabel]="saveLabel()" [canSave]="canPost()" [saving]="posting()" [initialBreakpoint]="0.95"
+  [breakpoints]="[0, 0.95]" (save)="post()" />
+
+<!-- A plain file input, as the composer's: `capture` is not needed to pick
+     from the library, and a native plugin for one button is not worth it. -->
+<input #fileInput type="file" class="mh-visually-hidden" accept="image/png,image/jpeg,image/webp"
+  (change)="onPhotoPicked($event)" />

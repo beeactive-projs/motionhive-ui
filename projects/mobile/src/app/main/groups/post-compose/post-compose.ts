@@ -22,6 +22,7 @@ import { forkJoin, of, switchMap, take } from 'rxjs';
 import { GroupService, GroupWithMyRole, GroupsRefreshService, PostService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { KeyboardFooterDirective } from '../../../_shared/directives/keyboard-footer.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
 import {
@@ -68,6 +69,7 @@ interface PendingImage {
     IonTextarea,
     IonTitle,
     IonToolbar,
+    KeyboardFooterDirective,
     TranslatePipe,
   ],
   templateUrl: './post-compose.html',
@@ -87,6 +89,7 @@ export class PostCompose {
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+  private readonly _keyboard = viewChild(KeyboardFooterDirective);
 
   readonly maxLength = POST_MAX_LENGTH;
   readonly maxImages = POST_MAX_IMAGES;
@@ -161,7 +164,18 @@ export class PostCompose {
   }
 
   pickImage(): void {
+    // The photo picker covers the screen; the keyboard would only come back
+    // under it with the bar jumping. Still inside the tap, so the picker opens.
+    this._dismissKeyboard();
     this._fileInput()?.nativeElement.click();
+  }
+
+  /** The bar and header verbs take the keyboard down before they act. */
+  private _dismissKeyboard(): void {
+    const keyboard = this._keyboard();
+    if (keyboard) {
+      keyboard.dismiss();
+    }
   }
 
   onFilesSelected(event: Event): void {
@@ -213,6 +227,7 @@ export class PostCompose {
 
   submit(): void {
     if (!this.canSubmit()) return;
+    this._dismissKeyboard();
     this.submitting.set(true);
 
     const pending = this.images();

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -34,10 +34,12 @@ import {
   formatRelativeShort,
 } from 'core';
 
+import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../_shared/components/sheet-shell/sheet-shell';
+import { KeyboardFooterDirective } from '../../../_shared/directives/keyboard-footer.directive';
 import { PostGallery } from '../_components/post-gallery/post-gallery';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
@@ -50,6 +52,7 @@ import {
 } from '../groups.config';
 import { GROUP_ICONS } from '../groups.icons';
 import { PostDetailStore } from './post-detail.store';
+import { PostActionId, PostActionIds, postActions } from '../_sheets/post-actions/post-actions.config';
 import { PostWorkoutCard } from '../_components/post-workout/post-workout';
 
 /**
@@ -63,6 +66,7 @@ import { PostWorkoutCard } from '../_components/post-workout/post-workout';
 @Component({
   selector: 'mh-post-detail',
   imports: [
+    ActionSheet,
     PostWorkoutCard,
     ConfirmSheet,
     EmptyState,
@@ -82,6 +86,7 @@ import { PostWorkoutCard } from '../_components/post-workout/post-workout';
     IonTextarea,
     IonTitle,
     IonToolbar,
+    KeyboardFooterDirective,
     PostGallery,
     SheetShell,
     TranslatePipe,
@@ -103,6 +108,8 @@ export class PostDetail implements ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _keyboard = viewChild(KeyboardFooterDirective);
+  private readonly _composer = viewChild<IonTextarea>('composer');
 
   readonly maxLength = COMMENT_MAX_LENGTH;
   readonly skeletonRows = [1, 2, 3];
@@ -192,6 +199,63 @@ export class PostDetail implements ViewWillEnter {
     this.store.refresh();
   }
 
+  /**
+   * Comment on a card opens the post with the field ready. The instruction
+   * is taken out of the URL once used, or every way back to this page would
+   * replay it.
+   */
+  ionViewDidEnter(): void {
+    const params = this._router.parseUrl(this._router.url).queryParamMap;
+    if (!params.has('comment')) {
+      return;
+    }
+    const composer = this._composer();
+    if (composer) {
+      void composer.setFocus();
+    }
+    void this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { comment: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  // ── The post's ⋯ ───────────────────────────────────────────────────────
+
+  readonly actionsOpen = signal(false);
+
+  /**
+   * Edit and Delete. View profile is left out here: the author's name above
+   * the post already opens it.
+   */
+  readonly postActions = computed(() => {
+    const post = this.store.post();
+    if (!post) {
+      return [];
+    }
+    const actions = postActions(post, {
+      canEdit: this.canEditThisPost(),
+      canDelete: this.canDeleteThisPost(),
+    });
+    return actions.filter((action) => action.id !== PostActionIds.Profile);
+  });
+
+  openActions(): void {
+    this._dismissKeyboard();
+    this.actionsOpen.set(true);
+  }
+
+  onAction(id: PostActionId): void {
+    if (id === PostActionIds.Edit) {
+      this.startEdit();
+      return;
+    }
+    if (id === PostActionIds.Delete) {
+      this.confirmDeletePost();
+    }
+  }
+
   // ── Display helpers ────────────────────────────────────────────────────
 
   authorName(row: Post | PostComment): string {
@@ -243,13 +307,34 @@ export class PostDetail implements ViewWillEnter {
    * Start a reply. `root` is the thread this belongs to and `tapped` is who
    * the viewer answered — the same row for a top-level comment, different
    * when they replied to a reply.
+   *
+   * The keyboard comes up at once, as Reply does in a messaging app, with the
+   * comment being answered kept above the bar (`row`). Focus is given inside
+   * the tap: the only moment iOS lets a script raise the keyboard.
    */
-  replyTo(root: PostComment, tapped: PostComment = root): void {
+  replyTo(root: PostComment, tapped: PostComment = root, row: HTMLElement | null = null): void {
     this.replyingTo.set({ rootId: root.id, name: this.authorName(tapped) });
+    const keyboard = this._keyboard();
+    if (keyboard) {
+      keyboard.keepInView(row);
+    }
+    const composer = this._composer();
+    if (composer) {
+      void composer.setFocus();
+    }
   }
 
   cancelReply(): void {
     this.replyingTo.set(null);
+    this._unpin();
+  }
+
+  /** The comment being answered no longer needs to stay in view. */
+  private _unpin(): void {
+    const keyboard = this._keyboard();
+    if (keyboard) {
+      keyboard.keepInView(null);
+    }
   }
 
   send(): void {
@@ -265,6 +350,7 @@ export class PostDetail implements ViewWillEnter {
         // worse than one that leaves it there to retry.
         this.draft.set('');
         this.replyingTo.set(null);
+        this._unpin();
       },
       error: (error: unknown) => {
         this.sending.set(false);
@@ -317,8 +403,17 @@ export class PostDetail implements ViewWillEnter {
   }
 
   startEdit(): void {
+    this._dismissKeyboard();
     this.editDraft.set(this.store.post()?.content ?? '');
     this.editOpen.set(true);
+  }
+
+  /** A header verb opening a sheet takes the comment bar's keyboard down first. */
+  private _dismissKeyboard(): void {
+    const keyboard = this._keyboard();
+    if (keyboard) {
+      keyboard.dismiss();
+    }
   }
 
   onEditDraft(value: string): void {
@@ -350,6 +445,7 @@ export class PostDetail implements ViewWillEnter {
   }
 
   confirmDeletePost(): void {
+    this._dismissKeyboard();
     this.deletePostOpen.set(true);
   }
 

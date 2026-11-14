@@ -35,6 +35,7 @@ import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { NeedRowItem } from '../_components/need-row/need-row';
 import { OnboardingStateService } from '../../../_shared/services/onboarding-state.service';
 import { WelcomeCard } from '../_components/welcome-card/welcome-card';
+import { GroupSetupCard } from '../_components/group-setup-card/group-setup-card';
 import {
   buildingCells,
   coachHiveCells,
@@ -97,6 +98,7 @@ interface FirstStep {
     RowSkeleton,
     TranslatePipe,
     WelcomeCard,
+    GroupSetupCard,
   ],
   templateUrl: './coach-home.html',
   styleUrl: './coach-home.scss',

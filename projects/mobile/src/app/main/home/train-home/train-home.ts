@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
@@ -34,6 +34,7 @@ import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
 import { WelcomeCard } from '../_components/welcome-card/welcome-card';
+import { GroupInvites } from '../_components/group-invites/group-invites';
 import { HOME_STACK, HomePages } from '../home-stack.config';
 import {
   buildingCells,
@@ -92,6 +93,7 @@ interface HiveMember {
     RowSkeleton,
     TranslatePipe,
     WelcomeCard,
+    GroupInvites,
   ],
   templateUrl: './train-home.html',
   styleUrl: './train-home.scss',
@@ -287,12 +289,28 @@ export class TrainHome implements OnInit {
     this.today.set(new Date());
     this._retrying();
     this.store.load();
+    this._reloadInvites();
   }
 
   refresh(done: () => void): void {
     this.today.set(new Date());
     this._retrying();
     this.store.load(done);
+    this._reloadInvites();
+  }
+
+  /** Joined from the invite card: the group joins Your hive. */
+  onGroupJoined(): void {
+    this.store.load();
+  }
+
+  private readonly _groupInvites = viewChild(GroupInvites);
+
+  private _reloadInvites(): void {
+    const invites = this._groupInvites();
+    if (invites) {
+      invites.reload();
+    }
   }
 
   /** The week card's Try again, after its reads failed. */

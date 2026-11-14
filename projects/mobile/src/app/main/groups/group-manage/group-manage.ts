@@ -94,14 +94,15 @@ export class GroupManage implements ViewWillEnter {
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
   /** Back on a cold load: the Groups list, or the stack the group was opened in. */
-  readonly backHref = groupLinks(inject(Router).url).home;
+  private readonly _router = inject(Router);
+  readonly backHref = groupLinks(this._router.url).home;
 
   readonly Tabs = ManageTabs;
   readonly skeletonRows = [1, 2, 3];
 
   readonly tab = signal<ManageTab>(ManageTabs.Requests);
 
-  readonly isRequests = computed(() => this.tab() === ManageTabs.Requests);
+  readonly isRequests = computed(() => this.activeTab() === ManageTabs.Requests);
 
   constructor() {
     addIcons(GROUP_ICONS);
@@ -116,7 +117,23 @@ export class GroupManage implements ViewWillEnter {
     // A queue is the one thing that must never be stale: deciding on a
     // request someone already withdrew is a wasted tap and a confusing error.
     this.store.refresh();
+    // "Review posts" and a Needs you row open the queue they are about.
+    // Read off the live URL: Ionic keeps this page alive across visits.
+    const tab = this._router.parseUrl(this._router.url).queryParamMap.get('tab');
+    if (tab) {
+      this.setTab(tab);
+    }
   }
+
+  /** A moderator has posts only: the requests queue is the owner's. */
+  readonly showRequestsTab = computed(() => this.store.requestsAllowed());
+
+  readonly activeTab = computed(() => {
+    if (!this.showRequestsTab()) {
+      return ManageTabs.Posts;
+    }
+    return this.tab();
+  });
 
   setTab(value: string | number | undefined): void {
     if (value !== ManageTabs.Requests && value !== ManageTabs.Posts) return;

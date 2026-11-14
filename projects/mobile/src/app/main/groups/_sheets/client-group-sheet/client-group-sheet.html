@@ -1,0 +1,92 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <!-- Name, then how people get in and who may post: a row that opens in
+         place, as iOS Settings does, so no sheet opens on top of this one. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item>
+        <ion-input [label]="'form.label.name' | translate" labelPlacement="stacked" [maxlength]="nameMaxLength"
+          [value]="name()" (ionInput)="name.set($event.detail.value ?? '')" />
+      </ion-item>
+      <ion-accordion-group>
+        <ion-accordion value="joining" class="mh-disclosure" toggleIcon="chevron-forward-outline">
+          <ion-item slot="header">
+            <ion-label>{{ 'groups.common.joining' | translate }}</ion-label>
+            <ion-note slot="end">{{ joinPolicyLabel() | translate }}</ion-note>
+          </ion-item>
+          <div slot="content">
+            <ion-radio-group [value]="joinPolicy()" (ionChange)="setJoinPolicy($event.detail.value)">
+              @for (option of joinPolicyOptions; track option.value) {
+              <ion-item>
+                <ion-radio [value]="option.value" justify="start" labelPlacement="end">
+                  <ion-label class="ion-text-wrap">
+                    <h2>{{ option.label | translate }}</h2>
+                    <p>{{ option.hint | translate }}</p>
+                  </ion-label>
+                </ion-radio>
+              </ion-item>
+              }
+            </ion-radio-group>
+          </div>
+        </ion-accordion>
+        <ion-accordion value="posting" class="mh-disclosure" toggleIcon="chevron-forward-outline">
+          <ion-item slot="header">
+            <ion-label>{{ 'groups.setup.whoCanPost' | translate }}</ion-label>
+            <ion-note slot="end">{{ postPolicyLabel() | translate }}</ion-note>
+          </ion-item>
+          <div slot="content">
+            <ion-radio-group [value]="postPolicy()" (ionChange)="setPostPolicy($event.detail.value)">
+              @for (option of postPolicyOptions; track option.value) {
+              <ion-item>
+                <ion-radio [value]="option.value" justify="start" labelPlacement="end">
+                  <ion-label class="ion-text-wrap">
+                    <h2>{{ option.label | translate }}</h2>
+                    <p>{{ option.hint | translate }}</p>
+                  </ion-label>
+                </ion-radio>
+              </ion-item>
+              }
+            </ion-radio-group>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    </ion-list>
+
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <h2 class="mh-kicker">{{ 'groups.setup.inviteClients' | translate }}</h2>
+        @if (clients().length > 0) {
+        <ion-button fill="clear" size="small" class="mh-text-link" (click)="toggleAll()">
+          {{ (allSelected() ? 'groups.invitePeople.selectNone' : 'groups.invitePeople.selectAll') | translate }}
+        </ion-button>
+        }
+      </div>
+      @if (loading()) {
+      <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
+        @for (_ of [1, 2, 3]; track $index) {
+        <ion-item>
+          <mh-hex-avatar slot="start" size="sm" color="medium" tone="wash" />
+          <ion-label><ion-skeleton-text [animated]="true" style="width: 45%" /></ion-label>
+        </ion-item>
+        }
+      </ion-list>
+      } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (client of clients(); track client.clientId) {
+        <ion-item button [detail]="false" (click)="toggle(client)">
+          <mh-hex-avatar slot="start" size="sm" aria-hidden="true" [name]="clientName(client)"
+            [imageUrl]="client.client?.avatarUrl ?? null" [color]="tone(client)" />
+          <ion-label>{{ clientName(client) }}</ion-label>
+          <ion-checkbox slot="end" [checked]="isSelected(client)" [attr.aria-label]="clientName(client)"
+            (click)="$event.preventDefault()" />
+        </ion-item>
+        }
+      </ion-list>
+      }
+      <p class="mh-footnote">{{ 'groups.invitePeople.note' | translate }}</p>
+    </section>
+  </div>
+</ng-template>
+
+<mh-sheet-shell [(open)]="open" [title]="'groups.setup.title' | translate" [subtitle]="'groups.setup.subtitle' | translate"
+  [body]="body" [saveLabel]="saveLabel()" [canSave]="canSave()" [saving]="saving()" [initialBreakpoint]="0.95"
+  [breakpoints]="[0, 0.95]" (save)="create()" />

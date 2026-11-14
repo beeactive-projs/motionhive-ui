@@ -152,6 +152,12 @@ export const API_ENDPOINTS = {
     // behaviour while we wait for the jobs/notifications module.
     FRIEND_EMAIL: '/invitations/friend',
     INSTRUCTOR_EMAIL: '/invitations/instructor',
+    /** A group owner inviting several of their clients at once. */
+    GROUP_BULK: '/invitations/bulk',
+    /** My group invitations still waiting on an answer. */
+    PENDING: '/invitations/pending',
+    ACCEPT_MINE: (id: string) => `/invitations/mine/${id}/accept`,
+    DECLINE_MINE: (id: string) => `/invitations/mine/${id}/decline`,
   },
   PAYMENTS: {
     // Instructor — onboarding

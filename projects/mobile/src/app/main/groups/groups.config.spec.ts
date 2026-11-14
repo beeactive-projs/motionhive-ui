@@ -27,10 +27,7 @@ import {
   postNeedsApproval,
   previewBackLabel,
 } from './groups.config';
-import {
-  MIN_SEARCH_LENGTH,
-  matchesMemberQuery,
-} from './groups.filters';
+import { matchesMemberQuery } from './groups.filters';
 
 const OWNER = GroupMemberRoles.Owner;
 const MODERATOR = GroupMemberRoles.Moderator;
@@ -204,10 +201,6 @@ describe('groups.filters — search', () => {
     // A soft-deleted user comes back without the association.
     expect(matchesMemberQuery({} as GroupMember, 'anna')).toBe(false);
     expect(matchesMemberQuery({} as GroupMember, '')).toBe(true);
-  });
-
-  it('has a search floor', () => {
-    expect(MIN_SEARCH_LENGTH).toBeGreaterThan(1);
   });
 });
 

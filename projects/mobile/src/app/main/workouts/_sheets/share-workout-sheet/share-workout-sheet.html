@@ -440,6 +440,7 @@
   [initialBreakpoint]="0.95"
   (save)="mode() === Modes.Full ? saveToPhotos() : openInInstagram()"
   (action)="send()"
+  (dismissed)="onDismissed()"
 />
 
 <mh-adjust-duration-sheet [(open)]="adjustOpen" [log]="workout()" (saved)="durationSaved($event)" />

@@ -1,7 +1,16 @@
-import { DestroyRef, Directive, ElementRef, afterNextRender, inject, signal } from '@angular/core';
+import {
+  DestroyRef,
+  Directive,
+  ElementRef,
+  afterNextRender,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 
 import {
   KEYBOARD_HEIGHT_GUESS_PX,
+  isAtEnd,
   keyboardLift,
   revealDistance,
   scrollTopWithoutRoom,
@@ -38,6 +47,12 @@ const DRAG_DISMISS_PX = 24;
 /** Ionic's own wait after a blur, in case focus is only moving to the next field. */
 const BLUR_SETTLE_MS = 120;
 
+/** Lines kept in view at the foot of a long text being typed at its end: the caret's and the one above. */
+const CARET_LINES_IN_VIEW = 2;
+
+/** A line's height for a field whose `line-height` is `normal`: the body leading. */
+const TEXT_LINE_FALLBACK = 1.55;
+
 /** The Ionic hosts of a text field: a tap on one is a tap on the field. */
 const FIELD_HOSTS = 'ion-input, ion-textarea, ion-searchbar';
 
@@ -68,6 +83,11 @@ let lastKeyboardHeight: number | null = null;
  *   keep it up carries `data-mh-keeps-keyboard`. Pages call `dismiss()`
  *   before a footer or header button acts.
  * - **Android** resizes its window itself, so nothing is lifted there.
+ * - **`followEnd`**, for a send bar under a thread (a post's comments): the
+ *   field is in the bar, not the content, so there is no field to reveal.
+ *   Instead, a reader at the end of the content stays at the end as the
+ *   keyboard rises, the way the chat keeps the newest message in view, and a
+ *   reader further up keeps their place.
  *
  * Every native call is caught: there is no Keyboard plugin on the web build,
  * and the keyboard events simply never come.
@@ -80,9 +100,16 @@ export class KeyboardFooterDirective {
   private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly _destroyRef = inject(DestroyRef);
 
+  /** Keep the end of the content in view as the keyboard rises, for a reader already there. */
+  readonly followEnd = input(false);
+
   /** The keyboard is up, or on its way. */
   readonly open = signal(false);
 
+  /** `followEnd`: the reader was at the end when the keyboard was asked for. */
+  private _followingEnd = false;
+  /** Something in the content to keep above the bar while the bar's field is typed in. */
+  private _pinned: HTMLElement | null = null;
   private _page: HTMLElement | null = null;
   private _content: HTMLIonContentElement | null = null;
   private _scroller: HTMLElement | null = null;
@@ -111,6 +138,18 @@ export class KeyboardFooterDirective {
     }
   }
 
+  /**
+   * Keep `element` in view above the bar while the bar's own field is typed
+   * in: the comment being replied to. Placed as the keyboard rises, or at once
+   * when it is already up; `null` lets go. Let go of when the keyboard goes down.
+   */
+  keepInView(element: HTMLElement | null): void {
+    this._pinned = element;
+    if (element && this.open()) {
+      this._reveal(true);
+    }
+  }
+
   // ─── Wiring ───────────────────────────────────────────────────────────
 
   private _arm(): void {
@@ -126,6 +165,10 @@ export class KeyboardFooterDirective {
 
     this._listen(window, 'keyboardWillShow', (event) => this._onWillShow(event));
     this._listen(window, 'keyboardWillHide', () => this._onWillHide());
+    // `followEnd`: where the reader is, measured as the bar's field takes
+    // focus, before the keyboard has moved anything.
+    this._listen(footer, 'focusin', () => this._noteEnd(), { capture: true });
+    this._listen(window, 'keyboardDidShow', () => this._onDidShow());
 
     const page = this._page;
     if (page) {
@@ -188,6 +231,8 @@ export class KeyboardFooterDirective {
   }
 
   private _release(): void {
+    this._followingEnd = false;
+    this._pinned = null;
     if (!this._holding) {
       return;
     }
@@ -218,6 +263,11 @@ export class KeyboardFooterDirective {
     if (typeof height === 'number' && height <= 0) {
       return;
     }
+    // Already up and changing height (suggestions, emoji): the reader may
+    // have scrolled since the field took focus, so ask again.
+    if (this.open()) {
+      this._noteEnd(true);
+    }
     this._setOpen(true);
     if (!FOLLOWS_KEYBOARD || typeof height !== 'number') {
       return;
@@ -225,9 +275,33 @@ export class KeyboardFooterDirective {
     lastKeyboardHeight = height;
     this._raise(keyboardLift(height, this._clearance()));
     this._reveal(true);
+    if (this._followingEnd && !this._pinned) {
+      this._keepEnd(true);
+    }
+  }
+
+  /**
+   * Android: the window has finished shrinking, from the bottom, which takes
+   * the end of the content out of view. What was pinned is brought back
+   * above the bar; otherwise a reader who was at the end is put back there,
+   * as the chat does. (A field in the content is Android's own to scroll to.)
+   */
+  private _onDidShow(): void {
+    if (FOLLOWS_KEYBOARD || !this._isShown()) {
+      return;
+    }
+    if (this._pinned) {
+      this._reveal(true);
+      return;
+    }
+    if (this._followingEnd) {
+      this._keepEnd(false);
+    }
   }
 
   private _onWillHide(): void {
+    this._followingEnd = false;
+    this._pinned = null;
     if (!this.open()) {
       return;
     }
@@ -235,6 +309,32 @@ export class KeyboardFooterDirective {
     if (FOLLOWS_KEYBOARD) {
       this._raise(0);
     }
+  }
+
+  /** `followEnd`: remember whether the reader is at the end of the content. */
+  private _noteEnd(force = false): void {
+    if (!this.followEnd() || (this.open() && !force)) {
+      return;
+    }
+    const scroller = this._scroller;
+    if (!scroller) {
+      this._followingEnd = false;
+      return;
+    }
+    this._followingEnd = isAtEnd(scroller.scrollTop, scroller.scrollHeight, scroller.clientHeight);
+  }
+
+  /** Scroll to the end of the content, the room under it included, so its last row sits on the bar. */
+  private _keepEnd(animate: boolean): void {
+    const content = this._content;
+    if (!content) {
+      return;
+    }
+    let duration = 0;
+    if (animate) {
+      duration = KEYBOARD_ANIMATION_MS;
+    }
+    void content.scrollToBottom(duration);
   }
 
   private _setOpen(open: boolean): void {
@@ -340,15 +440,24 @@ export class KeyboardFooterDirective {
 
   // ─── The field in view ────────────────────────────────────────────────
 
-  /** iOS: scroll the focused field (and its block) above the raised bar. */
+  /**
+   * Scroll the focused field (and its block) above the raised bar; when the
+   * field is in the bar itself, what was pinned (`keepInView`) instead.
+   */
   private _reveal(animate: boolean): void {
     const content = this._content;
     const scroller = this._scroller;
-    const field = focusedTextEntry();
-    if (!content || !scroller || !field || !content.contains(field)) {
+    if (!content || !scroller) {
       return;
     }
-    const distance = this._distanceFor(field, this._lift, this._elementRef.nativeElement.offsetTop);
+    let target = focusedTextEntry();
+    if (!target || !content.contains(target)) {
+      target = this._pinned;
+    }
+    if (!target || !content.contains(target)) {
+      return;
+    }
+    const distance = this._distanceFor(target, this._lift, this._elementRef.nativeElement.offsetTop);
     if (distance === 0) {
       return;
     }
@@ -384,10 +493,31 @@ export class KeyboardFooterDirective {
     }
     return revealDistance({
       blockBottom: this._blockOf(field).getBoundingClientRect().bottom,
-      fieldTop: row.getBoundingClientRect().top,
+      fieldTop: this._typedLineTop(field, row.getBoundingClientRect().top),
       visibleTop,
       barTop: parentTop + barOffsetTop - lift,
     });
+  }
+
+  /**
+   * The top of what must stay in view: the field's row, or, while text is
+   * typed at the end of a box taller than the room (a long post, a long
+   * description), its last lines, where the caret is. Keeping the box's top
+   * there instead would push the line being typed under the bar.
+   */
+  private _typedLineTop(field: HTMLElement, rowTop: number): number {
+    if (!(field instanceof HTMLTextAreaElement) || field.selectionEnd !== field.value.length) {
+      return rowTop;
+    }
+    const style = getComputedStyle(field);
+    let line = parseFloat(style.lineHeight);
+    if (Number.isNaN(line)) {
+      line = parseFloat(style.fontSize) * TEXT_LINE_FALLBACK;
+    }
+    if (Number.isNaN(line)) {
+      return rowTop;
+    }
+    return Math.max(rowTop, field.getBoundingClientRect().bottom - line * CARET_LINES_IN_VIEW);
   }
 
   private _blockOf(field: HTMLElement): Element {

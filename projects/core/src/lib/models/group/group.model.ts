@@ -99,6 +99,47 @@ export interface UpdateMemberRolePayload {
  */
 export interface GroupWithMyRole extends Group {
   myRole: GroupMemberRole;
+  /** The last published post, null when nobody has posted yet. */
+  lastPostAt?: string | null;
+  /** Join requests waiting on you: counted for the owner only, else 0. */
+  pendingJoinRequestCount?: number;
+  /** Posts waiting for review: counted for the owner and moderators, else 0. */
+  pendingPostCount?: number;
+  /** Who runs the group. */
+  owner?: GroupOwner | null;
+}
+
+/** The person who runs a group, as a member's read of it names them. */
+export interface GroupOwner {
+  id: string;
+  firstName: string;
+  lastName: string;
+  handle: string | null;
+  avatarUrl: string | null;
+}
+
+/** One of my group invitations, as the invite card shows it. */
+export interface PendingGroupInvitation {
+  id: string;
+  message: string | null;
+  createdAt: string;
+  expiresAt: string;
+  inviter: GroupOwner | null;
+  group: {
+    id: string;
+    name: string;
+    slug: string;
+    logoUrl: string | null;
+    description: string | null;
+    memberCount: number;
+    categoryIds: string[];
+  };
+}
+
+/** What inviting several clients did: members and open invitations are skipped. */
+export interface InviteClientsResult {
+  invited: number;
+  skipped: number;
 }
 
 export type GroupListResponse = PaginatedResponse<Group>;

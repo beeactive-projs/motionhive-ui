@@ -7,10 +7,11 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-segment class="mh-tabs" mode="md" [value]="tab()" (ionChange)="setTab($event.detail.value)">
+    <ion-segment class="mh-tabs" mode="md" [value]="activeTab()" (ionChange)="setTab($event.detail.value)">
       <!-- Each queue's count rides its icon, as the tab bar draws counts. The
            wash pairing, not the solid fill: white on danger-500 is 3.76:1,
            and badge-sized text needs 4.5:1. -->
+      @if (showRequestsTab()) {
       <ion-segment-button [value]="Tabs.Requests">
         <ion-icon name="person-add-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.manage.requests.tab' | translate }}</ion-label>
@@ -18,6 +19,7 @@
         <ion-badge data-tone="danger">{{ store.requestCount() }}</ion-badge>
         }
       </ion-segment-button>
+      }
       <ion-segment-button [value]="Tabs.Posts">
         <ion-icon name="newspaper-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.common.posts' | translate }}</ion-label>

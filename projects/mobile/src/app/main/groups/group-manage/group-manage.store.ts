@@ -41,14 +41,20 @@ export class GroupManageStore {
   private readonly _busyIds = signal<ReadonlySet<string>>(new Set());
 
   /**
-   * Both queues answered 403 — this viewer does not own the group.
+   * Which queues answered 403. A moderator reviews posts but never sees join
+   * requests, so the requests queue alone refusing is normal for them; both
+   * refusing means this viewer is not staff here.
    *
    * Told apart from a failed load because they are different news: one is
    * "try again", the other is "this was never yours to see".
    */
-  private readonly _forbidden = signal(false);
+  private readonly _requestsForbidden = signal(false);
+  private readonly _postsForbidden = signal(false);
 
-  readonly forbidden = this._forbidden.asReadonly();
+  readonly forbidden = computed(() => this._requestsForbidden() && this._postsForbidden());
+
+  /** Whether the viewer may see join requests (the owner only). */
+  readonly requestsAllowed = computed(() => !this._requestsForbidden());
 
   readonly requests = this._requests.asReadonly();
   readonly posts = this._posts.asReadonly();
@@ -65,8 +71,8 @@ export class GroupManageStore {
   /** Both queues failed and there is nothing to show instead. */
   readonly showError = computed(
     () =>
-      !this._forbidden() &&
-      this._requestsError() &&
+      !this.forbidden() &&
+      (this._requestsError() || this._requestsForbidden()) &&
       this._postsError() &&
       this._requests().length === 0 &&
       this._posts().length === 0,
@@ -163,7 +169,9 @@ export class GroupManageStore {
         },
         error: (error: unknown) => {
           this._requestsError.set(true);
-          this._noteForbidden(error);
+          if (isForbidden(error)) {
+            this._requestsForbidden.set(true);
+          }
           done(error);
         },
       });
@@ -192,17 +200,14 @@ export class GroupManageStore {
         },
         error: (error: unknown) => {
           this._postsError.set(true);
-          this._noteForbidden(error);
+          if (isForbidden(error)) {
+            this._postsForbidden.set(true);
+          }
           done(error);
         },
       });
   }
 
-  private _noteForbidden(error: unknown): void {
-    if ((error as { status?: number } | null)?.status === 403) {
-      this._forbidden.set(true);
-    }
-  }
 
   private _resetAll(): void {
     this._requests.set([]);
@@ -212,6 +217,12 @@ export class GroupManageStore {
     this._postsLoaded.set(false);
     this._postsError.set(false);
     this._busyIds.set(new Set());
-    this._forbidden.set(false);
+    this._requestsForbidden.set(false);
+    this._postsForbidden.set(false);
   }
+}
+
+/** A refusal rather than a failure: the queue was never this viewer's. */
+function isForbidden(error: unknown): boolean {
+  return (error as { status?: number } | null)?.status === 403;
 }

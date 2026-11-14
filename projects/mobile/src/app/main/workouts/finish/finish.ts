@@ -55,6 +55,7 @@ import { LoggedExercises } from '../_components/logged-exercises/logged-exercise
 import { SaveRoutineService } from '../_services/save-routine.service';
 import { WorkoutPhotoStore } from '../_services/workout-photo';
 import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
+import { PostWorkoutSheet } from '../_sheets/post-workout-sheet/post-workout-sheet';
 import {
   NOTE_MAX_LENGTH,
   STREAK_WORTH_SAYING,
@@ -148,6 +149,7 @@ interface Highlight {
     LoggedExercises,
     SettingsRow,
     ShareWorkoutSheet,
+    PostWorkoutSheet,
     TranslatePipe,
   ],
   templateUrl: './finish.html',
@@ -219,6 +221,15 @@ export class Finish implements ViewWillEnter {
   readonly deleting = signal(false);
   /** Closed through its own `close()` before navigating, as the logger's discard is. */
   private readonly _deleteSheet = viewChild<ConfirmSheet>('deleteSheet');
+  private readonly _postSheet = viewChild(PostWorkoutSheet);
+
+  /** A group chip on the share sheet, which has closed: post there. */
+  openPostToGroup(groupId: string): void {
+    const sheet = this._postSheet();
+    if (sheet) {
+      sheet.show(groupId);
+    }
+  }
   private readonly _photoStore = inject(WorkoutPhotoStore);
 
   readonly visibility = computed(() => this.log()?.visibility ?? ProfilePrivacy.OnlyMe);

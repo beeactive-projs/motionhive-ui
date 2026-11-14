@@ -1104,6 +1104,15 @@
     }
   },
   "groups": {
+    "actions": {
+      "edit": "Editează grupul",
+      "invite": "Invită persoane",
+      "requests": "Cereri de alăturare",
+      "reviewPosts": "Verifică postările",
+      "youAreIn": "Faci parte din acest grup",
+      "youModerate": "Moderezi acest grup",
+      "youRun": "Tu conduci acest grup"
+    },
     "addMembers": {
       "empty": {
         "message": "Toți cei pe care îi antrenezi sunt deja în acest grup.",
@@ -1132,6 +1141,7 @@
       "nobodyMatches": "Nicio potrivire",
       "postContent": "Conținutul postării",
       "posts": "Postări",
+      "runBy": "Condus de",
       "where": "Unde"
     },
     "compose": {
@@ -1159,6 +1169,7 @@
     "detail": {
       "a11y": {
         "manage": "Verifică cererile și postările",
+        "options": "Opțiunile grupului",
         "settings": "Setările grupului"
       },
       "announce": {
@@ -1195,6 +1206,7 @@
         },
         "loadError": "Postările nu au putut fi încărcate"
       },
+      "postsToReview": "Postări de verificat",
       "toast": {
         "leaveFailed": "Nu am reușit să te scoatem din grup.",
         "left": "Ai părăsit grupul"
@@ -1244,6 +1256,34 @@
       "openPhoto": "Deschide fotografia {index} din {total}",
       "openPhotoBy": "Deschide fotografia {index} din {total} de la {name}"
     },
+    "invite": {
+      "invitedYou": "{name} te-a invitat",
+      "invitedYouNoName": "Ai primit o invitație",
+      "join": "Intră în grup",
+      "notNow": "Nu acum",
+      "privacy": "Membrii îți văd numele, fotografia și antrenamentele pe care alegi să le postezi. Poți ieși oricând.",
+      "toast": {
+        "declineFailed": "Nu am putut refuza invitația.",
+        "declined": "Invitație refuzată",
+        "joinFailed": "Nu am putut să te adăugăm în grup.",
+        "joined": "Ai intrat în {group}"
+      }
+    },
+    "invitePeople": {
+      "clients": "Clienții tăi",
+      "empty": {
+        "title": "Nu mai e nimeni de invitat"
+      },
+      "note": "Primesc o invitație și intră doar dacă o acceptă. Membrii își văd unii altora numele și fotografiile.",
+      "save": "{count, plural, =0 {Invită} other {Invită #}}",
+      "selectAll": "Selectează tot",
+      "selectNone": "Deselectează tot",
+      "toast": {
+        "alreadyInvited": "Au deja o invitație sau fac deja parte din grup",
+        "failed": "Nu am putut trimite invitațiile.",
+        "sent": "{count, plural, one {# invitație trimisă} few {# invitații trimise} other {# de invitații trimise}}"
+      }
+    },
     "join": {
       "closed": "Doar cu invitație",
       "pending": "Cerere în așteptare"
@@ -1279,6 +1319,9 @@
       "OPEN": "Oricine se poate alătura imediat."
     },
     "list": {
+      "a11y": {
+        "waiting": "{count, plural, one {# lucru te așteaptă} few {# lucruri te așteaptă} other {# de lucruri te așteaptă}}"
+      },
       "announce": {
         "count": "{count, plural, one {# grup} few {# grupuri} other {# de grupuri}}.",
         "none": "Niciun grup nu se potrivește."
@@ -1299,6 +1342,8 @@
         },
         "seeGroups": "Vezi grupurile tale"
       },
+      "joinedHeading": "Grupuri din care faci parte",
+      "lastPost": "ultima postare {time}",
       "loadError": "Grupurile nu au putut fi încărcate",
       "mine": {
         "empty": {
@@ -1306,18 +1351,26 @@
           "title": "Nu faci parte din niciun grup"
         }
       },
+      "needsYou": "Te așteaptă",
       "noGroups": {
         "coachMessage": "Creează un grup ca să-ți aduni clienții într-un singur loc.",
         "memberMessage": "Alătură-te unui grup și postările lui vor apărea aici.",
         "title": "Niciun grup încă"
       },
+      "noPosts": "nicio postare încă",
       "private": "Privat",
+      "runBy": "Condus de {name}",
+      "runHeading": "Grupuri pe care le conduci",
       "search": "Caută grupuri",
       "searchHint": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}} ca să cauți.",
       "segments": {
         "discover": "Descoperă",
         "feed": "Flux",
         "mine": "Grupurile tale"
+      },
+      "waiting": {
+        "posts": "{count, plural, one {# postare de verificat} few {# postări de verificat} other {# de postări de verificat}}",
+        "requests": "{count, plural, one {# cerere de alăturare} few {# cereri de alăturare} other {# de cereri de alăturare}}"
       }
     },
     "manage": {
@@ -1358,6 +1411,25 @@
       },
       "written": "Scrisă · {time}"
     },
+    "members": {
+      "makeModerator": "Numește moderator",
+      "makeModeratorHint": "Poate verifica și șterge postări",
+      "message": "Trimite un mesaj",
+      "remove": "Scoate din grup",
+      "removeConfirm": {
+        "body": "Nu va mai vedea postările și membrii grupului. Îi poți trimite mai târziu o nouă invitație.",
+        "title": "Scoți persoana {name} din grup?"
+      },
+      "removeModerator": "Retrage rolul de moderator",
+      "removeModeratorHint": "Rămâne în grup ca membru",
+      "toast": {
+        "moderatorMade": "{name} este acum moderator",
+        "moderatorRemoved": "{name} nu mai este moderator",
+        "removeFailed": "Nu am putut scoate persoana din grup.",
+        "removed": "{name} nu mai face parte din grup",
+        "roleFailed": "Nu am putut schimba rolul."
+      }
+    },
     "photos": {
       "alt": "Fotografia {index} din {total}",
       "counter": "{index} din {total}",
@@ -1378,14 +1450,17 @@
         "editThis": "Editează postarea",
         "like": "Apreciază postarea de la {name}",
         "likeThis": "Apreciază postarea",
+        "more": "Opțiuni pentru postarea scrisă de {name}",
         "openBy": "Deschide postarea de la {name}",
         "openByMember": "Deschide postarea unui membru",
+        "options": "Opțiunile postării",
         "postComment": "Publică comentariul",
         "unlike": "Retrage aprecierea pentru postarea de la {name}",
         "unlikeThis": "Retrage aprecierea",
         "viewProfile": "Vezi profilul lui {name}"
       },
       "addComment": "Adaugă un comentariu",
+      "comment": "Comentează",
       "commentCount": "{count, plural, one {# comentariu} few {# comentarii} other {# de comentarii}}",
       "comments": "Comentarii",
       "commentsLoadError": "Comentariile nu au putut fi încărcate",
@@ -1397,11 +1472,13 @@
         "body": "Dispare pentru toți, împreună cu comentariile.",
         "title": "Ștergi postarea?"
       },
+      "deleteVerb": "Șterge postarea",
       "editTitle": "Editează postarea",
       "empty": {
         "message": "Scrie primul comentariu.",
         "title": "Niciun comentariu încă"
       },
+      "like": "Îmi place",
       "loadError": {
         "message": "Poate a fost ștearsă sau ești offline.",
         "title": "Postarea nu a putut fi încărcată"
@@ -1450,6 +1527,18 @@
         "withdrawn": "Cerere retrasă"
       },
       "withdraw": "Retrage"
+    },
+    "setup": {
+      "defaultName": "Echipa {name}",
+      "inviteClients": "Invită-ți clienții",
+      "save": "{count, plural, =0 {Creează grupul} other {Creează și invită #}}",
+      "subtitle": "Poți schimba totul mai târziu",
+      "title": "Grupul clienților tăi",
+      "toast": {
+        "created": "{count, plural, =0 {Grup creat} one {Grup creat, # invitație trimisă} few {Grup creat, # invitații trimise} other {Grup creat, # de invitații trimise}}",
+        "invitesFailed": "Grupul e gata, dar invitațiile nu au plecat. Încearcă Invită persoane din grup."
+      },
+      "whoCanPost": "Cine poate posta"
     }
   },
   "home": {
@@ -1546,6 +1635,11 @@
       "afternoon": "Bună ziua.",
       "evening": "Bună seara.",
       "morning": "Bună dimineața."
+    },
+    "groupSetup": {
+      "detail": "Un grup privat în care își arată antrenamentele și se încurajează unii pe alții.",
+      "notNow": "Nu acum",
+      "title": "Adună-ți clienții laolaltă"
     },
     "latest": {
       "capped": "{count, plural, one {Cel mai recent antrenament} few {Ultimele # antrenamente} other {Ultimele # de antrenamente}}",
@@ -3219,6 +3313,21 @@
       "title": "Plan",
       "yourCoach": "antrenorul tău"
     },
+    "postToGroup": {
+      "caption": "Text",
+      "captionPlaceholder": "Spune ceva despre el",
+      "card": "Cardul antrenamentului",
+      "cardHint": "Numele și un rezumat, ca un card",
+      "changePhoto": "Schimbă fotografia",
+      "kindLabel": "Ce postezi",
+      "noGroups": "Niciunul dintre grupurile tale nu primește acum postări de la tine.",
+      "photoHint": "Detaliile apar peste fotografie",
+      "privacyCard": "Grupul vede numele și un rezumat. Niciodată notițele, greutățile sau fotografia ta.",
+      "privacyPhoto": "Grupul vede fotografia, numele și un rezumat. Niciodată notițele sau greutățile tale.",
+      "submit": "Postează în {group}",
+      "title": "Postează într-un grup",
+      "yourPhoto": "Fotografia ta"
+    },
     "prescription": {
       "compact": "{sets} × {reps}",
       "compactHold": "{sets} × {seconds} s",
@@ -3437,7 +3546,7 @@
       "group": {
         "done": "Postat în {group}",
         "failed": "Nu am putut posta în grup",
-        "hint": "Membrii văd un card cu numele antrenamentului și cifrele. Niciodată notița, greutățile sau poza.",
+        "hint": "Alege un grup ca să postezi fotografia sau cardul antrenamentului. Niciodată notițele sau greutățile.",
         "pending": "Trimis în {group}. Apare după ce grupul îl aprobă.",
         "posting": "Se postează în {group}",
         "title": "Sau postează-l într-un grup"

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  FOLLOW_END_THRESHOLD_PX,
   KEYBOARD_REVEAL_GAP_PX,
+  isAtEnd,
   keyboardLift,
   revealDistance,
   scrollTopWithoutRoom,
@@ -40,6 +42,25 @@ describe('revealDistance', () => {
 
   it('never scrolls the other way', () => {
     expect(revealDistance({ blockBottom: 200, fieldTop: 50, visibleTop: 100, barTop: 450 })).toBe(0);
+  });
+});
+
+describe('isAtEnd', () => {
+  it('is reading the end when scrolled all the way down', () => {
+    expect(isAtEnd(1200, 2000, 800)).toBe(true);
+  });
+
+  it('counts a little short of the end as the end, the way the chat does', () => {
+    expect(isAtEnd(1200 - FOLLOW_END_THRESHOLD_PX, 2000, 800)).toBe(true);
+    expect(isAtEnd(1200 - FOLLOW_END_THRESHOLD_PX - 1, 2000, 800)).toBe(false);
+  });
+
+  it('is at the end when everything fits on screen', () => {
+    expect(isAtEnd(0, 500, 800)).toBe(true);
+  });
+
+  it('is not at the end while reading higher up', () => {
+    expect(isAtEnd(100, 2000, 800)).toBe(false);
   });
 });
 

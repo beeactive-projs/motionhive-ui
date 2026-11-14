@@ -159,6 +159,8 @@ export class ShareWorkoutSheet {
   readonly photoUrl = input<string | null>(null);
   /** The workout with its corrected duration, so the page behind can say the same. */
   readonly logChange = output<WorkoutLog>();
+  /** A group chip was tapped: post the workout there, in its own sheet. */
+  readonly postToGroup = output<string>();
 
   readonly Modes = ShareModes;
   readonly Details = ShareDetails;
@@ -567,34 +569,29 @@ export class ShareWorkoutSheet {
   }
 
   /**
-   * Posts the workout into the group as a card. The card is the safe
-   * summary, so the group never gets the note, the weights or the photo.
-   * A group that reviews member posts holds it until someone approves
-   * it, and the toast says so.
+   * A group chip: this sheet closes, then "Post to a group" opens on that
+   * group (design 2026-11-14), where the photo or the card, the caption and
+   * what the group sees are chosen. Reported once this sheet has gone, so
+   * the two never stack.
    */
   shareToGroup(group: GroupWithMyRole): void {
-    if (this.sharingTo()) return;
-    this.sharingTo.set(group.id);
-    this._postService
-      .createPost({ content: '', groupIds: [group.id], workoutLogId: this.log().id })
-      .pipe(take(1))
-      .subscribe({
-        next: ({ posts }) => {
-          this.sharingTo.set(null);
-          const pending = posts[0]?.approvalState === PostApprovalStates.Pending;
-          void this._feedbackService.success(
-            this._t(pending ? 'workouts.share.group.pending' : 'workouts.share.group.done', {
-              group: group.name,
-            }),
-          );
-          this.open.set(false);
-        },
-        error: (err) => {
-          this.sharingTo.set(null);
-          void this._feedbackService.error(err, this._t('workouts.share.group.failed'));
-        },
-      });
+    if (this.sharingTo()) {
+      return;
+    }
+    this._groupAfterClose = group.id;
+    this.open.set(false);
   }
+
+  /** The sheet has gone: hand over to "Post to a group" if a chip asked. */
+  onDismissed(): void {
+    const groupId = this._groupAfterClose;
+    this._groupAfterClose = null;
+    if (groupId) {
+      this.postToGroup.emit(groupId);
+    }
+  }
+
+  private _groupAfterClose: string | null = null;
 
   // ─── Internals ───────────────────────────────────────────────────────────
 

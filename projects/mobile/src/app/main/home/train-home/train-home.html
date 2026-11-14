@@ -108,6 +108,9 @@
 <!-- The welcome questions passed over, offered once more; gone when answered or closed. -->
 <mh-welcome-card [kind]="NavModes.Train" />
 
+<!-- A coach's invitation to their group, waiting on the reader. -->
+<mh-group-invites (joined)="onGroupJoined()" />
+
 <!-- A session booked for today, only on a day that has one: one small row. -->
 @if (todayFirst(); as first) {
   <ion-list class="mh-flat-list today-row">

@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, TemplateRef, computed, input, model, output } from '@angular/core';
-import { IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../sheet-shell/sheet-shell';
@@ -24,7 +24,7 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
  */
 @Component({
   selector: 'mh-action-sheet',
-  imports: [HexAvatar, IonItem, IonLabel, IonList, NgTemplateOutlet, SheetShell, TranslatePipe],
+  imports: [HexAvatar, IonItem, IonLabel, IonList, IonNote, NgTemplateOutlet, SheetShell, TranslatePipe],
   templateUrl: './action-sheet.html',
   styleUrl: './action-sheet.scss',
 })
