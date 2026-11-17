@@ -203,7 +203,7 @@
         </ion-label>
         @if (plan.paused) {
         <!-- Paused: Resume is the Overview's one honey action. -->
-        <ion-button slot="end" shape="round" class="mh-row-action" [disabled]="store.isPlanBusy(plan.row.id)" (click)="
+        <ion-button slot="end" class="mh-row-action" [disabled]="store.isPlanBusy(plan.row.id)" (click)="
                           setPlanStatus(plan.row, PlanStatuses.Active); $event.stopPropagation()
                         ">
           {{ 'button.resume' | translate }}

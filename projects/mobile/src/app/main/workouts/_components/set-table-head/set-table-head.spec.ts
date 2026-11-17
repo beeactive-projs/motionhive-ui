@@ -38,4 +38,16 @@ describe('SetTableHead', () => {
       'workouts.logger.gridHead.repsEach',
     ]);
   });
+
+  // The routine builder's sets have nothing to tick, so no Done heading.
+  it('heads the tick column unless the rows have none', () => {
+    expect(head([SetFields.Reps]).tickable()).toBe(true);
+
+    const fixture = TestBed.createComponent(SetTableHead);
+    fixture.componentRef.setInput('fields', [SetFields.Reps]);
+    fixture.componentRef.setInput('tickable', false);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.tickable()).toBe(false);
+    expect(fixture.componentInstance.labels()).toEqual(['workouts.logger.gridHead.reps']);
+  });
 });

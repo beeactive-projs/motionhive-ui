@@ -3,11 +3,15 @@ import { describe, expect, it } from 'vitest';
 
 import { AssignedSet, ExerciseKind, ExerciseSetType, LoggedExercise, LoggedSet, RestSources, SetFields } from 'core';
 
+import { KeypadFields } from '../workouts.config';
 import {
   BadgeTones,
+  KEYPAD_FIELD,
   WARMUP_REST_SECONDS,
   afterTick,
   asksEffort,
+  cellValue,
+  columnLabelKey,
   copiedValues,
   effortTarget,
   estimatedRest,
@@ -149,6 +153,29 @@ describe('setBadge', () => {
     expect(setBadge(sets, 1)).toEqual({ text: '1', tone: BadgeTones.Plain, name: 'Set 1' });
     expect(setBadge(sets, 2).text).toBe('2');
     expect(setBadge(sets, 3)).toEqual({ text: 'D', tone: BadgeTones.Drop, name: 'Drop set' });
+  });
+
+  // The routine builder's planned sets carry a type and their targets, no log.
+  it('numbers a routine’s planned sets the same way', () => {
+    const planned = [{ setType: ExerciseSetType.Warmup }, { setType: ExerciseSetType.Normal }];
+
+    expect(setBadge(planned, 0).text).toBe('W');
+    expect(setBadge(planned, 1)).toEqual({ text: '1', tone: BadgeTones.Plain, name: 'Set 1' });
+  });
+});
+
+describe('the pad’s field words', () => {
+  it('maps each field to its keypad, and says reps per side where they are', () => {
+    expect(KEYPAD_FIELD[SetFields.Weight]).toBe(KeypadFields.Weight);
+    expect(KEYPAD_FIELD[SetFields.Duration]).toBe(KeypadFields.Duration);
+    expect(columnLabelKey(SetFields.Reps, false)).toBe('workouts.logger.columns.reps');
+    expect(columnLabelKey(SetFields.Reps, true)).toBe('workouts.logger.columns.repsEach');
+    expect(columnLabelKey(SetFields.Weight, true)).toBe('workouts.logger.columns.weight');
+  });
+
+  it('reads a planned set’s values as a logged set’s', () => {
+    const planned = { reps: 8, weightKg: 60, durationSeconds: null, distanceMeters: null };
+    expect(cellValue(planned, SetFields.Weight)).toBe(60);
   });
 });
 

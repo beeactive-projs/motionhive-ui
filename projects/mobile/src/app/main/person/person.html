@@ -127,7 +127,7 @@
                and no tab stop of its own. -->
           <div class="mh-chip-row groups">
             @for (group of sharedGroups(); track group.id) {
-              <ion-button class="chip" fill="clear" shape="round" size="small" (click)="openGroup(group)">
+              <ion-button class="chip" fill="clear" size="small" (click)="openGroup(group)">
                 {{ group.name }}
               </ion-button>
             }

@@ -2,6 +2,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  afterRenderEffect,
   computed,
   effect,
   inject,
@@ -34,6 +35,7 @@ import {
   IonTitle,
   IonToolbar,
   NavController,
+  ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
@@ -43,6 +45,7 @@ import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import {
+  AuthStore,
   Exercise,
   ExerciseKind,
   ExerciseService,
@@ -51,8 +54,9 @@ import {
   LogSetPayload,
   LoggedExercise,
   LoggedSet,
+  Routine,
+  RoutineService,
   SetField,
-  SetFields,
   WorkoutLog,
   WorkoutLogService,
   appLocale,
@@ -80,6 +84,12 @@ import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-she
 import { EffortPrompt } from '../_components/effort-prompt/effort-prompt';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
+import {
+  PAD_REVEAL_MS,
+  ScreenSpan,
+  revealAbovePad,
+  visibleSpan,
+} from '../_components/numeric-keypad/pad-reveal';
 import { RestTimerBar } from '../_components/rest-timer-bar/rest-timer-bar';
 import { SetRow } from '../_components/set-row/set-row';
 import { SetTableHead } from '../_components/set-table-head/set-table-head';
@@ -116,8 +126,10 @@ import {
 } from '../workouts.config';
 import {
   EFFORT_PROMPT_MS,
+  KEYPAD_FIELD,
   MeasuredRest,
   PAYLOAD_KEY,
+  columnLabelKey,
   RestChoices,
   SetBadge,
   SetRef,
@@ -149,6 +161,16 @@ import {
   tappedRest,
 } from './logger-flow';
 import { LoggerStore } from './logger.store';
+import {
+  ROUTINE_UPDATE_ACTIONS,
+  RoutineUpdateChoice,
+  RoutineUpdateChoices,
+  changeSummary,
+  isOwnRoutine,
+  routineChanges,
+  routineFromWorkout,
+  updatableRoutineId,
+} from './routine-update';
 
 /** Which cell the keypad is bound to. */
 interface EditTarget {
@@ -156,14 +178,6 @@ interface EditTarget {
   setId: string;
   field: SetField;
 }
-
-/** The keypad's step size is keyed to the field, not the exercise kind. */
-const KEYPAD_FIELD: Record<SetField, KeypadField> = {
-  [SetFields.Weight]: KeypadFields.Weight,
-  [SetFields.Reps]: KeypadFields.Reps,
-  [SetFields.Duration]: KeypadFields.Duration,
-  [SetFields.Distance]: KeypadFields.Distance,
-};
 
 /** One set as the list draws it. */
 interface SetView {
@@ -239,14 +253,6 @@ const FOCUS_AT = 0.32;
 /** The list's scroll into place after a tick. */
 const FOCUS_SCROLL_MS = 320;
 
-/** The set grid's column heading for each field — translation keys. */
-const COLUMN_LABELS: Record<SetField, string> = {
-  [SetFields.Weight]: 'workouts.logger.columns.weight',
-  [SetFields.Reps]: 'workouts.logger.columns.reps',
-  [SetFields.Duration]: 'workouts.logger.columns.time',
-  [SetFields.Distance]: 'workouts.logger.columns.distance',
-};
-
 /**
  * The active workout — the screen a trainee looks at for an hour.
  *
@@ -308,7 +314,7 @@ const COLUMN_LABELS: Record<SetField, string> = {
   templateUrl: './logger.html',
   styleUrl: './logger.scss',
 })
-export class Logger implements ViewWillEnter, ViewWillLeave {
+export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
   readonly store = inject(LoggerStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
@@ -332,6 +338,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _onScreen = signal(false);
   private readonly _settingsStore = inject(WorkoutSettingsStore);
   private readonly _exerciseService = inject(ExerciseService);
+  private readonly _routineService = inject(RoutineService);
+  private readonly _authStore = inject(AuthStore);
 
   /** The person's logger settings: their default rest, sound, vibration, effort. */
   private readonly _settings = this._settingsStore.settings;
@@ -404,6 +412,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly focusAbove = signal(false);
   private _programmaticScrollAt = 0;
   private _lastFocusId: string | null = null;
+  /** The cell the pad was last kept in view for; '' while the pad is closed. */
+  private _revealedKey = '';
   private readonly _content = viewChild(IonContent);
   private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -541,6 +551,29 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly finishActions = computed(() => finishOptions(this.store.progress().done));
   readonly discarding = signal(false);
   readonly finishing = signal(false);
+
+  /**
+   * The routine this workout was started from, when it is yours to change:
+   * read with the workout, so Finish can say at once what changed in it.
+   */
+  private readonly _sourceRoutine = signal<Routine | null>(null);
+  /** What the workout changed in its routine's shape; null when nothing did. */
+  readonly routineChanges = computed(() => {
+    const routine = this._sourceRoutine();
+    return routine ? routineChanges(routine, this.store.exercises()) : null;
+  });
+  /** "Update Leg day?", asked at Finish when the routine's shape changed. */
+  readonly updateAskOpen = signal(false);
+  readonly updateActions = ROUTINE_UPDATE_ACTIONS;
+  readonly updateTitle = computed(() =>
+    this._translateService.instant('workouts.updateRoutine.title', {
+      name: this._sourceRoutine()?.name ?? '',
+    }),
+  );
+  readonly updateNote = computed(() => {
+    const changes = this.routineChanges();
+    return changes ? changeSummary(changes) : '';
+  });
   /** Asked on the way out: keep the clock running, or pause it. */
   readonly leaveOpen = signal(false);
 
@@ -901,6 +934,16 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       if (id && !untracked(this.userScrolled)) this._scrollToFocusSoon();
     });
 
+    // Once the pad is drawn, the set it types into shows above it: in the
+    // same frame when the pad opens, so the set never shows under it first,
+    // and gliding when the pad, already up, moves on to a set it hides.
+    afterRenderEffect(() => {
+      const key = this.editingKey();
+      const opening = this._revealedKey === '';
+      this._revealedKey = key;
+      if (key) void this._revealEditing(opening);
+    });
+
     // "Other value" on the lock screen opens the logger on that set, to type it.
     this._route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const setId = params.get('set');
@@ -943,11 +986,6 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   ionViewWillEnter(): void {
     this._onScreen.set(true);
-    // A set swipes right to Copy, and on iOS a drag from the left edge is the
-    // back gesture, which outranks the row's: a copy started on the set
-    // number popped the page instead, past the leave sheet's question. The
-    // way out is the ⌄, which asks it.
-    if (this._ionRouterOutlet) this._ionRouterOutlet.swipeGesture = false;
     // Catch the clock up at once rather than on the next tick.
     this._now.set(Date.now());
     this._settingsStore.load();
@@ -971,6 +1009,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         // Back at the workout is back to work: a paused clock starts again.
         this.store.resumeClock();
         this._loadLastTimes();
+        this._loadSourceRoutine();
         this._adoptRest();
         // A Repeat just started: its movements, into this page's store.
         const from = this._activeWorkoutService.takeCarryOver(id);
@@ -1070,6 +1109,18 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!route) return false;
     void this._router.navigate(route, { replaceUrl: true });
     return true;
+  }
+
+  /**
+   * A set swipes right to Copy, and on iOS a drag from the left edge is the
+   * back gesture, which outranks the row's: a copy started on the set number
+   * popped the page instead, past the leave sheet's question. The way out is
+   * the ⌄, which asks it. Turned off here, not on will-enter: an iOS swipe
+   * back to this page fires that as it starts, and switching the gesture off
+   * mid-drag snapped every such swipe back and left it dead.
+   */
+  ionViewDidEnter(): void {
+    if (this._ionRouterOutlet) this._ionRouterOutlet.swipeGesture = false;
   }
 
   ionViewWillLeave(): void {
@@ -1370,7 +1421,6 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       ?.rows.find((r) => r.set.id === fresh.id);
     const current = cellValue(fresh, field) ?? row?.prefill[field] ?? null;
     this.draft.set(current == null ? '' : String(current));
-    this._revealEditingSoon();
   }
 
   /**
@@ -1523,38 +1573,20 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     );
   }
 
-  /** Once the pad is up: keep the set being typed into just above it. */
-  private _revealEditingSoon(): void {
-    setTimeout(() => void this._revealEditing(), 120);
-  }
-
-  private async _revealEditing(): Promise<void> {
+  /** The set the pad types into, kept above the pad (`revealAbovePad`). */
+  private async _revealEditing(opening: boolean): Promise<void> {
     const row = this._row('[data-editing]');
     const content = this._content();
     if (!row || !content) return;
-    const box = this._visibleBox(await content.getScrollElement());
-    const rect = row.getBoundingClientRect();
-    let delta = 0;
-    if (rect.bottom > box.bottom - 16) delta = rect.bottom - (box.bottom - 16);
-    else if (rect.top < box.top + 8) delta = rect.top - (box.top + 8);
-    if (delta === 0) return;
-    this._programmaticScrollAt = Date.now();
-    await content.scrollByPoint(0, delta, prefersReducedMotion() ? 0 : 200);
+    const duration = opening || prefersReducedMotion() ? 0 : PAD_REVEAL_MS;
+    await revealAbovePad(content, this._host.nativeElement, row, duration, () => {
+      this._programmaticScrollAt = Date.now();
+    });
   }
 
-  /**
-   * The part of the list a person can actually see: the content runs behind
-   * the header and the docked pad or rest bar, so both are taken off.
-   */
-  private _visibleBox(scroller: HTMLElement): { top: number; bottom: number } {
-    const box = scroller.getBoundingClientRect();
-    const host = this._host.nativeElement;
-    const header = host.querySelector('ion-header')?.getBoundingClientRect();
-    const footer = host.querySelector('ion-footer')?.getBoundingClientRect();
-    return {
-      top: Math.max(box.top, header?.bottom ?? box.top),
-      bottom: footer && footer.height > 0 ? Math.min(box.bottom, footer.top) : box.bottom,
-    };
+  /** The part of the list a person can see, between the header and the pad or rest bar. */
+  private _visibleBox(scroller: HTMLElement): ScreenSpan {
+    return visibleSpan(this._host.nativeElement, scroller);
   }
 
   private _row(selector: string): HTMLElement | null {
@@ -1612,11 +1644,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   private _columnLabel(exercise: LoggedExercise, field: SetField): string {
-    return this._translateService.instant(
-      field === SetFields.Reps && this.isUnilateral(exercise)
-        ? 'workouts.logger.columns.repsEach'
-        : COLUMN_LABELS[field],
-    );
+    return this._translateService.instant(columnLabelKey(field, this.isUnilateral(exercise)));
   }
 
   // ─── Folding ──────────────────────────────────────────────────
@@ -2085,16 +2113,76 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       this.finishSheetOpen.set(true);
       return;
     }
-    this._complete();
+    this._completeOrAsk();
   }
 
   /** The finish sheet's answer, reported once the sheet has gone. */
   onFinishChoice(choice: FinishChoice): void {
     if (choice === FinishChoices.Save) {
-      this._complete();
+      this._completeOrAsk();
       return;
     }
     this.openDiscard();
+  }
+
+  /**
+   * A routine whose shape this workout changed asks first whether the
+   * routine should change with it (user decision, 2026-11-16). Closing that
+   * sheet without an answer goes back to the workout, unfinished.
+   */
+  private _completeOrAsk(): void {
+    if (this.routineChanges()) {
+      this.updateAskOpen.set(true);
+      return;
+    }
+    this._complete();
+  }
+
+  /** The update sheet's answer: both finish the workout; one also updates the routine. */
+  onUpdateChoice(choice: RoutineUpdateChoice): void {
+    this._complete(choice === RoutineUpdateChoices.Update);
+  }
+
+  /**
+   * Yours, and started as a routine: read now, quietly. Without it Finish
+   * simply does not ask.
+   */
+  private _loadSourceRoutine(): void {
+    const log = this.store.log();
+    const id = log ? updatableRoutineId(log) : null;
+    if (!id || this._sourceRoutine()?.id === id) return;
+    this._routineService
+      .get(id)
+      .pipe(take(1), catchError(() => of(null)))
+      .subscribe((routine) => {
+        const own = routine && isOwnRoutine(routine, this._authStore.user()?.id);
+        this._sourceRoutine.set(own ? routine : null);
+      });
+  }
+
+  /**
+   * The routine takes the workout's shape. After the workout is saved, so a
+   * failure here loses nothing logged; it says so and the routine stays.
+   */
+  private _updateRoutine(routine: Routine, exercises: readonly LoggedExercise[]): void {
+    this._routineService
+      .update(routine.id, { exercises: routineFromWorkout(routine, exercises) })
+      .pipe(take(1))
+      .subscribe({
+        next: () =>
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.updateRoutine.toast.updated', {
+              name: routine.name,
+            }),
+          ),
+        error: (err) =>
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.updateRoutine.toast.failed', {
+              name: routine.name,
+            }),
+          ),
+      });
   }
 
   /** The red confirm, from the ⋯ sheet or the finish sheet. */
@@ -2107,11 +2195,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
    * duration and records are only set by completing. Waits for set writes
    * still on their way first, or the last tick before Finish is refused.
    */
-  private _complete(): void {
+  private _complete(updateRoutine = false): void {
     const log = this.store.log();
     if (!log || this.finishing()) return;
     this.finishing.set(true);
     this.restEndsAt.set(null);
+    const routine = updateRoutine ? this._sourceRoutine() : null;
 
     this.store.whenSettled(() =>
       this._workoutLogService
@@ -2120,6 +2209,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         .subscribe({
           next: () => {
             this.finishing.set(false);
+            // Read once every set write has landed, as the workout was saved.
+            if (routine) this._updateRoutine(routine, this.store.exercises());
             // Replaced, so back from the summary returns to wherever the
             // workout was opened from rather than into a finished logger.
             this._activeSession.end();

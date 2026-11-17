@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { foldForSearch } from 'core';
 
-import { ChoiceOption, matchChoices } from './choice-sheet';
+import { CHOICE_PAGE_SIZE, ChoiceOption, ChoiceSheet, matchChoices } from './choice-sheet';
 
 const zones: ChoiceOption[] = [
   { value: 'America/Sao_Paulo', label: '(UTC-03:00) America/São Paulo' },
@@ -34,5 +35,43 @@ describe('matchChoices', () => {
       'Europe/London',
       'Europe/Bucharest',
     ]);
+  });
+});
+
+describe('ChoiceSheet', () => {
+  const many: ChoiceOption[] = Array.from({ length: CHOICE_PAGE_SIZE + 5 }, (_, i) => ({
+    value: String(i),
+    label: `Option ${i}`,
+  }));
+
+  beforeEach(() => {
+    TestBed.overrideComponent(ChoiceSheet, { set: { template: '', imports: [] } });
+  });
+
+  function sheet(searchPlaceholder = ''): ChoiceSheet {
+    const fixture = TestBed.createComponent(ChoiceSheet);
+    fixture.componentRef.setInput('title', 'Rest');
+    fixture.componentRef.setInput('options', many);
+    fixture.componentRef.setInput('searchPlaceholder', searchPlaceholder);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  }
+
+  // A routine's nine rests opened at half height with five showing.
+  it('is as tall as its rows, all of them, without a search field', () => {
+    const choice = sheet();
+
+    expect(choice.fit()).toBe(true);
+    expect(choice.rows()).toHaveLength(many.length);
+    expect(choice.hasMore()).toBe(false);
+  });
+
+  it('opens tall and draws a page at a time with a search field', () => {
+    const choice = sheet('Search');
+
+    expect(choice.fit()).toBe(false);
+    expect(choice.initialBreakpoint).toBe(0.9);
+    expect(choice.rows()).toHaveLength(CHOICE_PAGE_SIZE);
+    expect(choice.hasMore()).toBe(true);
   });
 });

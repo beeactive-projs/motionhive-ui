@@ -412,10 +412,15 @@ export class WorkoutLogService {
    * "Last time you did this" — most-recent completed log's actuals for
    * a catalog exercise. Returns up to 6 sets (one workout's worth).
    * Powers the `LastTimeHint` component on the active log.
+   *
+   * Always silent: it only adds a hint to a screen that works without it
+   * (the logger and the routine builder show a dash when it fails), so a
+   * failure must not open the global error dialog over that screen.
    */
   lastForExercise(exerciseId: string): Observable<LoggedSet[]> {
     return this._http.get<LoggedSet[]>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.LAST_FOR_EXERCISE(exerciseId)}`,
+      { context: silentRequest() },
     );
   }
 }

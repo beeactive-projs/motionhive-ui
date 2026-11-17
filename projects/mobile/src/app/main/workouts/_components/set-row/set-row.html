@@ -1,4 +1,9 @@
-<div class="mh-set-grid row" [class.done]="mode() === Modes.Done" [class.selected]="editing() !== null">
+<div
+  class="mh-set-grid row"
+  [class.untickable]="!tickable()"
+  [class.done]="mode() === Modes.Done"
+  [class.selected]="editing() !== null"
+>
   <!-- The set's options (type, copy, note, delete), on its number. -->
   <button
     type="button"
@@ -16,7 +21,7 @@
     type="button"
     class="previous"
     [class.empty]="!previous()"
-    [disabled]="!previous() || set().isCompleted"
+    [disabled]="!previous() || done()"
     [attr.aria-label]="
       previous()
         ? ('workouts.setRow.usePrevious' | translate: { name: badge().name, value: previous() })
@@ -48,19 +53,21 @@
   }
 
   <!-- A tick alone is a valid log: never gated on a value being typed. -->
-  <button
-    type="button"
-    class="tick"
-    [class.on]="set().isCompleted"
-    [attr.aria-pressed]="set().isCompleted"
-    [attr.aria-label]="
-      (set().isCompleted ? 'workouts.setRow.untick' : 'workouts.setRow.complete')
-        | translate: { name: badge().name, number: badge().text }
-    "
-    (click)="tick.emit()"
-  >
-    <ion-icon name="checkmark-outline" aria-hidden="true" />
-  </button>
+  @if (tickable()) {
+    <button
+      type="button"
+      class="tick"
+      [class.on]="done()"
+      [attr.aria-pressed]="done()"
+      [attr.aria-label]="
+        (done() ? 'workouts.setRow.untick' : 'workouts.setRow.complete')
+          | translate: { name: badge().name, number: badge().text }
+      "
+      (click)="tick.emit()"
+    >
+      <ion-icon name="checkmark-outline" aria-hidden="true" />
+    </button>
+  }
 </div>
 
 @if (rpe() || set().notes) {

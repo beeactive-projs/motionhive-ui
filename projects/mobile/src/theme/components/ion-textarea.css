@@ -2,3 +2,35 @@
 ion-textarea:not([shape='round']) {
   --border-radius: var(--mh-radius-control) !important;
 }
+
+/* Field colours — the same block, and the same reasons, as ion-input.css.
+   A textarea is a field; it reads the same tokens as the single-line one. */
+ion-textarea {
+  --ion-color-step-300: var(--ion-border-color);
+  --ion-color-step-750: var(--ion-color-medium);
+  --placeholder-color: var(--ion-color-medium) !important;
+  --placeholder-opacity: 1 !important;
+  --highlight-color-valid: var(--ion-color-primary) !important;
+  --highlight-color-invalid: var(--mh-color-danger-deep) !important;
+}
+
+ion-textarea .label-text-wrapper {
+  color: var(--ion-color-medium);
+}
+
+/* Focused, the deep amber rather than the outline's honey — the reasoning is
+   in ion-input.css. */
+ion-textarea.has-focus .label-text-wrapper {
+  color: var(--mh-color-honey-deep) !important;
+}
+
+/* A textarea whose error line is showing, off the same `.mh-helper.over`
+   sibling ion-input.css keys on, so the two kinds of field fail alike. */
+ion-textarea:has(+ .mh-helper.over) {
+  --border-color: var(--mh-color-danger-deep) !important;
+  --highlight-color-focused: var(--mh-color-danger-deep);
+}
+
+ion-textarea:has(+ .mh-helper.over) .label-text-wrapper {
+  color: var(--mh-color-danger-deep) !important;
+}

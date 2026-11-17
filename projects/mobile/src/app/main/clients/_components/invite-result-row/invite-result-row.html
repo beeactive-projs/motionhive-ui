@@ -20,7 +20,6 @@
   @if (isIdle()) {
     <ion-button
       slot="end"
-      shape="round"
       class="mh-row-action"
       [attr.aria-label]="'clients.invite.inviteRowLabel' | translate: { name: name() }"
       (click)="invite.emit()"

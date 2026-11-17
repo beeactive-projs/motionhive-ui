@@ -1075,8 +1075,7 @@
       "deleteHint": "Past workouts keep it",
       "editHint": "Change the name, what it tracks or your note",
       "emptyAction": "Create an exercise",
-      "emptyMessage": "Missing an exercise, like a machine at your gym? Create it and only you will see it.",
-      "menuFor": "More for {name}"
+      "emptyMessage": "Missing an exercise, like a machine at your gym? Create it and only you will see it."
     },
     "simpleForm": {
       "more": "More…",
@@ -1098,8 +1097,8 @@
       },
       "picture": "Picture",
       "addPicture": "Add a picture",
-      "changePicture": "Change",
-      "removePicture": "Remove",
+      "changePicture": "Change picture",
+      "removePicture": "Remove picture",
       "pictureHint": "A photo of the machine or the move. Anyone who can see the exercise sees it."
     }
   },
@@ -3395,6 +3394,17 @@
       "change": "Change the rest"
     },
     "routineBuilder": {
+      "actions": {
+        "moveDown": "Move down",
+        "moveUp": "Move up",
+        "reorder": "Reorder exercises"
+      },
+      "archive": {
+        "action": "Archive",
+        "done": "Archived. It waits under Archived routines.",
+        "failed": "Couldn't change it. Try again.",
+        "unarchived": "Unarchived. It is back in your routines."
+      },
       "copyConfirm": {
         "body": "You get your own copy of {name} to change freely. The original stays as it is.",
         "title": "Make a copy?"
@@ -3403,27 +3413,86 @@
         "message": "Delete {name}? Workouts already logged from it are kept.",
         "title": "Delete routine"
       },
+      "discard": {
+        "editBody": "Your changes to {name} will be lost.",
+        "keep": "Keep editing",
+        "newBody": "This routine has not been saved, so its exercises and sets will be lost.",
+        "title": "Discard changes?"
+      },
+      "keypad": {
+        "nextSet": "Next set"
+      },
       "makeCopy": "Make a copy",
       "name": {
         "label": "Routine name",
-        "placeholder": "Push day"
+        "placeholder": "Push day",
+        "required": "Give the routine a name."
       },
-      "noExercises": "No exercises yet. Add the movements in the order you do them.",
+      "noExercises": "Add the movements in the order you do them.",
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Heavy squats first, then accessories."
+      },
+      "options": {
+        "discardEdit": "Discard changes",
+        "discardNew": "Discard routine"
+      },
+      "plan": {
+        "addSetFor": "Add set to {name}",
+        "addWeightFor": "Add weight to {name}",
+        "perSet": "Set by set",
+        "perSetFor": "Set by set, {name}",
+        "sameForAll": "Same for every set",
+        "sameForAllFor": "Same for every set, {name}"
+      },
+      "reorder": {
+        "hint": "Drag the handles to change the order.",
+        "title": "Reorder exercises"
+      },
+      "rest": {
+        "chip": "Rest",
+        "exercise": "Rest for {name}",
+        "exerciseInherited": "Rest for {name}, same as the routine ({value})",
+        "exerciseOwn": "Rest for {name}, {value}",
+        "hint": "For every exercise",
+        "row": "Rest between sets",
+        "sameAsRoutine": "Same as the routine ({value})",
+        "yourDefault": "Default ({value})"
+      },
+      "saveAndStart": "Save and start",
       "starterNote": "A MotionHive starter. Start it and it becomes yours to edit.",
       "starterNoteCoach": "A MotionHive starter. Make a copy to change it for your clients.",
       "stepper": {
         "fewer": "One set fewer for {name}",
         "group": "Sets for {name}",
-        "more": "One set more for {name}",
-        "unit": "{count, plural, one {set} other {sets}}"
+        "more": "One set more for {name}"
+      },
+      "superset": {
+        "hint": "Link two exercises to do them back to back, then rest.",
+        "link": "Link as superset",
+        "linkFor": "Link {a} and {b} as a superset",
+        "unlink": "Superset · tap to unlink",
+        "unlinkFor": "Unlink {a} and {b}"
       },
       "targets": {
+        "distance": "Distance",
+        "group": "Target {field} for {name}",
+        "lower": "Lower the {field} for {name}",
+        "raise": "Raise the {field} for {name}",
         "reps": "Reps",
-        "repsFor": "Target reps for {name}",
-        "repsKeypad": "Target reps",
+        "repsEach": "Reps each",
+        "sets": "Sets",
+        "time": "Time",
+        "type": "Type the {field} for {name}, now {value}",
         "weight": "Weight",
-        "weightFor": "Target weight for {name}",
-        "weightKeypad": "Target weight (kg)"
+        "withUnit": "{field} ({unit})",
+        "words": {
+          "distance": "distance",
+          "reps": "reps",
+          "repsEach": "reps each side",
+          "time": "time",
+          "weight": "weight"
+        }
       },
       "thisRoutine": "this routine",
       "title": "Routine",
@@ -3436,26 +3505,6 @@
         "saveFailed": "Could not save the routine",
         "saved": "Routine saved",
         "startFailed": "Could not start that routine"
-      },
-      "rest": {
-        "row": "Rest between sets",
-        "hint": "For every exercise in this routine",
-        "yourDefault": "Your default ({value})",
-        "sameAsRoutine": "Same as the routine ({value})",
-        "exercise": "Rest for {name}",
-        "chip": "Rest"
-      },
-      "superset": {
-        "link": "Link as superset",
-        "unlink": "Superset · tap to unlink",
-        "linkFor": "Link {a} and {b} as a superset",
-        "unlinkFor": "Unlink {a} and {b}"
-      },
-      "archive": {
-        "action": "Archive",
-        "done": "Archived. It waits under Archived routines.",
-        "failed": "Couldn't change it. Try again.",
-        "unarchived": "Unarchived. It is back in your routines."
       }
     },
     "routineRow": {
@@ -3845,6 +3894,24 @@
       "skipSet": "Skip set",
       "otherValue": "Other value",
       "allDone": "All sets done"
+    },
+    "updateRoutine": {
+      "added": "You added {names}.",
+      "keep": "Keep it as it was",
+      "keepHint": "Only this workout has the changes.",
+      "more": "{count, plural, one {# more} other {# more}}",
+      "removed": "You removed {names}.",
+      "reordered": "You changed the order of the exercises.",
+      "sets": "You changed the sets of {names}.",
+      "supersets": "You changed the supersets.",
+      "swapped": "You swapped in {names}.",
+      "title": "Update {name}?",
+      "toast": {
+        "failed": "Could not update {name}. Your workout is saved.",
+        "updated": "{name} updated"
+      },
+      "update": "Update routine",
+      "updateHint": "Next time starts with these changes."
     }
   },
   "feedback": {

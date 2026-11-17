@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import type {
   CreateRoutinePayload,
   RoutineSet,
@@ -16,15 +17,9 @@ import type {
   UpdateRoutinePayload,
 } from '../../models/workout/routine.model';
 import type { WorkoutLog } from '../../models/workout/log.model';
+import { decimalToNumber } from '../../utils/number.utils';
 
 const BASE = '/programs';
-
-/** The API returns DECIMAL columns as strings; the UI wants numbers. */
-function toNumber(v: number | string | null | undefined): number | null {
-  if (v === null || v === undefined || v === '') return null;
-  const n = typeof v === 'number' ? v : Number(v);
-  return Number.isFinite(n) ? n : null;
-}
 
 /**
  * Collapse a prescribed exercise into the flat shape the routine editor
@@ -40,8 +35,9 @@ function toRoutineExercise(pe: ProgramExerciseWire): RoutineExercise {
     setType: s.setType,
     targetRepsMin: s.targetRepsMin,
     targetRepsMax: s.targetRepsMax,
-    targetWeightKg: toNumber(s.targetWeightKg),
+    targetWeightKg: decimalToNumber(s.targetWeightKg),
     targetDurationSeconds: s.targetDurationSeconds ?? null,
+    targetDistanceMeters: s.targetDistanceMeters ?? null,
     restAfterSeconds: s.restAfterSeconds,
   }));
   // If every set matches the first, the flat summary is lossless and the
@@ -53,7 +49,8 @@ function toRoutineExercise(pe: ProgramExerciseWire): RoutineExercise {
       s.targetRepsMin !== sets[0].targetRepsMin ||
       s.targetRepsMax !== sets[0].targetRepsMax ||
       s.targetWeightKg !== sets[0].targetWeightKg ||
-      s.targetDurationSeconds !== sets[0].targetDurationSeconds,
+      s.targetDurationSeconds !== sets[0].targetDurationSeconds ||
+      s.targetDistanceMeters !== sets[0].targetDistanceMeters,
   );
   return {
     sets,
@@ -66,7 +63,7 @@ function toRoutineExercise(pe: ProgramExerciseWire): RoutineExercise {
     defaultSets: pe.sets?.length ?? 3,
     targetRepsMin: first?.targetRepsMin ?? null,
     targetRepsMax: first?.targetRepsMax ?? null,
-    targetWeightKg: toNumber(first?.targetWeightKg),
+    targetWeightKg: decimalToNumber(first?.targetWeightKg),
     restAfterSeconds: first?.restAfterSeconds ?? null,
     exercise: pe.exercise,
   };
@@ -141,9 +138,16 @@ export class RoutineService {
       .pipe(map(toRoutine));
   }
 
-  get(id: string): Observable<Routine> {
+  /**
+   * `silent` opts the read out of the global error dialog, for a screen that
+   * shows its own failure state (the routine builder's "Couldn't open").
+   */
+  get(id: string, opts?: { silent?: boolean }): Observable<Routine> {
     return this._http
-      .get<ProgramWire>(`${this._base}/${id}`)
+      .get<ProgramWire>(
+        `${this._base}/${id}`,
+        opts?.silent ? { context: silentRequest() } : {},
+      )
       .pipe(map(toRoutine));
   }
 

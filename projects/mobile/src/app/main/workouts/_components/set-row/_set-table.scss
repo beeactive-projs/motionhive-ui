@@ -1,0 +1,97 @@
+/* An exercise card's set table, as the logger and the routine builder both
+   draw it: the card narrowed for the table, the rows, their swipe options
+   and the Add set line under them. `@use` it from the page that hosts the
+   cards, so the two screens stay one table. */
+
+/* The set table pads its own rows (the grid's inset and ring), so the card
+   narrows to give the columns the room, and its header moves in by that
+   padding: the tile over the set numbers, the ⋮ over the last column. */
+mh-exercise-card {
+  --mh-card-inset: 0.5rem;
+  --mh-card-lead: calc(0.25rem + var(--mh-ring-width));
+}
+
+/* The set table: its heading, then one row per set (set-row draws the done,
+   focus and ahead looks on one grid). */
+.sets {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add set / Add weight under the sets — quiet text actions in the honey ink,
+   centred under the rows they add to. Regular weight (user decision,
+   2026-11-10): the honey and the plus already say it is an action, and
+   semibold made it shout over the sets. */
+.ex-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.375rem;
+}
+
+.ex-actions ion-button {
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0.5rem;
+  position: relative;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* …and a finger's 44px to press them by: an invisible box that takes the
+   gap above (never the last set's row) and grows the rest below. */
+.ex-actions ion-button::after {
+  content: '';
+  position: absolute;
+  inset-block-start: -0.375rem;
+  inset-block-end: calc(0.375rem + 100% - var(--mh-tap-target));
+  inset-inline: 0;
+}
+
+/* A set row that swipes. The teal Copy and the red Delete wait behind it
+   (their skin is the lists', `mh-swipe-row` in ion-list.css). */
+.set-slide {
+  display: block;
+}
+
+/* The item paints the card's own fill, so it reads as the card, and so it
+   hides the options until the swipe uncovers them: Ionic lays them out as
+   wide as the row, and a transparent item let the Delete show through
+   mid-drag with the tick over its label. The row's done and focus looks
+   paint on top of it. */
+.set-item {
+  --background: var(--ion-card-background);
+  --background-hover: transparent;
+  --background-activated: transparent;
+  --background-focused: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  --min-height: 0;
+  --border-width: 0;
+}
+
+.set-item mh-set-row {
+  width: 100%;
+}
+
+/* An option is drawn like the row it belongs to: inset by the row's own
+   0.125rem margin above and below, with the row's radius on its outer
+   corners, so the table keeps its rhythm while a row is open. The inner
+   edge, where the row slides off it, stays square. */
+.set-slide ion-item-option {
+  overflow: hidden;
+  margin-block: 0.125rem;
+  border-radius: var(--mh-radius-control);
+}
+
+.set-slide ion-item-options[side='end'] ion-item-option {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+.set-slide ion-item-options[side='start'] ion-item-option {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}

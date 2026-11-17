@@ -1,50 +1,14 @@
+/* The exercise cards' set table and the header, shared with the routine builder. */
+@use '../_components/set-row/set-table';
+@use '../_components/workout-header/workout-header';
+
 /* ─── Header ──────────────────────────────────────────────────────
-   After the workout prototype: the name (Poppins, one line), and under it
-   the clock in honey (this moment, not a status; tabular so it does not
-   jitter as it ticks) and the volume so far, in the muted ink. */
-ion-title .name,
-ion-title .meta {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-ion-title .name {
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-md);
-  font-weight: 600;
-  line-height: var(--mh-leading-heading);
-}
-
-ion-title .meta {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-}
-
+   After the workout prototype: under the name, the clock in honey (this
+   moment, not a status; tabular so it does not jitter as it ticks) and the
+   volume so far, in the muted ink. Finish is the header's honey button. */
 ion-title .timer {
   color: var(--mh-color-honey-deep);
   font-weight: 600;
-}
-
-/* Finish is the one honey ask on the screen: Ionic's own primary button,
-   solid and round (`color="primary"` in the template), the honey fill with
-   its black contrast ink, 9.8:1. The colour also keeps it out of the iOS
-   rule that gives header buttons the text colour (ion-toolbar.css), which
-   put white on the honey. Here only its size, a pill beside the ⋯. */
-ion-button.finish {
-  --padding-start: 1rem;
-  --padding-end: 1rem;
-  --box-shadow: none;
-  position: relative;
-  height: 2rem;
-  min-height: 0;
-  margin: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  letter-spacing: normal;
 }
 
 /* Sets done across the whole workout, under the bar: a thin bar and the
@@ -73,12 +37,8 @@ ion-toolbar.progress {
   font-variant-numeric: tabular-nums;
 }
 
-/* The set table pads its own rows (the grid's inset and ring), so the card
-   narrows to give the columns the room, and its header moves in by that
-   padding: the tile over the set numbers, the ⋮ over the ticks. A folded
-   row takes the same inset, so its mark and chevron sit where the open
-   card's tile and ⋮ do. */
-mh-exercise-card,
+/* A folded row takes the open card's inset (`_set-table.scss`), so its
+   mark and chevron sit where the open card's tile and ⋮ do. */
 ion-card.folded {
   --mh-card-inset: 0.5rem;
   --mh-card-lead: calc(0.25rem + var(--mh-ring-width));
@@ -115,32 +75,6 @@ ion-card.folded {
   font-weight: 600;
 }
 
-/* The set table: its heading, then one row per set (set-row draws the done,
-   focus and ahead looks on one grid). */
-.sets {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Add set / Add weight under the sets — quiet text actions in the honey ink,
-   centred under the rows they add to. Regular weight (user decision,
-   2026-11-10): the honey and the plus already say it is an action, and
-   semibold made it shout over the sets. */
-.ex-actions {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.375rem;
-}
-
-.ex-actions ion-button {
-  --color: var(--mh-color-honey-deep);
-  --padding-start: 0.25rem;
-  --padding-end: 0.5rem;
-  margin: 0;
-  font-weight: 400;
-}
-
 ion-card ion-skeleton-text {
   margin: 0.375rem 0;
 }
@@ -166,13 +100,21 @@ ion-button.finish-early {
   padding-bottom: calc(var(--mh-tap-target) + 1rem + var(--mh-page-gutter));
 }
 
-/* "Back to Bench press · Set 3": floats over the list, above the bars. */
+/* "Back to Bench press · Set 3": floats over the list, above the bars. A
+   strip of no height at the end of the list, stuck 1rem above the footer,
+   with the pill hanging above it. The list runs on behind the footer, but
+   sticky stops at the scroller's padding, which Ionic sets to that overlap,
+   so 1rem is measured from the footer's top. Being in the scroller, a swipe
+   that starts on the pill scrolls the list; only a tap goes back. Over the
+   set rows, whose sliding items paint at z-index 1 and 2. */
 .back-to {
-  position: absolute;
-  inset-inline: 0;
+  position: sticky;
+  z-index: 3;
   bottom: 1rem;
   display: flex;
+  align-items: flex-end;
   justify-content: center;
+  block-size: 0;
   padding-inline: 1rem;
   pointer-events: none;
 }
@@ -189,7 +131,7 @@ ion-button.finish-early {
   min-height: var(--mh-tap-target);
   padding: 0 1rem 0 0.75rem;
   border: var(--mh-hairline) solid var(--ion-border-color);
-  border-radius: var(--mh-radius-pill);
+  border-radius: var(--mh-radius-control);
   background: var(--mh-color-floating);
   box-shadow: var(--mh-shadow-overlay);
   color: var(--ion-text-color);
@@ -352,54 +294,6 @@ ion-card.superset .sets {
 /* The hint that the label opens something: the round's ⋯. */
 .round-more {
   font-size: var(--mh-icon-sm);
-}
-
-/* A set row that swipes. The teal Copy and the red Delete wait behind it
-   (their skin is the lists', `mh-swipe-row` in ion-list.css). */
-.set-slide {
-  display: block;
-}
-
-/* The item paints the card's own fill, so it reads as the card, and so it
-   hides the options until the swipe uncovers them: Ionic lays them out as
-   wide as the row, and a transparent item let the Delete show through
-   mid-drag with the tick over its label. The row's done and focus looks
-   paint on top of it. */
-.set-item {
-  --background: var(--ion-card-background);
-  --background-hover: transparent;
-  --background-activated: transparent;
-  --background-focused: transparent;
-  --padding-start: 0;
-  --padding-end: 0;
-  --inner-padding-end: 0;
-  --inner-padding-start: 0;
-  --min-height: 0;
-  --border-width: 0;
-}
-
-.set-item mh-set-row {
-  width: 100%;
-}
-
-/* An option is drawn like the row it belongs to: inset by the row's own
-   0.125rem margin above and below, with the row's radius on its outer
-   corners, so the table keeps its rhythm while a row is open. The inner
-   edge, where the row slides off it, stays square. */
-.set-slide ion-item-option {
-  overflow: hidden;
-  margin-block: 0.125rem;
-  border-radius: var(--mh-radius-control);
-}
-
-.set-slide ion-item-options[side='end'] ion-item-option {
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
-}
-
-.set-slide ion-item-options[side='start'] ion-item-option {
-  border-start-end-radius: 0;
-  border-end-end-radius: 0;
 }
 
 .round-done {

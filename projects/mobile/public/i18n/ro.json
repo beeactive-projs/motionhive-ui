@@ -1075,8 +1075,7 @@
       "deleteHint": "Antrenamentele trecute îl păstrează",
       "editHint": "Schimbă numele, ce urmărește sau nota ta",
       "emptyAction": "Creează un exercițiu",
-      "emptyMessage": "Îți lipsește un exercițiu, cum ar fi un aparat de la sala ta? Creează-l și doar tu îl vei vedea.",
-      "menuFor": "Mai multe pentru {name}"
+      "emptyMessage": "Îți lipsește un exercițiu, cum ar fi un aparat de la sala ta? Creează-l și doar tu îl vei vedea."
     },
     "simpleForm": {
       "more": "Mai multe…",
@@ -1098,8 +1097,8 @@
       },
       "picture": "Imagine",
       "addPicture": "Adaugă o imagine",
-      "changePicture": "Schimbă",
-      "removePicture": "Elimină",
+      "changePicture": "Schimbă imaginea",
+      "removePicture": "Elimină imaginea",
       "pictureHint": "O poză cu aparatul sau cu mișcarea. O vede oricine vede exercițiul."
     }
   },
@@ -3395,6 +3394,17 @@
       "change": "Schimbă pauza"
     },
     "routineBuilder": {
+      "actions": {
+        "moveDown": "Mută mai jos",
+        "moveUp": "Mută mai sus",
+        "reorder": "Reordonează exercițiile"
+      },
+      "archive": {
+        "action": "Arhivează",
+        "done": "Arhivată. O găsești la Rutine arhivate.",
+        "failed": "Nu am putut face schimbarea. Încearcă din nou.",
+        "unarchived": "Dezarhivată. E din nou printre rutinele tale."
+      },
       "copyConfirm": {
         "body": "Primești propria copie a rutinei {name}, pe care o poți schimba cum vrei. Originalul rămâne neschimbat.",
         "title": "Faci o copie?"
@@ -3403,27 +3413,86 @@
         "message": "Ștergi {name}? Antrenamentele deja înregistrate pe baza ei se păstrează.",
         "title": "Șterge rutina"
       },
+      "discard": {
+        "editBody": "Schimbările făcute la {name} se vor pierde.",
+        "keep": "Continuă editarea",
+        "newBody": "Rutina nu a fost salvată, așa că exercițiile și seriile ei se vor pierde.",
+        "title": "Renunți la schimbări?"
+      },
+      "keypad": {
+        "nextSet": "Seria următoare"
+      },
       "makeCopy": "Fă o copie",
       "name": {
         "label": "Numele rutinei",
-        "placeholder": "Ziua de împins"
+        "placeholder": "Ziua de împins",
+        "required": "Dă un nume rutinei."
       },
-      "noExercises": "Niciun exercițiu încă. Adaugă mișcările în ordinea în care le faci.",
+      "noExercises": "Adaugă mișcările în ordinea în care le faci.",
+      "notes": {
+        "label": "Notițe",
+        "placeholder": "Întâi genuflexiunile grele, apoi exercițiile ajutătoare."
+      },
+      "options": {
+        "discardEdit": "Renunță la schimbări",
+        "discardNew": "Renunță la rutină"
+      },
+      "plan": {
+        "addSetFor": "Adaugă serie la {name}",
+        "addWeightFor": "Adaugă greutate la {name}",
+        "perSet": "Serie cu serie",
+        "perSetFor": "Serie cu serie, {name}",
+        "sameForAll": "La fel pentru toate seriile",
+        "sameForAllFor": "La fel pentru toate seriile, {name}"
+      },
+      "reorder": {
+        "hint": "Trage de mânere ca să schimbi ordinea.",
+        "title": "Reordonează exercițiile"
+      },
+      "rest": {
+        "chip": "Pauză",
+        "exercise": "Pauză pentru {name}",
+        "exerciseInherited": "Pauză pentru {name}, la fel ca rutina ({value})",
+        "exerciseOwn": "Pauză pentru {name}, {value}",
+        "hint": "Pentru toate exercițiile",
+        "row": "Pauză între serii",
+        "sameAsRoutine": "La fel ca rutina ({value})",
+        "yourDefault": "Implicit ({value})"
+      },
+      "saveAndStart": "Salvează și începe",
       "starterNote": "O rutină de start MotionHive. Când o începi, devine a ta și o poți edita.",
       "starterNoteCoach": "O rutină de start MotionHive. Fă o copie ca să o adaptezi pentru clienții tăi.",
       "stepper": {
         "fewer": "O serie în minus pentru {name}",
         "group": "Serii pentru {name}",
-        "more": "O serie în plus pentru {name}",
-        "unit": "{count, plural, one {serie} few {serii} other {de serii}}"
+        "more": "O serie în plus pentru {name}"
+      },
+      "superset": {
+        "hint": "Leagă două exerciții ca să le faci unul după altul, apoi iei pauză.",
+        "link": "Leagă în superset",
+        "linkFor": "Leagă {a} și {b} în superset",
+        "unlink": "Superset · atinge pentru a dezlega",
+        "unlinkFor": "Dezleagă {a} și {b}"
       },
       "targets": {
+        "distance": "Distanță",
+        "group": "Ținta: {field}, {name}",
+        "lower": "Scade {field} pentru {name}",
+        "raise": "Crește {field} pentru {name}",
         "reps": "Repetări",
-        "repsFor": "Repetări țintă pentru {name}",
-        "repsKeypad": "Repetări țintă",
+        "repsEach": "Rep./parte",
+        "sets": "Serii",
+        "time": "Timp",
+        "type": "Scrie {field} pentru {name}, acum {value}",
         "weight": "Greutate",
-        "weightFor": "Greutate țintă pentru {name}",
-        "weightKeypad": "Greutate țintă (kg)"
+        "withUnit": "{field} ({unit})",
+        "words": {
+          "distance": "distanța",
+          "reps": "repetările",
+          "repsEach": "repetările pe parte",
+          "time": "timpul",
+          "weight": "greutatea"
+        }
       },
       "thisRoutine": "această rutină",
       "title": "Rutină",
@@ -3436,26 +3505,6 @@
         "saveFailed": "Nu am putut salva rutina",
         "saved": "Rutină salvată",
         "startFailed": "Nu am putut începe rutina"
-      },
-      "rest": {
-        "row": "Pauză între serii",
-        "hint": "Pentru toate exercițiile din rutină",
-        "yourDefault": "Setarea ta ({value})",
-        "sameAsRoutine": "La fel ca rutina ({value})",
-        "exercise": "Pauză pentru {name}",
-        "chip": "Pauză"
-      },
-      "superset": {
-        "link": "Leagă în superset",
-        "unlink": "Superset · atinge pentru a dezlega",
-        "linkFor": "Leagă {a} și {b} în superset",
-        "unlinkFor": "Dezleagă {a} și {b}"
-      },
-      "archive": {
-        "action": "Arhivează",
-        "done": "Arhivată. O găsești la Rutine arhivate.",
-        "failed": "Nu am putut face schimbarea. Încearcă din nou.",
-        "unarchived": "Dezarhivată. E din nou printre rutinele tale."
       }
     },
     "routineRow": {
@@ -3845,6 +3894,24 @@
       "skipSet": "Sari seria",
       "otherValue": "Altă valoare",
       "allDone": "Toate seriile gata"
+    },
+    "updateRoutine": {
+      "added": "Ai adăugat {names}.",
+      "keep": "Las-o cum era",
+      "keepHint": "Doar acest antrenament are schimbările.",
+      "more": "{count, plural, one {încă #} few {încă #} other {încă #}}",
+      "removed": "Ai scos {names}.",
+      "reordered": "Ai schimbat ordinea exercițiilor.",
+      "sets": "Ai schimbat seriile la {names}.",
+      "supersets": "Ai schimbat superseturile.",
+      "swapped": "Ai pus în loc {names}.",
+      "title": "Actualizezi {name}?",
+      "toast": {
+        "failed": "Nu am putut actualiza {name}. Antrenamentul tău e salvat.",
+        "updated": "Rutina {name} a fost actualizată"
+      },
+      "update": "Actualizează rutina",
+      "updateHint": "Data viitoare începi cu aceste schimbări."
     }
   },
   "feedback": {

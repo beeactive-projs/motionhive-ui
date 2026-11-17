@@ -44,7 +44,6 @@ import {
   withEnumLabels,
 } from 'core';
 
-import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import {
   HexAvatarTone,
   HexAvatarTones,
@@ -910,28 +909,3 @@ export function toggleCapped(ids: readonly string[], id: string, max: number): s
   if (ids.includes(id)) return ids.filter((entry) => entry !== id);
   return ids.length >= max ? [...ids] : [...ids, id];
 }
-
-/** The ⋯ on a row of your own: change it, or let it go. */
-export const OwnExerciseActionIds = {
-  Edit: 'edit',
-  Delete: 'delete',
-} as const;
-
-export type OwnExerciseActionId = (typeof OwnExerciseActionIds)[keyof typeof OwnExerciseActionIds];
-
-export const OWN_EXERCISE_ACTIONS: readonly SheetAction<OwnExerciseActionId>[] = [
-  {
-    id: OwnExerciseActionIds.Edit,
-    label: 'button.edit',
-    icon: 'create-outline',
-    color: 'primary',
-  },
-  {
-    id: OwnExerciseActionIds.Delete,
-    label: 'button.delete',
-    hint: 'exercises.own.deleteHint',
-    icon: 'trash-outline',
-    color: 'danger',
-    destructive: true,
-  },
-];

@@ -1,57 +1,68 @@
-/* ─── Targets ─────────────────────────────────────────────────────
-   Two cells of the same grid the logger's set rows use — plain buttons on
-   theme tokens, sized for a thumb, so a target is entered with the same
-   gesture as an actual. Optional, so they read as quiet fields rather than
-   required inputs. */
-.targets {
-  display: flex;
-  gap: 0.5rem;
-}
+/* The set table of an exercise planned set by set, the logger's own:
+   planning a set and logging one look the same. The rest chip and the link
+   chip between two cards, a program day's. */
+@use '../_components/set-row/set-table';
+@use '../_components/plan-chips/plan-chips';
+/* The workout's header: name over meta, the ⋯ and the honey Save button. */
+@use '../_components/workout-header/workout-header';
 
-.target {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-height: var(--mh-tap-target);
-  padding: 0.375rem 0.625rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-  color: var(--ion-text-color);
-  text-align: start;
-  cursor: pointer;
-}
-
-.target.active {
-  border-color: var(--mh-color-honey-deep);
-  box-shadow: 0 0 0 var(--mh-ring-width) var(--mh-color-selected-background);
-}
-
-.target .mh-kicker {
-  color: var(--ion-color-medium);
-}
-
-.target strong {
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.target strong em {
-  margin-inline-start: 0.125rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  font-style: normal;
-  font-weight: 500;
-}
-
-/* The sets stepper and the remove control on one line under the targets. */
+/* Under the targets: the rest chip, the quiet text actions, and Remove at
+   the far edge. Inset like the rows above it, so it lines up with them;
+   wraps when the text is large. */
 .controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.625rem;
+  padding-inline: calc(0.25rem + var(--mh-ring-width));
+}
+
+.controls .text-action {
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0.5rem;
+  position: relative;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* The quiet text actions are small to the eye but take a finger's 44px: an
+   invisible box above and below, inside the controls row (the Remove
+   beside them is already 44px tall). The same for "Add exercise" at the
+   end of the section head, which has the page's rhythm above it. */
+.controls .text-action::after,
+.mh-section-head ion-button::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--mh-tap-target) - 100%) / -2);
+  inset-inline: 0;
+}
+
+/* Above the card under it, which is positioned and comes later, so the box's
+   lower edge reaches into the card's empty top padding. */
+.mh-section-head ion-button {
+  position: relative;
+  z-index: 1;
+}
+
+/* The page's h1 in the bar while it is not building (reorder, loading,
+   failed): the bar's own title type, not a page heading's. */
+ion-title h1.title {
+  margin: 0;
+  overflow: hidden;
+  font: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controls .mh-remove {
+  margin-inline-start: auto;
+}
+
+/* The page's last word: save and go, after everything it saves. */
+ion-button.start {
+  margin: 0.5rem 0 0;
 }
 
 /* The overview's loading stand-in: heading lines on the page, then rows. */
@@ -63,67 +74,35 @@
   margin: 0.5rem 0;
 }
 
-mh-hex-avatar {
-  margin-inline-end: 0.875rem;
+/* The builder's loading stand-in: the name field, then (after the rest
+   row) one exercise card, at about their heights. */
+.field-skeleton,
+.card-skeleton {
+  margin: 0;
 }
 
-/* "Rest between sets", just under the name. */
-.rest-row {
-  margin-top: 0.75rem;
+.field-skeleton {
+  height: 3.5rem;
+  border-radius: var(--mh-radius-control);
 }
 
-/* An exercise's own rest, quiet when it takes the routine's. */
-.rest-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  min-height: 2.25rem;
-  margin-inline-start: auto;
-  padding: 0 0.75rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-pill);
-  background: var(--ion-card-background);
-  color: var(--ion-color-medium);
-  cursor: pointer;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+.card-skeleton {
+  height: 13rem;
+  border-radius: var(--mh-radius-card);
 }
 
-.rest-chip.own {
-  border-color: var(--ion-color-primary);
-  color: var(--ion-text-color);
-}
-
-/* The link between two cards, centred in the gap. */
-.link-row {
+/* The reorder's drag handle. Ionic sizes it to its 16px glyph, under the
+   24px a target needs: here it is a full tap target to grab, its glyph at
+   the inline size in the muted ink, as a row's trailing control. */
+ion-reorder {
   display: flex;
-  justify-content: center;
-  margin: -0.25rem 0;
-}
-
-.link-chip {
-  display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  min-height: 2.25rem;
-  padding: 0 0.875rem;
-  border: 1px dashed var(--ion-border-color);
-  border-radius: var(--mh-radius-pill);
-  background: var(--ion-background-color);
+  justify-content: center;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+}
+
+ion-reorder ion-icon {
   color: var(--ion-color-medium);
-  cursor: pointer;
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-}
-
-.link-chip.linked {
-  border: 1px solid var(--ion-color-primary);
-  background: var(--ion-color-primary-wash);
-  color: var(--ion-color-primary-wash-contrast);
-}
-
-button:focus-visible {
-  outline: 2px solid var(--ion-color-primary);
-  outline-offset: 2px;
+  font-size: var(--mh-icon-md);
 }

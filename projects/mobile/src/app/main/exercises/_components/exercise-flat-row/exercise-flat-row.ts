@@ -24,17 +24,22 @@ import {
 } from '../../exercises.config';
 
 /**
- * One row of the exercise library page, a flat-list row (`mh-flat-list`),
- * laid out like a client row: the exercise's tile, its name, and what it
- * trains with its level beside it. The name may wrap to a second line, the
- * one flat-list title that does (`lists.md`, "Exercises").
+ * One row of the exercise library, on its own page and on the Workouts
+ * tab's Exercises segment, a flat-list row (`mh-flat-list`), laid out like a
+ * client row: the exercise's tile, its name, and what it trains with its
+ * level beside it. The name may wrap to a second line, the one flat-list
+ * title that does (`lists.md`, "Exercises").
  *
  * The tile is the exercise's own photo where there is one and the
  * kind-tinted hexagon where there is not, as on `mh-exercise-row`, the card
- * list's row the picker and the Workouts tab keep.
+ * list's row the picker and the workout overview keep.
  *
  * An exercise of your own swipes left to Edit and Delete. The row only
  * emits; the page decides which form edits it and confirms the delete.
+ *
+ * It is a compact row (`mh-compact-row`, ion-list.css), like
+ * `mh-exercise-row`: an md tile and smaller type on 1.25rem lines, a 3.5rem
+ * row where a person's is 4.5rem.
  */
 @Component({
   selector: 'mh-exercise-flat-row',
@@ -51,6 +56,7 @@ import {
   ],
   templateUrl: './exercise-flat-row.html',
   styleUrl: './exercise-flat-row.scss',
+  host: { class: 'mh-compact-row' },
 })
 export class ExerciseFlatRow {
   readonly exercise = input.required<Exercise>();

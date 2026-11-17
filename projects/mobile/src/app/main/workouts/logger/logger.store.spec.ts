@@ -77,6 +77,40 @@ describe('LoggerStore.whenSettled — Finish waits for the last tick', () => {
   });
 });
 
+// A set write answers with the bare row. Swapping it in whole dropped the
+// set's plan: a ticked set forgot its targets, and Finish read a routine's
+// own set as one the workout added.
+describe('LoggerStore.logSet — the reply keeps the set’s plan', () => {
+  it('keeps the plan and planned rest the reply does not carry', () => {
+    const plan = { id: 'ps-1', targetRepsMin: 8, targetWeightKg: 60 };
+    const reply = new Subject<LoggedSet>();
+    TestBed.configureTestingModule({
+      providers: [LoggerStore, { provide: WorkoutLogService, useValue: { logSet: () => reply } }],
+    });
+    const store = TestBed.inject(LoggerStore);
+    store.adopt({
+      id: 'wl-1',
+      exercises: [
+        {
+          id: 'ex-1',
+          sets: [{ id: 's-1', isCompleted: false, prescribedSet: plan, plannedRestSeconds: 120 }],
+        },
+      ],
+    } as unknown as WorkoutLog);
+
+    store.logSet('ex-1', 's-1', { isCompleted: true, reps: 8 });
+    reply.next({ id: 's-1', isCompleted: true, reps: 8 } as LoggedSet);
+    reply.complete();
+
+    expect(store.exercises()[0].sets?.[0]).toMatchObject({
+      isCompleted: true,
+      reps: 8,
+      prescribedSet: plan,
+      plannedRestSeconds: 120,
+    });
+  });
+});
+
 describe('LoggerStore.copySet — Copy set', () => {
   function copySetup(addSet: ReturnType<typeof vi.fn>) {
     const logSet = vi.fn(() => of({ id: 's-2', isCompleted: false } as LoggedSet));
@@ -121,6 +155,97 @@ describe('LoggerStore.copySet — Copy set', () => {
 
     expect(onError).toHaveBeenCalledWith(refusal);
     expect(store.exercises()[0].sets).toHaveLength(1);
+  });
+});
+
+// Skip and swap answer with the bare row too: no sets, no exercise, no link
+// to the routine. Swapped in whole, Finish read a skipped routine exercise as
+// one the workout removed, and Update took it out of the routine.
+describe('LoggerStore — skip and swap keep what the reply lacks', () => {
+  const plan = { id: 'pe-1', notes: null };
+
+  function planned(): WorkoutLog {
+    return {
+      id: 'wl-1',
+      exercises: [
+        {
+          id: 'ex-1',
+          exerciseId: 'squat',
+          isSkipped: false,
+          prescribedExercise: plan,
+          sets: [{ id: 's-1', isCompleted: false }],
+        },
+      ],
+    } as unknown as WorkoutLog;
+  }
+
+  /** What the API sends back: the row alone. */
+  function bare(patch: object): object {
+    return { id: 'ex-1', exerciseId: 'squat', isSkipped: false, ...patch };
+  }
+
+  function storeWith(service: object): LoggerStore {
+    TestBed.configureTestingModule({
+      providers: [LoggerStore, { provide: WorkoutLogService, useValue: service }],
+    });
+    const store = TestBed.inject(LoggerStore);
+    store.adopt(planned());
+    return store;
+  }
+
+  it('takes only the flag from a skip reply', () => {
+    const store = storeWith({ setExerciseSkipped: () => of(bare({ isSkipped: true })) });
+
+    store.setSkipped('ex-1', true);
+
+    expect(store.exercises()[0]).toMatchObject({
+      isSkipped: true,
+      prescribedExercise: plan,
+      sets: [{ id: 's-1' }],
+    });
+  });
+
+  it('keeps the row as it was when unskipping', () => {
+    const store = storeWith({ setExerciseSkipped: () => of(bare({ isSkipped: false })) });
+
+    store.setSkipped('ex-1', true);
+    store.setSkipped('ex-1', false);
+
+    expect(store.exercises()[0]).toMatchObject({ isSkipped: false, prescribedExercise: plan });
+    expect(store.exercises()[0].sets).toHaveLength(1);
+  });
+
+  it('reads the log again after a swap', () => {
+    const fresh = planned();
+    fresh.exercises![0] = { ...fresh.exercises![0], exerciseId: 'leg-press' };
+    const get = vi.fn(() => of(fresh));
+    const store = storeWith({
+      swapExercise: () => of(bare({ exerciseId: 'leg-press', swappedFromExerciseId: 'squat' })),
+      get,
+    });
+    const done = vi.fn();
+
+    store.swapExercise('ex-1', 'leg-press', done);
+
+    expect(get).toHaveBeenCalledWith('wl-1');
+    expect(store.exercises()[0]).toMatchObject({ exerciseId: 'leg-press', sets: [{ id: 's-1' }] });
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  it('lays the swap reply over the row when the read fails', () => {
+    const store = storeWith({
+      swapExercise: () => of(bare({ exerciseId: 'leg-press', swappedFromExerciseId: 'squat' })),
+      get: () => throwError(() => ({ status: 0 })),
+    });
+
+    store.swapExercise('ex-1', 'leg-press');
+
+    expect(store.exercises()[0]).toMatchObject({
+      exerciseId: 'leg-press',
+      swappedFromExerciseId: 'squat',
+      prescribedExercise: plan,
+      sets: [{ id: 's-1' }],
+    });
   });
 });
 

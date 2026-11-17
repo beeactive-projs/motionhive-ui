@@ -39,13 +39,14 @@
   font-size: var(--mh-icon-md);
 }
 
-/* The Where and access tiles are pills — icon beside label, per the design. */
+/* The Where and access tiles are one line, icon beside label, with the
+   control radius every button with words wears. */
 .tile.row {
   flex-direction: row;
   justify-content: center;
   gap: 0.375rem;
   padding: 0.75rem 0.5rem;
-  border-radius: var(--mh-radius-pill);
+  border-radius: var(--mh-radius-control);
 }
 
 /* The two When pills. Not `.pair`: the date deserves more room than "60 min". */
@@ -79,7 +80,7 @@
   justify-content: flex-start;
 }
 
-/* Weekday circles. */
+/* Weekday squares: a letter is words, so the control radius, not a circle. */
 .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -93,7 +94,7 @@
   aspect-ratio: 1;
   justify-self: center;
   border: none;
-  border-radius: var(--mh-radius-pill);
+  border-radius: var(--mh-radius-control);
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
   font-size: var(--mh-text-base);

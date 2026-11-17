@@ -160,7 +160,7 @@ export class Preview implements ViewWillEnter {
         kind: this._kindOf(exercise),
         thumbnailUrl: exercise.exercise?.thumbnailUrl ?? null,
       },
-      prescription: prescriptionLine(exercise.sets ?? []),
+      prescription: prescriptionLine(exercise.sets ?? [], this._kindOf(exercise)),
     })),
   );
 

@@ -28,6 +28,17 @@ Each of these has caused a real bug or a false QA finding in this app.
   `ion-input:has(+ .mh-helper.over)` in `theme/components/ion-input.css` paints the field invalid off that sibling, so keep the `<p>` immediately after it.
 - Don't bind dynamic `aria-*` on `ion-input`; give it a stable label.
 
+## Page lifecycle
+
+- `ionViewWillEnter` fires on the page underneath as soon as an iOS edge swipe back starts, and nothing undoes it if the swipe is let go. Keep it to what is safe to run twice. Clear a one-shot flag and switch `IonRouterOutlet.swipeGesture` in `ionViewDidEnter`, which fires only when the entry completes: switching the gesture off mid-drag snapped every swipe back and left it dead (the routine builder and the logger, 2026-11-17).
+- A tab tap lands on the tab's first page (`navigateRoot`, user decision) and destroys every page above it in that stack. State that must outlive a tab switch lives outside the page; the routine builder parks its draft in `RoutineDraftStore`. A link straight to a page's own URL from another tab (Home's "+ → Routine") reuses the cached page instead.
+
+## Floating controls over a list
+
+- A touch that starts on a `slot="fixed"` element never scrolls `ion-content`: the fixed slot sits outside the scroller. A wide control there, in the middle of the screen where a thumb starts a swipe, makes the list refuse to scroll, and a short flick on it reads as a tap. The logger's "Back to…" pill did both (2026-11-17): the list would not go down past it and kept jumping back to the set in progress.
+- So a floating control over a scrolling list goes inside the scroller: a zero-height `position: sticky` strip at the end of the content, `bottom` measured from the footer, with the control hanging above it (`logger.scss`, `.back-to`). Sticky stops at the scroller's padding, which Ionic sets to the header and footer overlap on a `[fullscreen]` page, so don't add `--offset-bottom` to the inset.
+- `slot="fixed"` stays right for what is not touched mid-scroll: `ion-refresher`, a decorative background, an `ion-fab` in a corner.
+
 ## Searchbars
 
 - Every `ion-searchbar` carries `mhAutofocus` (`_shared/directives/searchbar-autofocus.directive.ts`). It waits for the sheet's `mh-presented` class and for Stencil to render the inner input; `setFocus()` called earlier is a silent no-op.

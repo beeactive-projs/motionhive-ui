@@ -1,0 +1,56 @@
+/* The workout's header, as the logger and the routine builder both draw
+   it: the name (Poppins, one line) over a meta line in the muted ink, then
+   the ⋯ and the one honey ask (Finish, Save) as a compact button. `@use` it
+   from the page; the page adds what is its own (the logger's honey clock). */
+
+/* The name may be the page's h1 (the builder's): no heading margin. */
+ion-title .name,
+ion-title .meta {
+  display: block;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ion-title .name {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  line-height: var(--mh-leading-heading);
+}
+
+ion-title .meta {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one honey ask on the screen: Ionic's own primary button, solid
+   (`color="primary"` in the template), the honey fill with its black
+   contrast ink, 9.8:1, and the control radius every button with words
+   wears (ion-button.css). The colour also keeps it out of the iOS rule that
+   gives header buttons the text colour (ion-toolbar.css), which put white
+   on the honey. Here only its size, compact beside the ⋯. */
+ion-button.header-action {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --box-shadow: none;
+  position: relative;
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+/* …and a finger's 44px to press it by: an invisible box above and below
+   the 2rem button, inside the bar (56px in md, 44px in iOS). */
+ion-button.header-action::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--mh-tap-target) - 100%) / -2);
+  inset-inline: 0;
+}

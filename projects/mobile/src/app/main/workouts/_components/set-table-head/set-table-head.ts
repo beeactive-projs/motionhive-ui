@@ -37,6 +37,8 @@ export class SetTableHead {
   readonly fields = input.required<readonly SetField[]>();
   /** Split squats and single-arm work: reps read as per side. */
   readonly unilateral = input(false);
+  /** Off over a routine's planned sets, which have no tick column (`SetRow.tickable`). */
+  readonly tickable = input(true);
 
   readonly labels = computed(() =>
     this.fields().map((field) =>

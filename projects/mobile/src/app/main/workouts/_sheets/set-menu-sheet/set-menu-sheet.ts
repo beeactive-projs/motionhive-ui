@@ -65,8 +65,13 @@ const TONES: Partial<Record<ExerciseSetType, BadgeTone>> = {
 })
 export class SetMenuSheet {
   readonly open = model(false);
-  readonly set = input<LoggedSet | null>(null);
+  /** A logged set, or a routine's planned set, which has a type but no note. */
+  readonly set = input<Pick<LoggedSet, 'setType'> & Partial<Pick<LoggedSet, 'notes'>> | null>(
+    null,
+  );
   readonly badge = input<SetBadge | null>(null);
+  /** Off where a set takes no note (a routine's planned set): the row goes. */
+  readonly noteable = input(true);
 
   readonly typeChange = output<ExerciseSetType>();
   readonly noteChange = output<string | null>();

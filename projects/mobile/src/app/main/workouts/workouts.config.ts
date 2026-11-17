@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { RedirectFunction, Router } from '@angular/router';
 import {
   AssignedWorkout,
+  ExerciseKind,
   ExerciseProgress,
   ExerciseSetType,
   LoggedExercise,
@@ -65,6 +66,7 @@ import {
   playSkipForwardOutline,
   refreshOutline,
   removeOutline,
+  reorderThreeOutline,
   repeatOutline,
   searchOutline,
   shareOutline,
@@ -122,6 +124,7 @@ export const WORKOUT_ICONS = {
   playSkipForwardOutline,
   refreshOutline,
   removeOutline,
+  reorderThreeOutline,
   repeatOutline,
   searchOutline,
   shareOutline,
@@ -441,20 +444,27 @@ export interface SetTarget {
   targetRepsMax: number | null;
   targetWeightKg: number | null;
   targetDurationSeconds: number | null;
+  /** Runs, rows and carries; absent where the plan predates it. */
+  targetDistanceMeters?: number | null;
   targetWeightPercent1rm?: number | null;
   /** The %1RM already turned into kilograms, when the API has done it. */
   resolvedWeightKg?: number | null;
 }
 
+/** The kinds planned by a distance and a time: their time is one to make, not a hold. */
+const COVERED_KINDS = new Set<string>([ExerciseKind.Distance, ExerciseKind.Cardio]);
+
 /**
- * "4 sets · 6–8 reps · 82.5 kg top set" for an exercise row before Start.
+ * "4 sets · 6–8 reps · 82.5 kg top set" for an exercise row before Start,
+ * "4 sets · 400 m · 1:45" for a run.
  *
  * Reps span the lowest floor to the highest ceiling across the sets. A load
  * that changes from set to set names the heaviest one as the top set; a
  * percentage stands in only when no kilograms are known yet. A set with no
- * reps but a duration is a hold.
+ * reps but a duration is a hold, unless it covers a distance (a distance on
+ * the sets, or a run or a row by `kind`): then the time reads as a clock.
  */
-export function prescriptionLine(sets: readonly SetTarget[]): string {
+export function prescriptionLine(sets: readonly SetTarget[], kind?: string | null): string {
   if (!sets.length) return '';
   const parts = [translate('count.sets', { count: sets.length })];
 
@@ -469,9 +479,20 @@ export function prescriptionLine(sets: readonly SetTarget[]): string {
         : translate('workouts.prescription.repsRange', { min, max }),
     );
   } else {
-    const holds = present(sets.map((s) => s.targetDurationSeconds));
-    if (holds.length) {
-      parts.push(translate('workouts.prescription.hold', { seconds: Math.max(...holds) }));
+    const distances = present(sets.map((s) => s.targetDistanceMeters));
+    if (distances.length) {
+      const farthest = formatMeasure(Math.max(...distances));
+      parts.push(translate('workouts.units.meters', { value: farthest }));
+    }
+    const times = present(sets.map((s) => s.targetDurationSeconds));
+    if (times.length) {
+      const longest = Math.max(...times);
+      const covered = distances.length > 0 || (!!kind && COVERED_KINDS.has(kind));
+      parts.push(
+        covered
+          ? secondsToClock(longest)
+          : translate('workouts.prescription.hold', { seconds: longest }),
+      );
     }
   }
 
@@ -1248,6 +1269,18 @@ export const KeypadFields = {
 } as const;
 
 export type KeypadField = (typeof KeypadFields)[keyof typeof KeypadFields];
+
+/**
+ * How far one ± moves a field, on the pad and on the routine builder's
+ * steppers alike. Weight steps by the smallest plate pair.
+ */
+export const KEYPAD_STEP: Record<KeypadField, number> = {
+  [KeypadFields.Weight]: 2.5,
+  [KeypadFields.Reps]: 1,
+  [KeypadFields.Duration]: 15,
+  [KeypadFields.Distance]: 50,
+  [KeypadFields.Rpe]: 0.5,
+};
 
 /**
  * How long a number the keypad builds may get: whole digits, then decimals.

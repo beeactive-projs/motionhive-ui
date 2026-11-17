@@ -256,6 +256,13 @@
   --mh-row-line: 1.5rem;
 
   /*
+   * One line of a compact row (`.mh-compact-row`, ion-list.css), the exercise
+   * rows. Two of them are an md tile's 2.5rem, so a compact row is
+   * 0.5 + 1.25 + 1.25 + 0.5 = 3.5rem in either kind of list.
+   */
+  --mh-row-line-compact: 1.25rem;
+
+  /*
    * The page's layout primitives (layout.css). Components carry no margins;
    * a screen opts into these and gets the app's one gutter and one rhythm.
    */
@@ -330,6 +337,18 @@
   --mh-color-chart-idle: var(--mh-slate-300);
 
   /*
+   * The round − and + of a stepper (layout.css). A step above the divider the
+   * value's well is drawn on, so the sign reads as a button beside the number
+   * rather than merging with it into one bar. Neutral by rule: a stepper
+   * selects nothing, and the honey the signs used to wear is the selection
+   * fill, which left a card of targets looking lit up and spent the one
+   * colour that means "the pad is typing here". It matches the border colour
+   * in both palettes today; it is its own token because it is a fill, and a
+   * border may move without the buttons moving with it.
+   */
+  --mh-color-stepper-sign: var(--mh-slate-300);
+
+  /*
    * The hairline between rows of a grouped list (ion-list.css). Not the
    * divider above: that one doubles as a soft fill (pills) and is
    * too pale to read as a line on a card. Mixed from the ink rather
@@ -401,8 +420,8 @@
   --mh-color-floating: #ffffff;
 
   /*
-   * A honey-tinted capsule that is not a selection: Home's role pill,
-   * Discover's city. Honey at 12% over the white page in light. Over
+   * A honey tint that is not a selection: Home's role switch, Discover's
+   * city. Honey at 12% over the white page in light. Over
    * navy any see-through honey mixes to a grey, so dark uses the honey wash
    * fill instead (the dark block).
    */
@@ -810,7 +829,7 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
      cards sit: light ink 10:1, the honey 300 glyph 7.9:1. */
   --mh-color-floating: #3a3a3c;
 
-  /* The honey capsule takes the honey wash's fill, opaque, so it stays warm
+  /* The honey tint takes the honey wash's fill, opaque, so it stays warm
      on the grey. Honey ink on it is 7:1. */
   --mh-color-honey-tint: var(--ion-color-primary-wash);
 
@@ -942,6 +961,7 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --ion-border-color: #48484a;
   --mh-color-divider: #3a3a3c;
   --mh-color-chart-idle: #636366;
+  --mh-color-stepper-sign: #48484a;
 
   /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
      and a sheet scales the scrim by how far it is open. */

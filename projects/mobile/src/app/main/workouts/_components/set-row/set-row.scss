@@ -103,6 +103,11 @@ button:focus-visible {
     min-height: 1.75rem;
   }
 
+  /* No tick column to stop short of on a routine's planned set. */
+  .row.untickable > .previous {
+    grid-column: 2 / -1;
+  }
+
   .row > .previous.empty {
     display: none;
   }

@@ -121,7 +121,7 @@
   color: var(--ion-text-color);
 }
 
-/* The city: a neutral capsule, a hairline and the body ink, its glyphs
+/* The city: a neutral button, a hairline and the body ink, its glyphs
    muted, its label ellipsing before it outgrows the line. Small to the
    eye, a finger's 44px to press. It stays `fill="outline"`, which honours
    `--background`; pressed, the fill holds rather than fading. */
@@ -177,7 +177,7 @@
   width: 7rem;
   height: 1.875rem;
   margin: 0;
-  border-radius: var(--mh-radius-pill);
+  border-radius: var(--mh-radius-control);
 }
 
 /* The field-look search entry: the card fill, no outline, a tap target

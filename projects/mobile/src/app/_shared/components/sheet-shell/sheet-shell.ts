@@ -108,11 +108,12 @@ export class SheetShell {
   readonly subtitle = input('');
   /**
    * Size the sheet to its content instead of to snap points: Ionic's
-   * auto-height sheet. For short, fixed bodies like an action list, where a
-   * fraction of the screen is either too much (empty sheet) or too little
-   * (clipped rows) depending on the phone. The body is not an `ion-content`
-   * here, it scrolls itself past most of the screen's height, and
-   * `breakpoints` is ignored.
+   * auto-height sheet. For every body without a text or search field (an
+   * action list, a confirmation, a choice list), where a fraction of the
+   * screen is either too much (empty sheet) or too little (clipped rows)
+   * depending on the phone. The body is not an `ion-content` here, it
+   * scrolls itself past most of the screen's height, and `breakpoints` is
+   * ignored.
    */
   readonly fit = input(false);
   /** The sheet's fields, declared by the consumer as `<ng-template #body>`. */
@@ -143,10 +144,9 @@ export class SheetShell {
    * swipe down dismiss. Two or more open stops (half-open and tall) make the
    * grabber a button that steps between them, so resizing never needs a drag.
    *
-   * Opening at 0.75 or lower? Add a `0.95` stop when the body holds a text
-   * field (the keyboard eats the half-open height), a list that can grow, or
-   * copy of unknown length. Short fixed action menus keep a single stop:
-   * pulling them up would only reveal empty sheet.
+   * Only for a sheet with a text or search field, which needs a `0.95` stop
+   * (the keyboard eats the half-open height). Everything else is `fit`: as
+   * tall as its content, and a long one scrolls inside (see `fit`).
    */
   readonly breakpoints = input<readonly number[]>([0, 0.6, 0.95]);
   readonly initialBreakpoint = input(0.6);

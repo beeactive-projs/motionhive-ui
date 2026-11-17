@@ -14,7 +14,7 @@
   margin-inline-end: var(--verb-room);
 }
 
-/* The row verb's capsule (ion-button.css `mh-row-action`), placed over the
+/* The row verb's button (ion-button.css `mh-row-action`), placed over the
    row's end, centred on its two lines: it lives beside the item, where the
    theme's in-row rule does not reach. */
 .verb {
@@ -34,7 +34,7 @@
   translate: 0 -50%;
 }
 
-/* A finger's 44px to press it by, past the capsule. */
+/* A finger's 44px to press it by, past the button. */
 .verb::after {
   content: '';
   position: absolute;

@@ -303,6 +303,11 @@ export class LoggerStore {
 
   // ─── Exercises ────────────────────────────────────────────────
 
+  /**
+   * The reply is the bare row: no sets, no exercise, no link to the plan.
+   * Only its flag is taken, since swapping it in whole made Finish read a
+   * skipped routine exercise as one the workout removed.
+   */
   setSkipped(exerciseId: string, skipped: boolean): void {
     const log = this._log();
     if (!log) return;
@@ -311,7 +316,8 @@ export class LoggerStore {
       .setExerciseSkipped(log.id, exerciseId, skipped)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((updated) => {
-        if (updated) this._updateExercise(exerciseId, () => updated);
+        if (!updated) return;
+        this._updateExercise(exerciseId, (ex) => ({ ...ex, isSkipped: updated.isSkipped }));
       });
   }
 
@@ -350,6 +356,12 @@ export class LoggerStore {
       });
   }
 
+  /**
+   * The reply is the bare row, without its sets (the server keeps them on the
+   * swapped exercise) or the new movement's kind, so the log is read again.
+   * Should that read fail, the reply is laid over the row on screen, which
+   * keeps its sets and its link to the plan.
+   */
   swapExercise(exerciseId: string, newExerciseId: string, done?: () => void): void {
     const log = this._log();
     if (!log) return;
@@ -357,8 +369,26 @@ export class LoggerStore {
       .swapExercise(log.id, exerciseId, newExerciseId)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((swapped) => {
-        if (swapped) this._updateExercise(exerciseId, () => swapped);
-        done?.();
+        if (!swapped) {
+          done?.();
+          return;
+        }
+        this._workoutLogService
+          .get(log.id)
+          .pipe(take(1), catchError(() => of(null)))
+          .subscribe((fresh) => {
+            if (fresh) {
+              this._log.set(fresh);
+            } else {
+              this._updateExercise(exerciseId, (ex) => ({
+                ...swapped,
+                sets: ex.sets,
+                assignedExercise: ex.assignedExercise,
+                prescribedExercise: ex.prescribedExercise,
+              }));
+            }
+            done?.();
+          });
       });
   }
 
@@ -419,10 +449,26 @@ export class LoggerStore {
     }));
   }
 
+  /**
+   * The server's row for a set, over the one on screen. A set write answers
+   * with the bare row: the plan the set came from (`assignedSet`,
+   * `prescribedSet`) and its planned rest come only with the workout's read.
+   * They are kept from the row on screen, or a ticked set forgot its plan,
+   * and Finish took a routine's own set for one the workout added.
+   */
   private _replaceSet(exerciseId: string, saved: LoggedSet): void {
     this._updateExercise(exerciseId, (ex) => ({
       ...ex,
-      sets: (ex.sets ?? []).map((s) => (s.id === saved.id ? saved : s)),
+      sets: (ex.sets ?? []).map((s) =>
+        s.id === saved.id
+          ? {
+              ...saved,
+              assignedSet: saved.assignedSet ?? s.assignedSet,
+              prescribedSet: saved.prescribedSet ?? s.prescribedSet,
+              plannedRestSeconds: saved.plannedRestSeconds ?? s.plannedRestSeconds,
+            }
+          : s,
+      ),
     }));
   }
 }

@@ -5,7 +5,7 @@
     <h3 class="mh-kicker">{{ 'venues.sheet.kind' | translate }}</h3>
     <div class="mh-chip-cloud" role="group" [attr.aria-label]="'venues.sheet.kind' | translate">
       @for (option of kindOptions; track option.kind) {
-        <ion-button class="chip" fill="clear" shape="round" size="small"
+        <ion-button class="chip" fill="clear" size="small"
           [class.selected]="isKind(option.kind)" [attr.aria-pressed]="isKind(option.kind)"
           (click)="pickKind(option.kind)">
           <ion-icon slot="start" [name]="option.icon" aria-hidden="true" />
@@ -23,7 +23,7 @@
       </div>
       <div class="mh-chip-cloud" role="group" [attr.aria-label]="'venues.sheet.platform' | translate">
         @for (option of providerOptions; track option.provider) {
-          <ion-button class="chip" fill="clear" shape="round" size="small"
+          <ion-button class="chip" fill="clear" size="small"
             [class.selected]="isProvider(option.provider)" [attr.aria-pressed]="isProvider(option.provider)"
             (click)="pickProvider(option.provider)">
             @if (option.brand) {

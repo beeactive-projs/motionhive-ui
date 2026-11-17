@@ -14,7 +14,7 @@ import {
   translate,
 } from 'core';
 
-import { formatMeasure, secondsToClock } from '../workouts.config';
+import { KeypadField, KeypadFields, formatMeasure, secondsToClock } from '../workouts.config';
 
 /**
  * The logger's flow, as plain functions: which set has the focus, what a set
@@ -288,7 +288,7 @@ export interface SetBadge {
  * and a typed set wears its letter where the number would be.
  */
 export function setBadge(
-  sets: readonly LoggedSet[],
+  sets: readonly Pick<LoggedSet, 'setType'>[],
   index: number,
   /** In a superset: the member's tag ("A1") and the exercise's name. */
   member: { tag: string; name: string } | null = null,
@@ -335,8 +335,38 @@ export const PAYLOAD_KEY = {
 /** A log column a set field writes to: what a set's values are keyed by. */
 export type PayloadKey = (typeof PAYLOAD_KEY)[SetField];
 
-export function cellValue(set: LoggedSet | null | undefined, field: SetField): number | null {
+/**
+ * A set's values, keyed as the log keys them. A logged set is one; so is a
+ * routine's planned set in the builder, which holds targets under the same
+ * names so the set table reads both.
+ */
+export type SetValues = Pick<LoggedSet, PayloadKey>;
+
+export function cellValue(set: SetValues | null | undefined, field: SetField): number | null {
   return set?.[PAYLOAD_KEY[field]] ?? null;
+}
+
+/** The keypad's step size is keyed to the field, not the exercise kind. */
+export const KEYPAD_FIELD: Record<SetField, KeypadField> = {
+  [SetFields.Weight]: KeypadFields.Weight,
+  [SetFields.Reps]: KeypadFields.Reps,
+  [SetFields.Duration]: KeypadFields.Duration,
+  [SetFields.Distance]: KeypadFields.Distance,
+};
+
+/** What the pad's label calls each field ("Set 2 · kg"): translation keys. */
+export const COLUMN_LABELS: Record<SetField, string> = {
+  [SetFields.Weight]: 'workouts.logger.columns.weight',
+  [SetFields.Reps]: 'workouts.logger.columns.reps',
+  [SetFields.Duration]: 'workouts.logger.columns.time',
+  [SetFields.Distance]: 'workouts.logger.columns.distance',
+};
+
+/** The pad's label word for `field`; reps read as per side on split squats and one-arm work. */
+export function columnLabelKey(field: SetField, unilateral: boolean): string {
+  return field === SetFields.Reps && unilateral
+    ? 'workouts.logger.columns.repsEach'
+    : COLUMN_LABELS[field];
 }
 
 /** A set as the list draws it, as much as `shownValue` reads. */

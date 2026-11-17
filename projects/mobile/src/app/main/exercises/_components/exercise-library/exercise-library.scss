@@ -5,25 +5,26 @@
   flex-direction: column;
 }
 
-/* The field on the page's gutter, flush with the cards below it. */
+/* The list runs edge to edge, so the body has no page gutter: the field and
+   the chips sit on the row gutter, in line with the tiles, as the library
+   page's header puts them. The top is the page's rhythm `.mh-page` gave. */
 .search {
-  padding: 0 0 0.5rem;
+  padding: var(--mh-page-rhythm) var(--mh-row-gutter) 0.5rem;
 }
 
-/* The chips sit in the page's gutter here, not a bar's, with the strip's
-   own block padding, as on History. */
 .bar {
-  padding-inline: 0;
+  padding-inline: var(--mh-row-gutter);
 }
 
-/* "883 exercises · A to Z" — a label on the list, not a row of it. The
-   section head gives it the row gutter. */
+/* "883 exercises · sorted by relevance" and New exercise: spaced as the
+   label over the library page's list (`.mh-section-label`), so it is the
+   seam over the first row. The section head gives it the row gutter. */
+.mh-section-head {
+  padding-block: 1rem 0.375rem;
+}
+
 .meta {
   color: var(--ion-color-medium);
-}
-
-.show-more {
-  margin-top: 0.25rem;
 }
 
 /* On a narrow phone the count gives way, never the action: "New exercise"
@@ -35,4 +36,11 @@
 .mh-section-head ion-button {
   flex: none;
   white-space: nowrap;
+}
+
+/* "Create it" is a card, not one more row of the list, so it sits on the
+   row gutter, its edge in line with the search field (as on the library
+   page). */
+.create {
+  padding: 0.75rem var(--mh-row-gutter) 0;
 }

@@ -141,3 +141,65 @@ describe('SetRow', () => {
     expect(setRow.cells().map((cell) => cell.unit)).toEqual([null, null]);
   });
 });
+
+/** A routine's planned set, as the builder hands it over: values only. */
+const planned = (values: Partial<LoggedSet> = {}) => ({
+  reps: null,
+  weightKg: null,
+  durationSeconds: null,
+  distanceMeters: null,
+  ...values,
+});
+
+describe('SetRow, a planned set', () => {
+  it('reads a set with only its values as not done', () => {
+    const setRow = row({ set: planned({ weightKg: 60, reps: 8 }), tickable: false });
+
+    expect(setRow.done()).toBe(false);
+    expect(setRow.rpe()).toBe('');
+    expect(texts(setRow)).toEqual([
+      ['60', false],
+      ['8', false],
+    ]);
+  });
+
+  it('shows a rep range where the cell would show one number', () => {
+    const setRow = row({
+      set: planned({ reps: 8 }),
+      fields: [SetFields.Reps],
+      texts: { [SetFields.Reps]: '8–12' },
+    });
+
+    expect(setRow.cells()[0].text).toBe('8–12');
+  });
+
+  it('shows what is typed over a range, and the pre-fill once it is cleared', () => {
+    const typing = row({
+      set: planned({ reps: 8 }),
+      fields: [SetFields.Reps],
+      texts: { [SetFields.Reps]: '8–12' },
+      editing: SetFields.Reps,
+      draft: '10',
+    });
+    expect(typing.cells()[0].text).toBe('10');
+
+    const cleared = row({
+      set: planned({ reps: 8 }),
+      fields: [SetFields.Reps],
+      texts: { [SetFields.Reps]: '8–12' },
+      editing: SetFields.Reps,
+      draft: '',
+    });
+    expect(cleared.cells()[0].text).toBe('');
+  });
+
+  it('keeps a text for an empty cell out of the cell', () => {
+    const setRow = row({
+      set: planned(),
+      fields: [SetFields.Reps],
+      texts: { [SetFields.Reps]: '8–12' },
+    });
+
+    expect(setRow.cells()[0].text).toBe('');
+  });
+});

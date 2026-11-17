@@ -1,5 +1,3 @@
-<mh-action-sheet [(open)]="menuOpen" [title]="menuTitle()" [actions]="actions" (chosen)="onAction($event)" />
-
 <mh-exercise-form-sheet [(open)]="formOpen" [exercise]="editing()" [name]="editing() ? '' : createName()"
   (saved)="onSaved($event)" />
 

@@ -35,6 +35,15 @@ $narrow: 19.25rem;
   border-radius: var(--mh-radius-control);
 }
 
+/* A routine's planned sets (the builder): nothing to tick, so no tick
+   column, and the fields take its room. */
+.mh-set-grid.untickable {
+  grid-template-columns:
+    2.25rem
+    minmax(0, 3fr)
+    repeat(var(--mh-set-fields, 2), minmax(0, 4fr));
+}
+
 /* Narrower than that the column goes, rather than shrinking to a button too
    small to read, and the fields take its room. The heading drops its label;
    a row moves Previous under its fields as a line (`set-row.scss`), so last
@@ -45,5 +54,11 @@ $narrow: 19.25rem;
       2.25rem
       repeat(var(--mh-set-fields, 2), minmax(0, 1fr))
       var(--mh-tap-target);
+  }
+
+  .mh-set-grid.untickable {
+    grid-template-columns:
+      2.25rem
+      repeat(var(--mh-set-fields, 2), minmax(0, 1fr));
   }
 }

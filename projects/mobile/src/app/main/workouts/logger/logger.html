@@ -34,7 +34,13 @@
       >
         <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
       </ion-button>
-      <ion-button class="finish" color="primary" fill="solid" shape="round" [disabled]="!store.log() || finishing()" (click)="finish()">
+      <ion-button
+        class="header-action"
+        color="primary"
+        fill="solid"
+        [disabled]="!store.log() || finishing()"
+        (click)="finish()"
+      >
         {{ 'workouts.logger.finish' | translate }}
       </ion-button>
     </ion-buttons>
@@ -226,9 +232,13 @@
   }
 
   <!-- Scrolled away from the set you are on: the list stops following it,
-       and this takes you back. The chevron points the way it will scroll. -->
+       and this takes you back. The chevron points the way it will scroll.
+       Inside the list, stuck to its bottom, never in slot="fixed": it shows
+       right where a thumb starts the next swipe, and a swipe begun on a
+       fixed-slot element never reaches the scroller, so the list would not
+       move and a short flick would read as a tap back up. -->
   @if (userScrolled() && backToLabel() && !editing()) {
-    <div slot="fixed" class="back-to">
+    <div class="back-to">
       <button type="button" class="back-to-pill" (click)="backToFocus()">
         <ion-icon [name]="focusAbove() ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true" />
         <span>{{ backToLabel() }}</span>
@@ -497,4 +507,15 @@
   [note]="finishNote()"
   [actions]="finishActions()"
   (chosen)="onFinishChoice($event)"
+/>
+
+<!-- Finishing a routine whose shape this workout changed: does the routine
+     change with it? Both answers finish; closing the sheet goes back to the
+     workout. -->
+<mh-action-sheet
+  [(open)]="updateAskOpen"
+  [title]="updateTitle()"
+  [note]="updateNote()"
+  [actions]="updateActions"
+  (chosen)="onUpdateChoice($event)"
 />

@@ -58,6 +58,8 @@ export interface RoutineSet {
   targetWeightKg: number | null;
   /** Holds and carries prescribe time, not reps. */
   targetDurationSeconds: number | null;
+  /** Runs, rows and carries prescribe a distance. */
+  targetDistanceMeters: number | null;
   restAfterSeconds: number | null;
 }
 
@@ -99,6 +101,8 @@ export interface ProgramSetWire {
   targetRepsMax: number | null;
   targetWeightKg: number | string | null;
   targetDurationSeconds: number | null;
+  /** Absent from responses that predate it. */
+  targetDistanceMeters?: number | null;
   restAfterSeconds: number | null;
 }
 
@@ -148,6 +152,7 @@ export interface CreateRoutineSetPayload {
   targetRepsMax?: number;
   targetWeightKg?: number;
   targetDurationSeconds?: number;
+  targetDistanceMeters?: number;
   restAfterSeconds?: number;
 }
 

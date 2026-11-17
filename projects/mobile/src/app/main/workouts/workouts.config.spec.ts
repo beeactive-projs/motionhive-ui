@@ -1,7 +1,13 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ExerciseSetType, OneRepMaxSource, ProgramAssignmentKind, WorkoutLogStatus } from 'core';
+import {
+  ExerciseKind,
+  ExerciseSetType,
+  OneRepMaxSource,
+  ProgramAssignmentKind,
+  WorkoutLogStatus,
+} from 'core';
 
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
@@ -543,6 +549,23 @@ describe('workouts config', () => {
     const hold = { targetRepsMin: null, targetRepsMax: null, targetWeightKg: null, targetDurationSeconds: 45 };
     expect(prescriptionLine([hold, hold, hold])).toBe('3 sets · 45 sec hold');
     expect(prescriptionLine([])).toBe('');
+  });
+
+  // The builder plans distances now; the read view never showed them, and
+  // called a run's time a hold.
+  it('describes a run by its distance, and its time as a time', () => {
+    const interval = {
+      targetRepsMin: null,
+      targetRepsMax: null,
+      targetWeightKg: null,
+      targetDurationSeconds: 105,
+      targetDistanceMeters: 400,
+    };
+    expect(prescriptionLine([interval, interval, interval, interval])).toBe('4 sets · 400 m · 1:45');
+
+    const timed = { ...interval, targetDistanceMeters: null, targetDurationSeconds: 1200 };
+    expect(prescriptionLine([timed], ExerciseKind.Cardio)).toBe('1 set · 20:00');
+    expect(prescriptionLine([timed], ExerciseKind.Duration)).toBe('1 set · 1200 sec hold');
   });
 
   it('cuts a prescription down to the hero card column', () => {

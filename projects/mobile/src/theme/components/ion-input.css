@@ -11,6 +11,47 @@ ion-input:not([shape='round']) {
   --border-radius: var(--mh-radius-control) !important;
 }
 
+/* One set of colours for everything you can type into. Ionic works a field's
+   own out from `--ion-color-step-*`, greys it computes off the page rather
+   than ones this app chose, so a field was the only outline on screen that
+   did not match the set table's cells, a stepper's value or a tick box.
+   Redefining the steps on the host lets Ionic's own formulas resolve to the
+   tokens, which leaves its focus and validity rules working on top of them. */
+ion-input {
+  --ion-color-step-300: var(--ion-border-color);
+  /* Ionic walks the outline towards black on hover. No phone hovers, but the
+     browser every visual change is checked in does. */
+  --ion-color-step-750: var(--ion-color-medium);
+  /* The placeholder is the body ink at 60% out of the box, so how readable it
+     came out depended on whatever sat behind the field. The muted ink is
+     already measured against every surface, so it is shown as it is. */
+  --placeholder-color: var(--ion-color-medium) !important;
+  --placeholder-opacity: 1 !important;
+  /* Focus is the honey outline, the one the set table's active cell wears.
+     Ionic swaps in its success green the moment a *valid* field takes focus,
+     which left the same ring meaning "you are here" on one screen and
+     "correct" on the next. */
+  --highlight-color-valid: var(--ion-color-primary) !important;
+  /* Ionic's own invalid path, for a field whose error has not drawn its
+     helper line yet. The slot red is a fill; as a 12px label it is 4:1. */
+  --highlight-color-invalid: var(--mh-color-danger-deep) !important;
+}
+
+/* The label in the notch is secondary text like any other label: the muted
+   ink, not the full body ink it inherits by default. */
+ion-input .label-text-wrapper {
+  color: var(--ion-color-medium);
+}
+
+/* Focused, Ionic paints the label with the same `--highlight-color` as the
+   outline, so the two matched exactly. On a 2px rule the honey is fine; as
+   12px text it is 2.2:1 on the white page. The label takes the deep amber
+   instead, the way the selected tab's label and a text link already sit
+   beside their honey glyph rather than wearing the honey themselves. */
+ion-input.has-focus .label-text-wrapper {
+  color: var(--mh-color-honey-deep) !important;
+}
+
 /* Browser autofill paints its own fill and ink on the native input, which
    inside an ion-input is a strip inset from the outline: a grey bar behind
    the saved email and password instead of a filled field. The delay holds
@@ -34,7 +75,9 @@ mh-password-input:has(+ .mh-helper.over) ion-input {
   --highlight-color-focused: var(--mh-color-danger-deep);
 }
 
+/* After the focus rule above, and `!important` like it, so a field that is
+   focused *and* wrong reads as wrong. */
 ion-input:has(+ .mh-helper.over) .label-text-wrapper,
 mh-password-input:has(+ .mh-helper.over) ion-input .label-text-wrapper {
-  color: var(--mh-color-danger-deep);
+  color: var(--mh-color-danger-deep) !important;
 }

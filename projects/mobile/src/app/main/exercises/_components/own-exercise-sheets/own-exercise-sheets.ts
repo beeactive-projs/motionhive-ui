@@ -4,32 +4,27 @@ import { take } from 'rxjs';
 
 import { Exercise, ExerciseService } from 'core';
 
-import { ActionSheet } from '../../../../_shared/components/action-sheet/action-sheet';
 import { ConfirmSheet } from '../../../../_shared/components/confirm-sheet/confirm-sheet';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { ExerciseFormSheet } from '../../_sheets/exercise-form-sheet/exercise-form-sheet';
-import {
-  OWN_EXERCISE_ACTIONS,
-  OwnExerciseActionId,
-  OwnExerciseActionIds,
-} from '../../exercises.config';
 
 /**
- * The sheets that act on an exercise of your own: the row's ⋯ menu, the
- * simple form (to make one or change one) and the delete confirmation.
+ * The sheets that act on an exercise of your own: the simple form (to make
+ * one or change one) and the delete confirmation.
  *
  * The library page, the Workouts page's Exercises tab and an exercise's own
- * page all offer the same few verbs; this keeps them, their order and their
- * copy in one place. A host drops it in once, calls `menu`, `create`, `edit`
- * or `confirmDelete`, and refreshes on the outputs, which fire once the
- * sheet that caused them has gone, so a host can navigate on them.
+ * page all offer the same few verbs (a row's swipe, the page's buttons);
+ * this keeps them and their copy in one place. A host drops it in once,
+ * calls `create`, `edit` or `confirmDelete`, and refreshes on the outputs,
+ * which fire once the sheet that caused them has gone, so a host can
+ * navigate on them.
  *
  * Deleting is a soft delete on the server: past workouts keep the exercise
  * and its name, which is why the confirmation can be plain.
  */
 @Component({
   selector: 'mh-own-exercise-sheets',
-  imports: [ActionSheet, ConfirmSheet, ExerciseFormSheet, TranslatePipe],
+  imports: [ConfirmSheet, ExerciseFormSheet, TranslatePipe],
   templateUrl: './own-exercise-sheets.html',
 })
 export class OwnExerciseSheets {
@@ -48,14 +43,11 @@ export class OwnExerciseSheets {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
 
-  readonly actions = OWN_EXERCISE_ACTIONS;
-
-  /** The exercise the menu or the confirmation is about. */
+  /** The exercise the confirmation is about. */
   readonly target = signal<Exercise | null>(null);
   /** What the form is editing; null while it makes a new one. */
   readonly editing = signal<Exercise | null>(null);
 
-  readonly menuOpen = signal(false);
   readonly formOpen = signal(false);
   readonly deleteOpen = signal(false);
   readonly deleting = signal(false);
@@ -63,19 +55,12 @@ export class OwnExerciseSheets {
 
   private readonly _deleteSheet = viewChild(ConfirmSheet);
 
-  readonly menuTitle = computed(() => this.target()?.name ?? '');
-
   readonly deleteTitle = computed<string>(() => {
     const name = this.target()?.name;
     return name
       ? this._translateService.instant('exercises.edit.deleteConfirm.title', { name })
       : this._translateService.instant('exercises.edit.deleteConfirm.titleFallback');
   });
-
-  menu(exercise: Exercise): void {
-    this.target.set(exercise);
-    this.menuOpen.set(true);
-  }
 
   /** The form, started from the words a search already has, if any. */
   create(name = ''): void {
@@ -92,14 +77,6 @@ export class OwnExerciseSheets {
   confirmDelete(exercise: Exercise): void {
     this.target.set(exercise);
     this.deleteOpen.set(true);
-  }
-
-  /** Reported once the menu has gone, so the next sheet opens on a clear screen. */
-  onAction(id: OwnExerciseActionId): void {
-    const exercise = this.target();
-    if (!exercise) return;
-    if (id === OwnExerciseActionIds.Edit) this.edit(exercise);
-    else this.confirmDelete(exercise);
   }
 
   onSaved(exercise: Exercise): void {

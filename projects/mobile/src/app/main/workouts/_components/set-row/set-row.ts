@@ -4,8 +4,22 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { LoggedSet, SetField, SetFields } from 'core';
 
-import { SetBadge, SetRowMode, SetRowModes, cellValue, fieldText } from '../../logger/logger-flow';
+import {
+  SetBadge,
+  SetRowMode,
+  SetRowModes,
+  SetValues,
+  cellValue,
+  fieldText,
+} from '../../logger/logger-flow';
 import { formatMeasure } from '../../workouts.config';
+
+/**
+ * What a row reads from its set: the values, and for a logged set whether it
+ * is ticked and its effort and note. A routine's planned set has only the
+ * values.
+ */
+export type SetRowSet = SetValues & Partial<Pick<LoggedSet, 'isCompleted' | 'rpe' | 'notes'>>;
 
 /** One field of the row, as drawn. */
 interface SetCell {
@@ -61,6 +75,11 @@ const LONG_CELL = 6;
  * exercises) sets `units`, and weight and distance name their unit in the
  * cell. Too narrow for the Previous column, Previous moves under the fields
  * as "last 60 × 8" (`set-row.scss`).
+ *
+ * The routine builder draws a routine's sets on the same row, as targets:
+ * `tickable` off drops the tick column, since a plan is not done, and
+ * `texts` shows a rep range ("8–12") where the cell would show one number.
+ *
  * Plain buttons on theme tokens rather than Ionic's: these are grid cells
  * sized for a thumb between sets, and Ionic's button chrome fights them.
  */
@@ -74,7 +93,7 @@ const LONG_CELL = 6;
   },
 })
 export class SetRow {
-  readonly set = input.required<LoggedSet>();
+  readonly set = input.required<SetRowSet>();
   readonly mode = input.required<SetRowMode>();
   readonly badge = input.required<SetBadge>();
   /** The cells this exercise records, in order. */
@@ -93,6 +112,13 @@ export class SetRow {
   readonly draft = input<string | null>(null);
   /** No column heading over this row: weight and distance carry their unit. */
   readonly units = input(false);
+  /** Off for a routine's planned set: no tick column, nothing to log. */
+  readonly tickable = input(true);
+  /**
+   * What a cell shows in place of its formatted value while it is not being
+   * typed into: a routine's rep range, "8–12". Fields left out show the value.
+   */
+  readonly texts = input<Partial<Record<SetField, string>>>({});
 
   readonly tick = output<void>();
   readonly edit = output<SetField>();
@@ -101,6 +127,8 @@ export class SetRow {
   readonly usePrevious = output<void>();
 
   readonly Modes = SetRowModes;
+
+  readonly done = computed(() => this.set().isCompleted ?? false);
 
   readonly rpe = computed(() => {
     const rpe = this.set().rpe;
@@ -112,6 +140,7 @@ export class SetRow {
     const prefill = this.prefill();
     const draft = this.draft();
     const units = this.units();
+    const texts = this.texts();
     return this.fields().map((field) => {
       const active = this.editing() === field;
       // Something typed on the pad is shown as typed; cleared to nothing, the
@@ -120,7 +149,9 @@ export class SetRow {
       const cleared = active && draft === '';
       const value = cleared ? null : cellValue(set, field);
       const shown = value ?? prefill[field] ?? null;
-      const text = typing ? draft : shown == null ? '' : fieldText(field, shown, false);
+      const own = !cleared && value !== null ? texts[field] : undefined;
+      const formatted = own ?? (shown == null ? '' : fieldText(field, shown, false));
+      const text = typing ? draft : formatted;
       return {
         field,
         active,

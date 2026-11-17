@@ -7,11 +7,14 @@ import { NEVER, of } from 'rxjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  AuthStore,
   DEFAULT_WORKOUT_SETTINGS,
   ExerciseService,
   ExerciseSetType,
   LoggedExercise,
   LoggedSet,
+  Routine,
+  RoutineService,
   WorkoutLog,
   WorkoutLogService,
 } from 'core';
@@ -27,6 +30,7 @@ import { StillTrainingService } from '../_services/still-training.service';
 import { WorkoutSettingsStore } from '../_services/workout-settings.store';
 import { FinishChoices } from '../workouts.config';
 import { Logger } from './logger';
+import { RoutineUpdateChoices } from './routine-update';
 
 function set(id: string, partial: Partial<LoggedSet> = {}): LoggedSet {
   return {
@@ -76,12 +80,16 @@ afterEach(() => {
  * jsdom), with the services it reaches stubbed. Its effects never run: no
  * change detection, so the clock, the lock screen and the scroll stay out.
  */
-function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios') {
+function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | null = null) {
   const service = {
     // A write that never answers: the store keeps its optimistic copy.
     logSet: vi.fn(() => NEVER),
     addSet: vi.fn(() => of(set('s-copy'))),
     complete: vi.fn(() => of(log)),
+  };
+  const routineService = {
+    get: vi.fn(() => of(source)),
+    update: vi.fn(() => of(source)),
   };
   const navigate = vi.fn(() => Promise.resolve(true));
   const outlet = { swipeGesture: true };
@@ -89,6 +97,8 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios') {
   TestBed.configureTestingModule({
     providers: [
       { provide: WorkoutLogService, useValue: service },
+      { provide: RoutineService, useValue: routineService },
+      { provide: AuthStore, useValue: { user: () => ({ id: 'me' }) } },
       { provide: Router, useValue: { navigate } },
       {
         provide: ActivatedRoute,
@@ -98,7 +108,7 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios') {
         },
       },
       { provide: TranslateService, useValue: { instant: (key: string) => key } },
-      { provide: FeedbackService, useValue: { error: stub, info: stub } },
+      { provide: FeedbackService, useValue: { error: stub, info: stub, success: stub } },
       { provide: RestAlertService, useValue: {} },
       { provide: NavController, useValue: {} },
       { provide: IonRouterOutlet, useValue: outlet },
@@ -130,8 +140,146 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios') {
   destroy = () => fixture.destroy();
   const logger = fixture.componentInstance;
   logger.store.adopt(log);
-  return { logger, service, navigate, outlet };
+  return { logger, service, routineService, navigate, outlet };
 }
+
+/** Your routine "Leg day", one exercise of one set: what `routineWorkout` was started from. */
+function legDay(ownerId = 'me'): Routine {
+  return {
+    id: 'r-1',
+    ownerId,
+    source: 'USER',
+    name: 'Leg day',
+    notes: null,
+    folder: null,
+    lastPerformedAt: null,
+    level: null,
+    defaultRestSeconds: null,
+    archived: false,
+    createdAt: '',
+    updatedAt: '',
+    deletedAt: null,
+    exerciseCount: 1,
+    exercises: [
+      {
+        id: 'pe-a',
+        exerciseId: 'cat-a',
+        orderIndex: 0,
+        supersetGroupId: null,
+        notes: null,
+        defaultSets: 1,
+        targetRepsMin: 8,
+        targetRepsMax: 8,
+        targetWeightKg: 60,
+        restAfterSeconds: null,
+        sets: [
+          {
+            setType: ExerciseSetType.Normal,
+            targetRepsMin: 8,
+            targetRepsMax: 8,
+            targetWeightKg: 60,
+            targetDurationSeconds: null,
+            targetDistanceMeters: null,
+            restAfterSeconds: null,
+          },
+        ],
+        hasVariedSets: false,
+      },
+    ],
+  };
+}
+
+/** A workout started from "Leg day", every set ticked; `added` adds an exercise to it. */
+function routineWorkout(added = false): WorkoutLog {
+  const done = (id: string) => set(id, { isCompleted: true, reps: 8, weightKg: 60 });
+  const exercises = [
+    exercise('a', [done('a1')], { prescribedExercise: { id: 'pe-a', notes: null } }),
+    ...(added ? [exercise('b', [done('b1')])] : []),
+  ];
+  return {
+    ...workout(...exercises),
+    sourceProgramId: 'r-1',
+    sourceProgram: { id: 'r-1', name: 'Leg day', isSingleWorkout: true },
+  } as WorkoutLog;
+}
+
+describe('Logger finish, from a routine', () => {
+  /** The routine is read with the workout; the specs read it here instead. */
+  const readSource = (logger: Logger) => logger['_loadSourceRoutine']();
+
+  it('asks whether the routine changes too, and Update saves its new shape', () => {
+    const { logger, service, routineService } = setup(routineWorkout(true), 'ios', legDay());
+    readSource(logger);
+
+    logger.finish();
+
+    expect(logger.updateAskOpen()).toBe(true);
+    expect(logger.updateTitle()).toBe('workouts.updateRoutine.title');
+    expect(logger.updateNote()).toBe('You added b.');
+    expect(service.complete).not.toHaveBeenCalled();
+
+    logger.onUpdateChoice(RoutineUpdateChoices.Update);
+    expect(service.complete).toHaveBeenCalledWith('wl-1');
+    expect(routineService.update).toHaveBeenCalledWith('r-1', {
+      exercises: [
+        {
+          exerciseId: 'cat-a',
+          sets: [{ setType: 'NORMAL', targetRepsMin: 8, targetRepsMax: 8, targetWeightKg: 60 }],
+        },
+        {
+          exerciseId: 'cat-b',
+          sets: [{ setType: 'NORMAL', targetRepsMin: 8, targetRepsMax: 8, targetWeightKg: 60 }],
+        },
+      ],
+    });
+  });
+
+  it('finishes without touching the routine on Keep', () => {
+    const { logger, service, routineService } = setup(routineWorkout(true), 'ios', legDay());
+    readSource(logger);
+    logger.finish();
+
+    logger.onUpdateChoice(RoutineUpdateChoices.Keep);
+
+    expect(service.complete).toHaveBeenCalledWith('wl-1');
+    expect(routineService.update).not.toHaveBeenCalled();
+  });
+
+  it('does not ask after a workout done as the routine has it', () => {
+    const { logger, service } = setup(routineWorkout(), 'ios', legDay());
+    readSource(logger);
+
+    logger.finish();
+
+    expect(logger.updateAskOpen()).toBe(false);
+    expect(service.complete).toHaveBeenCalledWith('wl-1');
+  });
+
+  it('does not ask about a routine that is not yours', () => {
+    const { logger, service } = setup(routineWorkout(true), 'ios', legDay('someone-else'));
+    readSource(logger);
+
+    logger.finish();
+
+    expect(logger.updateAskOpen()).toBe(false);
+    expect(service.complete).toHaveBeenCalledWith('wl-1');
+  });
+
+  // After the unticked-sets question, the routine's is next.
+  it('asks after Finish and save when sets are left', () => {
+    const log = routineWorkout(true);
+    log.exercises![1].sets!.push(set('b2'));
+    const { logger, service } = setup(log, 'ios', legDay());
+    readSource(logger);
+
+    logger.finish();
+    expect(logger.finishSheetOpen()).toBe(true);
+    logger.onFinishChoice(FinishChoices.Save);
+
+    expect(logger.updateAskOpen()).toBe(true);
+    expect(service.complete).not.toHaveBeenCalled();
+  });
+});
 
 describe('Logger finish', () => {
   it('goes straight to the summary with every set ticked', () => {
@@ -289,9 +437,23 @@ describe('Logger swipe back', () => {
     const { logger, outlet } = setup(workout());
 
     logger.ionViewWillEnter();
+    logger.ionViewDidEnter();
     expect(outlet.swipeGesture).toBe(false);
 
     logger.ionViewWillLeave();
+    expect(outlet.swipeGesture).toBe(true);
+  });
+
+  // An iOS swipe back to the logger fires will-enter as it starts. Turning
+  // the gesture off there snapped the swipe back and left it dead.
+  it('leaves the swipe alone until the page is on screen', () => {
+    const { logger, outlet } = setup(workout());
+    logger.ionViewWillEnter();
+    logger.ionViewDidEnter();
+    logger.ionViewWillLeave();
+
+    logger.ionViewWillEnter();
+
     expect(outlet.swipeGesture).toBe(true);
   });
 
@@ -299,6 +461,7 @@ describe('Logger swipe back', () => {
     const { logger, outlet } = setup(workout(), 'md');
 
     logger.ionViewWillEnter();
+    logger.ionViewDidEnter();
     logger.ionViewWillLeave();
 
     expect(outlet.swipeGesture).toBe(false);

@@ -1,0 +1,42 @@
+@for (stepper of steppers(); track stepper.label) {
+  <!-- One target per row: its name, then − value +. -->
+  <div class="plan-row" [attr.data-editing]="isActive(stepper) ? '' : null">
+    <span class="plan-label" aria-hidden="true">{{ stepper.label | translate }}</span>
+    <div class="mh-stepper" role="group" [attr.aria-label]="stepper.groupLabel">
+      <ion-button
+        fill="clear"
+        shape="round"
+        [disabled]="!stepper.canLower"
+        [attr.aria-label]="stepper.lowerLabel"
+        (click)="step.emit({ field: stepper.field, delta: -1 })"
+      >
+        <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
+      </ion-button>
+      @if (stepper.field !== null) {
+        <button
+          type="button"
+          class="value"
+          [class.active]="isActive(stepper)"
+          [class.empty]="isEmpty(stepper)"
+          [class.long]="stepper.long"
+          [attr.aria-label]="stepper.typeLabel"
+          (click)="edit.emit(stepper.field)"
+        >
+          {{ shown(stepper) }}@if (unitFor(stepper); as unit) {&nbsp;<em>{{ unit }}</em>}
+        </button>
+      } @else {
+        <!-- Drawn as the number; said as "4 sets", and said again on each step. -->
+        <span class="value" aria-hidden="true">{{ stepper.value }}</span>
+        <span class="mh-visually-hidden" aria-live="polite">{{ stepper.spoken }}</span>
+      }
+      <ion-button
+        fill="clear"
+        shape="round"
+        [attr.aria-label]="stepper.raiseLabel"
+        (click)="step.emit({ field: stepper.field, delta: 1 })"
+      >
+        <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
+      </ion-button>
+    </div>
+  </div>
+}

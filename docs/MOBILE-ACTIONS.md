@@ -145,6 +145,28 @@ nothing it cannot change.
 
 Make a copy always asks first and then opens the copy.
 
+**Building** (a new routine, or your own in edit mode; user decisions, 2026-11-16 and 2026-11-17):
+the header is the logger's, the name over "N exercises · M sets", then the ⋯ and **Save**, the
+honey button where the workout has Finish.
+
+| Where                  | Verb                                        | Then                                                      |
+| ---------------------- | ------------------------------------------- | --------------------------------------------------------- |
+| The header's ⋯         | Add exercises (honey)                       | the picker                                                |
+|                        | Reorder (navy), once there are two          | the cards fold into handles to drag; Done ends it         |
+|                        | Discard (red, its own card), once there is something to lose | asks in red: a new routine is dropped, an edit loses its changes |
+| A card's ⋮             | Move up (navy), Move down (sky), where there is room | one place up or down, no dragging                |
+|                        | Swap (honey)                                | the picker, for the movement to put in                    |
+|                        | Reorder (navy), once there are two          | the drag mode                                             |
+| A card's header        | tap                                         | the exercise's page                                       |
+| Under a card           | its rest, Set by set / Same for every set, Add weight (bodyweight), Remove (red) | Remove happens at once |
+| Between two cards      | the Link chip                               | links them as a superset, or undoes it                    |
+| The end of the content | Save and start (train mode only)            | saves, then starts the workout                            |
+
+Leaving with changes unsaved asks first (the back chevron, the X named Cancel on an edit, Android's
+back). A look at an exercise's page keeps the draft; so does another tab: the tab bar's reset throws
+the page away, so the draft is parked and comes back the next time that routine, or a new one in
+that tab, opens.
+
 **Workouts list** (`workouts/workouts.html`, the swipe on your routine rows): a swipe left reveals
 More and Edit; there is no swipe right. More is the builder's sheet without Edit (Make a copy,
 Archive, Delete routine). Edit opens the builder in edit mode (`?edit`). Archive happens on the tap
@@ -189,13 +211,21 @@ one. The workout cannot be renamed mid-session: the API has no call for it.
 
 | Ticked   | Then                                                                                         |
 | -------- | -------------------------------------------------------------------------------------------- |
-| every set | straight to the summary                                                                     |
+| every set | straight to the summary, or first to "Update the routine?" below                            |
 | some     | "Finish early?" (`mh-action-sheet`, the unticked count in its note): Finish and save, Discard workout |
 | none     | "Nothing logged yet", with Discard workout alone: there is nothing to save               |
 
 Discard workout always asks again in red (`tone="danger"`, "This cannot be undone"); Finish and
 save completes the workout as it stands. With nothing ticked it is not offered (`finishOptions`, as
 in dba74362): completing would mark a coach's plan day done with no sets in it, and tell the coach.
+
+**Update the routine?** (`logger/routine-update.ts`, user decisions, 2026-11-16): a workout started
+from your own routine asks once more before the summary, after the sheet above when that one shows,
+but only when the workout changed the routine's shape: exercises added, removed, swapped or moved, a
+different number of sets, other supersets. Heavier numbers and skips never ask. "Update {name}?"
+says what changed, then Update routine (honey) or Keep it as it was (green); both finish. Update
+keeps the routine's own targets on its sets and takes what was logged for anything new. Closing the
+sheet goes back to the workout.
 
 **Under the exercises** (user decisions, 2026-11-10): Add exercise is an option row, a one-row
 `mh-card-list` with the ⋯ sheet's honey tile, not a dashed button. Last comes "Finish workout early

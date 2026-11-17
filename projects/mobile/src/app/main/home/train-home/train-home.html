@@ -74,7 +74,7 @@
             <p class="hive-kicker">{{ 'home.train.today.inProgress' | translate }}</p>
             <h3>{{ log.name }}</h3>
           </div>
-          <ion-button shape="round" (click)="resume()">
+          <ion-button (click)="resume()">
             {{ 'button.continue' | translate }}
           </ion-button>
         </div>
@@ -87,7 +87,7 @@
               <p class="hive-sub">{{ meta }}</p>
             }
           </div>
-          <ion-button shape="round" (click)="openNext()">
+          <ion-button (click)="openNext()">
             {{ 'button.start' | translate }}
           </ion-button>
         </div>

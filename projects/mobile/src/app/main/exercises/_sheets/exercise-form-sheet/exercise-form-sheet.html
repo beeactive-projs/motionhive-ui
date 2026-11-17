@@ -1,140 +1,223 @@
 <ng-template #body>
   @if (loadFailed()) {
-  <mh-empty-state icon="alert-circle-outline" [heading]="'exercises.edit.loadError.title' | translate"
-    [message]="'exercises.edit.loadError.message' | translate" [actionLabel]="'button.tryAgain' | translate"
-    (action)="retry()" />
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'exercises.edit.loadError.title' | translate"
+      [message]="'exercises.edit.loadError.message' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="retry()"
+    />
   } @else {
-  <div class="mh-stack">
-    <section class="mh-section">
-      <span class="mh-kicker">{{ 'form.label.name' | translate }}</span>
-      <ion-list [inset]="true" class="mh-card-list">
-        <ion-item>
-          <ion-input [attr.aria-label]="'form.label.name' | translate"
-            [placeholder]="'exercises.simpleForm.namePlaceholder' | translate" autocapitalize="sentences"
-            [maxlength]="maxNameLength" [value]="form.draft().name"
-            (ionInput)="form.patch({ name: $event.detail.value ?? '' })" />
-        </ion-item>
-      </ion-list>
-    </section>
+    <div class="form">
+      <ion-input
+        mode="md"
+        fill="outline"
+        labelPlacement="stacked"
+        [label]="'form.label.name' | translate"
+        [placeholder]="'exercises.simpleForm.namePlaceholder' | translate"
+        autocapitalize="sentences"
+        [maxlength]="maxNameLength"
+        [value]="form.draft().name"
+        (ionInput)="form.patch({ name: $event.detail.value ?? '' })"
+      />
 
-    <section class="mh-section">
-      <span class="mh-kicker">{{ 'exercises.simpleForm.track.label' | translate }}</span>
-      <!-- Four tiles, not a select: what you track decides what the logger
-           asks you for, so the choice should be visible while you make it.
-           One of four, so radio semantics, as on the coach's kind grid. -->
-      <div class="tracks" role="radiogroup" [attr.aria-label]="'exercises.simpleForm.track.label' | translate">
-        @for (tile of trackTiles; track tile.value) {
-        <button type="button" role="radio" class="track" [class.on]="isKindOn(tile.value)"
-          [attr.aria-checked]="isKindOn(tile.value)" (click)="selectKind(tile.value)">
-          <ion-icon class="track-icon" aria-hidden="true" [color]="tile.color" [name]="tile.icon" />
-          <span class="label">{{ tile.label }}</span>
-        </button>
-        }
-      </div>
-    </section>
-
-    <section class="mh-section">
-      <div class="mh-section-head">
-        <span class="mh-kicker">{{ 'exercises.simpleForm.muscleGroup' | translate }}</span>
-        <ion-note>
-          {{ (form.requirePrimary() ? 'exercises.muscleFields.required' : 'exercises.muscleFields.optional') | translate }}
-        </ion-note>
-      </div>
-      <div class="mh-chip-cloud">
-        @for (chip of muscleChips(); track chip.value) {
-        <ion-button class="chip" fill="clear" shape="round" size="small" [class.selected]="isMuscleOn(chip.value)"
-          [attr.aria-pressed]="isMuscleOn(chip.value)" [disabled]="musclesFull() && !isMuscleOn(chip.value)"
-          (click)="toggleMuscle(chip.value)">
-          {{ chip.label }}
-        </ion-button>
-        }
-        @if (hasMoreMuscles()) {
-        <ion-button class="chip more" fill="clear" shape="round" size="small" (click)="musclesExpanded.set(true)">
-          {{ 'exercises.simpleForm.more' | translate }}
-        </ion-button>
-        }
-      </div>
-    </section>
-
-    <section class="mh-section">
-      <div class="mh-section-head">
-        <span class="mh-kicker">{{ 'exercises.fields.equipment' | translate }}</span>
-        <ion-note>{{ 'exercises.muscleFields.optional' | translate }}</ion-note>
-      </div>
-      <div class="mh-chip-cloud">
-        @for (chip of equipmentChips(); track chip.value) {
-        <ion-button class="chip" fill="clear" shape="round" size="small" [class.selected]="isEquipmentOn(chip.value)"
-          [attr.aria-pressed]="isEquipmentOn(chip.value)" (click)="toggleEquipment(chip.value)">
-          {{ chip.label }}
-        </ion-button>
-        }
-        @if (hasMoreEquipment()) {
-        <ion-button class="chip more" fill="clear" shape="round" size="small" (click)="equipmentExpanded.set(true)">
-          {{ 'exercises.simpleForm.more' | translate }}
-        </ion-button>
-        }
-      </div>
-    </section>
-
-    <section class="mh-section">
-      <div class="mh-section-head">
-        <span class="mh-kicker">{{ 'exercises.simpleForm.note' | translate }}</span>
-        <ion-note>{{ 'exercises.muscleFields.optional' | translate }}</ion-note>
-      </div>
-      <ion-list [inset]="true" class="mh-card-list">
-        <ion-item>
-          <ion-textarea [attr.aria-label]="'exercises.simpleForm.note' | translate" [autoGrow]="true" [rows]="2"
-            [maxlength]="maxNoteLength" [counter]="note().length > maxNoteLength - 40" [disabled]="loading()"
-            [placeholder]="'exercises.simpleForm.notePlaceholder' | translate" [value]="note()"
-            (ionInput)="note.set($event.detail.value ?? '')" />
-        </ion-item>
-      </ion-list>
-    </section>
-
-    <section class="mh-section">
-      <div class="mh-section-head">
-        <span class="mh-kicker">{{ 'exercises.simpleForm.picture' | translate }}</span>
-        <ion-note>{{ 'exercises.muscleFields.optional' | translate }}</ion-note>
-      </div>
-      <input #pictureInput type="file" accept="image/*" hidden (change)="onPicturePicked($event)" />
-      @if (picture(); as shown) {
-      <div class="picture">
-        <img [src]="shown.url" [alt]="'exercises.simpleForm.picture' | translate" />
-        <div class="picture-actions">
-          <ion-button fill="clear" size="small" [disabled]="loading() || preparingPicture()"
-            (click)="pictureInput.click()">
-            <ion-icon slot="start" name="camera-outline" aria-hidden="true" />
-            {{ 'exercises.simpleForm.changePicture' | translate }}
-          </ion-button>
-          <ion-button fill="clear" size="small" color="danger" [disabled]="loading() || preparingPicture()"
-            (click)="removePicture()">
-            <ion-icon slot="start" name="trash-outline" aria-hidden="true" />
-            {{ 'exercises.simpleForm.removePicture' | translate }}
-          </ion-button>
+      <section class="mh-section">
+        <h3 class="mh-kicker">{{ 'exercises.simpleForm.track.label' | translate }}</h3>
+        <!-- Tiles, not a select: what you track decides what the logger asks
+             you for, so the choice should be visible while you make it. One
+             of four, so radio semantics, as on the coach's kind grid. -->
+        <div
+          class="tracks"
+          role="radiogroup"
+          [attr.aria-label]="'exercises.simpleForm.track.label' | translate"
+        >
+          @for (tile of trackTiles; track tile.value) {
+            <button
+              type="button"
+              role="radio"
+              class="track mh-pick-tile"
+              [class.on]="isKindOn(tile.value)"
+              [attr.aria-checked]="isKindOn(tile.value)"
+              (click)="selectKind(tile.value)"
+            >
+              <ion-icon [name]="tile.icon" aria-hidden="true" />
+              <span class="label">{{ tile.label }}</span>
+            </button>
+          }
         </div>
-      </div>
-      } @else {
-      <button type="button" class="add-picture" [disabled]="loading() || preparingPicture()"
-        (click)="pictureInput.click()">
-        <ion-icon name="camera-outline" aria-hidden="true" />
-        <span>{{ 'exercises.simpleForm.addPicture' | translate }}</span>
-      </button>
-      }
-      <p class="picture-hint">{{ 'exercises.simpleForm.pictureHint' | translate }}</p>
-    </section>
+      </section>
 
-    <!-- A coach's own public exercise can be edited here too; it is not
-         private, so the line would be wrong for it. -->
-    @if (form.isPrivate()) {
-    <p class="private">
-      <ion-icon name="lock-closed-outline" aria-hidden="true" />
-      <span>{{ 'exercises.simpleForm.privateLine' | translate }}</span>
-    </p>
-    }
-  </div>
+      <section class="mh-section">
+        <div class="mh-section-head">
+          <h3 class="mh-kicker">{{ 'exercises.simpleForm.muscleGroup' | translate }}</h3>
+          <!-- Only the optional fields are marked: no mark means required. -->
+          @if (!form.requirePrimary()) {
+            <ion-note>{{ 'form.hint.optional' | translate }}</ion-note>
+          }
+        </div>
+        <!-- Pills, as in the exercise filter sheet: the one form whose option
+             chips are round (surfaces-and-sheets.md). -->
+        <div
+          class="mh-chip-cloud"
+          role="group"
+          [attr.aria-label]="'exercises.simpleForm.muscleGroup' | translate"
+        >
+          @for (chip of muscleChips(); track chip.value) {
+            <ion-button
+              class="chip"
+              fill="clear"
+              shape="round"
+              size="small"
+              [class.selected]="isMuscleOn(chip.value)"
+              [attr.aria-pressed]="isMuscleOn(chip.value)"
+              [disabled]="musclesFull() && !isMuscleOn(chip.value)"
+              (click)="toggleMuscle(chip.value)"
+            >
+              {{ chip.label }}
+            </ion-button>
+          }
+          @if (hasMoreMuscles()) {
+            <ion-button
+              class="chip more"
+              fill="clear"
+              shape="round"
+              size="small"
+              (click)="musclesExpanded.set(true)"
+            >
+              {{ 'exercises.simpleForm.more' | translate }}
+            </ion-button>
+          }
+        </div>
+      </section>
+
+      <section class="mh-section">
+        <div class="mh-section-head">
+          <h3 class="mh-kicker">{{ 'exercises.fields.equipment' | translate }}</h3>
+          <ion-note>{{ 'form.hint.optional' | translate }}</ion-note>
+        </div>
+        <div
+          class="mh-chip-cloud"
+          role="group"
+          [attr.aria-label]="'exercises.fields.equipment' | translate"
+        >
+          @for (chip of equipmentChips(); track chip.value) {
+            <ion-button
+              class="chip"
+              fill="clear"
+              shape="round"
+              size="small"
+              [class.selected]="isEquipmentOn(chip.value)"
+              [attr.aria-pressed]="isEquipmentOn(chip.value)"
+              (click)="toggleEquipment(chip.value)"
+            >
+              {{ chip.label }}
+            </ion-button>
+          }
+          @if (hasMoreEquipment()) {
+            <ion-button
+              class="chip more"
+              fill="clear"
+              shape="round"
+              size="small"
+              (click)="equipmentExpanded.set(true)"
+            >
+              {{ 'exercises.simpleForm.more' | translate }}
+            </ion-button>
+          }
+        </div>
+      </section>
+
+      <ion-textarea
+        mode="md"
+        fill="outline"
+        labelPlacement="stacked"
+        [label]="('exercises.simpleForm.note' | translate) + ' ' + ('form.hint.optional' | translate)"
+        [placeholder]="'exercises.simpleForm.notePlaceholder' | translate"
+        [autoGrow]="true"
+        [rows]="1"
+        [maxlength]="maxNoteLength"
+        [counter]="note().length > maxNoteLength - 40"
+        [disabled]="loading()"
+        [value]="note()"
+        (ionInput)="note.set($event.detail.value ?? '')"
+      />
+
+      <section class="mh-section">
+        <div class="mh-section-head">
+          <h3 class="mh-kicker">{{ 'exercises.simpleForm.picture' | translate }}</h3>
+          <ion-note>{{ 'form.hint.optional' | translate }}</ion-note>
+        </div>
+        <input #pictureInput type="file" accept="image/*" hidden (change)="onPicturePicked($event)" />
+        <!-- Empty, the app's dashed "add" button: an optional field holds no
+             big blank box open. With a photo, the photo as the exercise page
+             shows it (full width, 16:10), so the coach sees the crop their
+             clients will see, and under it both verbs in words: nothing on the
+             photo, and Remove apart from Change, where a thumb won't hit it
+             by mistake. -->
+        @if (picture() || preparingPicture()) {
+          <div class="preview">
+            @if (preparingPicture()) {
+              <ion-spinner name="crescent" />
+            } @else if (picture(); as shown) {
+              <img [src]="shown.url" alt="" />
+            }
+          </div>
+          <div class="picture-actions">
+            <ion-button
+              class="mh-text-link"
+              fill="clear"
+              size="small"
+              [disabled]="loading() || preparingPicture()"
+              (click)="pictureInput.click()"
+            >
+              <ion-icon slot="start" name="camera-outline" aria-hidden="true" />
+              {{ 'exercises.simpleForm.changePicture' | translate }}
+            </ion-button>
+            <ion-button
+              color="danger"
+              fill="clear"
+              size="small"
+              [disabled]="loading() || preparingPicture()"
+              (click)="removePicture()"
+            >
+              <ion-icon slot="start" name="trash-outline" aria-hidden="true" />
+              {{ 'exercises.simpleForm.removePicture' | translate }}
+            </ion-button>
+          </div>
+        } @else {
+          <ion-button
+            class="mh-add-dashed"
+            expand="block"
+            fill="outline"
+            [disabled]="loading()"
+            (click)="pictureInput.click()"
+          >
+            <ion-icon slot="start" name="camera-outline" aria-hidden="true" />
+            {{ 'exercises.simpleForm.addPicture' | translate }}
+          </ion-button>
+        }
+        <p class="mh-footnote">{{ 'exercises.simpleForm.pictureHint' | translate }}</p>
+      </section>
+
+      <!-- Who sees it, closing the form: the fact the person most needs
+           before they save. A coach's own public exercise can be edited here
+           too; it is not private, so the line would be wrong for it. -->
+      @if (form.isPrivate()) {
+        <p class="mh-footnote private">{{ 'exercises.simpleForm.privateLine' | translate }}</p>
+      }
+    </div>
   }
 </ng-template>
 
-<mh-sheet-shell [(open)]="open" [title]="title()" [body]="body" [saveLabel]="confirmLabel()"
-  [canSave]="canSave()" [saving]="saving()" [breakpoints]="[0, 0.95]" [initialBreakpoint]="0.95"
-  (save)="submit()" (dismissed)="onDismissed()" />
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [saveLabel]="confirmLabel()"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  (save)="submit()"
+  (dismissed)="onDismissed()"
+/>

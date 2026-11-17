@@ -140,7 +140,7 @@
     <!-- The real rows' geometry, so nothing shifts when data lands. -->
     <ion-list class="mh-flat-list" aria-busy="true">
       @for (_ of skeletonRows; track $index) {
-        <mh-row-skeleton [index]="$index" />
+        <mh-row-skeleton [index]="$index" [compact]="true" />
       }
     </ion-list>
   } @else if (isMineEmpty()) {

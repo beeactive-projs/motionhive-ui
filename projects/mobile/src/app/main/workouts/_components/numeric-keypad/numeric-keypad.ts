@@ -4,6 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { decimalSeparator, localizeTypedNumber } from 'core';
 
 import {
+  KEYPAD_STEP as STEP,
   KeypadField,
   KeypadFields,
   clockDigitsToDisplay,
@@ -11,15 +12,6 @@ import {
   fitsKeypadLimit,
   secondsToClockDigits,
 } from '../../workouts.config';
-
-/** Per-field stepper increments. Weight steps by the smallest plate pair. */
-const STEP: Record<KeypadField, number> = {
-  [KeypadFields.Weight]: 2.5,
-  [KeypadFields.Reps]: 1,
-  [KeypadFields.Duration]: 15,
-  [KeypadFields.Distance]: 50,
-  [KeypadFields.Rpe]: 0.5,
-};
 
 const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
   [KeypadFields.Weight]: true,

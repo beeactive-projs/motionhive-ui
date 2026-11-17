@@ -36,8 +36,12 @@
    On Messages and Clients the search and chips are in the header and an
    empty state sits straight in the content, filling it. Here they scroll
    with the tab, so the tab fills the screen instead and its body takes the
-   room left, where the body's empty state grows and centres. */
+   room left, where the body's empty state grows and centres. A column of
+   its own, since the Exercises body is not an `.mh-page`: its flat list
+   runs edge to edge. */
 .tab-body {
+  display: flex;
+  flex-direction: column;
   min-block-size: 100%;
 }
 
