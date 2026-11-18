@@ -18,7 +18,11 @@ concurrency:
 
 jobs:
   build-and-upload:
-    runs-on: macos-15
+    # GitHub names macOS images by Xcode major, one per image. App Store
+    # Connect requires the iOS 27 SDK from April 2027 (ITMS-90725), and
+    # macos-15 stops at Xcode 26. Move this label up each autumn when Apple
+    # announces the next SDK deadline.
+    runs-on: xcode-27
     steps:
       # A missing secret otherwise only shows up at the upload, after a full
       # macOS build. Fail first and name it.
@@ -49,6 +53,8 @@ jobs:
         run: echo "BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
 
       # App Store Connect only accepts builds made with a current SDK.
+      # latest-stable only picks among the Xcodes the runner image ships, so
+      # the SDK is really chosen by the runs-on label above.
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
