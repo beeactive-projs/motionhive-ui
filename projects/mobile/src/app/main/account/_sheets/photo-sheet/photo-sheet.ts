@@ -1,7 +1,7 @@
-import { Component, ElementRef, inject, model, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, inject, model, viewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { cameraOutline, imageOutline, trashOutline } from 'ionicons/icons';
+import { cameraOutline, expandOutline, imageOutline, trashOutline } from 'ionicons/icons';
 import { take } from 'rxjs';
 
 import { AVATAR_ACCEPT, AVATAR_MAX_BYTES, UserService, avatarRejectionReason } from 'core';
@@ -9,15 +9,25 @@ import { AVATAR_ACCEPT, AVATAR_MAX_BYTES, UserService, avatarRejectionReason } f
 import { ActionSheet } from '../../../../_shared/components/action-sheet/action-sheet';
 import { SheetAction } from '../../../../_shared/components/action-sheet/action-sheet.model';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
+import { PhotoViewerService } from '../../../../_shared/services/photo-viewer.service';
 import { AccountStore } from '../../account.store';
 
 const PhotoActionIds = {
+  View: 'view',
   Take: 'take',
   Choose: 'choose',
   Remove: 'remove',
 } as const;
 
 type PhotoActionId = (typeof PhotoActionIds)[keyof typeof PhotoActionIds];
+
+/** "See photo", first, while there is one: the hexagon shows it cropped. */
+const VIEW_ACTION: SheetAction<PhotoActionId> = {
+  id: PhotoActionIds.View,
+  label: 'accountSheets.photo.view',
+  icon: 'expand-outline',
+  color: 'violet',
+};
 
 /** "Remove photo" is disabled rather than absent: there is no DELETE avatar endpoint yet. */
 const PHOTO_ACTIONS: readonly SheetAction<PhotoActionId>[] = [
@@ -58,20 +68,29 @@ export class PhotoSheet {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
   private readonly _translateService = inject(TranslateService);
+  private readonly _photoViewer = inject(PhotoViewerService);
 
   private readonly _cameraInput = viewChild<ElementRef<HTMLInputElement>>('cameraInput');
   private readonly _galleryInput = viewChild<ElementRef<HTMLInputElement>>('galleryInput');
 
   readonly open = model(false);
   readonly accept = AVATAR_ACCEPT;
-  readonly actions = PHOTO_ACTIONS;
+  readonly actions = computed<readonly SheetAction<PhotoActionId>[]>(() => {
+    if (this._accountStore.avatarUrl()) {
+      return [VIEW_ACTION, ...PHOTO_ACTIONS];
+    }
+    return PHOTO_ACTIONS;
+  });
 
   constructor() {
-    addIcons({ cameraOutline, imageOutline, trashOutline });
+    addIcons({ cameraOutline, expandOutline, imageOutline, trashOutline });
   }
 
   choose(id: PhotoActionId): void {
     switch (id) {
+      case PhotoActionIds.View:
+        this._view();
+        break;
       case PhotoActionIds.Take:
         this._cameraInput()?.nativeElement.click();
         break;
@@ -79,6 +98,18 @@ export class PhotoSheet {
         this._galleryInput()?.nativeElement.click();
         break;
     }
+  }
+
+  /** The whole photo, full screen, opening as the sheet goes down. */
+  private _view(): void {
+    const url = this._accountStore.avatarUrl();
+    this.open.set(false);
+    if (!url) {
+      return;
+    }
+    this._photoViewer.open([
+      { url, alt: this._translateService.instant('photoViewer.alt.profile') },
+    ]);
   }
 
   onFileSelected(event: Event): void {

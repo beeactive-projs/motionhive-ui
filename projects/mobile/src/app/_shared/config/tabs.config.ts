@@ -66,8 +66,10 @@ export const COACH_TAB_SET: TabSet = {
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
-    { id: TabIds.Clients, label: 'nav.clients', icon: 'people-outline' },
     DISCOVER_TAB,
+    // A coach's clients are what they open daily, so they hold the centre,
+    // as Workouts does for a trainee (user decision, 2026-11-18).
+    { id: TabIds.Clients, label: 'nav.clients', icon: 'people-outline' },
     MESSAGES,
   ],
   // Grouped by intent, mirroring web's rail: the coaching workspace first,

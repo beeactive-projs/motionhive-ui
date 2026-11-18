@@ -112,7 +112,7 @@ describe('deep links', () => {
     expect(queryParamsFor({ screen: 'coaching/payments' })).toBeNull();
     // An unrouted screen has nowhere to forward them to. `groups` used to be
     // the example here; it is routed now, so this uses one that still isn't.
-    expect(queryParamsFor({ screen: 'user/plans', queryParams: { x: '1' } })).toBeNull();
+    expect(queryParamsFor({ screen: 'coaching/exercises', queryParams: { x: '1' } })).toBeNull();
     expect(queryParamsFor({ screen: 'groups', queryParams: { x: '1' } })).toEqual({ x: '1' });
   });
 
@@ -130,11 +130,12 @@ describe('deep links', () => {
     expect(routeFor({ screen: 'coaching/payments' })).toEqual(['/tabs/more/payments']);
   });
 
-  // A program assignment is the alert most likely to be tapped by a trainee,
-  // and it was the one falling through the map.
-  it('names the plan screen a program assignment points at', () => {
-    expect(routeFor({ screen: 'user/plans', entityId: 'a-1' })).toBeNull();
-    expect(webOnlyLabel({ screen: 'user/plans', entityId: 'a-1' })).toBe('My plans');
+  // A program assignment is the alert most likely to be tapped by a trainee:
+  // it opens the plan in the Workouts tab, which has the page now.
+  it('opens the plan a program assignment points at', () => {
+    expect(routeFor({ screen: 'user/plans', entityId: 'a-1' })).toEqual(['/tabs/workouts/plan', 'a-1']);
+    expect(routeFor({ screen: 'user/plans' })).toEqual(['/tabs/workouts']);
+    expect(webOnlyLabel({ screen: 'user/plans', entityId: 'a-1' })).toBeNull();
   });
 
   // The web keeps invoices and memberships behind profile tabs; mobile gives
@@ -183,7 +184,7 @@ describe('isOnTarget', () => {
 
   it('is false when the notification has nowhere to go', () => {
     // An unrouted screen, and no notification at all.
-    expect(isOnTarget('/tabs/home', { screen: 'user/plans' })).toBe(false);
+    expect(isOnTarget('/tabs/home', { screen: 'coaching/exercises' })).toBe(false);
     expect(isOnTarget('/tabs/home', null)).toBe(false);
   });
 

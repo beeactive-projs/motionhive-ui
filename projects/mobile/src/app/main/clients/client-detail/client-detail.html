@@ -129,8 +129,10 @@
       }
       } @else {
       <div class="week-top">
+        <!-- The roster's window is the last seven days, not the calendar
+             week: the label says what is counted. -->
         <span class="mh-kicker">{{
-          'clients.detail.sections.thisWeek' | translate
+          'clients.detail.sections.lastSevenDays' | translate
           }}</span>
         @if (weekTrend(); as trend) {
         <span class="trend" [attr.data-trend]="trend.direction">

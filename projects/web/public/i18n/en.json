@@ -2321,7 +2321,7 @@
       "summary": {
         "block": "{days}, for {count, plural, one {# week} other {# weeks}}.",
         "pickDay": "Pick at least one day.",
-        "weekly": "{days}, every week."
+        "weekly": "{days}, every week for {count, plural, one {# week} other {# weeks}}."
       },
       "title": "Add to your week",
       "toast": {

@@ -367,18 +367,14 @@ export class ClientPlanDetail implements OnInit {
   private _skipWorkout(w: AssignedWorkout): void {
     this._service.skipAssignedWorkout(w.id).subscribe({
       next: () => {
-        // Optimistically flip the workout state + bump completion%.
+        // Optimistically flip the workout state. "% done" counts trained
+        // days only (the API's rule), so a skip leaves it where it was.
         const a = this.assignment();
         if (!a) return;
         const workouts = (a.workouts ?? []).map((aw) =>
           aw.id === w.id ? { ...aw, status: WorkoutLogStatus.Skipped } : aw,
         );
-        const done = workouts.filter(
-          (aw) =>
-            aw.status === WorkoutLogStatus.Completed || aw.status === WorkoutLogStatus.Skipped,
-        ).length;
-        const percent = workouts.length === 0 ? 0 : Math.round((done / workouts.length) * 100);
-        this.assignment.set({ ...a, workouts, completionPercent: percent });
+        this.assignment.set({ ...a, workouts });
         this._messageService.add({
           severity: 'success',
           summary: this._translateService.instant('training.planDetail.toast.skipped'),

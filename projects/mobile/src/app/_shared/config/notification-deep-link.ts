@@ -93,6 +93,14 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
       d.entityId ? ['/tabs/workouts/finish', d.entityId] : ['/tabs/workouts/history'],
       params(d),
     ),
+  // A plan a coach assigned: its page in the Workouts tab, where its days
+  // are; without an id, the tab itself.
+  'user/plans': (d) => {
+    if (d.entityId) {
+      return link(['/tabs/workouts/plan', d.entityId], params(d));
+    }
+    return link(['/tabs/workouts'], params(d));
+  },
 };
 
 /**
@@ -104,7 +112,6 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
  * every screen the API emits.
  */
 const NOT_ON_MOBILE: Record<string, string> = {
-  'user/plans': 'notifications.webOnlyPlace.myPlans',
   'coaching/exercises': 'nav.exercises',
   // Subscriptions a coach *sells* stay on the web; the client's own
   // memberships are a segment on their billing screen.

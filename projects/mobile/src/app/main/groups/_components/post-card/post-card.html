@@ -35,14 +35,12 @@
       [attr.aria-label]="(liked() ? 'groups.post.a11y.unlike' : 'groups.post.a11y.like') | translate: { name: authorName() }"
       [attr.aria-pressed]="liked()" (click)="like.emit()">
       <ion-icon slot="start" [name]="liked() ? 'thumbs-up' : 'thumbs-up-outline'" aria-hidden="true" />
-      <span class="verb">{{ 'groups.post.like' | translate }}</span>
-      <span class="count">{{ post().reactionCount }}</span>
+      {{ post().reactionCount }}
     </ion-button>
     <ion-button fill="clear" size="small" class="meta-button"
       [attr.aria-label]="'groups.post.a11y.comments' | translate: { name: authorName() }" (click)="comment.emit()">
       <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
-      <span class="verb">{{ 'groups.post.comment' | translate }}</span>
-      <span class="count">{{ post().commentCount }}</span>
+      {{ post().commentCount }}
     </ion-button>
   </div>
 </article>

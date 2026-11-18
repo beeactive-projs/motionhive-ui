@@ -135,6 +135,10 @@
     "choice": {
       "noMatches": "No matches"
     },
+    "sensitive": {
+      "title": "Sensitive actions",
+      "intro": "What can't be undone lives here. Each one explains what happens and asks you to confirm before anything changes."
+    },
     "privacy": {
       "intro": "Your name and photo are always visible. Choose who sees each of these.",
       "hint": {
@@ -142,7 +146,8 @@
         "COACHES_ONLY": "Only the coaches you train with",
         "ONLY_ME": "No one but you"
       },
-      "saveFailed": "Couldn't save that. Try again."
+      "saveFailed": "Couldn't save that. Try again.",
+      "yourData": "Your data"
     },
     "delete": {
       "title": "Delete account",
@@ -265,7 +270,9 @@
       "toast": {
         "failed": "Could not update your location.",
         "updated": "Location updated"
-      }
+      },
+      "noResults": "No place found by that name.",
+      "unavailable": "Place search isn't answering. Try again in a moment."
     },
     "name": {
       "hint": "This is how your name appears on your profile and in messages.",
@@ -296,7 +303,8 @@
         "failed": "Could not upload the picture.",
         "updated": "Photo updated"
       },
-      "tooLarge": "Images must be under {size} MB."
+      "tooLarge": "Images must be under {size} MB.",
+      "view": "See photo"
     }
   },
   "chipInput": {
@@ -452,7 +460,7 @@
       "profileAria": "{name}, view profile",
       "sections": {
         "plans": "Plans",
-        "thisWeek": "This week"
+        "lastSevenDays": "Last 7 days"
       },
       "sessions": {
         "label": "Which sessions",
@@ -766,9 +774,7 @@
       "yourCoach": "Your coach"
     },
     "coaches": {
-      "all": "{count, plural, one {See all} other {All #}}",
-      "near": "Coaches near you",
-      "title": "Coaches"
+      "more": "See more"
     },
     "featured": {
       "message": "Message",
@@ -848,8 +854,6 @@
       "title": "Search"
     },
     "spotlight": {
-      "pause": "Pause the spotlight",
-      "play": "Play the spotlight",
       "position": "{position} of {total}",
       "show": "Show {name}",
       "slide": "coach",
@@ -1459,7 +1463,6 @@
         "viewProfile": "View {name}’s profile"
       },
       "addComment": "Add a comment",
-      "comment": "Comment",
       "commentCount": "{count, plural, one {# comment} other {# comments}}",
       "comments": "Comments",
       "commentsLoadError": "Couldn't load comments",
@@ -1477,7 +1480,6 @@
         "message": "Be the first to say something.",
         "title": "No comments yet"
       },
-      "like": "Like",
       "loadError": {
         "message": "It may have been deleted, or you may be offline.",
         "title": "Couldn't load this post"
@@ -2046,11 +2048,11 @@
     },
     "webOnlyPlace": {
       "coaches": "Coaches",
-      "memberships": "Memberships",
-      "myPlans": "My plans"
+      "memberships": "Memberships"
     }
   },
   "pageTitle": {
+    "sensitiveActions": "Sensitive actions",
     "account": "Account",
     "assignments": "Assignments",
     "billing": "Billing",
@@ -3349,7 +3351,9 @@
         "skipFailed": "Could not skip that",
         "skipped": "Marked as skipped"
       },
-      "todaysWorkout": "Today's workout"
+      "todaysWorkout": "Today's workout",
+      "dayClosed": "You did this day.",
+      "planClosed": "{status, select, PAUSED {This plan is paused.} COMPLETED {This plan is finished.} CANCELLED {This plan was cancelled.} other {This plan is not active.}}"
     },
     "progress": {
       "clientPrivacyNote": "Workouts your client does outside your plans stay private unless they share them, so these numbers may not count everything they did.",
@@ -3411,7 +3415,7 @@
         "title": "Make a copy?"
       },
       "delete": {
-        "message": "Delete {name}? Workouts already logged from it are kept.",
+        "message": "Delete {name}? Workouts already logged from it are kept, and its scheduled days still ahead are cancelled.",
         "title": "Delete routine"
       },
       "discard": {
@@ -3684,7 +3688,8 @@
       "sets": "Sets",
       "time": "Time",
       "volume": "Volume",
-      "workouts": "Workouts"
+      "workouts": "Workouts",
+      "durationUnknown": "Unknown"
     },
     "todayHero": {
       "done": "Done for today. Nice work.",
@@ -4095,6 +4100,21 @@
       "removed": "Place removed",
       "saveFailed": "Could not save this place.",
       "removeFailed": "Could not remove this place."
+    }
+  },
+  "photoViewer": {
+    "counter": "{index} of {total}",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "open": {
+      "profile": "See the profile photo",
+      "group": "See the group's photo",
+      "workout": "See the workout photo"
+    },
+    "alt": {
+      "profile": "Profile photo",
+      "group": "Group photo",
+      "workout": "Workout photo"
     }
   }
 }

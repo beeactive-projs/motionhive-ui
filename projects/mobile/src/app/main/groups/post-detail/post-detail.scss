@@ -159,11 +159,15 @@
   font-size: var(--mh-text-sm);
 }
 
-/* Liked: the brand amber, matching web's `severity="primary"` reaction
-   button. Grey read as "disabled" on the one control meant to look
-   acted-on. The count travels with the icon, so the whole button flips. */
+.meta-button ion-icon {
+  font-size: var(--mh-icon-md);
+}
+
+/* Liked: the brand amber as text, so the deep honey (the bare honey fails
+   on the slate card). Grey read as "disabled" on the one control meant to
+   look acted-on. The count travels with the icon, so the whole button flips. */
 .meta-button.reacted {
-  --color: var(--ion-color-primary);
+  --color: var(--mh-color-honey-deep);
   font-weight: 600;
 }
 

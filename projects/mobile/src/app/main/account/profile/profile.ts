@@ -18,6 +18,7 @@ import { SOCIAL_PLATFORMS } from 'core';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { ACCOUNT_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
 import { AboutSheet } from '../_sheets/about-sheet/about-sheet';
@@ -59,6 +60,7 @@ import { PhotoSheet } from '../_sheets/photo-sheet/photo-sheet';
     PhotoSheet,
     SettingsRow,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',

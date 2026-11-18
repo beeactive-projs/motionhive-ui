@@ -24,6 +24,7 @@ import { WorkoutLog, WorkoutLogService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import {
   workoutDuration,
   workoutTiles,
@@ -63,6 +64,7 @@ import { PROGRAM_ICONS } from '../programs.config';
     LoggedExercises,
     StatTile,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './log-review.html',
   styleUrl: './log-review.scss',

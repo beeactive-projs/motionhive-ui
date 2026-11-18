@@ -57,7 +57,14 @@
       </ion-list>
 
       @if (photoUrl(); as src) {
-        <img class="photo" [src]="src" [alt]="'person.workout.photoAlt' | translate" />
+        <img
+          class="photo"
+          [src]="src"
+          [alt]="'person.workout.photoAlt' | translate"
+          [mhViewPhoto]="src"
+          [mhViewPhotoAlt]="'person.workout.photoAlt' | translate"
+          [mhViewPhotoLabel]="'photoViewer.open.workout' | translate"
+        />
       }
 
       <section class="mh-section">

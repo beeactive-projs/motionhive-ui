@@ -1,0 +1,58 @@
+<!-- Named by its photo, so one photo alone (no counter) still has a name. -->
+<ion-modal
+  class="mh-photo-viewer"
+  [isOpen]="viewer.isOpen()"
+  [attr.aria-label]="viewer.current()?.alt"
+  (didDismiss)="viewer.close()"
+>
+  <ng-template>
+    <ion-header class="bar">
+      <ion-toolbar class="bar">
+        <ion-buttons slot="start">
+          <ion-button shape="round" [attr.aria-label]="'a11y.closePhoto' | translate" (click)="viewer.close()">
+            <ion-icon slot="icon-only" name="close-outline" />
+          </ion-button>
+        </ion-buttons>
+        @if (viewer.total() > 1) {
+          <ion-title>
+            {{ 'photoViewer.counter' | translate: { index: viewer.index() + 1, total: viewer.total() } }}
+          </ion-title>
+        }
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="stage" [fullscreen]="true">
+      @if (viewer.current(); as photo) {
+        <div class="centre">
+          <img [src]="photo.url" [alt]="photo.alt" />
+        </div>
+      }
+
+      @if (viewer.total() > 1) {
+        <!-- Arrows, as on a post's photos: one gesture for one thing. -->
+        <div class="nav">
+          <ion-button
+            fill="clear"
+            shape="round"
+            class="arrow"
+            [disabled]="!viewer.hasPrevious()"
+            [attr.aria-label]="'photoViewer.previous' | translate"
+            (click)="viewer.previous()"
+          >
+            <ion-icon slot="icon-only" name="chevron-back-outline" />
+          </ion-button>
+          <ion-button
+            fill="clear"
+            shape="round"
+            class="arrow"
+            [disabled]="!viewer.hasNext()"
+            [attr.aria-label]="'photoViewer.next' | translate"
+            (click)="viewer.next()"
+          >
+            <ion-icon slot="icon-only" name="chevron-forward-outline" />
+          </ion-button>
+        </div>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -256,6 +256,7 @@ export const API_ENDPOINTS = {
       `/programs/${id}/workouts/${workoutId}/exercises`,
     EXERCISES_REORDER: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/reorder`,
+    SUPERSETS: (id: string, workoutId: string) => `/programs/${id}/workouts/${workoutId}/supersets`,
     EXERCISE_BY_ID: (id: string, workoutId: string, exerciseId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}`,
     SETS: (id: string, workoutId: string, exerciseId: string) =>

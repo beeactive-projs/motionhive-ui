@@ -3,7 +3,7 @@
 <mh-action-sheet
   [(open)]="open"
   [title]="'accountSheets.photo.title' | translate"
-  [actions]="actions"
+  [actions]="actions()"
   [closeOnChoose]="false"
   (chosen)="choose($event)"
 />

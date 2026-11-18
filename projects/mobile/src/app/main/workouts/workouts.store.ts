@@ -135,7 +135,11 @@ export class WorkoutsStore {
     const edits = this._routineEdits;
 
     forkJoin({
-      day: this._programAssignmentService.trainingDay().pipe(catchError(() => of(null))),
+      // The phone's own day, as Home asks: unasked, the API takes the UTC
+      // date, and in Romania just after midnight "today" was yesterday.
+      day: this._programAssignmentService
+        .trainingDay(localDayKey(new Date()))
+        .pipe(catchError(() => of(null))),
       routines: this._routineService
         .list({ library: 'mine', limit: ROUTINE_LIMIT })
         .pipe(catchError(() => of(null))),

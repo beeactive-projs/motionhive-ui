@@ -135,6 +135,10 @@
     "choice": {
       "noMatches": "Niciun rezultat"
     },
+    "sensitive": {
+      "title": "Acțiuni sensibile",
+      "intro": "Aici sunt acțiunile care nu se pot anula. Fiecare îți explică ce se întâmplă și îți cere confirmarea înainte să se schimbe ceva."
+    },
     "privacy": {
       "intro": "Numele și fotografia ta sunt mereu vizibile. Alege cine vede fiecare dintre acestea.",
       "hint": {
@@ -142,7 +146,8 @@
         "COACHES_ONLY": "Doar antrenorii cu care te antrenezi",
         "ONLY_ME": "Nimeni în afară de tine"
       },
-      "saveFailed": "Nu am putut salva. Încearcă din nou."
+      "saveFailed": "Nu am putut salva. Încearcă din nou.",
+      "yourData": "Datele tale"
     },
     "delete": {
       "title": "Șterge contul",
@@ -265,7 +270,9 @@
       "toast": {
         "failed": "Locația nu a putut fi actualizată.",
         "updated": "Locație actualizată"
-      }
+      },
+      "noResults": "Niciun loc găsit cu acest nume.",
+      "unavailable": "Căutarea locurilor nu răspunde acum. Încearcă din nou peste puțin timp."
     },
     "name": {
       "hint": "Așa apare numele tău pe profil și în mesaje.",
@@ -296,7 +303,8 @@
         "failed": "Poza nu a putut fi încărcată.",
         "updated": "Poză actualizată"
       },
-      "tooLarge": "Imaginile trebuie să aibă sub {size} MB."
+      "tooLarge": "Imaginile trebuie să aibă sub {size} MB.",
+      "view": "Vezi poza"
     }
   },
   "chipInput": {
@@ -452,7 +460,7 @@
       "profileAria": "{name}, vezi profilul",
       "sections": {
         "plans": "Planuri",
-        "thisWeek": "Săptămâna aceasta"
+        "lastSevenDays": "Ultimele 7 zile"
       },
       "sessions": {
         "label": "Ce sesiuni",
@@ -766,9 +774,7 @@
       "yourCoach": "Antrenorul tău"
     },
     "coaches": {
-      "all": "{count, plural, one {Vezi tot} few {Toți cei #} other {Toți cei #}}",
-      "near": "Antrenori din apropiere",
-      "title": "Antrenori"
+      "more": "Vezi mai mulți"
     },
     "featured": {
       "message": "Mesaj",
@@ -848,8 +854,6 @@
       "title": "Căutare"
     },
     "spotlight": {
-      "pause": "Pune pe pauză prim-planul",
-      "play": "Pornește prim-planul",
       "position": "{position} din {total}",
       "show": "Treci la {name}",
       "slide": "antrenor",
@@ -1459,7 +1463,6 @@
         "viewProfile": "Vezi profilul lui {name}"
       },
       "addComment": "Adaugă un comentariu",
-      "comment": "Comentează",
       "commentCount": "{count, plural, one {# comentariu} few {# comentarii} other {# de comentarii}}",
       "comments": "Comentarii",
       "commentsLoadError": "Comentariile nu au putut fi încărcate",
@@ -1477,7 +1480,6 @@
         "message": "Scrie primul comentariu.",
         "title": "Niciun comentariu încă"
       },
-      "like": "Îmi place",
       "loadError": {
         "message": "Poate a fost ștearsă sau ești offline.",
         "title": "Postarea nu a putut fi încărcată"
@@ -2046,11 +2048,11 @@
     },
     "webOnlyPlace": {
       "coaches": "Antrenori",
-      "memberships": "Abonamente",
-      "myPlans": "Planurile mele"
+      "memberships": "Abonamente"
     }
   },
   "pageTitle": {
+    "sensitiveActions": "Acțiuni sensibile",
     "account": "Cont",
     "assignments": "Programe atribuite",
     "billing": "Facturare",
@@ -3349,7 +3351,9 @@
         "skipFailed": "Nu am putut marca ziua ca omisă",
         "skipped": "Ai sărit peste antrenamentul de azi"
       },
-      "todaysWorkout": "Antrenamentul de azi"
+      "todaysWorkout": "Antrenamentul de azi",
+      "dayClosed": "Ai făcut deja ziua aceasta.",
+      "planClosed": "{status, select, PAUSED {Planul e pus pe pauză.} COMPLETED {Planul e încheiat.} CANCELLED {Planul a fost anulat.} other {Planul nu e activ.}}"
     },
     "progress": {
       "clientPrivacyNote": "Antrenamentele pe care clientul le face în afara planurilor tale rămân private dacă nu le partajează, așa că cifrele pot să nu includă tot ce a făcut.",
@@ -3411,7 +3415,7 @@
         "title": "Faci o copie?"
       },
       "delete": {
-        "message": "Ștergi {name}? Antrenamentele deja înregistrate pe baza ei se păstrează.",
+        "message": "Ștergi {name}? Antrenamentele deja înregistrate pe baza ei se păstrează, iar zilele programate care urmează se anulează.",
         "title": "Șterge rutina"
       },
       "discard": {
@@ -3684,7 +3688,8 @@
       "sets": "Serii",
       "time": "Timp",
       "volume": "Volum",
-      "workouts": "Antrenamente"
+      "workouts": "Antrenamente",
+      "durationUnknown": "Necunoscută"
     },
     "todayHero": {
       "done": "Gata pe azi. Bravo!",
@@ -4095,6 +4100,21 @@
       "removed": "Loc eliminat",
       "saveFailed": "Locul nu a putut fi salvat.",
       "removeFailed": "Locul nu a putut fi eliminat."
+    }
+  },
+  "photoViewer": {
+    "counter": "{index} din {total}",
+    "previous": "Fotografia anterioară",
+    "next": "Fotografia următoare",
+    "open": {
+      "profile": "Vezi fotografia de profil",
+      "group": "Vezi fotografia grupului",
+      "workout": "Vezi fotografia antrenamentului"
+    },
+    "alt": {
+      "profile": "Fotografie de profil",
+      "group": "Fotografia grupului",
+      "workout": "Fotografia antrenamentului"
     }
   }
 }

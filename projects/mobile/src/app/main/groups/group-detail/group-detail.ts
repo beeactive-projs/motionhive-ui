@@ -53,6 +53,7 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { GROUP_AVATAR_TONE, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { PostCard } from '../_components/post-card/post-card';
 import { InvitePeopleSheet } from '../_sheets/invite-people-sheet/invite-people-sheet';
 import { JoinLinkSheet } from '../_sheets/join-link-sheet/join-link-sheet';
@@ -126,6 +127,7 @@ import { GroupDetailStore } from './group-detail.store';
     SearchbarLabelDirective,
     StaleBar,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './group-detail.html',
   styleUrl: './group-detail.scss',

@@ -59,8 +59,16 @@
   } @else if (log(); as log) {
     <section class="hero" [class.celebrate]="!isReview()" [class.with-photo]="!!photoUrl()">
       @if (photoUrl(); as src) {
-        <!-- The photo is the cover; the numbers sit on it like a poster. -->
-        <img class="cover" [src]="src" [alt]="'workouts.photo.alt' | translate" />
+        <!-- The photo is the cover; the numbers sit on it like a poster, and
+             a tap anywhere on it shows the whole photo. -->
+        <img
+          class="cover"
+          [src]="src"
+          [alt]="'workouts.photo.alt' | translate"
+          [mhViewPhoto]="src"
+          [mhViewPhotoAlt]="'photoViewer.alt.workout' | translate"
+          [mhViewPhotoLabel]="'photoViewer.open.workout' | translate"
+        />
         <ion-button
           class="change-photo"
           size="small"

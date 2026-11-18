@@ -42,6 +42,19 @@
       <ion-note class="mh-note-block" color="medium">
         {{ 'workoutVisibility.sectionNote' | translate }}
       </ion-note>
+
+      <!-- Last on the page: the actions that cannot be undone, one level
+           down (owner, 2026-11-18). The row only opens a page, so it is not
+           red; the delete inside it is. -->
+      <div class="mh-section-label">{{ 'account.privacy.yourData' | translate }}</div>
+      <ion-list [inset]="true" class="mh-card-list">
+        <mh-settings-row
+          [label]="'account.sensitive.title' | translate"
+          icon="warning-outline"
+          iconColor="medium"
+          (select)="openSensitive()"
+        />
+      </ion-list>
     } @else if (store.loadFailed() && !store.loading()) {
       <mh-empty-state
         icon="alert-circle-outline"

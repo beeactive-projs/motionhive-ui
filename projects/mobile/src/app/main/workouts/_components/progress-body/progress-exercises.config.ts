@@ -115,5 +115,9 @@ export function trendLabel(trend: ProgressTrend | null, sessionCount: number): s
  */
 export function latestSetRecord(exercise: TrainedExercise, records: readonly ProgressRecord[]): boolean {
   const record = records.find((r) => r.exerciseId === exercise.exerciseId);
-  return !!record && localDayKey(new Date(record.recordedAt)) === localDayKey(new Date(exercise.lastPerformedAt));
+  // A first time on the lift is a best, not a record (the finish screen's rule).
+  if (!record || record.first) {
+    return false;
+  }
+  return localDayKey(new Date(record.recordedAt)) === localDayKey(new Date(exercise.lastPerformedAt));
 }

@@ -36,6 +36,7 @@ import { SettingsRow } from '../../../_shared/components/settings-row/settings-r
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { ProfileStacks, personBase, stackRootOf } from '../../../_shared/utils/stack-paths';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { MESSAGING_ICONS } from '../messages.config';
 
 /**
@@ -64,6 +65,7 @@ import { MESSAGING_ICONS } from '../messages.config';
     IonToolbar,
     SettingsRow,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './chat-details.html',
   styleUrl: './chat-details.scss',

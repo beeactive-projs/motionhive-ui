@@ -1,0 +1,13 @@
+/* A shown photo that opens full screen (`mhViewPhoto`): it is the button
+   itself, so it keeps its own look and only takes the pointer, a focus ring
+   and no grey flash on a tap. The class is set only while there is a photo
+   to open. */
+.mh-photo-tap {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mh-photo-tap:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
+}

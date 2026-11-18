@@ -260,4 +260,7 @@ export interface CreatePrescribedSetPayload {
   notes?: string;
 }
 
-export type UpdatePrescribedSetPayload = Partial<CreatePrescribedSetPayload>;
+/** A set edit: a field left out keeps its value, a `null` clears it. */
+export type UpdatePrescribedSetPayload = {
+  [K in keyof CreatePrescribedSetPayload]?: CreatePrescribedSetPayload[K] | null;
+};

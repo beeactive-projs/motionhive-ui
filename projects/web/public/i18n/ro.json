@@ -2321,7 +2321,7 @@
       "summary": {
         "block": "{days}, timp de {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}.",
         "pickDay": "Alege cel puțin o zi.",
-        "weekly": "{days}, în fiecare săptămână."
+        "weekly": "{days}, în fiecare săptămână, timp de {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}."
       },
       "title": "Adaugă în săptămâna ta",
       "toast": {

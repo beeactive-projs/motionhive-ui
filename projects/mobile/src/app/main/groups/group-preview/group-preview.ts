@@ -29,6 +29,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { JoinActions, joinPolicyLabel, joinPolicyTone, previewBackLabel } from '../groups.config';
 import { GROUP_ICONS } from '../groups.icons';
 import { GroupPreviewStore } from './group-preview.store';
@@ -62,6 +63,7 @@ import { GroupPreviewStore } from './group-preview.store';
     IonTitle,
     IonToolbar,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './group-preview.html',
   styleUrl: './group-preview.scss',

@@ -932,11 +932,13 @@ export function recordSessionIds(progress: ExerciseProgress): Set<string> {
     OneRepMaxSource.EstimatedEpley,
     OneRepMaxSource.EstimatedBrzycki,
   ]);
-  const days = new Set(
-    progress.oneRepMaxSeries
-      .filter((point) => estimated.has(point.source))
-      .map((point) => localDayKey(new Date(point.recordedAt))),
-  );
+  // The earliest estimate is the first time on the lift: a best, not a
+  // record beaten, as the finish screen and History count it.
+  const points = progress.oneRepMaxSeries
+    .filter((point) => estimated.has(point.source))
+    .sort((a, b) => a.recordedAt.localeCompare(b.recordedAt))
+    .slice(1);
+  const days = new Set(points.map((point) => localDayKey(new Date(point.recordedAt))));
   return new Set(
     progress.sessions
       .filter((session) => days.has(localDayKey(new Date(session.performedAt))))
@@ -1332,13 +1334,19 @@ export interface WorkoutTile {
  * the two are always talking about the same numbers.
  */
 export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
-  const sets = (log.exercises ?? [])
-    .flatMap((exercise) => exercise.sets ?? [])
-    .filter((set) => set.isCompleted);
+  // A skipped exercise counts for nothing, as on the API's volume card.
+  const exercises = (log.exercises ?? []).filter((exercise) => !exercise.isSkipped);
+  const sets = exercises.flatMap(doneSetsOf);
 
-  const volume = sets.reduce((sum, set) => sum + loadedVolume(set), 0);
-  const bodyweightReps = sets
-    .filter((set) => set.weightKg == null && set.reps != null)
+  const volume = workoutVolume(log);
+  // Reps for what is not weighed: a bodyweight movement (added weight or
+  // not) and any set with no weight.
+  const bodyweightReps = exercises
+    .flatMap((exercise) =>
+      doneSetsOf(exercise).filter(
+        (set) => set.reps != null && (!countsInKgTotal(exercise) || set.weightKg == null),
+      ),
+    )
     .reduce((sum, set) => sum + (set.reps ?? 0), 0);
   const holdSeconds = sets.reduce((sum, set) => sum + (set.durationSeconds ?? 0), 0);
   const distance = sets.reduce((sum, set) => sum + (set.distanceMeters ?? 0), 0);
@@ -1368,6 +1376,21 @@ export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
     });
   }
   return tiles;
+}
+
+/** The ticked sets of an exercise. */
+function doneSetsOf(exercise: LoggedExercise): LoggedSet[] {
+  return (exercise.sets ?? []).filter((set) => set.isCompleted);
+}
+
+/**
+ * Whether an exercise's kg joins a workout's total, the API's rule
+ * (`countsInKgTotal`): not skipped, and not a bodyweight movement, which is
+ * measured in reps (its added weight is not what it moves). Otherwise the
+ * hero said 2,400 kg while the rows said "Bench 1,800 kg · Dips 30 reps".
+ */
+export function countsInKgTotal(exercise: LoggedExercise): boolean {
+  return !exercise.isSkipped && exercise.exercise?.kind !== ExerciseKind.Bodyweight;
 }
 
 /**
@@ -1533,11 +1556,15 @@ export function cheerKey(logId: string): string {
   return `workouts.finish.cheer.${(hash % CHEER_LINES) + 1}`;
 }
 
-/** Kilograms moved over the completed, loaded sets. */
+/**
+ * Kilograms moved over the completed, loaded sets of the exercises a kg
+ * total counts (`countsInKgTotal`), warm-ups out: the finish screen's,
+ * History's and the share image's one number.
+ */
 export function workoutVolume(log: WorkoutLog): number {
   return (log.exercises ?? [])
-    .flatMap((exercise) => exercise.sets ?? [])
-    .filter((set) => set.isCompleted)
+    .filter(countsInKgTotal)
+    .flatMap(doneSetsOf)
     .reduce((sum, set) => sum + loadedVolume(set), 0);
 }
 

@@ -72,8 +72,9 @@
       </div>
     </section>
 
-    <!-- The spotlight, then the coaches near you. Hidden on error: an
-         empty section is a claim about the catalogue. -->
+    <!-- The spotlight, with the way to every coach beside its title (owner,
+         2026-11-18: the list under it is gone). Hidden on error: an empty
+         section is a claim about the catalogue. -->
     @if (coachesLoading()) {
       <section class="mh-section" aria-busy="true">
         <div class="mh-section-head">
@@ -83,59 +84,23 @@
           <ion-skeleton-text class="card-skeleton" [animated]="true" />
         </div>
       </section>
-      <section class="mh-section" aria-busy="true">
+    } @else if (spotlight().length > 0) {
+      <section class="mh-section" [attr.aria-label]="'discover.spotlight.title' | translate">
         <div class="mh-section-head">
-          <ion-skeleton-text [animated]="true" style="width: 8rem; height: 0.75rem" />
+          <h2 class="mh-kicker">{{ 'discover.spotlight.title' | translate }}</h2>
+          <ion-button fill="clear" (click)="openAllCoaches()">
+            {{ 'discover.coaches.more' | translate }}
+          </ion-button>
         </div>
-        <ion-list class="mh-flat-list">
-          <mh-row-skeleton [index]="0" />
-          <mh-row-skeleton [index]="1" />
-        </ion-list>
+        <div class="gutter">
+          <mh-coach-spotlight
+            [coaches]="spotlight()"
+            [active]="onScreen()"
+            (viewProfile)="openCoach($event)"
+            (message)="messageCoach($event)"
+          />
+        </div>
       </section>
-    } @else {
-      @if (spotlight().length > 0) {
-        <section class="mh-section" [attr.aria-label]="'discover.spotlight.title' | translate">
-          <div class="mh-section-head">
-            <h2 class="mh-kicker">{{ 'discover.spotlight.title' | translate }}</h2>
-            <!-- With nobody else to list under it, the way to every coach
-                 rides on this head instead. -->
-            @if (nearCoaches().length === 0) {
-              <ion-button fill="clear" (click)="openAllCoaches()">
-                {{ 'discover.coaches.all' | translate: { count: allCoachesCount() } }}
-              </ion-button>
-            }
-          </div>
-          <div class="gutter">
-            <mh-coach-spotlight
-              [coaches]="spotlight()"
-              [active]="onScreen()"
-              (viewProfile)="openCoach($event)"
-              (message)="messageCoach($event)"
-            />
-          </div>
-        </section>
-      }
-
-      @if (nearCoaches().length > 0) {
-        <section class="mh-section">
-          <div class="mh-section-head">
-            <h2 class="mh-kicker">{{ nearTitle() | translate }}</h2>
-            <ion-button fill="clear" (click)="openAllCoaches()">
-              {{ 'discover.coaches.all' | translate: { count: allCoachesCount() } }}
-            </ion-button>
-          </div>
-          <ion-list class="mh-flat-list">
-            @for (coach of nearCoaches(); track coach.id) {
-              <mh-coach-row
-                [coach]="coach"
-                [line]="nearLine(coach)"
-                [shape]="hexShape"
-                (select)="openCoach(coach)"
-              />
-            }
-          </ion-list>
-        </section>
-      }
     }
 
     <!-- Public groups the reader is not in yet, two cards to a row. -->
