@@ -34,8 +34,9 @@
  *   shade / tint    = ramp steps 600 / 400 of the base 500
  *   wash (light)    = step 100 fill + step 700 ink   (honey: 800 — 700 is
  *                     the honey-deep accent and too light for tile ink)
- *   wash (dark)     = step 900 fill + step 200 ink   (honey: 950 + 300 —
- *                     amber's 900 reads as milk chocolate next to navy)
+ *   wash (dark)     = step 900 fill + step 200 ink   (honey: the honey at
+ *                     16% over the card grey + 300 ink; every dark amber
+ *                     step is a brown on the grey page)
  * Contrast colours are chosen for WCAG AA on the base colour. `-rgb`
  * triplets are raw values by necessity — keep them in sync with their hex.
  *
@@ -412,20 +413,20 @@
   --mh-color-prefill: var(--mh-slate-500);
 
   /*
-   * A control floating over a list, the logger's "Back to…" pill: the
-   * raised surface iOS and WhatsApp draw their jump buttons on, with a
-   * hairline and `--mh-shadow-overlay` to lift it. White in light (navy ink
-   * 17:1, deep honey glyph 5:1); dark lifts it a step above the cards.
-   */
-  --mh-color-floating: #ffffff;
-
-  /*
    * A honey tint that is not a selection: Home's role switch, Discover's
    * city. Honey at 12% over the white page in light. Over
    * navy any see-through honey mixes to a grey, so dark uses the honey wash
    * fill instead (the dark block).
    */
   --mh-color-honey-tint: rgba(245, 158, 11, 0.12);
+
+  /*
+   * Muted ink on a wash surface: the line under a tinted hero's name, the
+   * summary on a post's workout card, a session block's time. The muted
+   * slate in light (6.2:1 or more on every 100 wash); dark steps it up, as a
+   * sheet's cards do, because slate 400 is under AA on the dark washes.
+   */
+  --mh-color-wash-muted: var(--mh-slate-600);
 
   /*
    * A day a coach's plan was trained on, in the workout history calendar.
@@ -825,13 +826,13 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
      the page-grey field, where slate 500 would be 3.5:1. */
   --mh-color-prefill: #8e8e93;
 
-  /* The floating control a step above the cards (#2c2c2e), as a sheet's
-     cards sit: light ink 10:1, the honey 300 glyph 7.9:1. */
-  --mh-color-floating: #3a3a3c;
-
   /* The honey tint takes the honey wash's fill, opaque, so it stays warm
-     on the grey. Honey ink on it is 7:1. */
+     on the grey. Honey ink on it is 4.8:1. */
   --mh-color-honey-tint: var(--ion-color-primary-wash);
+
+  /* Muted ink on a wash steps up to slate 300: 7:1 on the honey wash, 6.4:1
+     on the teal and sky washes, where slate 400 was 4:1 and 3.7:1. */
+  --mh-color-wash-muted: var(--mh-slate-300);
 
   /* The hive card is a navy box on the grey page, honey on it, as in the
      light block. The empty cells are the design's #1D2E4C, which sits
@@ -869,11 +870,25 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --mh-color-chip-idle: var(--mh-navy-500);
   --mh-color-chip-idle-contrast: var(--mh-navy-100);
 
-  /* Wash inverts: deep fill (step 900; honey 950), light ink (step 200;
-     honey 300). */
-  --ion-color-primary-wash: var(--mh-warning-950);
+  /* Wash inverts: deep fill (step 900), light ink (step 200).
+
+     Honey is the exception (2026-11-18). Every dark step of the amber ramp
+     is a brown: 950 (#451a03) was picked against the navy page, and on the
+     grey one it read as a muddy band under every note and caution box. So
+     its fill is the honey at 16% over the card grey, a warm grey a step
+     above the card (about #4c3e28), the way the done and selected rows tint
+     the grey. It is mixed once, here, against the page's card (#2c2c2e), so
+     it stays the same opaque colour in a sheet and on the navy hive card,
+     where see-through honey would turn grey. Honey 300 ink on it is 7.2:1,
+     the body ink 9.4:1. The page's muted slate is 4:1 on it, so muted text
+     on any wash reads `--mh-color-wash-muted`, never `--ion-color-medium`. */
+  --ion-color-primary-wash: color-mix(
+    in srgb,
+    var(--ion-color-primary) 16%,
+    var(--ion-card-background)
+  );
   --ion-color-primary-wash-contrast: var(--mh-warning-300);
-  --ion-color-warning-wash: var(--mh-warning-950);
+  --ion-color-warning-wash: var(--ion-color-primary-wash);
   --ion-color-warning-wash-contrast: var(--mh-warning-300);
   --ion-color-success-wash: var(--mh-success-900);
   --ion-color-success-wash-contrast: var(--mh-success-200);

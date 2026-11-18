@@ -74,6 +74,7 @@ import {
   trashOutline,
   trendingUpOutline,
   trophyOutline,
+  unlinkOutline,
 } from 'ionicons/icons';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
@@ -132,6 +133,7 @@ export const WORKOUT_ICONS = {
   trashOutline,
   trendingUpOutline,
   trophyOutline,
+  unlinkOutline,
 };
 
 /**
@@ -566,6 +568,18 @@ export function compactPrescription(sets: readonly SetTarget[]): string {
 
 function present(values: readonly (number | null | undefined)[]): number[] {
   return values.filter((v): v is number => v != null);
+}
+
+/**
+ * "6 exercises · 19 sets": what a workout holds, under its name in the
+ * builder's header and in a routine's or a plan day's read view alike.
+ * Nothing while it is empty, and no sets while none are counted.
+ */
+export function contentsLine(exercises: number, sets: number): string {
+  if (exercises <= 0) return '';
+  const parts = [translate('count.exercises', { count: exercises })];
+  if (sets > 0) parts.push(translate('count.sets', { count: sets }));
+  return parts.join(' · ');
 }
 
 /**
@@ -1622,6 +1636,7 @@ export const ExerciseActionIds = {
   History: 'history',
   Note: 'note',
   Swap: 'swap',
+  Unlink: 'unlink',
   Skip: 'skip',
   Remove: 'remove',
 } as const;
@@ -1642,9 +1657,14 @@ export type ExerciseAction = SheetAction<ExerciseActionId>;
  * aside until one tap brings it back (violet, green to unskip), as Archive /
  * Unarchive do.
  *
- * Collapse leads, and only on an exercise opened again with every set
- * ticked (`canCollapse`): folding it back to its check row is why you came
- * to the ⋯ (user decision, 2026-11-10). Green, the done row it folds into.
+ * Collapse leads (user decision, 2026-11-10), green as the done row a
+ * finished exercise folds into. Every exercise folds, finished or still
+ * being worked (user decision, 2026-11-18), so the logger offers it on every
+ * card but a skipped exercise's, which has no sets to fold (`canCollapse`).
+ *
+ * Unlink from superset, on an exercise in one (`canUnlink`), after Swap: it
+ * changes the workout's shape too, and one tap on the link chip undoes it.
+ * Sky, the tile of a link.
  */
 export function exerciseActions(
   skipped: boolean,
@@ -1652,6 +1672,7 @@ export function exerciseActions(
   /** Offer the person's own note: write one, or change the one there is. */
   note: 'add' | 'edit' | null = null,
   canCollapse = false,
+  canUnlink = false,
 ): ExerciseAction[] {
   const collapse: ExerciseAction[] = canCollapse
     ? [
@@ -1684,6 +1705,17 @@ export function exerciseActions(
         },
       ]
     : [];
+  const unlink: ExerciseAction[] = canUnlink
+    ? [
+        {
+          id: ExerciseActionIds.Unlink,
+          label: 'workouts.exerciseActions.unlink',
+          icon: 'unlink-outline',
+          color: 'info',
+          tone: 'shade',
+        },
+      ]
+    : [];
   return [
     ...collapse,
     ...history,
@@ -1694,6 +1726,7 @@ export function exerciseActions(
       icon: 'repeat-outline',
       color: 'primary',
     },
+    ...unlink,
     {
       id: ExerciseActionIds.Skip,
       label: skipped ? 'workouts.exerciseActions.unskip' : 'workouts.exerciseActions.skip',
@@ -1709,25 +1742,6 @@ export function exerciseActions(
     },
   ];
 }
-
-/** What a round of a superset offers when its label is tapped. */
-export const RoundActionIds = {
-  Delete: 'delete',
-} as const;
-
-export type RoundActionId = (typeof RoundActionIds)[keyof typeof RoundActionIds];
-
-/** Deleting a round loses every set in it, of every exercise: destructive. */
-export const ROUND_ACTIONS: readonly SheetAction<RoundActionId>[] = [
-  {
-    id: RoundActionIds.Delete,
-    label: 'workouts.superset.deleteRound',
-    hint: 'workouts.superset.deleteRoundHint',
-    icon: 'trash-outline',
-    color: 'danger',
-    destructive: true,
-  },
-];
 
 // ─── Routine verbs ────────────────────────────────────────────────────────
 

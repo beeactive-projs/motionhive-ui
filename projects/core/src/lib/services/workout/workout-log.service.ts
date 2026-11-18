@@ -11,6 +11,7 @@ import type {
   LogSetPayload,
   LoggedSet,
   StartWorkoutPayload,
+  SupersetChange,
   WorkoutLog,
   WorkoutMemory,
 } from '../../models/workout/log.model';
@@ -77,9 +78,14 @@ export class WorkoutLogService {
     return this._http.post<WorkoutLog>(this._base, payload);
   }
 
-  get(id: string): Observable<WorkoutLog> {
+  /**
+   * `silent` for a read that only repairs the screen after a write already
+   * reported its own failure: a second dialog would report it twice.
+   */
+  get(id: string, opts?: { silent?: boolean }): Observable<WorkoutLog> {
     return this._http.get<WorkoutLog>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.BY_ID(id)}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 
@@ -357,6 +363,18 @@ export class WorkoutLogService {
         loggedExerciseId,
       )}`,
       { skipped },
+    );
+  }
+
+  /**
+   * Superset links changed mid-workout: every exercise whose group changed,
+   * saved in one transaction, all or none. The groups are worked out with
+   * the routine builder's rules (`linkWithNext`, `unlinkFromNext`).
+   */
+  setSupersets(workoutLogId: string, exercises: SupersetChange[]): Observable<void> {
+    return this._http.patch<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SUPERSETS(workoutLogId)}`,
+      { exercises },
     );
   }
 

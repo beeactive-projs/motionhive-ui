@@ -19,21 +19,31 @@ const squat = {
   personalNote: null,
 } as unknown as LoggedExercise;
 
-function sheet(canCollapse: boolean): ExerciseActionsSheet {
+function sheet(canCollapse: boolean, canUnlink = false): ExerciseActionsSheet {
   const fixture = TestBed.createComponent(ExerciseActionsSheet);
   fixture.componentRef.setInput('exercise', squat);
   fixture.componentRef.setInput('canCollapse', canCollapse);
+  fixture.componentRef.setInput('canUnlink', canUnlink);
   fixture.detectChanges();
   return fixture.componentInstance;
 }
 
 describe('ExerciseActionsSheet', () => {
-  // The logger knows whether the exercise is done and open again; the sheet
-  // leads with Collapse only then.
+  // The logger knows whether the exercise's card can fold; the sheet leads
+  // with Collapse only then.
   it('leads with Collapse while the logger says the exercise can fold', () => {
     expect(sheet(true).actions()[0].id).toBe(ExerciseActionIds.Collapse);
     expect(sheet(false).actions().map((action) => action.id)).not.toContain(
       ExerciseActionIds.Collapse,
+    );
+  });
+
+  // An exercise in a superset can be taken out of it, after Swap.
+  it('offers Unlink from superset only on an exercise in one', () => {
+    const ids = sheet(true, true).actions().map((action) => action.id);
+    expect(ids.indexOf(ExerciseActionIds.Unlink)).toBe(ids.indexOf(ExerciseActionIds.Swap) + 1);
+    expect(sheet(true).actions().map((action) => action.id)).not.toContain(
+      ExerciseActionIds.Unlink,
     );
   });
 });

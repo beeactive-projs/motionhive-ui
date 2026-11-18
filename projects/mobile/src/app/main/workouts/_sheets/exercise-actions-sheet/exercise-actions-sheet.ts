@@ -18,8 +18,10 @@ import { ExerciseActionId, exerciseActions } from '../../workouts.config';
 export class ExerciseActionsSheet {
   readonly open = model(false);
   readonly exercise = input<LoggedExercise | null>(null);
-  /** The exercise is done and open again, so it can fold back to its check row. */
+  /** The exercise's card can fold to one line: any but a skipped exercise's. */
   readonly canCollapse = input(false);
+  /** The exercise is in a superset, so it can be taken out of it. */
+  readonly canUnlink = input(false);
 
   readonly action = output<ExerciseActionId>();
 
@@ -29,6 +31,12 @@ export class ExerciseActionsSheet {
     const exercise = this.exercise();
     const inCatalog = !!exercise?.exerciseId;
     const note = !inCatalog ? null : exercise?.personalNote?.trim() ? 'edit' : 'add';
-    return exerciseActions(exercise?.isSkipped ?? false, inCatalog, note, this.canCollapse());
+    return exerciseActions(
+      exercise?.isSkipped ?? false,
+      inCatalog,
+      note,
+      this.canCollapse(),
+      this.canUnlink(),
+    );
   });
 }

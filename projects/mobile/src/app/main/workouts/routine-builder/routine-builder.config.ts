@@ -53,6 +53,14 @@ export function personDefaultLabel(seconds: number): string {
   return translate('workouts.routineBuilder.rest.yourDefault', { value: secondsToClock(seconds) });
 }
 
+/**
+ * "Rest between sets" as its row reads it: the routine's own rest, else the
+ * person's default, said as such.
+ */
+export function routineRestLabel(own: number | null, personDefault: number): string {
+  return own !== null ? secondsToClock(own) : personDefaultLabel(personDefault);
+}
+
 // ─── The draft ────────────────────────────────────────────────────────────
 
 /**

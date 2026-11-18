@@ -42,12 +42,16 @@
       [class.active]="cell.active"
       [class.prefill]="cell.prefill"
       [class.long]="cell.long"
+      [class.captioned]="!!cell.caption"
       [attr.aria-label]="'workouts.setRow.cellLabel' | translate: { field: cell.field, number: badge().text }"
       (click)="edit.emit(cell.field)"
     >
-      {{ cell.text || '–' }}
-      @if (cell.unit) {
-        <span class="unit">{{ cell.unit | translate }}</span>
+      <!-- No heading over this row: the field says what it holds, over the value. -->
+      @if (cell.caption) {
+        <span class="caption" aria-hidden="true">{{ cell.caption | translate }}</span>
+        <span class="value">{{ cell.text || '–' }}</span>
+      } @else {
+        {{ cell.text || '–' }}
       }
     </button>
   }

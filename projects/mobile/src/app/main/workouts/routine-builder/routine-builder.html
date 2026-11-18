@@ -2,7 +2,10 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (reordering()) {
-        <!-- Done, at the end, is the only way out of the reorder. -->
+        <!-- Back leaves the order as it was; Done, at the end, keeps the new one. -->
+        <ion-button [attr.aria-label]="'a11y.back' | translate" (click)="cancelReorder()">
+          <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+        </ion-button>
       } @else if (editingSaved()) {
         <!-- Editing a saved routine: back out to how it was, not off the page.
              The X a sheet closes with, not the word: "Anulează" at large text
@@ -23,7 +26,11 @@
          then the ⋯ and Save as the honey button where the workout has Finish. -->
     <!-- The page's h1, but on the read view: the overview's heading is its h1. -->
     <ion-title>
-      @if (showBuilder() && !reordering()) {
+      @if (reordering()) {
+        <!-- The same header, naming what the page does over what it moves. -->
+        <h1 class="name">{{ title() }}</h1>
+        <span class="meta">{{ headerMeta() }}</span>
+      } @else if (showBuilder()) {
         <h1 class="name">{{ headerName() }}</h1>
         @if (headerMeta()) {
           <span class="meta">{{ headerMeta() }}</span>
@@ -35,8 +42,11 @@
       }
     </ion-title>
     @if (reordering()) {
+      <!-- The one honey ask, where Save is while building. -->
       <ion-buttons slot="end">
-        <ion-button (click)="doneReorder()">{{ 'button.done' | translate }}</ion-button>
+        <ion-button class="header-action" color="primary" fill="solid" (click)="doneReorder()">
+          {{ 'button.done' | translate }}
+        </ion-button>
       </ion-buttons>
     } @else if (showBuilder()) {
       <ion-buttons slot="end">
@@ -94,12 +104,22 @@
       <ion-skeleton-text [animated]="true" class="card-skeleton" />
     </div>
   } @else if (showSkeleton()) {
+    <!-- The read view's shape: the hero's three lines, the rest row, the list. -->
     <div class="mh-page">
       <div class="hero-skeleton">
         <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.75rem" />
-        <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.5rem" />
-        <ion-skeleton-text [animated]="true" style="width: 35%; height: 1.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 45%; height: 1rem" />
       </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <mh-hex-avatar slot="start" size="sm" color="medium" tone="wash" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
           <ion-item>
@@ -119,42 +139,70 @@
       <mh-workout-overview
         [eyebrow]="eyebrow()"
         [title]="routine()!.name"
-        [chips]="chips()"
+        [meta]="overviewMeta()"
         [hint]="readOnly() ? starterHint() : null"
         [note]="routine()!.notes"
         [noteLabel]="noteLabel()"
+        [rest]="overviewRest()"
         [exercises]="overviewExercises()"
         (exerciseSelect)="openExerciseById($event)"
       />
+
+      <!-- One button, the screen's main action, last on the page where the
+           builder's Save and start is, and as wide; every other verb about
+           this routine is behind the ⋯ (docs/MOBILE-ACTIONS.md). Coaching,
+           a routine is something to shape: a starter becomes yours by
+           copying it, your own opens to Edit. Training, Start leads. -->
+      @if (isCoachMode()) {
+        @if (readOnly()) {
+          <ion-button class="main-action" expand="block" [disabled]="copying()" (click)="askCopy()">
+            {{ 'workouts.routineBuilder.makeCopy' | translate }}
+          </ion-button>
+        } @else {
+          <ion-button class="main-action" expand="block" (click)="edit()">
+            {{ 'button.edit' | translate }}
+          </ion-button>
+        }
+      } @else {
+        <ion-button class="main-action" expand="block" [disabled]="starting()" (click)="start()">
+          {{ 'workouts.common.startWorkout' | translate }}
+        </ion-button>
+      }
     </div>
   } @else if (reordering()) {
-    <!-- The cards folded to their names, to drag into a new order. -->
+    <!-- The cards folded to their names, as the workout folds a finished
+         exercise, to drag into a new order: the tile, the name and the
+         handle where the open card's tile, name and ⋮ are. -->
     <div class="mh-page">
       <section class="mh-section">
-        <ion-list [inset]="true" class="mh-card-list">
-          <ion-reorder-group [disabled]="false" (ionReorderEnd)="onReorder($event)">
-            @for (row of exercises(); track row.key) {
-              <ion-item>
-                <mh-hex-avatar
-                  slot="start"
-                  size="md"
-                  tone="wash"
-                  aria-hidden="true"
-                  [color]="tileOf(row).tone"
-                  [icon]="tileOf(row).icon"
-                  [imageUrl]="tileOf(row).imageUrl"
-                />
-                <ion-label>
-                  <h2>{{ row.name }}</h2>
-                  <p>{{ setsLabel(row) }}</p>
-                </ion-label>
-                <ion-reorder slot="end">
-                  <ion-icon name="reorder-three-outline" aria-hidden="true" />
-                </ion-reorder>
-              </ion-item>
-            }
-          </ion-reorder-group>
-        </ion-list>
+        <ion-reorder-group [disabled]="false" (ionReorderEnd)="onReorder($event)">
+          @for (row of reorderRows(); track row.key) {
+            <!-- The gap under a card is inside its slot: Ionic places a
+                 dragged card by adding up the slots' heights. -->
+            <div class="reorder-slot">
+              <ion-card class="folded">
+                <ion-item lines="none">
+                  <mh-hex-avatar
+                    slot="start"
+                    size="md"
+                    tone="wash"
+                    aria-hidden="true"
+                    [color]="tileOf(row).tone"
+                    [icon]="tileOf(row).icon"
+                    [imageUrl]="tileOf(row).imageUrl"
+                  />
+                  <ion-label>
+                    <h2>{{ row.name }}</h2>
+                    <p>{{ setsLabel(row) }}</p>
+                  </ion-label>
+                  <ion-reorder slot="end">
+                    <ion-icon name="reorder-three-outline" aria-hidden="true" />
+                  </ion-reorder>
+                </ion-item>
+              </ion-card>
+            </div>
+          }
+        </ion-reorder-group>
         <p class="mh-footnote">{{ 'workouts.routineBuilder.reorder.hint' | translate }}</p>
       </section>
     </div>
@@ -439,7 +487,7 @@
            workout. The header's Save keeps it without starting. -->
       @if (showStart()) {
         <ion-button
-          class="start"
+          class="main-action"
           expand="block"
           [disabled]="!canSave() || saving() || starting()"
           (click)="saveAndStart()"
@@ -466,28 +514,6 @@
       (preview)="typed.set($event)"
       (dismiss)="closePad()"
     />
-  </ion-footer>
-} @else if (showOverview()) {
-  <ion-footer [translucent]="true">
-    <ion-toolbar>
-      <div class="mh-cta-bar">
-        <!-- One button, the screen's main action; every other verb about
-             this routine is behind the ⋯ (docs/MOBILE-ACTIONS.md). Coaching,
-             a routine is something to shape: a starter becomes yours by
-             copying it, your own opens to Edit. Training, Start leads. -->
-        @if (isCoachMode()) {
-          @if (readOnly()) {
-            <ion-button expand="block" [disabled]="copying()" (click)="askCopy()">
-              {{ 'workouts.routineBuilder.makeCopy' | translate }}
-            </ion-button>
-          } @else {
-            <ion-button expand="block" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
-          }
-        } @else {
-          <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
-        }
-      </div>
-    </ion-toolbar>
   </ion-footer>
 }
 

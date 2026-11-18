@@ -3,8 +3,10 @@
    chip between two cards, a program day's. */
 @use '../_components/set-row/set-table';
 @use '../_components/plan-chips/plan-chips';
-/* The workout's header: name over meta, the ⋯ and the honey Save button. */
+/* The workout's header: name over meta, the ⋯ and the honey Save button.
+   The reorder folds the cards as the workout folds a finished exercise. */
 @use '../_components/workout-header/workout-header';
+@use '../_components/folded-card/folded-card';
 
 /* Under the targets: the rest chip, the quiet text actions, and Remove at
    the far edge. Inset like the rows above it, so it lines up with them;
@@ -46,8 +48,8 @@
   z-index: 1;
 }
 
-/* The page's h1 in the bar while it is not building (reorder, loading,
-   failed): the bar's own title type, not a page heading's. */
+/* The page's h1 in the bar while it is not building (loading, failed):
+   the bar's own title type, not a page heading's. */
 ion-title h1.title {
   margin: 0;
   overflow: hidden;
@@ -60,14 +62,17 @@ ion-title h1.title {
   margin-inline-start: auto;
 }
 
-/* The page's last word: save and go, after everything it saves. */
-ion-button.start {
+/* The page's last word, after everything it is about: Save and start while
+   building, Start (or Edit, Make a copy) while reading. One place and one
+   width for both, the page gutter's, not a footer bar's wider inset. */
+ion-button.main-action {
   margin: 0.5rem 0 0;
 }
 
-/* The overview's loading stand-in: heading lines on the page, then rows. */
+/* The overview's loading stand-in: heading lines on the page, on the row
+   gutter as the hero is, then rows. */
 .hero-skeleton {
-  padding-inline: 0.25rem;
+  padding-inline: var(--mh-row-gutter);
 }
 
 .hero-skeleton ion-skeleton-text {
@@ -91,18 +96,43 @@ ion-button.start {
   border-radius: var(--mh-radius-card);
 }
 
-/* The reorder's drag handle. Ionic sizes it to its 16px glyph, under the
-   24px a target needs: here it is a full tap target to grab, its glyph at
-   the inline size in the muted ink, as a row's trailing control. */
-ion-reorder {
+/* ─── Reorder ─────────────────────────────────────────────────────
+   One folded card per slot. The gap under a card is the slot's padding,
+   not a flex gap: Ionic places a dragged card by adding up the slots'
+   heights and sees no gaps. The group takes the last gap back, so the
+   footnote sits under the cards as it does under any list. */
+ion-reorder-group {
+  display: block;
+  margin-block-end: calc(-1 * var(--mh-page-rhythm));
+}
+
+.reorder-slot {
+  padding-block-end: var(--mh-page-rhythm);
+}
+
+/* The card lifts while it is dragged, not its slot (the slot holds the gap,
+   and its square shadow would run under it). */
+.reorder-slot.reorder-selected {
+  box-shadow: none;
+}
+
+.reorder-selected ion-card {
+  box-shadow: var(--mh-shadow-overlay);
+}
+
+/* The drag handle, where the open card's ⋮ is. Ionic sizes it to its 16px
+   glyph, under the 24px a target needs: here it is a full tap target to
+   grab, its glyph at the inline size in the muted ink. */
+.folded ion-reorder {
   display: flex;
   align-items: center;
   justify-content: center;
   width: var(--mh-tap-target);
   height: var(--mh-tap-target);
+  margin-inline: 0.5rem calc(var(--mh-card-inset) + var(--mh-card-lead));
 }
 
-ion-reorder ion-icon {
+.folded ion-reorder ion-icon {
   color: var(--ion-color-medium);
   font-size: var(--mh-icon-md);
 }

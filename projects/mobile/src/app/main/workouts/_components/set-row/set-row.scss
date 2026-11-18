@@ -157,10 +157,29 @@ button:focus-visible {
   border: var(--mh-ring-width) solid var(--ion-color-primary);
 }
 
-/* A superset round has no heading over its columns, so weight and distance
-   name their unit after the value, muted and a step down. */
-.unit {
-  margin-inline-start: 0.125rem;
+/* A superset round has no heading over its columns (its rows are different
+   exercises), so each field names itself: the heading's word over the
+   value, as a stacked field label does, inside the same tap-target box. */
+.field.captioned {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding-inline: 0.25rem;
+  line-height: var(--mh-leading-none);
+}
+
+.caption,
+.field.captioned .value {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Always the muted ink at regular weight, whatever the value wears. */
+.caption {
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
   font-weight: 400;

@@ -36,7 +36,12 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { workoutLinks } from '../../home/home-stack.config';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { OverviewExercise, WorkoutOverview } from '../_components/workout-overview/workout-overview';
-import { WORKOUT_ICONS, planPositionLabel, prescriptionLine } from '../workouts.config';
+import {
+  WORKOUT_ICONS,
+  contentsLine,
+  planPositionLabel,
+  prescriptionLine,
+} from '../workouts.config';
 
 /**
  * What today's prescribed workout holds, before committing to it.
@@ -122,21 +127,26 @@ export class Preview implements ViewWillEnter {
     );
   });
 
-  readonly chips = computed(() => {
+  /** "~45 min · 5 exercises · 15 sets": how long, then what the day holds. */
+  readonly meta = computed(() => {
     const workout = this.workout();
-    if (!workout) return [];
-    const chips: string[] = [];
+    if (!workout) return null;
+    const exercises = workout.exercises ?? [];
+    const parts: string[] = [];
     if (workout.estimatedDurationMinutes != null) {
-      chips.push(
+      parts.push(
         this._translateService.instant('workouts.meta.aboutMinutes', {
           minutes: workout.estimatedDurationMinutes,
         }),
       );
     }
-    chips.push(
-      this._translateService.instant('count.exercises', { count: workout.exercises?.length ?? 0 }),
+    parts.push(
+      contentsLine(
+        exercises.length,
+        exercises.reduce((total, exercise) => total + (exercise.sets?.length ?? 0), 0),
+      ),
     );
-    return chips;
+    return parts.filter(Boolean).join(' · ') || null;
   });
 
   /** The coach by first name; a plan you scheduled yourself has no coach to name. */

@@ -55,7 +55,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="onScroll()">
+<ion-content [fullscreen]="true">
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
@@ -84,115 +84,124 @@
         @if (block.kind === 'single') {
           <ng-container *ngTemplateOutlet="exerciseTpl; context: { $implicit: block.view }" />
         } @else if (block.folded) {
-          <!-- A finished superset folds to one line, like an exercise. -->
+          <!-- A superset folds to one line, like an exercise: finished, with
+               the check and its rounds, or folded by hand mid-way, with the
+               link tile and the round it is on. -->
           <ion-card class="folded">
             <ion-item
               button
               detail="false"
               lines="none"
-              [attr.aria-label]="'workouts.logger.expand' | translate: { name: block.names }"
+              [attr.aria-label]="'workouts.logger.expand' | translate: { name: block.names, summary: block.summary }"
               (click)="unfold(block.members[0].view.exercise)"
             >
-              <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
+              @if (block.done) {
+                <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
+              } @else {
+                <mh-hex-avatar slot="start" size="md" tone="wash" color="info" icon="link-outline" aria-hidden="true" />
+              }
               <ion-label>
                 <h2>{{ block.names }}</h2>
-                <p>{{ 'workouts.superset.rounds' | translate: { count: block.total } }}</p>
+                <p>{{ block.summary }}</p>
               </ion-label>
               <ion-icon slot="end" name="chevron-down-outline" color="medium" aria-hidden="true" />
             </ion-item>
           </ion-card>
         } @else {
-          <!-- A superset: one card with a rail, laid out in rounds. -->
+          <!-- A superset: one card with the honey rail, laid out in rounds.
+               It is an exercise card with more than one exercise: each
+               member has the header an exercise has (`mh-exercise-head`),
+               and the rounds are its set table, on the same grid as the
+               cards around it. -->
           <ion-card class="superset">
-            <div class="ss-head">
-              <span class="mh-kicker ss-kicker">
-                {{ 'workouts.superset.kicker' | translate: { round: block.current, total: block.total } }}
-              </span>
-              @for (member of block.members; track member.view.exercise.id) {
-                <div class="ss-member" [class.skipped]="member.view.exercise.isSkipped">
-                  <span class="ss-tag">{{ member.tag }}</span>
-                  <button type="button" class="ss-name" (click)="openExercise(member.view.exercise)">
-                    {{ member.view.exercise.exerciseNameSnapshot }}
-                  </button>
-                  @if (member.view.exercise.isSkipped) {
-                    <span class="ss-skipped">{{ 'workouts.superset.skipped' | translate }}</span>
-                  }
-                  <ion-button
-                    fill="clear"
-                    shape="round"
-                    color="medium"
-                    class="ss-actions"
-                    [attr.aria-label]="'workouts.exerciseCard.actionsFor' | translate: { name: member.view.exercise.exerciseNameSnapshot }"
-                    (click)="openActions(member.view.exercise)"
-                  >
-                    <ion-icon slot="icon-only" name="ellipsis-vertical-outline" aria-hidden="true" />
-                  </ion-button>
-                </div>
-                @if (member.view.note || member.view.plan || member.view.planNote) {
-                  <div class="ss-lines">
-                    @if (member.view.note) {
-                      <button type="button" class="ss-line note" (click)="openNote(member.view.exercise)">
-                        <ion-icon name="create-outline" aria-hidden="true" />
-                        <span>{{ member.view.note }}</span>
-                      </button>
-                    }
-                    @if (member.view.plan) {
-                      <p class="ss-line">
-                        <ion-icon name="person-outline" aria-hidden="true" />
-                        <span>{{ member.view.plan }}</span>
-                      </p>
-                    }
-                    @if (member.view.planNote) {
-                      <p class="ss-line plan-note">{{ member.view.planNote }}</p>
-                    }
-                  </div>
-                }
-              }
-            </div>
+            <span class="mh-kicker ss-kicker">
+              {{ 'workouts.superset.kicker' | translate: { round: block.current, total: block.total } }}
+            </span>
+            @for (member of block.members; track member.view.exercise.id) {
+              <mh-exercise-head
+                [name]="member.view.exercise.exerciseNameSnapshot"
+                [tag]="member.tag"
+                [kind]="member.view.exercise.exercise?.kind ?? null"
+                [imageUrl]="
+                  member.view.exercise.exercise?.thumbnailUrl ||
+                  member.view.exercise.exerciseThumbnailUrlSnapshot ||
+                  null
+                "
+                [skipped]="member.view.exercise.isSkipped"
+                [showActions]="true"
+                [meta]="
+                  member.view.exercise.isSkipped
+                    ? ('workouts.superset.memberSkipped' | translate)
+                    : member.view.plan || null
+                "
+                [note]="member.view.note || null"
+                [planNote]="member.view.planNote || null"
+                (open)="openExercise(member.view.exercise)"
+                (actions)="openActions(member.view.exercise)"
+                (noteTap)="openNote(member.view.exercise)"
+              />
+            }
 
-            <div class="sets">
-              @for (round of block.rounds; track round.index) {
-                <!-- The label is the round's handle: tap it to delete the whole round. -->
-                <button
-                  type="button"
-                  class="round-label"
-                  [attr.aria-label]="'workouts.superset.roundActions' | translate: { number: round.index + 1 }"
-                  (click)="openRoundMenu(round)"
-                >
-                  <span class="round-name">
+            <ion-card-content>
+              <div class="sets">
+                <!-- One heading over every round when the members record the
+                     same fields; otherwise none, and each field names itself
+                     in its box, since a round's rows are different exercises. -->
+                @if (block.columns; as columns) {
+                  <mh-set-table-head [fields]="columns.fields" [unilateral]="columns.unilateral" />
+                }
+                @for (round of block.rounds; track round.index) {
+                  <!-- A round opens with its name, under a rule across the
+                       card from the second round on. No menu of its own:
+                       removing the round is in any of its sets' menus, on
+                       the badge (user decision, 2026-11-18). -->
+                  <h3 class="round-head">
                     {{ 'workouts.superset.round' | translate: { number: round.index + 1 } }}
-                    <ion-icon class="round-more" name="ellipsis-horizontal-outline" aria-hidden="true" />
-                  </span>
-                  @if (round.done) {
-                    <span class="round-done">{{ 'workouts.superset.done' | translate }}</span>
-                  }
-                </button>
-                @if (round.summary !== null) {
-                  <button type="button" class="round-summary" [class.done]="round.done" (click)="openRound(round)">
-                    {{ round.summary }}
-                  </button>
-                } @else {
-                  <!-- No heading over a round: its rows are different
-                       exercises, so the cells name their units. -->
+                  </h3>
                   @for (item of round.rows; track item.row.set.id) {
                     <ng-container
-                      *ngTemplateOutlet="rowTpl; context: { $implicit: item.row, view: item.view, units: true }"
+                      *ngTemplateOutlet="rowTpl; context: { $implicit: item.row, view: item.view, captions: !block.columns }"
                     />
                   }
                 }
-              }
-            </div>
+              </div>
 
-            <div class="ss-foot">
-              <ion-button fill="clear" size="small" (click)="addRound(block.members)">
-                <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                {{ 'workouts.superset.addRound' | translate }}
-              </ion-button>
-              @if (block.restLine) {
-                <span class="ss-rest">{{ block.restLine }}</span>
-              }
-            </div>
+              <!-- Add round is a superset's Add set, where Add set sits. -->
+              <div class="ex-actions">
+                <ion-button fill="clear" size="small" (click)="addRound(block.members)">
+                  <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                  {{ 'workouts.superset.addRound' | translate }}
+                </ion-button>
+              </div>
+            </ion-card-content>
           </ion-card>
+        }
+
+        <!-- Between two cards: link them as a superset, or undo it, as the
+             routine builder does. -->
+        @if (links()[$index]; as link) {
+          <div class="link-row">
+            <button
+              type="button"
+              class="link-chip"
+              [class.linked]="link.linked"
+              [attr.aria-label]="
+                (link.linked
+                  ? 'workouts.routineBuilder.superset.unlinkFor'
+                  : 'workouts.routineBuilder.superset.linkFor'
+                ) | translate: { a: link.a, b: link.b }
+              "
+              (click)="toggleLink(link.index)"
+            >
+              <ion-icon name="link-outline" aria-hidden="true" />
+              {{
+                (link.linked
+                  ? 'workouts.routineBuilder.superset.unlink'
+                  : 'workouts.routineBuilder.superset.link'
+                ) | translate
+              }}
+            </button>
+          </div>
         }
       }
 
@@ -228,21 +237,6 @@
           {{ 'workouts.logger.finishEarly' | translate: exerciseProgress() }}
         </ion-button>
       }
-    </div>
-  }
-
-  <!-- Scrolled away from the set you are on: the list stops following it,
-       and this takes you back. The chevron points the way it will scroll.
-       Inside the list, stuck to its bottom, never in slot="fixed": it shows
-       right where a thumb starts the next swipe, and a swipe begun on a
-       fixed-slot element never reaches the scroller, so the list would not
-       move and a short flick would read as a tap back up. -->
-  @if (userScrolled() && backToLabel() && !editing()) {
-    <div class="back-to">
-      <button type="button" class="back-to-pill" (click)="backToFocus()">
-        <ion-icon [name]="focusAbove() ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true" />
-        <span>{{ backToLabel() }}</span>
-      </button>
     </div>
   }
 </ion-content>
@@ -284,17 +278,33 @@
 
 <ng-template #exerciseTpl let-view>
   @if (view.folded) {
-    <!-- Done: folded to one line so the open exercise stays near the
-         top. Tapping it opens the sets again. -->
+    <!-- Folded to one line: done, so the open exercise stays near the top,
+         or by its ⋯'s Collapse. Done, it leads with the check; still being
+         worked, with the card's own tile, and says how far along it is.
+         Tapping it opens the sets again. -->
     <ion-card class="folded">
       <ion-item
         button
         detail="false"
         lines="none"
-        [attr.aria-label]="'workouts.logger.expand' | translate: { name: view.exercise.exerciseNameSnapshot }"
+        [attr.aria-label]="
+          'workouts.logger.expand' | translate: { name: view.exercise.exerciseNameSnapshot, summary: view.summary }
+        "
         (click)="unfold(view.exercise)"
       >
-        <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
+        @if (view.done) {
+          <ion-icon slot="start" name="checkmark-circle" class="done-mark" aria-hidden="true" />
+        } @else if (view.tile; as tile) {
+          <mh-hex-avatar
+            slot="start"
+            size="md"
+            tone="wash"
+            aria-hidden="true"
+            [color]="tile.tone"
+            [icon]="tile.icon"
+            [imageUrl]="tile.imageUrl"
+          />
+        }
         <ion-label>
           <h2>{{ view.exercise.exerciseNameSnapshot }}</h2>
           <p>{{ view.summary }}</p>
@@ -346,7 +356,7 @@
   }
 </ng-template>
 
-<ng-template #rowTpl let-row let-view="view" let-units="units">
+<ng-template #rowTpl let-row let-view="view" let-captions="captions">
   <!-- Swipe left for Delete, as everywhere on a phone; swipe right for Copy,
        another set like this one (teal, the colour of a copy). A full swipe
        does it at once, or a tap on the option (user decision, 2026-11-09).
@@ -365,7 +375,8 @@
         [previous]="row.previous"
         [editing]="row.editing"
         [draft]="row.editing ? typed() : null"
-        [units]="!!units"
+        [captions]="!!captions"
+        [unilateral]="isUnilateral(view.exercise)"
         (tick)="tick(view.exercise, row.set)"
         (edit)="editCell(view.exercise, row.set, $event)"
         (menu)="openMenu(view.exercise, row.set, row.badge)"
@@ -441,20 +452,15 @@
   (apply)="applyRest($event)"
 />
 
-<mh-action-sheet
-  [(open)]="roundMenuOpen"
-  [title]="roundMenuTitle()"
-  [actions]="roundActions"
-  (chosen)="onRoundAction($event)"
-/>
-
 <mh-set-menu-sheet
   [(open)]="menuOpen"
   [set]="menuSet()?.set ?? null"
   [badge]="menuSet()?.badge ?? null"
+  [round]="menuRoundNumber()"
   (typeChange)="onSetType($event)"
   (noteChange)="onSetNote($event)"
   (remove)="onSetRemove()"
+  (removeRound)="onRoundRemove()"
   (duplicate)="onSetCopy()"
 />
 
@@ -462,6 +468,7 @@
   [(open)]="actionsOpen"
   [exercise]="actionsFor()"
   [canCollapse]="actionsCanCollapse()"
+  [canUnlink]="actionsCanUnlink()"
   (action)="onAction($event)"
 />
 

@@ -28,6 +28,7 @@ import {
   collapsedChips,
   exerciseDetailRows,
   exerciseSubline,
+  exerciseTile,
   featuredFirst,
   hasExactNameMatch,
   isOwnExercise,
@@ -297,6 +298,28 @@ describe('the library\'s search', () => {
       '908 exercises · sorted by relevance',
     );
     expect(resultMetaLabel(1, ExerciseSortKey.Name)).toBe('1 exercise · sorted by name');
+  });
+});
+
+// The tile an exercise card leads with, and the logger's folded line too.
+describe('an exercise\'s tile', () => {
+  it("draws the kind's glyph, else the photo on the kind's tint", () => {
+    expect(exerciseTile(ExerciseKind.Strength, null)).toEqual({
+      icon: 'flash-outline',
+      tone: 'warning',
+      imageUrl: null,
+    });
+    expect(exerciseTile(ExerciseKind.Strength, 'bench.jpg')).toEqual({
+      icon: null,
+      tone: 'warning',
+      imageUrl: 'bench.jpg',
+    });
+    expect(exerciseTile(null, 'bench.jpg')).toEqual({ icon: null, tone: 'medium', imageUrl: 'bench.jpg' });
+  });
+
+  it('draws none with neither a kind nor a photo', () => {
+    expect(exerciseTile(null, null)).toBeNull();
+    expect(exerciseTile(null, '')).toBeNull();
   });
 });
 

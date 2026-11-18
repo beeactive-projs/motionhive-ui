@@ -37,4 +37,30 @@ describe('WorkoutLogService', () => {
     expect(isSilentRequest(req.request.context)).toBe(true);
     req.flush([]);
   });
+
+  // The logger re-reads a workout after a refused write that already said so.
+  it('reads a workout silently only when asked', () => {
+    service.get('wl-1').subscribe();
+    service.get('wl-1', { silent: true }).subscribe();
+    const [loud, quiet] = httpMock.match(`${BASE}/workout-logs/wl-1`);
+
+    expect(isSilentRequest(loud.request.context)).toBe(false);
+    expect(isSilentRequest(quiet.request.context)).toBe(true);
+    loud.flush({});
+    quiet.flush({});
+  });
+
+  // The logger's "Link as superset": every changed group in one request.
+  it('saves superset links in one request', () => {
+    const exercises = [
+      { id: 'le-1', supersetGroupId: 1 },
+      { id: 'le-2', supersetGroupId: null },
+    ];
+    service.setSupersets('wl-1', exercises).subscribe();
+    const req = httpMock.expectOne(`${BASE}/workout-logs/wl-1/supersets`);
+
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({ exercises });
+    req.flush(null);
+  });
 });

@@ -25,6 +25,7 @@ import {
   normalizeSupersets,
   payloadExercises,
   repsRangeText,
+  routineRestLabel,
   stepperFields,
   steppedAll,
   supersetTags,
@@ -568,5 +569,20 @@ describe('the builder’s ⋯', () => {
     const [add, reorder] = builderOptions(true, null);
 
     expect(add.color).not.toBe(reorder.color);
+  });
+});
+
+describe('routineRestLabel', () => {
+  it('reads the routine’s own rest as a clock', () => {
+    expect(routineRestLabel(120, 90)).toBe('2:00');
+  });
+
+  it('says the person’s default when the routine sets none', () => {
+    expect(routineRestLabel(null, 90)).toBe('Default (1:30)');
+  });
+
+  // No rest is a rest the routine chose, not the person's.
+  it('keeps a routine’s zero rest its own', () => {
+    expect(routineRestLabel(0, 90)).toBe('0:00');
   });
 });

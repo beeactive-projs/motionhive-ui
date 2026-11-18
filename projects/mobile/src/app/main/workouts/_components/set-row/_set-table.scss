@@ -5,8 +5,10 @@
 
 /* The set table pads its own rows (the grid's inset and ring), so the card
    narrows to give the columns the room, and its header moves in by that
-   padding: the tile over the set numbers, the ⋮ over the last column. */
-mh-exercise-card {
+   padding: the tile over the set numbers, the ⋮ over the last column. The
+   logger's superset card hosts the same table, so it takes the same grid. */
+mh-exercise-card,
+ion-card.superset {
   --mh-card-inset: 0.5rem;
   --mh-card-lead: calc(0.25rem + var(--mh-ring-width));
 }

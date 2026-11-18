@@ -2,7 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { LoggedSet, SetField, SetFields } from 'core';
+import { LoggedSet, SetField } from 'core';
 
 import {
   SetBadge,
@@ -13,6 +13,7 @@ import {
   fieldText,
 } from '../../logger/logger-flow';
 import { formatMeasure } from '../../workouts.config';
+import { fieldHeadingKey } from '../set-table-head/set-table-head';
 
 /**
  * What a row reads from its set: the values, and for a logged set whether it
@@ -30,18 +31,12 @@ interface SetCell {
   active: boolean;
   /** Longer than `LONG_CELL`: one text size down, so it still fits. */
   long: boolean;
-  /** The unit's key, drawn after the value, when no heading names the column. */
-  unit: string | null;
+  /**
+   * The field's name, drawn over the value inside the cell, when no heading
+   * names the column ("kg", "Reps", "Time"): the key, or null.
+   */
+  caption: string | null;
 }
-
-/**
- * The units a cell names when its column has no heading. Reps and a clock
- * read as what they are beside a weight or a distance, so only these two.
- */
-const CELL_UNITS: Partial<Record<SetField, string>> = {
-  [SetFields.Weight]: 'workouts.units.kgShort',
-  [SetFields.Distance]: 'workouts.units.metersShort',
-};
 
 /**
  * Past six characters a value steps down a size: the keypad's longest
@@ -72,8 +67,8 @@ const LONG_CELL = 6;
  *
  * The column headings live in `mh-set-table-head`, on the same grid. A row
  * without one over it (a superset round, whose rows belong to different
- * exercises) sets `units`, and weight and distance name their unit in the
- * cell. Too narrow for the Previous column, Previous moves under the fields
+ * exercises) sets `captions`, and every field names itself inside its box,
+ * in the heading's words, empty or not. Too narrow for the Previous column, Previous moves under the fields
  * as "last 60 × 8" (`set-row.scss`).
  *
  * The routine builder draws a routine's sets on the same row, as targets:
@@ -110,8 +105,10 @@ export class SetRow {
    * is cleared (the field shows empty).
    */
   readonly draft = input<string | null>(null);
-  /** No column heading over this row: weight and distance carry their unit. */
-  readonly units = input(false);
+  /** No column heading over this row: each field names itself in its box. */
+  readonly captions = input(false);
+  /** Split squats and single-arm work: the reps caption reads per side. */
+  readonly unilateral = input(false);
   /** Off for a routine's planned set: no tick column, nothing to log. */
   readonly tickable = input(true);
   /**
@@ -139,7 +136,8 @@ export class SetRow {
     const set = this.set();
     const prefill = this.prefill();
     const draft = this.draft();
-    const units = this.units();
+    const captions = this.captions();
+    const unilateral = this.unilateral();
     const texts = this.texts();
     return this.fields().map((field) => {
       const active = this.editing() === field;
@@ -158,7 +156,7 @@ export class SetRow {
         prefill: value == null && !typing,
         text,
         long: text.length > LONG_CELL,
-        unit: units && text ? (CELL_UNITS[field] ?? null) : null,
+        caption: captions ? fieldHeadingKey(field, unilateral) : null,
       };
     });
   });

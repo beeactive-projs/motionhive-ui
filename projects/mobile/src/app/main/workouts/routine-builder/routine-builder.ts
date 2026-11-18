@@ -25,6 +25,7 @@ import {
   IonItemOptions,
   IonItemSliding,
   IonLabel,
+  IonCard,
   IonList,
   IonNote,
   IonReorder,
@@ -72,7 +73,7 @@ import { SettingsRow } from '../../../_shared/components/settings-row/settings-r
 import { resolveMode } from '../../../_shared/config/tabs.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
-import { swipeBackDefault } from '../../../_shared/utils/swipe-back';
+import { PAGE_BACK_PRIORITY, swipeBackDefault } from '../../../_shared/utils/swipe-back';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { kindIcon, kindTone, levelLabel } from '../../exercises/exercises.config';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
@@ -109,6 +110,7 @@ import {
   RoutineActionId,
   RoutineActionIds,
   WORKOUT_ICONS,
+  contentsLine,
   prescriptionLine,
   routineActions,
   secondsToClock,
@@ -140,6 +142,7 @@ import {
   payloadExercises,
   personDefaultLabel,
   repsRangeText,
+  routineRestLabel,
   stepperFields,
   steppedAll,
   supersetTags,
@@ -201,9 +204,6 @@ interface ExerciseView {
 /** The URL segment that means "a routine that does not exist yet". */
 const NEW = 'new';
 
-/** Hardware back on Android: above the page stack (0), under the open sheets (100). */
-const BACK_PRIORITY = 10;
-
 /**
  * The routine builder: the logger without a stopwatch (user decision,
  * 2026-11-16). The same exercise cards, the same set table and the same
@@ -244,6 +244,7 @@ const BACK_PRIORITY = 10;
     IonBackButton,
     IonButton,
     IonButtons,
+    IonCard,
     IonContent,
     IonFooter,
     IonHeader,
@@ -363,6 +364,8 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
   readonly editMode = signal(false);
   /** The cards folded into a list of handles, to drag into a new order. */
   readonly reordering = signal(false);
+  /** The order being dragged, a copy: Done keeps it, back leaves the routine as it was. */
+  readonly reorderRows = signal<DraftExercise[]>([]);
 
   /**
    * A signal, not a field: `isNew` is a computed over it, and a computed
@@ -508,12 +511,10 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
 
   readonly headerMeta = computed(() => {
     const rows = this.exercises();
-    if (!rows.length) return '';
-    const sets = rows.reduce((total, row) => total + row.sets.length, 0);
-    return [
-      this._translateService.instant('count.exercises', { count: rows.length }),
-      this._translateService.instant('count.sets', { count: sets }),
-    ].join(' · ');
+    return contentsLine(
+      rows.length,
+      rows.reduce((total, row) => total + row.sets.length, 0),
+    );
   });
 
   /** The builder's ⋯: Discard only once there is something to lose. */
@@ -537,15 +538,32 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
       : this._translateService.instant('workouts.routineView.yours');
   });
 
-  readonly chips = computed(() => {
+  /**
+   * "6 exercises · 19 sets" under the name, the builder's header line, and
+   * a starter's level after it. Counted off the saved tree, as the list
+   * under it is, so the two never disagree.
+   */
+  readonly overviewMeta = computed(() => {
     const routine = this.routine();
-    if (!routine) return [];
-    const chips: string[] = [
-      this._translateService.instant('count.exercises', { count: routine.exerciseCount }),
-    ];
-    if (routine.level) chips.push(levelLabel(routine.level));
-    return chips;
+    if (!routine) return null;
+    const exercises = routine.exercises ?? [];
+    const sets = exercises.reduce(
+      (total, e) => total + (e.sets.length || e.defaultSets || DEFAULT_SETS),
+      0,
+    );
+    // A list response carries only the count, and no sets to add up.
+    const parts = [contentsLine(exercises.length || routine.exerciseCount, sets)];
+    if (routine.level) parts.push(levelLabel(routine.level));
+    return parts.filter(Boolean).join(' · ') || null;
   });
+
+  /** The saved routine's rest, not the draft's: what Start will rest. */
+  readonly overviewRest = computed(() =>
+    routineRestLabel(
+      this.routine()?.defaultRestSeconds ?? null,
+      this._settingsStore.settings().defaultRestSeconds,
+    ),
+  );
 
   readonly noteLabel = computed(() =>
     this._translateService.instant(
@@ -773,12 +791,9 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
   /** Which rest the sheet is choosing: the routine's (`ROUTINE_REST`), or an exercise's (by key). */
   readonly restFor = signal<string | null>(null);
   readonly restOpen = signal(false);
-  readonly defaultRestLabel = computed(() => {
-    const own = this.defaultRest();
-    return own !== null
-      ? secondsToClock(own)
-      : personDefaultLabel(this._settingsStore.settings().defaultRestSeconds);
-  });
+  readonly defaultRestLabel = computed(() =>
+    routineRestLabel(this.defaultRest(), this._settingsStore.settings().defaultRestSeconds),
+  );
   readonly restSheetTitle = computed(() => {
     const target = this.restFor();
     if (target === null || target === ROUTINE_REST) {
@@ -876,14 +891,14 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
     this._setSwipeBack(!this.showBuilder());
     this._backSubscription?.unsubscribe();
     this._backSubscription = this._platform.backButton.subscribeWithPriority(
-      BACK_PRIORITY,
+      PAGE_BACK_PRIORITY,
       (processNextHandler) => {
         if (this.editing()) {
           this.closePad();
           return;
         }
         if (this.reordering()) {
-          this.doneReorder();
+          this.cancelReorder();
           return;
         }
         if (this.guarded()) {
@@ -910,6 +925,9 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
     const id = this._id();
     if (!id || id === NEW) return;
 
+    // The read view's rest row says the person's default when the routine
+    // sets none; once per session.
+    this._settingsStore.load();
     this.loading.set(true);
     this.error.set(false);
     // Silent: the page says it couldn't open the routine, so the global
@@ -971,7 +989,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
         this.addExercise();
         return;
       case BuilderOptionIds.Reorder:
-        this.reordering.set(true);
+        this.startReorder();
         return;
       case BuilderOptionIds.Discard:
         if (this.editingSaved()) {
@@ -1184,7 +1202,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
         this.moveExercise(key, id === BuilderExerciseActionIds.MoveUp ? -1 : 1);
         return;
       case BuilderExerciseActionIds.Reorder:
-        this.reordering.set(true);
+        this.startReorder();
         return;
       case BuilderExerciseActionIds.Swap:
         this.swapTarget.set(key);
@@ -1239,16 +1257,37 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
 
   // ─── Reordering ───────────────────────────────────────────────
 
-  /** A drag landed: the list takes the new order, and supersets split where it broke them. */
+  /** The cards fold to their names, over a copy of the order to drag. */
+  startReorder(): void {
+    this._keepTyped();
+    this.editing.set(null);
+    this.reorderRows.set(this.exercises());
+    this.reordering.set(true);
+  }
+
+  /** A drag landed: the copy takes the new order. */
   onReorder(event: ReorderEndCustomEvent): void {
     const { from, to } = event.detail;
     // The page owns the order, so Ionic's own DOM move is cancelled.
     event.detail.complete(false);
     if (from === to) return;
-    this.exercises.update((rows) => normalizeSupersets(moveItem(rows, from, to)));
+    this.reorderRows.update((rows) => moveItem(rows, from, to));
   }
 
+  /**
+   * Done: the routine takes the new order, and supersets split where it
+   * broke them. Only once the drags are over, so a pair dragged apart and
+   * back together stays a pair.
+   */
   doneReorder(): void {
+    const rows = this.reorderRows();
+    const moved = rows.some((row, i) => row.key !== this.exercises()[i]?.key);
+    if (moved) this.exercises.set(normalizeSupersets(rows));
+    this.reordering.set(false);
+  }
+
+  /** Back: out of the reorder, the order as it was. */
+  cancelReorder(): void {
     this.reordering.set(false);
   }
 

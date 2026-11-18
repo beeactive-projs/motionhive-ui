@@ -27,6 +27,7 @@ import {
   clockDigitsToDisplay,
   clockDigitsToSeconds,
   compactPrescription,
+  contentsLine,
   dateRail,
   durationClock,
   heroState,
@@ -849,6 +850,18 @@ describe('loggerRedirect', () => {
     for (const status of [WorkoutLogStatus.Skipped, WorkoutLogStatus.Abandoned]) {
       expect(loggerRedirect({ id: 'wl-2', status })).toEqual(['/tabs/workouts/finish', 'wl-2']);
     }
+  });
+});
+
+describe('contentsLine', () => {
+  it('says how many exercises and sets a workout holds', () => {
+    expect(contentsLine(6, 19)).toBe('6 exercises · 19 sets');
+    expect(contentsLine(1, 1)).toBe('1 exercise · 1 set');
+  });
+
+  it('leaves the sets out while none are counted, and says nothing for an empty workout', () => {
+    expect(contentsLine(4, 0)).toBe('4 exercises');
+    expect(contentsLine(0, 0)).toBe('');
   });
 });
 

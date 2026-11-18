@@ -273,3 +273,104 @@ describe('LoggerStore.removeSets — a delete the server refused', () => {
     expect(store.exercises()[0].sets).toHaveLength(1);
   });
 });
+
+describe('LoggerStore.setSupersets — the link chip', () => {
+  function supersetStore(setSupersets: () => unknown, get = vi.fn(() => of(log()))) {
+    TestBed.configureTestingModule({
+      providers: [
+        LoggerStore,
+        { provide: WorkoutLogService, useValue: { setSupersets: vi.fn(setSupersets), get } },
+      ],
+    });
+    const store = TestBed.inject(LoggerStore);
+    store.adopt({
+      id: 'wl-1',
+      exercises: [
+        { id: 'ex-1', supersetGroupId: null, sets: [] },
+        { id: 'ex-2', supersetGroupId: null, sets: [] },
+      ],
+    } as unknown as WorkoutLog);
+    return { store, get, service: TestBed.inject(WorkoutLogService) };
+  }
+
+  it('links on screen at once and saves every change in one call', () => {
+    const { store, service } = supersetStore(() => of(undefined));
+    const changes = [
+      { id: 'ex-1', supersetGroupId: 1 },
+      { id: 'ex-2', supersetGroupId: 1 },
+    ];
+
+    store.setSupersets(changes);
+
+    expect(store.exercises().map((e) => e.supersetGroupId)).toEqual([1, 1]);
+    expect(service.setSupersets).toHaveBeenCalledOnce();
+    expect(service.setSupersets).toHaveBeenCalledWith('wl-1', changes);
+  });
+
+  // Quietly: the caller's toast has already said it failed, and a second
+  // dialog from the read reported one failure twice.
+  it('reads the log again quietly when the server refuses, and says why', () => {
+    const refusal = { status: 400 };
+    const { store, get } = supersetStore(() => throwError(() => refusal));
+    const onError = vi.fn();
+
+    store.setSupersets([{ id: 'ex-1', supersetGroupId: 1 }], onError);
+
+    expect(onError).toHaveBeenCalledWith(refusal);
+    expect(get).toHaveBeenCalledWith('wl-1', { silent: true });
+  });
+
+  // Offline, the read fails too: the screen must not keep a superset the
+  // server never saved, or the next link is worked out from it.
+  it('puts the old groups back when the save and the read both fail', () => {
+    const { store } = supersetStore(
+      () => throwError(() => ({ status: 0 })),
+      vi.fn(() => throwError(() => ({ status: 0 }))),
+    );
+
+    store.setSupersets([
+      { id: 'ex-1', supersetGroupId: 1 },
+      { id: 'ex-2', supersetGroupId: 1 },
+    ]);
+
+    expect(store.exercises().map((e) => e.supersetGroupId)).toEqual([null, null]);
+  });
+});
+
+// The API unlinks the one exercise a superset is left with. Left holding its
+// old group here, that exercise read as unchanged when it was linked again,
+// and the save left it out: the server kept no superset the screen showed.
+describe('LoggerStore.removeExercise — a superset member', () => {
+  function removeStore(groups: (number | null)[]) {
+    const removeExercise = vi.fn(() => of(undefined));
+    TestBed.configureTestingModule({
+      providers: [LoggerStore, { provide: WorkoutLogService, useValue: { removeExercise } }],
+    });
+    const store = TestBed.inject(LoggerStore);
+    store.adopt({
+      id: 'wl-1',
+      exercises: groups.map((supersetGroupId, i) => ({ id: `ex-${i + 1}`, supersetGroupId, sets: [] })),
+    } as unknown as WorkoutLog);
+    return { store, removeExercise };
+  }
+
+  it('unlinks the exercise a superset of two is left with, as the API does', () => {
+    const { store, removeExercise } = removeStore([1, 1, null]);
+
+    store.removeExercise('ex-2');
+
+    expect(removeExercise).toHaveBeenCalledWith('wl-1', 'ex-2');
+    expect(store.exercises().map((e) => [e.id, e.supersetGroupId])).toEqual([
+      ['ex-1', null],
+      ['ex-3', null],
+    ]);
+  });
+
+  it('keeps what is left of a longer superset linked', () => {
+    const { store } = removeStore([1, 1, 1]);
+
+    store.removeExercise('ex-1');
+
+    expect(store.exercises().map((e) => e.supersetGroupId)).toEqual([1, 1]);
+  });
+});

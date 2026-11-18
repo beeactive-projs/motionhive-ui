@@ -35,13 +35,14 @@ import {
   IonTitle,
   IonToolbar,
   NavController,
+  Platform,
   ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { of } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import {
@@ -57,6 +58,7 @@ import {
   Routine,
   RoutineService,
   SetField,
+  SupersetChange,
   WorkoutLog,
   WorkoutLogService,
   appLocale,
@@ -70,7 +72,7 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { RestLiveAction, RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
-import { swipeBackDefault } from '../../../_shared/utils/swipe-back';
+import { PAGE_BACK_PRIORITY, swipeBackDefault } from '../../../_shared/utils/swipe-back';
 import { ActiveSessionStore, LiveStep, LiveValues } from '../_services/active-session.store';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { liveValues } from '../_services/lock-screen.config';
@@ -81,8 +83,10 @@ import { StillTrainingService } from '../_services/still-training.service';
 import { WorkoutSettingsStore } from '../_services/workout-settings.store';
 import { ExerciseNoteSheet } from '../_sheets/exercise-note-sheet/exercise-note-sheet';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
+import { ExerciseTile, exerciseTile } from '../../exercises/exercises.config';
 import { EffortPrompt } from '../_components/effort-prompt/effort-prompt';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
+import { ExerciseHead } from '../_components/exercise-head/exercise-head';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
 import {
   PAD_REVEAL_MS,
@@ -113,12 +117,8 @@ import {
   KeypadFields,
   LeaveChoice,
   LeaveChoices,
-  ROUND_ACTIONS,
-  RoundActionId,
-  RoundActionIds,
   WORKOUT_ICONS,
   formatMeasure,
-  secondsToClock,
   isExerciseDone,
   loggerRedirect,
   workoutClock,
@@ -142,10 +142,14 @@ import {
   effortTarget,
   estimatedRest,
   exerciseBlocks,
+  inSuperset,
   isLastLeft,
+  linkedToNext,
   memberTag,
   nextSetLine,
   roundCount,
+  sharedColumns,
+  SetColumns,
   fieldsFor,
   focusOf,
   foldedSummary,
@@ -154,11 +158,14 @@ import {
   planLine,
   planNoteOf,
   prefillValue,
-  restAfterTick,
   setBadge,
   setLine,
   shownValue,
+  reshapedCards,
   tappedRest,
+  toggledLinks,
+  withLinks,
+  withoutSuperset,
 } from './logger-flow';
 import { LoggerStore } from './logger.store';
 import {
@@ -200,8 +207,12 @@ interface SetView {
 /** One exercise as the list draws it. */
 interface ExerciseView {
   exercise: LoggedExercise;
-  /** Every set ticked: folded to one line until opened again. */
+  /** Every set ticked. */
+  done: boolean;
+  /** Drawn as one line: finished, or folded by its ⋯'s Collapse (`Logger._folds`). */
   folded: boolean;
+  /** The card's tile, which the folded line of an exercise still being worked leads with. */
+  tile: ExerciseTile | null;
   summary: string;
   fields: SetField[];
   plan: string;
@@ -210,12 +221,13 @@ interface ExerciseView {
   rows: SetView[];
 }
 
-/** One round of a superset as the card draws it. */
+/**
+ * One round of a superset as the card draws it: a set row per member, as
+ * an exercise's card draws its sets, done, on now or ahead.
+ */
 interface RoundView {
   index: number;
   done: boolean;
-  /** One line ("A1 62.5 × 8 · A2 × 15") for a round finished or still ahead; null shows the rows. */
-  summary: string | null;
   rows: { tag: string; view: ExerciseView; row: SetView }[];
 }
 
@@ -227,18 +239,32 @@ type BlockView =
       key: string;
       members: { tag: string; view: ExerciseView }[];
       rounds: RoundView[];
+      /** The heading over the rounds, when the members record the same fields; null for none. */
+      columns: SetColumns | null;
       /** The round on now, from 1; the last one once all are done. */
       current: number;
       total: number;
+      /** Every member still in play is done. */
+      done: boolean;
       folded: boolean;
       names: string;
-      restLine: string;
+      /** The folded line's "3 rounds", or "Superset · round 2 of 3" mid-way. */
+      summary: string;
     };
 
 type SupersetBlock = Extract<BlockView, { kind: 'superset' }>;
 
-/** Programmatic scrolls fire scroll events too; ignore them for this long. */
-const PROGRAMMATIC_SCROLL_MS = 900;
+/** The link chip after a card: between its last exercise and the next card's first. */
+interface BlockLink {
+  /** That last exercise's place in the workout. */
+  index: number;
+  /** Already linked: the chip undoes it. Only while supersets show as cards of their own. */
+  linked: boolean;
+  /** The two exercises it joins, for its accessible name. */
+  a: string;
+  b: string;
+}
+
 /** A tick from the lock screen's ✓: when it was tapped, and what its button showed. */
 interface LockScreenTick {
   at: number;
@@ -250,7 +276,7 @@ const LIVE_STEPS = 3;
 
 /** Where the focus set sits, as a share of the visible list's height. */
 const FOCUS_AT = 0.32;
-/** The list's scroll into place after a tick. */
+/** The list's scroll to the set you are on, as the workout opens. */
 const FOCUS_SCROLL_MS = 320;
 
 /**
@@ -277,6 +303,7 @@ const FOCUS_SCROLL_MS = 320;
     EmptyState,
     ExerciseActionsSheet,
     ExerciseCard,
+    ExerciseHead,
     ExerciseNoteSheet,
     ExercisePickerSheet,
     HexAvatar,
@@ -323,9 +350,12 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
   private readonly _restAlertService = inject(RestAlertService);
   private readonly _translateService = inject(TranslateService);
   private readonly _navController = inject(NavController);
-  /** The stack's swipe back, held off while the logger is on screen: see `ionViewWillEnter`. */
+  /** The stack's swipe back, held off while the logger is on screen: see `ionViewDidEnter`. */
   private readonly _ionRouterOutlet = inject(IonRouterOutlet, { optional: true });
   private readonly _config = inject(Config);
+  /** Android's back, taken while the logger is on screen: see `ionViewDidEnter`. */
+  private readonly _platform = inject(Platform);
+  private _backSubscription: Subscription | null = null;
   private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _restCueService = inject(RestCueService);
   private readonly _activeSession = inject(ActiveSessionStore);
@@ -379,7 +409,7 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
   /** What the keypad has typed so far, echoed into the open cell; null until it is touched. */
   readonly typed = signal<string | null>(null);
 
-  /** The next set to do: the one the list points at and scrolls to. */
+  /** The next set to do: the one the list points at, and opens on. */
   readonly focus = computed<SetRef | null>(() =>
     focusOf(this.store.exercises(), this._rounds(), this._activeSession.passed()),
   );
@@ -390,28 +420,29 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
 
   /** The set whose badge menu is open. */
   readonly menuOpen = signal(false);
-  /** The superset round whose label was tapped, and its sheet. */
-  readonly roundMenu = signal<RoundView | null>(null);
-  readonly roundMenuOpen = signal(false);
-  readonly roundActions = ROUND_ACTIONS;
-  readonly roundMenuTitle = computed(() => {
-    const round = this.roundMenu();
-    if (!round) {
-      return '';
-    }
-    return this._translateService.instant('workouts.superset.round', { number: round.index + 1 });
-  });
   readonly menuSet = signal<{ exerciseId: string; set: LoggedSet; badge: SetBadge } | null>(null);
-
   /**
-   * The person scrolled the focus set out of view themselves: the list stops
-   * following it until the next tick or a tap on "Back to…".
+   * The superset round that set is in, when it is in one: its menu then
+   * offers to remove the whole round, which has no menu of its own.
    */
-  readonly userScrolled = signal(false);
-  /** Which way "Back to…" points: the focus set went off the top, else off the bottom. */
-  readonly focusAbove = signal(false);
-  private _programmaticScrollAt = 0;
-  private _lastFocusId: string | null = null;
+  readonly menuRound = computed<RoundView | null>(() => {
+    const setId = this.menuSet()?.set.id;
+    if (!setId) return null;
+    for (const block of this.blocks()) {
+      if (block.kind !== 'superset') continue;
+      const round = block.rounds.find((r) => r.rows.some((item) => item.row.set.id === setId));
+      if (round) return round;
+    }
+    return null;
+  });
+  /** That round as people count it, from 1, for the menu's row. */
+  readonly menuRoundNumber = computed(() => {
+    const round = this.menuRound();
+    return round ? round.index + 1 : null;
+  });
+
+  /** The list has been brought to the set you are on, which it does once. */
+  private _shownFocus = false;
   /** The cell the pad was last kept in view for; '' while the pad is closed. */
   private _revealedKey = '';
   private readonly _content = viewChild(IonContent);
@@ -428,10 +459,15 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
   private _ticker: ReturnType<typeof setInterval> | null = null;
 
   /**
-   * Done exercises the user has opened again. Folding is otherwise automatic:
-   * tick the last set and the exercise folds to its check row.
+   * Exercises folded or opened by hand, by their card's key (an exercise's
+   * own id, a superset's first member's), over the default: a finished one
+   * folds to its check row, one still being worked is open. Every exercise
+   * folds, finished or not (user decision, 2026-11-18). An entry is kept
+   * only while it differs from the default, so one folded by hand stays
+   * folded once finished, and one opened again by hand before it was
+   * finished still folds when its last set is ticked.
    */
-  private readonly _unfolded = signal<ReadonlySet<string>>(new Set());
+  private readonly _folds = signal<ReadonlyMap<string, boolean>>(new Map());
 
   /** Epoch ms when rest ends. Null parks the timer and frees the slot. */
   readonly restEndsAt = signal<number | null>(null);
@@ -536,10 +572,16 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
   /** The exercise whose verb sheet is open. */
   readonly actionsFor = signal<LoggedExercise | null>(null);
   readonly actionsOpen = signal(false);
-  /** The ⋯ sheet's exercise can fold back to its check row: see `_foldKey`. */
+  /** The ⋯ sheet's exercise can fold to one line: see `_foldTarget`. */
   readonly actionsCanCollapse = computed(() => {
     const exercise = this.actionsFor();
-    return !!exercise && this._foldKey(exercise) !== null;
+    return !!exercise && this._foldTarget(exercise) !== null;
+  });
+  /** The ⋯ sheet's exercise is in a superset, so it can be taken out of it. */
+  readonly actionsCanUnlink = computed(() => {
+    const exercise = this.actionsFor();
+    const exercises = this.store.exercises();
+    return !!exercise && inSuperset(exercises, exercises.findIndex((e) => e.id === exercise.id));
   });
 
   /** Confirms that would otherwise lose logged work without asking. */
@@ -598,7 +640,7 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     const focus = this.focus();
     const editing = this.editing();
     const previous = this._previous();
-    const unfolded = this._unfolded();
+    const folds = this._folds();
     const loaded = this._loaded();
 
     const exercises = this.store.exercises();
@@ -638,9 +680,17 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
         };
       });
 
+      const done = isExerciseDone(exercise);
       return {
         exercise,
-        folded: isExerciseDone(exercise) && !unfolded.has(exercise.id) && !editingHere,
+        done,
+        // A skipped card has no sets to fold away, and nothing would open it
+        // again (`_foldTarget`), whatever a fold left over from a superset says.
+        folded: !exercise.isSkipped && (folds.get(exercise.id) ?? done) && !editingHere,
+        tile: exerciseTile(
+          exercise.exercise?.kind ?? null,
+          exercise.exercise?.thumbnailUrl || exercise.exerciseThumbnailUrlSnapshot || null,
+        ),
         summary: foldedSummary(exercise, exercise.exercise?.kind ?? null),
         fields,
         plan: planLine(exercise),
@@ -653,14 +703,13 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
 
   /**
    * The list in blocks: an exercise on its own, or a superset laid out in
-   * rounds. Finished rounds and rounds still ahead read as one line; the
-   * round on now (or one being edited) shows its sets.
+   * rounds. Every round shows its sets, as an exercise's card shows all of
+   * its own, under one heading when the members record the same fields.
    */
   readonly blocks = computed<BlockView[]>(() => {
     const views = this.views();
     const exercises = this.store.exercises();
-    const effortFor = this.effortFor();
-    const unfolded = this._unfolded();
+    const folds = this._folds();
     const editing = this.editing();
     const byId = new Map(views.map((view) => [view.exercise.id, view]));
     if (!this._rounds()) {
@@ -684,65 +733,58 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
           .map((m) => ({ tag: m.tag, view: m.view, row: m.view.rows[index] }))
           .filter((r) => !!r.row);
         const done = rows.length > 0 && rows.every((r) => r.row.set.isCompleted);
-        const busy = rows.some(
-          (r) => r.row.focus || r.row.editing !== null || r.row.set.id === effortFor,
-        );
-        const untouched = rows.every((r) => !r.row.set.isCompleted);
-        const summary =
-          !busy && (done || untouched)
-            ? rows
-                .map(
-                  (r) =>
-                    `${r.tag} ${
-                      setLine(r.view.fields, (field) => shownValue(r.row, field), false) || '–'
-                    }`,
-                )
-                .join(' · ')
-            : null;
-        if (rows.length) rounds.push({ index, done, summary, rows });
+        if (rows.length) rounds.push({ index, done, rows });
       }
       const firstOpen = rounds.findIndex((r) => !r.done);
       const key = block.exercises[0].id;
       const allDone = live.length > 0 && live.every((m) => isExerciseDone(m.view.exercise));
       const editingHere = members.some((m) => m.view.exercise.id === editing?.exerciseId);
-      const lastLive = live[live.length - 1]?.view.exercise;
       const round = firstOpen < 0 ? Math.max(0, total - 1) : rounds[firstOpen].index;
-      const restSet = lastLive?.sets?.[round] ?? null;
-      const rest = restSet
-        ? restAfterTick(restSet, restSet, {
-            exerciseOverride: lastLive ? (this._restByExercise()[lastLive.id] ?? null) : null,
-            workoutDefault: this._restForAll(),
-            personDefault: this._settings().defaultRestSeconds,
-          })
-        : null;
       return {
         kind: 'superset',
         key,
         members,
         rounds,
+        columns: sharedColumns(
+          live.map((m) => ({
+            fields: m.view.fields,
+            unilateral: this.isUnilateral(m.view.exercise),
+          })),
+        ),
         current: round + 1,
         total,
-        folded: allDone && !unfolded.has(key) && !editingHere,
+        done: allDone,
+        // Every member skipped leaves no sets to fold, as for a skipped exercise.
+        folded: live.length > 0 && (folds.get(key) ?? allDone) && !editingHere,
         names: members.map((m) => m.view.exercise.exerciseNameSnapshot).join(' + '),
-        restLine:
-          rest !== null
-            ? this._translateService.instant('workouts.superset.restAfterRound', {
-                value: secondsToClock(rest),
-              })
-            : '',
+        summary: allDone
+          ? this._translateService.instant('workouts.superset.rounds', { count: total })
+          : this._translateService.instant('workouts.superset.kicker', { round: round + 1, total }),
       };
     });
   });
 
-  /** "Back to Bench press · Set 3", on the pill shown once the focus scrolls away. */
-  readonly backToLabel = computed(() => {
-    const focus = this.focus();
-    if (!focus) return '';
-    const view = this.views().find((v) => v.exercise.id === focus.exerciseId);
-    const row = view?.rows.find((r) => r.set.id === focus.setId);
-    if (!view || !row) return '';
-    return this._translateService.instant('workouts.logger.backTo', {
-      value: `${view.exercise.exerciseNameSnapshot} · ${row.badge.short ?? row.badge.name}`,
+  /**
+   * The link chip after each card but the last, as the routine builder has
+   * between its cards: "Link as superset" joins the card's last exercise
+   * with the next card's first. In rounds a superset is one card, so a chip
+   * there always links; with rounds off every exercise is its own card and
+   * the chip between two linked ones undoes the link, as in the builder.
+   * Aligned with `blocks`, by position.
+   */
+  readonly links = computed<(BlockLink | null)[]>(() => {
+    const exercises = this.store.exercises();
+    const blocks = this.blocks();
+    let end = -1;
+    return blocks.map((block, i) => {
+      end += block.kind === 'single' ? 1 : block.members.length;
+      if (i === blocks.length - 1) return null;
+      return {
+        index: end,
+        linked: linkedToNext(exercises, end),
+        a: exercises[end]?.exerciseNameSnapshot ?? '',
+        b: exercises[end + 1]?.exerciseNameSnapshot ?? '',
+      };
     });
   });
 
@@ -925,13 +967,14 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
       untracked(() => this._activeSession.setNext(log.id, next, steps));
     });
 
-    // Follow the focus: whenever it moves (a tick, the list loading), bring
-    // it to a third of the way down, unless the person scrolled away.
+    // Opening the workout brings the set you are on into view, once. After
+    // that the list stays where the person put it: a tick never scrolls it
+    // (user decision, 2026-11-18), since a list that moved on its own read
+    // on a phone as a jump.
     effect(() => {
-      const id = this.focus()?.setId ?? null;
-      if (id === this._lastFocusId) return;
-      this._lastFocusId = id;
-      if (id && !untracked(this.userScrolled)) this._scrollToFocusSoon();
+      if (this._shownFocus || !this.focus()) return;
+      this._shownFocus = true;
+      this._scrollToFocusSoon();
     });
 
     // Once the pad is drawn, the set it types into shows above it: in the
@@ -977,6 +1020,7 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
 
     this._startTicker();
     this._destroyRef.onDestroy(() => {
+      this._backSubscription?.unsubscribe();
       this._detachLockScreen?.();
       void this._screenAwake.release();
       this._stopTicker();
@@ -1118,22 +1162,42 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
    * the ⌄, which asks it. Turned off here, not on will-enter: an iOS swipe
    * back to this page fires that as it starts, and switching the gesture off
    * mid-drag snapped every such swipe back and left it dead.
+   *
+   * Android's back is not that gesture: the button, and the system's swipe
+   * in from either edge, popped the page with the workout still running.
+   * It closes the pad first, then asks as the ⌄ does. An open sheet closes
+   * before either, its handler being above this one.
    */
   ionViewDidEnter(): void {
     if (this._ionRouterOutlet) this._ionRouterOutlet.swipeGesture = false;
+    this._backSubscription?.unsubscribe();
+    this._backSubscription = this._platform.backButton.subscribeWithPriority(
+      PAGE_BACK_PRIORITY,
+      (processNextHandler) => {
+        if (this.editing()) {
+          this.closePad();
+          return;
+        }
+        if (this.store.log()) {
+          this.leave();
+          return;
+        }
+        processNextHandler();
+      },
+    );
   }
 
   ionViewWillLeave(): void {
     this._onScreen.set(false);
+    // The page in front owns the back now.
+    this._backSubscription?.unsubscribe();
+    this._backSubscription = null;
     // The pages after this one swipe back as the app does everywhere else.
     if (this._ionRouterOutlet) this._ionRouterOutlet.swipeGesture = swipeBackDefault(this._config);
     // The rest carries on in the mini-bar; only what was being typed closes.
     this._keepTyped();
     this.editing.set(null);
     this.dismissEffort();
-    // Back on the page, the list finds the focus again.
-    this._lastFocusId = null;
-    this.userScrolled.set(false);
   }
 
   /** Asks whether the clock keeps running while away, then goes. */
@@ -1381,8 +1445,6 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     }
     const log = this.store.log();
     if (log) void this._stillTraining.remind(log.id, log.name);
-    // A tick brings the list back to the focus, wherever it was scrolled.
-    this.userScrolled.set(false);
   }
 
   /**
@@ -1412,6 +1474,10 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     this._keepTyped();
     this.dismissEffort();
     const fresh = this._findSet(exercise.id, set.id) ?? set;
+    // A set opened in a card folded by hand (from the lock screen) opens the
+    // card for good: the person is working there again.
+    const fold = this._foldTarget(exercise);
+    if (fold && this._folds().get(fold.key) === true) this._setFold(fold.key, null);
     this.editing.set({ exerciseId: exercise.id, setId: fresh.id, field });
     this.typed.set(null);
     // Seeded with the value, else its pre-fill: the steppers work from what
@@ -1529,28 +1595,15 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     if (target && exercise) this.removeSet(exercise, target.set);
   }
 
+  /** From the set's menu: the whole superset round it is in. */
+  onRoundRemove(): void {
+    const round = this.menuRound();
+    if (round) this.deleteRound(round);
+  }
+
   // ─── Scroll and focus ─────────────────────────────────────────
 
-  /** The person scrolled: does the focus set still show? */
-  async onScroll(): Promise<void> {
-    if (Date.now() - this._programmaticScrollAt < PROGRAMMATIC_SCROLL_MS) return;
-    const row = this._row('[data-focus]');
-    const content = this._content();
-    if (!row || !content) return;
-    const box = this._visibleBox(await content.getScrollElement());
-    const rect = row.getBoundingClientRect();
-    const above = rect.bottom < box.top + 20;
-    const away = above || rect.top > box.bottom - 20;
-    if (away) this.focusAbove.set(above);
-    if (away !== this.userScrolled()) this.userScrolled.set(away);
-  }
-
-  backToFocus(): void {
-    this.userScrolled.set(false);
-    void this._scrollToFocus();
-  }
-
-  /** After the list has drawn the new focus. */
+  /** After the list has drawn the focus. */
   private _scrollToFocusSoon(): void {
     setTimeout(() => void this._scrollToFocus(), 120);
   }
@@ -1565,7 +1618,6 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     const want = box.top + (box.bottom - box.top) * FOCUS_AT;
     const delta = row.getBoundingClientRect().top - want;
     if (Math.abs(delta) < 4) return;
-    this._programmaticScrollAt = Date.now();
     await content.scrollToPoint(
       0,
       Math.max(0, scroller.scrollTop + delta),
@@ -1579,9 +1631,7 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     const content = this._content();
     if (!row || !content) return;
     const duration = opening || prefersReducedMotion() ? 0 : PAD_REVEAL_MS;
-    await revealAbovePad(content, this._host.nativeElement, row, duration, () => {
-      this._programmaticScrollAt = Date.now();
-    });
+    await revealAbovePad(content, this._host.nativeElement, row, duration);
   }
 
   /** The part of the list a person can see, between the header and the pad or rest bar. */
@@ -1649,52 +1699,105 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
 
   // ─── Folding ──────────────────────────────────────────────────
 
-  /** A finished exercise folds to its check row unless it was opened again. */
+  /** The card `exercise` is in shows as one line: see `_folds`. */
   isFolded(exercise: LoggedExercise): boolean {
-    return isExerciseDone(exercise) && !this._unfolded().has(exercise.id);
+    const block = this._blockOf(exercise);
+    return block?.kind === 'single' ? block.view.folded : !!block?.folded;
   }
 
+  /** A folded line was tapped: its sets show again. */
   unfold(exercise: LoggedExercise): void {
-    this._unfolded.update((set) => new Set(set).add(exercise.id));
+    const target = this._foldTarget(exercise);
+    if (target) this._setFold(target.key, target.done ? false : null);
   }
 
   /**
-   * Folds a done exercise opened again back to its check row: the ⋯ sheet's
+   * Folds an exercise, or the superset it is in, to one line: the ⋯ sheet's
    * Collapse. A set open in the pad there closes first, keeping what was
    * typed, since an exercise being edited never folds.
    */
   fold(exercise: LoggedExercise): void {
-    const key = this._foldKey(exercise);
-    if (key === null) return;
-    const block = this.blocks().find((b) => b.key === key);
+    const target = this._foldTarget(exercise);
+    if (!target) return;
+    const block = this._blockOf(exercise);
     const ids =
       block?.kind === 'superset' ? block.members.map((m) => m.view.exercise.id) : [exercise.id];
     if (ids.includes(this.editing()?.exerciseId ?? '')) this.closePad();
-    this._unfolded.update((set) => {
-      const next = new Set(set);
-      next.delete(key);
-      next.delete(exercise.id);
+    this._setFold(target.key, target.done ? null : true);
+  }
+
+  /** The card `exercise` is drawn in: its own, or its superset's. */
+  private _blockOf(exercise: LoggedExercise): BlockView | null {
+    return (
+      this.blocks().find((block) =>
+        block.kind === 'single'
+          ? block.view.exercise.id === exercise.id
+          : block.members.some((m) => m.view.exercise.id === exercise.id),
+      ) ?? null
+    );
+  }
+
+  /**
+   * What folds `exercise`'s card, and whether it is finished (which folds it
+   * without asking), or null when there is nothing to fold: a skipped
+   * exercise, whose card has no sets, or a superset with every member skipped.
+   */
+  private _foldTarget(exercise: LoggedExercise): { key: string; done: boolean } | null {
+    const block = this._blockOf(exercise);
+    if (!block) return null;
+    if (block.kind === 'single') {
+      return block.view.exercise.isSkipped ? null : { key: block.key, done: block.view.done };
+    }
+    return block.members.some((m) => !m.view.exercise.isSkipped)
+      ? { key: block.key, done: block.done }
+      : null;
+  }
+
+  /** Folds (true) or opens (false) the card by hand; null goes back to the default. */
+  private _setFold(key: string, folded: boolean | null): void {
+    this._folds.update((folds) => {
+      const next = new Map(folds);
+      if (folded === null) next.delete(key);
+      else next.set(key, folded);
       return next;
     });
   }
 
+  // ─── Superset links ───────────────────────────────────────────
+
+  /** The chip between two cards: link them as a superset, or undo it. */
+  toggleLink(index: number): void {
+    this._setSupersets(toggledLinks(this.store.exercises(), index));
+  }
+
+  /** The ⋯ sheet's Unlink from superset: the exercise leaves its superset. */
+  unlink(exercise: LoggedExercise): void {
+    const exercises = this.store.exercises();
+    const index = exercises.findIndex((e) => e.id === exercise.id);
+    if (index >= 0) this._setSupersets(withoutSuperset(exercises, index));
+  }
+
   /**
-   * What folds `exercise`'s card, or null while it cannot fold: its own id
-   * once every set is ticked, or a superset's first member once every member
-   * still in play is done, the same tests `views` and `blocks` fold by.
+   * The cards change shape, so a set open in the pad closes first, keeping
+   * what was typed. A card folded or opened by hand that the link reshapes
+   * (it joins, leaves or gains a member) goes back to the default: the new
+   * card is a different one. Any other card stays as it was left, including
+   * a superset the change only renumbers.
    */
-  private _foldKey(exercise: LoggedExercise): string | null {
-    for (const block of this.blocks()) {
-      if (block.kind === 'single') {
-        if (block.view.exercise.id !== exercise.id) continue;
-        return isExerciseDone(exercise) ? block.key : null;
-      }
-      if (!block.members.some((m) => m.view.exercise.id === exercise.id)) continue;
-      const live = block.members.filter((m) => !m.view.exercise.isSkipped);
-      const done = live.length > 0 && live.every((m) => isExerciseDone(m.view.exercise));
-      return done ? block.key : null;
+  private _setSupersets(changes: SupersetChange[]): void {
+    if (!changes.length) return;
+    if (this.editing()) this.closePad();
+    const exercises = this.store.exercises();
+    const reshaped = reshapedCards(exercises, withLinks(exercises, changes), this._rounds());
+    if (reshaped.size) {
+      this._folds.update((folds) => new Map([...folds].filter(([key]) => !reshaped.has(key))));
     }
-    return null;
+    this.store.setSupersets(changes, (error) => {
+      void this._feedbackService.error(
+        error,
+        this._translateService.instant('workouts.logger.toast.supersetFailed'),
+      );
+    });
   }
 
   addSet(exercise: LoggedExercise): void {
@@ -1706,12 +1809,6 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     for (const { view } of members) {
       if (!view.exercise.isSkipped) this.store.addSet(view.exercise.id);
     }
-  }
-
-  /** A summary line was tapped: open its first set to edit in place. */
-  openRound(round: RoundView): void {
-    const first = round.rows[0];
-    if (first) this.openSet(first.view.exercise, first.row.set);
   }
 
   removeSet(exercise: LoggedExercise, set: LoggedSet): void {
@@ -1754,22 +1851,6 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
         this._translateService.instant('workouts.logger.toast.copySetFailed'),
       ),
     );
-  }
-
-  /** A round's label was tapped: what can be done with the whole round. */
-  openRoundMenu(round: RoundView): void {
-    this._keepTyped();
-    this.editing.set(null);
-    this.dismissEffort();
-    this.roundMenu.set(round);
-    this.roundMenuOpen.set(true);
-  }
-
-  onRoundAction(id: RoundActionId): void {
-    const round = this.roundMenu();
-    if (id === RoundActionIds.Delete && round) {
-      this.deleteRound(round);
-    }
   }
 
   /** Every set of the round, of every exercise in it, in one go. */
@@ -1998,6 +2079,9 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
       case ExerciseActionIds.Swap:
         this.swapTarget.set(exercise);
         this.pickerOpen.set(true);
+        return;
+      case ExerciseActionIds.Unlink:
+        this.unlink(exercise);
         return;
       case ExerciseActionIds.Skip:
         this.store.setSkipped(exercise.id, !exercise.isSkipped);

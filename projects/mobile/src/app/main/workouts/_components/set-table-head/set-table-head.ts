@@ -16,6 +16,17 @@ const FIELD_LABELS: Record<SetField, string> = {
 };
 
 /**
+ * A field's name as its column heading says it ("kg", "Reps", "Reps each",
+ * "Time", "m"): over the column here, and inside the cell where a row has
+ * no heading over it (`SetRow.captions`).
+ */
+export function fieldHeadingKey(field: SetField, unilateral: boolean): string {
+  return field === SetFields.Reps && unilateral
+    ? 'workouts.logger.gridHead.repsEach'
+    : FIELD_LABELS[field];
+}
+
+/**
  * The headings over an exercise's set table: set, previous, one per field,
  * and Done over the ticks. Sentence case, unlike the prototype's capitals:
  * the app adds no uppercase labels (colour-and-type.md). Hidden from screen
@@ -41,10 +52,6 @@ export class SetTableHead {
   readonly tickable = input(true);
 
   readonly labels = computed(() =>
-    this.fields().map((field) =>
-      field === SetFields.Reps && this.unilateral()
-        ? 'workouts.logger.gridHead.repsEach'
-        : FIELD_LABELS[field],
-    ),
+    this.fields().map((field) => fieldHeadingKey(field, this.unilateral())),
   );
 }

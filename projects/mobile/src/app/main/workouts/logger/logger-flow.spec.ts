@@ -16,8 +16,14 @@ import {
   effortTarget,
   estimatedRest,
   exerciseBlocks,
+  inSuperset,
+  linkedToNext,
   memberTag,
   sameRound,
+  reshapedCards,
+  toggledLinks,
+  withLinks,
+  withoutSuperset,
   setLengthSeconds,
   tappedRest,
   focusOf,
@@ -33,6 +39,7 @@ import {
   restAfterTick,
   setBadge,
   setLine,
+  sharedColumns,
   shownValue,
 } from './logger-flow';
 
@@ -353,6 +360,17 @@ describe('summaries', () => {
     expect(foldedSummary(pushups, ExerciseKind.Bodyweight)).toBe('2 sets · best × 15');
   });
 
+  // Every exercise folds, finished or not (2026-11-18).
+  it('folds an exercise still being worked to how far along it is', () => {
+    const ex = exercise('bench', [
+      set({ weightKg: 60, reps: 8, isCompleted: true }),
+      set({ weightKg: 62.5, reps: 8 }),
+      set({ weightKg: 62.5, reps: 8 }),
+    ]);
+    expect(foldedSummary(ex, ExerciseKind.Strength)).toBe('1 of 3 sets · best 60 × 8');
+    expect(foldedSummary(exercise('row', [set(), set()]), ExerciseKind.Strength)).toBe('0 of 2 sets');
+  });
+
   it('writes the plan line from the working sets', () => {
     const planned = (extra: Partial<AssignedSet> = {}) =>
       set({ assignedSet: plan({ targetRepsMin: 8, targetRepsMax: 10, targetRpe: 8, targetWeightKg: 62.5, restAfterSeconds: 120, ...extra }) });
@@ -411,5 +429,130 @@ describe('supersets', () => {
       name: 'Push-ups',
       short: 'Round 2',
     });
+  });
+});
+
+// One heading over a superset's rounds, as over an exercise's sets (2026-11-18).
+describe('sharedColumns', () => {
+  const lifted = { fields: [SetFields.Weight, SetFields.Reps], unilateral: false };
+
+  it('gives the members’ columns when they all record the same fields', () => {
+    expect(sharedColumns([lifted, { ...lifted, fields: [SetFields.Weight, SetFields.Reps] }])).toEqual(lifted);
+  });
+
+  it('gives none when a member records other fields, or the same in another order', () => {
+    expect(sharedColumns([lifted, { fields: [SetFields.Duration], unilateral: false }])).toBeNull();
+    expect(sharedColumns([lifted, { fields: [SetFields.Reps], unilateral: false }])).toBeNull();
+    expect(
+      sharedColumns([lifted, { fields: [SetFields.Reps, SetFields.Weight], unilateral: false }]),
+    ).toBeNull();
+  });
+
+  // "Reps each" over a lunge would be wrong for the push-up beside it.
+  it('gives none when only some members count reps per side', () => {
+    expect(sharedColumns([lifted, { ...lifted, unilateral: true }])).toBeNull();
+    expect(sharedColumns([{ ...lifted, unilateral: true }, { ...lifted, unilateral: true }])).toEqual({
+      ...lifted,
+      unilateral: true,
+    });
+  });
+
+  it('gives none with nobody in play', () => {
+    expect(sharedColumns([])).toBeNull();
+  });
+});
+
+// The link chip between two cards, as the routine builder has (2026-11-18).
+describe('superset links', () => {
+  const ex = (id: string, group: number | null = null) => exercise(id, [set()], { supersetGroupId: group });
+
+  it('reads which exercises are linked', () => {
+    const list = [ex('a', 1), ex('b', 1), ex('c')];
+    expect(linkedToNext(list, 0)).toBe(true);
+    expect(linkedToNext(list, 1)).toBe(false);
+    expect([0, 1, 2].map((i) => inSuperset(list, i))).toEqual([true, true, false]);
+  });
+
+  it('links two exercises, sending only the ones that changed', () => {
+    expect(toggledLinks([ex('a'), ex('b'), ex('c')], 1)).toEqual([
+      { id: 'b', supersetGroupId: 1 },
+      { id: 'c', supersetGroupId: 1 },
+    ]);
+  });
+
+  it('adds an exercise to the superset beside it, and merges two', () => {
+    expect(toggledLinks([ex('a', 1), ex('b', 1), ex('c')], 1)).toEqual([{ id: 'c', supersetGroupId: 1 }]);
+    expect(toggledLinks([ex('a', 1), ex('b', 1), ex('c', 2), ex('d', 2)], 1)).toEqual([
+      { id: 'c', supersetGroupId: 1 },
+      { id: 'd', supersetGroupId: 1 },
+    ]);
+  });
+
+  it('undoes a link, and a superset left with one exercise is none', () => {
+    expect(toggledLinks([ex('a', 1), ex('b', 1)], 0)).toEqual([
+      { id: 'a', supersetGroupId: null },
+      { id: 'b', supersetGroupId: null },
+    ]);
+  });
+
+  it('takes an exercise out of its superset, keeping the rest linked', () => {
+    const four = [ex('a', 1), ex('b', 1), ex('c', 1), ex('d', 1)];
+    expect(withoutSuperset(four, 0)).toEqual([{ id: 'a', supersetGroupId: null }]);
+    expect(withoutSuperset(four, 3)).toEqual([{ id: 'd', supersetGroupId: null }]);
+    // From the middle: what is left on either side stays only if it is two or more.
+    expect(withoutSuperset(four, 1)).toEqual([
+      { id: 'a', supersetGroupId: null },
+      { id: 'b', supersetGroupId: null },
+    ]);
+    expect(withoutSuperset([ex('a', 1), ex('b', 1), ex('c', 1)], 1)).toEqual([
+      { id: 'a', supersetGroupId: null },
+      { id: 'b', supersetGroupId: null },
+      { id: 'c', supersetGroupId: null },
+    ]);
+  });
+
+  it('puts the changed groups into the workout, leaving the rest as they were', () => {
+    const list = [ex('a'), ex('b'), ex('c', 1)];
+    const linked = withLinks(list, [
+      { id: 'a', supersetGroupId: 2 },
+      { id: 'b', supersetGroupId: 2 },
+    ]);
+
+    expect(linked.map((e) => e.supersetGroupId)).toEqual([2, 2, 1]);
+    expect(linked[2]).toBe(list[2]);
+  });
+});
+
+// Which cards a link reshapes: a hand fold on any of them goes back to the default.
+describe('reshapedCards', () => {
+  const ex = (id: string, group: number | null = null) => exercise(id, [set()], { supersetGroupId: group });
+  const reshaped = (
+    before: LoggedExercise[],
+    changes: { id: string; supersetGroupId: number | null }[],
+    rounds = true,
+  ) => [...reshapedCards(before, withLinks(before, changes), rounds)].sort();
+
+  it('names the card that joins, and the superset it joins', () => {
+    // a joins b + c at the front, so the superset's key moves from b to a.
+    const list = [ex('a'), ex('b', 1), ex('c', 1)];
+    expect(reshaped(list, [{ id: 'a', supersetGroupId: 1 }])).toEqual(['a', 'b']);
+  });
+
+  it('names a superset that gains a member at its end', () => {
+    const list = [ex('b', 1), ex('c', 1), ex('d')];
+    expect(reshaped(list, [{ id: 'd', supersetGroupId: 1 }])).toEqual(['b', 'd']);
+  });
+
+  // Linking p and q renumbers the superset under them; its card is the same one.
+  it('leaves out a superset the change only renumbers', () => {
+    const list = [ex('p'), ex('q'), ex('b', 1), ex('c', 1)];
+    const changes = toggledLinks(list, 0);
+    expect(changes.map((c) => c.id)).toEqual(['p', 'q', 'b', 'c']);
+    expect(reshaped(list, changes)).toEqual(['p', 'q']);
+  });
+
+  it('names none while every exercise is a card of its own', () => {
+    const list = [ex('a'), ex('b', 1), ex('c', 1)];
+    expect(reshaped(list, [{ id: 'a', supersetGroupId: 1 }], false)).toEqual([]);
   });
 });

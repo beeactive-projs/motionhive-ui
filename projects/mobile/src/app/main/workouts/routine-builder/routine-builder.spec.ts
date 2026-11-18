@@ -17,9 +17,11 @@ import {
   CreateRoutinePayload,
   Exercise,
   ExerciseKind,
+  ExerciseLevel,
   ExerciseSetType,
   Routine,
   RoutineService,
+  RoutineSources,
   SetFields,
   UpdateRoutinePayload,
   WorkoutLogService,
@@ -110,6 +112,7 @@ function setup({ id = 'new', coach = false, outlet, ios = false, blocked = false
     snapshot: { paramMap: convertToParamMap({ id }), queryParamMap: convertToParamMap({}) },
   };
   const translate = { instant: vi.fn((key: string) => key) };
+  const settingsStore = { settings: () => ({ defaultRestSeconds: 90 }), load: vi.fn() };
   TestBed.configureTestingModule({
     providers: [
       { provide: RoutineService, useValue: routineService },
@@ -140,17 +143,24 @@ function setup({ id = 'new', coach = false, outlet, ios = false, blocked = false
       { provide: RoutineActionsService, useValue: {} },
       { provide: AuthStore, useValue: { isInstructor: () => coach, user: () => ({ id: 'me' }) } },
       { provide: AppModeStore, useValue: { mode: () => (coach ? 'coach' : 'train') } },
-      {
-        provide: WorkoutSettingsStore,
-        useValue: { settings: () => ({ defaultRestSeconds: 90 }), load: () => undefined },
-      },
+      { provide: WorkoutSettingsStore, useValue: settingsStore },
       { provide: TranslateService, useValue: translate },
     ],
   });
   TestBed.overrideComponent(RoutineBuilder, { set: { template: '', imports: [] } });
   const fixture = TestBed.createComponent(RoutineBuilder);
   const page = fixture.componentInstance;
-  return { page, fixture, routineService, router, route, navController, feedback, translate };
+  return {
+    page,
+    fixture,
+    routineService,
+    router,
+    route,
+    navController,
+    feedback,
+    translate,
+    settingsStore,
+  };
 }
 
 /** A new routine with one movement in it, as the page shows it. */
@@ -403,7 +413,7 @@ describe('RoutineBuilder, the header', () => {
 
     page.onPicked([squat]);
 
-    expect(page.headerMeta()).toBe('count.exercises · count.sets');
+    expect(page.headerMeta()).toBe('1 exercise · 3 sets');
   });
 
   it('offers adding in the ⋯, reordering once there are two, discarding once changed', () => {
@@ -427,6 +437,7 @@ describe('RoutineBuilder, the header', () => {
 
     page.onOption('reorder');
     expect(page.reordering()).toBe(true);
+    expect(page.reorderRows()).toEqual(page.exercises());
   });
 
   it('asks before Discard drops a new routine, then leaves', async () => {
@@ -752,15 +763,83 @@ describe('RoutineBuilder, the set table', () => {
     expect(order()).toEqual(['plank', 'squat', 'pushup']);
   });
 
-  it('takes the order a drag leaves, and lets Ionic move nothing', () => {
+  const drag = (page: RoutineBuilder, from: number, to: number, complete = vi.fn()) =>
+    page.onReorder({ detail: { from, to, complete } } as unknown as ReorderEndCustomEvent);
+
+  it('drags a copy of the order, and lets Ionic move nothing', () => {
     const { page } = withSquat();
     page.onPicked([plank]);
     const complete = vi.fn();
+    page.startReorder();
+    expect(page.reordering()).toBe(true);
 
-    page.onReorder({ detail: { from: 1, to: 0, complete } } as unknown as ReorderEndCustomEvent);
+    drag(page, 1, 0, complete);
 
     expect(complete).toHaveBeenCalledWith(false);
-    expect(page.exercises().map((row) => row.exerciseId)).toEqual(['plank', 'squat']);
+    expect(page.reorderRows().map((row) => row.exerciseId)).toEqual(['plank', 'squat']);
+    expect(page.exercises().map((row) => row.exerciseId)).toEqual(['squat', 'plank']);
+  });
+
+  it('keeps the dragged order on Done', () => {
+    const { page } = withSquat();
+    page.onPicked([plank, pushUp]);
+    page.startReorder();
+
+    drag(page, 2, 0);
+    page.doneReorder();
+
+    expect(page.reordering()).toBe(false);
+    expect(page.exercises().map((row) => row.exerciseId)).toEqual(['pushup', 'squat', 'plank']);
+  });
+
+  // Back out of the reorder left the drags in the routine: there was no way
+  // to go back without changes.
+  it('leaves the order as it was on back', () => {
+    const { page } = withSquat();
+    page.onPicked([plank, pushUp]);
+    page.startReorder();
+
+    drag(page, 2, 0);
+    page.cancelReorder();
+
+    expect(page.reordering()).toBe(false);
+    expect(page.exercises().map((row) => row.exerciseId)).toEqual(['squat', 'plank', 'pushup']);
+
+    // The next reorder starts from the routine, not from the dropped drags.
+    page.startReorder();
+    expect(page.reorderRows().map((row) => row.exerciseId)).toEqual(['squat', 'plank', 'pushup']);
+  });
+
+  it('splits a superset only where the final order breaks it', () => {
+    const { page } = withSquat();
+    page.onPicked([plank, pushUp]);
+    page.toggleLink(0);
+    page.startReorder();
+
+    // Apart, then back together: still a pair.
+    drag(page, 0, 2);
+    drag(page, 2, 0);
+    page.doneReorder();
+    expect(page.views().map((view) => view.tag)).toEqual(['A1', 'A2', null]);
+
+    // Apart for good: the pair splits.
+    page.startReorder();
+    drag(page, 0, 2);
+    page.doneReorder();
+    expect(page.exercises().map((row) => row.exerciseId)).toEqual(['plank', 'pushup', 'squat']);
+    expect(page.views().map((view) => view.tag)).toEqual([null, null, null]);
+  });
+
+  it('opens the reorder from the ⋮ with the pad closed', () => {
+    const { page } = withSquat();
+    page.onPicked([plank]);
+    page.openExerciseActions(page.exercises()[1]);
+
+    page.onExerciseAction('reorder');
+
+    expect(page.reordering()).toBe(true);
+    expect(page.editing()).toBeNull();
+    expect(page.reorderRows().map((row) => row.exerciseId)).toEqual(['squat', 'plank']);
   });
 });
 
@@ -789,6 +868,70 @@ describe('RoutineBuilder, loading', () => {
 
     page.load();
     expect(page.editingSaved()).toBe(true);
+  });
+});
+
+describe('RoutineBuilder, the read view', () => {
+  it('says what a saved routine holds under its name, as the builder’s header does', () => {
+    const { page } = setup({ id: 'r-1' });
+    page.ionViewWillEnter();
+
+    expect(page.showOverview()).toBe(true);
+    expect(page.overviewMeta()).toBe('1 exercise · 1 set');
+  });
+
+  // Saved by the simple editor: no set rows, only the flat summary, which
+  // the list under the name stands in for in the same way.
+  it('counts the summary’s sets when a routine has no set rows', () => {
+    const { page, routineService } = setup({ id: 'r-1' });
+    const routine = savedRoutine('r-1');
+    routine.exercises![0] = { ...routine.exercises![0], sets: [], defaultSets: 4 };
+    routineService.get.mockReturnValueOnce(of(routine));
+
+    page.ionViewWillEnter();
+
+    expect(page.overviewMeta()).toBe('1 exercise · 4 sets');
+  });
+
+  it('adds a starter’s level after the counts', () => {
+    const { page, routineService } = setup({ id: 'r-1' });
+    routineService.get.mockReturnValueOnce(
+      of({
+        ...savedRoutine('r-1'),
+        source: RoutineSources.System,
+        ownerId: null,
+        level: ExerciseLevel.Beginner,
+      }),
+    );
+
+    page.ionViewWillEnter();
+
+    expect(page.overviewMeta()).toBe('1 exercise · 1 set · Beginner');
+  });
+
+  it('reads the rest between sets: the person’s default until the routine sets one', () => {
+    const { page, routineService, settingsStore } = setup({ id: 'r-1' });
+    page.ionViewWillEnter();
+    expect(settingsStore.load).toHaveBeenCalled();
+    expect(page.overviewRest()).toBe('Default (1:30)');
+
+    routineService.get.mockReturnValueOnce(of({ ...savedRoutine('r-1'), defaultRestSeconds: 120 }));
+    page.load();
+
+    expect(page.overviewRest()).toBe('2:00');
+  });
+
+  // The read view is what Start runs: an unsaved edit never shows on it.
+  it('shows the saved rest, not the draft’s', () => {
+    const { page } = setup({ id: 'r-1' });
+    page.ionViewWillEnter();
+    page.edit();
+
+    page.openRest(page.RoutineRest);
+    page.pickRest('60');
+
+    expect(page.defaultRestLabel()).toBe('1:00');
+    expect(page.overviewRest()).toBe('Default (1:30)');
   });
 });
 

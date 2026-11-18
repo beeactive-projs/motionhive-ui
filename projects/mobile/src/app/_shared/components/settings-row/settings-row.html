@@ -1,8 +1,8 @@
 <ion-item
-  [button]="!disabled()"
-  [detail]="detail() && !disabled()"
+  [button]="isButton()"
+  [detail]="showDetail()"
   [disabled]="disabled()"
-  (click)="select.emit()"
+  (click)="onClick()"
 >
   @if (icon(); as name) {
     <mh-hex-avatar

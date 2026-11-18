@@ -30,6 +30,20 @@ describe('SetMenuSheet', () => {
     expect(menu.open()).toBe(false);
   });
 
+  // A superset round has no menu of its own: its one verb is here (2026-11-18).
+  it('offers to remove the whole round only for a set in a superset round', () => {
+    expect(sheet().round()).toBeNull();
+
+    const menu = sheet({ round: 2 });
+    let removed = 0;
+    menu.removeRound.subscribe(() => removed++);
+    menu.removeRoundSets();
+
+    expect(menu.round()).toBe(2);
+    expect(removed).toBe(1);
+    expect(menu.open()).toBe(false);
+  });
+
   // The routine builder's sets have a type and no note.
   it('reads a planned set, which has a type and no note', () => {
     const menu = sheet({ set: { setType: ExerciseSetType.Warmup }, noteable: false });

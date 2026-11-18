@@ -3010,7 +3010,8 @@
       "history": "Exercise history",
       "addNote": "Add your note",
       "collapse": "Collapse exercise",
-      "editNote": "Edit your note"
+      "editNote": "Edit your note",
+      "unlink": "Unlink from superset"
     },
     "exerciseCard": {
       "actionsFor": "Actions for {name}"
@@ -3211,7 +3212,7 @@
         "message": "Pick the movements as you go. Nothing has to be planned up front.",
         "title": "Add your first exercise"
       },
-      "expand": "Show the sets for {name}",
+      "expand": "{name}, {summary}. Show the sets",
       "finish": "Finish",
       "finishEarly": "{total, plural, one {Finish workout early · {done}/# exercise} other {Finish workout early · {done}/# exercises}}",
       "gridHead": {
@@ -3254,11 +3255,11 @@
         "removed": "Removed {name}",
         "repeatFailed": "Could not load that workout to repeat",
         "removeRoundFailed": "Could not delete that round",
-        "copySetFailed": "Could not copy that set"
+        "copySetFailed": "Could not copy that set",
+        "supersetFailed": "Could not change the superset"
       },
       "last": "last {value}",
       "best": "best {value}",
-      "backTo": "Back to {value}",
       "plan": {
         "effort": "effort {value}",
         "rest": "rest {value}"
@@ -3747,6 +3748,8 @@
       "addNote": "Add a note",
       "notePlaceholder": "For example: the last rep was assisted",
       "remove": "Remove set",
+      "removeRound": "Remove round {number}",
+      "removeRoundHint": "Every set in this round, of every exercise",
       "copy": "Copy set"
     },
     "effort": {
@@ -3777,15 +3780,11 @@
     "superset": {
       "kicker": "Superset · round {round} of {total}",
       "round": "Round {number}",
-      "done": "done",
+      "memberSkipped": "Skipped",
       "skipped": "skipped",
       "addRound": "Add round",
-      "restAfterRound": "Rest after the round: {value}",
       "rounds": "{count, plural, one {# round} other {# rounds}}",
-      "summary": "Superset · {count, plural, one {# round} other {# rounds}}",
-      "deleteRound": "Delete round",
-      "deleteRoundHint": "Every set in this round, of every exercise",
-      "roundActions": "Round {number}: options"
+      "summary": "Superset · {count, plural, one {# round} other {# rounds}}"
     },
     "loggerOptions": {
       "title": "This workout",

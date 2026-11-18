@@ -193,6 +193,29 @@ export function kindTone(kind: ExerciseKind): string {
   return KIND_META[kind]?.tone ?? 'medium';
 }
 
+/** An exercise's hex tile: its photo, else its kind's glyph, on the kind's tint. */
+export interface ExerciseTile {
+  icon: string | null;
+  tone: string;
+  imageUrl: string | null;
+}
+
+/**
+ * The tile an exercise card leads with, as the library row draws it: the
+ * photo when there is one, else the kind's glyph. The kind's tint stays
+ * under the photo, so one that fails to load still reads as an exercise of
+ * that kind. Null with neither, and the card shows no tile.
+ */
+export function exerciseTile(kind: ExerciseKind | null, imageUrl: string | null): ExerciseTile | null {
+  const url = imageUrl || null;
+  if (!kind && !url) return null;
+  return {
+    icon: url || !kind ? null : kindIcon(kind),
+    tone: kind ? kindTone(kind) : 'medium',
+    imageUrl: url,
+  };
+}
+
 // ── Level ───────────────────────────────────────────────────────────────────
 
 /**

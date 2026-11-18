@@ -1,6 +1,6 @@
 /* The layout lives in `mh-workout-overview`; only the loading stand-in is here. */
 .hero-skeleton {
-  padding-inline: 0.25rem;
+  padding-inline: var(--mh-row-gutter);
 }
 
 .hero-skeleton ion-skeleton-text {

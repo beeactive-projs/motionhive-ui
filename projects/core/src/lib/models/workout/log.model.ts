@@ -278,6 +278,16 @@ export interface LogSetPayload {
   notes?: string | null;
 }
 
+/**
+ * One logged exercise's new superset group, mid-workout: neighbours sharing
+ * a group are one superset, null takes it out of any.
+ */
+export interface SupersetChange {
+  /** The logged exercise's id. */
+  id: string;
+  supersetGroupId: number | null;
+}
+
 export interface CompleteWorkoutPayload {
   /** 1–5. */
   feelingRating?: number;

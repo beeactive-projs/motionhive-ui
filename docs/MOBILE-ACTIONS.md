@@ -12,8 +12,10 @@ document is about placement and flow, not styling.
 1. **⋯ opens the item's action sheet.** Always `mh-action-sheet`. It never navigates to a page and
    there is no "settings" screen behind it.
 2. **A footer button is for the one step the screen is waiting on**: publishing a draft, starting
-   a routine, copying a starter. It lives in `mh-cta-bar`. Once an item is ready, what you do
-   with it (Assign included) is in the ⋯, the main verb first. A verb is never in both places.
+   a routine, copying a starter. It lives in `mh-cta-bar`, except on a routine's page, which puts
+   it at the end of the content as the routine builder does (below). Once an item is ready, what
+   you do with it (Assign included) is in the ⋯, the main verb first. A verb is never in both
+   places.
 3. **The sheet lists only what applies now.** Hide a verb that cannot apply to this item in this
    state (a draft has nobody assigned, a MotionHive starter cannot be deleted). Show it disabled,
    with a hint saying why, only when the person can make it possible from here.
@@ -136,7 +138,7 @@ nothing it cannot change.
 
 **Routine builder** (`workouts/routine-builder`, `routineActions`)
 
-| Who                | Footer       | ⋯                                    |
+| Who                | Main button  | ⋯                                    |
 | ------------------ | ------------ | ------------------------------------ |
 | Coach, own routine | Edit         | Make a copy, Delete routine          |
 | Trainee, own       | Start        | Edit, Make a copy, Delete routine    |
@@ -145,6 +147,10 @@ nothing it cannot change.
 
 Make a copy always asks first and then opens the copy.
 
+The main button is not in an `mh-cta-bar` footer here: it is the last thing in the content, where
+the builder's Save and start is and as wide (2026-11-18, laying the read view out as the builder).
+A footer bar's wider inset made the two buttons different widths.
+
 **Building** (a new routine, or your own in edit mode; user decisions, 2026-11-16 and 2026-11-17):
 the header is the logger's, the name over "N exercises · M sets", then the ⋯ and **Save**, the
 honey button where the workout has Finish.
@@ -152,7 +158,7 @@ honey button where the workout has Finish.
 | Where                  | Verb                                        | Then                                                      |
 | ---------------------- | ------------------------------------------- | --------------------------------------------------------- |
 | The header's ⋯         | Add exercises (honey)                       | the picker                                                |
-|                        | Reorder (navy), once there are two          | the cards fold into handles to drag; Done ends it         |
+|                        | Reorder (navy), once there are two          | the cards fold into handles to drag; Done keeps the new order, back (the chevron or Android's) leaves it as it was (2026-11-18) |
 |                        | Discard (red, its own card), once there is something to lose | asks in red: a new routine is dropped, an edit loses its changes |
 | A card's ⋮             | Move up (navy), Move down (sky), where there is room | one place up or down, no dragging                |
 |                        | Swap (honey)                                | the picker, for the movement to put in                    |
@@ -186,7 +192,7 @@ tick`, under the exercise's column headings (`mh-set-table-head`).
 | ----------------------------- | ---------------------------- | -------------------------------------------------------------------------------------- |
 | Swipe right                   | Copy (teal)                  | at once: a set of the same type with the same numbers, unticked, last on the exercise (the API appends) |
 | Swipe left                    | Delete (red)                 | at once                                                                                 |
-| The badge (`mh-set-menu-sheet`) | the set's type, Copy set, Note, Remove set | the type applies and closes; the note opens in the same sheet with its own Save; Copy set is the swipe's copy |
+| The badge (`mh-set-menu-sheet`) | the set's type, Copy set, Note, Remove set; in a superset round also Remove round N | the type applies and closes; the note opens in the same sheet with its own Save; Copy set is the swipe's copy; Remove round N takes every exercise's set in that round (a round has no menu of its own, user decision, 2026-11-18) |
 | Previous                      | tap                          | the set takes last time's numbers, not ticked: the tick still confirms it               |
 | A field                       | tap                          | the number pad on that field                                                            |
 
@@ -234,10 +240,25 @@ ink: it destroys nothing, so it is not red. It shows only while something is unt
 Discard of its own, which lives in the ⋯ sheet and the finish sheet. Add set, Add weight and Add
 round are honey text at regular weight.
 
-**Folding**: an exercise folds to its check row when its last set is ticked, and a tap on the row
-opens it again. Opened again, its ⋯ leads with Collapse exercise (green), which folds it back; an
-exercise still being worked has no Collapse. The folded row sits on the open card's grid: the mark
-over the tile, the chevron over the ⋮ and the tick column.
+**Folding**: every exercise folds (user decision, 2026-11-18). One folds to its check row on its
+own when its last set is ticked, and any open card's ⋯ leads with Collapse exercise (green), finished
+or still being worked; a superset folds whole from any member's ⋮. A skipped exercise has no Collapse:
+its card has no sets. A tap on a folded row opens it again. Folded mid-way, the row leads with the
+card's own tile (a superset's with the link tile) and says how far along it is ("1 of 3 sets · best
+60 × 8", "Superset · round 2 of 3"); it stays folded when finished, and a set opened into it from the
+lock screen opens it for good. The folded row sits on the open card's grid: the mark or tile over
+the tile, the chevron over the ⋮ and the tick column.
+
+**Supersets** (user decision, 2026-11-18): between every two cards sits the routine builder's link
+chip, "Link as superset" (`plan-chips`), which joins the card's last exercise with the next card's
+first: two exercises start a superset, an exercise joins the superset beside it, two supersets
+merge. In rounds a superset is one card, so the chip between cards always links; with "Jump to the
+next exercise in a superset" off, every exercise is its own card and the chip between two linked
+ones reads "Superset · tap to unlink", as in the builder. A member's ⋮ adds Unlink from superset
+(sky, after Swap), which takes that exercise out and leaves the rest linked if two or more remain.
+The groups are worked out with core's `linkWithNext` / `unlinkFromNext` and saved at once in one
+call (`PATCH /workout-logs/:id/supersets`); a refusal re-reads the workout. Finishing a routine whose
+supersets changed asks "Update the routine?", as for any change of shape.
 
 ## Other screens already on this pattern
 

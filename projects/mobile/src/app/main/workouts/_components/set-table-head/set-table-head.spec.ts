@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { SetField, SetFields } from 'core';
 
-import { SetTableHead } from './set-table-head';
+import { SetTableHead, fieldHeadingKey } from './set-table-head';
 
 // The template blanked (Ionic does not render in jsdom), once per test:
 // TestBed refuses an override after the first component is created.
@@ -37,6 +37,13 @@ describe('SetTableHead', () => {
       'workouts.logger.gridHead.weight',
       'workouts.logger.gridHead.repsEach',
     ]);
+  });
+
+  // A superset round's cells name themselves in the same words (2026-11-18).
+  it('shares its words with the cells of a row that has no heading', () => {
+    expect(fieldHeadingKey(SetFields.Weight, false)).toBe('workouts.logger.gridHead.weight');
+    expect(fieldHeadingKey(SetFields.Reps, true)).toBe('workouts.logger.gridHead.repsEach');
+    expect(fieldHeadingKey(SetFields.Duration, true)).toBe('workouts.logger.gridHead.time');
   });
 
   // The routine builder's sets have nothing to tick, so no Done heading.

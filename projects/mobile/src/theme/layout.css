@@ -17,6 +17,17 @@
   padding: var(--mh-page-rhythm) var(--mh-page-gutter) var(--mh-page-gutter);
 }
 
+/* A page holding nothing but its empty state is the empty screen (a person
+   not found, a queue with nothing in it, an empty workout), so it centres
+   there, as it does straight in `ion-content`: the page fills the scroll box
+   and the block grows into it (`empty-state.scss`). Anything else on the
+   page keeps the block at its own height under the rest: a form above it
+   (the routine builder's name, notes and rest), or a second page block
+   beside it (the groups feed under its invitations). */
+ion-content > .mh-page:only-of-type:has(> mh-empty-state:only-child) {
+  min-block-size: 100%;
+}
+
 .mh-section {
   display: flex;
   flex-direction: column;

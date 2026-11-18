@@ -1,14 +1,16 @@
+/* The builder's rhythm between its blocks: note, rest, exercises. */
 :host {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--mh-page-rhythm);
 }
 
 /* ─── Hero ────────────────────────────────────────────────────────
    On the page, not in a card: it is the page's heading, and the cards below
-   it are the content. */
+   it are the content. Its text starts on the row gutter, the line the note,
+   the "Exercises" head and the tiles below all start on. */
 .hero {
-  padding-inline: 0.25rem;
+  padding: 0.25rem var(--mh-row-gutter) 0.5rem;
 }
 
 /* Where this sits, in the honey ink: it names the moment, not a status. */
@@ -17,41 +19,37 @@
 }
 
 h1 {
-  margin: 0.375rem 0 0;
+  margin: 0.25rem 0 0;
   font-family: var(--mh-font-heading);
   font-size: var(--mh-text-3xl);
   font-weight: 600;
   line-height: var(--mh-leading-heading);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.875rem;
-}
-
-.chips ion-badge {
-  --padding-start: 0.75rem;
-  --padding-end: 0.75rem;
-  --padding-top: 0.375rem;
-  --padding-bottom: 0.375rem;
-  border-radius: var(--mh-radius-pill);
-  font-size: var(--mh-text-sm);
-  font-weight: 500;
+/* Secondary by colour, at the body size: the builder's header meta, given
+   room under a display title. */
+.meta {
+  margin: 0.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  font-variant-numeric: tabular-nums;
 }
 
 .hint {
-  margin: 0.75rem 0 0;
+  margin: 0.5rem 0 0;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
 }
 
 /* ─── Note ────────────────────────────────────────────────────────
-   On the honey wash: the one thing on the page a person wrote. */
+   On the honey wash: the one thing on the page a person wrote. On the row
+   gutter in both modes (Ionic pads card content 16px in md, 20px in iOS). */
 .note {
-  border-color: rgba(var(--ion-color-primary-rgb), 0.3);
   background: var(--ion-color-primary-wash);
+}
+
+.note ion-card-content {
+  padding: 0.75rem var(--mh-row-gutter);
 }
 
 .note .mh-kicker {
@@ -59,7 +57,7 @@ h1 {
 }
 
 .note p {
-  margin: 0.5rem 0 0;
+  margin: 0.375rem 0 0;
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   line-height: var(--mh-leading-body);

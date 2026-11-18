@@ -295,6 +295,8 @@ export const API_ENDPOINTS = {
       `/workout-logs/${id}/sets/${setId}`,
     /** Several sets at once, such as a whole round of a superset. */
     REMOVE_SETS: (id: string) => `/workout-logs/${id}/sets/remove`,
+    /** Superset links changed mid-workout, every exercise whose group changed at once. */
+    SUPERSETS: (id: string) => `/workout-logs/${id}/supersets`,
     ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,
     REMOVE_EXERCISE: (id: string, exId: string) =>
       `/workout-logs/${id}/exercises/${exId}`,

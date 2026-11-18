@@ -7,11 +7,13 @@ import {
   LogSetPayload,
   LoggedExercise,
   LoggedSet,
+  SupersetChange,
   WorkoutLog,
   WorkoutLogService,
 } from 'core';
 
 import { DEFAULT_SETS } from '../workouts.config';
+import { withLinks } from './logger-flow';
 
 /**
  * One live workout.
@@ -322,6 +324,38 @@ export class LoggerStore {
   }
 
   /**
+   * New superset groups (the link chip, or Unlink in an exercise's ⋮): on
+   * screen now, saved in one call, all or none. A refusal puts the old
+   * groups back, tells the caller why, and re-reads the log quietly (the
+   * caller has already said it failed), so the screen never keeps a
+   * superset the server does not have, even when that read fails too.
+   */
+  setSupersets(changes: readonly SupersetChange[], onError?: (error: unknown) => void): void {
+    const log = this._log();
+    if (!log || changes.length === 0) return;
+    const changed = new Set(changes.map((change) => change.id));
+    const before: SupersetChange[] = (log.exercises ?? [])
+      .filter((e) => changed.has(e.id))
+      .map((e) => ({ id: e.id, supersetGroupId: e.supersetGroupId ?? null }));
+    this._updateLog((l) => ({ ...l, exercises: withLinks(l.exercises ?? [], changes) }));
+    this._workoutLogService
+      .setSupersets(log.id, [...changes])
+      .pipe(take(1))
+      .subscribe({
+        error: (error: unknown) => {
+          this._updateLog((l) => ({ ...l, exercises: withLinks(l.exercises ?? [], before) }));
+          onError?.(error);
+          this._workoutLogService
+            .get(log.id, { silent: true })
+            .pipe(take(1), catchError(() => of(null)))
+            .subscribe((fresh) => {
+              if (fresh) this._log.set(fresh);
+            });
+        },
+      });
+  }
+
+  /**
    * The picker commits several at once; the endpoint takes one at a time,
    * so they go in parallel and land in the order the user chose them.
    * `defaultSets` has the server seed the empty sets with each exercise,
@@ -392,13 +426,26 @@ export class LoggerStore {
       });
   }
 
+  /**
+   * The API unlinks the one exercise a superset is left with, so the screen
+   * does too. Left holding its old group, that exercise read as unchanged
+   * when it was next linked, the save skipped it, and the server kept no
+   * superset where the screen showed one.
+   */
   removeExercise(exerciseId: string): void {
     const log = this._log();
     if (!log) return;
-    this._updateLog((l) => ({
-      ...l,
-      exercises: (l.exercises ?? []).filter((e) => e.id !== exerciseId),
-    }));
+    this._updateLog((l) => {
+      const exercises = l.exercises ?? [];
+      const group = exercises.find((e) => e.id === exerciseId)?.supersetGroupId ?? null;
+      const rest = exercises.filter((e) => e.id !== exerciseId);
+      const left = group === null ? [] : rest.filter((e) => e.supersetGroupId === group);
+      return {
+        ...l,
+        exercises:
+          left.length === 1 ? withLinks(rest, [{ id: left[0].id, supersetGroupId: null }]) : rest,
+      };
+    });
     this._workoutLogService
       .removeExercise(log.id, exerciseId)
       .pipe(take(1), catchError(() => of(null)))

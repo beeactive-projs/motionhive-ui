@@ -9,9 +9,12 @@ import {
   RestSources,
   SetField,
   SetFields,
+  SupersetChange,
   enumLabel,
+  linkWithNext,
   setFieldsFor,
   translate,
+  unlinkFromNext,
 } from 'core';
 
 import { KeypadField, KeypadFields, formatMeasure, secondsToClock } from '../workouts.config';
@@ -108,6 +111,100 @@ export function exerciseBlocks(exercises: readonly LoggedExercise[]): ExerciseBl
   return blocks;
 }
 
+// ─── Superset links ──────────────────────────────────────────────
+// The routine builder's rules (core's `linkWithNext`, `unlinkFromNext`),
+// over the workout's exercises. Each returns only the exercises whose group
+// changed: what the API is sent.
+
+/** The exercises' groups, as core's link rules read them. */
+function linkRows(exercises: readonly LoggedExercise[]): SupersetChange[] {
+  return exercises.map((e) => ({ id: e.id, supersetGroupId: e.supersetGroupId ?? null }));
+}
+
+function changedLinks(
+  before: readonly SupersetChange[],
+  after: readonly SupersetChange[],
+): SupersetChange[] {
+  return after.filter((row, i) => row.supersetGroupId !== before[i]?.supersetGroupId);
+}
+
+/** Exercise `index` is linked with the one after it. */
+export function linkedToNext(exercises: readonly LoggedExercise[], index: number): boolean {
+  const group = exercises[index]?.supersetGroupId ?? null;
+  return group !== null && (exercises[index + 1]?.supersetGroupId ?? null) === group;
+}
+
+/** Exercise `index` is linked with the one before it or the one after. */
+export function inSuperset(exercises: readonly LoggedExercise[], index: number): boolean {
+  return linkedToNext(exercises, index) || (index > 0 && linkedToNext(exercises, index - 1));
+}
+
+/**
+ * The chip between exercise `index` and the next: links the two (joining
+ * the superset either is in, merging two), or undoes that link.
+ */
+export function toggledLinks(exercises: readonly LoggedExercise[], index: number): SupersetChange[] {
+  const rows = linkRows(exercises);
+  const next = linkedToNext(exercises, index)
+    ? unlinkFromNext(rows, index)
+    : linkWithNext(rows, index);
+  return changedLinks(rows, next);
+}
+
+/**
+ * Exercise `index` out of its superset: unlinked from the exercises before
+ * and after it. What is left of a longer superset stays linked; a superset
+ * left with one exercise is none.
+ */
+export function withoutSuperset(exercises: readonly LoggedExercise[], index: number): SupersetChange[] {
+  const rows = linkRows(exercises);
+  let next = unlinkFromNext(rows, index);
+  if (index > 0) next = unlinkFromNext(next, index - 1);
+  return changedLinks(rows, next);
+}
+
+/** The exercises with `changes`' groups put in: the workout once a link is saved. */
+export function withLinks(
+  exercises: readonly LoggedExercise[],
+  changes: readonly SupersetChange[],
+): LoggedExercise[] {
+  const groups = new Map(changes.map((change) => [change.id, change.supersetGroupId]));
+  return exercises.map((e) =>
+    groups.has(e.id) ? { ...e, supersetGroupId: groups.get(e.id) ?? null } : e,
+  );
+}
+
+/**
+ * The cards the list draws, by key (an exercise's own id, a superset's
+ * first member's), each with the exercises it holds. With rounds off every
+ * exercise is a card of its own.
+ */
+function cardsOf(exercises: readonly LoggedExercise[], rounds: boolean): Map<string, string> {
+  const blocks: { exercises: LoggedExercise[] }[] = rounds
+    ? exerciseBlocks(exercises)
+    : exercises.map((e) => ({ exercises: [e] }));
+  return new Map(
+    blocks.map((block) => [block.exercises[0].id, block.exercises.map((e) => e.id).join(' ')]),
+  );
+}
+
+/**
+ * The cards a link change reshapes, by key: each that holds other exercises
+ * afterwards, or is new, or is gone. A superset the change only renumbers
+ * keeps its key and its exercises, so it is not one of them; with rounds
+ * off no card is.
+ */
+export function reshapedCards(
+  before: readonly LoggedExercise[],
+  after: readonly LoggedExercise[],
+  rounds: boolean,
+): Set<string> {
+  const was = cardsOf(before, rounds);
+  const now = cardsOf(after, rounds);
+  const keys = new Set([...was.keys(), ...now.keys()]);
+  return new Set([...keys].filter((key) => was.get(key) !== now.get(key)));
+}
+
 /** "A1", "A2": a superset member's tag, or null outside a superset. */
 export function memberTag(block: ExerciseBlock, exerciseId: string): string | null {
   if (block.letter === null) return null;
@@ -118,6 +215,30 @@ export function memberTag(block: ExerciseBlock, exerciseId: string): string | nu
 /** How many rounds a superset has: its longest member. */
 export function roundCount(block: ExerciseBlock): number {
   return Math.max(0, ...block.exercises.map((e) => (e.sets ?? []).length));
+}
+
+/** The columns a set table's heading names: the fields, and whether reps are per side. */
+export interface SetColumns {
+  fields: SetField[];
+  unilateral: boolean;
+}
+
+/**
+ * The one heading a superset's rounds can share, as an exercise's sets
+ * have: when every member still in play records the same fields the same
+ * way (reps per side or not), those columns. Null when they differ, or with
+ * nobody in play: then there is no heading, and each cell names its unit.
+ */
+export function sharedColumns(members: readonly SetColumns[]): SetColumns | null {
+  const [first, ...rest] = members;
+  if (!first) return null;
+  const same = rest.every(
+    (member) =>
+      member.unilateral === first.unilateral &&
+      member.fields.length === first.fields.length &&
+      member.fields.every((field, i) => field === first.fields[i]),
+  );
+  return same ? { fields: [...first.fields], unilateral: first.unilateral } : null;
 }
 
 /**
@@ -277,7 +398,7 @@ export interface SetBadge {
   /** "Set 2", "Warm-up": what the focus card calls the set. */
   name: string;
   /**
-   * What labels elsewhere (the pad, the rest bar, "Back to…") call it after
+   * What labels elsewhere (the pad, the rest bar) call it after
    * the exercise's name, when that differs from `name`: "Round 2" in a superset.
    */
   short?: string;
@@ -659,13 +780,19 @@ export function asksEffort(set: LoggedSet, askAlways: boolean): boolean {
 }
 
 /**
- * "4 sets · best 65 × 8" for a finished exercise folded to one line. Best is
- * the heaviest weight × reps among the working sets; without weight, the
- * most reps, the longest hold or the furthest distance.
+ * "4 sets · best 65 × 8" for a finished exercise folded to one line, and
+ * "1 of 3 sets · best 60 × 8" for one folded while still being worked. Best
+ * is the heaviest weight × reps among the ticked working sets; without
+ * weight, the most reps, the longest hold or the furthest distance.
  */
 export function foldedSummary(exercise: LoggedExercise, kind: ExerciseKind | null): string {
-  const done = (exercise.sets ?? []).filter((set) => set.isCompleted);
-  const parts = [translate('count.sets', { count: done.length })];
+  const sets = exercise.sets ?? [];
+  const done = sets.filter((set) => set.isCompleted);
+  const parts = [
+    done.length === sets.length
+      ? translate('count.sets', { count: done.length })
+      : translate('workouts.meta.setsDone', { done: done.length, total: sets.length }),
+  ];
   const working = done.filter((set) => set.setType !== ExerciseSetType.Warmup);
   const fields = setFieldsFor(kind);
   const score = (set: LoggedSet): number =>

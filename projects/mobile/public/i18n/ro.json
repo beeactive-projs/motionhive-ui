@@ -3010,7 +3010,8 @@
       "history": "Istoricul exercițiului",
       "addNote": "Adaugă nota ta",
       "collapse": "Restrânge exercițiul",
-      "editNote": "Editează nota ta"
+      "editNote": "Editează nota ta",
+      "unlink": "Scoate din superset"
     },
     "exerciseCard": {
       "actionsFor": "Acțiuni pentru {name}"
@@ -3211,7 +3212,7 @@
         "message": "Alege mișcările din mers. Nu trebuie să planifici nimic dinainte.",
         "title": "Adaugă primul exercițiu"
       },
-      "expand": "Arată seriile pentru {name}",
+      "expand": "{name}, {summary}. Arată seriile",
       "finish": "Termină",
       "finishEarly": "{total, plural, one {Termină antrenamentul mai devreme · {done}/# exercițiu} few {Termină antrenamentul mai devreme · {done}/# exerciții} other {Termină antrenamentul mai devreme · {done}/# de exerciții}}",
       "gridHead": {
@@ -3254,11 +3255,11 @@
         "removed": "Am eliminat {name}",
         "repeatFailed": "Nu am putut încărca antrenamentul de repetat",
         "removeRoundFailed": "Nu am putut șterge runda",
-        "copySetFailed": "Nu am putut copia seria"
+        "copySetFailed": "Nu am putut copia seria",
+        "supersetFailed": "Nu am putut schimba supersetul"
       },
       "last": "data trecută {value}",
       "best": "cea mai bună {value}",
-      "backTo": "Înapoi la {value}",
       "plan": {
         "effort": "efort {value}",
         "rest": "pauză {value}"
@@ -3747,6 +3748,8 @@
       "addNote": "Adaugă o notă",
       "notePlaceholder": "De exemplu: ultima repetare a fost cu ajutor",
       "remove": "Șterge seria",
+      "removeRound": "Șterge runda {number}",
+      "removeRoundHint": "Toate seriile din rundă, de la fiecare exercițiu",
       "copy": "Copiază seria"
     },
     "effort": {
@@ -3777,15 +3780,11 @@
     "superset": {
       "kicker": "Superset · runda {round} din {total}",
       "round": "Runda {number}",
-      "done": "gata",
+      "memberSkipped": "Sărit",
       "skipped": "sărit",
       "addRound": "Adaugă o rundă",
-      "restAfterRound": "Pauză după rundă: {value}",
       "rounds": "{count, plural, one {# rundă} few {# runde} other {# de runde}}",
-      "summary": "Superset · {count, plural, one {# rundă} few {# runde} other {# de runde}}",
-      "deleteRound": "Șterge runda",
-      "deleteRoundHint": "Toate seriile din rundă, de la fiecare exercițiu",
-      "roundActions": "Runda {number}: opțiuni"
+      "summary": "Superset · {count, plural, one {# rundă} few {# runde} other {# de runde}}"
     },
     "loggerOptions": {
       "title": "Acest antrenament",

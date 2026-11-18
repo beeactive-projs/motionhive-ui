@@ -104,27 +104,39 @@ describe('SetRow', () => {
     expect(setRow.cells()[1]).toMatchObject({ text: '', prefill: true });
   });
 
-  it('keeps the units out of the cells under a heading', () => {
+  it('keeps the captions out of the cells under a heading', () => {
     const setRow = row({ set: set({ weightKg: 60, reps: 8 }) });
 
-    expect(setRow.cells().map((cell) => cell.unit)).toEqual([null, null]);
+    expect(setRow.cells().map((cell) => cell.caption)).toEqual([null, null]);
   });
 
-  // A superset round has no heading over its columns: "62.5 | 8" has to say
-  // which number is the weight.
-  it('names the weight and distance units in a row with no heading', () => {
+  // A superset round has no heading over its columns: "62.5 | 8" beside a
+  // "1:45" has to say which number is which (2026-11-18).
+  it('names every field in its cell, in the heading’s words, in a row with no heading', () => {
     const setRow = row({
       set: set({ weightKg: 62.5, reps: 8 }),
-      units: true,
+      captions: true,
     });
-    expect(setRow.cells().map((cell) => cell.unit)).toEqual(['workouts.units.kgShort', null]);
+    expect(setRow.cells().map((cell) => cell.caption)).toEqual([
+      'workouts.logger.gridHead.weight',
+      'workouts.logger.gridHead.reps',
+    ]);
 
     const cardio = row({
       set: set({ distanceMeters: 400, durationSeconds: 105 }),
       fields: [SetFields.Distance, SetFields.Duration],
-      units: true,
+      captions: true,
     });
-    expect(cardio.cells().map((cell) => cell.unit)).toEqual(['workouts.units.metersShort', null]);
+    expect(cardio.cells().map((cell) => cell.caption)).toEqual([
+      'workouts.logger.gridHead.distance',
+      'workouts.logger.gridHead.time',
+    ]);
+  });
+
+  it('says reps are per side for single-arm and split work', () => {
+    const setRow = row({ captions: true, unilateral: true });
+
+    expect(setRow.cells()[1].caption).toBe('workouts.logger.gridHead.repsEach');
   });
 
   // 9999.99 kg clipped by a few pixels on an SE at 130% text: past six
@@ -135,10 +147,14 @@ describe('SetRow', () => {
     expect(setRow.cells().map((cell) => cell.long)).toEqual([true, false]);
   });
 
-  it('names no unit on an empty cell', () => {
-    const setRow = row({ units: true });
+  // An empty field is where you most need to know what goes in it.
+  it('names an empty cell too', () => {
+    const setRow = row({ captions: true });
 
-    expect(setRow.cells().map((cell) => cell.unit)).toEqual([null, null]);
+    expect(setRow.cells().map((cell) => cell.caption)).toEqual([
+      'workouts.logger.gridHead.weight',
+      'workouts.logger.gridHead.reps',
+    ]);
   });
 });
 
