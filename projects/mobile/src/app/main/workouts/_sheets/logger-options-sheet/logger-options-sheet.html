@@ -31,36 +31,49 @@
               <ion-note slot="end" class="rest-value">{{ restLabel() }}</ion-note>
             </ion-item>
 
+            <!-- The shared stepper and the usual rests as option chips, as the
+                 rest sheet draws them, on the card itself. -->
             <div slot="content" class="rest-panel mh-stack">
-              <div class="stepper">
-                <button
-                  type="button"
+              <div
+                class="mh-stepper"
+                role="group"
+                [attr.aria-label]="'workouts.loggerOptions.restForAll' | translate"
+              >
+                <ion-button
+                  fill="clear"
+                  shape="round"
                   [attr.aria-label]="'workouts.restSheet.less' | translate: { seconds: step }"
                   (click)="nudge(-1)"
                 >
-                  <ion-icon name="remove-outline" aria-hidden="true" />
-                </button>
-                <strong aria-live="polite">{{ restLabel() }}</strong>
-                <button
-                  type="button"
+                  <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
+                </ion-button>
+                <span class="value" aria-live="polite">{{ restLabel() }}</span>
+                <ion-button
+                  fill="clear"
+                  shape="round"
                   [attr.aria-label]="'workouts.restSheet.more' | translate: { seconds: step }"
                   (click)="nudge(1)"
                 >
-                  <ion-icon name="add-outline" aria-hidden="true" />
-                </button>
+                  <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
+                </ion-button>
               </div>
 
-              <div class="presets" role="group" [attr.aria-label]="'workouts.loggerOptions.restForAll' | translate">
+              <div
+                class="mh-chip-cloud presets"
+                role="group"
+                [attr.aria-label]="'workouts.loggerOptions.restForAll' | translate"
+              >
                 @for (preset of presets; track preset) {
-                  <button
-                    type="button"
-                    class="preset"
-                    [class.on]="restForAll() === preset"
+                  <ion-button
+                    class="chip"
+                    fill="clear"
+                    size="small"
+                    [class.selected]="restForAll() === preset"
                     [attr.aria-pressed]="restForAll() === preset"
                     (click)="pickRest(preset)"
                   >
                     {{ clock(preset) }}
-                  </button>
+                  </ion-button>
                 }
               </div>
             </div>

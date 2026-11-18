@@ -75,4 +75,4 @@ These do not follow the rule and are waiting on their own redesign (user decisio
 
 - `groups/group-edit` and `_shared/components/chip-input`: the right label and placement, but no `fill="outline"` and no `mode="md"`.
 - `payments/coach/create-invoice`: three fields with no label at all, one of them with no placeholder either.
-- The note and message textareas in `set-menu-sheet`, `exercise-note-sheet`, `client-notes-sheet`, `participant-note-sheet`, `message-signups-sheet`, `cancel-session-sheet` and `assign-sheet`: outlined, but with no label.
+- The note and message textareas in `client-notes-sheet`, `participant-note-sheet`, `message-signups-sheet`, `cancel-session-sheet` and `assign-sheet`: outlined, but with no label. (The workout sheets' set and exercise notes have theirs, 2026-11-18.)

@@ -1,0 +1,8 @@
+<mh-action-sheet
+  [(open)]="open"
+  [title]="title()"
+  [subtitle]="'workouts.startConflict.subtitle' | translate"
+  [actions]="actions"
+  [closeOnChoose]="false"
+  (chosen)="onChosen($event)"
+/>

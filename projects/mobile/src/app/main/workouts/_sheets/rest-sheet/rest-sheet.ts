@@ -1,5 +1,5 @@
 import { Component, computed, effect, input, model, output, signal, untracked } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { addOutline, removeOutline } from 'ionicons/icons';
@@ -31,7 +31,7 @@ export const REST_PRESETS = [45, 60, 90, 120, 180] as const;
  */
 @Component({
   selector: 'mh-rest-sheet',
-  imports: [IonIcon, SheetShell, TranslatePipe],
+  imports: [IonButton, IonIcon, SheetShell, TranslatePipe],
   templateUrl: './rest-sheet.html',
   styleUrl: './rest-sheet.scss',
 })

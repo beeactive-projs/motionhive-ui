@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, model, output, signal, untracked } from '@angular/core';
+import { Component, computed, input, model, output, signal, viewChild } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList, IonText, IonTextarea } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
@@ -56,8 +56,11 @@ const TONES: Partial<Record<ExerciseSetType, BadgeTone>> = {
  * note sky, Remove (set and round) red in a card of their own.
  *
  * Picking a type applies it and closes, the common case in one tap. The note
- * opens in the same sheet with its own Save. Warm-ups say up front that they
- * don't count, so nobody wonders where their volume went.
+ * is a text field, so it opens in a sheet of its own once the menu has gone:
+ * tall, where the keyboard leaves it in view, with its own Save (the menu is
+ * as tall as its rows, and a fitted sheet sits under the keyboard). Warm-ups
+ * say up front that they don't count, so nobody wonders where their volume
+ * went.
  */
 @Component({
   selector: 'mh-set-menu-sheet',
@@ -98,10 +101,12 @@ export class SetMenuSheet {
   /** Another set like this one, added to the exercise. */
   readonly duplicate = output<void>();
 
-  /** The menu, or the note being written. */
-  readonly writing = signal(false);
+  /** The note's own sheet, opened from the menu's note row. */
+  readonly noteOpen = signal(false);
   readonly note = signal('');
   readonly noteMax = SET_NOTE_MAX_LENGTH;
+
+  private readonly _menuSheet = viewChild<SheetShell>('menuSheet');
 
   readonly current = computed(() => {
     const type = this.set()?.setType ?? ExerciseSetType.Normal;
@@ -126,14 +131,6 @@ export class SetMenuSheet {
 
   constructor() {
     addIcons({ checkmarkOutline, copyOutline, createOutline, trashOutline });
-    // Each opening starts on the menu, with the note as the set holds it.
-    effect(() => {
-      if (!this.open()) return;
-      untracked(() => {
-        this.writing.set(false);
-        this.note.set(this.set()?.notes ?? '');
-      });
-    });
   }
 
   pick(type: ExerciseSetType): void {
@@ -141,14 +138,22 @@ export class SetMenuSheet {
     this.open.set(false);
   }
 
-  startNote(): void {
-    this.writing.set(true);
+  /**
+   * Swaps the menu for the note's sheet, which starts on the note as the set
+   * holds it. The menu goes first: one sheet over another would stack two
+   * scrims.
+   */
+  async startNote(): Promise<void> {
+    this.note.set(this.set()?.notes ?? '');
+    this.open.set(false);
+    await this._menuSheet()?.close();
+    this.noteOpen.set(true);
   }
 
   saveNote(): void {
     const text = this.note().trim();
     if (text !== (this.set()?.notes ?? '').trim()) this.noteChange.emit(text || null);
-    this.open.set(false);
+    this.noteOpen.set(false);
   }
 
   /** Adds a set like this one and closes, the same as the swipe right. */

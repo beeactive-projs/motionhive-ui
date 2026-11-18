@@ -99,7 +99,7 @@ export class PostWorkoutSheet {
   private readonly _groupService = inject(GroupService);
   private readonly _postService = inject(PostService);
   private readonly _shareCardService = inject(ShareCardService);
-  private readonly _groupsRefresh = inject(GroupsRefreshService);
+  private readonly _groupsRefreshService = inject(GroupsRefreshService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
@@ -271,7 +271,7 @@ export class PostWorkoutSheet {
         next: ({ posts }) => {
           this.posting.set(false);
           this.open.set(false);
-          this._groupsRefresh.notify();
+          this._groupsRefreshService.notify();
           let key = 'workouts.share.group.done';
           if (posts[0]?.approvalState === PostApprovalStates.Pending) {
             key = 'workouts.share.group.pending';

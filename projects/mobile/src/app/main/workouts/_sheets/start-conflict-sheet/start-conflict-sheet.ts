@@ -1,5 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { addIcons } from 'ionicons';
+import { checkmarkOutline, playOutline, trashOutline } from 'ionicons/icons';
 
 import { ActionSheet } from '../../../../_shared/components/action-sheet/action-sheet';
 import { SheetAction } from '../../../../_shared/components/action-sheet/action-sheet.model';
@@ -12,21 +14,13 @@ import {
 /**
  * Starting a workout while another is open: resume that one, finish it and
  * start, or discard it and start. Hosted beside the tab bar so it can follow
- * a start from any screen.
+ * a start from any screen, so it registers its own glyphs: the screen the
+ * start came from may never have.
  */
 @Component({
   selector: 'mh-start-conflict-sheet',
   imports: [ActionSheet, TranslatePipe],
-  template: `
-    <mh-action-sheet
-      [(open)]="open"
-      [title]="title()"
-      [subtitle]="'workouts.startConflict.subtitle' | translate"
-      [actions]="actions"
-      [closeOnChoose]="false"
-      (chosen)="onChosen($event)"
-    />
-  `,
+  templateUrl: './start-conflict-sheet.html',
 })
 export class StartConflictSheet {
   private readonly _service = inject(ActiveWorkoutService);
@@ -68,6 +62,7 @@ export class StartConflictSheet {
   ];
 
   constructor() {
+    addIcons({ checkmarkOutline, playOutline, trashOutline });
     // Opens when a start runs into an open workout.
     effect(() => {
       if (this._service.conflict()) {

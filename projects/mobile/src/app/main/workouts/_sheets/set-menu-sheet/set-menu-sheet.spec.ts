@@ -53,6 +53,48 @@ describe('SetMenuSheet', () => {
     expect(menu.noteable()).toBe(false);
   });
 
+  // The note is a text field, so it has a tall sheet of its own: the menu
+  // goes, and the note's sheet opens on the note the set holds.
+  it('swaps the menu for the note’s own sheet, starting on the set’s note', async () => {
+    const menu = sheet({ set: { setType: ExerciseSetType.Normal, notes: 'Felt easy' } });
+
+    await menu.startNote();
+
+    expect(menu.open()).toBe(false);
+    expect(menu.noteOpen()).toBe(true);
+    expect(menu.note()).toBe('Felt easy');
+  });
+
+  it('saves a changed note trimmed, an emptied one as null, and closes the note’s sheet', async () => {
+    const menu = sheet({ set: { setType: ExerciseSetType.Normal, notes: 'Felt easy' } });
+    const saved: (string | null)[] = [];
+    menu.noteChange.subscribe((note) => saved.push(note));
+
+    await menu.startNote();
+    menu.note.set('  Grip slipped  ');
+    menu.saveNote();
+    expect(menu.noteOpen()).toBe(false);
+
+    await menu.startNote();
+    menu.note.set('   ');
+    menu.saveNote();
+
+    expect(saved).toEqual(['Grip slipped', null]);
+  });
+
+  it('closes the note’s sheet without a change when the note is the same', async () => {
+    const menu = sheet({ set: { setType: ExerciseSetType.Normal, notes: 'Felt easy' } });
+    let changes = 0;
+    menu.noteChange.subscribe(() => changes++);
+
+    await menu.startNote();
+    menu.note.set('Felt easy ');
+    menu.saveNote();
+
+    expect(changes).toBe(0);
+    expect(menu.noteOpen()).toBe(false);
+  });
+
   it('changes a planned set’s type and closes', () => {
     const menu = sheet({ set: { setType: ExerciseSetType.Normal }, noteable: false });
     const picked: ExerciseSetType[] = [];

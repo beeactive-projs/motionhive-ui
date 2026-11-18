@@ -1,5 +1,5 @@
-/* The two ways as selectable tiles: the border shows the pick (honey), the
-   one place a card keeps an outline. */
+/* The two ways side by side. The tile, its outline and its honey pick are
+   `.mh-pick-tile` (layout.css); the picture over its label is this sheet's. */
 .kinds {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -11,16 +11,6 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem;
-  border: 2px solid transparent;
-  border-radius: var(--mh-radius-card);
-  background: var(--ion-card-background);
-  color: var(--ion-text-color);
-  text-align: start;
-  cursor: pointer;
-}
-
-.kind.picked {
-  border-color: var(--ion-color-primary);
 }
 
 .kind:focus-visible {

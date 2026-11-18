@@ -2,6 +2,7 @@ import { Component, computed, input, model, output } from '@angular/core';
 import {
   IonAccordion,
   IonAccordionGroup,
+  IonButton,
   IonIcon,
   IonItem,
   IonLabel,
@@ -56,6 +57,7 @@ const REST_FOR_ALL_PRESETS = [60, 90, 120, 180, 240] as const;
     HexAvatar,
     IonAccordion,
     IonAccordionGroup,
+    IonButton,
     IonIcon,
     IonItem,
     IonLabel,
