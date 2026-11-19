@@ -66,7 +66,7 @@ export class DiscoverInstructors {
   search(): void {
     this.searching.set(true);
     this.searched.set(false);
-    this._profileService.discoverInstructors(this.searchQuery() || undefined).subscribe({
+    this._profileService.discoverInstructors({ search: this.searchQuery() || undefined }).subscribe({
       next: (data) => {
         this.results.set(data);
         this.searching.set(false);

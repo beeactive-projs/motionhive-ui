@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
@@ -19,6 +19,7 @@ import {
   formatRelativeShort,
   GroupWithMyRole,
   MyInstructor,
+  NavModes,
   sentenceCase,
   weekdayNames,
 } from 'core';
@@ -28,9 +29,12 @@ import { RowSkeleton } from '../../../_shared/components/row-skeleton/row-skelet
 import { avatarToneFor, GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupBase, personBase, ProfileStacks } from '../../../_shared/utils/stack-paths';
 import { COACHES_URL, COACHES_YOURS_URL } from '../../coaches/coaches.filters';
+import { ActiveWorkoutService } from '../../workouts/_services/active-workout.service';
 import { workoutDuration, workoutMetaLine } from '../../workouts/workouts.config';
 import { Hive } from '../_components/hive/hive';
 import { LatestRowItem } from '../_components/latest-row/latest-row';
+import { WelcomeCard } from '../_components/welcome-card/welcome-card';
+import { GroupInvites } from '../_components/group-invites/group-invites';
 import { HOME_STACK, HomePages } from '../home-stack.config';
 import {
   buildingCells,
@@ -88,6 +92,8 @@ interface HiveMember {
     LatestRowItem,
     RowSkeleton,
     TranslatePipe,
+    WelcomeCard,
+    GroupInvites,
   ],
   templateUrl: './train-home.html',
   styleUrl: './train-home.scss',
@@ -96,6 +102,7 @@ interface HiveMember {
 export class TrainHome implements OnInit {
   private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
+  private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -126,6 +133,7 @@ export class TrainHome implements OnInit {
   // ─── The week ────────────────────────────────────────────────
 
   readonly LoadStates = LoadStates;
+  readonly NavModes = NavModes;
 
   /** Set once a first load has run `SLOW_LOAD_MS`; reset by each new one. */
   private readonly _slow = signal(false);
@@ -281,12 +289,28 @@ export class TrainHome implements OnInit {
     this.today.set(new Date());
     this._retrying();
     this.store.load();
+    this._reloadInvites();
   }
 
   refresh(done: () => void): void {
     this.today.set(new Date());
     this._retrying();
     this.store.load(done);
+    this._reloadInvites();
+  }
+
+  /** Joined from the invite card: the group joins Your hive. */
+  onGroupJoined(): void {
+    this.store.load();
+  }
+
+  private readonly _groupInvites = viewChild(GroupInvites);
+
+  private _reloadInvites(): void {
+    const invites = this._groupInvites();
+    if (invites) {
+      invites.reload();
+    }
   }
 
   /** The week card's Try again, after its reads failed. */
@@ -330,8 +354,9 @@ export class TrainHome implements OnInit {
     });
   }
 
+  /** Started first, then the logger opens once on it (in Workouts). */
   startEmpty(): void {
-    void this._router.navigate(['/tabs/workouts/log', 'new']);
+    this._activeWorkoutService.startFreestyle();
   }
 
   // ─── People and posts ────────────────────────────────────────

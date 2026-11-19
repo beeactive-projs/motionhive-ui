@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+/docs/workout-redesign
 
 # Node
 /node_modules
@@ -41,11 +42,12 @@ __screenshots__/
 test-results/
 playwright-report/
 .claude/
-# ...except the repo's shared Claude skills (/audit), committed for everyone;
-# settings.local.json stays private.
+# ...except the repo's shared Claude skills (/audit) and the agents they spawn
+# (/pr-review's reviewers), committed for everyone; settings.local.json stays private.
 !/.claude/
 /.claude/*
 !/.claude/skills/
+!/.claude/agents/
 # ...and the mobile app's shared Claude rules.
 !projects/mobile/.claude/
 projects/mobile/.claude/*

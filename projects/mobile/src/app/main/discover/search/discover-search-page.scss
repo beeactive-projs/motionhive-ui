@@ -1,7 +1,7 @@
 /* A flat screen (`mh-flat-page`): rows, labels, chips and notes come from
    the shared skins (ion-list.css, layout.css, ion-button.css); the header
    puts the field and the chips on the row gutter (ion-header.css). Only
-   the start screen's cards and the goal pill are placed here. */
+   the start screen's cards and the topic pill are placed here. */
 
 /* "Recent" with its "Clear" at the far end, on the row times' edge. The
    button keeps a full tap target without making the label taller. */
@@ -22,7 +22,7 @@
   font-weight: 600;
 }
 
-/* Browse by goal and the privacy line, on the row gutter. */
+/* Browse by activity and the privacy line, on the row gutter. */
 .start {
   display: flex;
   flex-direction: column;
@@ -52,7 +52,7 @@
   }
 }
 
-.goal {
+.topic {
   height: 100%;
   margin: 0;
   color: var(--ion-text-color);
@@ -60,7 +60,7 @@
 
 /* Ionic centres a button card's content; the tile and the label start at
    the card's edge, stacked. */
-.goal::part(native) {
+.topic::part(native) {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -70,7 +70,7 @@
   text-align: start;
 }
 
-.goal-label {
+.topic-label {
   font-size: var(--mh-text-sm);
   font-weight: 600;
   line-height: var(--mh-leading-tight);
@@ -95,8 +95,8 @@
   font-size: var(--mh-icon-sm);
 }
 
-/* The goal the results are narrowed to, on the row gutter above them. */
-.goal-pill {
+/* The topic the results are narrowed to, on the row gutter above them. */
+.topic-pill {
   display: flex;
   padding: 0.5rem var(--mh-row-gutter) 0;
 }

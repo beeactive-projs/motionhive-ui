@@ -17,6 +17,17 @@
   padding: var(--mh-page-rhythm) var(--mh-page-gutter) var(--mh-page-gutter);
 }
 
+/* A page holding nothing but its empty state is the empty screen (a person
+   not found, a queue with nothing in it, an empty workout), so it centres
+   there, as it does straight in `ion-content`: the page fills the scroll box
+   and the block grows into it (`empty-state.scss`). Anything else on the
+   page keeps the block at its own height under the rest: a form above it
+   (the routine builder's name, notes and rest), or a second page block
+   beside it (the groups feed under its invitations). */
+ion-content > .mh-page:only-of-type:has(> mh-empty-state:only-child) {
+  min-block-size: 100%;
+}
+
 .mh-section {
   display: flex;
   flex-direction: column;
@@ -173,22 +184,25 @@ ion-content.mh-flat-page > .mh-note-block {
 }
 
 /* A grouped − value + control that names its own unit ("3 sets", "6 weeks").
-   The two ends are clear ion-buttons squared off to the group's corners;
-   the value between them takes the slack. */
+   The signs are round buttons on the neutral fill (`shape="round"` in the
+   template: the theme's control radius outranks any radius set here) and
+   the value takes the slack between them. The group is not a box: three
+   things that already read as three things need no outline drawn around
+   them, and a card surface earns its edge from its fill.
+
+   Nothing here is honey. A stepper selects nothing, so the selection fill the
+   signs used to wear said nothing, and spent on decoration the one colour
+   that can mean "the number pad is typing into this one". */
 .mh-stepper {
   display: flex;
   flex: 1;
   align-items: center;
-  overflow: hidden;
-  border: var(--mh-hairline) solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
+  gap: 0.375rem;
 }
 
 .mh-stepper ion-button {
-  --background: var(--mh-color-selected-background);
-  --color: var(--mh-color-honey-deep);
-  --border-radius: 0 !important;
+  --background: var(--mh-color-stepper-sign);
+  --color: var(--ion-color-medium);
   --padding-start: 0;
   --padding-end: 0;
   flex: none;
@@ -204,11 +218,31 @@ ion-content.mh-flat-page > .mh-note-block {
 
 .mh-stepper .value {
   flex: 1;
+  min-width: 0;
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: center;
+}
+
+/* A value that opens the number pad is a field, drawn as the set table's
+   cells are (`set-row.scss`, `.field`): a full tap target, sunk into the
+   card on the page's colour and keeping its own outline, so a number reads
+   as something that was typed and can be typed again. One that only the
+   signs change (a program's weeks) is a span, and stays plain text. */
+.mh-stepper button.value {
+  box-sizing: border-box;
+  height: var(--mh-tap-target);
+  padding-inline: 0.5rem;
+  overflow: hidden;
+  border: var(--mh-hairline) solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-background-color);
+  cursor: pointer;
+  font-family: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mh-stepper .value em {
@@ -272,4 +306,87 @@ ion-content.mh-flat-page > .mh-note-block {
    rather than taking its own share of the free space. */
 .mh-section-head ion-button + ion-button {
   margin-inline-start: 0;
+}
+
+/* ─── Stepped forms ────────────────────────────────────────────────
+   A form asked one screen at a time (the welcome flow, a new exercise):
+   "Step 2 of 3" in the header, marks above the footer's buttons, Back
+   beside the way on, and choices picked with a tap. Each form keeps its own
+   spacing around these and lays out its own tiles. */
+
+/* "Step 2 of 3" in the toolbar's end slot: a label, not a button, so it
+   sheds the button metrics `ion-buttons` would otherwise impose. */
+.mh-step-count {
+  padding-inline-end: 0.75rem;
+  color: var(--ion-color-medium);
+  white-space: nowrap;
+}
+
+/* Progress as marks, one a step. The current step is a bar rather than a
+   dot, so the place reads at a glance without counting. Decorative: the
+   header says it in words. */
+.mh-step-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+.mh-step-dots span {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-border-color);
+  transition: width 0.2s ease;
+}
+
+.mh-step-dots span.done {
+  background: var(--ion-color-primary);
+}
+
+.mh-step-dots span.on {
+  width: 1.125rem;
+  background: var(--ion-color-primary);
+}
+
+/* While the keyboard is up (`mhKeyboardFooter` on the footer) the bar keeps
+   only its buttons, so the field being typed in has the screen: the marks
+   and the quiet Skip come back with the keyboard down. */
+ion-footer.mh-keyboard-open .mh-step-dots,
+ion-footer.mh-keyboard-open .mh-quiet-actions {
+  display: none;
+}
+
+/* Back yields to the way on: going on is the common case, going back the
+   escape. `.single` when there is nothing to go back to. */
+.mh-step-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+}
+
+.mh-step-actions.single {
+  grid-template-columns: 1fr;
+}
+
+.mh-step-actions ion-button {
+  margin: 0;
+}
+
+/* A choice picked with a tap: a card whose border shows the selection, the
+   one place a card keeps an outline (surfaces-and-sheets.md). Honey marks
+   the pick, the one job the brand colour has here; each form inks its own
+   glyph and secondary line on a picked tile. */
+.mh-pick-tile {
+  border: var(--mh-hairline) solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  font-family: var(--ion-font-family);
+  text-align: start;
+  cursor: pointer;
+}
+
+.mh-pick-tile.on {
+  border-color: var(--ion-color-primary);
+  background: var(--ion-color-primary-wash);
 }

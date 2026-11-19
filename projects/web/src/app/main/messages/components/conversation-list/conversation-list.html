@@ -11,7 +11,9 @@
     (filterChange)="onFilterChange($event)"
   />
 
-  <div class="mh-list__scroll">
+  <!-- The next page as the list nears its end: past 50 chats used to be
+       unreachable here. -->
+  <div class="mh-list__scroll" (scroll)="onScroll($event)">
     @if (store.loading() && !store.hasLoaded()) {
       <!-- Skeleton rows on first load only. Subsequent reloads update
            data in place without flashing the skeleton. -->
@@ -35,6 +37,9 @@
           [active]="conversation.id === store.activeId()"
           (select)="onRowSelect(conversation.id)"
         />
+      }
+      @if (store.loadingMore()) {
+        <div class="mh-list__skeleton" aria-hidden="true"></div>
       }
     }
   </div>

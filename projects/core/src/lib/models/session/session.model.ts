@@ -96,6 +96,11 @@ export interface SessionTemplate {
   instructor?: SessionInstructorRef;
   group?: SessionGroupRef | null;
   venue?: SessionVenueRef | null;
+  /**
+   * What it trains, ids from `GET /categories`: its group's, else its
+   * coach's. Only Discover's list sends it.
+   */
+  categoryIds?: string[];
 }
 
 // ─── Instance (one occurrence) ────────────────────────────────────────────
@@ -324,6 +329,8 @@ export interface DiscoverQuery {
   locationKind?: SessionLocationKind;
   instructorId?: string;
   groupId?: string;
+  /** Sessions in any of these categories: their group's, else their coach's. */
+  categoryIds?: readonly string[];
   dateFrom?: string;
   dateTo?: string;
   page?: number;

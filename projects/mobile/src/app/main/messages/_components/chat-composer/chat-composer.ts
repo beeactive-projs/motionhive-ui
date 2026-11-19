@@ -10,12 +10,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { IonButton, IonIcon, IonNote, IonTextarea } from '@ionic/angular/standalone';
-import { Keyboard } from '@capacitor/keyboard';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { MessagingStore, translate } from 'core';
 
+import { dismissKeyboard } from '../../../../_shared/utils/keyboard';
 import { MESSAGING_ICONS } from '../../messages.config';
 
 /** Matches the BE's cap; anything longer is rejected server-side. */
@@ -133,10 +133,7 @@ export class ChatComposer implements OnDestroy {
 
   /** Close the keyboard: blur the field, and ask the native side too. */
   async dismissKeyboard(): Promise<void> {
-    const input = await this._field()?.getInputElement();
-    input?.blur();
-    // No Keyboard plugin on the web build, where the blur is enough.
-    await Keyboard.hide().catch(() => undefined);
+    await dismissKeyboard(await this._field()?.getInputElement());
   }
 
   async send(): Promise<void> {

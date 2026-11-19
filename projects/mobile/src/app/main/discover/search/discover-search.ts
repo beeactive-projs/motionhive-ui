@@ -12,6 +12,7 @@ import {
 } from 'rxjs';
 
 import {
+  CoachDirectorySorts,
   DiscoverGroup,
   GroupService,
   InstructorSearchResult,
@@ -24,6 +25,7 @@ import {
 const MIN_LENGTH = 2;
 const DEBOUNCE_MS = 300;
 const SESSION_LIMIT = 20;
+const COACH_LIMIT = 30;
 const GROUP_LIMIT = 10;
 
 /** Per-endpoint results; null marks that endpoint's request failing (an
@@ -89,9 +91,18 @@ export function injectDiscoverSearch(): DiscoverSearch {
         }
         isSearching.set(true);
         return forkJoin({
+          // The directory: every coach (names, words, city and the names of
+          // the categories they coach, in every language), the most
+          // relevant to the reader first, nobody blocked.
           coaches: profileService
-            .discoverInstructors(term)
-            .pipe(catchError(() => of<InstructorSearchResult[] | null>(null))),
+            .coachDirectory(
+              { search: term, limit: COACH_LIMIT, sort: CoachDirectorySorts.Recommended },
+              { silent: true },
+            )
+            .pipe(
+              map((page) => page.items),
+              catchError(() => of<InstructorSearchResult[] | null>(null)),
+            ),
           groups: groupService.discoverGroups({ search: term, limit: GROUP_LIMIT }).pipe(
             map((page) => page.items),
             catchError(() => of<DiscoverGroup[] | null>(null)),

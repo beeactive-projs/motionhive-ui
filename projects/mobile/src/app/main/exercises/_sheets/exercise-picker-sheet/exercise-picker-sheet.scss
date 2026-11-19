@@ -1,8 +1,20 @@
-/* The searchbar carries Ionic's own page padding; inside an already padded
-   sheet it only needs to sit flush with the rows under it. */
+/* The Messages pill (`mh-search-pill`), whose sides the sheet skin already
+   zeroes (ion-searchbar.css). Its top and bottom go too: the strip's chips
+   bring their own room below it. */
 ion-searchbar {
-  --box-shadow: none;
-  padding-inline: 0;
+  padding-block: 0;
+}
+
+/* The filter strip starts on the sheet's inset, flush with the searchbar
+   and the rows, and still scrolls to the sheet's edges: it bleeds out by the
+   inset and pads back in by it (in place of the page strip's wider bar
+   gutter). Under the field it keeps only the block padding its chips' 44px
+   hit box overhangs the 2rem pill by (ion-button.css): any less and the
+   sideways scroll clips the box. */
+.mh-chip-row {
+  margin-inline: calc(var(--ion-padding, 16px) * -1);
+  padding-block: calc((var(--mh-tap-target) - 2rem) / 2);
+  padding-inline: var(--ion-padding, 16px);
 }
 
 /* Already in the list behind the sheet: ticked, and quietly out of play. */
@@ -10,4 +22,3 @@ mh-exercise-row.locked {
   opacity: 0.55;
   pointer-events: none;
 }
-

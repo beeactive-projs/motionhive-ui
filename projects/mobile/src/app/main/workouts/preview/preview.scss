@@ -1,6 +1,6 @@
 /* The layout lives in `mh-workout-overview`; only the loading stand-in is here. */
 .hero-skeleton {
-  padding-inline: 0.25rem;
+  padding-inline: var(--mh-row-gutter);
 }
 
 .hero-skeleton ion-skeleton-text {
@@ -10,4 +10,11 @@
 /* Tile then name, the same gap the overview rows use. */
 mh-hex-avatar {
   margin-inline-end: 0.875rem;
+}
+
+/* Why the day has no Start: the bar's one line, centred like its buttons. */
+.closed-note {
+  margin: 0;
+  padding: 0.75rem var(--mh-page-gutter);
+  text-align: center;
 }

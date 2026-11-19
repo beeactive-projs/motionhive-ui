@@ -44,6 +44,7 @@ const ro = createMessageFormatTranslator({ ...sharedRo, ...appRo }, 'ro');
 const STARTED = new Date(2026, 9, 28, 18, 20).toISOString();
 
 type SetShape = {
+  setType?: string;
   weightKg?: number | null;
   reps?: number | null;
   durationSeconds?: number | null;
@@ -145,6 +146,26 @@ function input(
 }
 
 describe('shareCardContent: what an image says', () => {
+  // The image never says more than the finish screen: warm-ups lift no volume.
+  it('leaves warm-ups out of the volume, as the finish screen does', () => {
+    const warmedUp = log({
+      exercises: [
+        exercise(0, 'Bench press', [
+          { setType: 'WARMUP', weightKg: 40, reps: 10 },
+          { setType: 'WARMUP', weightKg: 40, reps: 10 },
+          { weightKg: 80, reps: 8 },
+          { weightKg: 80, reps: 8 },
+          { weightKg: 80, reps: 8 },
+        ]),
+      ],
+    });
+    const card = shareCardContent(input({ log: warmedUp }), t);
+    expect(card.stats).toEqual([
+      { value: '5', label: 'sets' },
+      { value: '1,920', label: 'kg volume' },
+    ]);
+  });
+
   it('says the workout with everything on', () => {
     const card = shareCardContent(input(), t);
     expect(card.title).toBe('Back and shoulders');

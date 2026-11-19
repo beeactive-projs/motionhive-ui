@@ -1,0 +1,66 @@
+<ion-list [inset]="true" class="mh-card-list">
+  @if (pending()) {
+    <ion-item>
+      <ion-label>
+        <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
+        <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+      </ion-label>
+    </ion-item>
+  } @else if (store.failed()) {
+    <!-- The list could not be had: say so in place, with the retry, and
+         never claim there are no places. -->
+    <ion-item>
+      <ion-label class="ion-text-wrap" color="medium">{{ 'venues.list.loadFailed' | translate }}</ion-label>
+      <ion-button slot="end" fill="clear" size="small" (click)="retry()">
+        {{ 'button.tryAgain' | translate }}
+      </ion-button>
+    </ion-item>
+  } @else {
+    @for (row of rows(); track row.venue.id) {
+      <ion-item button [detail]="false" (click)="edit(row.venue)">
+        <mh-hex-avatar slot="start" size="sm" color="teal" [icon]="row.line.icon" />
+        <ion-label class="ion-text-wrap">
+          <h3>{{ row.venue.name }}</h3>
+          <p>{{ lineText(row.line) }}</p>
+        </ion-label>
+        <ion-button
+          slot="end"
+          class="more"
+          fill="clear"
+          shape="round"
+          color="medium"
+          [attr.aria-label]="'venues.list.more' | translate: { name: row.venue.name }"
+          (click)="more($event, row.venue)"
+        >
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        </ion-button>
+      </ion-item>
+    }
+  }
+
+  @if (!pending()) {
+    <ion-item button [detail]="false" (click)="add()">
+      <mh-hex-avatar slot="start" size="sm" color="primary" icon="add-outline" />
+      <ion-label class="ion-text-wrap">{{ 'venues.list.add' | translate }}</ion-label>
+    </ion-item>
+  }
+</ion-list>
+
+<mh-venue-sheet [(open)]="sheetOpen" [venue]="editing()" [saving]="saving()" (save)="save($event)" />
+
+<mh-action-sheet
+  [(open)]="actionsOpen"
+  [title]="targetName()"
+  [actions]="actions"
+  (chosen)="onAction($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="removeOpen"
+  tone="danger"
+  [title]="'venues.remove.title' | translate: { name: targetName() }"
+  [body]="'venues.remove.body' | translate: { name: targetName() }"
+  [confirmLabel]="'venues.remove.confirm' | translate"
+  [saving]="removing()"
+  (confirm)="remove()"
+/>

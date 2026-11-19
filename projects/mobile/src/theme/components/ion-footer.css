@@ -10,3 +10,12 @@ ion-tabs .ion-page > ion-footer {
 ion-tabs .ion-page > ion-footer ion-toolbar:first-of-type {
   --border-width: 0;
 }
+
+/* While the keyboard is up (`mhKeyboardFooter`) the bar sits on the keys,
+   and the home indicator it pads is under them. Ionic drops that padding
+   itself on the same event, a frame later; set here so the lift is measured
+   on the bar as it will be. (0,3,2) beats Ionic's
+   `ion-footer.footer-toolbar-padding ion-toolbar:last-of-type` (0,2,2). */
+.ion-page > ion-footer.mh-keyboard-open ion-toolbar:last-of-type {
+  padding-bottom: 0;
+}

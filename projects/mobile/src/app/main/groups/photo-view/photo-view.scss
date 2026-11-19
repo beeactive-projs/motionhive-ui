@@ -7,6 +7,12 @@
   --border-color: transparent;
 }
 
+/* The theme gives toolbar buttons the page's ink, navy in light: on black
+   the close X needs white. */
+.bar ion-button {
+  --color: #fff;
+}
+
 .stage {
   --background: #000;
 }

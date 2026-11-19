@@ -15,6 +15,9 @@ export const environment = {
   webAppUrl: 'https://app.motionhive.fit',
   websiteUrl: 'https://www.motionhive.fit',
   facebookAppId: '888056193830836',
+  // Sign in with Apple on the web: the Services ID (developer.apple.com, Identifiers).
+  // The iOS app signs in natively with its bundle id and does not read this.
+  appleServicesId: 'fit.motionhive.web',
   primeUiLicenseKey:
     'eyJpZCI6IjhkZGJlNTZjLTY0YmYtNGM0YS1hZDEyLWE1NjYzYjU4YzdjOCIsInByb2R1Y3QiOiJwcmltZXVpIiwidGllciI6ImNvbW11bml0eSIsInR5cGUiOiJkZXYiLCJpYXQiOjE3ODU4MjY4MTEsImV4cCI6MTgxNzM2MjgxMX0.TUGio97ZwSoIbJ6rQN9HSAkM1TWMF2o0kTclcnb6hXOLHmSDzta2HVHU8X3yd-uTqYTXIcNGhY9ry9ZrsIEtCA',
 };

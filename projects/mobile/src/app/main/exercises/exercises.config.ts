@@ -9,7 +9,7 @@ import {
   chevronBackOutline,
   closeCircleOutline,
   createOutline,
-  ellipsisHorizontal,
+  ellipsisHorizontalOutline,
   flashOutline,
   gitNetworkOutline,
   globeOutline,
@@ -44,12 +44,13 @@ import {
   withEnumLabels,
 } from 'core';
 
-import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import {
   HexAvatarTone,
   HexAvatarTones,
 } from '../../_shared/components/hex-avatar/hex-avatar';
 import { RecentPerson } from '../../_shared/config/recent-searches.config';
+
+import type { ExerciseFilters } from './exercises.store';
 
 /**
  * Every icon the exercise screens render. Each page calls
@@ -67,7 +68,7 @@ export const EXERCISE_ICONS = {
   chevronBackOutline,
   closeCircleOutline,
   createOutline,
-  ellipsisHorizontal,
+  ellipsisHorizontalOutline,
   flashOutline,
   gitNetworkOutline,
   globeOutline,
@@ -190,6 +191,29 @@ export function kindIcon(kind: ExerciseKind): string {
 
 export function kindTone(kind: ExerciseKind): string {
   return KIND_META[kind]?.tone ?? 'medium';
+}
+
+/** An exercise's hex tile: its photo, else its kind's glyph, on the kind's tint. */
+export interface ExerciseTile {
+  icon: string | null;
+  tone: string;
+  imageUrl: string | null;
+}
+
+/**
+ * The tile an exercise card leads with, as the library row draws it: the
+ * photo when there is one, else the kind's glyph. The kind's tint stays
+ * under the photo, so one that fails to load still reads as an exercise of
+ * that kind. Null with neither, and the card shows no tile.
+ */
+export function exerciseTile(kind: ExerciseKind | null, imageUrl: string | null): ExerciseTile | null {
+  const url = imageUrl || null;
+  if (!kind && !url) return null;
+  return {
+    icon: url || !kind ? null : kindIcon(kind),
+    tone: kind ? kindTone(kind) : 'medium',
+    imageUrl: url,
+  };
 }
 
 // ── Level ───────────────────────────────────────────────────────────────────
@@ -883,6 +907,23 @@ export function collapsedChips(
 }
 
 /**
+ * The picker strip's muscle chip that says everything the filters do, or
+ * null when they hold more than one chip can: a muscle off the strip, two
+ * muscles, or any equipment. Then the Filters chip is the lit one and no
+ * muscle lights, as a filter strip shows one choice (colour-and-type.md).
+ */
+export function quickMuscleOf(
+  filters: ExerciseFilters,
+  quickIds: readonly string[],
+): string | null {
+  const { kinds, levels, muscleIds, equipmentIds } = filters;
+  if (kinds.length || levels.length || equipmentIds.length || muscleIds.length !== 1) {
+    return null;
+  }
+  return quickIds.includes(muscleIds[0]) ? muscleIds[0] : null;
+}
+
+/**
  * Tap a chip in a capped cloud: off if it was on, on if there is room. At the
  * cap a new chip is refused rather than bumping the oldest, which would undo
  * a choice the person never touched.
@@ -891,28 +932,3 @@ export function toggleCapped(ids: readonly string[], id: string, max: number): s
   if (ids.includes(id)) return ids.filter((entry) => entry !== id);
   return ids.length >= max ? [...ids] : [...ids, id];
 }
-
-/** The ⋯ on a row of your own: change it, or let it go. */
-export const OwnExerciseActionIds = {
-  Edit: 'edit',
-  Delete: 'delete',
-} as const;
-
-export type OwnExerciseActionId = (typeof OwnExerciseActionIds)[keyof typeof OwnExerciseActionIds];
-
-export const OWN_EXERCISE_ACTIONS: readonly SheetAction<OwnExerciseActionId>[] = [
-  {
-    id: OwnExerciseActionIds.Edit,
-    label: 'button.edit',
-    icon: 'create-outline',
-    color: 'primary',
-  },
-  {
-    id: OwnExerciseActionIds.Delete,
-    label: 'button.delete',
-    hint: 'exercises.own.deleteHint',
-    icon: 'trash-outline',
-    color: 'danger',
-    destructive: true,
-  },
-];

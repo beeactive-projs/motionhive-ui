@@ -228,7 +228,7 @@
       "archive": {
         "accept": "Da, arhivează",
         "header": "Arhivează clientul",
-        "message": "Sigur vrei să arhivezi relația cu {name}?"
+        "message": "Arhivezi relația cu {name}? Colaborarea se încheie: va fi anunțat, iar antrenamentele lui nu îți mai sunt deschise. Ca să lucrați din nou împreună, trimite-i o invitație pe care s-o accepte."
       },
       "cancelInvitation": {
         "accept": "Anulează invitația",
@@ -245,10 +245,10 @@
         "header": "Retrimite invitația",
         "message": "Retrimiți invitația către {name}?"
       },
-      "unarchive": {
-        "accept": "Da, dezarhivează",
-        "header": "Dezarhivează clientul",
-        "message": "Sigur vrei să dezarhivezi relația cu {name}?"
+      "inviteAgain": {
+        "header": "Invită din nou",
+        "message": "Îi trimiți o invitație lui {name}? Redevine clientul tău după ce acceptă.",
+        "accept": "Trimite invitația"
       }
     },
     "import": {
@@ -473,7 +473,7 @@
       "actions": {
         "archive": "Arhivează clientul",
         "message": "Trimite mesaj",
-        "unarchive": "Dezarhivează clientul"
+        "inviteAgain": "Invită din nou"
       },
       "back": "Înapoi la clienți",
       "info": {
@@ -585,14 +585,16 @@
           "dropped": "A scăzut de la {previous}% la {current}% față de perioada anterioară.",
           "neverStarted": "Are un plan atribuit, dar nu a înregistrat niciun antrenament.",
           "silent": "{due, plural, one {{completed} din # sesiune făcută în această perioadă.} few {{completed} din # sesiuni făcute în această perioadă.} other {{completed} din # de sesiuni făcute în această perioadă.}}",
-          "silentNoDue": "Niciun antrenament înregistrat recent."
+          "silentNoDue": "Niciun antrenament înregistrat recent.",
+          "noPlan": "Nu are acum niciun plan de urmat."
         },
         "hint": "cele mai urgente primele",
         "reason": {
           "behind": "Rămas în urmă cu planul",
           "dropped": "În scădere",
           "neverStarted": "Nu a început",
-          "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}"
+          "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}",
+          "noPlan": "Fără plan"
         },
         "title": "Necesită atenție"
       },
@@ -615,7 +617,8 @@
       "subtitle": {
         "noPlan": "Niciun plan activ",
         "nothingScheduled": "Nimic programat în această perioadă",
-        "sessions": "{due, plural, one {{completed} din # sesiune} few {{completed} din # sesiuni} other {{completed} din # de sesiuni}}"
+        "sessions": "{due, plural, one {{completed} din # sesiune} few {{completed} din # sesiuni} other {{completed} din # de sesiuni}}",
+        "paused": "Plan pe pauză"
       },
       "trainedToday": "s-a antrenat azi",
       "windowAriaLabel": "Interval de timp"
@@ -679,13 +682,17 @@
         "detail": "Nu am putut trimite invitația. Încearcă din nou.",
         "summary": "Invitația nu a putut fi trimisă"
       },
-      "unarchiveFailed": {
-        "detail": "Clientul nu a putut fi dezarhivat",
-        "summary": "Dezarhivarea a eșuat"
+      "inviteAgainFailed": {
+        "summary": "Invitația nu a fost trimisă",
+        "detail": "Nu am putut trimite invitația. Încearcă din nou."
       },
-      "unarchived": {
-        "detail": "Relația cu clientul a fost restaurată",
-        "summary": "Client dezarhivat"
+      "invitedAgain": {
+        "summary": "Invitație trimisă",
+        "detail": "Redevine clientul tău după ce acceptă."
+      },
+      "alreadyInvited": {
+        "summary": "Deja invitat",
+        "detail": "Are deja o invitație de la tine."
       }
     }
   },
@@ -1343,6 +1350,9 @@
     },
     "formDialog": {
       "addTag": "Adaugă etichetă",
+      "categories": "Ce se antrenează în grup",
+      "categoriesHint": "Oamenii găsesc grupul după ele în Descoperă.",
+      "categoriesPlaceholder": "Alege activități",
       "create": "Creează grupul",
       "descriptionPlaceholder": "Descrie scopul acestui grup...",
       "joinPolicyPlaceholder": "Alege cine se poate alătura",
@@ -1754,7 +1764,7 @@
     "blockDialog": {
       "block": "Blochează",
       "header": "Blochezi acest utilizator?",
-      "leadAfterName": "nu îți va mai putea trimite mesaje și nu va mai vedea istoricul conversației voastre. Îl poți debloca oricând din setările de siguranță.",
+      "leadAfterName": "nu îți va mai putea trimite mesaje și nu va mai vedea istoricul conversației voastre. Dacă unul dintre voi îl antrenează pe celălalt, colaborarea se încheie și ea. Îl poți debloca oricând din setările de siguranță.",
       "reason": "Motiv (opțional)"
     },
     "bubble": {
@@ -2318,7 +2328,7 @@
       "summary": {
         "block": "{days}, timp de {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}.",
         "pickDay": "Alege cel puțin o zi.",
-        "weekly": "{days}, în fiecare săptămână."
+        "weekly": "{days}, în fiecare săptămână, timp de {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}."
       },
       "title": "Adaugă în săptămâna ta",
       "toast": {
@@ -4682,7 +4692,8 @@
       "providerOther": "Alta",
       "travelRadius": "Rază de deplasare (km)",
       "travelRadiusHint": "Cât de departe ești dispus să te deplasezi la client.",
-      "travelRadiusPlaceholder": "ex. 15"
+      "travelRadiusPlaceholder": "ex. 15",
+      "meetingUrlHint": "Opțional și nu apare niciodată pe profilul tău public."
     },
     "kind": {
       "CLIENT_HOME": "La client",
@@ -4721,10 +4732,6 @@
       "meetingUrlInvalid": {
         "detail": "Folosește ceva de genul zoom.us/j/123 sau https://meet.google.com/...",
         "summary": "Linkul întâlnirii pare invalid"
-      },
-      "meetingUrlRequired": {
-        "detail": "Lipește URL-ul întâlnirii pentru locațiile online.",
-        "summary": "Linkul întâlnirii e obligatoriu"
       },
       "nameRequired": {
         "detail": "Dă-i locației un nume scurt.",

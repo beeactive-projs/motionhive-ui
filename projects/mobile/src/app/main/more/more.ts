@@ -2,7 +2,7 @@ import { Component, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { chatbubbleEllipsesOutline } from 'ionicons/icons';
+import { chatbubbleEllipsesOutline, timeOutline } from 'ionicons/icons';
 import {
   IonButtons,
   IonContent,
@@ -16,7 +16,7 @@ import {
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 
-import { AppModeStore, AuthStore } from 'core';
+import { AppModeStore, AuthStore, environment } from 'core';
 
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
@@ -104,10 +104,13 @@ export class More implements ViewWillEnter {
   /** The feedback sheet, from the row at the foot of the menu. */
   readonly feedbackOpen = signal(false);
 
+  /** Developer pages, below everything, in any build but a production one. */
+  readonly devTools = !environment.production;
+
   constructor() {
     // The feedback row's glyph is the menu's own; the tab shell registers
     // only the icons its configs name.
-    addIcons({ chatbubbleEllipsesOutline });
+    addIcons({ chatbubbleEllipsesOutline, timeOutline });
   }
 
   /** Tab pages stay alive, so re-entering is the moment a dot can be stale. */
@@ -121,6 +124,11 @@ export class More implements ViewWillEnter {
 
   open(entry: MoreTile): void {
     void this._router.navigateByUrl(entry.route);
+  }
+
+  /** Every workout status surface, on mock data (developers only). */
+  openWorkoutStatus(): void {
+    void this._router.navigateByUrl('/tabs/more/dev/workout-status');
   }
 
   /** Same destination as the home pill — a page that explains what a switch changes. */

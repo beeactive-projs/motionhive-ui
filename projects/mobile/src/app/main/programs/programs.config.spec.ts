@@ -130,7 +130,8 @@ describe('programs config', () => {
   // The paused promise is the whole point of pausing.
   it('says what resuming a paused assignment does', () => {
     expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Paused }))).toMatch(
-      /shifts the remaining schedule forward/,
+      // What really happens: the nightly sweep skips the missed days.
+      /marked skipped once it resumes/,
     );
     // Started is the fact a coach scans for; the percentage alone hid it.
     expect(assignmentSubline(assignment())).toMatch(/^Started .+ · 25% done$/);

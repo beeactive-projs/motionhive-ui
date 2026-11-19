@@ -24,6 +24,7 @@ import {
   ThreatFlags,
   UserBlockReason,
 } from '../models/messaging';
+import { UserSearchResult } from '../models/user/user.model';
 import { conversationMatches } from '../utils/messaging.utils';
 
 /**
@@ -190,6 +191,14 @@ export class MessagingStore {
   /** Server-reported total, for deciding whether another page exists. */
   private readonly _total = signal(0);
   private readonly _loadingMore = signal(false);
+  /**
+   * Rows fetched one at a time for a thread opened from outside the loaded
+   * pages (a link, a notification, a search). Kept across a list refresh so
+   * the open thread keeps its header and composer, and left out of the page
+   * count so paging does not skip a row.
+   */
+  private readonly _outsidePages = new Set<string>();
+  private readonly _fetchingOne = new Set<string>();
   private readonly _activeId = signal<string | null>(null);
   private readonly _filter = signal<InboxFilter>('all');
   private readonly _searchQuery = signal<string>('');
@@ -228,6 +237,8 @@ export class MessagingStore {
    * separate route.
    */
   private readonly _composeMode = signal(false);
+  /** Who the picker opens addressed to, when a "Message" button named them. */
+  private readonly _composeRecipient = signal<UserSearchResult | null>(null);
 
   /**
    * `Date.now()` at which the BE-imposed send rate limit clears, if
@@ -407,6 +418,7 @@ export class MessagingStore {
 
   // ── F4 public read surfaces ─────────────────────────────────
   readonly composeMode = this._composeMode.asReadonly();
+  readonly composeRecipient = this._composeRecipient.asReadonly();
   readonly sendRateLimitedUntil = this._sendRateLimitedUntil.asReadonly();
   readonly sendError = this._sendError.asReadonly();
 
@@ -562,13 +574,19 @@ export class MessagingStore {
     this._composerDraft.update((all) => ({ ...all, [key]: text }));
   }
 
-  /** Open the New Message picker. URL stays /messages. */
-  enterComposeMode(): void {
+  /**
+   * Open the New Message picker. URL stays /messages. With a recipient it
+   * opens addressed to them, for a "Message" button whose person has no
+   * thread yet (or one past the loaded page: the first send finds it).
+   */
+  enterComposeMode(recipient: UserSearchResult | null = null): void {
+    this._composeRecipient.set(recipient);
     this._composeMode.set(true);
   }
 
   exitComposeMode(): void {
     this._composeMode.set(false);
+    this._composeRecipient.set(null);
     // Discard the 'new' draft so the picker starts fresh next time
     // and clear any inline error left from a failed picker send.
     this._composerDraft.update((all) => omitKey(all, 'new'));
@@ -828,6 +846,7 @@ export class MessagingStore {
     // A pending thread exists only on this client — asking the server
     // for its history would 400 on the id.
     if (isPendingThreadKey(conversationId)) return;
+    this.ensureConversation(conversationId);
 
     const state = this.messagesFor(conversationId);
     if (state.loading) return;
@@ -1182,6 +1201,40 @@ export class MessagingStore {
   // ─── Data actions ─────────────────────────────────────────────
 
   /**
+   * The inbox row of a thread that is open but not among the loaded pages
+   * (past the first 50, or opened before the list came): fetched on its
+   * own, so the thread has its header and its composer. It used to open
+   * blank, with sending switched off.
+   */
+  ensureConversation(conversationId: string): void {
+    if (isPendingThreadKey(conversationId)) {
+      return;
+    }
+    if (this._conversations().some((c) => c.id === conversationId)) {
+      return;
+    }
+    if (this._fetchingOne.has(conversationId)) {
+      return;
+    }
+    this._fetchingOne.add(conversationId);
+    this._api
+      .getConversation(conversationId)
+      .pipe(
+        catchError(() => EMPTY),
+        finalize(() => this._fetchingOne.delete(conversationId)),
+      )
+      .subscribe((conversation) => {
+        this._conversations.update((list) => {
+          if (list.some((c) => c.id === conversation.id)) {
+            return list;
+          }
+          this._outsidePages.add(conversation.id);
+          return [...list, conversation];
+        });
+      });
+  }
+
+  /**
    * Append the next page of conversations.
    *
    * Separate from `loadConversations` on purpose: that one *replaces* the list
@@ -1200,7 +1253,8 @@ export class MessagingStore {
 
     // Page from what we hold rather than a counter: SSE inserts and removals
     // change the list under us, and a stale page number would skip or repeat.
-    const nextPage = Math.floor(this._conversations().length / CONVERSATION_PAGE_SIZE) + 1;
+    const paged = this._conversations().filter((c) => !this._outsidePages.has(c.id)).length;
+    const nextPage = Math.floor(paged / CONVERSATION_PAGE_SIZE) + 1;
     this._loadingMore.set(true);
 
     this._api
@@ -1212,6 +1266,10 @@ export class MessagingStore {
             const seen = new Set(current.map((c) => c.id));
             return [...current, ...page.items.filter((c) => !seen.has(c.id))];
           });
+          // A thread fetched on its own has now come in with its page.
+          for (const item of page.items) {
+            this._outsidePages.delete(item.id);
+          }
         }),
         catchError(() => EMPTY),
         finalize(() => {
@@ -1264,7 +1322,14 @@ export class MessagingStore {
       .listConversations(1, CONVERSATION_PAGE_SIZE)
       .pipe(
         tap((page) => {
-          this._conversations.set(page.items);
+          const pageIds = new Set(page.items.map((c) => c.id));
+          const outside = this._conversations().filter(
+            (c) => this._outsidePages.has(c.id) && !pageIds.has(c.id),
+          );
+          for (const id of pageIds) {
+            this._outsidePages.delete(id);
+          }
+          this._conversations.set([...page.items, ...outside]);
           this._total.set(page.total);
           this._hasLoaded.set(true);
           this._loadFailed.set(false);

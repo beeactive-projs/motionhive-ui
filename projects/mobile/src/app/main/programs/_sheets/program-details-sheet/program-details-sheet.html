@@ -24,11 +24,22 @@
     <section class="length">
       <span class="mh-kicker">{{ 'programs.settings.length' | translate }}</span>
       <div class="mh-stepper" role="group" [attr.aria-label]="'programs.settings.lengthAria' | translate">
-        <ion-button fill="clear" [disabled]="weeks() <= 1" [attr.aria-label]="'programs.settings.weekFewer' | translate" (click)="stepWeeks(-1)">
+        <ion-button
+          fill="clear"
+          shape="round"
+          [disabled]="weeks() <= 1"
+          [attr.aria-label]="'programs.settings.weekFewer' | translate"
+          (click)="stepWeeks(-1)"
+        >
           <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
         </ion-button>
         <span class="value" aria-live="polite">{{ weeks() }} <em>{{ weeksLabel() }}</em></span>
-        <ion-button fill="clear" [attr.aria-label]="'programs.settings.weekMore' | translate" (click)="stepWeeks(1)">
+        <ion-button
+          fill="clear"
+          shape="round"
+          [attr.aria-label]="'programs.settings.weekMore' | translate"
+          (click)="stepWeeks(1)"
+        >
           <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
         </ion-button>
       </div>

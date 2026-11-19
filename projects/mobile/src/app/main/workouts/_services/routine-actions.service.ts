@@ -49,11 +49,15 @@ export class RoutineActionsService {
     );
   }
 
-  /** After the red confirm. The workouts logged from it stay in History. */
+  /**
+   * After the red confirm. The workouts logged from it stay in History; its
+   * days still ahead on a schedule are cancelled with it, or a deleted
+   * routine kept showing up on Today (the web asks the same).
+   */
   remove(id: string): Observable<void> {
     return this._run(
       id,
-      () => this._routineService.remove(id),
+      () => this._routineService.remove(id, true),
       'workouts.routineBuilder.toast.deleted',
       'workouts.routineBuilder.toast.deleteFailed',
     );

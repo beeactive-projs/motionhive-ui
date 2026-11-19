@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, input, model, output, signal } fro
 import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { CoachDirectoryFacets, CoachDirectorySort } from 'core';
+import { CategoryStore, CoachDirectoryFacets, CoachDirectorySort } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import {
@@ -20,7 +20,8 @@ import {
  * header, chip groups in the body, Cancel / Apply in the footer), so a filter
  * is picked the same way everywhere in the app. These go to the server: the
  * list is paged, and a filter over the page already loaded would return short
- * pages. The specializations and cities come from the whole directory
+ * pages. What coaches coach (the category list, the same one Discover's
+ * chips use) and the cities come from the whole directory
  * (`/directory/facets`), with how many coaches each.
  *
  * Edits are local until Apply, so browsing the chips never reloads the list
@@ -34,10 +35,32 @@ import {
 })
 export class CoachFilterSheet {
   private readonly _translateService = inject(TranslateService);
+  private readonly _categoryStore = inject(CategoryStore);
 
   readonly open = model(false);
   readonly filters = input<CoachSheetFilters>(NO_SHEET_FILTERS);
   readonly facets = input<CoachDirectoryFacets>({ cities: [], specializations: [] });
+
+  /**
+   * The activities somebody coaches, in the list's order with how many
+   * coach each, plus any picked one nobody coaches any more (so a pick can
+   * always be taken off).
+   */
+  readonly categoryChips = computed(() => {
+    const counts = new Map<string, number>();
+    for (const facet of this.facets().categories ?? []) {
+      counts.set(facet.id, facet.count);
+    }
+    const picked = this.draft().categoryIds;
+    const chips: { id: string; name: string; count: number }[] = [];
+    for (const category of this._categoryStore.activities()) {
+      const count = counts.get(category.id) ?? 0;
+      if (count > 0 || picked.includes(category.id)) {
+        chips.push({ id: category.id, name: category.name, count });
+      }
+    }
+    return chips;
+  });
 
   readonly applied = output<CoachSheetFilters>();
 
@@ -53,6 +76,7 @@ export class CoachFilterSheet {
       if (!this.open()) return;
       this.draft.set({ ...this.filters() });
     });
+    this._categoryStore.ensureLoaded();
   }
 
   readonly count = computed(() => sheetFilterCount(this.draft()));
@@ -68,18 +92,18 @@ export class CoachFilterSheet {
     this.draft.update((draft) => ({ ...draft, sort }));
   }
 
-  /** Specializations stack: each chip is its own toggle. */
-  toggleSpecialization(label: string): void {
-    this.draft.update((draft) => ({
-      ...draft,
-      specializations: draft.specializations.includes(label)
-        ? draft.specializations.filter((picked) => picked !== label)
-        : [...draft.specializations, label],
-    }));
+  /** What they coach stacks: each chip is its own toggle, any of them matches. */
+  toggleCategory(id: string): void {
+    this.draft.update((draft) => {
+      if (draft.categoryIds.includes(id)) {
+        return { ...draft, categoryIds: draft.categoryIds.filter((picked) => picked !== id) };
+      }
+      return { ...draft, categoryIds: [...draft.categoryIds, id] };
+    });
   }
 
-  isPicked(label: string): boolean {
-    return this.draft().specializations.includes(label);
+  isPicked(id: string): boolean {
+    return this.draft().categoryIds.includes(id);
   }
 
   /** One city at a time; null is everywhere. */

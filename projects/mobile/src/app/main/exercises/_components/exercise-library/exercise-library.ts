@@ -2,13 +2,13 @@ import { Component, computed, inject, input, linkedSignal, signal, viewChild } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import {
+  InfiniteScrollCustomEvent,
   IonButton,
   IonIcon,
-  IonItem,
-  IonLabel,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonList,
   IonSearchbar,
-  IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
@@ -23,7 +23,7 @@ import {
 } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { RowSkeleton } from '../../../../_shared/components/row-skeleton/row-skeleton';
 import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { ExerciseFilterSheet } from '../../_sheets/exercise-filter-sheet/exercise-filter-sheet';
 import {
@@ -34,8 +34,8 @@ import {
   resultMetaLabel,
 } from '../../exercises.config';
 import { ExerciseFilters, ExercisesStore } from '../../exercises.store';
-import { ExerciseRow } from '../exercise-row/exercise-row';
 import { CreateExerciseRow } from '../create-exercise-row/create-exercise-row';
+import { ExerciseFlatRow } from '../exercise-flat-row/exercise-flat-row';
 import { OwnExerciseSheets } from '../own-exercise-sheets/own-exercise-sheets';
 
 /** Long enough that a typist is not sending a request per letter. */
@@ -43,10 +43,15 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 /**
  * The exercise library as a page's section: the field, the filter strip and
- * the list, a page at a time with Show more. The Workouts page's Exercises
- * tab; the library's own page keeps its header search and the coach's
- * authoring. Here a person makes and keeps their own exercises through the
- * short form: "New exercise" over the list, a ⋯ on each of their rows.
+ * the list. The Workouts page's Exercises tab; the library's own page keeps
+ * its header search and the coach's authoring.
+ *
+ * The list is the library page's (user decision, 2026-11-17): a flat list of
+ * `mh-exercise-flat-row`s run edge to edge, loading the next page as its end
+ * comes up. So the host places this outside `.mh-page`, and the field and
+ * the chips sit on the row gutter, in line with the tiles. Here a person
+ * makes and keeps their own exercises through the short form: "New exercise"
+ * beside the count, and a swipe left to Edit and Delete on each of their rows.
  *
  * Its state is the host's `ExercisesStore`, so switching tabs keeps the
  * place; the host refreshes it when the section shows. `detailBase` is where
@@ -58,16 +63,15 @@ const SEARCH_DEBOUNCE_MS = 300;
     CreateExerciseRow,
     EmptyState,
     ExerciseFilterSheet,
-    ExerciseRow,
-    HexAvatar,
+    ExerciseFlatRow,
     IonButton,
     IonIcon,
-    IonItem,
-    IonLabel,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     IonList,
     IonSearchbar,
-    IonSkeletonText,
     OwnExerciseSheets,
+    RowSkeleton,
     SearchbarLabelDirective,
     TranslatePipe,
   ],
@@ -83,7 +87,7 @@ export class ExerciseLibrary {
   /** Where an exercise opens, as router commands before its id. */
   readonly detailBase = input<readonly string[]>(['/tabs/exercises']);
 
-  readonly skeletonRows = [1, 2, 3, 4, 5, 6];
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
   readonly filterOpen = signal(false);
   /**
    * The raw field value; the committed term lives on the store, which
@@ -115,6 +119,9 @@ export class ExerciseLibrary {
 
   readonly metaLabel = computed(() => resultMetaLabel(this.store.total(), this.store.sort()));
 
+  /** The one slice that mixes owners, so the only one whose rows say whose they are. */
+  readonly onAll = computed(() => this.store.ownership() === ExerciseOwnershipFilter.All);
+
   /**
    * Mine with nothing in it and nothing narrowing it: a beginning, with the
    * way to make one, not "nothing matches".
@@ -136,7 +143,6 @@ export class ExerciseLibrary {
     this._searchTerms
       .pipe(debounceTime(SEARCH_DEBOUNCE_MS), takeUntilDestroyed())
       .subscribe((term) => this.store.setSearch(term));
-
   }
 
   onQuery(value: string): void {
@@ -166,6 +172,10 @@ export class ExerciseLibrary {
     this.store.refresh();
   }
 
+  onLoadMore(event: InfiniteScrollCustomEvent): void {
+    this.store.loadMore(() => void event.target.complete());
+  }
+
   /** From a search that found nothing by that name: the form starts from it. */
   createFromSearch(name: string): void {
     this._ownSheets()?.create(name);
@@ -175,12 +185,17 @@ export class ExerciseLibrary {
     this._ownSheets()?.create();
   }
 
-  hasMenu(exercise: Exercise): boolean {
+  /** Yours, and the short form is offered here: the row swipes to Edit and Delete. */
+  isSwipeable(exercise: Exercise): boolean {
     return this.canKeepOwn() && isOwnExercise(exercise, this.myUserId());
   }
 
-  openMenu(exercise: Exercise): void {
-    this._ownSheets()?.menu(exercise);
+  edit(exercise: Exercise): void {
+    this._ownSheets()?.edit(exercise);
+  }
+
+  confirmDelete(exercise: Exercise): void {
+    this._ownSheets()?.confirmDelete(exercise);
   }
 
   /** Made from here: show it where it now lives, among your own. */

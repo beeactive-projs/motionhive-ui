@@ -31,6 +31,8 @@ export * from './lib/models/profile/instructor-lead.model';
 export * from './lib/models/review/review.model';
 
 // Models - Venue
+export * from './lib/models/onboarding/onboarding.enums';
+export * from './lib/models/onboarding/onboarding.model';
 export * from './lib/models/venue/venue.enums';
 export * from './lib/models/venue/venue.model';
 
@@ -199,6 +201,7 @@ export * from './lib/utils/messaging.utils';
 export * from './lib/utils/client.utils';
 export * from './lib/utils/email.utils';
 export * from './lib/utils/money.utils';
+export * from './lib/utils/apple-sign-in.utils';
 export * from './lib/utils/notification.utils';
 export * from './lib/utils/number.utils';
 export * from './lib/utils/search.utils';
@@ -222,6 +225,7 @@ export * from './lib/i18n/message-format-translator';
 export * from './lib/services/auth/auth.service';
 export * from './lib/services/auth/token.service';
 export * from './lib/services/auth/google-auth.service';
+export * from './lib/services/auth/apple-auth.service';
 export * from './lib/services/auth/facebook-auth.service';
 export * from './lib/services/account-deletion/account-deletion.service';
 export * from './lib/services/user/user.service';
@@ -247,6 +251,8 @@ export * from './lib/services/payment/subscription.service';
 export * from './lib/services/payment/refund.service';
 export * from './lib/services/payment/earnings.service';
 export * from './lib/services/payment/client-payment.service';
+export * from './lib/services/onboarding/category.service';
+export * from './lib/services/onboarding/onboarding.service';
 export * from './lib/services/venue/venue.service';
 export * from './lib/services/exercise/exercise.service';
 export * from './lib/services/workout/program.service';
@@ -273,6 +279,7 @@ export * from './lib/directives/stripe-iframe.directive';
 // Stores
 export * from './lib/stores/auth.store';
 export * from './lib/stores/app-mode.store';
+export * from './lib/stores/category.store';
 export * from './lib/stores/exercise-taxonomy.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';

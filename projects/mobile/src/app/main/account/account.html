@@ -85,6 +85,18 @@
         @if (isInstructor()) {
         <mh-settings-row [label]="'account.rows.coachingProfile' | translate" icon="ribbon-outline" iconColor="info" iconTone="shade"
           [badge]="acceptingBadge()" (select)="go('coaching')" />
+        <!-- Honey: a row that edits something. -->
+        <mh-settings-row [label]="'account.rows.coachCategories' | translate" icon="trophy-outline" iconColor="primary"
+          (select)="openWelcome(WelcomeSteps.coachCategories)" />
+        }
+        <!-- The welcome flow's own screens, as editors: what you like, your level
+             and goals. Violet: part of the profile people see. -->
+        <mh-settings-row [label]="'account.rows.interests' | translate" icon="compass-outline" iconColor="violet"
+          (select)="openWelcome(WelcomeSteps.interests)" />
+        @if (!isInstructor()) {
+        <!-- The coach role's own hue (ROLES), and never violet beside the row above. -->
+        <mh-settings-row [label]="'account.rows.becomeCoach' | translate" icon="people-outline" iconColor="primary"
+          (select)="openWelcome(WelcomeSteps.role)" />
         }
       </ion-list>
     </section>
@@ -132,12 +144,9 @@
         }
         <mh-settings-row [label]="'button.signOut' | translate" icon="log-out-outline" iconColor="danger" [detail]="false"
           [disabled]="signingOut()" (select)="onSignOut()" />
-        <!-- Last, after the everyday sign out, and it opens a page that
-             explains before anything happens. Findable, as Apple requires.
-             Red like every destructive verb (lists.md). -->
-        <mh-settings-row [label]="'account.rows.deleteAccount' | translate" icon="trash-outline" iconColor="danger"
-          (select)="go('delete')" />
       </ion-list>
+      <!-- Delete account lives at the end of Privacy, under "Your data"
+           (owner, 2026-11-18): still two taps from here, as Apple requires. -->
     </section>
 
     @if (memberSince(); as since) {

@@ -62,6 +62,41 @@ export const COACH_FILTERS: readonly CoachFilter[] = [
  */
 export const COACH_FILTER_PARAM = 'filter';
 
+/** What they coach, as Discover's "All" passes a topic in: comma separated category ids. */
+export const COACH_CATEGORIES_PARAM = 'categories';
+
+/**
+ * The screen on a topic from Discover: the Online chip for Online, else its
+ * categories in the sheet, else just the screen.
+ */
+export function coachesTopicUrl(topic: {
+  categoryIds: readonly string[] | null;
+  online: boolean;
+}): string {
+  if (topic.online) {
+    return `${COACHES_URL}?${COACH_FILTER_PARAM}=${CoachFilterIds.Online}`;
+  }
+  if (topic.categoryIds && topic.categoryIds.length > 0) {
+    const ids = topic.categoryIds.map((id) => encodeURIComponent(id)).join(',');
+    return `${COACHES_URL}?${COACH_CATEGORIES_PARAM}=${ids}`;
+  }
+  return COACHES_URL;
+}
+
+/** The categories a URL of this screen passes in (`?categories=`), or null for none. */
+export function categoriesFromUrl(url: string): string[] | null {
+  const [path, query = ''] = url.split('#')[0].split('?');
+  if (path !== COACHES_URL) return null;
+  const value = new URLSearchParams(query).get(COACH_CATEGORIES_PARAM);
+  if (!value) return null;
+  const ids = value
+    .split(',')
+    .map((id) => id.trim())
+    .filter((id) => id !== '');
+  if (ids.length === 0) return null;
+  return [...new Set(ids)];
+}
+
 /** The screen, opened on the reader's own coaches. */
 export const COACHES_YOURS_URL = `${COACHES_URL}?${COACH_FILTER_PARAM}=${CoachFilterIds.Yours}`;
 
@@ -113,8 +148,8 @@ export function matchesCoachQuery(coach: InstructorSearchResult, query: string):
 /** What the Filters chip's sheet holds. Applied together, on Apply. */
 export interface CoachSheetFilters {
   sort: CoachDirectorySort;
-  /** Any of them; the facet labels, as the API matches them. */
-  specializations: readonly string[];
+  /** What they coach: any of these categories (ids from `GET /categories`). */
+  categoryIds: readonly string[];
   /** A facet city's label, or null for everywhere. */
   city: string | null;
   /** At least this many years; null for any. */
@@ -123,14 +158,14 @@ export interface CoachSheetFilters {
 
 export const NO_SHEET_FILTERS: CoachSheetFilters = {
   sort: CoachDirectorySorts.Recommended,
-  specializations: [],
+  categoryIds: [],
   city: null,
   minYears: null,
 };
 
 /** Whether the sheet narrows the list, as opposed to only reordering it. */
 export function sheetNarrows(filters: CoachSheetFilters): boolean {
-  return filters.specializations.length > 0 || !!filters.city || !!filters.minYears;
+  return filters.categoryIds.length > 0 || !!filters.city || !!filters.minYears;
 }
 
 /**
@@ -140,7 +175,7 @@ export function sheetNarrows(filters: CoachSheetFilters): boolean {
 export function sheetFilterCount(filters: CoachSheetFilters): number {
   return (
     (filters.sort !== CoachDirectorySorts.Recommended ? 1 : 0) +
-    filters.specializations.length +
+    filters.categoryIds.length +
     (filters.city ? 1 : 0) +
     (filters.minYears ? 1 : 0)
   );
@@ -216,7 +251,7 @@ export function directoryParams(request: DirectoryRequest): CoachDirectoryParams
     ...(city ? { city } : {}),
     ...(chip === CoachFilterIds.Requests ? { requested: true } : {}),
     ...(chip === CoachFilterIds.Online ? { online: true } : {}),
-    ...(sheet.specializations.length > 0 ? { specializations: sheet.specializations } : {}),
+    ...(sheet.categoryIds.length > 0 ? { categoryIds: sheet.categoryIds } : {}),
     ...(sheet.minYears ? { minYears: sheet.minYears } : {}),
   };
 }
@@ -229,7 +264,7 @@ export function narrowsDirectory(params: CoachDirectoryParams): boolean {
     params.accepting ||
     params.online ||
     params.requested ||
-    params.specializations?.length ||
+    params.categoryIds?.length ||
     params.minYears
   );
 }

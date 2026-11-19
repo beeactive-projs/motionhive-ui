@@ -181,7 +181,7 @@ export class Discover implements OnInit {
   // ── Coaches ──────────────────────────────────────────────────────
   private loadCoaches(q?: string): void {
     this.loadingCoaches.set(true);
-    this._profileService.discoverInstructors(q || undefined).subscribe({
+    this._profileService.discoverInstructors({ search: q || undefined }).subscribe({
       next: (list) => {
         this.coaches.set(list);
         this.loadingCoaches.set(false);

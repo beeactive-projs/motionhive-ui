@@ -1,3 +1,9 @@
+.providers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 // Holds the height of Google's button while its script loads.
 // Google's iframe document is light only. In dark mode the page is
 // `color-scheme: dark` (PrimeNG sets it on `.dark`), and Safari paints an
@@ -6,6 +12,54 @@
 .google {
   min-height: 2.75rem;
   color-scheme: light;
+}
+
+// Apple's rules for a custom Sign in with Apple button: black with a white
+// logo and title on a light page, white with black on a dark one (a brand
+// requirement, like Google's colours, so no theme token). The size follows
+// Google's drawn "large" button beside it: 40px tall, as wide as the column
+// up to Google's 400px, with Google's corner and label size, so neither
+// stands out over the other.
+.apple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+  height: 40px;
+  margin-inline: auto;
+  padding: 0 0.75rem;
+  border: 1px solid #000;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  svg {
+    width: 0.875rem;
+    height: 1.0625rem;
+    flex: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+:host-context(.dark) .apple {
+  border-color: #fff;
+  background: #fff;
+  color: #000;
 }
 
 :host ::ng-deep .p-divider-content {

@@ -126,7 +126,7 @@ export class CoachRoster implements OnInit {
     // `to`, not `with` — the inbox reads `to`, matching the public
     // profile's message button.
     this._router.navigate(['/messages'], {
-      queryParams: { to: c.clientId },
+      queryParams: { to: c.clientId, name: c.name },
     });
   }
 
@@ -143,6 +143,8 @@ export class CoachRoster implements OnInit {
         return this._translateService.instant('clients.roster.attention.reason.dropped');
       case 'BEHIND':
         return this._translateService.instant('clients.roster.attention.reason.behind');
+      case 'NO_PLAN':
+        return this._translateService.instant('clients.roster.attention.reason.noPlan');
       default:
         return '';
     }
@@ -170,6 +172,8 @@ export class CoachRoster implements OnInit {
           completed: c.completed,
           due: c.due,
         });
+      case 'NO_PLAN':
+        return this._translateService.instant('clients.roster.attention.detail.noPlan');
       default:
         return '';
     }
@@ -182,11 +186,14 @@ export class CoachRoster implements OnInit {
   /** Nothing scheduled is a fact about the plan, not about the person. */
   subtitleFor(c: RosterClient): string {
     if (c.due === 0) {
-      return this._translateService.instant(
-        c.activePlans === 0
-          ? 'clients.roster.subtitle.noPlan'
-          : 'clients.roster.subtitle.nothingScheduled',
-      );
+      if (c.activePlans > 0) {
+        return this._translateService.instant('clients.roster.subtitle.nothingScheduled');
+      }
+      const paused = c.pausedPlans ?? 0;
+      if (paused > 0) {
+        return this._translateService.instant('clients.roster.subtitle.paused');
+      }
+      return this._translateService.instant('clients.roster.subtitle.noPlan');
     }
     return this._translateService.instant('clients.roster.subtitle.sessions', {
       completed: c.completed,

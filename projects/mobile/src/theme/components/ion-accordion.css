@@ -1,0 +1,26 @@
+/* An accordion in a grouped list is one of its rows, so it paints the card.
+   Its host default is Ionic's page colour, which drew the opened row and its
+   content as a band across the card. */
+ion-list.mh-card-list ion-accordion {
+  background: var(--ion-item-background);
+}
+
+/* A disclosure row, as iOS Settings draws one: `class="mh-disclosure"` with
+   `toggleIcon="chevron-forward-outline"`. The chevron points on while the
+   row is shut and turns down as it opens; Ionic gives its toggle a half turn
+   (core.css), which suits a down chevron, not a forward one. Its ink, size
+   and place are the detail chevron's (Ionic's `.item-detail-icon`, inked in
+   ion-list.css), so it lines up with the chevron of every other row in both
+   modes: iOS gives an end icon no gap at all, md 16px. Ionic's script puts
+   the icon in the row, outside any component's style scope, so the rule is
+   global. */
+ion-accordion.mh-disclosure > [slot='header'] .ion-accordion-toggle-icon {
+  margin-inline: calc(var(--inner-padding-end) / 2) -0.375rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-icon-md);
+}
+
+ion-accordion.mh-disclosure.accordion-expanding > [slot='header'] .ion-accordion-toggle-icon,
+ion-accordion.mh-disclosure.accordion-expanded > [slot='header'] .ion-accordion-toggle-icon {
+  transform: rotate(90deg);
+}

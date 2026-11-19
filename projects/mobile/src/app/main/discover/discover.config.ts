@@ -1,22 +1,18 @@
 import {
   alertCircleOutline,
-  barbellOutline,
-  bodyOutline,
   calendarOutline,
   chevronDownOutline,
   closeOutline,
   compassOutline,
   desktopOutline,
-  flameOutline,
-  leafOutline,
   locationOutline,
   lockClosedOutline,
   optionsOutline,
   peopleOutline,
   searchOutline,
+  sparklesOutline,
   timeOutline,
   videocamOutline,
-  walkOutline,
 } from 'ionicons/icons';
 
 import {
@@ -41,7 +37,9 @@ import {
   formatMinorUnits,
   translate,
 } from 'core';
+import type { Category } from 'core';
 
+import { categoryIcon } from '../../_shared/config/category-icons.config';
 import {
   ProfileStacks,
   groupBase,
@@ -52,8 +50,8 @@ import {
 /**
  * The Discover surface's pure brain: spine tones, price parts, spots and
  * full/waitlist chips, the date-preset compiler, the quick-filter chip
- * model, the coach and group lines, the goals and cities that filter the
- * tab, the coach of the week, search's recents and highlights, and the
+ * model, the coach and group lines, the topics and cities that filter the
+ * tab, the spotlight, search's recents and highlights, and the
  * links that keep Discover's screens in whichever stack mounts them.
  *
  * Everything derives from a `PublicSessionInstance` / `InstructorSearchResult`
@@ -65,23 +63,19 @@ import {
 /** Every icon this feature renders — same guard idea as the other configs. */
 export const DISCOVER_ICONS = {
   alertCircleOutline,
-  barbellOutline,
-  bodyOutline,
   calendarOutline,
   chevronDownOutline,
   closeOutline,
   compassOutline,
   desktopOutline,
-  flameOutline,
-  leafOutline,
   locationOutline,
   lockClosedOutline,
   optionsOutline,
   peopleOutline,
   searchOutline,
+  sparklesOutline,
   timeOutline,
   videocamOutline,
-  walkOutline,
 };
 
 // ─── Spine tone ────────────────────────────────────────────────────────────
@@ -447,18 +441,6 @@ export function coachSubline(c: InstructorSearchResult): string {
     : translate('discover.coach.newCoach');
 }
 
-/**
- * The line under a name on Discover's "Coaches near you": two of their
- * specialties, then the years they have coached, or the city when the list
- * spans every city (a list of one city does not need it repeated).
- */
-export function coachNearLine(c: InstructorSearchResult, withCity: boolean): string {
-  const specs = trimmed(c.specializations ?? []).slice(0, 2);
-  const tail = withCity ? c.city?.trim() || coachYears(c) : coachYears(c) || c.city?.trim();
-  const parts = trimmed([...specs, tail]);
-  return parts.length > 0 ? parts.join(' · ') : coachSubline(c);
-}
-
 /** The featured card's facts: up to three specialties and the years. */
 export function coachFacts(c: InstructorSearchResult): string {
   return trimmed([...(c.specializations ?? []).slice(0, 3), coachYears(c)]).join(' · ');
@@ -494,19 +476,27 @@ export function coachBadge(
   return null;
 }
 
-/** Accepting-first, then by name — the only honest sort the payload offers. */
-export function sortCoaches(list: InstructorSearchResult[]): InstructorSearchResult[] {
-  return [...list].sort((a, b) => {
-    if (a.isAcceptingClients !== b.isAcceptingClients) {
-      return a.isAcceptingClients ? -1 : 1;
-    }
-    return coachName(a).localeCompare(coachName(b));
-  });
-}
-
 /** Everyone but the reader: Discover never pitches a coach to themselves. */
 export function withoutReader<T extends { userId: string }>(list: readonly T[], readerId: string | null | undefined): T[] {
   return readerId ? list.filter((item) => item.userId !== readerId) : [...list];
+}
+
+/**
+ * Who takes turns in Discover's spotlight: today's few taking clients, the
+ * reader left out. With nobody taking clients, the most relevant coaches
+ * stand in, so Discover never loses its coaches now that the list under the
+ * spotlight is gone (owner, 2026-11-18). At most `SPOTLIGHT_LIMIT`.
+ */
+export function spotlightCoaches<T extends { userId: string }>(
+  taking: readonly T[],
+  recommended: readonly T[],
+  readerId: string | null | undefined,
+): T[] {
+  let coaches = withoutReader(taking, readerId);
+  if (coaches.length === 0) {
+    coaches = withoutReader(recommended, readerId);
+  }
+  return coaches.slice(0, SPOTLIGHT_LIMIT);
 }
 
 /**
@@ -524,180 +514,242 @@ export function bioQuote(bio: string | null | undefined, max = 140): string | nu
   return `${(space > max / 2 ? cut.slice(0, space) : cut).replace(/[\s,;:]+$/, '')}…`;
 }
 
-// ─── Coach of the week ─────────────────────────────────────────────────────
-
-/** The ISO 8601 week number (weeks start on Monday; week 1 holds the
-    year's first Thursday), in the reader's local calendar. */
-export function isoWeek(date: Date): number {
-  const day = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const weekday = day.getUTCDay() || 7;
-  day.setUTCDate(day.getUTCDate() + 4 - weekday);
-  const yearStart = new Date(Date.UTC(day.getUTCFullYear(), 0, 1));
-  return Math.ceil(((day.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
-}
-
-export interface CoachOfTheWeekOptions {
-  /** The city Discover shows (`cityKey`), or null for everywhere. */
-  cityKey: string | null;
-  readerId: string | null | undefined;
-  goal: DiscoverGoalId | null;
-  now: Date;
-}
+// ─── Coach spotlight ───────────────────────────────────────────────────────
 
 /**
- * One coach taking clients, chosen by the week of the year so it changes
- * every Monday and is the same for everyone looking at the same city that
- * week. Among the city's coaches first, and every city's when that one has
- * nobody; a goal narrows the pool like it narrows the rest of the tab. The
- * pool is ordered by id and counts the reader, so the pick does not depend
- * on who is looking; landing on the reader moves on to the next coach.
+ * At most this many coaches take turns in the spotlight: a few faces, not
+ * the directory. The server picks them (the directory's `spotlight` order,
+ * a new one every day, the same for everyone), so every coach gets turns.
  */
-export function coachOfTheWeek(
-  coaches: readonly InstructorSearchResult[],
-  options: CoachOfTheWeekOptions,
-): InstructorSearchResult | null {
-  const open = coaches
-    .filter((coach) => coach.isAcceptingClients && coachMatchesGoal(coach, options.goal))
-    .sort((a, b) => a.id.localeCompare(b.id));
-  const local = options.cityKey
-    ? open.filter((coach) => cityKey(coach.city) === options.cityKey)
-    : open;
-  const pool = local.some((coach) => coach.userId !== options.readerId) ? local : open;
-  if (pool.length === 0) return null;
-  const start = isoWeek(options.now) % pool.length;
-  for (let step = 0; step < pool.length; step++) {
-    const pick = pool[(start + step) % pool.length];
-    if (pick.userId !== options.readerId) return pick;
-  }
-  return null;
+export const SPOTLIGHT_LIMIT = 5;
+
+/**
+ * How long each coach stays in the spotlight before the next one comes in:
+ * time to read a name, a line and two facts (about 25 words at a relaxed
+ * pace), well past the 5 s under which moving content needs no pause.
+ */
+export const SPOTLIGHT_INTERVAL_MS = 7000;
+
+// ─── Topics ────────────────────────────────────────────────────────────────
+
+/**
+ * What the band's chips and search's browse cards narrow Discover to: the
+ * reader's own interests ("For you"), Online, or one activity from the
+ * category list (`GET /categories`, in the reader's language).
+ */
+export interface DiscoverTopic {
+  /** `for-you`, `online` or the category's slug. */
+  id: string;
+  /** What the chip, the card and the pill say, already translated. */
+  label: string;
+  icon: string;
+  /** The categories it matches; empty for Online. */
+  categoryIds: readonly string[];
+  online: boolean;
 }
 
-// ─── Goals ─────────────────────────────────────────────────────────────────
-
-export const DiscoverGoalIds = {
-  Strength: 'strength',
-  Running: 'running',
-  FatLoss: 'fat-loss',
-  Mobility: 'mobility',
-  Beginners: 'beginners',
+export const DiscoverTopicIds = {
+  ForYou: 'for-you',
   Online: 'online',
 } as const;
 
-export type DiscoverGoalId = (typeof DiscoverGoalIds)[keyof typeof DiscoverGoalIds];
+/** At most this many activity chips after For you and Online: a strip, not a catalogue. */
+export const TOPIC_CHIP_LIMIT = 8;
 
-export interface DiscoverGoal {
-  id: DiscoverGoalId;
-  /** The band's short chip, a translation key; null where the band has no chip. */
-  chip: string | null;
-  /** The search page's browse card, a translation key. */
-  card: string;
-  icon: string;
-  /**
-   * How a word starts when it means this goal, folded (no accents, lower
-   * case), in English and Romanian: "alerg" finds "Alergare" and "Alergăm",
-   * "incepat" finds "începători".
-   */
-  words: readonly string[];
+/** One activity from the list as a topic. */
+export function categoryTopic(category: Category): DiscoverTopic {
+  return {
+    id: category.slug,
+    label: category.name,
+    // A glyph this build registered (`CATEGORY_ICONS`), never a blank box.
+    icon: categoryIcon(category.icon),
+    categoryIds: [category.id],
+    online: false,
+  };
 }
 
-export const DISCOVER_GOALS: Readonly<Record<DiscoverGoalId, DiscoverGoal>> = {
-  [DiscoverGoalIds.Strength]: {
-    id: DiscoverGoalIds.Strength,
-    chip: 'discover.goals.strength',
-    card: 'discover.browse.strength',
-    icon: 'barbell-outline',
-    words: ['strength', 'forta', 'power', 'lift', 'haltere', 'putere', 'musculat', 'bodybuild', 'culturism'],
-  },
-  [DiscoverGoalIds.Running]: {
-    id: DiscoverGoalIds.Running,
-    chip: 'discover.goals.running',
-    card: 'discover.browse.running',
-    icon: 'walk-outline',
-    words: ['run', 'alerg', 'jog', 'marathon', 'maraton', 'trail'],
-  },
-  [DiscoverGoalIds.FatLoss]: {
-    id: DiscoverGoalIds.FatLoss,
-    chip: null,
-    card: 'discover.browse.fatLoss',
-    icon: 'flame-outline',
-    words: ['fat', 'loss', 'slab', 'hiit', 'cardio', 'grasim', 'tonifi'],
-  },
-  [DiscoverGoalIds.Mobility]: {
-    id: DiscoverGoalIds.Mobility,
-    chip: 'discover.goals.mobility',
-    card: 'discover.browse.mobility',
-    icon: 'body-outline',
-    words: ['mobil', 'stretch', 'flexib', 'yoga', 'pilates', 'postur', 'intinder'],
-  },
-  [DiscoverGoalIds.Beginners]: {
-    id: DiscoverGoalIds.Beginners,
-    chip: 'discover.goals.beginners',
-    card: 'discover.browse.beginners',
-    icon: 'leaf-outline',
-    words: ['beginner', 'incepat', 'starter', 'novice', 'debutant'],
-  },
-  [DiscoverGoalIds.Online]: {
-    id: DiscoverGoalIds.Online,
-    chip: 'discover.goals.online',
-    card: 'discover.browse.online',
+export function onlineTopic(): DiscoverTopic {
+  return {
+    id: DiscoverTopicIds.Online,
+    label: translate('discover.goals.online'),
     icon: 'desktop-outline',
-    words: ['online', 'remote', 'virtual'],
-  },
-};
+    categoryIds: [],
+    online: true,
+  };
+}
 
-/** The band's chips, in the design's order. */
-export const GOAL_CHIPS: readonly DiscoverGoalId[] = [
-  DiscoverGoalIds.Strength,
-  DiscoverGoalIds.Running,
-  DiscoverGoalIds.Beginners,
-  DiscoverGoalIds.Online,
-  DiscoverGoalIds.Mobility,
-];
+/**
+ * "For you": every activity the reader picked, as one topic. Null when they
+ * picked none (goals alone say why, not what, so nothing matches on them).
+ * `activities` is the list's activities (`CategoryStore.activities`), so a
+ * goal among the interests finds nothing here.
+ */
+export function forYouTopic(
+  activities: readonly Category[],
+  interestIds: readonly string[],
+): DiscoverTopic | null {
+  const liked = activities.filter((category) => interestIds.includes(category.id));
+  if (liked.length === 0) {
+    return null;
+  }
+  return {
+    id: DiscoverTopicIds.ForYou,
+    label: translate('discover.goals.forYou'),
+    icon: 'sparkles-outline',
+    categoryIds: liked.map((category) => category.id),
+    online: false,
+  };
+}
 
-/** Search's "Browse by goal" cards, two to a row. */
-export const BROWSE_GOALS: readonly DiscoverGoalId[] = [
-  DiscoverGoalIds.Strength,
-  DiscoverGoalIds.Running,
-  DiscoverGoalIds.FatLoss,
-  DiscoverGoalIds.Mobility,
-  DiscoverGoalIds.Beginners,
-  DiscoverGoalIds.Online,
-];
+/**
+ * What the API narrows a list to for a topic: its categories, or null for
+ * no topic and for Online, which no category says (a coach's online venue,
+ * where a session happens).
+ */
+export function topicCategoryIds(topic: DiscoverTopic | null): readonly string[] | null {
+  if (!topic || topic.categoryIds.length === 0) {
+    return null;
+  }
+  return topic.categoryIds;
+}
 
-/** Whether any of `texts` has a word that starts like one of the goal's. */
-export function textMatchesGoal(
-  texts: readonly (string | null | undefined)[],
-  goal: DiscoverGoalId,
+/**
+ * Whether an item holds one of the topic's categories. Categories are the
+ * only thing a topic matches on: the API tags coaches, groups and sessions
+ * and filters by the same ids (`categoryIds`), so the phone never guesses
+ * from words in a name.
+ */
+function inTopicCategories(
+  itemCategoryIds: readonly string[] | undefined,
+  topic: DiscoverTopic,
 ): boolean {
-  const starts = DISCOVER_GOALS[goal].words;
-  return texts.some((text) =>
-    foldForSearch(text ?? '')
-      .split(/[^a-z0-9]+/)
-      .some((word) => word !== '' && starts.some((start) => word.startsWith(start))),
+  const ids = itemCategoryIds ?? [];
+  return ids.some((id) => topic.categoryIds.includes(id));
+}
+
+/**
+ * A group by what it trains. Online is where a session happens, and a
+ * group has no place of its own, so no group is shown under it.
+ */
+export function groupMatchesTopic(g: DiscoverGroup, topic: DiscoverTopic | null): boolean {
+  if (!topic) {
+    return true;
+  }
+  if (topic.online) {
+    return false;
+  }
+  return inTopicCategories(g.categoryIds, topic);
+}
+
+/** A session by its categories (its group's, else its coach's), and Online by where it happens. */
+export function sessionMatchesTopic(
+  i: PublicSessionInstance,
+  topic: DiscoverTopic | null,
+): boolean {
+  if (!topic) {
+    return true;
+  }
+  if (topic.online) {
+    return isOnlineSession(i);
+  }
+  return inTopicCategories(i.template?.categoryIds, topic);
+}
+
+/**
+ * What Discover knows is there, for deciding which topics are worth a chip:
+ * the categories coached anywhere and how many coach online (the
+ * directory's facets, over every coach), and the groups and sessions on
+ * screen.
+ */
+export interface DiscoverPool {
+  coachCategoryIds: ReadonlySet<string>;
+  onlineCoaches: number;
+  groups: readonly DiscoverGroup[];
+  sessions: readonly PublicSessionInstance[];
+}
+
+/** The pool's coach side from the directory's facets. */
+export function coachPool(
+  facets: { categories?: readonly { id: string; count: number }[]; online?: number },
+): Pick<DiscoverPool, 'coachCategoryIds' | 'onlineCoaches'> {
+  const ids = new Set<string>();
+  for (const facet of facets.categories ?? []) {
+    if (facet.count > 0) {
+      ids.add(facet.id);
+    }
+  }
+  return { coachCategoryIds: ids, onlineCoaches: facets.online ?? 0 };
+}
+
+/** Whether anything in the pool matches the topic. */
+export function topicHasMatches(topic: DiscoverTopic, pool: DiscoverPool): boolean {
+  let coaches = false;
+  if (topic.online) {
+    coaches = pool.onlineCoaches > 0;
+  } else {
+    coaches = topic.categoryIds.some((id) => pool.coachCategoryIds.has(id));
+  }
+  return (
+    coaches ||
+    pool.groups.some((group) => groupMatchesTopic(group, topic)) ||
+    pool.sessions.some((instance) => sessionMatchesTopic(instance, topic))
   );
 }
 
 /**
- * A coach by what they coach, and Online by an online venue (the API's
- * `isOnline`), never by a word in their specializations. No goal matches
- * everyone.
+ * The band's chips: For you when the reader likes something on screen, then
+ * the activities that have something to show (the list's order, at most
+ * `TOPIC_CHIP_LIMIT`), then Online when something is online. A chip that
+ * would empty the tab is never offered, except the one the reader picked
+ * (`pickedId`): it stays while it is picked, past the cap too, so the lit
+ * chip never leaves the strip.
  */
-export function coachMatchesGoal(c: InstructorSearchResult, goal: DiscoverGoalId | null): boolean {
-  if (!goal) return true;
-  if (goal === DiscoverGoalIds.Online) return c.isOnline;
-  return textMatchesGoal(c.specializations ?? [], goal);
+export function discoverTopicChips(
+  activities: readonly Category[],
+  interestIds: readonly string[],
+  pool: DiscoverPool,
+  pickedId?: string | null,
+): DiscoverTopic[] {
+  const chips: DiscoverTopic[] = [];
+  const forYou = forYouTopic(activities, interestIds);
+  if (forYou && (forYou.id === pickedId || topicHasMatches(forYou, pool))) {
+    chips.push(forYou);
+  }
+  let shown = 0;
+  for (const category of activities) {
+    const topic = categoryTopic(category);
+    if (topic.id === pickedId || (shown < TOPIC_CHIP_LIMIT && topicHasMatches(topic, pool))) {
+      chips.push(topic);
+      shown++;
+    }
+  }
+  const online = onlineTopic();
+  if (online.id === pickedId || topicHasMatches(online, pool)) {
+    chips.push(online);
+  }
+  return chips;
 }
 
-/** A group by its name and tags. */
-export function groupMatchesGoal(g: DiscoverGroup, goal: DiscoverGoalId | null): boolean {
-  return !goal || textMatchesGoal([g.name, ...(g.tags ?? [])], goal);
-}
-
-/** A session by its title, and Online by where it happens. */
-export function sessionMatchesGoal(i: PublicSessionInstance, goal: DiscoverGoalId | null): boolean {
-  if (!goal) return true;
-  if (goal === DiscoverGoalIds.Online) return isOnlineSession(i);
-  return textMatchesGoal([discoverTitle(i), i.template?.group?.name], goal);
+/**
+ * Search's "Browse by activity" cards: For you when the reader picked some
+ * (built as the band's chips build it), then every activity on the list,
+ * then Online. The lists behind them load only once one is opened, so every
+ * activity is offered.
+ */
+export function browseTopics(
+  activities: readonly Category[],
+  interestIds: readonly string[],
+): DiscoverTopic[] {
+  const topics: DiscoverTopic[] = [];
+  const forYou = forYouTopic(activities, interestIds);
+  if (forYou) {
+    topics.push(forYou);
+  }
+  for (const category of activities) {
+    topics.push(categoryTopic(category));
+  }
+  topics.push(onlineTopic());
+  return topics;
 }
 
 // ─── Cities ────────────────────────────────────────────────────────────────
@@ -733,16 +785,16 @@ export interface DiscoverCity {
   label: string;
 }
 
-/** The cities Discover can show: every city a coach, group or session is
-    in, one row each, by name. */
+/** The cities Discover can show: every city a coach (the directory's
+    facet cities), group or session is in, one row each, by name. */
 export function discoverCities(
-  coaches: readonly InstructorSearchResult[],
+  coachCities: readonly (string | null | undefined)[],
   groups: readonly DiscoverGroup[],
   sessions: readonly PublicSessionInstance[],
 ): DiscoverCity[] {
   const byKey = new Map<string, string>();
   const names = [
-    ...coaches.map((coach) => coach.city),
+    ...coachCities,
     ...groups.map((group) => group.city),
     ...sessions.map(sessionCity),
   ];

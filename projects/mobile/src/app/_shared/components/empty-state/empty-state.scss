@@ -6,7 +6,8 @@
 // Inside `.mh-page` or a sheet body the parent's height is auto, the
 // percentage resolves to none, and the block falls back to its own height.
 // `flex-grow` does the same in a flex column that has room to give: a body
-// the Workouts tab stretches to the screen (`workouts.scss`, `.tab-body`).
+// the Workouts tab stretches to the screen (`workouts.scss`, `.tab-body`),
+// or an `.mh-page` with nothing else in it, which `layout.css` stretches.
 :host {
   display: flex;
   min-block-size: 100%;

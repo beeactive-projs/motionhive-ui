@@ -161,6 +161,13 @@ describe('logged exercises', () => {
     expect(exerciseActions(false).map((action) => action.id)[0]).toBe(ExerciseActionIds.History);
     expect(exerciseActions(false, false).map((action) => action.id)).not.toContain(ExerciseActionIds.History);
   });
+
+  // A done exercise opened again folds back from its ⋯, ahead of history;
+  // one still being worked offers no Collapse.
+  it('leads with Collapse only when the exercise can fold', () => {
+    expect(exerciseActions(false, true, null, true).map((action) => action.id)[0]).toBe(ExerciseActionIds.Collapse);
+    expect(exerciseActions(false).map((action) => action.id)).not.toContain(ExerciseActionIds.Collapse);
+  });
 });
 
 describe('what a finished set recorded', () => {

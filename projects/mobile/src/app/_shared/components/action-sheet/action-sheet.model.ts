@@ -25,6 +25,12 @@ export interface SheetAction<T extends string = string> {
   label: string;
   /** A second line under the label, for verbs whose effect needs saying. */
   hint?: string;
+  /**
+   * A count or value at the end of the row, already translated ("2"): what
+   * is waiting behind the verb. The row then shows a chevron too, since the
+   * verb opens a screen.
+   */
+  value?: string;
   icon?: string;
   /** Ionic palette name for the tile, the concept's hue; a destructive verb's is `danger`. */
   color: SheetActionColor;

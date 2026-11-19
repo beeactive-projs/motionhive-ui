@@ -340,7 +340,10 @@ export class PublicProfile implements OnInit {
       return;
     }
     const u = this.userProfile();
-    if (u) void this._router.navigate(['/messages'], { queryParams: { to: u.userId } });
+    if (u) {
+      const name = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim();
+      void this._router.navigate(['/messages'], { queryParams: { to: u.userId, name } });
+    }
   }
 
   onBook(): void {

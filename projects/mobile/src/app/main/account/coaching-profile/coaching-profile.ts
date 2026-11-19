@@ -30,27 +30,27 @@ import {
   ProductService,
   ProfileService,
   SOCIAL_PLATFORMS,
-  Venue,
-  VenueService,
   getProductBillingLabel,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { VenueList } from '../../../_shared/components/venue-list/venue-list';
+import { CoachVenuesStore } from '../../../_shared/services/coach-venues.store';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { homeOr } from '../../home/home-stack.config';
 import { SOCIAL_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
 import { CoachingSheet } from '../_sheets/coaching-sheet/coaching-sheet';
-import { COACHING_PROFILE_ICONS, priceLine, venueLine } from './coaching-profile.config';
+import { COACHING_PROFILE_ICONS, priceLine } from './coaching-profile.config';
 
 /**
  * The coaching profile as clients see it, plus one way to edit the parts that
  * belong to the profile itself.
  *
- * Services and venues are read-only here: pricing and venue management are
- * whole features of their own and have no mobile screens yet, so each card says
- * where they are managed instead of offering a dead affordance.
+ * Services are read-only here: pricing is a whole feature of its own with no
+ * mobile screens yet, so the card says where it is managed instead of
+ * offering a dead affordance. The places the coach works from are edited in
+ * place (`mh-venue-list`), as in the welcome flow's coach step.
  *
  * "Clients can mention me" is the one switch on the page itself: it is about
  * what clients do, not what the profile says, so it commits on the flip
@@ -62,7 +62,6 @@ import { COACHING_PROFILE_ICONS, priceLine, venueLine } from './coaching-profile
     CoachingSheet,
     CurrencyRonPipe,
     EmptyState,
-    HexAvatar,
     IonBackButton,
     IonBadge,
     IonButton,
@@ -82,6 +81,7 @@ import { COACHING_PROFILE_ICONS, priceLine, venueLine } from './coaching-profile
     IonToggle,
     IonToolbar,
     TranslatePipe,
+    VenueList,
   ],
   templateUrl: './coaching-profile.html',
   styleUrl: './coaching-profile.scss',
@@ -89,7 +89,7 @@ import { COACHING_PROFILE_ICONS, priceLine, venueLine } from './coaching-profile
 export class CoachingProfile implements OnInit {
   private readonly _productService = inject(ProductService);
   private readonly _profileService = inject(ProfileService);
-  private readonly _venueService = inject(VenueService);
+  private readonly _venuesStore = inject(CoachVenuesStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _router = inject(Router);
@@ -104,11 +104,8 @@ export class CoachingProfile implements OnInit {
 
   readonly editSheetOpen = signal(false);
   readonly products = signal<Product[]>([]);
-  readonly venues = signal<Venue[]>([]);
   readonly loadingProducts = signal(false);
-  readonly loadingVenues = signal(false);
   readonly productsFailed = signal(false);
-  readonly venuesFailed = signal(false);
   /** A mentions write in flight, so the switch can't be flipped twice. */
   readonly savingMentions = signal(false);
 
@@ -127,10 +124,6 @@ export class CoachingProfile implements OnInit {
     }));
   });
 
-  readonly venueRows = computed(() =>
-    this.venues().map((venue) => ({ id: venue.id, name: venue.name, ...venueLine(venue) })),
-  );
-
   constructor() {
     addIcons(COACHING_PROFILE_ICONS);
   }
@@ -138,14 +131,17 @@ export class CoachingProfile implements OnInit {
   ngOnInit(): void {
     this.store.ensureLoaded();
     this._loadProducts();
-    this._loadVenues();
   }
 
   /** The retry on a failed load: the profile, and the cards that failed with it. */
   retry(): void {
     this.store.refresh();
-    if (this.productsFailed()) this._loadProducts();
-    if (this.venuesFailed()) this._loadVenues();
+    if (this.productsFailed()) {
+      this._loadProducts();
+    }
+    if (this._venuesStore.failed()) {
+      this._venuesStore.reload();
+    }
   }
 
   priceLine(price: string, product: Product): string {
@@ -206,24 +202,6 @@ export class CoachingProfile implements OnInit {
         error: () => {
           this.productsFailed.set(true);
           this.loadingProducts.set(false);
-        },
-      });
-  }
-
-  private _loadVenues(): void {
-    this.loadingVenues.set(true);
-    this.venuesFailed.set(false);
-    this._venueService
-      .list({ silent: true })
-      .pipe(take(1))
-      .subscribe({
-        next: (venues) => {
-          this.venues.set(venues);
-          this.loadingVenues.set(false);
-        },
-        error: () => {
-          this.venuesFailed.set(true);
-          this.loadingVenues.set(false);
         },
       });
   }

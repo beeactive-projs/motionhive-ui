@@ -82,9 +82,12 @@ export type CoachSuggestionReason =
  * experienced, then by name.
  */
 export const CoachDirectorySorts = {
+  /** Taking clients first, then the reader's interests coached, then experience. */
   Recommended: 'recommended',
   Experience: 'experience',
   Name: 'name',
+  /** A new order every day, the same for everyone: Discover's spotlight. */
+  Spotlight: 'spotlight',
 } as const;
 
 export type CoachDirectorySort = (typeof CoachDirectorySorts)[keyof typeof CoachDirectorySorts];

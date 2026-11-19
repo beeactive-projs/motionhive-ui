@@ -1,0 +1,328 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <!-- Close, not Back: every answer is already saved, and leaving skips
+           what is left, so a chevron would promise an undo that is not there. -->
+      <ion-button [attr.aria-label]="'a11y.close' | translate" [disabled]="saving()" (click)="close()">
+        <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      @if (ready() && progress().total > 1) {
+        <span class="mh-kicker mh-step-count">
+          {{ 'welcome.stepOf' | translate: { step: progress().position, total: progress().total } }}
+        </span>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (!ready()) {
+    <div class="loading" aria-busy="true">
+      <ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" />
+    </div>
+  } @else {
+    <div class="mh-page">
+      @if (copy(); as copy) {
+        <div class="intro">
+          <h1>{{ copy.title | translate }}</h1>
+          <p>{{ copy.intro | translate }}</p>
+        </div>
+      }
+
+      @switch (step()) {
+        @case (Steps.Role) {
+          <!-- One of two, so radio semantics; the pick waits for Continue so a
+               slip of the thumb never makes anyone a coach. -->
+          <div class="choices" role="radiogroup" [attr.aria-label]="'welcome.role.title' | translate">
+            @for (choice of roleChoices; track choice.role) {
+              <button
+                type="button"
+                role="radio"
+                class="choice mh-pick-tile"
+                [class.on]="role() === choice.role"
+                [attr.aria-checked]="role() === choice.role"
+                (click)="pickRole(choice.role)"
+              >
+                <mh-hex-avatar size="lg" aria-hidden="true" [icon]="choice.icon" [color]="choice.color" />
+                <span class="choice-copy">
+                  <span class="label">{{ choice.label | translate }}</span>
+                  <span class="detail">{{ choice.detail | translate }}</span>
+                </span>
+              </button>
+            }
+          </div>
+          <ion-note class="mh-note-block">{{ 'welcome.role.note' | translate }}</ion-note>
+        }
+
+        @case (Steps.Interests) {
+          @if (categoryStore.loaded()) {
+            <div class="tiles" role="group" [attr.aria-label]="'welcome.interests.title' | translate">
+              @for (category of categoryStore.interestActivities(); track category.id) {
+                <button
+                  type="button"
+                  class="tile mh-pick-tile"
+                  [class.on]="interestIds().includes(category.id)"
+                  [attr.aria-pressed]="interestIds().includes(category.id)"
+                  (click)="toggleInterest(category.id)"
+                >
+                  <ion-icon [name]="categoryIcon(category.icon)" aria-hidden="true" />
+                  <span class="label">{{ category.name }}</span>
+                </button>
+              }
+            </div>
+          } @else {
+            <ng-container [ngTemplateOutlet]="categoriesPending" />
+          }
+        }
+
+        @case (Steps.Level) {
+          <div class="choices" role="radiogroup" [attr.aria-label]="'welcome.level.title' | translate">
+            @for (choice of levelChoices; track choice.level) {
+              <button
+                type="button"
+                role="radio"
+                class="choice compact mh-pick-tile"
+                [class.on]="level() === choice.level"
+                [attr.aria-checked]="level() === choice.level"
+                (click)="pickLevel(choice.level)"
+              >
+                <span class="choice-copy">
+                  <span class="label">{{ choice.label | translate }}</span>
+                  <span class="detail">{{ choice.detail | translate }}</span>
+                </span>
+                @if (level() === choice.level) {
+                  <ion-icon class="check" name="checkmark-outline" aria-hidden="true" />
+                }
+              </button>
+            }
+          </div>
+
+          @if (!categoryStore.loaded()) {
+            <ng-container [ngTemplateOutlet]="categoriesPending" />
+          } @else if (categoryStore.goals().length) {
+            <section class="mh-section">
+              <div class="mh-section-head">
+                <h2 class="mh-kicker">{{ 'welcome.level.goals' | translate }}</h2>
+                <ion-note>{{ 'welcome.optional' | translate }}</ion-note>
+              </div>
+              <div class="mh-chip-cloud goals" role="group" [attr.aria-label]="'welcome.level.goals' | translate">
+                @for (goal of categoryStore.goals(); track goal.id) {
+                  <ion-button
+                    class="chip"
+                    fill="clear"
+                    size="small"
+                    [class.selected]="interestIds().includes(goal.id)"
+                    [attr.aria-pressed]="interestIds().includes(goal.id)"
+                    (click)="toggleInterest(goal.id)"
+                  >
+                    {{ goal.name }}
+                  </ion-button>
+                }
+              </div>
+            </section>
+          }
+        }
+
+        @case (Steps.CoachCategories) {
+          @if (categoryStore.loaded()) {
+            <div class="tiles" role="group" [attr.aria-label]="'welcome.coachCategories.title' | translate">
+              @for (category of categoryStore.activities(); track category.id) {
+                <button
+                  type="button"
+                  class="tile mh-pick-tile"
+                  [class.on]="coachCategoryIds().includes(category.id)"
+                  [attr.aria-pressed]="coachCategoryIds().includes(category.id)"
+                  (click)="toggleCoachCategory(category.id)"
+                >
+                  <ion-icon [name]="categoryIcon(category.icon)" aria-hidden="true" />
+                  <span class="label">{{ category.name }}</span>
+                </button>
+              }
+            </div>
+
+            <section class="mh-section">
+              <div class="mh-section-head">
+                <h2 class="mh-kicker">{{ 'welcome.coachCategories.other' | translate }}</h2>
+                <ion-note>{{ 'welcome.optional' | translate }}</ion-note>
+              </div>
+              <mh-chip-input
+                [(values)]="otherWords"
+                [label]="'welcome.coachCategories.otherLabel' | translate"
+                [placeholder]="'welcome.coachCategories.otherPlaceholder' | translate"
+                [addLabel]="'welcome.coachCategories.otherAdd' | translate"
+                [listLabel]="'welcome.coachCategories.otherList' | translate"
+                [max]="maxWords"
+                [maxLength]="maxWordLength"
+                [exclude]="otherExclusions()"
+                excludedNote="welcome.coachCategories.otherOnList"
+                (excluded)="onOtherWordsOnList($event)"
+              />
+              <ion-note class="mh-note-block">{{ 'welcome.coachCategories.otherHint' | translate }}</ion-note>
+            </section>
+          } @else {
+            <ng-container [ngTemplateOutlet]="categoriesPending" />
+          }
+        }
+
+        @case (Steps.CoachDetails) {
+          <!-- The city as a row with its value; the search opens only on a
+               tap, with the caret in it, so nobody lands on a field. Cancel
+               sits in the head, not beside the field: at 130% text on a small
+               phone the field beside it had no room left to type in. The
+               section is the block kept above the keyboard: field and results. -->
+          <section class="mh-section" data-mh-keyboard-block>
+            <div class="mh-section-head">
+              <h2 class="mh-kicker">{{ 'form.label.city' | translate }}</h2>
+              @if (changingCity()) {
+                <ion-button fill="clear" size="small" (click)="keepCity()">
+                  {{ 'button.cancel' | translate }}
+                </ion-button>
+              }
+            </div>
+            @if (changingCity()) {
+              <ion-searchbar
+                mhAutofocus
+                searchIcon="search-outline"
+                clearIcon="close-outline"
+                showCancelButton="never"
+                [placeholder]="'welcome.coachDetails.citySearch' | translate"
+                [attr.aria-label]="'welcome.coachDetails.citySearch' | translate"
+                [debounce]="0"
+                (ionInput)="onPlaceSearch($event.detail.value)"
+              />
+              @if (searchingPlaces() && !places().length) {
+                <div class="loading small"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+              } @else if (places().length) {
+                <ion-list [inset]="true" class="mh-card-list">
+                  @for (option of places(); track option.displayName) {
+                    <ion-item button [detail]="false" (click)="pickPlace(option)">
+                      <mh-hex-avatar slot="start" size="sm" [icon]="locationTile.icon" [color]="locationTile.color" />
+                      <ion-label class="ion-text-wrap">
+                        {{ option.city }}
+                        <p>{{ option.country }}</p>
+                      </ion-label>
+                    </ion-item>
+                  }
+                </ion-list>
+              } @else if (noPlaces()) {
+                <ion-note class="mh-note-block">{{ 'welcome.coachDetails.noPlaces' | translate }}</ion-note>
+              }
+            } @else {
+              <ion-list [inset]="true" class="mh-card-list">
+                <!-- The city itself is the row's text, wrapping rather than cut
+                     short like a trailing value; the tile names the action. -->
+                <ion-item button [detail]="true" (click)="changeCity()">
+                  @if (cityValue(); as city) {
+                    <mh-hex-avatar
+                      slot="start"
+                      size="sm"
+                      [icon]="locationTile.icon"
+                      [color]="locationTile.color"
+                      [name]="'welcome.coachDetails.changeCity' | translate"
+                    />
+                    <ion-label class="ion-text-wrap">{{ city }}</ion-label>
+                  } @else {
+                    <mh-hex-avatar slot="start" size="sm" [icon]="locationTile.icon" [color]="locationTile.color" />
+                    <ion-label class="ion-text-wrap">{{ 'welcome.coachDetails.addCity' | translate }}</ion-label>
+                  }
+                </ion-item>
+              </ion-list>
+              <ion-note class="mh-note-block">{{ 'welcome.coachDetails.cityHint' | translate }}</ion-note>
+            }
+          </section>
+
+          <!-- Where the coach works: a gym, a studio, online. Optional, and
+               each place is saved as its sheet saves (Continue sends only the
+               city and the switch below). The same list as the coaching
+               profile's, so a place added here is there. -->
+          <section class="mh-section">
+            <div class="mh-section-head">
+              <h2 class="mh-kicker">{{ 'welcome.coachDetails.places' | translate }}</h2>
+              <ion-note>{{ 'welcome.optional' | translate }}</ion-note>
+            </div>
+            <mh-venue-list />
+            <ion-note class="mh-note-block">{{ 'venues.list.hint' | translate }}</ion-note>
+          </section>
+
+          <section class="mh-section">
+            <ion-list [inset]="true" class="mh-card-list">
+              <ion-item>
+                <ion-toggle
+                  justify="space-between"
+                  [checked]="accepting()"
+                  (ionChange)="onAccepting($event.detail.checked)"
+                >
+                  <!-- Wraps at 130% text rather than ending in "…". -->
+                  <ion-label class="ion-text-wrap">{{ 'welcome.coachDetails.accepting' | translate }}</ion-label>
+                </ion-toggle>
+              </ion-item>
+            </ion-list>
+            <ion-note class="mh-note-block">{{ 'welcome.coachDetails.acceptingHint' | translate }}</ion-note>
+          </section>
+        }
+      }
+    </div>
+  }
+
+  <!-- The category list on its way, or a retry when it could not be had:
+       the steps that pick from it wait for it (Continue stays off). -->
+  <ng-template #categoriesPending>
+    @if (categoryStore.failed()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        [heading]="'welcome.categoriesFailed' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
+        (action)="retryCategories()"
+      />
+    } @else {
+      <div class="loading"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+    }
+  </ng-template>
+</ion-content>
+
+@if (ready()) {
+  <!-- Rides up with the keyboard on iOS and keeps only its buttons while it
+       is up; the dots and Skip step aside (`mhKeyboardFooter`). -->
+  <ion-footer mhKeyboardFooter>
+    <ion-toolbar>
+      <div class="mh-cta-bar">
+        @if (dots().length > 1) {
+          <!-- Decorative: the header says "Step 2 of 3" in words. -->
+          <div class="mh-step-dots" aria-hidden="true">
+            @for (dot of dots(); track dot) {
+              <span [class.on]="dot === progress().position" [class.done]="dot < progress().position"></span>
+            }
+          </div>
+        }
+        <div class="mh-step-actions" [class.single]="!canGoBack()">
+          @if (canGoBack()) {
+            <ion-button fill="outline" color="medium" [disabled]="saving()" (click)="back()">
+              {{ 'button.back' | translate }}
+            </ion-button>
+          }
+          <ion-button expand="block" [disabled]="!canContinue() || saving()" (click)="next()">
+            @if (saving()) {
+              <ion-spinner name="crescent" />
+            } @else if (isLast()) {
+              {{ 'button.done' | translate }}
+            } @else {
+              {{ 'button.continue' | translate }}
+            }
+          </ion-button>
+        </div>
+        <!-- Quiet: passing over is a decision, not the thing we are asking for.
+             A skipped question waits on a Home card. -->
+        @if (canSkip()) {
+          <div class="mh-quiet-actions">
+            <ion-button fill="clear" size="small" [disabled]="saving()" (click)="skip()">
+              {{ 'button.skip' | translate }}
+            </ion-button>
+          </div>
+        }
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}

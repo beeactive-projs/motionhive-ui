@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { WorkoutLog, WorkoutLogService } from 'core';
+import { WorkoutLog, WorkoutLogService, appLocale } from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ActiveSessionStore } from './active-session.store';
@@ -54,6 +54,60 @@ export class ActiveWorkoutService {
   /** The workout already open, while the choice is being made. */
   readonly conflict = this._conflict.asReadonly();
   readonly busy = signal(false);
+
+  /** A Repeat's source, waiting for the logger that opens the new workout. */
+  private _carryOver: { logId: string; from: string } | null = null;
+  /** A freestyle start in flight: a second tap must not start a second one. */
+  private _startingFreestyle = false;
+
+  /**
+   * An empty workout, or a Repeat of a past one (`from`), started here so
+   * the logger opens once, on the new workout, as a routine's or a plan's
+   * start does. Opening `log/new` and replacing it with the new id slid a
+   * second logger in over the first. The Repeat's movements are copied by
+   * that logger into the store it shows (`takeCarryOver`).
+   */
+  startFreestyle(from: string | null = null, replaceUrl = false): void {
+    if (this._startingFreestyle) return;
+    this._startingFreestyle = true;
+    const settle = () => (this._startingFreestyle = false);
+    const name = this._translateService.instant('workouts.logger.defaultName', {
+      date: new Date().toLocaleDateString(appLocale(), {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'short',
+      }),
+    });
+    this.startOrResume(
+      () =>
+        this._workoutLogService
+          .start({ name })
+          .pipe(take(1))
+          .subscribe({
+            next: (log) => {
+              settle();
+              this._carryOver = from ? { logId: log.id, from } : null;
+              void this._router.navigate(['/tabs/workouts/log', log.id], { replaceUrl });
+            },
+            error: (err) => {
+              settle();
+              void this._feedbackService.error(
+                err,
+                this._translateService.instant('workouts.common.startFailed'),
+              );
+            },
+          }),
+      { onBlocked: settle, replaceUrl },
+    );
+  }
+
+  /** The Repeat source for `logId`, once: the logger copies it in, and it is gone. */
+  takeCarryOver(logId: string): string | null {
+    const pending = this._carryOver;
+    if (!pending || pending.logId !== logId) return null;
+    this._carryOver = null;
+    return pending.from;
+  }
 
   startOrResume(start: () => void, options: StartOptions = {}): void {
     this._workoutLogService

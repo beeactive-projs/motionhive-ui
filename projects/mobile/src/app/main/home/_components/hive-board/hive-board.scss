@@ -89,6 +89,8 @@ ion-button.cell {
   --padding-bottom: 0;
   --ripple-color: transparent;
   --opacity: 1;
+  // A record's trophy stands on the hexagon's top point, past the box.
+  --overflow: visible;
   margin: 0;
   min-height: 0;
   pointer-events: none;
@@ -255,25 +257,25 @@ ion-button.cell.ion-focused .mark {
   transform: translateX(-50%);
 }
 
-// A record: a small light at the top of the day.
+// A record: a trophy in the deep honey, as a record wears everywhere, on
+// the top point of the day. Ringed and cut out in the page's colour, so it
+// stands clear of a honey cell, an empty one and a photo. Taps go to the cell.
 .dot {
   position: absolute;
-  top: 12%;
+  top: -0.375rem;
   left: 50%;
-  width: 0.375rem;
-  height: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
   border-radius: var(--mh-radius-pill);
-  background: var(--ion-text-color);
+  background: var(--mh-color-honey-deep);
+  box-shadow: 0 0 0 0.125rem var(--ion-background-color);
+  color: var(--ion-background-color);
+  font-size: 0.6875rem;
   transform: translateX(-50%);
-}
-
-[data-honey] .dot {
-  background: var(--ion-color-primary-contrast);
-}
-
-// Over a photo the dot keeps a honey halo, so it reads on any picture.
-[data-photo] .dot {
-  box-shadow: 0 0 0 var(--mh-ring-width) var(--ion-color-primary);
+  pointer-events: none;
 }
 
 // ─── Motion ──────────────────────────────────────────────────────

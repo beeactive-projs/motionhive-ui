@@ -7,13 +7,6 @@
   line-height: var(--mh-leading-body);
 }
 
-/* Tag chips double as their own remove button, so the whole chip is the
-   target rather than a 12px × inside it; the × is the chips' small glyph. */
-.mh-chip-row .chip ion-icon {
-  margin-inline: 0.25rem -0.25rem;
-  font-size: var(--mh-icon-sm);
-}
-
 .danger-row {
   margin-top: 1.5rem;
 }
@@ -25,4 +18,23 @@
   --padding-bottom: 0.5rem;
   --padding-start: 1rem;
   --padding-end: 1rem;
+}
+
+/* On the section head's inset, so the chips start under the kicker. */
+.mh-chip-cloud,
+.categories-failed {
+  padding-inline: var(--mh-row-gutter);
+}
+
+.categories-failed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.categories-loading {
+  display: grid;
+  place-items: center;
+  min-height: var(--mh-tap-target);
 }

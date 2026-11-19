@@ -1,7 +1,8 @@
 import { Component, ElementRef, afterRenderEffect, input, output, signal, viewChild } from '@angular/core';
-import { IonBadge, IonButton, IonCard, IonCardContent, IonList } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonList, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { SettingsRow } from '../../../../_shared/components/settings-row/settings-row';
 import {
   ExerciseRef,
   ExerciseRow,
@@ -16,8 +17,10 @@ export interface OverviewExercise {
 }
 
 /**
- * The pre-Start read of a workout: eyebrow, name, meta chips, the note, then
- * every exercise with its sets and targets.
+ * The pre-Start read of a workout: eyebrow, name, what it holds, the note,
+ * the routine's rest, then every exercise with its sets and targets. Laid
+ * out as the routine builder is (note, rest row, "Exercises" head, list), so
+ * a routine reads the way it is built.
  *
  * Shared by a plan's day and a saved routine, which hold different trees but
  * answer the same question — what am I about to do — so they should read the
@@ -25,18 +28,30 @@ export interface OverviewExercise {
  */
 @Component({
   selector: 'mh-workout-overview',
-  imports: [ExerciseRow, IonBadge, IonButton, IonCard, IonCardContent, IonList, TranslatePipe],
+  imports: [
+    ExerciseRow,
+    IonButton,
+    IonCard,
+    IonCardContent,
+    IonList,
+    IonNote,
+    SettingsRow,
+    TranslatePipe,
+  ],
   templateUrl: './workout-overview.html',
   styleUrl: './workout-overview.scss',
 })
 export class WorkoutOverview {
   readonly eyebrow = input<string | null>(null);
   readonly title = input.required<string>();
-  readonly chips = input<readonly string[]>([]);
-  /** A quiet line under the chips — what a starter does when you start it. */
+  /** "6 exercises · 19 sets", muted under the name (`contentsLine`). */
+  readonly meta = input<string | null>(null);
+  /** A quiet line under the meta — what a starter does when you start it. */
   readonly hint = input<string | null>(null);
   readonly note = input<string | null>(null);
   readonly noteLabel = input('');
+  /** "Rest between sets", as the builder's row reads it; null hides the row (a plan's day has none). */
+  readonly rest = input<string | null>(null);
   readonly exercises = input.required<readonly OverviewExercise[]>();
 
   readonly exerciseSelect = output<string>();

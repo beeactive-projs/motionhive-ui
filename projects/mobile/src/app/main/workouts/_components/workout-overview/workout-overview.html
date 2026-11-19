@@ -4,12 +4,9 @@
   }
   <h1>{{ title() }}</h1>
 
-  @if (chips().length) {
-    <div class="chips">
-      @for (chip of chips(); track $index) {
-        <ion-badge data-tone="medium">{{ chip }}</ion-badge>
-      }
-    </div>
+  <!-- What it holds, as the builder's header says it under the name. -->
+  @if (meta(); as text) {
+    <p class="meta">{{ text }}</p>
   }
 
   @if (hint(); as text) {
@@ -32,8 +29,26 @@
   </ion-card>
 }
 
+<!-- The builder's row, read: what the routine rests, changed in Edit. -->
+@if (rest(); as value) {
+  <ion-list [inset]="true" class="mh-card-list">
+    <mh-settings-row
+      [label]="'workouts.routineBuilder.rest.row' | translate"
+      icon="time-outline"
+      iconColor="coral"
+      [value]="value"
+      [note]="'workouts.routineBuilder.rest.hint' | translate"
+      [interactive]="false"
+    />
+  </ion-list>
+}
+
 <section class="mh-section">
-  <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
+  <!-- The builder's head: "Exercises" and how many. -->
+  <div class="mh-section-head">
+    <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
+    <ion-note>{{ exercises().length }}</ion-note>
+  </div>
   <ion-list [inset]="true" class="mh-card-list">
     @for (row of exercises(); track row.key) {
       <mh-exercise-row

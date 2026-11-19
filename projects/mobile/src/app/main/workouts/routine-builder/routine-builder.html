@@ -1,20 +1,74 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      @if (editingSaved()) {
-        <!-- Editing a saved routine: back out to how it was, not off the page. -->
-        <ion-button (click)="cancelEdit()">{{ 'button.cancel' | translate }}</ion-button>
+      @if (reordering()) {
+        <!-- Back leaves the order as it was; Done, at the end, keeps the new one. -->
+        <ion-button [attr.aria-label]="'a11y.back' | translate" (click)="cancelReorder()">
+          <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+        </ion-button>
+      } @else if (editingSaved()) {
+        <!-- Editing a saved routine: back out to how it was, not off the page.
+             The X a sheet closes with, not the word: "Anulează" at large text
+             left the routine's name two letters. -->
+        <ion-button [attr.aria-label]="'button.cancel' | translate" (click)="askCancel()">
+          <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
+        </ion-button>
+      } @else if (guarded()) {
+        <!-- Unsaved: the same chevron, but it asks before the draft goes. -->
+        <ion-button [attr.aria-label]="'a11y.back' | translate" (click)="askLeave()">
+          <ion-icon slot="icon-only" name="chevron-back-outline" aria-hidden="true" />
+        </ion-button>
       } @else {
         <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="stackBase()" />
       }
     </ion-buttons>
-    <ion-title>{{ title() }}</ion-title>
-    <!-- Nothing while it loads: a saved routine opens to the ⋯, not to Save. -->
-    @if (!showOverview() && !loading()) {
+    <!-- Building: the workout's header. The name over what is in it so far,
+         then the ⋯ and Save as the honey button where the workout has Finish. -->
+    <!-- The page's h1, but on the read view: the overview's heading is its h1. -->
+    <ion-title>
+      @if (reordering()) {
+        <!-- The same header, naming what the page does over what it moves. -->
+        <h1 class="name">{{ title() }}</h1>
+        <span class="meta">{{ headerMeta() }}</span>
+      } @else if (showBuilder()) {
+        <h1 class="name">{{ headerName() }}</h1>
+        @if (headerMeta()) {
+          <span class="meta">{{ headerMeta() }}</span>
+        }
+      } @else if (showOverview()) {
+        {{ title() }}
+      } @else {
+        <h1 class="title">{{ title() }}</h1>
+      }
+    </ion-title>
+    @if (reordering()) {
+      <!-- The one honey ask, where Save is while building. -->
       <ion-buttons slot="end">
-        <ion-button [disabled]="!canSave() || saving()" (click)="save()">{{ 'button.save' | translate }}</ion-button>
+        <ion-button class="header-action" color="primary" fill="solid" (click)="doneReorder()">
+          {{ 'button.done' | translate }}
+        </ion-button>
+      </ion-buttons>
+    } @else if (showBuilder()) {
+      <ion-buttons slot="end">
+        <ion-button
+          shape="round"
+          [attr.aria-label]="'a11y.moreActions' | translate"
+          (click)="openOptions()"
+        >
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        </ion-button>
+        <ion-button
+          class="header-action"
+          color="primary"
+          fill="solid"
+          [disabled]="!canSave() || saving() || (editingSaved() && !dirty())"
+          (click)="save()"
+        >
+          {{ 'button.save' | translate }}
+        </ion-button>
       </ion-buttons>
     } @else if (showActions()) {
+      <!-- Nothing while it loads: a saved routine opens to the ⋯, not to Save. -->
       <ion-buttons slot="end">
         <ion-button [attr.aria-label]="'a11y.moreActions' | translate" (click)="openActions()">
           <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
@@ -33,13 +87,39 @@
       [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
+  } @else if (showSkeleton() && editMode()) {
+    <!-- Opened to edit (the list's Edit swipe): the builder's own shape, the
+         name field, the rest row and a card, so nothing jumps when it lands. -->
+    <div class="mh-page">
+      <ion-skeleton-text [animated]="true" class="field-skeleton" />
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <mh-hex-avatar slot="start" size="sm" color="medium" tone="wash" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <ion-skeleton-text [animated]="true" class="card-skeleton" />
+    </div>
   } @else if (showSkeleton()) {
+    <!-- The read view's shape: the hero's three lines, the rest row, the list. -->
     <div class="mh-page">
       <div class="hero-skeleton">
         <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.75rem" />
-        <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.5rem" />
-        <ion-skeleton-text [animated]="true" style="width: 35%; height: 1.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 45%; height: 1rem" />
       </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item>
+          <mh-hex-avatar slot="start" size="sm" color="medium" tone="wash" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
           <ion-item>
@@ -59,154 +139,362 @@
       <mh-workout-overview
         [eyebrow]="eyebrow()"
         [title]="routine()!.name"
-        [chips]="chips()"
+        [meta]="overviewMeta()"
         [hint]="readOnly() ? starterHint() : null"
         [note]="routine()!.notes"
         [noteLabel]="noteLabel()"
+        [rest]="overviewRest()"
         [exercises]="overviewExercises()"
         (exerciseSelect)="openExerciseById($event)"
       />
+
+      <!-- One button, the screen's main action, last on the page where the
+           builder's Save and start is, and as wide; every other verb about
+           this routine is behind the ⋯ (docs/MOBILE-ACTIONS.md). Coaching,
+           a routine is something to shape: a starter becomes yours by
+           copying it, your own opens to Edit. Training, Start leads. -->
+      @if (isCoachMode()) {
+        @if (readOnly()) {
+          <ion-button class="main-action" expand="block" [disabled]="copying()" (click)="askCopy()">
+            {{ 'workouts.routineBuilder.makeCopy' | translate }}
+          </ion-button>
+        } @else {
+          <ion-button class="main-action" expand="block" (click)="edit()">
+            {{ 'button.edit' | translate }}
+          </ion-button>
+        }
+      } @else {
+        <ion-button class="main-action" expand="block" [disabled]="starting()" (click)="start()">
+          {{ 'workouts.common.startWorkout' | translate }}
+        </ion-button>
+      }
+    </div>
+  } @else if (reordering()) {
+    <!-- The cards folded to their names, as the workout folds a finished
+         exercise, to drag into a new order: the tile, the name and the
+         handle where the open card's tile, name and ⋮ are. -->
+    <div class="mh-page">
+      <section class="mh-section">
+        <ion-reorder-group [disabled]="false" (ionReorderEnd)="onReorder($event)">
+          @for (row of reorderRows(); track row.key) {
+            <!-- The gap under a card is inside its slot: Ionic places a
+                 dragged card by adding up the slots' heights. -->
+            <div class="reorder-slot">
+              <ion-card class="folded">
+                <ion-item lines="none">
+                  <mh-hex-avatar
+                    slot="start"
+                    size="md"
+                    tone="wash"
+                    aria-hidden="true"
+                    [color]="tileOf(row).tone"
+                    [icon]="tileOf(row).icon"
+                    [imageUrl]="tileOf(row).imageUrl"
+                  />
+                  <ion-label>
+                    <h2>{{ row.name }}</h2>
+                    <p>{{ setsLabel(row) }}</p>
+                  </ion-label>
+                  <ion-reorder slot="end">
+                    <ion-icon name="reorder-three-outline" aria-hidden="true" />
+                  </ion-reorder>
+                </ion-item>
+              </ion-card>
+            </div>
+          }
+        </ion-reorder-group>
+        <p class="mh-footnote">{{ 'workouts.routineBuilder.reorder.hint' | translate }}</p>
+      </section>
     </div>
   } @else {
+    <!-- The builder: an empty workout's page, planned rather than logged. -->
     <div class="mh-page">
-      <ion-input mode="md"
+      <div>
+        <ion-input
+          #nameInput
+          mode="md"
+          fill="outline"
+          [label]="'workouts.routineBuilder.name.label' | translate"
+          labelPlacement="stacked"
+          [placeholder]="'workouts.routineBuilder.name.placeholder' | translate"
+          [value]="name()"
+          (ionFocus)="closePad()"
+          (ionInput)="onName($any($event).detail.value ?? '')"
+        />
+        @if (nameError()) {
+          <p class="mh-helper over" role="alert">
+            {{ 'workouts.routineBuilder.name.required' | translate }}
+          </p>
+        }
+      </div>
+
+      <!-- The routine's own note, what the read view shows as "Your notes". -->
+      <ion-textarea
+        mode="md"
         fill="outline"
-        [label]="'workouts.routineBuilder.name.label' | translate"
         labelPlacement="stacked"
-        [placeholder]="'workouts.routineBuilder.name.placeholder' | translate"
-        [value]="name()"
-        (ionInput)="name.set($any($event).detail.value ?? '')"
+        [label]="
+          ('workouts.routineBuilder.notes.label' | translate) + ' ' + ('form.hint.optional' | translate)
+        "
+        [placeholder]="'workouts.routineBuilder.notes.placeholder' | translate"
+        [autoGrow]="true"
+        [maxlength]="2000"
+        [value]="notes()"
+        (ionFocus)="closePad()"
+        (ionInput)="notes.set($any($event).detail.value ?? '')"
       />
 
-      <!-- One rest for the whole routine; an exercise can still set its own. -->
-      <ion-list [inset]="true" class="mh-card-list rest-row">
+      <!-- One rest for the whole routine; an exercise can still set its own (its chip). -->
+      <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row
           [label]="'workouts.routineBuilder.rest.row' | translate"
           icon="time-outline"
-          iconColor="primary"
+          iconColor="coral"
           [value]="defaultRestLabel()"
           [note]="'workouts.routineBuilder.rest.hint' | translate"
-          (select)="openRest('routine')"
+          (select)="openRest(RoutineRest)"
         />
       </ion-list>
 
-      <section class="mh-section">
-        <div class="mh-section-head">
-          <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
-          @if (exercises().length) {
+      @if (exercises().length) {
+        <section class="mh-section">
+          <!-- "Exercises", how many, and Add exercise at the far end. -->
+          <div class="mh-section-head">
+            <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
             <ion-note>{{ exercises().length }}</ion-note>
-          }
-        </div>
+            <ion-button fill="clear" size="small" (click)="addExercise()">
+              <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+              {{ 'workouts.logger.addExercise' | translate }}
+            </ion-button>
+          </div>
 
-        @for (row of exercises(); track row.key; let i = $index) {
-          <mh-exercise-card [name]="row.name" [tag]="tags()[i]" (open)="openExercise(row)">
-            <!-- What to aim for. Both optional: a routine that only names the
-                 movements in order is still a useful routine. The two cells
-                 share the logger's keypad, so entering a number is one
-                 learned gesture across the feature. -->
-            <div class="targets">
-              <button
-                type="button"
-                class="target"
-                [class.active]="isEditing(i, Targets.Reps)"
-                [attr.aria-label]="'workouts.routineBuilder.targets.repsFor' | translate: { name: row.name }"
-                (click)="editTarget(i, Targets.Reps)"
-              >
-                <span class="mh-kicker">{{ 'workouts.routineBuilder.targets.reps' | translate }}</span>
-                <strong>{{ (isEditing(i, Targets.Reps) && typed()) || targetLabel(row, Targets.Reps) }}</strong>
-              </button>
-              <button
-                type="button"
-                class="target"
-                [class.active]="isEditing(i, Targets.Weight)"
-                [attr.aria-label]="'workouts.routineBuilder.targets.weightFor' | translate: { name: row.name }"
-                (click)="editTarget(i, Targets.Weight)"
-              >
-                <span class="mh-kicker">{{ 'workouts.routineBuilder.targets.weight' | translate }}</span>
-                <strong>{{ (isEditing(i, Targets.Weight) && typed()) || targetLabel(row, Targets.Weight) }}<em>{{ 'workouts.units.kgShort' | translate }}</em></strong>
-              </button>
-            </div>
+          @for (view of views(); track view.row.key; let i = $index, last = $last) {
+            <mh-exercise-card
+              [name]="view.row.name"
+              [kind]="view.row.kind"
+              [imageUrl]="view.row.thumbnailUrl"
+              [tag]="view.tag"
+              [planNote]="view.row.notes"
+              [showActions]="true"
+              (open)="openExercise(view.row)"
+              (actions)="openExerciseActions(view.row)"
+            >
+              @if (!view.row.perSet) {
+                <!-- The same for every set: Sets, then Reps or Time, then
+                     Weight (kg), one row each. A value opens the number pad. -->
+                <mh-plan-steppers
+                  [exercise]="view.row"
+                  [active]="view.activeField"
+                  [preview]="view.activeField ? typed() : null"
+                  (step)="stepTarget(view.row, $event)"
+                  (edit)="editAll(view.row, $event)"
+                />
+              } @else {
+                <div class="sets">
+                  @if (view.rows.length) {
+                    <mh-set-table-head
+                      [fields]="view.fields"
+                      [unilateral]="view.row.unilateral"
+                      [tickable]="false"
+                    />
+                  }
+                  @for (row of view.rows; track row.set.key) {
+                    <!-- As in the logger: swipe right for Copy (teal), left for
+                         Delete; a full swipe does either at once. Never while the
+                         set is in the pad. -->
+                    <ion-item-sliding
+                      #sliding
+                      class="set-slide mh-swipe-row"
+                      [disabled]="row.editing !== null"
+                    >
+                      <ion-item lines="none" class="set-item">
+                        <mh-set-row
+                          [attr.data-editing]="row.editing ? '' : null"
+                          [set]="row.set"
+                          [mode]="Modes.Future"
+                          [badge]="row.badge"
+                          [fields]="view.fields"
+                          [previous]="row.previous"
+                          [editing]="row.editing"
+                          [draft]="row.editing ? typed() : null"
+                          [tickable]="false"
+                          [texts]="row.texts"
+                          (edit)="editCell(view.row, row.set, $event)"
+                          (menu)="openMenu(view.row, row.set, row.badge)"
+                          (usePrevious)="usePrevious(view.row, row.set, row.previousSet)"
+                        />
+                      </ion-item>
+                      <ion-item-options
+                        side="start"
+                        (ionSwipe)="swipeCopy(sliding, view.row, row.set)"
+                      >
+                        <ion-item-option
+                          color="teal"
+                          [expandable]="true"
+                          (click)="swipeCopy(sliding, view.row, row.set)"
+                        >
+                          <ion-icon slot="top" name="copy-outline" aria-hidden="true" />
+                          {{ 'button.copy' | translate }}
+                        </ion-item-option>
+                      </ion-item-options>
+                      <ion-item-options
+                        side="end"
+                        (ionSwipe)="swipeDelete(sliding, view.row, row.set)"
+                      >
+                        <ion-item-option
+                          color="danger"
+                          [expandable]="true"
+                          (click)="swipeDelete(sliding, view.row, row.set)"
+                        >
+                          <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
+                          {{ 'button.delete' | translate }}
+                        </ion-item-option>
+                      </ion-item-options>
+                    </ion-item-sliding>
+                  }
+                </div>
 
-            <div class="controls">
-              <div class="mh-stepper" role="group" [attr.aria-label]="'workouts.routineBuilder.stepper.group' | translate: { name: row.name }">
-                <ion-button
-                  fill="clear"
-                  [disabled]="row.sets <= 1"
-                  [attr.aria-label]="'workouts.routineBuilder.stepper.fewer' | translate: { name: row.name }"
-                  (click)="setCount(i, -1)"
+                <div class="ex-actions">
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    [attr.aria-label]="
+                      'workouts.routineBuilder.plan.addSetFor' | translate: { name: view.row.name }
+                    "
+                    (click)="addSet(view.row)"
+                  >
+                    <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                    {{ 'workouts.logger.addSet' | translate }}
+                  </ion-button>
+                </div>
+              }
+
+              <!-- Under the targets: its own rest, set by set or the same for
+                   every set, a weight for a bodyweight move, and taking it out. -->
+              <div class="controls">
+                <!-- Its own rest, or the routine's when it shows none. -->
+                <button
+                  type="button"
+                  class="rest-chip"
+                  [class.own]="!!view.restChip"
+                  [attr.aria-label]="view.restName"
+                  (click)="openRest(view.row.key)"
                 >
-                  <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
+                  <ion-icon name="time-outline" aria-hidden="true" />
+                  {{ view.restChip || ('workouts.routineBuilder.rest.chip' | translate) }}
+                </button>
+
+                <ion-button
+                  class="text-action"
+                  fill="clear"
+                  size="small"
+                  [attr.aria-label]="
+                    (view.row.perSet
+                      ? 'workouts.routineBuilder.plan.sameForAllFor'
+                      : 'workouts.routineBuilder.plan.perSetFor'
+                    ) | translate: { name: view.row.name }
+                  "
+                  (click)="togglePerSet(view.row)"
+                >
+                  {{
+                    (view.row.perSet
+                      ? 'workouts.routineBuilder.plan.sameForAll'
+                      : 'workouts.routineBuilder.plan.perSet'
+                    ) | translate
+                  }}
                 </ion-button>
 
-                <!-- The number says what it is. "3" alone between two circles
-                     told the user nothing. -->
-                <span class="value" aria-live="polite">
-                  {{ row.sets }} <em>{{ 'workouts.routineBuilder.stepper.unit' | translate: { count: row.sets } }}</em>
-                </span>
+                <!-- Weighted pull-ups and dips still deserve a target weight. -->
+                @if (view.canAddWeight && !view.row.perSet) {
+                  <ion-button
+                    class="text-action"
+                    fill="clear"
+                    size="small"
+                    [attr.aria-label]="
+                      'workouts.routineBuilder.plan.addWeightFor' | translate: { name: view.row.name }
+                    "
+                    (click)="addWeight(view.row)"
+                  >
+                    <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                    {{ 'workouts.logger.addWeight' | translate }}
+                  </ion-button>
+                }
 
                 <ion-button
-                  fill="clear"
-                  [attr.aria-label]="'workouts.routineBuilder.stepper.more' | translate: { name: row.name }"
-                  (click)="setCount(i, 1)"
+                  class="mh-remove"
+                  fill="outline"
+                  color="danger"
+                  [attr.aria-label]="'a11y.removeItem' | translate: { name: view.row.name }"
+                  (click)="remove(i)"
                 >
-                  <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
+                  <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
                 </ion-button>
               </div>
+            </mh-exercise-card>
 
-              <!-- Its own rest, or the routine's when it shows none. -->
-              <button
-                type="button"
-                class="rest-chip"
-                [class.own]="!!restChip(row)"
-                [attr.aria-label]="'workouts.routineBuilder.rest.exercise' | translate: { name: row.name }"
-                (click)="openRest(i)"
-              >
-                <ion-icon name="time-outline" aria-hidden="true" />
-                {{ restChip(row) || ('workouts.routineBuilder.rest.chip' | translate) }}
-              </button>
-
-              <ion-button
-                class="mh-remove"
-                fill="outline"
-                color="danger"
-                [attr.aria-label]="'a11y.removeItem' | translate: { name: row.name }"
-                (click)="remove(i)"
-              >
-                <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
-              </ion-button>
-            </div>
-          </mh-exercise-card>
-
-          <!-- Between two exercises: link them as a superset, or undo it. -->
-          @if (i < exercises().length - 1) {
-            <div class="link-row">
-              <button
-                type="button"
-                class="link-chip"
-                [class.linked]="linkedToNext(i)"
-                [attr.aria-label]="
-                  (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlinkFor' : 'workouts.routineBuilder.superset.linkFor')
-                    | translate: { a: row.name, b: exercises()[i + 1].name }
-                "
-                (click)="toggleLink(i)"
-              >
-                <ion-icon name="link-outline" aria-hidden="true" />
-                {{ (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlink' : 'workouts.routineBuilder.superset.link') | translate }}
-              </button>
-            </div>
+            <!-- Between two exercises: link them as a superset, or undo it. -->
+            @if (!last) {
+              <div class="link-row">
+                <button
+                  type="button"
+                  class="link-chip"
+                  [class.linked]="view.linkedToNext"
+                  [attr.aria-label]="
+                    (view.linkedToNext
+                      ? 'workouts.routineBuilder.superset.unlinkFor'
+                      : 'workouts.routineBuilder.superset.linkFor'
+                    ) | translate: { a: view.row.name, b: views()[i + 1].row.name }
+                  "
+                  (click)="toggleLink(i)"
+                >
+                  <ion-icon name="link-outline" aria-hidden="true" />
+                  {{
+                    (view.linkedToNext
+                      ? 'workouts.routineBuilder.superset.unlink'
+                      : 'workouts.routineBuilder.superset.link'
+                    ) | translate
+                  }}
+                </button>
+              </div>
+            }
           }
-        }
 
-        @if (!exercises().length) {
-          <ion-note class="mh-note-block">{{ 'workouts.routineBuilder.noExercises' | translate }}</ion-note>
-        }
-      </section>
+          @if (exercises().length > 1) {
+            <p class="mh-footnote">{{ 'workouts.routineBuilder.superset.hint' | translate }}</p>
+          }
+        </section>
 
-      <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="pickerOpen.set(true)">
-        <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-        {{ 'workouts.common.addExercises' | translate }}
-      </ion-button>
+        <!-- The logger's own row, with its honey tile: the add at the end of a long list. -->
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item button [detail]="false" (click)="addExercise()">
+            <mh-hex-avatar slot="start" size="sm" icon="add-outline" color="primary" />
+            <ion-label>{{ 'workouts.logger.addExercise' | translate }}</ion-label>
+          </ion-item>
+        </ion-list>
+      } @else {
+        <!-- Nothing in it yet: the empty workout's screen, one instruction
+             and one button, and no "Exercises" head over nothing. -->
+        <mh-empty-state
+          icon="barbell-outline"
+          [heading]="'workouts.logger.empty.title' | translate"
+          [message]="'workouts.routineBuilder.noExercises' | translate"
+          [actionLabel]="'workouts.logger.addExercise' | translate"
+          (action)="addExercise()"
+        />
+      }
 
+      <!-- Last on the page, not fixed over it: save, then straight into the
+           workout. The header's Save keeps it without starting. -->
+      @if (showStart()) {
+        <ion-button
+          class="main-action"
+          expand="block"
+          [disabled]="!canSave() || saving() || starting()"
+          (click)="saveAndStart()"
+        >
+          {{ startLabel() | translate }}
+        </ion-button>
+      }
     </div>
   }
 </ion-content>
@@ -218,41 +506,42 @@
       [label]="keypadLabel()"
       [value]="draft()"
       [cell]="editingKey()"
-      (commit)="commitTarget($event)"
+      [replaceOnType]="true"
+      [actionLabel]="keypadAction().label"
+      [actionIcon]="keypadAction().icon"
+      [actionIconSlot]="keypadAction().slot"
+      (commit)="onPadAction($event)"
       (preview)="typed.set($event)"
-      (dismiss)="editing.set(null)"
+      (dismiss)="closePad()"
     />
-  </ion-footer>
-} @else if (showOverview()) {
-  <ion-footer [translucent]="true">
-    <ion-toolbar>
-      <div class="mh-cta-bar">
-        <!-- One button, the screen's main action; every other verb about
-             this routine is behind the ⋯ (docs/MOBILE-ACTIONS.md). Coaching,
-             a routine is something to shape: a starter becomes yours by
-             copying it, your own opens to Edit. Training, Start leads. -->
-        @if (isCoachMode()) {
-          @if (readOnly()) {
-            <ion-button expand="block" [disabled]="copying()" (click)="askCopy()">
-              {{ 'workouts.routineBuilder.makeCopy' | translate }}
-            </ion-button>
-          } @else {
-            <ion-button expand="block" (click)="edit()">{{ 'button.edit' | translate }}</ion-button>
-          }
-        } @else {
-          <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
-        }
-      </div>
-    </ion-toolbar>
   </ion-footer>
 }
 
 <mh-exercise-picker-sheet
   [(open)]="pickerOpen"
-  [title]="'workouts.common.addExercises' | translate"
-  [context]="name() || ('workouts.routineBuilder.thisRoutine' | translate)"
+  [title]="pickerTitle()"
+  [context]="pickerContext()"
+  [confirmVerb]="(swapTarget() ? 'workouts.logger.picker.swapFor' : 'button.add') | translate"
+  [single]="swapTarget() !== null"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
+/>
+
+<mh-action-sheet
+  [(open)]="exerciseSheetOpen"
+  [title]="exerciseTitle()"
+  [actions]="exerciseActions()"
+  (chosen)="onExerciseAction($event)"
+/>
+
+<mh-set-menu-sheet
+  [(open)]="menuOpen"
+  [set]="menuSet()"
+  [badge]="menuFor()?.badge ?? null"
+  [noteable]="false"
+  (typeChange)="onSetType($event)"
+  (remove)="onSetRemove()"
+  (duplicate)="onSetCopy()"
 />
 
 <mh-choice-sheet
@@ -268,6 +557,25 @@
   [title]="routine()?.name ?? ''"
   [actions]="actions()"
   (chosen)="onAction($event)"
+/>
+
+<!-- The builder's ⋯, as the workout's: add, reorder, discard. -->
+<mh-action-sheet
+  [(open)]="optionsOpen"
+  [title]="headerName()"
+  [actions]="options()"
+  (chosen)="onOption($event)"
+/>
+
+<mh-confirm-sheet
+  #discardSheet
+  [(open)]="discardOpen"
+  [title]="'workouts.routineBuilder.discard.title' | translate"
+  [body]="discardBody()"
+  [confirmLabel]="'button.discard' | translate"
+  [cancelLabel]="'workouts.routineBuilder.discard.keep' | translate"
+  tone="danger"
+  (confirm)="confirmDiscard()"
 />
 
 <mh-confirm-sheet

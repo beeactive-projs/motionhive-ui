@@ -1,0 +1,115 @@
+/* A card, not a list row: a post is a block of text with an author above it
+   and its own verbs below, which a row cannot hold without truncating the
+   part people came to read. */
+:host {
+  display: block;
+}
+
+.post-card {
+  display: block;
+  padding: 0.875rem;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.post-head .who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: var(--mh-leading-tight);
+}
+
+.post-head h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-head p {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-more {
+  --color: var(--ion-text-color);
+  flex: none;
+  margin: 0;
+}
+
+/* The body opens the post; the verbs below have their own targets. */
+.post-body-button {
+  display: block;
+  width: 100%;
+  margin: 0.625rem 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+}
+
+.post-body-button:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
+}
+
+/* Clamped: a long post is opened to be read, and an unbounded card pushes
+   the next post off the screen. `pre-wrap` keeps the author's own breaks. */
+.post-body {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-md);
+  line-height: var(--mh-leading-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.post-meta {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.375rem;
+  /* The first glyph lines up with the text above, not the button's edge. */
+  margin-inline-start: -0.5rem;
+}
+
+/* Small and grey, like the post page's: the verbs sit under what people came
+   to read and must not outweigh it. The icon and its count say enough; the
+   words live in the accessible names. */
+.meta-button {
+  --color: var(--ion-color-medium);
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
+}
+
+.meta-button ion-icon {
+  font-size: var(--mh-icon-md);
+}
+
+/* Liked: honey as text is the deep honey (the bare honey fails on the
+   slate card), and the whole button flips, count included. */
+.meta-button.reacted {
+  --color: var(--mh-color-honey-deep);
+  font-weight: 600;
+}

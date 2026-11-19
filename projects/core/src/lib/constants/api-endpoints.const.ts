@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
     REFRESH: '/auth/refresh',
     GOOGLE: '/auth/google',
     FACEBOOK: '/auth/facebook',
+    APPLE: '/auth/apple',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
     RESEND_VERIFICATION: '/auth/resend-verification',
@@ -61,6 +62,7 @@ export const API_ENDPOINTS = {
     LEAVE_INSTRUCTOR: (instructorId: string) => `/clients/my-instructors/${instructorId}`,
     PENDING_REQUESTS: '/clients/requests/pending',
     PENDING_REQUESTS_COUNT: '/clients/requests/pending/count',
+    SENT_REQUESTS: '/clients/requests/sent',
     FILTER_REQUESTS: '/clients/requests/filter',
     INVITE: '/clients/invite',
     IMPORT: '/clients/import',
@@ -151,6 +153,12 @@ export const API_ENDPOINTS = {
     // behaviour while we wait for the jobs/notifications module.
     FRIEND_EMAIL: '/invitations/friend',
     INSTRUCTOR_EMAIL: '/invitations/instructor',
+    /** A group owner inviting several of their clients at once. */
+    GROUP_BULK: '/invitations/bulk',
+    /** My group invitations still waiting on an answer. */
+    PENDING: '/invitations/pending',
+    ACCEPT_MINE: (id: string) => `/invitations/mine/${id}/accept`,
+    DECLINE_MINE: (id: string) => `/invitations/mine/${id}/decline`,
   },
   PAYMENTS: {
     // Instructor — onboarding
@@ -249,6 +257,7 @@ export const API_ENDPOINTS = {
       `/programs/${id}/workouts/${workoutId}/exercises`,
     EXERCISES_REORDER: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/reorder`,
+    SUPERSETS: (id: string, workoutId: string) => `/programs/${id}/workouts/${workoutId}/supersets`,
     EXERCISE_BY_ID: (id: string, workoutId: string, exerciseId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}`,
     SETS: (id: string, workoutId: string, exerciseId: string) =>
@@ -286,6 +295,10 @@ export const API_ENDPOINTS = {
     PAUSE_GAP: (id: string) => `/workout-logs/${id}/pause-gap`,
     LOG_SET: (id: string, setId: string) =>
       `/workout-logs/${id}/sets/${setId}`,
+    /** Several sets at once, such as a whole round of a superset. */
+    REMOVE_SETS: (id: string) => `/workout-logs/${id}/sets/remove`,
+    /** Superset links changed mid-workout, every exercise whose group changed at once. */
+    SUPERSETS: (id: string) => `/workout-logs/${id}/supersets`,
     ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,
     REMOVE_EXERCISE: (id: string, exId: string) =>
       `/workout-logs/${id}/exercises/${exId}`,
@@ -316,6 +329,14 @@ export const API_ENDPOINTS = {
   },
   MUSCLES: {
     BASE: '/muscles',
+  },
+  /** What people train and why (migration 081); open to guests. */
+  CATEGORIES: {
+    BASE: '/categories',
+  },
+  /** The reader's welcome flow: state, answers, skip and dismiss. */
+  ONBOARDING: {
+    BASE: '/users/me/onboarding',
   },
   EQUIPMENT: {
     BASE: '/equipment',

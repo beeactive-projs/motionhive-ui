@@ -1,11 +1,12 @@
-import { Component, computed, effect, input, model, output, signal, untracked } from '@angular/core';
-import { IonIcon, IonItem, IonLabel, IonList, IonTextarea } from '@ionic/angular/standalone';
+import { Component, computed, input, model, output, signal, viewChild } from '@angular/core';
+import { IonIcon, IonItem, IonLabel, IonList, IonText, IonTextarea } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline, createOutline, trashOutline } from 'ionicons/icons';
+import { checkmarkOutline, copyOutline, createOutline, trashOutline } from 'ionicons/icons';
 
 import { ExerciseSetType, LoggedSet, enumLabel, translate } from 'core';
 
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { BadgeTone, BadgeTones, SetBadge } from '../../logger/logger-flow';
 
@@ -45,31 +46,67 @@ const TONES: Partial<Record<ExerciseSetType, BadgeTone>> = {
 };
 
 /**
- * Tap a set's badge: what kind of set it is, a note on it, or take it out.
+ * Tap a set's badge: what kind of set it is, a copy of it, a note on it, or
+ * take it out. In a superset round, also take out the whole round, every
+ * exercise's set in it: the round has no menu of its own (user decision,
+ * 2026-11-18), so its one verb waits here, where a set is acted on.
+ *
+ * The type picked now carries the honey check (and `aria-current`), as on
+ * every choice sheet. The verbs wear their concept's tiles: Copy teal, the
+ * note sky, Remove (set and round) red in a card of their own.
  *
  * Picking a type applies it and closes, the common case in one tap. The note
- * opens in the same sheet with its own Save. Warm-ups say up front that they
- * don't count, so nobody wonders where their volume went.
+ * is a text field, so it opens in a sheet of its own once the menu has gone:
+ * tall, where the keyboard leaves it in view, with its own Save (the menu is
+ * as tall as its rows, and a fitted sheet sits under the keyboard). Warm-ups
+ * say up front that they don't count, so nobody wonders where their volume
+ * went.
  */
 @Component({
   selector: 'mh-set-menu-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, IonTextarea, SheetShell, TranslatePipe],
+  imports: [
+    HexAvatar,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonText,
+    IonTextarea,
+    SheetShell,
+    TranslatePipe,
+  ],
   templateUrl: './set-menu-sheet.html',
   styleUrl: './set-menu-sheet.scss',
 })
 export class SetMenuSheet {
   readonly open = model(false);
-  readonly set = input<LoggedSet | null>(null);
+  /** A logged set, or a routine's planned set, which has a type but no note. */
+  readonly set = input<Pick<LoggedSet, 'setType'> & Partial<Pick<LoggedSet, 'notes'>> | null>(
+    null,
+  );
   readonly badge = input<SetBadge | null>(null);
+  /** Off where a set takes no note (a routine's planned set): the row goes. */
+  readonly noteable = input(true);
+  /**
+   * The superset round this set is in, from 1: the menu then offers to
+   * remove that whole round. Null outside a superset's rounds.
+   */
+  readonly round = input<number | null>(null);
 
   readonly typeChange = output<ExerciseSetType>();
   readonly noteChange = output<string | null>();
   readonly remove = output<void>();
+  /** The whole round this set is in, every exercise's set in it. */
+  readonly removeRound = output<void>();
+  /** Another set like this one, added to the exercise. */
+  readonly duplicate = output<void>();
 
-  /** The menu, or the note being written. */
-  readonly writing = signal(false);
+  /** The note's own sheet, opened from the menu's note row. */
+  readonly noteOpen = signal(false);
   readonly note = signal('');
   readonly noteMax = SET_NOTE_MAX_LENGTH;
+
+  private readonly _menuSheet = viewChild<SheetShell>('menuSheet');
 
   readonly current = computed(() => {
     const type = this.set()?.setType ?? ExerciseSetType.Normal;
@@ -93,15 +130,7 @@ export class SetMenuSheet {
   readonly hasNote = computed(() => !!this.set()?.notes?.trim());
 
   constructor() {
-    addIcons({ checkmarkOutline, createOutline, trashOutline });
-    // Each opening starts on the menu, with the note as the set holds it.
-    effect(() => {
-      if (!this.open()) return;
-      untracked(() => {
-        this.writing.set(false);
-        this.note.set(this.set()?.notes ?? '');
-      });
-    });
+    addIcons({ checkmarkOutline, copyOutline, createOutline, trashOutline });
   }
 
   pick(type: ExerciseSetType): void {
@@ -109,18 +138,37 @@ export class SetMenuSheet {
     this.open.set(false);
   }
 
-  startNote(): void {
-    this.writing.set(true);
+  /**
+   * Swaps the menu for the note's sheet, which starts on the note as the set
+   * holds it. The menu goes first: one sheet over another would stack two
+   * scrims.
+   */
+  async startNote(): Promise<void> {
+    this.note.set(this.set()?.notes ?? '');
+    this.open.set(false);
+    await this._menuSheet()?.close();
+    this.noteOpen.set(true);
   }
 
   saveNote(): void {
     const text = this.note().trim();
     if (text !== (this.set()?.notes ?? '').trim()) this.noteChange.emit(text || null);
+    this.noteOpen.set(false);
+  }
+
+  /** Adds a set like this one and closes, the same as the swipe right. */
+  copySet(): void {
+    this.duplicate.emit();
     this.open.set(false);
   }
 
   removeSet(): void {
     this.remove.emit();
+    this.open.set(false);
+  }
+
+  removeRoundSets(): void {
+    this.removeRound.emit();
     this.open.set(false);
   }
 }

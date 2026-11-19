@@ -1,0 +1,29 @@
+/* An exercise folded to one row on its own card, as the logger folds a
+   finished exercise and the routine builder folds them all to reorder.
+   `@use` it from the page; the page adds its own lead (the logger's check)
+   and its end control (a chevron, a drag handle).
+
+   The row sits on the open card's grid (`_set-table.scss`): the tile where
+   the open card's tile is, the name where its name is, and the end control
+   `--mh-card-inset` + `--mh-card-lead` from the edge, where the ⋮ is. */
+ion-card.folded {
+  --mh-card-inset: 0.5rem;
+  --mh-card-lead: calc(0.25rem + var(--mh-ring-width));
+}
+
+.folded ion-item {
+  --background: var(--ion-card-background);
+  --padding-start: calc(var(--mh-card-inset) + var(--mh-card-lead));
+  --padding-end: 0;
+  --inner-padding-end: 0;
+}
+
+.folded mh-hex-avatar {
+  margin-block: 0;
+  margin-inline: 0 0.625rem;
+}
+
+.folded h2 {
+  font-family: var(--mh-font-heading);
+  font-weight: 600;
+}

@@ -43,6 +43,7 @@ import {
   TAB_SETS,
 } from '../../_shared/config/tabs.config';
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
+import { PhotoViewer } from '../../_shared/components/photo-viewer/photo-viewer';
 import { ActiveWorkoutBar } from '../../main/workouts/_components/active-workout-bar/active-workout-bar';
 import { ActiveSessionStore } from '../../main/workouts/_services/active-session.store';
 import { LockScreenService } from '../../main/workouts/_services/lock-screen.service';
@@ -159,6 +160,7 @@ function appReturns(): Observable<void> {
     IonTabs,
     ActiveWorkoutBar,
     NotificationBanner,
+    PhotoViewer,
     SaveRoutineSheet,
     StartConflictSheet,
     TranslatePipe,
@@ -319,6 +321,11 @@ export class Tabs {
         this._lastTabId = tabId;
         if (left) this._moreBadgesService.refreshPendingRequests(true);
       });
+
+    // Back from the background: anything may have arrived meanwhile.
+    this._appReturns
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this._moreBadgesService.refresh(true));
 
     // The keyboard is certainly down once it has finished hiding, and after a
     // return from the background, which closes it on both platforms.

@@ -45,12 +45,7 @@
         "notAccepting": "Nu accepți clienți"
       },
       "venues": {
-        "clientHome": "Acasă la client",
-        "empty": "Încă nu ai locații. Locațiile se gestionează în aplicația web.",
-        "loadFailed": "Locațiile nu au putut fi încărcate.",
-        "managedOnWeb": "Locațiile se gestionează în aplicația web.",
-        "online": "Online",
-        "title": "Locații"
+        "title": "Locurile unde antrenezi"
       }
     },
     "hero": {
@@ -106,7 +101,10 @@
       "resendVerification": "Retrimite emailul de verificare",
       "unverified": "Adresa {email} nu este încă verificată.",
       "deleteAccount": "Șterge contul",
-      "workouts": "Antrenamente"
+      "workouts": "Antrenamente",
+      "coachCategories": "Ce antrenezi",
+      "interests": "Ce îți place să practici",
+      "becomeCoach": "Devino antrenor"
     },
     "sections": {
       "account": "Cont",
@@ -137,6 +135,10 @@
     "choice": {
       "noMatches": "Niciun rezultat"
     },
+    "sensitive": {
+      "title": "Acțiuni sensibile",
+      "intro": "Aici sunt acțiunile care nu se pot anula. Fiecare îți explică ce se întâmplă și îți cere confirmarea înainte să se schimbe ceva."
+    },
     "privacy": {
       "intro": "Numele și fotografia ta sunt mereu vizibile. Alege cine vede fiecare dintre acestea.",
       "hint": {
@@ -144,7 +146,8 @@
         "COACHES_ONLY": "Doar antrenorii cu care te antrenezi",
         "ONLY_ME": "Nimeni în afară de tine"
       },
-      "saveFailed": "Nu am putut salva. Încearcă din nou."
+      "saveFailed": "Nu am putut salva. Încearcă din nou.",
+      "yourData": "Datele tale"
     },
     "delete": {
       "title": "Șterge contul",
@@ -225,11 +228,15 @@
       "acceptingHint": "Apare pe profilul tău public, ca oamenii să știe că te pot contacta.",
       "showSocialLinks": "Arată linkurile sociale",
       "showSocialLinksHint": "Linkurile tale rămân ascunse cât timp opțiunea e oprită.",
-      "specializationsHint": "Separă-le prin virgulă.",
       "title": "Profil de antrenor",
       "toast": {
         "failed": "Profilul de antrenor nu a putut fi actualizat.",
         "updated": "Profil de antrenor actualizat"
+      },
+      "specializations": {
+        "placeholder": "Adaugă una, de exemplu Kettlebell",
+        "add": "Adaugă specializarea",
+        "list": "Specializările tale"
       }
     },
     "handle": {
@@ -263,7 +270,9 @@
       "toast": {
         "failed": "Locația nu a putut fi actualizată.",
         "updated": "Locație actualizată"
-      }
+      },
+      "noResults": "Niciun loc găsit cu acest nume.",
+      "unavailable": "Căutarea locurilor nu răspunde acum. Încearcă din nou peste puțin timp."
     },
     "name": {
       "hint": "Așa apare numele tău pe profil și în mesaje.",
@@ -294,8 +303,17 @@
         "failed": "Poza nu a putut fi încărcată.",
         "updated": "Poză actualizată"
       },
-      "tooLarge": "Imaginile trebuie să aibă sub {size} MB."
+      "tooLarge": "Imaginile trebuie să aibă sub {size} MB.",
+      "view": "Vezi poza"
     }
+  },
+  "chipInput": {
+    "added": "Ai adăugat {value}",
+    "duplicate": "Ai adăugat deja {value}.",
+    "excluded": "{value} e deja pe listă.",
+    "full": "Ai ajuns la limita de {max}. Elimină ceva ca să faci loc.",
+    "removed": "Ai eliminat {value}",
+    "tooLong": "Fiecare poate avea cel mult {max, plural, one {# caracter} few {# caractere} other {# de caractere}}."
   },
   "clientHive": {
     "board": "Clienții tăi",
@@ -376,7 +394,7 @@
       "notes": "Notițe",
       "resendInvitation": "Retrimite invitația",
       "resent": "Invitație retrimisă",
-      "unarchiveClient": "Dezarhivează clientul",
+      "inviteAgain": "Invită din nou",
       "viewProfile": "Vezi profilul",
       "withdraw": "Retrage",
       "withdrawInvitationEllipsis": "Retrage invitația…"
@@ -387,7 +405,7 @@
     "clientFallback": "Client",
     "confirm": {
       "archive": {
-        "body": "Își păstrează contul și istoricul, iar tu îl poți dezarhiva mai târziu. Nu va fi anunțat.",
+        "body": "Își păstrează contul și istoricul, dar colaborarea se încheie: va fi anunțat, iar antrenamentele lui nu îți mai sunt deschise. Ca să lucrați din nou împreună, trimite-i o invitație pe care s-o accepte.",
         "title": "Arhivezi clientul {name}?",
         "titleFallback": "Arhivezi acest client?"
       },
@@ -429,6 +447,10 @@
         "planWaiting": "Plan · în așteptare"
       },
       "pastWindow": "{count, plural, one {Ultima zi} few {Ultimele # zile} other {Ultimele # de zile}}",
+      "ended": {
+        "title": "Colaborarea cu {name} s-a încheiat",
+        "body": "Antrenamentele lui nu îți mai sunt deschise. Ca să lucrați din nou împreună, invită-l din nou: redevine clientul tău după ce acceptă."
+      },
       "pending": {
         "title": "{name} nu a răspuns încă",
         "body": "Planurile, antrenamentele și progresul apar după ce invitația e acceptată."
@@ -442,7 +464,7 @@
       "profileAria": "{name}, vezi profilul",
       "sections": {
         "plans": "Planuri",
-        "thisWeek": "Săptămâna aceasta"
+        "lastSevenDays": "Ultimele 7 zile"
       },
       "sessions": {
         "label": "Ce sesiuni",
@@ -614,6 +636,7 @@
     },
     "thisPerson": "această persoană",
     "toast": {
+      "alreadyClient": "Este deja clientul tău.",
       "alreadyInvited": "Are deja o invitație de la tine.",
       "archiveFailed": "Clientul nu a putut fi arhivat.",
       "archived": "Client arhivat",
@@ -628,8 +651,7 @@
       "resendFailed": "Invitația nu a putut fi retrimisă.",
       "sendFailed": "Invitația nu a putut fi trimisă.",
       "shareFailed": "Linkul nu a putut fi distribuit.",
-      "unarchiveFailed": "Clientul nu a putut fi dezarhivat.",
-      "unarchived": "Client dezarhivat",
+      "invitedAgain": "Invitația a fost trimisă. Redevine clientul tău după ce acceptă.",
       "withdrawFailed": "Invitația nu a putut fi retrasă."
     }
   },
@@ -667,7 +689,7 @@
         "name": "Nume",
         "recommended": "Recomandați"
       },
-      "speciality": "Specializare",
+      "coaches": "Ce antrenează",
       "yearsPlus": "{count, plural, one {#+ an} few {#+ ani} other {#+ de ani}}"
     },
     "filters": {
@@ -726,6 +748,73 @@
       "left": "Colaborare încheiată"
     }
   },
+  "dev": {
+    "workoutStatus": {
+      "android": "Notificarea permanentă Android (sună când pauza s-a terminat)",
+      "data": "Date de test",
+      "dataNote": "Fiecare ceas pornește din momentul în care se schimbă un câmp. O pauză rămasă sub 0 e depășită.",
+      "field": {
+        "done": "Făcute la exercițiu",
+        "elapsed": "Durată (min)",
+        "exercise": "Exercițiu",
+        "lastReps": "Repetări trecute",
+        "lastWeight": "Greutate trecută (kg)",
+        "name": "Numele antrenamentului",
+        "reps": "Repetări",
+        "restLeft": "Pauză rămasă (s)",
+        "restPlanned": "Pauză planificată (s)",
+        "setNumber": "Numărul seriei",
+        "total": "Serii la exercițiu",
+        "weight": "Greutate (kg)",
+        "workoutDone": "Făcute în antrenament",
+        "workoutTotal": "Serii în antrenament"
+      },
+      "intro": "Toate locurile în care apare un antrenament în desfășurare, cu date de test. Nimic nu se salvează, iar ceasurile merg.",
+      "islandExpanded": "Dynamic Island, extinsă",
+      "islandSmall": "Dynamic Island, compactă și minimă",
+      "lockScreen": "Ecranul de blocare iOS (Live Activity)",
+      "menuRow": "Previzualizarea stării antrenamentului",
+      "menuSection": "Dezvoltator",
+      "miniBar": "Mini-bara, deasupra barei de taburi",
+      "mock": {
+        "exercise": "Împins la piept",
+        "partner": "Flotări",
+        "workout": "Zi de împins"
+      },
+      "mode": {
+        "every": "Toate scenariile",
+        "one": "Un scenariu"
+      },
+      "nativeNote": "Imaginile ecranului de blocare și ale notificărilor imită aranjamentele native (ios/App/RestTimer și RestLive.java), din starea pe care o trimite aplicația. Pe cele reale le desenează telefonul.",
+      "noRest": "Nu este nicio pauză în curs.",
+      "restAlert": "Alerta de final de pauză, cu aplicația în fundal: iOS, și Android după ce notificarea a fost închisă",
+      "restart": "Repornește ceasurile",
+      "restBar": "Cronometrul de pauză, în subsolul ecranului de antrenament",
+      "resumeCard": "Cardul de reluare, în tabul Antrenamente",
+      "scenario": "Scenariu",
+      "scenarios": {
+        "allDone": "Toate seriile făcute",
+        "betweenSets": "Între serii",
+        "go": "Pauza s-a terminat",
+        "overtime": "Pauză depășită",
+        "paused": "Antrenament pe pauză",
+        "restHidden": "Bara de pauză ascunsă",
+        "resting": "Pauză în curs",
+        "soon": "Ultimele 10 secunde",
+        "superset": "Superset"
+      },
+      "state": "Trimis pe ecranul de blocare",
+      "stillTraining": "Mementoul „Încă te antrenezi?”, la 30 de minute după ultima serie",
+      "title": "Starea antrenamentului",
+      "toggle": {
+        "ahead": "Mai sunt serii de făcut",
+        "paused": "Antrenament pe pauză",
+        "restHidden": "Bara de pauză ascunsă",
+        "resting": "O pauză este în curs",
+        "superset": "Într-un superset"
+      }
+    }
+  },
   "discover": {
     "allGroups": {
       "empty": {
@@ -735,13 +824,7 @@
       "loadError": "Nu am putut încărca grupurile"
     },
     "browse": {
-      "beginners": "De la zero",
-      "fatLoss": "Slăbește",
-      "mobility": "Mișcă-te mai bine",
-      "online": "Antrenament online",
-      "running": "Începe să alergi",
-      "strength": "Mai multă forță",
-      "title": "Caută după obiectiv"
+      "title": "Caută după activitate"
     },
     "city": {
       "everywhere": "Peste tot",
@@ -756,19 +839,15 @@
       "years": "{count, plural, one {# an} few {# ani} other {# de ani}}"
     },
     "coachRow": {
-      "online": "Online",
+      "online": "Antrenează online",
       "requestSent": "Cerere trimisă",
       "takingClients": "Primește clienți",
       "yourCoach": "Antrenorul tău"
     },
     "coaches": {
-      "all": "{count, plural, one {Vezi tot} few {Toți cei #} other {Toți cei #}}",
-      "near": "Antrenori din apropiere",
-      "title": "Antrenori"
+      "more": "Vezi mai mulți"
     },
     "featured": {
-      "kicker": "Antrenorul săptămânii",
-      "kickerCity": "Antrenorul săptămânii · {city}",
       "message": "Mesaj",
       "quote": "„{text}”",
       "viewProfile": "Vezi profilul"
@@ -780,8 +859,13 @@
       },
       "loadError": "Nu am putut încărca sesiunile",
       "noMatches": "Nicio sesiune viitoare nu se potrivește acestor filtre.",
+      "noneForTopic": "Nimic programat pentru {topic}",
+      "noneForTopicMessage": "Vezi toate sesiunile programate sau alege altă activitate.",
+      "noneForYou": "Încă nimic programat pentru tine",
       "noneInCity": "Nimic programat în {city}",
       "noneInCityMessage": "Încearcă alt oraș sau caută peste tot.",
+      "noneOnline": "Nicio sesiune online programată",
+      "seeAll": "Vezi toate sesiunile",
       "title": "Urmează"
     },
     "filterSheet": {
@@ -798,12 +882,9 @@
       "title": "Filtrează sesiunile"
     },
     "goals": {
-      "beginners": "Începători",
-      "label": "Obiective",
-      "mobility": "Mobilitate",
+      "label": "Activități",
       "online": "Online",
-      "running": "Alergare",
-      "strength": "Forță"
+      "forYou": "Pentru tine"
     },
     "groupsRail": {
       "all": "Toate",
@@ -819,7 +900,7 @@
     "search": {
       "accents": "Rezultate pentru „{typed}” și „{variant}”. Diacriticele nu contează.",
       "clear": "Șterge",
-      "clearGoal": "{goal}, renunță la obiectiv",
+      "clearGoal": "{goal}, renunță la filtru",
       "coaches": "Antrenori",
       "empty": "Nu am găsit antrenori, grupuri sau sesiuni. Încearcă mai puține cuvinte.",
       "error": {
@@ -828,7 +909,7 @@
       },
       "fieldPlaceholder": "Caută",
       "filterLabel": "Filtrează rezultatele",
-      "goalEmpty": "Încă nu sunt antrenori, grupuri sau sesiuni pentru acest obiectiv.",
+      "goalEmpty": "Încă nu sunt antrenori, grupuri sau sesiuni pentru asta.",
       "groups": "Grupuri",
       "hint": "Scrie cel puțin două litere ca să cauți antrenori, grupuri și sesiuni.",
       "join": "Alătură-te",
@@ -842,6 +923,12 @@
       "request": "Cere acces",
       "sessions": "Sesiuni",
       "title": "Căutare"
+    },
+    "spotlight": {
+      "position": "{position} din {total}",
+      "show": "Treci la {name}",
+      "slide": "antrenor",
+      "title": "În prim-plan"
     }
   },
   "exercises": {
@@ -1032,7 +1119,8 @@
         "confirmSingle": "Creează și înlocuiește",
         "hint": "„{query}” · doar tu îl poți vedea",
         "title": "Nu-l găsești? Creează-l"
-      }
+      },
+      "noFilterMatch": "Niciun exercițiu nu se potrivește filtrelor."
     },
     "row": {
       "equipmentMore": "{name} +{count}",
@@ -1062,8 +1150,7 @@
       "deleteHint": "Antrenamentele trecute îl păstrează",
       "editHint": "Schimbă numele, ce urmărește sau nota ta",
       "emptyAction": "Creează un exercițiu",
-      "emptyMessage": "Îți lipsește un exercițiu, cum ar fi un aparat de la sala ta? Creează-l și doar tu îl vei vedea.",
-      "menuFor": "Mai multe pentru {name}"
+      "emptyMessage": "Îți lipsește un exercițiu, cum ar fi un aparat de la sala ta? Creează-l și doar tu îl vei vedea."
     },
     "simpleForm": {
       "more": "Mai multe…",
@@ -1085,12 +1172,21 @@
       },
       "picture": "Imagine",
       "addPicture": "Adaugă o imagine",
-      "changePicture": "Schimbă",
-      "removePicture": "Elimină",
+      "changePicture": "Schimbă imaginea",
+      "removePicture": "Elimină imaginea",
       "pictureHint": "O poză cu aparatul sau cu mișcarea. O vede oricine vede exercițiul."
     }
   },
   "groups": {
+    "actions": {
+      "edit": "Editează grupul",
+      "invite": "Invită persoane",
+      "requests": "Cereri de alăturare",
+      "reviewPosts": "Verifică postările",
+      "youAreIn": "Faci parte din acest grup",
+      "youModerate": "Moderezi acest grup",
+      "youRun": "Tu conduci acest grup"
+    },
     "addMembers": {
       "empty": {
         "message": "Toți cei pe care îi antrenezi sunt deja în acest grup.",
@@ -1119,6 +1215,7 @@
       "nobodyMatches": "Nicio potrivire",
       "postContent": "Conținutul postării",
       "posts": "Postări",
+      "runBy": "Condus de",
       "where": "Unde"
     },
     "compose": {
@@ -1146,6 +1243,7 @@
     "detail": {
       "a11y": {
         "manage": "Verifică cererile și postările",
+        "options": "Opțiunile grupului",
         "settings": "Setările grupului"
       },
       "announce": {
@@ -1182,6 +1280,7 @@
         },
         "loadError": "Postările nu au putut fi încărcate"
       },
+      "postsToReview": "Postări de verificat",
       "toast": {
         "leaveFailed": "Nu am reușit să te scoatem din grup.",
         "left": "Ai părăsit grupul"
@@ -1189,6 +1288,9 @@
     },
     "edit": {
       "addTag": "Adaugă etichetă",
+      "categories": "Ce se antrenează în grup",
+      "categoriesFailed": "Nu am putut încărca activitățile.",
+      "categoriesHint": "Oamenii găsesc grupul după ele în Descoperă.",
       "delete": {
         "body": "Postările, membrii și comentariile dispar odată cu el.",
         "button": "Șterge grupul",
@@ -1210,7 +1312,7 @@
         "hint": "Oricine îl poate găsi în Descoperă.",
         "label": "Grup public"
       },
-      "removeTag": "Elimină eticheta {tag}",
+      "removeTag": "Elimină eticheta {name}",
       "saveCreate": "Creează grupul",
       "tagLabel": "Adaugă o etichetă",
       "tagPlaceholder": "forță",
@@ -1227,6 +1329,34 @@
     "gallery": {
       "openPhoto": "Deschide fotografia {index} din {total}",
       "openPhotoBy": "Deschide fotografia {index} din {total} de la {name}"
+    },
+    "invite": {
+      "invitedYou": "{name} te-a invitat",
+      "invitedYouNoName": "Ai primit o invitație",
+      "join": "Intră în grup",
+      "notNow": "Nu acum",
+      "privacy": "Membrii îți văd numele, fotografia și antrenamentele pe care alegi să le postezi. Poți ieși oricând.",
+      "toast": {
+        "declineFailed": "Nu am putut refuza invitația.",
+        "declined": "Invitație refuzată",
+        "joinFailed": "Nu am putut să te adăugăm în grup.",
+        "joined": "Ai intrat în {group}"
+      }
+    },
+    "invitePeople": {
+      "clients": "Clienții tăi",
+      "empty": {
+        "title": "Nu mai e nimeni de invitat"
+      },
+      "note": "Primesc o invitație și intră doar dacă o acceptă. Membrii își văd unii altora numele și fotografiile.",
+      "save": "{count, plural, =0 {Invită} other {Invită #}}",
+      "selectAll": "Selectează tot",
+      "selectNone": "Deselectează tot",
+      "toast": {
+        "alreadyInvited": "Au deja o invitație sau fac deja parte din grup",
+        "failed": "Nu am putut trimite invitațiile.",
+        "sent": "{count, plural, one {# invitație trimisă} few {# invitații trimise} other {# de invitații trimise}}"
+      }
     },
     "join": {
       "closed": "Doar cu invitație",
@@ -1263,6 +1393,9 @@
       "OPEN": "Oricine se poate alătura imediat."
     },
     "list": {
+      "a11y": {
+        "waiting": "{count, plural, one {# lucru te așteaptă} few {# lucruri te așteaptă} other {# de lucruri te așteaptă}}"
+      },
       "announce": {
         "count": "{count, plural, one {# grup} few {# grupuri} other {# de grupuri}}.",
         "none": "Niciun grup nu se potrivește."
@@ -1283,6 +1416,8 @@
         },
         "seeGroups": "Vezi grupurile tale"
       },
+      "joinedHeading": "Grupuri din care faci parte",
+      "lastPost": "ultima postare {time}",
       "loadError": "Grupurile nu au putut fi încărcate",
       "mine": {
         "empty": {
@@ -1290,18 +1425,26 @@
           "title": "Nu faci parte din niciun grup"
         }
       },
+      "needsYou": "Te așteaptă",
       "noGroups": {
         "coachMessage": "Creează un grup ca să-ți aduni clienții într-un singur loc.",
         "memberMessage": "Alătură-te unui grup și postările lui vor apărea aici.",
         "title": "Niciun grup încă"
       },
+      "noPosts": "nicio postare încă",
       "private": "Privat",
+      "runBy": "Condus de {name}",
+      "runHeading": "Grupuri pe care le conduci",
       "search": "Caută grupuri",
       "searchHint": "Scrie cel puțin {count, plural, one {# caracter} few {# caractere} other {# de caractere}} ca să cauți.",
       "segments": {
         "discover": "Descoperă",
         "feed": "Flux",
         "mine": "Grupurile tale"
+      },
+      "waiting": {
+        "posts": "{count, plural, one {# postare de verificat} few {# postări de verificat} other {# de postări de verificat}}",
+        "requests": "{count, plural, one {# cerere de alăturare} few {# cereri de alăturare} other {# de cereri de alăturare}}"
       }
     },
     "manage": {
@@ -1342,6 +1485,25 @@
       },
       "written": "Scrisă · {time}"
     },
+    "members": {
+      "makeModerator": "Numește moderator",
+      "makeModeratorHint": "Poate verifica și șterge postări",
+      "message": "Trimite un mesaj",
+      "remove": "Scoate din grup",
+      "removeConfirm": {
+        "body": "Nu va mai vedea postările și membrii grupului. Îi poți trimite mai târziu o nouă invitație.",
+        "title": "Scoți persoana {name} din grup?"
+      },
+      "removeModerator": "Retrage rolul de moderator",
+      "removeModeratorHint": "Rămâne în grup ca membru",
+      "toast": {
+        "moderatorMade": "{name} este acum moderator",
+        "moderatorRemoved": "{name} nu mai este moderator",
+        "removeFailed": "Nu am putut scoate persoana din grup.",
+        "removed": "{name} nu mai face parte din grup",
+        "roleFailed": "Nu am putut schimba rolul."
+      }
+    },
     "photos": {
       "alt": "Fotografia {index} din {total}",
       "counter": "{index} din {total}",
@@ -1362,8 +1524,10 @@
         "editThis": "Editează postarea",
         "like": "Apreciază postarea de la {name}",
         "likeThis": "Apreciază postarea",
+        "more": "Opțiuni pentru postarea scrisă de {name}",
         "openBy": "Deschide postarea de la {name}",
         "openByMember": "Deschide postarea unui membru",
+        "options": "Opțiunile postării",
         "postComment": "Publică comentariul",
         "unlike": "Retrage aprecierea pentru postarea de la {name}",
         "unlikeThis": "Retrage aprecierea",
@@ -1381,6 +1545,7 @@
         "body": "Dispare pentru toți, împreună cu comentariile.",
         "title": "Ștergi postarea?"
       },
+      "deleteVerb": "Șterge postarea",
       "editTitle": "Editează postarea",
       "empty": {
         "message": "Scrie primul comentariu.",
@@ -1434,6 +1599,18 @@
         "withdrawn": "Cerere retrasă"
       },
       "withdraw": "Retrage"
+    },
+    "setup": {
+      "defaultName": "Echipa {name}",
+      "inviteClients": "Invită-ți clienții",
+      "save": "{count, plural, =0 {Creează grupul} other {Creează și invită #}}",
+      "subtitle": "Poți schimba totul mai târziu",
+      "title": "Grupul clienților tăi",
+      "toast": {
+        "created": "{count, plural, =0 {Grup creat} one {Grup creat, # invitație trimisă} few {Grup creat, # invitații trimise} other {Grup creat, # de invitații trimise}}",
+        "invitesFailed": "Grupul e gata, dar invitațiile nu au plecat. Încearcă Invită persoane din grup."
+      },
+      "whoCanPost": "Cine poate posta"
     }
   },
   "home": {
@@ -1445,8 +1622,8 @@
           "title": "Creează primul tău program"
         },
         "specialties": {
-          "detail": "Ajută oamenii să te găsească în Descoperă.",
-          "title": "Adaugă-ți specializările"
+          "detail": "Așa te găsesc oamenii în Descoperă.",
+          "title": "Spune ce antrenezi"
         },
         "steps": "Pașii următori",
         "sub": "Primul inel are loc pentru șase.",
@@ -1531,6 +1708,11 @@
       "evening": "Bună seara.",
       "morning": "Bună dimineața."
     },
+    "groupSetup": {
+      "detail": "Un grup privat în care își arată antrenamentele și se încurajează unii pe alții.",
+      "notNow": "Nu acum",
+      "title": "Adună-ți clienții laolaltă"
+    },
     "latest": {
       "capped": "{count, plural, one {Cel mai recent antrenament} few {Ultimele # antrenamente} other {Ultimele # de antrenamente}}",
       "empty": {
@@ -1599,6 +1781,17 @@
         "streak": "{count, plural, one {# săptămână la rând} few {# săptămâni la rând} other {# de săptămâni la rând}}",
         "todayMakes": "Cu cel de azi ajungi la {count}."
       }
+    },
+    "welcomeCard": {
+      "train": {
+        "title": "Spune-ne ce îți place să practici",
+        "detail": "Îți sugerăm antrenori, grupuri și sesiuni potrivite."
+      },
+      "coach": {
+        "title": "Termină profilul de antrenor",
+        "detail": "Spune ce antrenezi și unde, ca să te găsească oamenii."
+      },
+      "dismiss": "Ascunde"
     }
   },
   "messages": {
@@ -1609,7 +1802,7 @@
       "unmute": "Activează notificările"
     },
     "blockSheet": {
-      "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație.",
+      "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație. Dacă unul dintre voi îl antrenează pe celălalt, colaborarea se încheie și ea.",
       "title": "Vrei să blochezi utilizatorul {name}?"
     },
     "bubble": {
@@ -1925,12 +2118,11 @@
       "deleted": "Notificare ștearsă"
     },
     "webOnlyPlace": {
-      "coaches": "Antrenori",
-      "memberships": "Abonamente",
-      "myPlans": "Planurile mele"
+      "memberships": "Abonamente"
     }
   },
   "pageTitle": {
+    "sensitiveActions": "Acțiuni sensibile",
     "account": "Cont",
     "assignments": "Programe atribuite",
     "billing": "Facturare",
@@ -1990,7 +2182,9 @@
     "clientHive": "Stupul tău",
     "monthHive": "Luna ta",
     "workoutSettings": "Setări pentru antrenamente",
-    "archivedRoutines": "Rutine arhivate"
+    "archivedRoutines": "Rutine arhivate",
+    "welcome": "Bun venit",
+    "workoutStatus": "Starea antrenamentului"
   },
   "payments": {
     "badge": {
@@ -2319,6 +2513,8 @@
       "note": "Notă",
       "program": "Program",
       "schedule": "Calendar",
+      "searchClients": "Caută clienți",
+      "noClientMatch": "Niciun client nu se potrivește.",
       "searchPrograms": "Caută programe",
       "starts": "Data de început",
       "title": "Atribuie programul",
@@ -2327,7 +2523,7 @@
     "assignment": {
       "notStarted": "Neînceput",
       "pause": "Pune pe pauză",
-      "pausedSubline": "Pe pauză. La reluare, restul programului se amână corespunzător",
+      "pausedSubline": "Pe pauză. Zilele ratate în pauză sunt marcate ca sărite la reluare",
       "percentDone": "{percent}% realizat",
       "startedPercent": "A început {date} · {percent}% realizat",
       "starts": "Începe {date}"
@@ -2888,7 +3084,9 @@
       "unskip": "Reia exercițiul",
       "history": "Istoricul exercițiului",
       "addNote": "Adaugă nota ta",
-      "editNote": "Editează nota ta"
+      "collapse": "Restrânge exercițiul",
+      "editNote": "Editează nota ta",
+      "unlink": "Scoate din superset"
     },
     "exerciseCard": {
       "actionsFor": "Acțiuni pentru {name}"
@@ -3066,7 +3264,8 @@
     "logRow": {
       "coach": "Antrenor",
       "repeat": "Repetă {name}",
-      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}"
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
+      "withPhoto": "Cu fotografie"
     },
     "logger": {
       "addExercise": "Adaugă exercițiu",
@@ -3083,22 +3282,24 @@
       "discard": {
         "irreversible": "Acțiunea nu poate fi anulată",
         "message": "Tot ce ai înregistrat în acest antrenament se șterge. Dacă sari peste un antrenament planificat e altceva: acela rămâne în istoric.",
-        "nothingTicked": "Nu ai bifat încă nicio serie, așa că nu ai ce termina. Renunță la antrenament sau continuă și bifează ce ai făcut.",
         "title": "Renunță la antrenament"
       },
       "empty": {
         "message": "Alege mișcările din mers. Nu trebuie să planifici nimic dinainte.",
         "title": "Adaugă primul exercițiu"
       },
-      "expand": "Arată seriile pentru {name}",
+      "expand": "{name}, {summary}. Arată seriile",
       "finish": "Termină",
-      "finishConfirm": {
-        "message": "{count, plural, one {# serie nu e bifată încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.} few {# serii nu sunt bifate încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.} other {# de serii nu sunt bifate încă. Dacă termini acum, antrenamentul se înregistrează așa cum e.}}",
-        "title": "Termină antrenamentul"
-      },
+      "finishEarly": "{total, plural, one {Termină antrenamentul mai devreme · {done}/# exercițiu} few {Termină antrenamentul mai devreme · {done}/# exerciții} other {Termină antrenamentul mai devreme · {done}/# de exerciții}}",
       "gridHead": {
-        "prev": "Anterior",
-        "set": "Serie"
+        "distance": "m",
+        "done": "Gata",
+        "previous": "Anterior",
+        "reps": "Repetări",
+        "repsEach": "Rep./parte",
+        "set": "Serie",
+        "time": "Timp",
+        "weight": "kg"
       },
       "leave": "Ieși din antrenament",
       "leaveSheet": {
@@ -3128,12 +3329,13 @@
         "pauseFailed": "Nu am putut pune antrenamentul pe pauză",
         "removeSetFailed": "Nu am putut elimina seria",
         "removed": "Am eliminat {name}",
-        "repeatFailed": "Nu am putut încărca antrenamentul de repetat"
+        "repeatFailed": "Nu am putut încărca antrenamentul de repetat",
+        "removeRoundFailed": "Nu am putut șterge runda",
+        "copySetFailed": "Nu am putut copia seria",
+        "supersetFailed": "Nu am putut schimba supersetul"
       },
       "last": "data trecută {value}",
       "best": "cea mai bună {value}",
-      "editing": "editezi",
-      "backTo": "Înapoi la {value}",
       "plan": {
         "effort": "efort {value}",
         "rest": "pauză {value}"
@@ -3143,6 +3345,17 @@
         "message": "Pui antrenamentul pe pauză pentru timpul acesta? Nu va intra în durată.",
         "pause": "Pune pe pauză",
         "keep": "Lasă așa"
+      },
+      "finishSheet": {
+        "early": {
+          "message": "{count, plural, one {# serie nu e bifată încă. Termini antrenamentul acum?} few {# serii nu sunt bifate încă. Termini antrenamentul acum?} other {# de serii nu sunt bifate încă. Termini antrenamentul acum?}}",
+          "title": "Termini mai devreme?"
+        },
+        "nothing": {
+          "message": "Nu ai bifat nicio serie, așa că nu ai ce salva încă. Renunță la antrenament sau continuă și bifează ce ai făcut.",
+          "title": "Nu ai înregistrat nimic"
+        },
+        "save": "Termină și salvează"
       }
     },
     "meta": {
@@ -3169,12 +3382,28 @@
     "plan": {
       "allWeeks": "Toate săptămânile",
       "doneCount": "{done} / {total} gata",
+      "coachNote": "Un mesaj de la antrenorul tău",
       "fromCoachStarted": "De la {coach} · Început {date}",
       "position": "Săptămâna {week} din {total}",
       "started": "Început {date}",
       "thisWeek": "Săptămâna aceasta",
       "title": "Plan",
       "yourCoach": "antrenorul tău"
+    },
+    "postToGroup": {
+      "caption": "Text",
+      "captionPlaceholder": "Spune ceva despre el",
+      "card": "Cardul antrenamentului",
+      "cardHint": "Numele și un rezumat, ca un card",
+      "changePhoto": "Schimbă fotografia",
+      "kindLabel": "Ce postezi",
+      "noGroups": "Niciunul dintre grupurile tale nu primește acum postări de la tine.",
+      "photoHint": "Detaliile apar peste fotografie",
+      "privacyCard": "Grupul vede numele și un rezumat. Niciodată notițele, greutățile sau fotografia ta.",
+      "privacyPhoto": "Grupul vede fotografia, numele și un rezumat. Niciodată notițele sau greutățile tale.",
+      "submit": "Postează în {group}",
+      "title": "Postează într-un grup",
+      "yourPhoto": "Fotografia ta"
     },
     "prescription": {
       "compact": "{sets} × {reps}",
@@ -3197,7 +3426,9 @@
         "skipFailed": "Nu am putut marca ziua ca omisă",
         "skipped": "Ai sărit peste antrenamentul de azi"
       },
-      "todaysWorkout": "Antrenamentul de azi"
+      "todaysWorkout": "Antrenamentul de azi",
+      "dayClosed": "Ai făcut deja ziua aceasta.",
+      "planClosed": "{status, select, PAUSED {Planul e pus pe pauză.} COMPLETED {Planul e încheiat.} CANCELLED {Planul a fost anulat.} other {Planul nu e activ.}}"
     },
     "progress": {
       "clientPrivacyNote": "Antrenamentele pe care clientul le face în afara planurilor tale rămân private dacă nu le partajează, așa că cifrele pot să nu includă tot ce a făcut.",
@@ -3243,35 +3474,105 @@
       "change": "Schimbă pauza"
     },
     "routineBuilder": {
+      "actions": {
+        "moveDown": "Mută mai jos",
+        "moveUp": "Mută mai sus",
+        "reorder": "Reordonează exercițiile"
+      },
+      "archive": {
+        "action": "Arhivează",
+        "done": "Arhivată. O găsești la Rutine arhivate.",
+        "failed": "Nu am putut face schimbarea. Încearcă din nou.",
+        "unarchived": "Dezarhivată. E din nou printre rutinele tale."
+      },
       "copyConfirm": {
         "body": "Primești propria copie a rutinei {name}, pe care o poți schimba cum vrei. Originalul rămâne neschimbat.",
         "title": "Faci o copie?"
       },
       "delete": {
-        "message": "Ștergi {name}? Antrenamentele deja înregistrate pe baza ei se păstrează.",
+        "message": "Ștergi {name}? Antrenamentele deja înregistrate pe baza ei se păstrează, iar zilele programate care urmează se anulează.",
         "title": "Șterge rutina"
+      },
+      "discard": {
+        "editBody": "Schimbările făcute la {name} se vor pierde.",
+        "keep": "Continuă editarea",
+        "newBody": "Rutina nu a fost salvată, așa că exercițiile și seriile ei se vor pierde.",
+        "title": "Renunți la schimbări?"
+      },
+      "keypad": {
+        "nextSet": "Seria următoare"
       },
       "makeCopy": "Fă o copie",
       "name": {
         "label": "Numele rutinei",
-        "placeholder": "Ziua de împins"
+        "placeholder": "Ziua de împins",
+        "required": "Dă un nume rutinei."
       },
-      "noExercises": "Niciun exercițiu încă. Adaugă mișcările în ordinea în care le faci.",
+      "noExercises": "Adaugă mișcările în ordinea în care le faci.",
+      "notes": {
+        "label": "Notițe",
+        "placeholder": "Întâi genuflexiunile grele, apoi exercițiile ajutătoare."
+      },
+      "options": {
+        "discardEdit": "Renunță la schimbări",
+        "discardNew": "Renunță la rutină"
+      },
+      "plan": {
+        "addSetFor": "Adaugă serie la {name}",
+        "addWeightFor": "Adaugă greutate la {name}",
+        "perSet": "Serie cu serie",
+        "perSetFor": "Serie cu serie, {name}",
+        "sameForAll": "La fel pentru toate seriile",
+        "sameForAllFor": "La fel pentru toate seriile, {name}"
+      },
+      "reorder": {
+        "hint": "Trage de mânere ca să schimbi ordinea.",
+        "title": "Reordonează exercițiile"
+      },
+      "rest": {
+        "chip": "Pauză",
+        "exercise": "Pauză pentru {name}",
+        "exerciseInherited": "Pauză pentru {name}, la fel ca rutina ({value})",
+        "exerciseOwn": "Pauză pentru {name}, {value}",
+        "hint": "Pentru toate exercițiile",
+        "row": "Pauză între serii",
+        "sameAsRoutine": "La fel ca rutina ({value})",
+        "yourDefault": "Implicit ({value})"
+      },
+      "saveAndStart": "Salvează și începe",
       "starterNote": "O rutină de start MotionHive. Când o începi, devine a ta și o poți edita.",
       "starterNoteCoach": "O rutină de start MotionHive. Fă o copie ca să o adaptezi pentru clienții tăi.",
       "stepper": {
         "fewer": "O serie în minus pentru {name}",
         "group": "Serii pentru {name}",
-        "more": "O serie în plus pentru {name}",
-        "unit": "{count, plural, one {serie} few {serii} other {de serii}}"
+        "more": "O serie în plus pentru {name}"
+      },
+      "superset": {
+        "hint": "Leagă două exerciții ca să le faci unul după altul, apoi iei pauză.",
+        "link": "Leagă în superset",
+        "linkFor": "Leagă {a} și {b} în superset",
+        "unlink": "Superset · atinge pentru a dezlega",
+        "unlinkFor": "Dezleagă {a} și {b}"
       },
       "targets": {
+        "distance": "Distanță",
+        "group": "Ținta: {field}, {name}",
+        "lower": "Scade {field} pentru {name}",
+        "raise": "Crește {field} pentru {name}",
         "reps": "Repetări",
-        "repsFor": "Repetări țintă pentru {name}",
-        "repsKeypad": "Repetări țintă",
+        "repsEach": "Rep./parte",
+        "sets": "Serii",
+        "time": "Timp",
+        "type": "Scrie {field} pentru {name}, acum {value}",
         "weight": "Greutate",
-        "weightFor": "Greutate țintă pentru {name}",
-        "weightKeypad": "Greutate țintă (kg)"
+        "withUnit": "{field} ({unit})",
+        "words": {
+          "distance": "distanța",
+          "reps": "repetările",
+          "repsEach": "repetările pe parte",
+          "time": "timpul",
+          "weight": "greutatea"
+        }
       },
       "thisRoutine": "această rutină",
       "title": "Rutină",
@@ -3284,26 +3585,6 @@
         "saveFailed": "Nu am putut salva rutina",
         "saved": "Rutină salvată",
         "startFailed": "Nu am putut începe rutina"
-      },
-      "rest": {
-        "row": "Pauză între serii",
-        "hint": "Pentru toate exercițiile din rutină",
-        "yourDefault": "Setarea ta ({value})",
-        "sameAsRoutine": "La fel ca rutina ({value})",
-        "exercise": "Pauză pentru {name}",
-        "chip": "Pauză"
-      },
-      "superset": {
-        "link": "Leagă în superset",
-        "unlink": "Superset · atinge pentru a dezlega",
-        "linkFor": "Leagă {a} și {b} în superset",
-        "unlinkFor": "Dezleagă {a} și {b}"
-      },
-      "archive": {
-        "action": "Arhivează",
-        "done": "Arhivată. O găsești la Rutine arhivate.",
-        "failed": "Nu am putut face schimbarea. Încearcă din nou.",
-        "unarchived": "Dezarhivată. E din nou printre rutinele tale."
       }
     },
     "routineRow": {
@@ -3325,8 +3606,9 @@
       "lastTime": "Data trecută: {value}",
       "options": "Opțiuni pentru seria {number}",
       "menu": "Opțiuni pentru {name}",
-      "edit": "Editează {name}",
-      "untick": "Marchează {name} ca nefăcută"
+      "untick": "Marchează {name} ca nefăcută",
+      "usePrevious": "Folosește data trecută pentru {name}: {value}",
+      "noPrevious": "{name}, nimic de data trecută"
     },
     "setTypeMark": {
       "DROPSET": "Drop set",
@@ -3393,7 +3675,7 @@
       "group": {
         "done": "Postat în {group}",
         "failed": "Nu am putut posta în grup",
-        "hint": "Membrii văd un card cu numele antrenamentului și cifrele. Niciodată notița, greutățile sau poza.",
+        "hint": "Alege un grup ca să postezi fotografia sau cardul antrenamentului. Niciodată notițele sau greutățile.",
         "pending": "Trimis în {group}. Apare după ce grupul îl aprobă.",
         "posting": "Se postează în {group}",
         "title": "Sau postează-l într-un grup"
@@ -3481,7 +3763,8 @@
       "sets": "Serii",
       "time": "Timp",
       "volume": "Volum",
-      "workouts": "Antrenamente"
+      "workouts": "Antrenamente",
+      "durationUnknown": "Necunoscută"
     },
     "todayHero": {
       "done": "Gata pe azi. Bravo!",
@@ -3544,7 +3827,10 @@
       "note": "Notă pentru serie",
       "addNote": "Adaugă o notă",
       "notePlaceholder": "De exemplu: ultima repetare a fost cu ajutor",
-      "remove": "Șterge seria"
+      "remove": "Șterge seria",
+      "removeRound": "Șterge runda {number}",
+      "removeRoundHint": "Toate seriile din rundă, de la fiecare exercițiu",
+      "copy": "Copiază seria"
     },
     "effort": {
       "title": "Cât de greu?",
@@ -3574,10 +3860,9 @@
     "superset": {
       "kicker": "Superset · runda {round} din {total}",
       "round": "Runda {number}",
-      "done": "gata",
+      "memberSkipped": "Sărit",
       "skipped": "sărit",
       "addRound": "Adaugă o rundă",
-      "restAfterRound": "Pauză după rundă: {value}",
       "rounds": "{count, plural, one {# rundă} few {# runde} other {# de runde}}",
       "summary": "Superset · {count, plural, one {# rundă} few {# runde} other {# de runde}}"
     },
@@ -3586,7 +3871,8 @@
       "restForAll": "Pauza pentru toate exercițiile",
       "pause": "Pune antrenamentul pe pauză",
       "footnote": "Se schimbă doar acest antrenament. Setările tale sunt în Setări › Antrenamente.",
-      "more": "Mai multe pentru acest antrenament"
+      "more": "Mai multe pentru acest antrenament",
+      "addExercises": "Adaugă exerciții"
     },
     "archived": {
       "link": "{count, plural, one {# rutină arhivată} few {# rutine arhivate} other {# de rutine arhivate}}",
@@ -3679,7 +3965,32 @@
     "live": {
       "next": "Urmează: {next}",
       "workout": "Antrenament",
-      "plus": "+{seconds} s"
+      "plus": "+{seconds} s",
+      "done": "Gata",
+      "target": "Ținta {value}",
+      "progress": "{done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
+      "planned": "din {total}",
+      "skipSet": "Sari seria",
+      "otherValue": "Altă valoare",
+      "allDone": "Toate seriile gata"
+    },
+    "updateRoutine": {
+      "added": "Ai adăugat {names}.",
+      "keep": "Las-o cum era",
+      "keepHint": "Doar acest antrenament are schimbările.",
+      "more": "{count, plural, one {încă #} few {încă #} other {încă #}}",
+      "removed": "Ai scos {names}.",
+      "reordered": "Ai schimbat ordinea exercițiilor.",
+      "sets": "Ai schimbat seriile la {names}.",
+      "supersets": "Ai schimbat superseturile.",
+      "swapped": "Ai pus în loc {names}.",
+      "title": "Actualizezi {name}?",
+      "toast": {
+        "failed": "Nu am putut actualiza {name}. Antrenamentul tău e salvat.",
+        "updated": "Rutina {name} a fost actualizată"
+      },
+      "update": "Actualizează rutina",
+      "updateHint": "Data viitoare începi cu aceste schimbări."
     }
   },
   "feedback": {
@@ -3731,5 +4042,154 @@
     "takenDown": "Scos de pe profilul tău după o raportare, deci nu mai poate fi public sau distribuit.",
     "visibleTo": "Vizibil pentru",
     "youAndCoach": "Tu și {name}"
+  },
+  "welcome": {
+    "stepOf": "Pasul {step} din {total}",
+    "optional": "Opțional",
+    "categoriesFailed": "Nu am putut încărca opțiunile",
+    "role": {
+      "title": "Cum vei folosi MotionHive?",
+      "intro": "Îți arătăm mai întâi ce ți se potrivește. Poți schimba oricând.",
+      "note": "Și antrenorii se antrenează și pot trece oricând de la un rol la altul.",
+      "train": {
+        "label": "Ca să mă antrenez",
+        "detail": "Urmezi planuri, îți notezi antrenamentele și găsești antrenori, grupuri și sesiuni."
+      },
+      "coach": {
+        "label": "Ca să antrenez alți oameni",
+        "detail": "Lucrezi cu clienți, organizezi grupuri și sesiuni și încasezi plăți."
+      }
+    },
+    "interests": {
+      "title": "Ce îți place să practici?",
+      "intro": "Alege oricâte vrei. Pe baza lor îți sugerăm antrenori, grupuri și sesiuni."
+    },
+    "level": {
+      "title": "De unde pornești?",
+      "intro": "Ca planurile și antrenorii pe care ți-i sugerăm să ți se potrivească.",
+      "goals": "Ce urmărești?",
+      "beginner": {
+        "label": "Abia încep",
+        "detail": "Sunt la început sau revin după o pauză lungă."
+      },
+      "intermediate": {
+        "label": "Mă antrenez din când în când",
+        "detail": "Știu lucrurile de bază și mă antrenez când pot."
+      },
+      "advanced": {
+        "label": "Mă antrenez constant",
+        "detail": "Mă antrenez aproape în fiecare săptămână și știu ce fac."
+      }
+    },
+    "coachCategories": {
+      "title": "Ce antrenezi?",
+      "intro": "După acestea te găsesc oamenii în Descoperă. Alege tot ce se potrivește.",
+      "other": "Altceva?",
+      "otherAdd": "Adaugă specializarea",
+      "otherHint": "Adaugă-le pe rând. Apar pe profilul tău.",
+      "otherLabel": "Adaugă ce lipsește",
+      "otherList": "Specializările tale",
+      "otherOnList": "Am ales {value} din lista de mai sus.",
+      "otherPlaceholder": "Kettlebell"
+    },
+    "coachDetails": {
+      "title": "Unde antrenezi?",
+      "intro": "Orașul tău îi ajută pe cei din apropiere să te găsească.",
+      "addCity": "Adaugă orașul tău",
+      "changeCity": "Schimbă orașul",
+      "cityHint": "Apare pe profilul tău. Adresa exactă nu apare niciodată.",
+      "citySearch": "Caută orașul tău",
+      "noPlaces": "Nu am găsit orașul. Verifică scrierea sau încearcă unul din apropiere.",
+      "accepting": "Primesc clienți noi",
+      "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Dezactivează opțiunea când nu mai ai locuri.",
+      "places": "Locurile unde antrenezi"
+    }
+  },
+  "venues": {
+    "kind": {
+      "GYM": "Sală",
+      "STUDIO": "Studio",
+      "PARK": "Parc",
+      "OUTDOOR": "În aer liber",
+      "CLIENT_HOME": "La clienți acasă",
+      "ONLINE": "Online",
+      "OTHER": "Altceva"
+    },
+    "provider": {
+      "OTHER": "Alta"
+    },
+    "defaultName": {
+      "online": "Online",
+      "clientHome": "La clienți acasă"
+    },
+    "list": {
+      "add": "Adaugă un loc",
+      "more": "Mai multe pentru {name}",
+      "loadFailed": "Locurile tale nu au putut fi încărcate.",
+      "hint": "Sala sau studioul tău, ori online pe Zoom. Profilul arată numele și orașul fiecăruia, niciodată strada sau linkul de întâlnire."
+    },
+    "sheet": {
+      "addTitle": "Adaugă un loc",
+      "editTitle": "Modifică locul",
+      "kind": "Ce fel de loc?",
+      "platform": "Unde vă întâlniți online",
+      "name": "Nume",
+      "namePlaceholder": {
+        "GYM": "De exemplu FitZone Centru",
+        "STUDIO": "De exemplu Studio Ana",
+        "PARK": "De exemplu Parcul Herăstrău",
+        "OUTDOOR": "De exemplu traseul de lângă lac",
+        "CLIENT_HOME": "La clienți acasă",
+        "ONLINE": "Online",
+        "OTHER": "De exemplu sala școlii"
+      },
+      "address": "Adresă",
+      "searchAddress": "Caută adresa",
+      "addressSearch": "Stradă, loc sau oraș",
+      "addressHint": "Pe profil apare doar orașul.",
+      "area": "Zona în care lucrezi",
+      "addArea": "Adaugă zona în care lucrezi",
+      "areaSearch": "Caută un oraș",
+      "areaHint": "Orașul prin care te deplasezi.",
+      "clearArea": "Elimină zona",
+      "noResults": "Nu am găsit nimic. Încearcă strada și orașul, sau doar orașul.",
+      "link": "Link de întâlnire",
+      "linkHint": "Opțional și nu apare niciodată pe profilul tău.",
+      "linkInvalid": "Nu pare un link web. Verifică-l sau lasă câmpul gol.",
+      "travel": "Cât de departe te deplasezi (km)",
+      "travelPlaceholder": "De exemplu 15",
+      "travelHint": "Opțional. Până la {max} km."
+    },
+    "actions": {
+      "edit": "Modifică detaliile",
+      "remove": "Elimină"
+    },
+    "remove": {
+      "title": "Elimini {name}?",
+      "body": "{name} dispare de pe profilul tău. Sesiunile deja planificate acolo își păstrează detaliile.",
+      "confirm": "Elimină"
+    },
+    "toast": {
+      "added": "Loc adăugat",
+      "updated": "Loc actualizat",
+      "removed": "Loc eliminat",
+      "saveFailed": "Locul nu a putut fi salvat.",
+      "removeFailed": "Locul nu a putut fi eliminat."
+    }
+  },
+  "photoViewer": {
+    "counter": "{index} din {total}",
+    "previous": "Fotografia anterioară",
+    "next": "Fotografia următoare",
+    "open": {
+      "profile": "Vezi fotografia de profil",
+      "group": "Vezi fotografia grupului",
+      "workout": "Vezi fotografia antrenamentului"
+    },
+    "alt": {
+      "profile": "Fotografie de profil",
+      "group": "Fotografia grupului",
+      "workout": "Fotografia antrenamentului"
+    }
   }
 }

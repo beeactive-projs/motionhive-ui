@@ -17,6 +17,8 @@ export interface SuggestedCoach {
   avatarUrl: string | null;
   displayName: string | null;
   specializations: string[] | null;
+  /** What they coach, ids from `GET /categories` (`CategoryStore`). Older APIs omit it. */
+  categoryIds?: string[];
   yearsOfExperience: number | null;
   city: string | null;
   countryCode: string | null;
@@ -57,6 +59,8 @@ export interface InstructorSearchResult {
   displayName: string | null;
   bio: string | null;
   specializations: string[] | null;
+  /** What they coach, ids from `GET /categories` (`CategoryStore`). Older APIs omit it. */
+  categoryIds?: string[];
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
   /** Has an active online venue (a meeting link): what "Online" means everywhere. */
@@ -82,6 +86,8 @@ export interface CoachDirectoryParams {
   search?: string;
   /** Contains, blind to accents and case. */
   city?: string;
+  /** With `city`: also the coaches who coach online, wherever they live. */
+  includeOnline?: boolean;
   /** ISO 3166-1 alpha-2. */
   country?: string;
   accepting?: boolean;
@@ -90,6 +96,8 @@ export interface CoachDirectoryParams {
   requested?: boolean;
   /** Any of them, matched whole, blind to accents and case. */
   specializations?: readonly string[];
+  /** Coaches of any of these categories. */
+  categoryIds?: readonly string[];
   minYears?: number;
   sort?: CoachDirectorySort;
 }
@@ -103,9 +111,19 @@ export interface CoachFacet {
 }
 
 /** `GET /profile/instructors/directory/facets`, the most common first. */
+/** A category the directory's coaches coach (id from `GET /categories`), with how many. */
+export interface CoachCategoryFacet {
+  id: string;
+  count: number;
+}
+
 export interface CoachDirectoryFacets {
   cities: CoachFacet[];
   specializations: CoachFacet[];
+  /** Every category coached, with its coaches. Older APIs omit it. */
+  categories?: CoachCategoryFacet[];
+  /** How many coaches have an active online venue. Older APIs omit it. */
+  online?: number;
 }
 
 export interface PublicInstructorProfile {
@@ -119,6 +137,8 @@ export interface PublicInstructorProfile {
   displayName: string | null;
   bio: string | null;
   specializations: string[];
+  /** What they coach, ids from `GET /categories` (`CategoryStore`). Older APIs omit it. */
+  categoryIds?: string[];
   certifications: InstructorCertification[];
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;

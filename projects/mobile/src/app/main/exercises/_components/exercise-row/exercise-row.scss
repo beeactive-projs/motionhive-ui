@@ -1,5 +1,5 @@
-/* Separator, chevron and the tile's gap come from the grouped-list skin
-   (theme/components/ion-list.css). */
+/* Separator, chevron, the tile's gap and the compact type and line boxes
+   (`mh-compact-row`) come from the list skin (theme/components/ion-list.css). */
 :host {
   display: block;
 }
@@ -38,11 +38,6 @@ ion-label p.meta span {
 
 ion-label p.meta ion-badge {
   flex: none;
-}
-
-ion-label h2 {
-  font-family: var(--ion-font-family);
-  font-weight: 600;
 }
 
 /* Level always shows; ownership only for the exceptions. Both stay on one

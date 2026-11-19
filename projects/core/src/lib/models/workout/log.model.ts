@@ -273,7 +273,19 @@ export interface LogSetPayload {
   restAfterSeconds?: number | null;
   restSource?: RestSource | null;
   isCompleted?: boolean;
+  /** With `isCompleted`: when it was ticked, if not now (a lock screen ✓ saved later). ISO time. */
+  completedAt?: string;
   notes?: string | null;
+}
+
+/**
+ * One logged exercise's new superset group, mid-workout: neighbours sharing
+ * a group are one superset, null takes it out of any.
+ */
+export interface SupersetChange {
+  /** The logged exercise's id. */
+  id: string;
+  supersetGroupId: number | null;
 }
 
 export interface CompleteWorkoutPayload {

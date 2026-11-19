@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, map, of, tap, timeout } from 'rxjs';
 
 import { silentRequest } from '../../interceptors/silent-request.context';
 import { PickedLocation } from '../../models/user/user.model';
@@ -33,7 +33,28 @@ interface NominatimResult {
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 /** Nominatim's usage policy asks for a contact address on every request. */
 const NOMINATIM_EMAIL = 'contact@motionhive.fit';
-const MIN_QUERY_LENGTH = 2;
+/** Shorter than this, no search is asked (and nothing was "not found"). */
+export const PLACE_SEARCH_MIN_LENGTH = 2;
+/**
+ * Nominatim usually answers within a second or two, now and then after 15 s
+ * with a 503. Past this the search gives up and says so, rather than
+ * spinning for as long as the server takes.
+ */
+export const PLACE_SEARCH_TIMEOUT_MS = 6000;
+/** Answers kept for the session, so a search typed again (or after a slip) is instant. */
+const CACHE_SIZE = 50;
+
+/** A search's answer: the places, and whether the search failed (so "nothing found" is not said when it is not true). */
+export interface PlaceSearchResult {
+  places: PickedLocation[];
+  failed: boolean;
+}
+
+export interface PlaceSearchOptions {
+  limit?: number;
+  /** Cities, towns and villages only (Nominatim's `featureType=settlement`): for a person's city. */
+  settlements?: boolean;
+}
 
 /**
  * Place lookup for the location fields, backed by OpenStreetMap's Nominatim.
@@ -50,26 +71,57 @@ const MIN_QUERY_LENGTH = 2;
 @Service()
 export class PlaceSearchService {
   private readonly _http = inject(HttpClient);
+  private readonly _cache = new Map<string, PickedLocation[]>();
 
-  /** Debouncing is the caller's job — it knows its own input. */
+  /** Debouncing is the caller's job — it knows its own input. A failure reads as no places. */
   search(query: string, limit = 5): Observable<PickedLocation[]> {
-    if (query.trim().length < MIN_QUERY_LENGTH) return of([]);
+    return this.lookup(query, { limit }).pipe(map((result) => result.places));
+  }
 
-    return this._http
-      .get<NominatimResult[]>(NOMINATIM_URL, {
-        params: {
-          q: query,
-          format: 'json',
-          addressdetails: '1',
-          limit: String(limit),
-          email: NOMINATIM_EMAIL,
-        },
-        context: silentRequest(),
-      })
-      .pipe(
-        map((results) => results.map(toPickedLocation)),
-        catchError(() => of([])),
-      );
+  /**
+   * The places for `query`, held to `PLACE_SEARCH_TIMEOUT_MS`, with a slow
+   * or failed answer told apart from an empty one. Answers are kept for the
+   * session; failures are not, so the same search can be tried again.
+   */
+  lookup(query: string, options: PlaceSearchOptions = {}): Observable<PlaceSearchResult> {
+    const term = query.trim();
+    if (term.length < PLACE_SEARCH_MIN_LENGTH) {
+      return of({ places: [], failed: false });
+    }
+    const limit = options.limit ?? 5;
+    const key = [term.toLocaleLowerCase(), limit, !!options.settlements].join('|');
+    const cached = this._cache.get(key);
+    if (cached) {
+      return of({ places: cached, failed: false });
+    }
+
+    const params: Record<string, string> = {
+      q: term,
+      format: 'json',
+      addressdetails: '1',
+      limit: String(limit),
+      email: NOMINATIM_EMAIL,
+    };
+    if (options.settlements) {
+      params['featureType'] = 'settlement';
+    }
+    return this._http.get<NominatimResult[]>(NOMINATIM_URL, { params, context: silentRequest() }).pipe(
+      timeout(PLACE_SEARCH_TIMEOUT_MS),
+      map((results) => results.map(toPickedLocation)),
+      tap((places) => this._remember(key, places)),
+      map((places) => ({ places, failed: false })),
+      catchError(() => of({ places: [], failed: true })),
+    );
+  }
+
+  private _remember(key: string, places: PickedLocation[]): void {
+    if (this._cache.size >= CACHE_SIZE) {
+      const oldest = this._cache.keys().next();
+      if (!oldest.done) {
+        this._cache.delete(oldest.value);
+      }
+    }
+    this._cache.set(key, places);
   }
 }
 

@@ -30,6 +30,18 @@ public class RestLivePlugin extends Plugin {
     @Override
     protected void handleOnDestroy() {
         RestLive.listener = null;
+        RestLive.inFront = false;
+    }
+
+    /** On screen: the rest bar says Go, so the notification stays silent. */
+    @Override
+    protected void handleOnResume() {
+        RestLive.inFront = true;
+    }
+
+    @Override
+    protected void handleOnPause() {
+        RestLive.inFront = false;
     }
 
     @PluginMethod

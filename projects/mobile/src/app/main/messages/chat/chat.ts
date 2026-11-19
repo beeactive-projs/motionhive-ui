@@ -29,8 +29,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
+import { Keyboard } from '@capacitor/keyboard';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
@@ -51,6 +50,13 @@ import {
   stackRootOf,
 } from '../../../_shared/utils/stack-paths';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
+import {
+  FOLLOWS_KEYBOARD,
+  KEYBOARD_ANIMATION_MS,
+  KEYBOARD_TRANSITION,
+  holdKeyboardResize,
+  releaseKeyboardResize,
+} from '../../../_shared/utils/keyboard';
 import { ChatComposer } from '../_components/chat-composer/chat-composer';
 import { MessageBubble } from '../_components/message-bubble/message-bubble';
 import { ThreadSkeleton } from '../_components/thread-skeleton/thread-skeleton';
@@ -68,65 +74,12 @@ const DRAG_DISMISS_PX = 24;
 /** Things inside the thread that own their tap. */
 const INTERACTIVE = 'a, button, ion-button, input, textarea, [role="button"]';
 
-/**
- * iOS: the send bar rides up with the keyboard instead of after it.
- *
- * The keyboard plugin resizes the page only once the keyboard has finished
- * rising, plus 0.2s (its `Keyboard.m`), so the bar landed on the keys about
- * half a second late. On this screen the plugin's resizing is held off and
- * the bar is lifted on `keyboardWillShow`, which arrives with the keyboard's
- * height as it starts to move. Android resizes the window itself, which the
- * plugin cannot change, and keeps the default behaviour.
+/*
+ * iOS: the send bar rides up with the keyboard instead of after it. While a
+ * chat is shown the plugin's late resizing is held off and the bar is lifted
+ * on `keyboardWillShow` (`FOLLOWS_KEYBOARD`, `_shared/utils/keyboard.ts`).
+ * The bar and the thread both move on `KEYBOARD_TRANSITION`.
  */
-const FOLLOWS_KEYBOARD = Capacitor.getPlatform() === 'ios';
-
-/**
- * The iOS keyboard's animation: its duration, and a curve close to its
- * spring (Ionic's own iOS easing). The bar and the thread both move on it.
- */
-const KEYBOARD_ANIMATION_MS = 250;
-const KEYBOARD_TRANSITION = `transform ${KEYBOARD_ANIMATION_MS}ms cubic-bezier(0.36, 0.66, 0.04, 1)`;
-
-/**
- * Chat screens holding the plugin's resizing off. A count, not a flag: when
- * one chat replaces another (a notification opening a different thread),
- * Ionic tells the new screen it is entering before it tells the old one it
- * is leaving, so the old one must not turn resizing back on under the new one.
- */
-let resizeHolds = 0;
-let resizeBefore: KeyboardResize = KeyboardResize.Body;
-
-async function holdKeyboardResize(): Promise<void> {
-  if (resizeHolds++ > 0) return;
-  try {
-    resizeBefore = (await Keyboard.getResizeMode()).mode;
-    await Keyboard.setResizeMode({ mode: KeyboardResize.None });
-  } catch {
-    // No plugin, nothing to hold.
-  }
-  clearResizedBody();
-}
-
-async function releaseKeyboardResize(): Promise<void> {
-  if (resizeHolds === 0 || --resizeHolds > 0) return;
-  await Keyboard.setResizeMode({ mode: resizeBefore }).catch(() => undefined);
-  clearResizedBody();
-}
-
-/**
- * Give the page back the height the plugin took for the keyboard.
- *
- * `resize: 'body'` sets `document.body`'s height to the room above the
- * keyboard and takes it off only on a keyboard hide that arrives in that
- * mode. A thread opened with the keyboard still up (a row picked from the
- * inbox search) switches to `none` first, the hide that follows is ignored,
- * and the body stayed cut short: the composer, then the tab bar back on the
- * inbox, halfway up the screen. The plugin also believes the keyboard is
- * down by then, so no later hide in `body` mode undid it either.
- */
-function clearResizedBody(): void {
-  document.body.style.removeProperty('height');
-}
 
 /**
  * One conversation.

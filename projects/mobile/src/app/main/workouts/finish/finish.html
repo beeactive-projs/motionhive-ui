@@ -29,7 +29,7 @@
           </ion-button>
         }
         <ion-button [attr.aria-label]="'a11y.moreActions' | translate" (click)="moreOpen.set(true)">
-          <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
         </ion-button>
       </ion-buttons>
     }
@@ -59,12 +59,19 @@
   } @else if (log(); as log) {
     <section class="hero" [class.celebrate]="!isReview()" [class.with-photo]="!!photoUrl()">
       @if (photoUrl(); as src) {
-        <!-- The photo is the cover; the numbers sit on it like a poster. -->
-        <img class="cover" [src]="src" [alt]="'workouts.photo.alt' | translate" />
+        <!-- The photo is the cover; the numbers sit on it like a poster, and
+             a tap anywhere on it shows the whole photo. -->
+        <img
+          class="cover"
+          [src]="src"
+          [alt]="'workouts.photo.alt' | translate"
+          [mhViewPhoto]="src"
+          [mhViewPhotoAlt]="'photoViewer.alt.workout' | translate"
+          [mhViewPhotoLabel]="'photoViewer.open.workout' | translate"
+        />
         <ion-button
           class="change-photo"
           size="small"
-          shape="round"
           (click)="photoActionsOpen.set(true)"
         >
           {{ 'workouts.photo.change' | translate }}
@@ -326,6 +333,8 @@
       [log]="log"
       [photoUrl]="photoUrl()"
       (logChange)="onLogChange($event)"
+      (postToGroup)="openPostToGroup($event)"
     />
+    <mh-post-workout-sheet [log]="log" [photoUrl]="photoUrl()" />
   }
 }

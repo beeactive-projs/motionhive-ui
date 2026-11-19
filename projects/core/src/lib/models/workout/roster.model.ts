@@ -36,6 +36,11 @@ export interface RosterClient {
   lastWorkoutAt: string | null;
   daysSinceLastWorkout: number | null;
   activePlans: number;
+  /**
+   * Plans the coach paused. Only paused is not "no plan": the client is not
+   * flagged. Optional for an API from before it was sent.
+   */
+  pausedPlans?: number;
   attention: RosterAttention;
 }
 

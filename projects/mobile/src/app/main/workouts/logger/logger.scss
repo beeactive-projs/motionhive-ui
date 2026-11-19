@@ -1,34 +1,22 @@
-/* ─── Header ──────────────────────────────────────────────────────
-   The name over the session clock. The clock is mono and tabular so it does
-   not jitter as it ticks, and honey because it is this moment, not a status. */
-ion-title .name,
-ion-title .timer {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* The exercise cards' set table, the header and the folded card, shared
+   with the routine builder, and the link chip between two cards, the
+   builder's and a program day's. */
+@use '../_components/set-row/set-table';
+@use '../_components/workout-header/workout-header';
+@use '../_components/folded-card/folded-card';
+@use '../_components/plan-chips/plan-chips';
 
+/* ─── Header ──────────────────────────────────────────────────────
+   After the workout prototype: under the name, the clock in honey (this
+   moment, not a status; tabular so it does not jitter as it ticks) and the
+   volume so far, in the muted ink. Finish is the header's honey button. */
 ion-title .timer {
   color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Finish is the one honey ask on the screen. Set through the variables: a
-   solid button inside a toolbar otherwise takes Ionic's inverted chip look. */
-ion-button.finish {
-  --background: var(--ion-color-primary);
-  --background-activated: var(--ion-color-primary-shade);
-  --color: var(--ion-color-primary-contrast);
-  --padding-start: 1.125rem;
-  --padding-end: 1.125rem;
-  height: 2.5rem;
-  margin-inline-end: 0.5rem;
   font-weight: 600;
 }
 
-/* Sets done across the whole workout, under the bar. */
+/* Sets done across the whole workout, under the bar: a thin bar and the
+   count beside it. */
 ion-toolbar.progress {
   --min-height: 0;
 }
@@ -42,284 +30,99 @@ ion-toolbar.progress {
 
 .progress-row ion-progress-bar {
   flex: 1;
-  height: 0.375rem;
+  height: 0.25rem;
   border-radius: var(--mh-radius-pill);
 }
 
-.progress-row .mh-kicker {
+.progress-row .count {
   flex: none;
   color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
   font-variant-numeric: tabular-nums;
 }
 
 /* ─── Folded exercise ─────────────────────────────────────────────
-   A finished exercise as one check row. The mark is the success shade: the
-   base emerald is under 3:1 against white for a glyph. */
-.folded ion-item {
-  --background: var(--ion-card-background);
-}
-
+   The row itself is `_folded-card.scss`. Done, it leads with the check,
+   centred in the tile's 2.5rem; still being worked, with the open card's
+   tile. The success shade: the base emerald is under 3:1 against white
+   for a glyph. */
 .folded .done-mark {
-  margin-inline-end: 0.875rem;
+  margin-inline: calc((2.5rem - var(--mh-icon-xl)) / 2) calc(0.625rem + (2.5rem - var(--mh-icon-xl)) / 2);
   color: var(--mh-color-success-deep);
   font-size: var(--mh-icon-xl);
 }
 
-.folded h2 {
-  font-family: var(--mh-font-heading);
-  font-weight: 600;
-}
-
-/* The sets: done ones as lines, the one you are on as a card, the rest as
-   grey lines (set-row draws all three). */
-.sets {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Add set / Add weight under the sets — quiet text actions in the honey ink,
-   centred under the rows they add to. */
-.ex-actions {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.375rem;
-}
-
-.ex-actions ion-button {
-  --color: var(--mh-color-honey-deep);
-  --padding-start: 0.25rem;
-  --padding-end: 0.5rem;
-  margin: 0;
-  font-weight: 600;
+/* The chevron at the ⋮'s size, centred over the tick column as the ⋮ is
+   (a tap target wide). */
+.folded ion-icon[slot='end'] {
+  margin-inline: 0.5rem
+    calc(var(--mh-card-inset) + var(--mh-card-lead) + (var(--mh-tap-target) - var(--mh-icon-md)) / 2);
+  font-size: var(--mh-icon-md);
 }
 
 ion-card ion-skeleton-text {
   margin: 0.375rem 0;
 }
 
-/* Discard sits at the very end, small and quiet: rare, and never the way out. */
-ion-button.discard {
-  margin: 0.5rem 0 0;
-  font-weight: 600;
+/* The link chip between two cards sits as close to them as the routine
+   builder's, whose cards are in an `.mh-section`: the section's gap on
+   either side, not the page's rhythm. Two cards with no chip between them
+   keep the rhythm. */
+.link-row {
+  margin-block: calc(var(--mh-section-gap) - var(--mh-page-rhythm));
 }
 
-/* Room under the last exercise, so its last sets can still rise to a third
-   of the way down, above the pad and the rest bar. */
-.mh-page {
-  padding-bottom: 16rem;
-}
-
-/* "Back to Bench press · Set 3": floats over the list, above the bars. */
-.back-to {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  padding-inline: 1rem;
-  pointer-events: none;
-}
-
-.back-to-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  max-width: 100%;
-  min-height: var(--mh-tap-target);
-  padding: 0 1rem;
-  border: 0;
-  border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-navy-card);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  color: var(--mh-color-navy-card-ink);
-  cursor: pointer;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  pointer-events: auto;
-}
-
-.back-to-pill ion-icon {
-  flex: none;
-  color: var(--ion-color-primary);
-}
-
-.back-to-pill span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ─── Superset: one card with a honey rail, in rounds ───────────── */
-
-ion-card.superset {
-  border-inline-start: 3px solid var(--ion-color-primary);
-}
-
-.ss-head {
-  padding: 0.875rem 0.75rem 0.25rem 1rem;
-}
-
-.ss-kicker {
-  display: block;
-  margin-bottom: 0.375rem;
-  color: var(--mh-color-honey-deep);
-}
-
-.ss-member {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: var(--mh-tap-target);
-}
-
-.ss-tag {
-  flex: none;
-  color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-sm);
-  font-weight: 700;
-}
-
-.ss-name {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ion-text-color);
-  cursor: pointer;
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  text-align: start;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.ss-member.skipped .ss-name {
-  color: var(--ion-color-medium);
-  text-decoration: line-through;
-}
-
-.ss-skipped {
-  flex: none;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-}
-
-.ss-actions {
-  flex: none;
-  margin: 0;
-}
-
-.ss-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  margin: -0.25rem 0 0.25rem;
-  padding-inline-start: 1.75rem;
-}
-
-.ss-line {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ion-color-medium);
-  font: inherit;
-  font-size: var(--mh-text-xs);
-  text-align: start;
-}
-
-.ss-line ion-icon {
-  flex: none;
-  font-size: var(--mh-icon-sm);
-}
-
-.ss-line span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ss-line.note {
-  min-height: 1.75rem;
-  color: var(--ion-text-color);
-  cursor: pointer;
-}
-
-.ss-line.plan-note {
-  font-style: italic;
-}
-
-ion-card.superset .sets {
-  padding: 0 0.75rem 0 1rem;
-}
-
-.round-label {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-  padding-inline: 0.25rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  letter-spacing: var(--mh-tracking-kicker);
-  text-transform: uppercase;
-}
-
-.round-done {
-  color: var(--mh-color-success-deep);
-  text-transform: lowercase;
-}
-
-/* A round finished or still ahead, in one line; tap to open its first set. */
-.round-summary {
-  display: block;
-  width: 100%;
-  min-height: var(--mh-tap-target);
-  padding: 0 0.25rem;
-  overflow: hidden;
-  border: 0;
-  background: none;
-  color: var(--ion-color-medium);
-  cursor: pointer;
-  font-size: var(--mh-text-sm);
-  font-variant-numeric: tabular-nums;
-  text-align: start;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.round-summary.done {
-  color: var(--ion-text-color);
-  font-weight: 600;
-}
-
-.ss-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem 0.75rem 1rem;
-}
-
-.ss-foot ion-button {
+/* Finish early sits at the very end as a line of text, not a button shape:
+   body size, regular weight, in the honey ink of the page's other text
+   actions. */
+ion-button.finish-early {
   --color: var(--mh-color-honey-deep);
-  --padding-start: 0.25rem;
-  --padding-end: 0.5rem;
-  margin: 0;
-  font-weight: 600;
+  margin: 0.5rem 0 0;
+  font-size: var(--mh-text-base);
+  font-weight: 400;
 }
 
-.ss-rest {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  text-align: end;
+/* ─── Superset: one card with the honey rail, in rounds ──────────────
+   An exercise card with more than one exercise: the kicker, a header per
+   member (`mh-exercise-head`), then the set table and Add round, on the
+   exercise card's grid (`_set-table.scss`), so its tiles, badges and ticks
+   sit in the columns of the cards above and below it. */
+
+/* The rail is drawn inside the card, as on a linked exercise card, so it
+   takes no room from the columns. */
+ion-card.superset {
+  box-shadow: inset var(--mh-spine-width) 0 0 var(--ion-color-primary);
+}
+
+/* The kicker where an exercise card's header starts, over the tiles. */
+.ss-kicker {
+  padding: 0.875rem calc(var(--mh-card-inset) + var(--mh-card-lead)) 0.375rem;
+  color: var(--mh-color-honey-deep);
+}
+
+/* The body's inset, as `mh-exercise-card` sets it. */
+ion-card.superset ion-card-content {
+  padding: 0.375rem var(--mh-card-inset) var(--mh-card-inset);
+}
+
+/* A round opens with its name, on the rows' inset, where the set badges
+   start: in the body ink, and a heading, so a screen reader can jump round
+   to round. Only text, with nothing to tap (its one verb is in its sets'
+   menus), so only as tall as its line. */
+.round-head {
+  margin: 0;
+  padding: 0.5rem calc(0.25rem + var(--mh-ring-width)) 0.25rem;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  line-height: var(--mh-leading-tight);
+}
+
+/* From the second round on, a rule across the table and more air above it
+   than between a round's own rows, so where one round ends and the next
+   begins reads at a glance. */
+.round-head ~ .round-head {
+  margin-top: 0.625rem;
+  padding-top: 0.75rem;
+  border-top: var(--mh-hairline) solid var(--mh-color-separator);
 }

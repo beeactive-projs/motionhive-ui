@@ -20,6 +20,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   ProgramAssignmentService,
   Routine,
+  WEEKLY_SCHEDULE_WEEKS,
   showApiError,
   weekdayNames,
 } from 'core';
@@ -96,7 +97,10 @@ export class ScheduleRoutineDialog {
           days: names,
           count: this.repeatWeeks(),
         })
-      : this._translateService.instant('myWorkouts.schedule.summary.weekly', { days: names });
+      : this._translateService.instant('myWorkouts.schedule.summary.weekly', {
+          days: names,
+          count: WEEKLY_SCHEDULE_WEEKS,
+        });
   });
 
   constructor() {

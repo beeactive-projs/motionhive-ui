@@ -65,7 +65,10 @@
       </div>
     }
     @case (Tabs.Exercises) {
-      <div class="mh-page tab-body">
+      <!-- No `.mh-page`: the library's list is the flat one the Exercises
+           page shows, edge to edge, and the library puts its field and
+           chips on the row gutter itself. -->
+      <div class="tab-body">
         <mh-exercise-library [detailBase]="exerciseBase" />
       </div>
     }
@@ -101,32 +104,12 @@
           <!-- A session left open outranks everything else on the page. Navy, not
            honey: resuming is not the same offer as starting. -->
           @if (store.inProgress(); as log) {
-            <ion-list [inset]="true" class="mh-card-list resume">
-              <ion-item button detail="false" (click)="resume()">
-                @if (isPaused()) {
-                  <ion-icon
-                    slot="start"
-                    name="pause-outline"
-                    class="paused-mark"
-                    aria-hidden="true"
-                  />
-                } @else {
-                  <span slot="start" class="live-dot" aria-hidden="true"></span>
-                }
-                <ion-label>
-                  <span class="mh-kicker">
-                    {{
-                      (isPaused() ? 'workouts.home.paused' : 'workouts.home.inProgress')
-                        | translate: { elapsed: elapsed() }
-                    }}
-                  </span>
-                  <h2>{{ log.name }}</h2>
-                </ion-label>
-                <ion-button slot="end" shape="round" class="mh-row-action" (click)="resume()">
-                  {{ 'button.resume' | translate }}
-                </ion-button>
-              </ion-item>
-            </ion-list>
+            <mh-resume-card
+              [name]="log.name"
+              [elapsed]="elapsed()"
+              [paused]="isPaused()"
+              (resume)="resume()"
+            />
           }
           @if (store.isColdStart()) {
             <!-- Two real actions and one line of promise — never an empty void. -->

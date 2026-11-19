@@ -1,12 +1,16 @@
+// Every part sits on the sheet's one inset, the title's: no side margins of
+// their own. The gaps between them are the stack's.
+
+// Full ink: `--ion-color-dark` is a dim slate in the dark palette.
 .lead {
-  margin: 0 0.25rem 1rem;
-  color: var(--ion-color-dark);
+  margin: 0;
+  color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   line-height: var(--mh-leading-body);
 }
 
 .facts {
-  margin: 0 0.25rem 0.75rem;
+  margin: 0;
   padding: 0.75rem 0.875rem;
   border-radius: var(--mh-radius-control);
   background: var(--ion-card-background);
@@ -41,7 +45,6 @@
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  margin: 0 0.25rem;
   padding: 0.625rem 0.75rem;
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-warning-wash);
@@ -58,7 +61,6 @@
 
 .blocked {
   display: block;
-  margin: 0.75rem 0.25rem 0;
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
 }

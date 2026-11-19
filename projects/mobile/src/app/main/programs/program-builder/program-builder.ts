@@ -32,6 +32,7 @@ import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
 import {
+  Program,
   ProgramAssignmentService,
   ProgramService,
   ProgramStatus,
@@ -70,6 +71,13 @@ const NEW = 'new';
  * compared against on the way out.
  */
 const UNTOUCHED_DRAFT_NAME_KEY = 'programs.builder.untitledProgram';
+
+/**
+ * The draft `new` just made, handed to the page that opens under its id:
+ * that page shows it at once instead of loading it again, so creating a
+ * program reads as one screen, not a screen and then a second one.
+ */
+let handedDraft: Program | null = null;
 
 /**
  * The program builder — vertical weeks.
@@ -137,6 +145,13 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   readonly clearOpen = signal(false);
 
   private _id: string | null = null;
+  /**
+   * The draft just created reopens under its own id (`_createDraft`). Ionic
+   * shows the id's address as a new page and closes this one, so this page
+   * leaves: the draft must not be thrown away as abandoned, or every edit on
+   * the new page answers "program not found".
+   */
+  private _replacedByDraft = false;
 
   /**
    * Which weeks show their days. Only the first when a program opens: with
@@ -183,6 +198,10 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
    * nothing scheduled.
    */
   ionViewWillLeave(): void {
+    if (this._replacedByDraft) {
+      this._replacedByDraft = false;
+      return;
+    }
     const program = this.store.program();
     if (!program || !this._id || this._id === NEW) return;
     if (program.name !== this._translateService.instant(UNTOUCHED_DRAFT_NAME_KEY)) return;
@@ -210,8 +229,14 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
       this._openFor = id;
       this.openWeeks.set(new Set([0]));
     }
-    // Always re-read: a day edited on the pushed screen changes this grid.
     this._id = id;
+    const draft = handedDraft;
+    handedDraft = null;
+    if (draft && draft.id === id) {
+      this.store.adopt(draft);
+      return;
+    }
+    // Always re-read: a day edited on the pushed screen changes this grid.
     this.store.load(id);
   }
 
@@ -731,12 +756,18 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
       .pipe(take(1))
       .subscribe({
         next: (program) => {
-          this.store.adopt({ ...program, workouts: program.workouts ?? [] });
+          const draft = { ...program, workouts: program.workouts ?? [] };
+          this.store.adopt(draft);
           this._id = program.id;
           // Same program under its real id: keep the weeks as they are.
           this._openFor = program.id;
-          void this._router.navigate([this.stack, 'program', program.id], {
+          this._replacedByDraft = true;
+          // The same screen under its real address: no slide, and the page
+          // that opens takes the draft as it is rather than loading again.
+          handedDraft = draft;
+          void this._navController.navigateForward([this.stack, 'program', program.id], {
             replaceUrl: true,
+            animated: false,
           });
         },
         error: (err) => {

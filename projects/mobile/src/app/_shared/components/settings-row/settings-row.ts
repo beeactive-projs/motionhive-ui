@@ -38,6 +38,12 @@ export class SettingsRow {
   readonly dot = input(false);
   readonly detail = input(true);
   readonly disabled = input(false);
+  /**
+   * False for a value to read rather than a row to tap (a saved routine's
+   * rest): no button, no chevron, and nothing emitted. Not `disabled`,
+   * which greys the row out as if it were off.
+   */
+  readonly interactive = input(true);
   /** Secondary line under the label — used for the disabled rows' "Coming soon". */
   readonly note = input<string | null>(null);
 
@@ -45,4 +51,10 @@ export class SettingsRow {
 
   readonly hasValue = computed(() => !!this.value());
   readonly displayValue = computed(() => this.value() ?? this.valuePlaceholder());
+  readonly isButton = computed(() => this.interactive() && !this.disabled());
+  readonly showDetail = computed(() => this.isButton() && this.detail());
+
+  onClick(): void {
+    if (this.isButton()) this.select.emit();
+  }
 }

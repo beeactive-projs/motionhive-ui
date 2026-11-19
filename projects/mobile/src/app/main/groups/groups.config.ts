@@ -1,5 +1,6 @@
 import {
   Group,
+  GroupMember,
   WEB_APP_URL,
   GroupMemberPostPolicies,
   GroupMemberPostPolicy,
@@ -7,10 +8,13 @@ import {
   GroupMemberRoles,
   JoinPolicies,
   JoinPolicy,
+  GroupWithMyRole,
   enumLabel,
+  formatRelativeShort,
   translate,
 } from 'core';
 
+import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import { ProfileStacks, groupLinks, stackRootOf } from '../../_shared/utils/stack-paths';
 
 /**
@@ -189,7 +193,8 @@ export function joinPolicyTone(policy: JoinPolicy): string {
     case JoinPolicies.Open:
       return 'success';
     case JoinPolicies.Approval:
-      return 'warning';
+      // Not amber: it sits too close to honey, and honey never marks a status.
+      return 'info';
     case JoinPolicies.InviteOnly:
       return 'medium';
   }
@@ -338,4 +343,233 @@ export function isPostingBlockedError(message: string): boolean {
   return (
     message.startsWith(POSTING_DISABLED_PREFIX) || message.startsWith(NOT_A_MEMBER_PREFIX)
   );
+}
+
+// ── Groups home ──────────────────────────────────────────────────────────
+
+/** Join requests plus posts waiting on you in one group: its red count. */
+export function waitingCount(
+  group: Pick<GroupWithMyRole, 'pendingJoinRequestCount' | 'pendingPostCount'>,
+): number {
+  return (group.pendingJoinRequestCount ?? 0) + (group.pendingPostCount ?? 0);
+}
+
+/**
+ * The line under a group waiting on you: "2 join requests · 1 post to
+ * review", each part only when there is some.
+ */
+export function waitingLine(
+  group: Pick<GroupWithMyRole, 'pendingJoinRequestCount' | 'pendingPostCount'>,
+): string {
+  const parts: string[] = [];
+  const requests = group.pendingJoinRequestCount ?? 0;
+  const posts = group.pendingPostCount ?? 0;
+  if (requests > 0) {
+    parts.push(translate('groups.list.waiting.requests', { count: requests }));
+  }
+  if (posts > 0) {
+    parts.push(translate('groups.list.waiting.posts', { count: posts }));
+  }
+  return parts.join(' · ');
+}
+
+/**
+ * The line under a group in Your groups. One you run says how alive it is
+ * ("4 members · last post 2h"); one you joined says whose it is ("Run by
+ * Ioana Pop · 12 members").
+ */
+export function groupRowLine(group: GroupWithMyRole, ownerName: string): string {
+  const members = translate('count.members', { count: group.memberCount });
+  if (isOwner(group.myRole)) {
+    if (group.lastPostAt) {
+      const time = formatRelativeShort(group.lastPostAt);
+      return `${members} · ${translate('groups.list.lastPost', { time })}`;
+    }
+    return `${members} · ${translate('groups.list.noPosts')}`;
+  }
+  if (ownerName) {
+    return `${translate('groups.list.runBy', { name: ownerName })} · ${members}`;
+  }
+  return members;
+}
+
+/**
+ * Where a "Needs you" row goes: Manage on the queue with something in it,
+ * join requests first. Moderators only ever have posts.
+ */
+export function manageTabFor(
+  group: Pick<GroupWithMyRole, 'pendingJoinRequestCount'>,
+): 'requests' | 'posts' {
+  if ((group.pendingJoinRequestCount ?? 0) > 0) {
+    return 'requests';
+  }
+  return 'posts';
+}
+
+// ── The group page's ⋯ ───────────────────────────────────────────────────
+
+/** The verbs a group's ⋯ can offer. */
+export const GroupActionIds = {
+  Edit: 'edit',
+  Invite: 'invite',
+  Requests: 'requests',
+  ReviewPosts: 'review-posts',
+  Delete: 'delete',
+  Leave: 'leave',
+} as const;
+
+export type GroupActionId = (typeof GroupActionIds)[keyof typeof GroupActionIds];
+
+/**
+ * A group's verbs for the reader, in the sheet's order (design 2026-11-14).
+ * The owner gets Edit, Invite people, Join requests and Review posts, with
+ * Delete group in the red card; a moderator only Review posts; a member only
+ * Leave group, in red. The queues carry their counts. Handing the group over
+ * comes later.
+ */
+export function groupActions(
+  role: ViewerRole,
+  group: Pick<GroupWithMyRole, 'pendingJoinRequestCount' | 'pendingPostCount'>,
+): SheetAction<GroupActionId>[] {
+  const actions: SheetAction<GroupActionId>[] = [];
+  if (isOwner(role)) {
+    actions.push(
+      { id: GroupActionIds.Edit, label: 'groups.actions.edit', icon: 'create-outline', color: 'primary' },
+      {
+        id: GroupActionIds.Invite,
+        label: 'groups.actions.invite',
+        icon: 'person-add-outline',
+        color: 'info',
+        tone: 'shade',
+      },
+      {
+        id: GroupActionIds.Requests,
+        label: 'groups.actions.requests',
+        icon: 'people-outline',
+        color: 'violet',
+        value: countValue(group.pendingJoinRequestCount),
+      },
+    );
+  }
+  if (isStaff(role)) {
+    actions.push({
+      id: GroupActionIds.ReviewPosts,
+      label: 'groups.actions.reviewPosts',
+      icon: 'shield-checkmark-outline',
+      color: 'info',
+      tone: 'shade',
+      value: countValue(group.pendingPostCount),
+    });
+  }
+  if (isOwner(role)) {
+    actions.push({
+      id: GroupActionIds.Delete,
+      label: 'groups.edit.delete.button',
+      icon: 'trash-outline',
+      color: 'danger',
+      destructive: true,
+    });
+  } else if (canLeave(role)) {
+    // A moderator may leave too: the design's "Review posts only" is about
+    // the verbs over the group, and nobody should be stuck in one.
+    actions.push({
+      id: GroupActionIds.Leave,
+      label: 'groups.detail.leave.button',
+      icon: 'exit-outline',
+      color: 'danger',
+      destructive: true,
+    });
+  }
+  return actions;
+}
+
+/** A queue's count at the end of its row, or nothing when it is empty. */
+function countValue(count: number | undefined): string | undefined {
+  if (!count) {
+    return undefined;
+  }
+  return String(count);
+}
+
+/** The line under the sheet's title: how the reader stands in the group. */
+export function groupRoleLine(role: ViewerRole): string {
+  if (isOwner(role)) {
+    return translate('groups.actions.youRun');
+  }
+  if (role === GroupMemberRoles.Moderator) {
+    return translate('groups.actions.youModerate');
+  }
+  return translate('groups.actions.youAreIn');
+}
+
+// ── A member's ⋯ (Members tab) ──────────────────────────────────────────
+
+export const MemberActionIds = {
+  Profile: 'profile',
+  Message: 'message',
+  MakeModerator: 'make-moderator',
+  RemoveModerator: 'remove-moderator',
+  Remove: 'remove',
+} as const;
+
+export type MemberActionId = (typeof MemberActionIds)[keyof typeof MemberActionIds];
+
+/**
+ * The verbs on one member. Anyone may open a profile (when the account has a
+ * handle) or message them; the owner also sets who moderates and removes
+ * people. Nobody acts on the owner's row, and nobody messages themselves.
+ */
+export function memberActions(
+  viewerRole: ViewerRole,
+  member: Pick<GroupMember, 'userId' | 'role' | 'user'>,
+  viewerId: string,
+): SheetAction<MemberActionId>[] {
+  const actions: SheetAction<MemberActionId>[] = [];
+  const handle = member.user?.handle;
+  if (handle) {
+    actions.push({
+      id: MemberActionIds.Profile,
+      label: 'button.viewProfile',
+      icon: 'person-outline',
+      color: 'violet',
+    });
+  }
+  const isSelf = member.userId === viewerId;
+  if (!isSelf) {
+    actions.push({
+      id: MemberActionIds.Message,
+      label: 'groups.members.message',
+      icon: 'chatbubble-outline',
+      color: 'info',
+      tone: 'shade',
+    });
+  }
+  if (!isOwner(viewerRole) || isSelf || member.role === GroupMemberRoles.Owner) {
+    return actions;
+  }
+  if (member.role === GroupMemberRoles.Moderator) {
+    actions.push({
+      id: MemberActionIds.RemoveModerator,
+      label: 'groups.members.removeModerator',
+      hint: 'groups.members.removeModeratorHint',
+      icon: 'shield-outline',
+      color: 'violet',
+    });
+  } else {
+    actions.push({
+      id: MemberActionIds.MakeModerator,
+      label: 'groups.members.makeModerator',
+      hint: 'groups.members.makeModeratorHint',
+      icon: 'shield-checkmark-outline',
+      color: 'teal',
+    });
+  }
+  actions.push({
+    id: MemberActionIds.Remove,
+    label: 'groups.members.remove',
+    icon: 'person-remove-outline',
+    color: 'danger',
+    destructive: true,
+  });
+  return actions;
 }

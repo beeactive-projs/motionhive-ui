@@ -1,12 +1,4 @@
 /* The chip groups are `.mh-chip-cloud` (layout.css, ion-button.css), the same
    treatment as the discover and agenda filter sheets: light navy when idle,
-   honey when picked. A facet count is the skin's `.count`. */
-
-/* "All 17 muscles…" is a disclosure, not a filter — no fill, and
-   the accent ink that marks every other in-place expansion in the app. */
-.mh-chip-cloud .chip.more {
-  --background: transparent;
-  --background-hover: transparent;
-  --background-activated: transparent;
-  --color: var(--mh-color-honey-deep);
-}
+   honey when picked. A facet count is the skin's `.count`, and "All 17
+   muscles…" its `.chip.more`. */

@@ -9,6 +9,7 @@ import { Message } from 'primeng/message';
 import {
   APP_HOME_URL,
   AUTH_FIELD_ERRORS,
+  AppleLoginRequest,
   AuthService,
   ClientInviteService,
   FieldErrorPipe,
@@ -95,6 +96,14 @@ export class Login {
 
   protected onGoogleFailed(): void {
     this.errorMessage.set(this._translateService.instant('auth.common.googleFailed'));
+  }
+
+  protected onAppleCredential(request: AppleLoginRequest): void {
+    this.signIn(this._authService.appleLogin(request), 'auth.common.appleFailed');
+  }
+
+  protected onAppleFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
   }
 
   private signIn(request: Observable<unknown>, fallbackKey: string): void {

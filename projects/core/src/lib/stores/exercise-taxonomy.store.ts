@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import type { Equipment } from '../models/exercise/equipment.model';
 import type { Muscle } from '../models/exercise/muscle.model';
@@ -41,25 +41,30 @@ export class ExerciseTaxonomyStore {
     () => new Map(this._equipment().map((e) => [e.id, e])),
   );
 
-  /** First-call wins. Re-callers (including concurrent ones) no-op. */
+  /**
+   * First-call wins. Re-callers (including concurrent ones) no-op while a
+   * load is on its way or after one landed. A failed load leaves the lists
+   * empty (downstream filters are empty rather than wrong) and lets the next
+   * call try again: `finalize`, because RxJS runs `complete` only on success,
+   * and a flag cleared there stayed set after one failure, so every later
+   * call returned early for the rest of the session.
+   */
   ensureLoaded(): void {
     if (this._loaded() || this._loading()) return;
     this._loading.set(true);
     forkJoin({
       muscles: this._exerciseService.listMuscles(),
       equipment: this._exerciseService.listEquipment(),
-    }).subscribe({
-      next: ({ muscles, equipment }) => {
-        this._muscles.set(muscles);
-        this._equipment.set(equipment);
-        this._loaded.set(true);
-      },
-      error: () => {
-        // Failure leaves the lists empty; downstream filters will be
-        // empty rather than wrong. Components can call `reload()` on retry.
-      },
-      complete: () => this._loading.set(false),
-    });
+    })
+      .pipe(finalize(() => this._loading.set(false)))
+      .subscribe({
+        next: ({ muscles, equipment }) => {
+          this._muscles.set(muscles);
+          this._equipment.set(equipment);
+          this._loaded.set(true);
+        },
+        error: () => undefined,
+      });
   }
 
   /** Force a refresh (rare — taxonomy doesn't change between deploys). */

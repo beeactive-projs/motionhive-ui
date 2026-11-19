@@ -1,0 +1,18 @@
+/* Navy, not honey. Resuming an abandoned session and starting a new one are
+   different offers, and the design is explicit that these must never be
+   mistaken for each other. The navy card set, like the mini-bar and the
+   rest timer, so all three are one navy in dark mode too; its warm label
+   names the moment. */
+.resume ion-item {
+  --background: var(--mh-color-navy-card);
+  --color: var(--mh-color-navy-card-ink);
+}
+
+.resume .mh-kicker {
+  color: var(--mh-color-navy-card-accent);
+}
+
+.resume h2 {
+  color: inherit;
+  font-weight: 600;
+}

@@ -1,0 +1,27 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/more/account/privacy" />
+    </ion-buttons>
+    <ion-title>{{ 'account.sensitive.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    <ion-note class="mh-note-block" color="medium">
+      {{ 'account.sensitive.intro' | translate }}
+    </ion-note>
+
+    <!-- Red like every destructive verb (lists.md); it opens a page that
+         explains before anything happens. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      <mh-settings-row
+        [label]="'account.rows.deleteAccount' | translate"
+        icon="trash-outline"
+        iconColor="danger"
+        (select)="openDelete()"
+      />
+    </ion-list>
+  </div>
+</ion-content>

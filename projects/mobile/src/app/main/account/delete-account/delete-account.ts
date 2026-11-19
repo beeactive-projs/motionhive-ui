@@ -35,6 +35,7 @@ import {
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { Notice } from '../../../_shared/components/notice/notice';
+import { AppleSignInService } from '../../../pages/auth/apple-sign-in.service';
 import { ACCOUNT_ICONS } from '../account.config';
 
 /** Seconds before another code can be asked for. */
@@ -101,6 +102,7 @@ export function foldWord(text: string): string {
 export class DeleteAccount implements OnInit {
   private readonly _deletionService = inject(AccountDeletionService);
   private readonly _authService = inject(AuthService);
+  private readonly _appleSignInService = inject(AppleSignInService);
   private readonly _navController = inject(NavController);
   private readonly _translateService = inject(TranslateService);
   private readonly _languageService = inject(LanguageService);
@@ -234,6 +236,9 @@ export class DeleteAccount implements OnInit {
         next: ({ scheduledFor }) => {
           // The API already signed this account out everywhere.
           this._authService.endLocalSession();
+          // The name Apple shared is kept on the phone for later sign ins;
+          // it goes with the account. Never holds up the way out.
+          void this._appleSignInService.clearCachedName();
           void this._navController.navigateRoot('/auth/account-closed', {
             queryParams: { until: scheduledFor },
           });

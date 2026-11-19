@@ -65,6 +65,13 @@ export function formatVolumeChange(change: number, unit: VolumeUnit): string {
   return `${sign}${formatVolume(Math.abs(change), unit)}`;
 }
 
+/**
+ * Past this a percent says more about how small the base was than about
+ * the change ("+1,820%" after one light set last time): the change is then
+ * said in its own unit instead. The API holds the same line.
+ */
+export const MAX_SHOWN_PERCENT = 300;
+
 /** "+9%", "−3%", in the reader's locale ("+9 %" in Romanian). */
 export function formatPercentChange(percent: number): string {
   const sign = percent > 0 ? '+' : percent < 0 ? MINUS : '';
@@ -175,7 +182,24 @@ export function exerciseVolumeRows(
         label: translate('workouts.volume.finish.rowLabelNew', { name, today }),
       };
     }
-    const percent = entry.changePercent ?? 0;
+    // No percent (a base too small for one to mean anything): the change in
+    // its own unit, rather than a "same" that is not true.
+    let delta = entry.changePercent;
+    let change = '';
+    if (delta == null) {
+      delta = entry.volume - entry.previous.volume;
+      if (delta !== 0) {
+        change = formatVolumeChange(delta, entry.unit);
+      }
+    } else if (delta !== 0) {
+      change = formatPercentChange(delta);
+    }
+    let trend: VolumeTrend = VolumeTrends.Same;
+    if (delta > 0) {
+      trend = VolumeTrends.Up;
+    } else if (delta < 0) {
+      trend = VolumeTrends.Down;
+    }
     return {
       loggedExerciseId: entry.loggedExerciseId,
       name,
@@ -183,8 +207,8 @@ export function exerciseVolumeRows(
       group,
       todayWidth: width(entry.volume, entry.unit),
       lastWidth: width(entry.previous.volume, entry.unit),
-      change: percent === 0 ? '' : formatPercentChange(percent),
-      trend: percent > 0 ? VolumeTrends.Up : percent < 0 ? VolumeTrends.Down : VolumeTrends.Same,
+      change,
+      trend,
       label: translate('workouts.volume.finish.rowLabel', {
         name,
         today,
@@ -294,10 +318,17 @@ export function volumePoints(
   return pointsPerDay(sessions, (s) => s.volume ?? null, (a, b) => a + b, range, now);
 }
 
-/** The latest point against the first, in whole percent; null under two points. */
+/**
+ * The latest point against the first, in whole percent; null under two
+ * points, or past `MAX_SHOWN_PERCENT` (a tiny first session).
+ */
 export function pointsChangePercent(points: readonly TrendPoint[]): number | null {
   if (points.length < 2 || points[0].y <= 0) return null;
-  return Math.round(((points[points.length - 1].y - points[0].y) / points[0].y) * 100);
+  const percent = Math.round(((points[points.length - 1].y - points[0].y) / points[0].y) * 100);
+  if (percent > MAX_SHOWN_PERCENT) {
+    return null;
+  }
+  return percent;
 }
 
 /**

@@ -7,7 +7,7 @@ import {
   IonLabel,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle, ellipsisHorizontal, informationCircleOutline } from 'ionicons/icons';
+import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { Exercise, ExerciseSource } from 'core';
@@ -58,12 +58,16 @@ function isLibraryExercise(exercise: Exercise | ExerciseRef): exercise is Exerci
  * row is about the work, not the movement's profile, so the level and
  * ownership chips step aside; the chevron stays, since it still opens the
  * movement.
+ *
+ * It is a compact row (`mh-compact-row`, ion-list.css): a step smaller than
+ * a person's, since it comes in long runs to scan.
  */
 @Component({
   selector: 'mh-exercise-row',
   imports: [HexAvatar, IonBadge, IonButton, IonIcon, IonItem, IonLabel, TranslatePipe],
   templateUrl: './exercise-row.html',
   styleUrl: './exercise-row.scss',
+  host: { class: 'mh-compact-row' },
 })
 export class ExerciseRow {
   readonly exercise = input.required<Exercise | ExerciseRef>();
@@ -73,11 +77,6 @@ export class ExerciseRow {
   readonly selected = input<boolean | null>(null);
   /** The sets and targets, in place of the library facts line. */
   readonly prescription = input<string | null>(null);
-  /**
-   * A ⋯ in place of the chevron and the ownership chip, on a row of your
-   * own: the row still opens the exercise, the ⋯ edits or deletes it.
-   */
-  readonly showMenu = input(false);
 
   readonly select = output<void>();
   /**
@@ -85,8 +84,6 @@ export class ExerciseRow {
    * where tapping the row commits to an exercise the reader may not know.
    */
   readonly preview = output<void>();
-  /** The ⋯ was tapped (only drawn with `showMenu`). */
-  readonly menu = output<void>();
 
   /** The full record when the row is in the library, and no prescription overrides it. */
   private readonly _library = computed(() => {
@@ -131,13 +128,10 @@ export class ExerciseRow {
 
   readonly isPicker = computed(() => this.selected() !== null);
 
-  /** The ⋯ shows on a library row of your own, never in a picker. */
-  readonly hasMenu = computed(() => this.showMenu() && !this.isPicker());
-
   constructor() {
     // The row is hosted by three features; none of them should have to know
     // it draws a tick. Registered here, it renders wherever the row does.
-    addIcons({ checkmarkCircle, ellipsisHorizontal, informationCircleOutline });
+    addIcons({ checkmarkCircle, informationCircleOutline });
   }
 
   /**

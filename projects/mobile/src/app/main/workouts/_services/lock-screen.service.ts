@@ -12,9 +12,16 @@ import {
   RestLiveActionTypes,
   RestLiveState,
 } from '../../../_shared/native/rest-live';
-import { tappedRest } from '../logger/logger-flow';
+import { RestAlertService } from '../../../_shared/services/rest-alert.service';
+import { estimatedRest, tappedRest } from '../logger/logger-flow';
 import { ActiveSessionStore } from './active-session.store';
-import { liveState } from './lock-screen.config';
+import {
+  alertsOnLockScreen,
+  isNextStep,
+  liveState,
+  liveTickRest,
+  liveValues,
+} from './lock-screen.config';
 import { WorkoutSettingsStore } from './workout-settings.store';
 
 /** Who applies the lock screen's buttons while the logger is open. */
@@ -30,7 +37,14 @@ export type LockScreenHandler = (action: RestLiveAction) => void;
  * are taken here as soon as the app runs again. The open logger applies them
  * as if its own bar had been tapped (`attach`); with the logger closed, the
  * rest kept in the store is moved on or ended here, and an ended rest is
- * saved as an exact one.
+ * saved as an exact one. A ✓ is saved here too, at the moment of the tap,
+ * Skip set passes the set over, and Continue ends the pause when it was tapped.
+ * Notes wait on the phone until the store knows which workout is open and
+ * has what it kept (`ActiveSessionStore.ready`), so none is lost on a cold start.
+ *
+ * The rest-over alert follows the same rest (`RestAlertService`), from
+ * sign-in on, so a rest the lock screen started still alerts once the app
+ * has been opened and left again.
  *
  * Off when the person turned "On the lock screen" off, and on the web.
  */
@@ -38,6 +52,7 @@ export type LockScreenHandler = (action: RestLiveAction) => void;
 export class LockScreenService {
   private readonly _store = inject(ActiveSessionStore);
   private readonly _settingsStore = inject(WorkoutSettingsStore);
+  private readonly _restAlertService = inject(RestAlertService);
   private readonly _translateService = inject(TranslateService);
   private readonly _workoutLogService = inject(WorkoutLogService);
 
@@ -56,9 +71,33 @@ export class LockScreenService {
     effect(() => {
       this._words();
       const state = this._state();
-      // Nothing is known to be open until the store has asked the API.
-      if (!this._store.checked()) return;
+      // Nothing is known to be open until the store has asked the API, and
+      // the sets ahead are not known until it has what it kept.
+      if (!this._store.ready()) return;
       untracked(() => this._mirror(state));
+    });
+    // Anything tapped while the app was closed, once the store can take it.
+    effect(() => {
+      if (!this._store.ready()) {
+        return;
+      }
+      untracked(() => void this.drain());
+    });
+    // The rest-over alert, for whichever rest runs: the logger's or the lock screen's.
+    effect(() => {
+      const rest = this._store.rest();
+      const session = this._store.session();
+      let endsAt: number | null = null;
+      let next = '';
+      if (rest && session && rest.logId === session.id) {
+        endsAt = rest.endsAt;
+        next = rest.next;
+      }
+      const nativeAlert = alertsOnLockScreen(
+        Capacitor.getPlatform(),
+        this._settingsStore.settings().lockScreen,
+      );
+      untracked(() => this._restAlertService.track(endsAt, next, nativeAlert));
     });
 
     const words = this._translateService.onLangChange.subscribe(() => this._words.update((n) => n + 1));
@@ -75,8 +114,6 @@ export class LockScreenService {
       words.unsubscribe();
       for (const listener of listeners) void listener.then((handle) => handle.remove());
     });
-    // Anything tapped while the app was closed.
-    void this.drain();
   }
 
   /**
@@ -91,8 +128,14 @@ export class LockScreenService {
     };
   }
 
-  /** Takes the notes the buttons left and applies them, oldest first. */
+  /**
+   * Takes the notes the buttons left and applies them, oldest first. Not
+   * before the store is ready: they stay on the phone until then.
+   */
   async drain(): Promise<void> {
+    if (!this._store.ready()) {
+      return;
+    }
     let actions: RestLiveAction[];
     try {
       actions = (await RestLive.takeActions()).actions ?? [];
@@ -107,8 +150,11 @@ export class LockScreenService {
     setTimeout(() => this._resend());
   }
 
-  /** Sends what the app holds now, even if it was sent before. */
+  /** Sends what the app holds now, even if it was sent before; nothing until the store is ready. */
   private _resend(): void {
+    if (!this._store.ready()) {
+      return;
+    }
     this._sent = undefined;
     this._mirror(untracked(() => this._state()));
   }
@@ -122,6 +168,7 @@ export class LockScreenService {
       this._store.next(),
       (key, params) => this._translateService.instant(key, params),
       Date.now(),
+      this._store.liveSteps(),
     );
   }
 
@@ -145,8 +192,34 @@ export class LockScreenService {
   }
 
   private _apply(action: RestLiveAction): void {
+    const session = this._store.session();
+    // Left on another workout's lock screen: nothing to do with this one.
+    if (session && action.logId && action.logId !== session.id) {
+      return;
+    }
     if (this._handler) {
       this._handler(action);
+      return;
+    }
+    if (!session) {
+      return;
+    }
+    if (action.type === RestLiveActionTypes.Log) {
+      this._logSet(session.id, action);
+      return;
+    }
+    if (action.type === RestLiveActionTypes.SkipSet) {
+      if (action.setId) {
+        this._store.pass(session.id, action.setId);
+        this._store.moveOnFrom(action.setId);
+      }
+      return;
+    }
+    if (action.type === RestLiveActionTypes.Resume) {
+      this._workoutLogService
+        .resume(session.id, action.at)
+        .pipe(take(1))
+        .subscribe({ next: (log) => this._store.track(log), error: () => undefined });
       return;
     }
     const rest = this._store.rest();
@@ -162,5 +235,43 @@ export class LockScreenService {
       .logSet(rest.logId, rest.setId, { restAfterSeconds: measured.seconds, restSource: measured.source })
       .pipe(take(1))
       .subscribe({ error: () => undefined });
+  }
+
+  /**
+   * ✓ with the logger closed: the set saved as the button showed it, at the
+   * moment of the tap, the rest before it measured as a tick in the app
+   * would, and the rest after it running from then, as on the lock screen.
+   * A ✓ on a set that is not the next one is a note handed over twice.
+   */
+  private _logSet(logId: string, action: RestLiveAction): void {
+    const setId = action.setId;
+    if (!setId) {
+      return;
+    }
+    if (!isNextStep(this._store.liveSteps(), setId)) {
+      return;
+    }
+    const values = liveValues(action.values);
+    const before = this._store.rest();
+    if (before && before.logId === logId && before.setId !== setId) {
+      const gap = (action.at - before.startedAt) / 1000;
+      const measured = estimatedRest(gap, before.planned, {
+        reps: values.reps ?? null,
+        durationSeconds: values.durationSeconds ?? null,
+      });
+      if (measured) {
+        this._workoutLogService
+          .logSet(logId, before.setId, { restAfterSeconds: measured.seconds, restSource: measured.source })
+          .pipe(take(1))
+          .subscribe({ error: () => undefined });
+      }
+    }
+    this._workoutLogService
+      .logSet(logId, setId, { ...values, isCompleted: true, completedAt: new Date(action.at).toISOString() })
+      .pipe(take(1))
+      .subscribe({ error: () => undefined });
+
+    const step = this._store.moveOnFrom(setId);
+    this._store.setRest(liveTickRest(logId, action, step, this._store.next()));
   }
 }

@@ -5,15 +5,10 @@
     </ion-buttons>
     <ion-title>{{ 'groups.post.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      @if (canEditThisPost()) {
-      <ion-button shape="round" [attr.aria-label]="'groups.post.a11y.editThis' | translate" (click)="startEdit()">
-        <ion-icon slot="icon-only" name="create-outline" />
-      </ion-button>
-      }
-      @if (canDeleteThisPost()) {
-      <ion-button shape="round" [attr.aria-label]="'groups.post.a11y.deleteThis' | translate"
-        (click)="confirmDeletePost()">
-        <ion-icon slot="icon-only" name="trash-outline" />
+      @if (postActions().length > 0) {
+      <!-- One ⋯ for the post's verbs, as on its card in a feed. -->
+      <ion-button shape="round" [attr.aria-label]="'groups.post.a11y.options' | translate" (click)="openActions()">
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" />
       </ion-button>
       }
     </ion-buttons>
@@ -122,7 +117,7 @@
       } @else {
       @for (comment of store.comments(); track comment.id) {
       <div class="thread">
-        <article class="comment">
+        <article class="comment" #commentRow>
           <button type="button" class="comment-avatar" [disabled]="!hasProfile(comment)"
             [attr.aria-label]="hasProfile(comment) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(comment) }) : null"
             (click)="openProfile(comment)">
@@ -139,8 +134,11 @@
             </div>
             <p>{{ comment.content }}</p>
             <div class="comment-actions">
-              <ion-button fill="clear" size="small" class="link-button"
-                [attr.aria-label]="'groups.post.replyTo' | translate: { name: authorName(comment) }" (click)="replyTo(comment)">
+              <!-- Keeps the keyboard: a reply typed into the bar moves on to
+                   the next without the keyboard dropping and coming back. -->
+              <ion-button fill="clear" size="small" class="link-button" data-mh-keeps-keyboard
+                [attr.aria-label]="'groups.post.replyTo' | translate: { name: authorName(comment) }"
+                (click)="replyTo(comment, comment, commentRow)">
                 {{ 'groups.post.reply' | translate }}
               </ion-button>
               @if (mayDeleteComment(comment)) {
@@ -157,7 +155,7 @@
         <!-- One level and no further: the API rejects a reply to a reply, so
              replying from in here targets the thread root above. -->
         @for (child of comment.replies ?? []; track child.id) {
-        <article class="comment reply">
+        <article class="comment reply" #replyRow>
           <button type="button" class="comment-avatar" [disabled]="!hasProfile(child)"
             [attr.aria-label]="hasProfile(child) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(child) }) : null"
             (click)="openProfile(child)">
@@ -174,9 +172,9 @@
             </div>
             <p>{{ child.content }}</p>
             <div class="comment-actions">
-              <ion-button fill="clear" size="small" class="link-button"
+              <ion-button fill="clear" size="small" class="link-button" data-mh-keeps-keyboard
                 [attr.aria-label]="'groups.post.replyTo' | translate: { name: authorName(child) }"
-                (click)="replyTo(comment, child)">
+                (click)="replyTo(comment, child, replyRow)">
                 {{ 'groups.post.reply' | translate }}
               </ion-button>
               @if (mayDeleteComment(child)) {
@@ -204,7 +202,9 @@
 </ion-content>
 
 @if (store.post()) {
-<ion-footer [translucent]="true">
+<!-- Rides up with the keyboard as the chat's send bar does; a reader at the
+     newest comment stays there (`followEnd`), as in a conversation. -->
+<ion-footer [translucent]="true" mhKeyboardFooter [followEnd]="true">
   @if (replyingTo(); as target) {
   <!-- Which thread this is going into. Without it, a reply started minutes
        ago looks exactly like a new comment. -->
@@ -217,7 +217,7 @@
   }
   <ion-toolbar class="composer-bar">
     <div class="composer">
-      <ion-textarea class="composer-input" [autoGrow]="true" [rows]="1" [maxlength]="maxLength"
+      <ion-textarea #composer class="composer-input" [autoGrow]="true" [rows]="1" [maxlength]="maxLength"
         [placeholder]="composerPlaceholder()" [attr.aria-label]="composerPlaceholder()"
         [value]="draft()" (ionInput)="onDraft($event.detail.value ?? '')" />
       <ion-button shape="round" class="send" color="primary" [disabled]="!canSend()"
@@ -255,3 +255,6 @@
   [body]="'groups.post.deletePost.body' | translate" [confirmLabel]="'button.delete' | translate"
   tone="danger" [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deletingPost()"
   (confirm)="deletePost()" />
+
+<mh-action-sheet [(open)]="actionsOpen" [title]="'groups.post.title' | translate" [actions]="postActions()"
+  (chosen)="onAction($event)" />

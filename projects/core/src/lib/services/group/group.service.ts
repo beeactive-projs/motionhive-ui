@@ -14,12 +14,15 @@ import {
   GroupMember,
   GroupMemberListResponse,
   GroupWithMyRole,
+  InviteClientsResult,
+  PendingGroupInvitation,
   PublicGroupProfile,
   SelfJoinResult,
   UpdateGroupPayload,
   UpdateMemberRolePayload,
 } from '../../models/group/group.model';
 import { silentRequest } from '../../interceptors/silent-request.context';
+import { PaginatedResponse } from '../../models/common/pagination.model';
 
 @Injectable({
   providedIn: 'root',
@@ -97,6 +100,44 @@ export class GroupService {
     );
   }
 
+  /**
+   * Invite several of your own clients to your group. Each one gets an
+   * invite in the app and joins only if they accept; members and people
+   * already invited are skipped (the counts say how many).
+   */
+  inviteClients(groupId: string, userIds: string[]): Observable<InviteClientsResult> {
+    return this._http.post<InviteClientsResult>(
+      `${environment.apiUrl}${API_ENDPOINTS.INVITATIONS.GROUP_BULK}`,
+      { groupId, userIds },
+    );
+  }
+
+  /**
+   * Your group invitations still waiting on an answer, newest first. Silent:
+   * the invite cards are extras on Home and Groups, and a failed read just
+   * leaves them out.
+   */
+  getMyInvitations(limit = 20): Observable<PaginatedResponse<PendingGroupInvitation>> {
+    return this._http.get<PaginatedResponse<PendingGroupInvitation>>(
+      `${environment.apiUrl}${API_ENDPOINTS.INVITATIONS.PENDING}`,
+      { params: new HttpParams().set('page', 1).set('limit', limit), context: silentRequest() },
+    );
+  }
+
+  acceptInvitation(invitationId: string): Observable<{ groupId: string }> {
+    return this._http.post<{ groupId: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.INVITATIONS.ACCEPT_MINE(invitationId)}`,
+      {},
+    );
+  }
+
+  declineInvitation(invitationId: string): Observable<void> {
+    return this._http.post<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.INVITATIONS.DECLINE_MINE(invitationId)}`,
+      {},
+    );
+  }
+
   removeMember(groupId: string, userId: string): Observable<void> {
     return this._http.delete<void>(`${this.baseUrl}/${groupId}/members/${userId}`);
   }
@@ -139,6 +180,10 @@ export class GroupService {
       for (const tag of query.tags) {
         params = params.append('tags', tag);
       }
+    }
+    // Ids hold no comma, but the param repeats like `tags` for one style.
+    for (const id of query.categoryIds ?? []) {
+      params = params.append('categoryIds', id);
     }
     return this._http.get<DiscoverGroupListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.GROUPS.DISCOVER}`,

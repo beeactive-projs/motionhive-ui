@@ -30,6 +30,9 @@ export interface ChoiceOption {
 /** Rows drawn per page of a long list; scrolling draws the next page, as the exercise picker does. */
 export const CHOICE_PAGE_SIZE = 40;
 
+/** A searchable sheet opens tall, so the keyboard leaves room for the rows. */
+const SEARCH_BREAKPOINTS: readonly number[] = [0, 0.9];
+const SEARCH_START = 0.9;
 
 /**
  * The options `query` matches. With nothing typed, `pinned` (the current
@@ -52,8 +55,10 @@ export function matchChoices(
  * detail. A tap applies and closes, the way a phone's own settings do, so
  * there is no Save.
  *
- * Give it a `searchPlaceholder` and it grows a search field and draws the
- * list in pages; without one it is a short list in its original order.
+ * Give it a `searchPlaceholder` and it grows a search field, opens tall and
+ * draws the list in pages; without one it is a short list in its original
+ * order, and the sheet is as tall as its rows. At half height a list of nine
+ * rests showed five, and the rest took a drag to find.
  */
 @Component({
   selector: 'mh-choice-sheet',
@@ -93,10 +98,15 @@ export class ChoiceSheet {
   readonly matches = computed(() =>
     matchChoices(this.options(), this.query(), this.searchable() ? this.selected() : null),
   );
-  readonly rows = computed(() => this.matches().slice(0, this._shown()));
+  /** Pages only with a search field: a short list fits, and has no `ion-content` to page in. */
+  readonly rows = computed(() =>
+    this.searchable() ? this.matches().slice(0, this._shown()) : this.matches(),
+  );
   readonly hasMore = computed(() => this.rows().length < this.matches().length);
-  readonly breakpoints = computed(() => (this.searchable() ? [0, 0.9] : [0, 0.5, 0.95]));
-  readonly initialBreakpoint = computed(() => (this.searchable() ? 0.9 : 0.5));
+  /** Sized to its rows unless it searches (the shell's `fit`). */
+  readonly fit = computed(() => !this.searchable());
+  readonly breakpoints = SEARCH_BREAKPOINTS;
+  readonly initialBreakpoint = SEARCH_START;
 
   constructor() {
     addIcons({ checkmarkOutline });

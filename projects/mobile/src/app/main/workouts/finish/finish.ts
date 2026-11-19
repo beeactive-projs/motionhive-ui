@@ -48,6 +48,7 @@ import {
 } from '../../../_shared/config/workout-visibility.config';
 import { APP_HEX_SHAPE, TILE_FRAME, tileFigure } from '../../../_shared/config/hexagon.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { workoutLinks } from '../../home/home-stack.config';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
 import { exerciseBlocks, memberTag } from '../logger/logger-flow';
@@ -55,6 +56,7 @@ import { LoggedExercises } from '../_components/logged-exercises/logged-exercise
 import { SaveRoutineService } from '../_services/save-routine.service';
 import { WorkoutPhotoStore } from '../_services/workout-photo';
 import { ShareWorkoutSheet } from '../_sheets/share-workout-sheet/share-workout-sheet';
+import { PostWorkoutSheet } from '../_sheets/post-workout-sheet/post-workout-sheet';
 import {
   NOTE_MAX_LENGTH,
   STREAK_WORTH_SAYING,
@@ -148,7 +150,9 @@ interface Highlight {
     LoggedExercises,
     SettingsRow,
     ShareWorkoutSheet,
+    PostWorkoutSheet,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './finish.html',
   styleUrl: './finish.scss',
@@ -219,6 +223,15 @@ export class Finish implements ViewWillEnter {
   readonly deleting = signal(false);
   /** Closed through its own `close()` before navigating, as the logger's discard is. */
   private readonly _deleteSheet = viewChild<ConfirmSheet>('deleteSheet');
+  private readonly _postSheet = viewChild(PostWorkoutSheet);
+
+  /** A group chip on the share sheet, which has closed: post there. */
+  openPostToGroup(groupId: string): void {
+    const sheet = this._postSheet();
+    if (sheet) {
+      sheet.show(groupId);
+    }
+  }
   private readonly _photoStore = inject(WorkoutPhotoStore);
 
   readonly visibility = computed(() => this.log()?.visibility ?? ProfilePrivacy.OnlyMe);
@@ -318,11 +331,14 @@ export class Finish implements ViewWillEnter {
   readonly heroStats = computed<HeroStat[]>(() => {
     const log = this.log();
     if (!log) return [];
+    // Over six hours of active time is stored as unknown (null): saying
+    // "0:00" would claim a length nobody trained.
+    let duration = this._translateService.instant('workouts.tiles.durationUnknown');
+    if (log.durationSeconds != null) {
+      duration = durationClock(log.durationSeconds);
+    }
     return [
-      {
-        label: this._translateService.instant('workouts.tiles.duration'),
-        value: durationClock(log.durationSeconds),
-      },
+      { label: this._translateService.instant('workouts.tiles.duration'), value: duration },
       ...workoutTiles(log).slice(0, 2),
     ];
   });

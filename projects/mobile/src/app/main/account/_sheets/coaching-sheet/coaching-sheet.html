@@ -33,16 +33,20 @@
     (ionInput)="bio.set($event.detail.value ?? '')"
   />
 
-  <ion-input mode="md"
-    class="field"
-    [label]="'form.label.specializations' | translate"
-    labelPlacement="stacked"
-    fill="outline"
-    placeholder="strength_training, hiit, yoga"
-    [value]="specializations()"
-    (ionInput)="specializations.set($event.detail.value ?? '')"
-  />
-  <p class="mh-helper">{{ 'accountSheets.coaching.specializationsHint' | translate }}</p>
+  <!-- One chip each, as the profile shows them: typed in and added with +
+       (or return), removed by tapping the chip. The same field as the
+       welcome flow's "Anything else?". -->
+  <div class="field">
+    <mh-chip-input
+      [(values)]="specializations"
+      [label]="'form.label.specializations' | translate"
+      [placeholder]="'accountSheets.coaching.specializations.placeholder' | translate"
+      [addLabel]="'accountSheets.coaching.specializations.add' | translate"
+      [listLabel]="'accountSheets.coaching.specializations.list' | translate"
+      [max]="maxSpecializations"
+      [maxLength]="specializationMaxLength"
+    />
+  </div>
 
   <ion-list [inset]="true" class="mh-card-list field">
     <ion-item>

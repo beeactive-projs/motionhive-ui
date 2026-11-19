@@ -4,7 +4,11 @@ import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, tap, Subscription, switchMap } from 'rxjs';
 import { LoginRequest } from '../../models/auth/login.model';
 import { RegisterRequest } from '../../models/auth/register.model';
-import { GoogleLoginRequest, FacebookLoginRequest } from '../../models/auth/social-login.model';
+import {
+  AppleLoginRequest,
+  GoogleLoginRequest,
+  FacebookLoginRequest,
+} from '../../models/auth/social-login.model';
 import { AuthResponse } from '../../models/auth/auth-response.model';
 import {
   ForgotPasswordRequest,
@@ -14,6 +18,7 @@ import {
 import { User } from '../../models/user/user.model';
 import { UserRole } from '../../models/user/role.enums';
 import { TokenService } from './token.service';
+import { AppleAuthService } from './apple-auth.service';
 import { AuthStore } from '../../stores/auth.store';
 import { LanguageService } from '../i18n/language.service';
 import { UserService } from '../user/user.service';
@@ -31,6 +36,7 @@ export class AuthService implements OnDestroy {
   private readonly _authStore = inject(AuthStore);
   private readonly _languageService = inject(LanguageService);
   private readonly _userService = inject(UserService);
+  private readonly _appleAuthService = inject(AppleAuthService);
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -120,6 +126,23 @@ export class AuthService implements OnDestroy {
       .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.GOOGLE}`, this.withLanguage(request))
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
+        switchMap(() => this.fetchAndStoreProfile()),
+      );
+  }
+
+  /**
+   * Signs in with a completed Sign in with Apple (web popup or the iOS app).
+   * Once the API has answered, the name Apple shared has been used, so the
+   * web's kept copy goes (see `AppleAuthService`).
+   */
+  appleLogin(request: AppleLoginRequest): Observable<User> {
+    return this._http
+      .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.APPLE}`, this.withLanguage(request))
+      .pipe(
+        tap((response) => {
+          this._appleAuthService.forgetSharedName();
+          this.handleAuthResponse(response);
+        }),
         switchMap(() => this.fetchAndStoreProfile()),
       );
   }

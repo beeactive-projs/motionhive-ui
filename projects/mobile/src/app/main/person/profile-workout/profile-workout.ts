@@ -37,6 +37,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { ReportWorkoutSheet } from '../_sheets/report-workout-sheet/report-workout-sheet';
 import { PROFILE_WORKOUT_ICONS, profileWorkoutTiles } from './profile-workout.config';
 
@@ -74,6 +75,7 @@ type WorkoutActionId = 'report';
     ReportWorkoutSheet,
     StatTile,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './profile-workout.html',
   styleUrl: './profile-workout.scss',

@@ -72,6 +72,22 @@
         (select)="openFeedback()"
       />
     </ion-list>
+
+    @if (devTools) {
+      <section class="mh-section">
+        <ion-note class="mh-kicker" color="medium">
+          {{ 'dev.workoutStatus.menuSection' | translate }}
+        </ion-note>
+        <ion-list [inset]="true" class="mh-card-list">
+          <mh-settings-row
+            [label]="'dev.workoutStatus.menuRow' | translate"
+            icon="time-outline"
+            iconColor="coral"
+            (select)="openWorkoutStatus()"
+          />
+        </ion-list>
+      </section>
+    }
   </div>
 </ion-content>
 

@@ -1,36 +1,30 @@
-import { Component, computed, input, output } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
-import { addIcons } from 'ionicons';
-import {
-  chevronForwardOutline,
-  createOutline,
-  ellipsisVerticalOutline,
-  personOutline,
-} from 'ionicons/icons';
+import { Component, input, output } from '@angular/core';
+import { IonCard, IonCardContent } from '@ionic/angular/standalone';
 
 import { ExerciseKind } from 'core';
 
-import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { kindIcon, kindTone } from '../../../exercises/exercises.config';
+import { ExerciseHead } from '../exercise-head/exercise-head';
 
 /**
- * One exercise as a card: its name up top, opening the catalogue page for
- * the movement, and whatever the screen prescribes or logs against it
+ * One exercise as a card: its header up top (`mh-exercise-head`: the tile,
+ * the name opening the catalogue page for the movement, the ⋮ or a chevron,
+ * the notes), and whatever the screen prescribes or logs against it
  * projected underneath.
  *
  * Three screens draw this frame — the live logger, the routine builder and
  * a program day — and each had its own copy of the header, the card chrome
  * and the "tap the name to see the movement" affordance. One component, so a
  * change to the card lands in all three and the builder really is the logger
- * without a stopwatch.
+ * without a stopwatch. The logger's superset card is the fourth: it draws
+ * the same header once per member.
  *
- * The trailing control is either a chevron (the header is a link and nothing
- * more) or the verb sheet's ellipsis, when the screen has verbs to offer.
+ * A host whose body pads its own rows (the logger's set table) narrows the
+ * card with `--mh-card-inset` and `--mh-card-lead`, so the tile sits over
+ * the body's first column (exercise-card.scss).
  */
 @Component({
   selector: 'mh-exercise-card',
-  imports: [HexAvatar, IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel, TranslatePipe],
+  imports: [ExerciseHead, IonCard, IonCardContent],
   templateUrl: './exercise-card.html',
   styleUrl: './exercise-card.scss',
   host: {
@@ -40,7 +34,7 @@ import { kindIcon, kindTone } from '../../../exercises/exercises.config';
 })
 export class ExerciseCard {
   readonly name = input.required<string>();
-  /** The line under the name — "Last time: 80 kg — 8 · 8 · 7", "3 sets". */
+  /** The line under the name (`ExerciseHead.meta`). Omit for none. */
   readonly meta = input<string | null>(null);
   /** A skipped exercise stays visible and legible; it is a decision, not an absence. */
   readonly skipped = input(false);
@@ -48,14 +42,10 @@ export class ExerciseCard {
   readonly showActions = input(false);
   /** The exercise's kind, for the tinted hexagon beside the name. Omit for none. */
   readonly kind = input<ExerciseKind | null>(null);
-  /**
-   * The person's own note on the movement ("Seat 4, pin on 3"), shown each
-   * time it comes up. Only when there is one: nothing new costs a line for
-   * someone who never writes one.
-   */
+  /** The exercise's photo, drawn in the hexagon as the library rows draw it. */
+  readonly imageUrl = input<string | null>(null);
+  /** The person's own note on the movement, when there is one. */
   readonly note = input<string | null>(null);
-  /** The plan's targets in one line: "3 × 8–10 · effort 8 · 62.5 kg · rest 2:00". */
-  readonly plan = input<string | null>(null);
   /** The plan's note on the exercise, in its author's words. */
   readonly planNote = input<string | null>(null);
 
@@ -67,23 +57,4 @@ export class ExerciseCard {
 
   readonly open = output<void>();
   readonly actions = output<void>();
-
-  /** The kind-tinted hex tile, same as the library row draws it. */
-  readonly tile = computed(() => {
-    const kind = this.kind();
-    return kind ? { icon: kindIcon(kind), tone: kindTone(kind) } : null;
-  });
-
-  constructor() {
-    // The card is hosted by three features; none of them should have to
-    // know which glyphs it draws.
-    addIcons({ chevronForwardOutline, createOutline, ellipsisVerticalOutline, personOutline });
-  }
-
-  onActions(event: Event): void {
-    // The button sits inside the header item; without this the tap also opens
-    // the catalogue page underneath the sheet.
-    event.stopPropagation();
-    this.actions.emit();
-  }
 }

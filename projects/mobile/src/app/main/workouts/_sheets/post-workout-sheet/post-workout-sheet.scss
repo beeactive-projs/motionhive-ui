@@ -1,0 +1,91 @@
+/* The two ways side by side. The tile, its outline and its honey pick are
+   `.mh-pick-tile` (layout.css); the picture over its label is this sheet's. */
+.kinds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.kind {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.kind:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
+}
+
+.frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: var(--mh-radius-control);
+  background: var(--mh-color-divider);
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.frame.card {
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--mh-color-navy-card);
+}
+
+.card-name {
+  color: var(--mh-color-navy-card-ink);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.label {
+  padding-inline: 0.25rem;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.photo-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: var(--mh-row-gutter);
+}
+
+.photo-line .mh-helper {
+  flex: 1;
+  margin: 0;
+}
+
+.photo-line ion-button {
+  margin: 0;
+}
+
+/* What the group will see, said before posting. */
+.privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding-inline: var(--mh-row-gutter);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.privacy ion-icon {
+  flex: none;
+  margin-top: 0.125rem;
+  font-size: var(--mh-icon-sm);
+}

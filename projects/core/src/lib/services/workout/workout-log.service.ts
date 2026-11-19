@@ -11,6 +11,7 @@ import type {
   LogSetPayload,
   LoggedSet,
   StartWorkoutPayload,
+  SupersetChange,
   WorkoutLog,
   WorkoutMemory,
 } from '../../models/workout/log.model';
@@ -77,9 +78,14 @@ export class WorkoutLogService {
     return this._http.post<WorkoutLog>(this._base, payload);
   }
 
-  get(id: string): Observable<WorkoutLog> {
+  /**
+   * `silent` for a read that only repairs the screen after a write already
+   * reported its own failure: a second dialog would report it twice.
+   */
+  get(id: string, opts?: { silent?: boolean }): Observable<WorkoutLog> {
     return this._http.get<WorkoutLog>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.BY_ID(id)}`,
+      opts?.silent ? { context: silentRequest() } : {},
     );
   }
 
@@ -131,11 +137,18 @@ export class WorkoutLogService {
     );
   }
 
-  /** Start the clock again. Does nothing on a workout that is running. */
-  resume(id: string): Observable<WorkoutLog> {
+  /**
+   * Start the clock again. Does nothing on a workout that is running. `at`
+   * (epoch ms) when Continue was tapped earlier, on the lock screen.
+   */
+  resume(id: string, at: number | null = null): Observable<WorkoutLog> {
+    const body: { at?: string } = {};
+    if (at !== null) {
+      body.at = new Date(at).toISOString();
+    }
     return this._http.post<WorkoutLog>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.RESUME(id)}`,
-      {},
+      body,
     );
   }
 
@@ -354,6 +367,18 @@ export class WorkoutLogService {
   }
 
   /**
+   * Superset links changed mid-workout: every exercise whose group changed,
+   * saved in one transaction, all or none. The groups are worked out with
+   * the routine builder's rules (`linkWithNext`, `unlinkFromNext`).
+   */
+  setSupersets(workoutLogId: string, exercises: SupersetChange[]): Observable<void> {
+    return this._http.patch<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SUPERSETS(workoutLogId)}`,
+      { exercises },
+    );
+  }
+
+  /**
    * Substitute a different movement mid-session. Set rows and anything
    * already logged into them survive; the swap is recorded so the coach
    * sees the substitution rather than an unexplained change.
@@ -391,13 +416,29 @@ export class WorkoutLogService {
   }
 
   /**
+   * Several sets of the running workout in one transaction (a whole round
+   * of a superset): all of them go, or none does.
+   */
+  removeSets(workoutLogId: string, setIds: string[]): Observable<void> {
+    return this._http.post<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.REMOVE_SETS(workoutLogId)}`,
+      { setIds },
+    );
+  }
+
+  /**
    * "Last time you did this" — most-recent completed log's actuals for
    * a catalog exercise. Returns up to 6 sets (one workout's worth).
    * Powers the `LastTimeHint` component on the active log.
+   *
+   * Always silent: it only adds a hint to a screen that works without it
+   * (the logger and the routine builder show a dash when it fails), so a
+   * failure must not open the global error dialog over that screen.
    */
   lastForExercise(exerciseId: string): Observable<LoggedSet[]> {
     return this._http.get<LoggedSet[]>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.LAST_FOR_EXERCISE(exerciseId)}`,
+      { context: silentRequest() },
     );
   }
 }

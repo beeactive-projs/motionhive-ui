@@ -15,6 +15,8 @@ export interface Group {
   joinPolicy: JoinPolicy;
   memberPostPolicy: GroupMemberPostPolicy;
   tags: string[] | null;
+  /** What the group trains, activity ids from `GET /categories`, in the list's order. */
+  categoryIds?: string[];
   contactEmail: string | null;
   contactPhone: string | null;
   address: string | null;
@@ -56,6 +58,8 @@ export interface CreateGroupPayload {
   joinPolicy?: JoinPolicy;
   memberPostPolicy?: GroupMemberPostPolicy;
   tags?: string[];
+  /** What the group trains: activity ids from `GET /categories`. */
+  categoryIds?: string[];
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
@@ -71,6 +75,8 @@ export interface UpdateGroupPayload {
   joinPolicy?: JoinPolicy;
   memberPostPolicy?: GroupMemberPostPolicy;
   tags?: string[];
+  /** Replaces what the group trains; an empty list clears it, absent leaves it. */
+  categoryIds?: string[];
   logoUrl?: string;
   contactEmail?: string;
   contactPhone?: string;
@@ -93,6 +99,47 @@ export interface UpdateMemberRolePayload {
  */
 export interface GroupWithMyRole extends Group {
   myRole: GroupMemberRole;
+  /** The last published post, null when nobody has posted yet. */
+  lastPostAt?: string | null;
+  /** Join requests waiting on you: counted for the owner only, else 0. */
+  pendingJoinRequestCount?: number;
+  /** Posts waiting for review: counted for the owner and moderators, else 0. */
+  pendingPostCount?: number;
+  /** Who runs the group. */
+  owner?: GroupOwner | null;
+}
+
+/** The person who runs a group, as a member's read of it names them. */
+export interface GroupOwner {
+  id: string;
+  firstName: string;
+  lastName: string;
+  handle: string | null;
+  avatarUrl: string | null;
+}
+
+/** One of my group invitations, as the invite card shows it. */
+export interface PendingGroupInvitation {
+  id: string;
+  message: string | null;
+  createdAt: string;
+  expiresAt: string;
+  inviter: GroupOwner | null;
+  group: {
+    id: string;
+    name: string;
+    slug: string;
+    logoUrl: string | null;
+    description: string | null;
+    memberCount: number;
+    categoryIds: string[];
+  };
+}
+
+/** What inviting several clients did: members and open invitations are skipped. */
+export interface InviteClientsResult {
+  invited: number;
+  skipped: number;
 }
 
 export type GroupListResponse = PaginatedResponse<Group>;
@@ -108,6 +155,8 @@ export type GroupMemberListResponse = PaginatedResponse<GroupMember>;
 export interface DiscoverGroupsQuery {
   search?: string;
   tags?: string[];
+  /** Groups that train any of these categories. */
+  categoryIds?: readonly string[];
   city?: string;
   country?: string;
   page?: number;
@@ -192,6 +241,7 @@ export interface PublicGroupProfile {
     | 'logoUrl'
     | 'joinPolicy'
     | 'tags'
+    | 'categoryIds'
     | 'contactEmail'
     | 'contactPhone'
     | 'address'

@@ -46,3 +46,37 @@ ion-button.google {
     margin-inline-end: 0.75rem;
   }
 }
+
+// Apple's rules for a custom Sign in with Apple button: black with a white
+// logo and title on the light theme, white with black on the dark one (a
+// brand requirement, like Google's colours, so no theme token), and the same
+// height, type and corner as Google's button, so neither outranks the other.
+ion-button.apple {
+  // A press shows as a slightly lighter black (and grey on white below),
+  // never the theme's primary.
+  --background: #000;
+  --background-activated: #333;
+  --background-focused: #333;
+  --background-hover: #333;
+  --color: #fff;
+  --box-shadow: none;
+  height: 2.875rem;
+  margin: 0;
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  letter-spacing: normal;
+
+  svg {
+    width: var(--mh-icon-md);
+    height: var(--mh-icon-md);
+    margin-inline-end: 0.75rem;
+  }
+}
+
+:host-context(.ion-palette-dark) ion-button.apple {
+  --background: #fff;
+  --background-activated: #ddd;
+  --background-focused: #ddd;
+  --background-hover: #ddd;
+  --color: #000;
+}

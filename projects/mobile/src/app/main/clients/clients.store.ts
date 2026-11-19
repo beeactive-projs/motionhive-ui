@@ -298,11 +298,19 @@ export class ClientsStore {
     );
   }
 
-  unarchive(client: InstructorClient): Observable<InstructorClient> {
-    return this._clientService.unarchiveClient(client.clientId).pipe(
+  /**
+   * Ask a former client to train together again. They become a client once
+   * they accept: the row stays archived meanwhile, and the invitation joins
+   * the list, so it reloads.
+   */
+  inviteAgain(client: InstructorClient): Observable<unknown> {
+    return this._clientService.sendInvitation({ userId: client.clientId }).pipe(
       take(1),
       takeUntilDestroyed(this._destroyRef),
-      tap((updated) => this._settle(client.id, updated, InstructorClientStatuses.Archived)),
+      tap(() => {
+        this.loadList({ force: true });
+        this.loadPendingCount(true);
+      }),
     );
   }
 

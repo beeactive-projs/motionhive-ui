@@ -25,7 +25,7 @@
   </ion-label>
 
   @if (startable()) {
-    <ion-button slot="end" class="start" size="small" shape="round" color="primary" (click)="onStart($event)">
+    <ion-button slot="end" class="start" size="small" color="primary" (click)="onStart($event)">
       {{ 'button.start' | translate }}
     </ion-button>
   } @else if (isDone()) {

@@ -1,43 +1,13 @@
-/* ─── Resume ──────────────────────────────────────────────────────
-   Navy, not honey. Resuming an abandoned session and starting a new one are
-   different offers, and the design is explicit that these must never be
-   mistaken for each other. The kicker takes the honey fill: on navy the deep
-   ink token would vanish, and here honey names the moment, not a status. */
-.resume ion-item {
-  --background: var(--ion-color-secondary);
-  --color: var(--ion-color-secondary-contrast);
-}
-
-.resume .mh-kicker {
-  color: var(--ion-color-primary);
-}
-
-/* The live dot before the kicker: something is running. */
-.resume .live-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-inline-end: 0.75rem;
-  border-radius: var(--mh-radius-pill);
-  background: var(--ion-color-primary);
-}
-
-/* Paused: the dot's place, but a glyph that says the clock is stopped. */
-.resume .paused-mark {
-  margin-inline-end: 0.5rem;
-  font-size: var(--mh-text-md);
-}
-
-.resume h2 {
-  color: inherit;
-  font-weight: 600;
-}
-
 /* ─── History, Progress, Exercises ────────────────────────────────
    On Messages and Clients the search and chips are in the header and an
    empty state sits straight in the content, filling it. Here they scroll
    with the tab, so the tab fills the screen instead and its body takes the
-   room left, where the body's empty state grows and centres. */
+   room left, where the body's empty state grows and centres. A column of
+   its own, since the Exercises body is not an `.mh-page`: its flat list
+   runs edge to edge. */
 .tab-body {
+  display: flex;
+  flex-direction: column;
   min-block-size: 100%;
 }
 

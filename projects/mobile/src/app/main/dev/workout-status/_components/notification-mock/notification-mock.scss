@@ -1,0 +1,118 @@
+/* The shade follows the phone's theme, as the app does, so it reads the
+   app's own surface and ink tokens. The buttons are the accent colour the
+   notification sets (`mh_notification_accent`), as text. */
+:host {
+  display: block;
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-width: 22.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1.5rem;
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-color-primary);
+}
+
+.mark svg {
+  display: block;
+  height: 0.625rem;
+}
+
+.mark path {
+  fill: var(--ion-color-primary-contrast);
+}
+
+.app {
+  color: var(--ion-text-color);
+  font-weight: 600;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+/* The custom view: one line, the big part first, the next set after it. */
+.body.inline {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.title {
+  flex: none;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--mh-text-base);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inline .title {
+  font-size: var(--mh-text-lg);
+  font-weight: 700;
+}
+
+.text {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.inline .text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track {
+  display: block;
+  height: 0.25rem;
+  overflow: hidden;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--ion-color-primary);
+  transition: width 1s linear;
+}
+
+.actions {
+  display: flex;
+  gap: 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.action {
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}

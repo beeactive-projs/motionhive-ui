@@ -17,6 +17,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+import { Observable } from 'rxjs';
 import {
   CreateVenuePayload,
   MeetingProvider,
@@ -45,7 +46,9 @@ import {
  * and closes. The parent is responsible for refreshing its list.
  *
  * Cross-field rules match the backend service:
- *   - kind=ONLINE -> meetingUrl required, address fields null.
+ *   - kind=ONLINE -> meeting link and platform both optional (the link is
+ *     never on the public profile), address fields null. On an edit an
+ *     emptied link or platform is sent as null, which clears it.
  *   - CLIENT_HOME -> no address; travelRadiusKm optional.
  *   - other kinds -> city required.
  */
@@ -183,11 +186,7 @@ export class VenueFormDialog {
       return;
     }
     let normalizedMeetingUrl: string | null = null;
-    if (f.kind === VenueKind.ONLINE) {
-      if (!f.meetingUrl.trim()) {
-        this._warn('venues.toast.meetingUrlRequired');
-        return;
-      }
+    if (f.kind === VenueKind.ONLINE && f.meetingUrl.trim()) {
       normalizedMeetingUrl = normalizeUrl(f.meetingUrl);
       if (!normalizedMeetingUrl) {
         this._warn('venues.toast.meetingUrlInvalid');
@@ -215,9 +214,13 @@ export class VenueFormDialog {
       payload.longitude = f.location.longitude ?? undefined;
     }
 
-    if (f.kind === VenueKind.ONLINE && normalizedMeetingUrl) {
-      payload.meetingUrl = normalizedMeetingUrl;
-      payload.meetingProvider = f.meetingProvider ?? MeetingProvider.OTHER;
+    if (f.kind === VenueKind.ONLINE) {
+      if (normalizedMeetingUrl) {
+        payload.meetingUrl = normalizedMeetingUrl;
+      }
+      if (f.meetingProvider) {
+        payload.meetingProvider = f.meetingProvider;
+      }
     }
 
     if (f.kind === VenueKind.CLIENT_HOME && f.travelRadiusKm != null) {
@@ -226,9 +229,19 @@ export class VenueFormDialog {
 
     this.saving.set(true);
     const existing = this.venue();
-    const request$ = existing
-      ? this._venueService.update(existing.id, payload as UpdateVenuePayload)
-      : this._venueService.create(payload);
+    let request$: Observable<Venue>;
+    if (existing) {
+      const changes: UpdateVenuePayload = { ...payload };
+      // A PATCH keeps what it leaves out: an emptied link or platform goes
+      // as null, which clears it.
+      if (f.kind === VenueKind.ONLINE) {
+        changes.meetingUrl = normalizedMeetingUrl;
+        changes.meetingProvider = f.meetingProvider;
+      }
+      request$ = this._venueService.update(existing.id, changes);
+    } else {
+      request$ = this._venueService.create(payload);
+    }
 
     request$.subscribe({
       next: (v) => {

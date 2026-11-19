@@ -135,42 +135,12 @@
         }
       </section>
 
+      <!-- Where the coach works, editable here as in the welcome flow: the
+           same list, so a place added in either is in both. -->
       <section class="mh-section">
         <div class="mh-section-label">{{ 'account.coachingProfile.venues.title' | translate }}</div>
-        @if (loadingVenues()) {
-          <ion-list [inset]="true" class="mh-card-list">
-            <ion-item>
-              <ion-label>
-                <h3><ion-skeleton-text [animated]="true" style="width: 40%" /></h3>
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        } @else if (venuesFailed()) {
-          <ion-note class="mh-footnote" color="medium">
-            {{ 'account.coachingProfile.venues.loadFailed' | translate }}
-          </ion-note>
-        } @else if (venueRows().length === 0) {
-          <ion-note class="mh-footnote" color="medium">
-            {{ 'account.coachingProfile.venues.empty' | translate }}
-          </ion-note>
-        } @else {
-          <ion-list [inset]="true" class="mh-card-list">
-            @for (venue of venueRows(); track venue.id) {
-              <ion-item>
-                <mh-hex-avatar slot="start" size="sm" [icon]="venue.icon" color="teal" />
-                <ion-label class="ion-text-wrap">
-                  <h3>{{ venue.name }}</h3>
-                  @if (venue.key) {
-                    <p>{{ venue.key | translate }}</p>
-                  } @else if (venue.city) {
-                    <p>{{ venue.city }}</p>
-                  }
-                </ion-label>
-              </ion-item>
-            }
-          </ion-list>
-          <ion-note class="mh-footnote" color="medium">{{ 'account.coachingProfile.venues.managedOnWeb' | translate }}</ion-note>
-        }
+        <mh-venue-list />
+        <ion-note class="mh-footnote" color="medium">{{ 'venues.list.hint' | translate }}</ion-note>
       </section>
     } @else if (store.loadFailed() && !store.loading()) {
       <mh-empty-state

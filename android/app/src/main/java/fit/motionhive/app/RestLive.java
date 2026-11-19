@@ -38,6 +38,12 @@ import java.util.Locale;
  * kept in preferences, so the buttons still work after the process died.
  * What they do is noted for the web side, which takes the notes when it runs
  * again and records the rest as if the bar had been tapped.
+ *
+ * At the rest's end this notification turns to Go and sounds itself, from an
+ * exact alarm, so there is no second "Rest over" notification beside it: the
+ * web side does not schedule one on Android while this one shows. Swiped
+ * away, it stays away, and the rest's end posts a plain "Rest over" instead.
+ * Silent while the app is on screen, where the rest bar says it.
  */
 final class RestLive {
 
@@ -49,6 +55,8 @@ final class RestLive {
     static final String ACTION_SKIP = "fit.motionhive.app.rest.SKIP";
     static final String ACTION_START = "fit.motionhive.app.rest.START";
     static final String ACTION_DISMISSED = "fit.motionhive.app.rest.DISMISSED";
+    /** The rest's end: Go is drawn, and sounds. */
+    static final String ACTION_GO = "fit.motionhive.app.rest.GO";
 
     /** The same nudge as the rest bar's (NUDGE_SECONDS). */
     private static final long NUDGE_MS = 15_000;
@@ -58,20 +66,24 @@ final class RestLive {
     private static final long TIMEOUT_MS = 8 * 60 * 60_000;
 
     /**
-     * The rest-over alert RestAlertService schedules through Capacitor's
-     * local notifications (REST_NOTIFICATION_ID). Its alarm is Capacitor's
-     * broadcast to this receiver with that id as the request code; finding
-     * the same PendingIntent moves or withdraws it with its contents intact.
+     * The id RestAlertService gives the rest-over alert (REST_NOTIFICATION_ID).
+     * A swiped-away workout's "Rest over" is posted here under the same id,
+     * so either side can take it down, and a rest ended from here takes down
+     * whichever is showing.
      */
     private static final int REST_ALERT_ID = 1;
-    private static final String CAPACITOR_PUBLISHER =
-            "com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher";
+    /** The channel that sounds: Go, and the plain "Rest over". */
+    static final String ALERT_CHANNEL_ID = "workout_rest_over";
+    /** Go sounds only while it is news: within a minute of the rest's end. */
+    private static final long ALERT_WINDOW_MS = 60_000;
 
     private static final String PREFS = "mh_rest_live";
     private static final String KEY_STATE = "state";
     private static final String KEY_ACTIONS = "actions";
     /** The workout whose notification was swiped away: it stays away for that workout. */
     private static final String KEY_DISMISSED = "dismissed";
+    /** The rest's end Go was last drawn for, so it sounds once a rest at most. */
+    private static final String KEY_ALERTED = "alerted";
 
     private enum Phase { REST, GO, WORKOUT, PAUSED }
 
@@ -79,6 +91,10 @@ final class RestLive {
     private static Runnable tick;
     /** Set while the plugin is loaded: tells the web side there are notes to take. */
     static Runnable listener;
+    /** True while the app is on screen: its own rest bar says Go, so this stays silent. */
+    static volatile boolean inFront;
+    /** When the Go alarm is set for, so a render each second does not set it again. */
+    private static long goAt;
 
     private RestLive() {}
 
@@ -102,7 +118,8 @@ final class RestLive {
 
     static synchronized void end(Context context) {
         stopTicking();
-        prefs(context).edit().remove(KEY_STATE).remove(KEY_DISMISSED).apply();
+        cancelGo(context);
+        prefs(context).edit().remove(KEY_STATE).remove(KEY_DISMISSED).remove(KEY_ALERTED).apply();
         NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID);
     }
 
@@ -124,7 +141,6 @@ final class RestLive {
         long endsAt = Math.max(now, end + NUDGE_MS);
         put(state, "restEndsAt", endsAt);
         save(context, state);
-        moveRestAlert(context, endsAt);
         JSONObject action = action("extend", now);
         put(action, "endsAt", endsAt);
         record(context, action);
@@ -138,8 +154,15 @@ final class RestLive {
         state.remove("restStartedAt");
         state.remove("restEndsAt");
         save(context, state);
-        cancelRestAlert(context);
+        // A "Rest over" already showing is old news once the rest has ended.
+        NotificationManagerCompat.from(context).cancel(REST_ALERT_ID);
         record(context, action(type, System.currentTimeMillis()));
+        render(context);
+    }
+
+    /** The Go alarm, at the rest's end: drawn now, and sounding if it is news. */
+    static synchronized void restOver(Context context) {
+        goAt = 0;
         render(context);
     }
 
@@ -156,12 +179,6 @@ final class RestLive {
         stopTicking();
         JSONObject state = load(context);
         if (state == null) return;
-        if (state.optString("logId").equals(prefs(context).getString(KEY_DISMISSED, null))) return;
-        if (!canNotify(context)) return;
-
-        JSONObject labels = state.optJSONObject("labels");
-        if (labels == null) labels = new JSONObject();
-        ensureChannel(context, labels.optString("channel", "Workout"));
 
         long now = System.currentTimeMillis();
         long start = state.optLong("restStartedAt", 0);
@@ -173,11 +190,28 @@ final class RestLive {
         else if (clockFrom > 0) phase = Phase.WORKOUT;
         else phase = Phase.PAUSED;
 
+        // Go is due at the rest's end whether or not the process lives then.
+        if (phase == Phase.REST) scheduleGo(context, end);
+        else cancelGo(context);
+        boolean alert = phase == Phase.GO && goIsNews(context, end, now);
+
+        if (!canNotify(context)) return;
+        JSONObject labels = state.optJSONObject("labels");
+        if (labels == null) labels = new JSONObject();
+        if (state.optString("logId").equals(prefs(context).getString(KEY_DISMISSED, null))) {
+            // Swiped away, it stays away; the rest's end still deserves a sound.
+            if (alert) postRestOver(context, labels, state.optString("goLine"));
+            return;
+        }
+        ensureChannel(context, labels.optString("channel", "Workout"));
+        if (alert) ensureAlertChannel(context, labels.optString("alertTitle", "Rest over"));
+
         String title = state.optString("title");
         String workoutLine = state.optString("workoutLine");
         RemoteViews view = new RemoteViews(context.getPackageName(), R.layout.rest_live_notification);
         String subText;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context, alert ? ALERT_CHANNEL_ID : CHANNEL_ID);
 
         switch (phase) {
             case REST: {
@@ -227,14 +261,19 @@ final class RestLive {
                 .setCustomBigContentView(view)
                 .setSubText(subText)
                 .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setSilent(true)
+                // Quiet on every redraw but the one Go that is news.
+                .setOnlyAlertOnce(!alert)
+                .setSilent(!alert)
                 .setShowWhen(false)
-                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                .setCategory(alert ? NotificationCompat.CATEGORY_REMINDER : NotificationCompat.CATEGORY_PROGRESS)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setTimeoutAfter(TIMEOUT_MS)
                 .setContentIntent(openApp(context))
                 .setDeleteIntent(broadcast(context, ACTION_DISMISSED));
+        if (alert) {
+            // Android 7 has no channels: the sound and the peek come from these.
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH).setDefaults(NotificationCompat.DEFAULT_ALL);
+        }
         try {
             NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build());
         } catch (SecurityException denied) {
@@ -302,6 +341,76 @@ final class RestLive {
         return NotificationManagerCompat.from(context).areNotificationsEnabled();
     }
 
+    /**
+     * Whether Go sounds now: the first time it is drawn for this rest, within
+     * a minute of the end, with the app not on screen. Once drawn quietly (the
+     * app was open, or the end is long past) it never sounds later.
+     */
+    private static boolean goIsNews(Context context, long end, long now) {
+        SharedPreferences prefs = prefs(context);
+        if (prefs.getLong(KEY_ALERTED, 0) == end) return false;
+        prefs.edit().putLong(KEY_ALERTED, end).apply();
+        return !inFront && now - end < ALERT_WINDOW_MS;
+    }
+
+    /** An exact alarm at the rest's end, so Go is drawn, and sounds, with the process gone. */
+    private static void scheduleGo(Context context, long at) {
+        if (goAt == at) return;
+        goAt = at;
+        AlarmManager alarms = context.getSystemService(AlarmManager.class);
+        PendingIntent go = broadcast(context, ACTION_GO);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarms.canScheduleExactAlarms()) {
+            alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, go);
+        } else {
+            alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, go);
+        }
+    }
+
+    /** No rest running: no Go to come. Always, since a new process does not know what an old one set. */
+    private static void cancelGo(Context context) {
+        goAt = 0;
+        context.getSystemService(AlarmManager.class).cancel(broadcast(context, ACTION_GO));
+    }
+
+    /** "Rest over" on its own, for a workout whose notification was swiped away. */
+    private static void postRestOver(Context context, JSONObject labels, String goLine) {
+        ensureAlertChannel(context, labels.optString("alertTitle", "Rest over"));
+        // The set to do, as the web side's alert says it; the sentence when nothing is known.
+        String body = goLine;
+        if (body == null || body.isEmpty() || body.equals(labels.optString("restOver"))) {
+            body = labels.optString("alertBody");
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, ALERT_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_motionhive)
+                .setColor(ContextCompat.getColor(context, R.color.mh_notification_accent))
+                .setContentTitle(labels.optString("alertTitle"))
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentIntent(openApp(context));
+        try {
+            NotificationManagerCompat.from(context).notify(REST_ALERT_ID, builder.build());
+        } catch (SecurityException denied) {
+            // Notifications refused: nothing to show.
+        }
+    }
+
+    /** High importance: Go sounds and peeks over the screen, as a timer's end does. */
+    private static void ensureAlertChannel(Context context, String name) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        NotificationChannel channel =
+                new NotificationChannel(ALERT_CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH);
+        channel.setShowBadge(false);
+        channel.enableVibration(true);
+        channel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
+        // Creating it again only renames it, in the person's language.
+        manager.createNotificationChannel(channel);
+    }
+
     /** Low importance: it sits in the shade and on the lock screen without a sound. */
     private static void ensureChannel(Context context, String name) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
@@ -325,32 +434,6 @@ final class RestLive {
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
                 context, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-    }
-
-    // ─── The rest-over alert ───────────────────────────────────────
-
-    private static PendingIntent restAlert(Context context) {
-        Intent intent = new Intent().setClassName(context, CAPACITOR_PUBLISHER);
-        int flags = PendingIntent.FLAG_NO_CREATE;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_MUTABLE;
-        return PendingIntent.getBroadcast(context, REST_ALERT_ID, intent, flags);
-    }
-
-    /** Same alarm, same notification, a new moment: setting it again replaces it. */
-    private static void moveRestAlert(Context context, long at) {
-        PendingIntent alert = restAlert(context);
-        if (alert == null) return;
-        AlarmManager alarms = context.getSystemService(AlarmManager.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarms.canScheduleExactAlarms()) {
-            alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, alert);
-        } else {
-            alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, alert);
-        }
-    }
-
-    private static void cancelRestAlert(Context context) {
-        PendingIntent alert = restAlert(context);
-        if (alert != null) context.getSystemService(AlarmManager.class).cancel(alert);
     }
 
     // ─── Kept in preferences ───────────────────────────────────────

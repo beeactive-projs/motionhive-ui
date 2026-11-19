@@ -114,6 +114,13 @@ ion-list:is(.mh-card-list, .mh-flat-list) > :last-child ion-item::after {
   display: none;
 }
 
+/* A reorder group wraps the rows (the routine builder's reorder): the rule
+   above reaches every row inside it, so the lines come back on all but its
+   last row. */
+ion-list:is(.mh-card-list, .mh-flat-list) > ion-reorder-group > ion-item:not(:last-child)::after {
+  display: block;
+}
+
 /* The label's start, per leading item: gutter + the item's width + gap.
    `--mh-row-lead` is that width. Hex tiles reflect their size on
    `data-size` (`sm` the settings-row tile, `md` a person or an entity, `lg`
@@ -252,6 +259,50 @@ ion-list.mh-flat-list ion-label p {
   font-size: var(--mh-text-sm);
 }
 
+/* ─── Compact rows ─────────────────────────────────────────────────────
+   The exercise rows, in either kind of list (user decision, 2026-11-17):
+   a long run of names to scan, so they set a step smaller than a person or
+   a conversation. The row host carries `mh-compact-row`. The name is body
+   size, the facts line small, each on a `--mh-row-line-compact` line box,
+   with an md tile exactly as tall as the two lines and the grouped row's
+   padding around them, so a row is 3.5rem in a card or flat list alike.
+   The flat-list rules above read the re-pointed steps; the item takes the
+   grouped row's 2rem floor in place of Ionic's 48px, and Ionic's label
+   margins (10px above and below, 2px around a title) would stack on the
+   padding, so the line boxes alone set the height. `ion-list` lifts these
+   past the flat-list skin's type rules. */
+ion-list .mh-compact-row {
+  --mh-row-line: var(--mh-row-line-compact);
+  --mh-flat-row-pad: var(--mh-row-pad);
+}
+
+ion-list .mh-compact-row ion-item {
+  --min-height: 2rem;
+}
+
+ion-list .mh-compact-row ion-item > ion-label {
+  margin-block: 0;
+}
+
+ion-list .mh-compact-row ion-label :is(h2, h3) {
+  margin: 0;
+  font-family: var(--ion-font-family);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  line-height: var(--mh-row-line);
+}
+
+ion-list .mh-compact-row ion-label p {
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-row-line);
+}
+
+/* The compact skeleton's block is the md tile's 2.5rem. */
+ion-list.mh-flat-list .mh-compact-row ion-item:has(> ion-skeleton-text[slot='start']) {
+  --mh-row-lead: 2.5rem;
+}
+
 /* Under a label the label is the seam, so the first row drops its top
    hairline; a run of labelled day groups would otherwise draw a line under
    every heading. A section head (a kicker with its note or action) is a
@@ -263,23 +314,33 @@ ion-list.mh-flat-list ion-label p {
 
 /* Swipe options, WhatsApp style, in either kind of list (the inbox's rows,
    the Workouts routines card): icon over label (`slot="top"` on the icon),
-   wide enough that the longest label (RO "Mai multe") stays on one line. */
-ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option {
+   wide enough that the longest label (RO "Mai multe") stays on one line.
+   A sliding row outside a list (the logger's set rows, inside an exercise
+   card) opts in with `mh-swipe-row` on its `ion-item-sliding`. */
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-option {
   min-width: 5rem;
   font-size: var(--mh-text-sm);
   font-weight: 600;
   text-transform: none;
 }
 
-ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option ion-icon {
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-option ion-icon {
   font-size: var(--mh-icon-lg);
+}
+
+/* iOS mode closes the end options with a hairline of its own
+   (`.item-options-ios.item-options-end`), as wide as the row, drawn while a
+   row is open. The skin draws the lines, so it goes, like the items' own.
+   `[side]` lifts this over Ionic's two classes. */
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-options[side] {
+  border-bottom-width: 0;
 }
 
 /* A swipe label is 12px text, so it needs 4.5:1, and white misses it on
    violet 500 (4.2:1). Violet swipes from its shade step instead (600,
-   5.7:1). The other hues already pass: the red slot is 600 (4.8:1), honey
-   and green take black ink, slate and navy are dark enough. `!important`
+   5.7:1). The other hues already pass: the red slot is 600 (4.8:1), honey,
+   green and teal take dark ink, slate and navy are dark enough. `!important`
    because Ionic's own `.ion-color-*` slots are. */
-ion-list:is(.mh-card-list, .mh-flat-list) ion-item-option.ion-color-violet {
+:is(ion-list:is(.mh-card-list, .mh-flat-list), .mh-swipe-row) ion-item-option.ion-color-violet {
   --ion-color-base: var(--ion-color-shade) !important;
 }

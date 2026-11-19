@@ -9,6 +9,7 @@ import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import {
   AUTH_FIELD_ERRORS,
+  AppleLoginRequest,
   AuthService,
   AuthStore,
   ClientInviteService,
@@ -142,6 +143,14 @@ export class SignUp {
 
   protected onGoogleFailed(): void {
     this.errorMessage.set(this._translateService.instant('auth.common.googleFailed'));
+  }
+
+  protected onAppleCredential(request: AppleLoginRequest): void {
+    this.signUp(this._authService.appleLogin(request), 'auth.common.appleFailed');
+  }
+
+  protected onAppleFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
   }
 
   private loadInvitation(token: string): void {

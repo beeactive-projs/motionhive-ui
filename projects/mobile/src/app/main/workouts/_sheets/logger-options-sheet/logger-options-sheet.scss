@@ -1,0 +1,33 @@
+// A long label (Romanian, 130% text) wraps rather than ellipsising. Not
+// `ion-text-wrap`: in iOS mode that also drops the label to 14px, under the
+// switches' labels above it.
+.rest-label {
+  white-space: normal;
+}
+
+// The rest at the row's end: the muted ink at the label's size, like every
+// trailing value, set in figures that keep their width as it steps.
+.rest-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+// The opened rest, on the row's gutter and closing the card with it.
+.rest-panel {
+  padding: 0 var(--mh-row-gutter) var(--mh-row-gutter);
+}
+
+// The rest the stepper sets, a step above the body like the rest sheet's
+// figure; the signs and the slack between them are the shared `.mh-stepper`.
+.mh-stepper .value {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+}
+
+// The five rests share the width evenly rather than wrapping as a cloud:
+// the chips' skin is `.mh-chip-cloud .chip` (ion-button.css), the columns
+// are this sheet's.
+.presets {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}

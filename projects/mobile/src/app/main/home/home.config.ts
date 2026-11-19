@@ -1,5 +1,7 @@
 import {
   CoachActivityItem,
+  NavMode,
+  NavModes,
   Post,
   ProgramAssignment,
   ProgramAssignmentStatus,
@@ -1055,7 +1057,9 @@ export function traineeLatest(
         post,
       }),
     ),
-    ...records.map(
+    // A first time on a lift beats nothing, so it is no "New record" here,
+    // as on the finish screen and in History.
+    ...records.filter((record) => !record.first).map(
       (record): LatestEntry => ({
         kind: LatestKinds.Record,
         id: `record-${record.exerciseId}-${record.recordedAt}`,
@@ -1207,5 +1211,89 @@ export function latestRow(entry: LatestEntry, copy: LatestCopy): LatestRow {
         state: { exerciseName: record.exerciseName },
       };
     }
+  }
+}
+
+// ─── Welcome card ───────────────────────────────────────────────────────────
+
+export interface WelcomeCardCopy {
+  title: string;
+  detail: string;
+  icon: string;
+}
+
+/**
+ * The welcome flow's passed over questions, offered again on each Home: the
+ * questions about training in Train mode, the coach's own in Coach mode.
+ */
+export const WELCOME_CARDS: Readonly<Record<NavMode, WelcomeCardCopy>> = {
+  [NavModes.Train]: {
+    title: 'home.welcomeCard.train.title',
+    detail: 'home.welcomeCard.train.detail',
+    icon: 'compass-outline',
+  },
+  [NavModes.Coach]: {
+    title: 'home.welcomeCard.coach.title',
+    detail: 'home.welcomeCard.coach.detail',
+    icon: 'ribbon-outline',
+  },
+};
+
+// ── Group offers on Home (design 2026-11-14) ─────────────────────────────
+
+/** Active clients a coach has before Home offers a client group. */
+export const GROUP_SETUP_MIN_CLIENTS = 3;
+
+/** How long "Not now" puts the offer away. */
+export const GROUP_SETUP_SNOOZE_DAYS = 30;
+
+/** Per account, so a shared phone never hides it for someone else. */
+export function groupSetupSnoozeKey(userId: string): string {
+  return `mh.groupSetupSnooze.v1.${userId}`;
+}
+
+/** Whether a stored "Not now" (its time in ms, as text) still holds at `now`. */
+export function snoozeActive(stored: string | null, now: number, days: number): boolean {
+  if (!stored) {
+    return false;
+  }
+  const at = Number(stored);
+  if (!Number.isFinite(at)) {
+    return false;
+  }
+  return now - at < days * 24 * 60 * 60 * 1000;
+}
+
+/** The offer's snooze, read safely: storage can be missing or blocked. */
+export function isGroupSetupSnoozed(userId: string, now: number): boolean {
+  try {
+    return snoozeActive(
+      localStorage.getItem(groupSetupSnoozeKey(userId)),
+      now,
+      GROUP_SETUP_SNOOZE_DAYS,
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** The group invitations a trainee put away from Home with "Not now". */
+export function hiddenInvitesKey(userId: string): string {
+  return `mh.hiddenGroupInvites.v1.${userId}`;
+}
+
+/** Ids stored as a JSON list; anything else reads as none. */
+export function parseHiddenInvites(stored: string | null): string[] {
+  if (!stored) {
+    return [];
+  }
+  try {
+    const value: unknown = JSON.parse(stored);
+    if (Array.isArray(value)) {
+      return value.filter((id): id is string => typeof id === 'string');
+    }
+    return [];
+  } catch {
+    return [];
   }
 }

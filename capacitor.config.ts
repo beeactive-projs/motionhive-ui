@@ -23,13 +23,16 @@ const config: CapacitorConfig = {
     Badge: {
       persist: false,
     },
-    // Google sign-in only. The others would bundle their SDKs (Facebook's
-    // adds its own permissions); turning one on needs a `cap sync`.
+    // Google, and Apple on iPhone. The others would bundle their SDKs
+    // (Facebook's adds its own permissions); turning one on needs a
+    // `cap sync`. Apple on iOS is the system's own framework, and the app
+    // offers it on iOS only (AppleSignInService); on Android this flag only
+    // bundles androidx.browser, which the plugin already compiles against.
     SocialLogin: {
       providers: {
         google: true,
         facebook: false,
-        apple: false,
+        apple: true,
         twitter: false,
       },
     },

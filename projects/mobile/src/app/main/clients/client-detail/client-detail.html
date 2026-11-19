@@ -116,6 +116,13 @@
       [heading]="'clients.detail.pending.title' | translate: { name: firstName() }"
       [message]="'clients.detail.pending.body' | translate" />
     } @else {
+    @if (isArchived()) {
+    <!-- The coaching ended: their training is closed to this coach, so the
+         tabs would only fail. The ⋮ offers Invite again. -->
+    <mh-empty-state icon="archive-outline"
+      [heading]="'clients.detail.ended.title' | translate: { name: firstName() }"
+      [message]="'clients.detail.ended.body' | translate" />
+    }
     @if (store.week(); as week) {
     <ion-card class="week" [class.flagged]="week.flagged">
       @if (attention(); as reason) {
@@ -129,8 +136,10 @@
       }
       } @else {
       <div class="week-top">
+        <!-- The roster's window is the last seven days, not the calendar
+             week: the label says what is counted. -->
         <span class="mh-kicker">{{
-          'clients.detail.sections.thisWeek' | translate
+          'clients.detail.sections.lastSevenDays' | translate
           }}</span>
         @if (weekTrend(); as trend) {
         <span class="trend" [attr.data-trend]="trend.direction">
@@ -203,7 +212,7 @@
         </ion-label>
         @if (plan.paused) {
         <!-- Paused: Resume is the Overview's one honey action. -->
-        <ion-button slot="end" shape="round" class="mh-row-action" [disabled]="store.isPlanBusy(plan.row.id)" (click)="
+        <ion-button slot="end" class="mh-row-action" [disabled]="store.isPlanBusy(plan.row.id)" (click)="
                           setPlanStatus(plan.row, PlanStatuses.Active); $event.stopPropagation()
                         ">
           {{ 'button.resume' | translate }}

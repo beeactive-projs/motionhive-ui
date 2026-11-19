@@ -29,6 +29,8 @@
   },
   "auth": {
     "common": {
+      "appleFailed": "Sign in with Apple failed. Please try again.",
+      "continueWithApple": "Continue with Apple",
       "continueWithGoogle": "Continue with Google",
       "createOneFree": "Create one for free",
       "emailAddress": "Email address",

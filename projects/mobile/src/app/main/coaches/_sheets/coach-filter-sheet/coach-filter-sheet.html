@@ -16,21 +16,21 @@
     }
   </div>
 
-  @if (facets().specializations.length > 0) {
-    <div class="mh-section-label">{{ 'coaches.filter.speciality' | translate }}</div>
+  @if (categoryChips().length > 0) {
+    <div class="mh-section-label">{{ 'coaches.filter.coaches' | translate }}</div>
     <div class="mh-chip-cloud">
-      @for (facet of facets().specializations; track facet.label) {
+      @for (chip of categoryChips(); track chip.id) {
         <ion-button
           class="chip"
           fill="clear"
           shape="round"
           size="small"
-          [class.selected]="isPicked(facet.label)"
-          [attr.aria-pressed]="isPicked(facet.label)"
-          (click)="toggleSpecialization(facet.label)"
+          [class.selected]="isPicked(chip.id)"
+          [attr.aria-pressed]="isPicked(chip.id)"
+          (click)="toggleCategory(chip.id)"
         >
-          {{ facet.label }}
-          <span class="count">{{ facet.count }}</span>
+          {{ chip.name }}
+          <span class="count">{{ chip.count }}</span>
         </ion-button>
       }
     </div>

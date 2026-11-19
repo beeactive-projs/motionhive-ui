@@ -31,3 +31,21 @@ ion-button {
   min-height: 0;
   margin: 0;
 }
+
+/* The photo hint: the hexagon on the trailing edge, on the row's centre line
+   like every trailing control, a little apart from Repeat. */
+.thumb {
+  flex: none;
+}
+
+.thumb + ion-button,
+.thumb + ion-icon {
+  margin-inline-start: 0.5rem;
+}
+
+/* In the tags line, at the text's size, in the muted ink. */
+.photo-glyph {
+  color: var(--ion-color-medium);
+  font-size: 1em;
+  vertical-align: middle;
+}

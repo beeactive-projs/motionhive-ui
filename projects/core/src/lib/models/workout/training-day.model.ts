@@ -61,12 +61,18 @@ export interface TrainingDayInstructor {
   handle: string | null;
 }
 
+/**
+ * How long an "every week" schedule runs: the API makes 12 weeks of days
+ * and nothing extends them, so the apps say so (owner, 2026-11-18).
+ */
+export const WEEKLY_SCHEDULE_WEEKS = 12;
+
 /** Body for scheduling one of your own routines across the week. */
 export interface ScheduleRoutinePayload {
   programId: string;
   /** ISO 8601 weekdays: 1 = Monday through 7 = Sunday. */
   daysOfWeek: number[];
-  /** WEEKLY rolls on; BLOCK runs for `repeatWeeks` then completes. */
+  /** WEEKLY runs `WEEKLY_SCHEDULE_WEEKS` weeks; BLOCK runs for `repeatWeeks`; then it completes. */
   repeatMode?: 'WEEKLY' | 'BLOCK';
   repeatWeeks?: number;
   /** Defaults to today. */

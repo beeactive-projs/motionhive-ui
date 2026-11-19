@@ -1,13 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonHeader,
   IonIcon,
   IonInfiniteScroll,
@@ -17,7 +16,6 @@ import {
   IonList,
   IonRefresher,
   IonRefresherContent,
-  IonSearchbar,
   IonSegment,
   IonSegmentButton,
   IonSkeletonText,
@@ -29,43 +27,52 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { AuthStore, DiscoverGroup, Post, displayName, formatRelativeShort } from 'core';
+import { AuthStore, GroupWithMyRole, PendingGroupInvitation, Post, displayName } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
-import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
-import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
+import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
+import { StaleBar } from '../../_shared/components/stale-bar/stale-bar';
+import { FeedbackService } from '../../_shared/services/feedback.service';
 import { GROUP_AVATAR_TONE } from '../../_shared/utils/avatar-tone.utils';
-import { PostGallery } from './_components/post-gallery/post-gallery';
+import { GroupInviteCard } from './_components/group-invite-card/group-invite-card';
+import { PostCard } from './_components/post-card/post-card';
+import { PostActions } from './_sheets/post-actions/post-actions';
+import { PostPermissions, postActions } from './_sheets/post-actions/post-actions.config';
+import {
+  canDeletePost,
+  canEditPost,
+  groupRowLine,
+  manageTabFor,
+  waitingCount,
+  waitingLine,
+} from './groups.config';
+import { GroupsSegments } from './groups.filters';
 import { GROUP_ICONS } from './groups.icons';
-import { GroupsSegments, MIN_SEARCH_LENGTH } from './groups.filters';
 import { GroupsStore } from './groups.store';
-import { PostWorkoutCard } from './_components/post-workout/post-workout';
 
 /**
- * The Groups hub: what's happening, what you could join, what you're in.
+ * Groups home: what is happening in your groups, and the groups themselves.
  *
- * Feed is the landing lens — every post from every group you belong to, in
- * one stream, because the reason to open this tab is usually to read rather
- * than to administer. Discover is the public directory, searched server-side.
- * Your groups is the list you act on: open one, or create one.
- *
- * Unlike the Clients tab, the three lenses are three different requests, so
- * only the one on screen loads; see `GroupsStore`.
+ * Feed is the landing lens, every post from every group you are in, with
+ * the work waiting on you ("Needs you") above it, because the reason to open
+ * Groups is usually to read, and for a coach to answer. Your groups lists
+ * the groups you run, then the ones you joined. Invitations sit on top of
+ * both. Finding a group is the Discover tab's job, so there is no search or
+ * directory here (design 2026-11-14).
  */
 @Component({
   selector: 'mh-groups',
   imports: [
-    PostWorkoutCard,
     EmptyState,
+    GroupInviteCard,
     HexAvatar,
     IonBackButton,
+    IonBadge,
     IonButton,
     IonButtons,
     IonContent,
-    IonFab,
-    IonFabButton,
     IonHeader,
     IonIcon,
     IonInfiniteScroll,
@@ -73,18 +80,18 @@ import { PostWorkoutCard } from './_components/post-workout/post-workout';
     IonItem,
     IonLabel,
     IonList,
-    IonRefresher,
+      IonRefresher,
     IonRefresherContent,
-    IonSearchbar,
     IonSegment,
     IonSegmentButton,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
     NotificationBell,
-    PostGallery,
-    SearchbarAutofocusDirective,
-    SearchbarLabelDirective,
+    PostActions,
+    PostCard,
+    RowSkeleton,
+    StaleBar,
     TranslatePipe,
   ],
   templateUrl: './groups.html',
@@ -95,153 +102,215 @@ export class Groups implements ViewWillEnter {
   readonly store = inject(GroupsStore);
   private readonly _router = inject(Router);
   private readonly _authStore = inject(AuthStore);
+  private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
 
+  private readonly _postActions = viewChild(PostActions);
+
   readonly Segments = GroupsSegments;
-  readonly minSearchLength = MIN_SEARCH_LENGTH;
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly groupTone = GROUP_AVATAR_TONE;
 
-  /**
-   * Search owns the whole toolbar while it is open — a title, two actions
-   * and a segment do not fit above the fold on a phone. Same treatment as
-   * the clients directory and the inbox.
-   *
-   * It belongs to Discover alone: the feed is a post stream nobody searches
-   * by group name, and Your groups is short enough to read. Opening it from
-   * another lens switches to Discover rather than taking a term that would
-   * change nothing.
-   */
-  readonly searchOpen = signal(false);
-
   readonly isFeed = computed(() => this.store.segment() === GroupsSegments.Feed);
-  readonly isDiscover = computed(() => this.store.segment() === GroupsSegments.Discover);
-  readonly isMine = computed(() => this.store.segment() === GroupsSegments.Mine);
 
   /**
-   * Only a coach is offered "create a group" — the API's create route carries
-   * `@Roles('INSTRUCTOR')`, so the FAB would 403 for everyone else.
+   * Only a coach is offered "create a group": the API's create route carries
+   * `@Roles('INSTRUCTOR')`, so the "+" would 403 for everyone else.
    */
   readonly canCreate = computed(() => this._authStore.isInstructor());
 
-  /** The floor only bites on Discover, the one lens that searches the API. */
-  readonly showSearchHint = computed(() => this.store.queryTooShort());
-
-  /**
-   * What a screen reader is told once a search settles. Nothing on screen
-   * says it otherwise: the list simply becomes shorter. Empty while a term
-   * is still on its way, because announcing a count over a list about to be
-   * replaced is worse than saying nothing.
-   */
-  readonly resultAnnouncement = computed(() => {
-    if (!this.isDiscover() || !this.store.query().trim()) return '';
-    if (!this.store.searchSettled() || this.store.showSkeleton()) return '';
-
-    const count = this.store.discover().length;
-    if (count === 0) return this._translateService.instant('groups.list.announce.none');
-    return this._translateService.instant('groups.list.announce.count', { count });
+  private readonly _viewerId = computed(() => {
+    const user = this._authStore.user();
+    if (!user) {
+      return '';
+    }
+    return user.id;
   });
 
-  /**
-   * Whether the viewer already has a request in on this group. The status is
-   * a bare union on the model with no const object behind it, so the literal
-   * is pinned here rather than written into the template.
-   */
-  hasPendingRequest(group: DiscoverGroup): boolean {
-    return group.myJoinRequestStatus === 'PENDING';
-  }
-
-  /**
-   * "now", "4h", "yesterday" — the same short form the inbox uses. A feed is
-   * read by how recent something is, not by the clock time it was posted at.
-   */
-  postedAt(iso: string): string {
-    return formatRelativeShort(iso);
-  }
+  /** The invitation being answered, and how, so its card can spin. */
+  readonly answering = signal<{ id: string; how: 'join' | 'later' } | null>(null);
 
   constructor() {
     addIcons(GROUP_ICONS);
   }
 
   // Not ngOnInit: Ionic keeps the page alive in the tab stack. A group joined,
-  // left or posted in elsewhere changes these lists, so entering refetches —
-  // quietly, since rows already on screen stay put. `reenter` holds that back
-  // for a few seconds so stepping into a group and straight back out does not
-  // re-fire the list for data seconds old.
+  // left or posted in elsewhere changes these lists, so entering refetches,
+  // quietly, since rows already on screen stay put.
   ionViewWillEnter(): void {
     this.store.reenter();
-    // "All groups" from Discover lands on Discover's lens here. Read off the
-    // live URL, not a route snapshot: this page stays alive across visits.
+    // Read off the live URL, not a route snapshot: this page stays alive.
     const segment = this._router.parseUrl(this._router.url).queryParamMap.get('segment');
-    if (segment) this.setSegment(segment);
+    if (segment) {
+      this.setSegment(segment);
+    }
   }
 
   setSegment(value: string | number | undefined): void {
-    if (
-      value !== GroupsSegments.Feed &&
-      value !== GroupsSegments.Discover &&
-      value !== GroupsSegments.Mine
-    ) {
+    if (value !== GroupsSegments.Feed && value !== GroupsSegments.Mine) {
       return;
-    }
-    // Leaving Discover leaves its term behind: coming back to a list silently
-    // narrowed by something typed minutes ago reads as a broken directory.
-    if (value !== GroupsSegments.Discover && this.store.query()) {
-      this.searchOpen.set(false);
-      this.store.clearQuery();
     }
     this.store.setSegment(value);
   }
 
-  /** Searching means searching the directory, so go there first. */
-  openSearch(): void {
-    if (!this.isDiscover()) this.store.setSegment(GroupsSegments.Discover);
-    this.searchOpen.set(true);
+  // ── Invitations ────────────────────────────────────────────────────────
+
+  answeringHow(invitation: PendingGroupInvitation): 'join' | 'later' | null {
+    const current = this.answering();
+    if (!current || current.id !== invitation.id) {
+      return null;
+    }
+    return current.how;
   }
 
-  closeSearch(): void {
-    this.searchOpen.set(false);
-    this.store.clearQuery();
-  }
-
-  onQuery(value: string): void {
-    this.store.setQuery(value);
-  }
-
-  /**
-   * A group you are in opens its own page. A Discover row does not: that
-   * page is members-only and answers a non-member with 403, so those go to
-   * the preview, which is the only screen that can offer a way in.
-   */
-  openGroup(groupId: string): void {
-    void this._router.navigate(['/tabs/groups', groupId]);
-  }
-
-  openDiscovered(groupId: string): void {
-    void this._router.navigate(['/tabs/groups/preview', groupId]);
-  }
-
-  openPost(postId: string): void {
-    void this._router.navigate(['/tabs/groups/post', postId]);
-  }
-
-  /** Straight to the viewer, skipping the post — the tap was on a photo. */
-  openPhoto(postId: string, index: number): void {
-    void this._router.navigate(['/tabs/groups/post', postId, 'photos'], {
-      queryParams: { index },
+  joinInvitation(invitation: PendingGroupInvitation): void {
+    if (this.answering()) {
+      return;
+    }
+    this.answering.set({ id: invitation.id, how: 'join' });
+    this.store.acceptInvitation(invitation).subscribe({
+      next: () => {
+        this.answering.set(null);
+        void this._feedbackService.success(
+          this._translateService.instant('groups.invite.toast.joined', {
+            group: invitation.group.name,
+          }),
+        );
+      },
+      error: (error: unknown) => {
+        this.answering.set(null);
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.invite.toast.joinFailed'),
+        );
+      },
     });
   }
 
-  authorNameOf(post: Post): string {
-    return displayName(post.author, this._translateService.instant('groups.common.member'));
+  /** Here the quiet verb is Decline: Groups is where an invitation is answered. */
+  declineInvitation(invitation: PendingGroupInvitation): void {
+    if (this.answering()) {
+      return;
+    }
+    this.answering.set({ id: invitation.id, how: 'later' });
+    this.store.declineInvitation(invitation).subscribe({
+      next: () => {
+        this.answering.set(null);
+        void this._feedbackService.success(
+          this._translateService.instant('groups.invite.toast.declined'),
+        );
+      },
+      error: (error: unknown) => {
+        this.answering.set(null);
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.invite.toast.declineFailed'),
+        );
+      },
+    });
+  }
+
+  // ── Needs you and Your groups ──────────────────────────────────────────
+
+  waitingLine(group: GroupWithMyRole): string {
+    return waitingLine(group);
+  }
+
+  waitingCount(group: GroupWithMyRole): number {
+    return waitingCount(group);
+  }
+
+  rowLine(group: GroupWithMyRole): string {
+    let ownerName = '';
+    if (group.owner) {
+      ownerName = displayName(group.owner, '');
+    }
+    return groupRowLine(group, ownerName);
+  }
+
+  /** A Needs you row opens the queue with something in it. */
+  openQueue(group: GroupWithMyRole): void {
+    void this._router.navigate(['/tabs/groups', group.id, 'manage'], {
+      queryParams: { tab: manageTabFor(group) },
+    });
+  }
+
+  openGroup(groupId: string): void {
+    void this._router.navigate(['/tabs/groups', groupId]);
   }
 
   createGroup(): void {
     void this._router.navigateByUrl('/tabs/groups/create');
   }
 
+  /** Finding a group is the Discover tab's job; its "Groups to join" is there. */
   discoverGroups(): void {
-    this.store.setSegment(GroupsSegments.Discover);
+    void this._router.navigateByUrl('/tabs/discover/groups');
+  }
+
+  // ── Feed posts ─────────────────────────────────────────────────────────
+
+  groupNameOf(post: Post): string | null {
+    if (!post.group) {
+      return null;
+    }
+    return post.group.name;
+  }
+
+  private _permissionsFor(post: Post): PostPermissions {
+    const viewerId = this._viewerId();
+    const role = this.store.roleByGroup().get(post.groupId) ?? null;
+    return {
+      canEdit: canEditPost(viewerId, post.authorId),
+      canDelete: canDeletePost(role, viewerId, post.authorId),
+    };
+  }
+
+  hasPostActions(post: Post): boolean {
+    return postActions(post, this._permissionsFor(post)).length > 0;
+  }
+
+  openPostActions(post: Post): void {
+    const sheet = this._postActions();
+    if (sheet) {
+      sheet.show(post, this._permissionsFor(post));
+    }
+  }
+
+  onPostUpdated(post: Post): void {
+    this.store.patchPost(post);
+  }
+
+  onPostDeleted(postId: string): void {
+    this.store.removePost(postId);
+  }
+
+  like(post: Post): void {
+    this.store.toggleReaction(post).subscribe({
+      error: (error: unknown) =>
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.post.toast.reactionFailed'),
+        ),
+    });
+  }
+
+  openPost(postId: string): void {
+    void this._router.navigate(['/tabs/groups/post', postId]);
+  }
+
+  /** Comment opens the post with the field ready, as Reply does. */
+  commentOn(postId: string): void {
+    void this._router.navigate(['/tabs/groups/post', postId], {
+      queryParams: { comment: 1 },
+    });
+  }
+
+  /** Straight to the viewer, skipping the post: the tap was on a photo. */
+  openPhoto(postId: string, index: number): void {
+    void this._router.navigate(['/tabs/groups/post', postId, 'photos'], {
+      queryParams: { index },
+    });
   }
 
   onRefresh(event: RefresherCustomEvent): void {
@@ -250,32 +319,17 @@ export class Groups implements ViewWillEnter {
 
   /**
    * A refresh that fails leaves the rows that were already there, which is
-   * right — but silently, they read as fresh. The stale bar says so and
-   * offers the retry; no toast on top of it, since the store's loads are
-   * silent for exactly that reason.
+   * right, but silently they read as fresh. The stale bar says so and offers
+   * the retry.
    */
   retry(): void {
     this.store.refresh();
   }
 
   onLoadMore(event: InfiniteScrollCustomEvent): void {
-    const done = () => void event.target.complete();
-    if (this.isFeed()) {
-      this.store.loadMoreFeed(done);
-      return;
-    }
-    if (this.isDiscover()) {
-      this.store.loadMoreDiscover(done);
-      return;
-    }
-    // Your groups is one unpaged response; there is never a second page.
-    done();
+    this.store.loadMoreFeed(() => void event.target.complete());
   }
 
-  /** Whether the lens on screen can page at all. */
-  readonly hasMore = computed(() => {
-    if (this.isFeed()) return this.store.feedHasMore();
-    if (this.isDiscover()) return this.store.discoverHasMore();
-    return false;
-  });
+  /** Only the feed pages; Your groups is one response. */
+  readonly hasMore = computed(() => this.isFeed() && this.store.feedHasMore());
 }

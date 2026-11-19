@@ -46,3 +46,10 @@ ion-item.current ion-label {
 .count {
   font-variant-numeric: tabular-nums;
 }
+
+/* Written by a person, so their line breaks are kept. */
+.coach-note p {
+  margin: 0.25rem 0 0;
+  white-space: pre-line;
+  color: var(--ion-text-color);
+}

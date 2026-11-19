@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, model, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, model, signal, untracked, viewChild } from '@angular/core';
 import {
   IonInput,
   IonItem,
@@ -12,6 +12,7 @@ import { take } from 'rxjs';
 
 import { InstructorProfile, ProfileService, UpdateInstructorProfilePayload, normalizeUrl } from 'core';
 
+import { ChipInput } from '../../../../_shared/components/chip-input/chip-input';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { SocialLinksFields } from '../../../../_shared/components/social-links-fields/social-links-fields';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
@@ -20,17 +21,21 @@ import { AccountStore } from '../../account.store';
 const DISPLAY_NAME_MAX_LENGTH = 100;
 const BIO_MAX_LENGTH = 4000;
 const MAX_YEARS_OF_EXPERIENCE = 50;
+/** Room for the welcome flow's ten words and more of the coach's own. */
+const MAX_SPECIALIZATIONS = 20;
+const SPECIALIZATION_MAX_LENGTH = 60;
 
 /**
  * The instructor-profile fields, in one sheet.
  *
- * Specializations are a comma-separated string here rather than a chip editor —
- * that is how web collects them too, and it keeps the sheet to a single column
- * of plain inputs.
+ * Specializations are chips, as the profile shows them: the same field as the
+ * welcome flow's "Anything else?" (type one, + or return adds it, tap a chip
+ * to remove it). A word typed and not yet added goes in on Save.
  */
 @Component({
   selector: 'mh-coaching-sheet',
   imports: [
+    ChipInput,
     IonInput,
     IonItem,
     IonLabel,
@@ -54,7 +59,7 @@ export class CoachingSheet {
 
   readonly displayName = signal('');
   readonly bio = signal('');
-  readonly specializations = signal('');
+  readonly specializations = signal<string[]>([]);
   readonly yearsOfExperience = signal<number | null>(null);
   readonly isAcceptingClients = signal(false);
   readonly showSocialLinks = signal(false);
@@ -64,6 +69,10 @@ export class CoachingSheet {
   readonly displayNameMaxLength = DISPLAY_NAME_MAX_LENGTH;
   readonly bioMaxLength = BIO_MAX_LENGTH;
   readonly maxYears = MAX_YEARS_OF_EXPERIENCE;
+  readonly maxSpecializations = MAX_SPECIALIZATIONS;
+  readonly specializationMaxLength = SPECIALIZATION_MAX_LENGTH;
+
+  private readonly _specializationsField = viewChild(ChipInput);
 
   readonly canSave = computed(() => this.displayName().trim().length > 0);
 
@@ -74,7 +83,11 @@ export class CoachingSheet {
       const profile = untracked(() => this._accountStore.instructorProfile());
       this.displayName.set(profile?.displayName ?? '');
       this.bio.set(profile?.bio ?? '');
-      this.specializations.set((profile?.specializations ?? []).join(', '));
+      let specializations: string[] = [];
+      if (profile && profile.specializations) {
+        specializations = [...profile.specializations];
+      }
+      this.specializations.set(specializations);
       this.yearsOfExperience.set(profile?.yearsOfExperience ?? null);
       this.isAcceptingClients.set(profile?.isAcceptingClients ?? false);
       this.showSocialLinks.set(profile?.showSocialLinks ?? false);
@@ -84,7 +97,16 @@ export class CoachingSheet {
 
   save(): void {
     const profile = this._accountStore.instructorProfile();
-    if (!profile) return;
+    if (!profile) {
+      return;
+    }
+    // A specialization typed and not yet added goes in with the rest; one
+    // that cannot (too long, no room) stays in the field with the line
+    // saying why, and the sheet stays open.
+    const field = this._specializationsField();
+    if (field && !field.commit()) {
+      return;
+    }
 
     const patch = this._diff(profile);
     if (Object.keys(patch).length === 0) {
@@ -129,10 +151,7 @@ export class CoachingSheet {
     const bio = this.bio().trim();
     if (bio !== (profile.bio ?? '')) patch.bio = bio;
 
-    const specializations = this.specializations()
-      .split(',')
-      .map((entry) => entry.trim())
-      .filter(Boolean);
+    const specializations = this.specializations();
     if (specializations.join('|') !== (profile.specializations ?? []).join('|')) {
       patch.specializations = specializations;
     }

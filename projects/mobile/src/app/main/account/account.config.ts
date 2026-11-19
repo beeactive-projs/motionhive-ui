@@ -1,4 +1,5 @@
-import { SocialPlatformKey } from 'core';
+import { OnboardingSteps, SocialPlatformKey } from 'core';
+import type { OnboardingStep } from 'core';
 import {
   alertCircleOutline,
   atOutline,
@@ -9,6 +10,7 @@ import {
   checkmarkCircle,
   closeOutline,
   colorPaletteOutline,
+  compassOutline,
   copyOutline,
   eyeOutline,
   globeOutline,
@@ -25,11 +27,14 @@ import {
   logOutOutline,
   mailOutline,
   openOutline,
+  peopleOutline,
   personOutline,
   qrCodeOutline,
   shareSocialOutline,
   timeOutline,
   trashOutline,
+  trophyOutline,
+  warningOutline,
 } from 'ionicons/icons';
 
 import { CATEGORY_ICONS } from '../../_shared/config/notification-categories.config';
@@ -51,6 +56,7 @@ export const ACCOUNT_ICONS = {
   checkmarkCircle,
   closeOutline,
   colorPaletteOutline,
+  compassOutline,
   copyOutline,
   eyeOutline,
   globeOutline,
@@ -67,12 +73,25 @@ export const ACCOUNT_ICONS = {
   logoYoutube,
   mailOutline,
   openOutline,
+  peopleOutline,
   personOutline,
   qrCodeOutline,
   shareSocialOutline,
   timeOutline,
   trashOutline,
+  trophyOutline,
+  warningOutline,
 };
+
+/** The welcome flow's own screens the Profile card opens, as editors. */
+export const ACCOUNT_WELCOME_STEPS = {
+  /** What you coach. */
+  coachCategories: [OnboardingSteps.CoachCategories],
+  /** What you like to train, then your level and goals. */
+  interests: [OnboardingSteps.Interests, OnboardingSteps.Level],
+  /** Become a coach: the role question, then the coach's own steps. */
+  role: [OnboardingSteps.Role],
+} as const satisfies Record<string, readonly OnboardingStep[]>;
 
 /** ionicons name for each social platform core knows about. */
 export const SOCIAL_ICONS: Record<SocialPlatformKey, string> = {

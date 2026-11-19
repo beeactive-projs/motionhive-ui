@@ -38,7 +38,8 @@ interface FilterChip<T> extends LabelledOption<T> {
 const MUSCLE_PREVIEW = 8;
 
 /**
- * Narrow the library: kind, level, primary muscle, equipment.
+ * Narrow the library: primary muscle, equipment, level, kind. The exercise
+ * picker uses the first two alone (`muscleAndEquipmentOnly`).
  *
  * Counts come from the same request that filled the list (`withFacets`), so
  * the numbers beside each chip are the catalogue's, not a guess. They follow
@@ -66,6 +67,12 @@ export class ExerciseFilterSheet {
   /** The rest of the query, so the footer's count matches what Apply will show. */
   readonly ownership = input<ExerciseOwnershipFilter>(ExerciseOwnershipFilter.All);
   readonly search = input('');
+  /**
+   * Muscles and equipment, without level, kind and the web-only note: the
+   * picker's sheet, where the question mid-workout is what a movement trains
+   * and what it needs.
+   */
+  readonly muscleAndEquipmentOnly = input(false);
 
   readonly applied = output<ExerciseFilters>();
 

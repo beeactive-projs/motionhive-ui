@@ -46,6 +46,7 @@ import { FeedbackService } from '../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { ProfileStacks, groupLinks, stackRootOf } from '../../_shared/utils/stack-paths';
+import { ViewPhotoDirective } from '../../_shared/directives/view-photo.directive';
 import { ProfileWorkoutRow } from './_components/profile-workout-row/profile-workout-row';
 import { ReportWorkoutSheet } from './_sheets/report-workout-sheet/report-workout-sheet';
 import { RequestCoachSheet } from './_sheets/request-coach-sheet/request-coach-sheet';
@@ -103,6 +104,7 @@ type WorkoutActionId = 'report';
     ReportWorkoutSheet,
     RequestCoachSheet,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './person.html',
   styleUrl: './person.scss',

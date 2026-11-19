@@ -29,6 +29,8 @@
   },
   "auth": {
     "common": {
+      "appleFailed": "Autentificarea cu Apple a eșuat. Încearcă din nou.",
+      "continueWithApple": "Continuă cu Apple",
       "continueWithGoogle": "Continuă cu Google",
       "createOneFree": "Creează unul gratuit",
       "emailAddress": "Adresă de email",
@@ -330,7 +332,7 @@
       "AMRAP": "AMRAP",
       "CLUSTER": "Cluster",
       "DROPSET": "Drop set",
-      "FAILURE": "Până la cedare",
+      "FAILURE": "Până la epuizare",
       "NORMAL": "Normală",
       "REST_PAUSE": "Rest-pause",
       "WARMUP": "Încălzire",

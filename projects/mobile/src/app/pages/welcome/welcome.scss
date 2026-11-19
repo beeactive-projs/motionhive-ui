@@ -1,0 +1,127 @@
+/* The stepped form's frame (step count, marks, Back beside the way on, the
+   picked tile) is shared with the new exercise form: `.mh-step-*` and
+   `.mh-pick-tile` in layout.css. */
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding-block: 3rem;
+}
+
+.loading.small {
+  padding-block: 1rem;
+}
+
+/* The question is the page's one heading; the line under it says why we ask. */
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding-block-start: 0.5rem;
+}
+
+.intro h1 {
+  margin: 0;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+}
+
+/* A pick among a few: whole-width cards, the words beside the tile. */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--mh-tap-target);
+  padding: 0.875rem;
+}
+
+.choice.compact {
+  padding-block: 0.75rem;
+}
+
+.choice-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.choice .label {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.choice .detail {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
+}
+
+.choice .check {
+  flex-shrink: 0;
+  color: var(--ion-color-primary-wash-contrast);
+  font-size: var(--mh-icon-sm);
+}
+
+.choice.on .detail {
+  color: var(--ion-color-primary-wash-contrast);
+}
+
+/* Several of many: two to a row, the glyph over the name. */
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  min-height: 4.5rem;
+  padding: 0.75rem;
+}
+
+.tile ion-icon {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-icon-sm);
+}
+
+.tile .label {
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  line-height: var(--mh-leading-tight);
+}
+
+.tile.on ion-icon,
+.tile.on .label {
+  color: var(--ion-color-primary-wash-contrast);
+}
+
+/* The bar takes the page gutter, so Continue sits flush with the cards. */
+ion-footer ion-toolbar {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0.25rem;
+  --padding-bottom: 0.5rem;
+}
+
+.mh-cta-bar {
+  padding-inline: var(--mh-page-gutter);
+}
+
+.mh-step-dots {
+  padding-block: 0.25rem;
+}

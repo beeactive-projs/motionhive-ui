@@ -447,12 +447,18 @@ export interface ClientActionTile {
  * client's page. Honey goes to the action that fits, else to Message.
  */
 export function clientActions(
-  client: Pick<RosterClient, 'activePlans'>,
+  client: Pick<RosterClient, 'activePlans' | 'pausedPlans'>,
   planEndsSoon: boolean,
   t: Translate,
 ): ClientActionTile[] {
-  const fits: ClientAction | null =
-    client.activePlans === 0 ? ClientActions.Assign : planEndsSoon ? ClientActions.OpenPlan : null;
+  // A paused plan is a plan: the coach resumes it rather than assigning another.
+  const paused = client.pausedPlans ?? 0;
+  let fits: ClientAction | null = null;
+  if (client.activePlans === 0 && paused === 0) {
+    fits = ClientActions.Assign;
+  } else if (planEndsSoon) {
+    fits = ClientActions.OpenPlan;
+  }
   const tiles: ClientActionTile[] = [
     {
       id: ClientActions.Message,

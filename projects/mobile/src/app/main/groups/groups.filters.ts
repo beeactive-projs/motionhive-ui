@@ -11,7 +11,6 @@ import { GroupMember, displayName, foldedIncludes } from 'core';
 /** The hub's three lenses, mirroring web's Feed · Discover · Your groups. */
 export const GroupsSegments = {
   Feed: 'feed',
-  Discover: 'discover',
   Mine: 'mine',
 } as const;
 
@@ -26,15 +25,6 @@ export const GroupTabs = {
 
 export type GroupTab = (typeof GroupTabs)[keyof typeof GroupTabs];
 
-/**
- * The shortest term Discover is asked to search on.
- *
- * Unlike the clients directory the API has no floor of its own here, so this
- * is ours: a single character is a request per keystroke for a result set
- * nobody can read. Below it the typed term narrows the loaded rows in memory
- * instead.
- */
-export const MIN_SEARCH_LENGTH = 2;
 
 /**
  * Member search. Email is owner-only on screen but searched for everyone who

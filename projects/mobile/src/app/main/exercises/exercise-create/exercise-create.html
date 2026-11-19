@@ -9,7 +9,7 @@
     </ion-buttons>
     <ion-title>{{ 'exercises.create.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <span class="mh-kicker step-count">
+      <span class="mh-kicker mh-step-count">
         {{ 'exercises.create.stepOf' | translate: { step: step(), total: steps.length } }}
       </span>
     </ion-buttons>
@@ -46,7 +46,7 @@
            un-presses its neighbour is the wrong story for a screen reader. -->
       <div class="kind-grid" role="radiogroup" [attr.aria-label]="'exercises.fields.kind' | translate">
         @for (card of kindCards; track card.value) {
-        <button type="button" role="radio" class="kind" [class.on]="form.draft().kind === card.value"
+        <button type="button" role="radio" class="kind mh-pick-tile" [class.on]="form.draft().kind === card.value"
           [attr.aria-checked]="form.draft().kind === card.value" (click)="selectKind(card.value)">
           <ion-icon [name]="card.icon" aria-hidden="true" />
           <span class="label">{{ card.label }}</span>
@@ -79,12 +79,12 @@
   <ion-toolbar>
     <!-- Where you are, in the one place a phone has room for it. Decorative:
          the header already says "Step 2 of 3" in words. -->
-    <div class="dots" aria-hidden="true">
+    <div class="mh-step-dots" aria-hidden="true">
       @for (index of steps; track index) {
       <span [class.on]="index === step()" [class.done]="index < step()"></span>
       }
     </div>
-    <div class="actions" [class.single]="step() === 1">
+    <div class="mh-step-actions" [class.single]="step() === 1">
       @if (step() > 1) {
       <ion-button fill="outline" color="medium" [disabled]="saving()" (click)="back()">
         {{ 'button.back' | translate }}

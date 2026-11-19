@@ -77,9 +77,9 @@
             </button>
             }
             @if (c.status === Statuses.Archived) {
-            <button pButton type="button" severity="success" fluid (click)="confirmUnarchive()">
-              <i class="pi pi-inbox"></i>
-              {{ 'clients.profile.actions.unarchive' | translate }}
+            <button pButton type="button" severity="success" fluid (click)="confirmInviteAgain()">
+              <i class="pi pi-user-plus"></i>
+              {{ 'clients.profile.actions.inviteAgain' | translate }}
             </button>
             }
           </div>

@@ -32,6 +32,8 @@ import {
   DirectoryRequest,
   NO_SHEET_FILTERS,
   backHrefFrom,
+  categoriesFromUrl,
+  coachesTopicUrl,
   directoryParams,
   filterFromUrl,
   matchesCoachQuery,
@@ -416,7 +418,7 @@ describe('directoryParams', () => {
       directoryRequest({
         sheet: {
           sort: CoachDirectorySorts.Experience,
-          specializations: ['Yoga', 'Forță'],
+          categoryIds: ['cat-yoga', 'cat-strength'],
           city: null,
           minYears: 5,
         },
@@ -424,7 +426,7 @@ describe('directoryParams', () => {
     );
     expect(params).toMatchObject({
       sort: CoachDirectorySorts.Experience,
-      specializations: ['Yoga', 'Forță'],
+      categoryIds: ['cat-yoga', 'cat-strength'],
       minYears: 5,
     });
     expect(narrowsDirectory(params)).toBe(true);
@@ -456,7 +458,7 @@ describe('the filter sheet', () => {
     expect(
       sheetFilterCount({
         sort: CoachDirectorySorts.Name,
-        specializations: ['Yoga', 'Pilates'],
+        categoryIds: ['cat-yoga', 'cat-pilates'],
         city: 'Cluj-Napoca',
         minYears: 2,
       }),
@@ -466,6 +468,26 @@ describe('the filter sheet', () => {
   it('tells a reorder apart from a narrowing', () => {
     expect(sheetNarrows({ ...NO_SHEET_FILTERS, sort: CoachDirectorySorts.Name })).toBe(false);
     expect(sheetNarrows({ ...NO_SHEET_FILTERS, minYears: 5 })).toBe(true);
+    expect(sheetNarrows({ ...NO_SHEET_FILTERS, categoryIds: ['cat-yoga'] })).toBe(true);
+  });
+});
+
+describe('a topic passed in from Discover', () => {
+  it('opens Online on its chip and a topic on its categories', () => {
+    expect(coachesTopicUrl({ categoryIds: null, online: true })).toBe(
+      `${COACHES_URL}?filter=online`,
+    );
+    const url = coachesTopicUrl({ categoryIds: ['cat-yoga', 'cat-run'], online: false });
+    expect(url).toBe(`${COACHES_URL}?categories=cat-yoga,cat-run`);
+    expect(categoriesFromUrl(url)).toEqual(['cat-yoga', 'cat-run']);
+    expect(coachesTopicUrl({ categoryIds: null, online: false })).toBe(COACHES_URL);
+  });
+
+  it('reads categories only from this screen, once each', () => {
+    expect(categoriesFromUrl(`${COACHES_URL}?categories=a,,b,a`)).toEqual(['a', 'b']);
+    expect(categoriesFromUrl(`${COACHES_URL}?categories=`)).toBeNull();
+    expect(categoriesFromUrl(`${COACHES_URL}?filter=yours`)).toBeNull();
+    expect(categoriesFromUrl('/tabs/discover?categories=a')).toBeNull();
   });
 });
 

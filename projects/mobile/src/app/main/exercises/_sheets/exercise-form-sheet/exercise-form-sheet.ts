@@ -3,9 +3,8 @@ import {
   IonButton,
   IonIcon,
   IonInput,
-  IonItem,
-  IonList,
   IonNote,
+  IonSpinner,
   IonTextarea,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -37,7 +36,6 @@ import {
   equipmentChip,
   featuredFirst,
   kindIcon,
-  kindTone,
   muscleChip,
   toggleCapped,
   trackLabel,
@@ -80,9 +78,8 @@ const EQUIPMENT_PREVIEW = FEATURED_EQUIPMENT_SLUGS.length;
     IonButton,
     IonIcon,
     IonInput,
-    IonItem,
-    IonList,
     IonNote,
+    IonSpinner,
     IonTextarea,
     SheetShell,
     TranslatePipe,
@@ -145,11 +142,14 @@ export class ExerciseFormSheet {
     () => !this.loading() && !this.loadFailed() && !this.preparingPicture() && this.form.isValid(),
   );
 
-  /** The four "What do you track?" tiles, wearing their kind's tile as the list rows do. */
+  /**
+   * The four "What do you track?" tiles: the kind's glyph and the words. No
+   * hue of their own, as on the coach's kind grid: the honey of the picked
+   * tile is the one colour on them.
+   */
   readonly trackTiles = SIMPLE_KINDS.map((kind) => ({
     value: kind,
     icon: kindIcon(kind),
-    color: kindTone(kind),
     get label() {
       return trackLabel(kind);
     },

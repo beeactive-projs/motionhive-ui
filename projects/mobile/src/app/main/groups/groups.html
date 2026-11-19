@@ -1,29 +1,3 @@
-@if (searchOpen()) {
-<!-- Search owns the toolbar: a title, two actions and a three-way segment do
-     not fit above the fold on a phone. Same as the clients directory. -->
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <!-- Debounced: this is a request per term, not a filter over loaded
-         rows. Named, because a searchbar with only a placeholder announces
-         itself as Ionic's default "search text". -->
-    <ion-searchbar searchIcon="search-outline" clearIcon="close-outline" mhAutofocus [placeholder]="'groups.list.search' | translate"
-      [attr.aria-label]="'groups.list.search' | translate" inputmode="search"
-      [debounce]="300" [value]="store.query()" (ionInput)="onQuery($event.detail.value ?? '')" />
-    <ion-buttons slot="end">
-      <ion-button class="cancel" (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <ion-toolbar class="scope-bar">
-    <!-- The box took the segment with it, so this says which list is under
-         it. Searching only ever means the directory. -->
-    <div class="scope"><span class="where">{{ 'groups.list.segments.discover' | translate }}</span></div>
-    @if (showSearchHint()) {
-    <p class="hint">{{ 'groups.list.searchHint' | translate: { count: minSearchLength } }}</p>
-    }
-  </ion-toolbar>
-</ion-header>
-} @else {
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -32,9 +6,14 @@
     <ion-title>{{ 'nav.groups' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell class="round" />
-      <ion-button shape="round" [attr.aria-label]="'groups.list.search' | translate" (click)="openSearch()">
-        <ion-icon slot="icon-only" name="search-outline" />
+      @if (canCreate()) {
+      <!-- The honey "+" of every root screen, in place of a floating button
+           that sat on the newest post. -->
+      <ion-button class="round" shape="round" fill="solid" color="primary"
+        [attr.aria-label]="'groups.list.createGroup' | translate" (click)="createGroup()">
+        <ion-icon slot="icon-only" name="add-outline" />
       </ion-button>
+      }
     </ion-buttons>
   </ion-toolbar>
 
@@ -44,10 +23,6 @@
         <ion-icon name="newspaper-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.list.segments.feed' | translate }}</ion-label>
       </ion-segment-button>
-      <ion-segment-button [value]="Segments.Discover">
-        <ion-icon name="compass-outline" aria-hidden="true" />
-        <ion-label>{{ 'groups.list.segments.discover' | translate }}</ion-label>
-      </ion-segment-button>
       <ion-segment-button [value]="Segments.Mine">
         <ion-icon name="people-outline" aria-hidden="true" />
         <ion-label>{{ 'groups.list.segments.mine' | translate }}</ion-label>
@@ -55,40 +30,41 @@
     </ion-segment>
   </ion-toolbar>
 </ion-header>
-}
 
-<ion-content [fullscreen]="true">
-  <!-- The toolbar shows the page's name but `ion-title` is not a heading, so
-       a screen reader had nothing to land on and the outline began at h2. -->
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <!-- `ion-title` is not a heading, so a screen reader had nothing to land
+       on and the outline began at h2. -->
   <h1 class="mh-visually-hidden">{{ 'nav.groups' | translate }}</h1>
-
-  <!-- A search is silent otherwise: the list simply becomes shorter. -->
-  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
 
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
 
   @if (store.isStale()) {
-  <!-- A status, so neutral-semantic rather than honey. It sits above every
-       lens because any of them can be the stale one. -->
-  <div class="stale" role="status">
-    <div class="stale-bar">
-      <ion-icon name="cloud-offline-outline" aria-hidden="true" />
-      <span>{{ 'error.staleData' | translate }}</span>
-      <ion-button size="small" fill="clear" (click)="retry()">{{ 'button.tryAgain' | translate }}</ion-button>
-    </div>
+  <mh-stale-bar (retry)="retry()" />
+  }
+
+  @if (store.invitations().length > 0) {
+  <!-- Waiting on the reader, so above both lenses: the invite notification
+       opens this page. -->
+  <div class="mh-page invites">
+    @for (invitation of store.invitations(); track invitation.id) {
+    <mh-group-invite-card [invitation]="invitation" laterLabel="button.decline"
+      [answering]="answeringHow(invitation)" (join)="joinInvitation(invitation)"
+      (later)="declineInvitation(invitation)" />
+    }
   </div>
   }
+
   @if (store.showLoadError()) {
   <mh-empty-state icon="alert-circle-outline" [heading]="'groups.list.loadError' | translate"
     [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
     (action)="retry()" />
   } @else if (store.showSkeleton()) {
   <!-- Mirrors the shape below it so nothing shifts when data lands: cards on
-       the feed, rows on the two group lists. -->
+       the feed, rows on Your groups. -->
+  @if (isFeed()) {
   <div class="mh-page" aria-busy="true">
-    @if (isFeed()) {
     @for (_ of skeletonRows; track $index) {
     <article class="post-skeleton">
       <div class="post-skeleton-head">
@@ -102,27 +78,43 @@
       <ion-skeleton-text [animated]="true" style="width: 70%; height: 0.75rem" />
     </article>
     }
-    } @else {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of skeletonRows; track $index) {
-      <ion-item>
-        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-        </ion-label>
-      </ion-item>
-      }
-    </ion-list>
-    }
   </div>
+  } @else {
+  <ion-list class="mh-flat-list" aria-busy="true">
+    @for (_ of skeletonRows; track $index) {
+    <mh-row-skeleton [index]="$index" />
+    }
+  </ion-list>
+  }
   } @else if (isFeed()) {
-  <div class="mh-page">
+  @if (store.needsYou().length > 0) {
+  <!-- The work waiting on a coach or moderator, before the reading: one row
+       per group, opening the queue with something in it. -->
+  <div class="mh-page needs-you">
+    <section class="mh-section">
+      <h2 class="mh-kicker">{{ 'groups.list.needsYou' | translate }}</h2>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (group of store.needsYou(); track group.id) {
+        <ion-item button [detail]="true" (click)="openQueue(group)">
+          <mh-hex-avatar slot="start" size="md" aria-hidden="true" [color]="groupTone" [name]="group.name"
+            [imageUrl]="group.logoUrl" />
+          <ion-label>
+            <h2>{{ group.name }}</h2>
+            <p>{{ waitingLine(group) }}</p>
+          </ion-label>
+        </ion-item>
+        }
+      </ion-list>
+    </section>
+  </div>
+  }
+
+  <div class="mh-page feed">
     @if (store.isEmpty()) {
     @if (store.myGroupCount() === 0) {
     <!-- Nothing in the feed because there is nothing to feed it. The way out
          differs by role: a coach makes the first group, everyone else finds
-         one. -->
+         one in Discover. -->
     @if (canCreate()) {
     <mh-empty-state icon="people-outline" [heading]="'groups.list.noGroups.title' | translate"
       [message]="'groups.list.noGroups.coachMessage' | translate"
@@ -130,138 +122,92 @@
     } @else {
     <mh-empty-state icon="compass-outline" [heading]="'groups.list.noGroups.title' | translate"
       [message]="'groups.list.noGroups.memberMessage' | translate"
-      [actionLabel]="'groups.list.discoverGroups' | translate"
-      (action)="discoverGroups()" />
+      [actionLabel]="'groups.list.discoverGroups' | translate" (action)="discoverGroups()" />
     }
     } @else {
     <!-- In groups, but nobody has posted in any of them. -->
     <mh-empty-state icon="chatbubble-outline" [heading]="'groups.list.feed.empty.title' | translate"
       [message]="'groups.list.feed.empty.message' | translate"
-      [actionLabel]="'groups.list.feed.seeGroups' | translate"
-      (action)="setSegment(Segments.Mine)" />
+      [actionLabel]="'groups.list.feed.seeGroups' | translate" (action)="setSegment(Segments.Mine)" />
     }
     } @else {
-    <!-- Cards rather than list rows: a post is a block of text with an author
-         above it and counts below, which a row cannot hold. -->
-    @for (post of store.feed(); track post.id) {
-    <article class="post-card" tabindex="0" role="button" [attr.aria-label]="post.author
-        ? ('groups.post.a11y.openBy' | translate: { name: authorNameOf(post) })
-        : ('groups.post.a11y.openByMember' | translate)"
-      (click)="openPost(post.id)" (keydown.enter)="openPost(post.id)" (keydown.space)="openPost(post.id)">
-      @if (post.group) {
-      <!-- Only the cross-group feed populates this; on a group's own feed
-           the group is implicit in the URL. -->
-      <p class="in-group">{{ post.group.name }}</p>
+    <div class="mh-stack">
+      @for (post of store.feed(); track post.id) {
+      <mh-post-card [post]="post" [groupName]="groupNameOf(post)" [showMore]="hasPostActions(post)"
+        (open)="openPost(post.id)" (openPhoto)="openPhoto(post.id, $event)" (like)="like(post)"
+        (comment)="commentOn(post.id)" (more)="openPostActions(post)" />
       }
-      <div class="post-head">
-        <mh-hex-avatar size="md" [name]="post.author ? post.author.firstName + ' ' + post.author.lastName : ''"
-          [imageUrl]="post.author?.avatarUrl ?? null" />
-        <div class="who">
-          <h2>{{ authorNameOf(post) }}</h2>
-          <p>{{ postedAt(post.postedAt) }}</p>
-        </div>
-      </div>
-            @if (post.content) {
-              <p class="post-body">{{ post.content }}</p>
-            }
-            @if (post.workout; as workout) {
-              <mh-post-workout [workout]="workout" [handle]="post.author?.handle" />
-            }
-      @if (post.mediaUrls; as photos) {
-      <mh-post-gallery [urls]="photos" [authorName]="authorNameOf(post)"
-        (openPhoto)="openPhoto(post.id, $event)" />
-      }
-
-      <div class="post-meta">
-        <span>
-          <ion-icon [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'"
-            [class.reacted]="post.myReaction" aria-hidden="true" />
-          {{ post.reactionCount }}
-        </span>
-        <span>
-          <ion-icon name="chatbubble-outline" aria-hidden="true" />
-          {{ post.commentCount }}
-        </span>
-      </div>
-    </article>
-    }
-    }
-  </div>
-  } @else if (isDiscover()) {
-  <div class="mh-page">
-    @if (store.isFilteredEmpty()) {
-    <mh-empty-state icon="search-outline" [heading]="'empty.nothingMatches' | translate"
-      [message]="'groups.list.discover.noMatch' | translate" />
-    } @else if (store.isEmpty()) {
-    <mh-empty-state icon="compass-outline" [heading]="'groups.list.discover.empty.title' | translate"
-      [message]="'groups.list.discover.empty.message' | translate" />
-    } @else {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (group of store.discover(); track group.id) {
-      <ion-item button [detail]="false"
-        (click)="openDiscovered(group.id)">
-        <mh-hex-avatar slot="start" size="md" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
-        <ion-label>
-          <h2>{{ group.name }}</h2>
-          <p>
-            {{ 'count.members' | translate: { count: group.memberCount } }}
-            @if (group.city) { · {{ group.city }} }
-          </p>
-        </ion-label>
-        @if (hasPendingRequest(group)) {
-        <!-- Says where they already stand, so the row does not read as an
-             untouched group they have yet to act on. -->
-        <ion-icon slot="end" name="hourglass-outline" color="warning"
-          [attr.aria-label]="'groups.join.pending' | translate" />
-        } @else {
-        <ion-icon slot="end" name="chevron-forward-outline" color="medium" aria-hidden="true" />
-        }
-      </ion-item>
-      }
-    </ion-list>
+    </div>
     }
   </div>
   } @else {
-  <div class="mh-page">
-    @if (store.isEmpty()) {
-    @if (canCreate()) {
-    <mh-empty-state icon="people-outline" [heading]="'groups.list.noGroups.title' | translate"
-      [message]="'groups.list.noGroups.coachMessage' | translate"
-      [actionLabel]="'groups.list.createGroup' | translate" (action)="createGroup()" />
-    } @else {
-    <mh-empty-state icon="compass-outline" [heading]="'groups.list.mine.empty.title' | translate"
-      [message]="'groups.list.mine.empty.message' | translate"
-      [actionLabel]="'groups.list.discoverGroups' | translate"
-      (action)="discoverGroups()" />
-    }
-    } @else {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (group of store.mine(); track group.id) {
-      <ion-item button [detail]="true" (click)="openGroup(group.id)">
-        <mh-hex-avatar slot="start" size="md" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
-        <ion-label>
-          <h2>{{ group.name }}</h2>
-          <p>
-            {{ 'count.members' | translate: { count: group.memberCount } }}
-            @if (!group.isPublic) { · {{ 'groups.list.private' | translate }} }
-          </p>
-        </ion-label>
-      </ion-item>
-      }
-    </ion-list>
-    }
-  </div>
+  @if (store.isEmpty()) {
+  @if (canCreate()) {
+  <mh-empty-state icon="people-outline" [heading]="'groups.list.noGroups.title' | translate"
+    [message]="'groups.list.noGroups.coachMessage' | translate"
+    [actionLabel]="'groups.list.createGroup' | translate" (action)="createGroup()" />
+  } @else {
+  <mh-empty-state icon="compass-outline" [heading]="'groups.list.mine.empty.title' | translate"
+    [message]="'groups.list.mine.empty.message' | translate"
+    [actionLabel]="'groups.list.discoverGroups' | translate" (action)="discoverGroups()" />
   }
+  } @else {
+  <!-- A grouped flat list: the groups you run, then the ones you joined.
+       The whole row is the tap, as in a chat list. -->
+  @if (store.run().length > 0) {
+  <h2 class="mh-section-label">{{ 'groups.list.runHeading' | translate }}</h2>
+  <ion-list class="mh-flat-list">
+    @for (group of store.run(); track group.id) {
+    <ion-item button [detail]="false" (click)="openGroup(group.id)">
+      <mh-hex-avatar slot="start" size="lg" aria-hidden="true" [color]="groupTone" [name]="group.name"
+        [imageUrl]="group.logoUrl" />
+      <ion-label>
+        <div class="mh-row-line">
+          <h2>{{ group.name }}</h2>
+          @if (waitingCount(group) > 0) {
+          <ion-badge color="danger"
+            [attr.aria-label]="'groups.list.a11y.waiting' | translate: { count: waitingCount(group) }">
+            {{ waitingCount(group) }}
+          </ion-badge>
+          }
+        </div>
+        <p>{{ rowLine(group) }}</p>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+  }
+  @if (store.joined().length > 0) {
+  <h2 class="mh-section-label">{{ 'groups.list.joinedHeading' | translate }}</h2>
+  <ion-list class="mh-flat-list">
+    @for (group of store.joined(); track group.id) {
+    <ion-item button [detail]="false" (click)="openGroup(group.id)">
+      <mh-hex-avatar slot="start" size="lg" aria-hidden="true" [color]="groupTone" [name]="group.name"
+        [imageUrl]="group.logoUrl" />
+      <ion-label>
+        <div class="mh-row-line">
+          <h2>{{ group.name }}</h2>
+          @if (waitingCount(group) > 0) {
+          <ion-badge color="danger"
+            [attr.aria-label]="'groups.list.a11y.waiting' | translate: { count: waitingCount(group) }">
+            {{ waitingCount(group) }}
+          </ion-badge>
+          }
+        </div>
+        <p>{{ rowLine(group) }}</p>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+  }
+  }
+  }
+
   @if (hasMore()) {
   <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
     <ion-infinite-scroll-content />
   </ion-infinite-scroll>
   }
-  @if (canCreate() && !searchOpen()) {
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button [attr.aria-label]="'groups.list.createGroup' | translate" (click)="createGroup()">
-      <ion-icon name="add-outline" />
-    </ion-fab-button>
-  </ion-fab>
-  }
 </ion-content>
+
+<mh-post-actions (updated)="onPostUpdated($event)" (deleted)="onPostDeleted($event)" />

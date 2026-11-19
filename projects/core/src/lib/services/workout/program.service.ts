@@ -23,6 +23,7 @@ import type {
   UpdateProgramPayload,
   UpdateProgramWorkoutPayload,
 } from '../../models/workout/program.model';
+import type { SupersetChange } from '../../models/workout/log.model';
 
 /**
  * ProgramService — REST wrapper over `/programs/...` (instructor-only
@@ -236,6 +237,19 @@ export class ProgramService {
     return this._http.post<PrescribedExercise>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.EXERCISES(programId, workoutId)}`,
       payload,
+    );
+  }
+
+  /**
+   * Superset links changed on a program day: every exercise whose group
+   * changed (`normalizeSupersets` renumbers neighbours), saved in one
+   * transaction, all or none. Never one PATCH per row: those raced, and a
+   * superset could lose its links.
+   */
+  setSupersets(programId: string, workoutId: string, exercises: SupersetChange[]): Observable<void> {
+    return this._http.patch<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.SUPERSETS(programId, workoutId)}`,
+      { exercises },
     );
   }
 

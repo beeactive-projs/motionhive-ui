@@ -24,6 +24,7 @@ import { Observable, finalize } from 'rxjs';
 import {
   APP_HOME_URL,
   AUTH_FIELD_ERRORS,
+  AppleLoginRequest,
   AuthService,
   AuthStore,
   ClientInviteService,
@@ -48,8 +49,8 @@ import { InviteLandingService } from '../invite-landing.service';
  * Sign up, which is also where a coach's client invite lands (`?token=`): the
  * email is fixed to the invited one, and the invite is accepted once the
  * account exists. Someone already signed in gets the accept card instead of
- * the form. Google sign-up is the same call as Google sign-in: it makes the
- * account when there is none.
+ * the form. Signing up with Apple or Google is the same call as signing in
+ * with it: it makes the account when there is none.
  */
 @Component({
   selector: 'mh-sign-up',
@@ -161,6 +162,14 @@ export class SignUp {
 
   protected onGoogleFailed(): void {
     this.errorMessage.set(this._translateService.instant('auth.common.googleFailed'));
+  }
+
+  protected onAppleCredential(request: AppleLoginRequest): void {
+    this.signUp(this._authService.appleLogin(request), 'auth.common.appleFailed');
+  }
+
+  protected onAppleFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
   }
 
   private signUp(request: Observable<unknown>, fallbackKey: string): void {

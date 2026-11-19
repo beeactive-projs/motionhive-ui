@@ -36,8 +36,11 @@
     (ionInput)="message.set($any($event).detail.value ?? '')"
   />
 
+  <!-- A nudge, not an error: Send waits until the message is long enough, so
+       nothing was refused. `.over` would paint the field red as they type
+       (`ion-textarea.css`). -->
   @if (messageTooShort()) {
-    <p class="mh-helper over">{{ 'feedback.minLength' | translate: { min: messageMin } }}</p>
+    <p class="mh-helper">{{ 'feedback.minLength' | translate: { min: messageMin } }}</p>
   } @else {
     <p class="mh-helper">{{ 'feedback.helper' | translate }}</p>
   }

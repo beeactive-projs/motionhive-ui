@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { RedirectFunction, Router } from '@angular/router';
 import {
   AssignedWorkout,
+  ExerciseKind,
   ExerciseProgress,
   ExerciseSetType,
   LoggedExercise,
@@ -30,7 +31,6 @@ import {
   addOutline,
   alertCircleOutline,
   archiveOutline,
-  arrowDownOutline,
   arrowForwardOutline,
   arrowUndoOutline,
   backspaceOutline,
@@ -49,10 +49,10 @@ import {
   closeOutline,
   copyOutline,
   createOutline,
-  ellipsisHorizontal,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
+  flagOutline,
   flashOutline,
   globeOutline,
   imageOutline,
@@ -66,6 +66,7 @@ import {
   playSkipForwardOutline,
   refreshOutline,
   removeOutline,
+  reorderThreeOutline,
   repeatOutline,
   searchOutline,
   shareOutline,
@@ -73,6 +74,7 @@ import {
   trashOutline,
   trendingUpOutline,
   trophyOutline,
+  unlinkOutline,
 } from 'ionicons/icons';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
@@ -88,7 +90,6 @@ export const WORKOUT_ICONS = {
   addOutline,
   alertCircleOutline,
   archiveOutline,
-  arrowDownOutline,
   arrowForwardOutline,
   arrowUndoOutline,
   backspaceOutline,
@@ -107,10 +108,10 @@ export const WORKOUT_ICONS = {
   closeOutline,
   copyOutline,
   createOutline,
-  ellipsisHorizontal,
   ellipsisHorizontalOutline,
   ellipsisVerticalOutline,
   eyeOutline,
+  flagOutline,
   flashOutline,
   globeOutline,
   imageOutline,
@@ -124,6 +125,7 @@ export const WORKOUT_ICONS = {
   playSkipForwardOutline,
   refreshOutline,
   removeOutline,
+  reorderThreeOutline,
   repeatOutline,
   searchOutline,
   shareOutline,
@@ -131,6 +133,7 @@ export const WORKOUT_ICONS = {
   trashOutline,
   trendingUpOutline,
   trophyOutline,
+  unlinkOutline,
 };
 
 /**
@@ -443,20 +446,27 @@ export interface SetTarget {
   targetRepsMax: number | null;
   targetWeightKg: number | null;
   targetDurationSeconds: number | null;
+  /** Runs, rows and carries; absent where the plan predates it. */
+  targetDistanceMeters?: number | null;
   targetWeightPercent1rm?: number | null;
   /** The %1RM already turned into kilograms, when the API has done it. */
   resolvedWeightKg?: number | null;
 }
 
+/** The kinds planned by a distance and a time: their time is one to make, not a hold. */
+const COVERED_KINDS = new Set<string>([ExerciseKind.Distance, ExerciseKind.Cardio]);
+
 /**
- * "4 sets · 6–8 reps · 82.5 kg top set" for an exercise row before Start.
+ * "4 sets · 6–8 reps · 82.5 kg top set" for an exercise row before Start,
+ * "4 sets · 400 m · 1:45" for a run.
  *
  * Reps span the lowest floor to the highest ceiling across the sets. A load
  * that changes from set to set names the heaviest one as the top set; a
  * percentage stands in only when no kilograms are known yet. A set with no
- * reps but a duration is a hold.
+ * reps but a duration is a hold, unless it covers a distance (a distance on
+ * the sets, or a run or a row by `kind`): then the time reads as a clock.
  */
-export function prescriptionLine(sets: readonly SetTarget[]): string {
+export function prescriptionLine(sets: readonly SetTarget[], kind?: string | null): string {
   if (!sets.length) return '';
   const parts = [translate('count.sets', { count: sets.length })];
 
@@ -471,9 +481,20 @@ export function prescriptionLine(sets: readonly SetTarget[]): string {
         : translate('workouts.prescription.repsRange', { min, max }),
     );
   } else {
-    const holds = present(sets.map((s) => s.targetDurationSeconds));
-    if (holds.length) {
-      parts.push(translate('workouts.prescription.hold', { seconds: Math.max(...holds) }));
+    const distances = present(sets.map((s) => s.targetDistanceMeters));
+    if (distances.length) {
+      const farthest = formatMeasure(Math.max(...distances));
+      parts.push(translate('workouts.units.meters', { value: farthest }));
+    }
+    const times = present(sets.map((s) => s.targetDurationSeconds));
+    if (times.length) {
+      const longest = Math.max(...times);
+      const covered = distances.length > 0 || (!!kind && COVERED_KINDS.has(kind));
+      parts.push(
+        covered
+          ? secondsToClock(longest)
+          : translate('workouts.prescription.hold', { seconds: longest }),
+      );
     }
   }
 
@@ -547,6 +568,18 @@ export function compactPrescription(sets: readonly SetTarget[]): string {
 
 function present(values: readonly (number | null | undefined)[]): number[] {
   return values.filter((v): v is number => v != null);
+}
+
+/**
+ * "6 exercises · 19 sets": what a workout holds, under its name in the
+ * builder's header and in a routine's or a plan day's read view alike.
+ * Nothing while it is empty, and no sets while none are counted.
+ */
+export function contentsLine(exercises: number, sets: number): string {
+  if (exercises <= 0) return '';
+  const parts = [translate('count.exercises', { count: exercises })];
+  if (sets > 0) parts.push(translate('count.sets', { count: sets }));
+  return parts.join(' · ');
 }
 
 /**
@@ -899,11 +932,13 @@ export function recordSessionIds(progress: ExerciseProgress): Set<string> {
     OneRepMaxSource.EstimatedEpley,
     OneRepMaxSource.EstimatedBrzycki,
   ]);
-  const days = new Set(
-    progress.oneRepMaxSeries
-      .filter((point) => estimated.has(point.source))
-      .map((point) => localDayKey(new Date(point.recordedAt))),
-  );
+  // The earliest estimate is the first time on the lift: a best, not a
+  // record beaten, as the finish screen and History count it.
+  const points = progress.oneRepMaxSeries
+    .filter((point) => estimated.has(point.source))
+    .sort((a, b) => a.recordedAt.localeCompare(b.recordedAt))
+    .slice(1);
+  const days = new Set(points.map((point) => localDayKey(new Date(point.recordedAt))));
   return new Set(
     progress.sessions
       .filter((session) => days.has(localDayKey(new Date(session.performedAt))))
@@ -1152,6 +1187,17 @@ export function secondsToClock(seconds: number): string {
   return `${mins}:${String(total % 60).padStart(2, '0')}`;
 }
 
+/** One tap of a rest's − or +. */
+export const REST_STEP_SECONDS = 15;
+const REST_MIN_SECONDS = 15;
+const REST_MAX_SECONDS = 600;
+
+/** A rest one step shorter or longer, kept between 0:15 and 10:00. */
+export function nudgeRest(seconds: number, direction: 1 | -1): number {
+  const next = seconds + direction * REST_STEP_SECONDS;
+  return Math.min(REST_MAX_SECONDS, Math.max(REST_MIN_SECONDS, next));
+}
+
 /**
  * Digits typed on a keypad, read right to left into seconds — the way every
  * timer input works. "130" is 1:30, i.e. 90 seconds; "45" is 0:45.
@@ -1163,6 +1209,16 @@ export function clockDigitsToSeconds(digits: string): number | null {
   const secs = Number(padded.slice(-2));
   const mins = Number(padded.slice(0, -2));
   return mins * 60 + secs;
+}
+
+/**
+ * Seconds as the digits the pad builds a clock from: 150 is "230" (2:30), 45
+ * is "45", 0 is "0". The inverse of `clockDigitsToSeconds`, so a duration the
+ * pad is seeded with commits back as the seconds it came from.
+ */
+export function secondsToClockDigits(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  return `${Math.floor(total / 60)}${String(total % 60).padStart(2, '0')}`.replace(/^0+(?=\d)/, '');
 }
 
 /** The same digits, shown back as the clock they are building. */
@@ -1230,6 +1286,37 @@ export const KeypadFields = {
 
 export type KeypadField = (typeof KeypadFields)[keyof typeof KeypadFields];
 
+/**
+ * How far one ± moves a field, on the pad and on the routine builder's
+ * steppers alike. Weight steps by the smallest plate pair.
+ */
+export const KEYPAD_STEP: Record<KeypadField, number> = {
+  [KeypadFields.Weight]: 2.5,
+  [KeypadFields.Reps]: 1,
+  [KeypadFields.Duration]: 15,
+  [KeypadFields.Distance]: 50,
+  [KeypadFields.Rpe]: 0.5,
+};
+
+/**
+ * How long a number the keypad builds may get: whole digits, then decimals.
+ * 9999.99 kg and 999 reps are past any real set, and a cell in the set grid
+ * has room for that much and no more. Fields not listed have no cap (a
+ * clock caps itself at 99:59).
+ */
+export const KEYPAD_LIMITS: Partial<Record<KeypadField, { whole: number; decimals: number }>> = {
+  [KeypadFields.Weight]: { whole: 4, decimals: 2 },
+  [KeypadFields.Reps]: { whole: 3, decimals: 0 },
+};
+
+/** Whether `typed` ("82.5", the buffer's "." form) fits the field's cap. */
+export function fitsKeypadLimit(field: KeypadField, typed: string): boolean {
+  const limit = KEYPAD_LIMITS[field];
+  if (!limit) return true;
+  const [whole, decimals = ''] = typed.split('.');
+  return whole.length <= limit.whole && decimals.length <= limit.decimals;
+}
+
 // ─── Summary tiles ────────────────────────────────────────────────────────
 
 export interface WorkoutTile {
@@ -1247,13 +1334,19 @@ export interface WorkoutTile {
  * the two are always talking about the same numbers.
  */
 export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
-  const sets = (log.exercises ?? [])
-    .flatMap((exercise) => exercise.sets ?? [])
-    .filter((set) => set.isCompleted);
+  // A skipped exercise counts for nothing, as on the API's volume card.
+  const exercises = (log.exercises ?? []).filter((exercise) => !exercise.isSkipped);
+  const sets = exercises.flatMap(doneSetsOf);
 
-  const volume = sets.reduce((sum, set) => sum + loadedVolume(set), 0);
-  const bodyweightReps = sets
-    .filter((set) => set.weightKg == null && set.reps != null)
+  const volume = workoutVolume(log);
+  // Reps for what is not weighed: a bodyweight movement (added weight or
+  // not) and any set with no weight.
+  const bodyweightReps = exercises
+    .flatMap((exercise) =>
+      doneSetsOf(exercise).filter(
+        (set) => set.reps != null && (!countsInKgTotal(exercise) || set.weightKg == null),
+      ),
+    )
     .reduce((sum, set) => sum + (set.reps ?? 0), 0);
   const holdSeconds = sets.reduce((sum, set) => sum + (set.durationSeconds ?? 0), 0);
   const distance = sets.reduce((sum, set) => sum + (set.distanceMeters ?? 0), 0);
@@ -1283,6 +1376,21 @@ export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
     });
   }
   return tiles;
+}
+
+/** The ticked sets of an exercise. */
+function doneSetsOf(exercise: LoggedExercise): LoggedSet[] {
+  return (exercise.sets ?? []).filter((set) => set.isCompleted);
+}
+
+/**
+ * Whether an exercise's kg joins a workout's total, the API's rule
+ * (`countsInKgTotal`): not skipped, and not a bodyweight movement, which is
+ * measured in reps (its added weight is not what it moves). Otherwise the
+ * hero said 2,400 kg while the rows said "Bench 1,800 kg · Dips 30 reps".
+ */
+export function countsInKgTotal(exercise: LoggedExercise): boolean {
+  return !exercise.isSkipped && exercise.exercise?.kind !== ExerciseKind.Bodyweight;
 }
 
 /**
@@ -1448,11 +1556,15 @@ export function cheerKey(logId: string): string {
   return `workouts.finish.cheer.${(hash % CHEER_LINES) + 1}`;
 }
 
-/** Kilograms moved over the completed, loaded sets. */
+/**
+ * Kilograms moved over the completed, loaded sets of the exercises a kg
+ * total counts (`countsInKgTotal`), warm-ups out: the finish screen's,
+ * History's and the share image's one number.
+ */
 export function workoutVolume(log: WorkoutLog): number {
   return (log.exercises ?? [])
-    .flatMap((exercise) => exercise.sets ?? [])
-    .filter((set) => set.isCompleted)
+    .filter(countsInKgTotal)
+    .flatMap(doneSetsOf)
     .reduce((sum, set) => sum + loadedVolume(set), 0);
 }
 
@@ -1501,13 +1613,57 @@ export const LEAVE_OPTIONS: readonly LeaveOption[] = [
   },
 ];
 
+// ─── Finish ─────────────────────────────────────────────────────────────
+
+/** The answers to Finish while sets are still unticked, or none are. */
+export const FinishChoices = {
+  Save: 'save',
+  Discard: 'discard',
+} as const;
+
+export type FinishChoice = (typeof FinishChoices)[keyof typeof FinishChoices];
+
+/**
+ * Finishing early: keep the workout as it stands, or throw it away. Saving is
+ * the honey verb; discarding is the one red one and still asks again, because
+ * it cannot be undone.
+ */
+export const FINISH_OPTIONS: readonly SheetAction<FinishChoice>[] = [
+  {
+    id: FinishChoices.Save,
+    label: 'workouts.logger.finishSheet.save',
+    icon: 'flag-outline',
+    color: 'primary',
+  },
+  {
+    id: FinishChoices.Discard,
+    label: 'workouts.logger.discard.title',
+    icon: 'trash-outline',
+    color: 'danger',
+    destructive: true,
+  },
+];
+
+/**
+ * The finish sheet's verbs for `ticked` sets done. With none there is nothing
+ * to save, so Discard is the only one (as in dba74362): completing would mark
+ * a coach's plan day done with no sets in it, and tell the coach so.
+ */
+export function finishOptions(ticked: number): readonly SheetAction<FinishChoice>[] {
+  return ticked > 0
+    ? FINISH_OPTIONS
+    : FINISH_OPTIONS.filter((option) => option.id === FinishChoices.Discard);
+}
+
 // ─── Exercise verbs ───────────────────────────────────────────────────────
 
 /** The verbs for one exercise mid-workout, in priority order, destructive last. */
 export const ExerciseActionIds = {
+  Collapse: 'collapse',
   History: 'history',
   Note: 'note',
   Swap: 'swap',
+  Unlink: 'unlink',
   Skip: 'skip',
   Remove: 'remove',
 } as const;
@@ -1527,13 +1683,34 @@ export type ExerciseAction = SheetAction<ExerciseActionId>;
  * (sky), swapping edits the workout (honey), and skipping puts the exercise
  * aside until one tap brings it back (violet, green to unskip), as Archive /
  * Unarchive do.
+ *
+ * Collapse leads (user decision, 2026-11-10), green as the done row a
+ * finished exercise folds into. Every exercise folds, finished or still
+ * being worked (user decision, 2026-11-18), so the logger offers it on every
+ * card but a skipped exercise's, which has no sets to fold (`canCollapse`).
+ *
+ * Unlink from superset, on an exercise in one (`canUnlink`), after Swap: it
+ * changes the workout's shape too, and one tap on the link chip undoes it.
+ * Sky, the tile of a link.
  */
 export function exerciseActions(
   skipped: boolean,
   hasHistory = true,
   /** Offer the person's own note: write one, or change the one there is. */
   note: 'add' | 'edit' | null = null,
+  canCollapse = false,
+  canUnlink = false,
 ): ExerciseAction[] {
+  const collapse: ExerciseAction[] = canCollapse
+    ? [
+        {
+          id: ExerciseActionIds.Collapse,
+          label: 'workouts.exerciseActions.collapse',
+          icon: 'chevron-up-outline',
+          color: 'success',
+        },
+      ]
+    : [];
   const history: ExerciseAction[] = hasHistory
     ? [
         {
@@ -1555,7 +1732,19 @@ export function exerciseActions(
         },
       ]
     : [];
+  const unlink: ExerciseAction[] = canUnlink
+    ? [
+        {
+          id: ExerciseActionIds.Unlink,
+          label: 'workouts.exerciseActions.unlink',
+          icon: 'unlink-outline',
+          color: 'info',
+          tone: 'shade',
+        },
+      ]
+    : [];
   return [
+    ...collapse,
     ...history,
     ...noteAction,
     {
@@ -1564,6 +1753,7 @@ export function exerciseActions(
       icon: 'repeat-outline',
       color: 'primary',
     },
+    ...unlink,
     {
       id: ExerciseActionIds.Skip,
       label: skipped ? 'workouts.exerciseActions.unskip' : 'workouts.exerciseActions.skip',

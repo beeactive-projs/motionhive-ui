@@ -42,3 +42,16 @@ export function sentMetaLabel(row: InstructorClient, now: number): string {
         : translate('clients.requests.expires.inDays', { count: left });
   return translate('clients.requests.sentMeta', { sent, expires });
 }
+
+/**
+ * A request verb refused because the request is no longer waiting: answered
+ * on another device, withdrawn by the other side, or expired. The row on
+ * screen is stale then, and trying again would only fail again.
+ */
+export function requestIsGone(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+  const status = (error as { status?: unknown }).status;
+  return status === 400 || status === 404 || status === 410;
+}

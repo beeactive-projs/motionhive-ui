@@ -26,7 +26,9 @@ import {
   ProgramAssignment,
   ProgramAssignmentKind,
   ProgramAssignmentService,
+  ProgramAssignmentStatus,
   WorkoutLogService,
+  WorkoutLogStatus,
   localDayKey,
 } from 'core';
 
@@ -36,7 +38,12 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { workoutLinks } from '../../home/home-stack.config';
 import { ActiveWorkoutService } from '../_services/active-workout.service';
 import { OverviewExercise, WorkoutOverview } from '../_components/workout-overview/workout-overview';
-import { WORKOUT_ICONS, planPositionLabel, prescriptionLine } from '../workouts.config';
+import {
+  WORKOUT_ICONS,
+  contentsLine,
+  planPositionLabel,
+  prescriptionLine,
+} from '../workouts.config';
 
 /**
  * What today's prescribed workout holds, before committing to it.
@@ -97,6 +104,30 @@ export class Preview implements ViewWillEnter {
   readonly showSkeleton = computed(() => this.loading() && !this.assignment());
   readonly showError = computed(() => this.error() && !this.assignment());
 
+  /**
+   * Why the day cannot be started, or null when it can: it is already done
+   * (history, which the API refuses to restart), or its plan is paused,
+   * finished or cancelled. A skipped day can still be made up (the nightly
+   * sweep skips every missed day), so it keeps Start.
+   */
+  readonly closedNote = computed<string | null>(() => {
+    const workout = this.workout();
+    const assignment = this.assignment();
+    if (!workout || !assignment) {
+      return null;
+    }
+    if (workout.status === WorkoutLogStatus.Completed) {
+      return this._translateService.instant('workouts.preview.dayClosed');
+    }
+    if (assignment.status && assignment.status !== ProgramAssignmentStatus.Active) {
+      return this._translateService.instant('workouts.preview.planClosed', { status: assignment.status });
+    }
+    return null;
+  });
+
+  /** Skip is for a day still to do; a skipped day only offers Start. */
+  readonly canSkip = computed(() => this.workout()?.status !== WorkoutLogStatus.Skipped);
+
   /** Loaded fine, but the plan holds no days at all — a different problem. */
   readonly isEmptyPlan = computed(
     () => !this.loading() && !this.error() && !!this.assignment() && !this.workout(),
@@ -122,21 +153,26 @@ export class Preview implements ViewWillEnter {
     );
   });
 
-  readonly chips = computed(() => {
+  /** "~45 min · 5 exercises · 15 sets": how long, then what the day holds. */
+  readonly meta = computed(() => {
     const workout = this.workout();
-    if (!workout) return [];
-    const chips: string[] = [];
+    if (!workout) return null;
+    const exercises = workout.exercises ?? [];
+    const parts: string[] = [];
     if (workout.estimatedDurationMinutes != null) {
-      chips.push(
+      parts.push(
         this._translateService.instant('workouts.meta.aboutMinutes', {
           minutes: workout.estimatedDurationMinutes,
         }),
       );
     }
-    chips.push(
-      this._translateService.instant('count.exercises', { count: workout.exercises?.length ?? 0 }),
+    parts.push(
+      contentsLine(
+        exercises.length,
+        exercises.reduce((total, exercise) => total + (exercise.sets?.length ?? 0), 0),
+      ),
     );
-    return chips;
+    return parts.filter(Boolean).join(' · ') || null;
   });
 
   /** The coach by first name; a plan you scheduled yourself has no coach to name. */
@@ -160,7 +196,7 @@ export class Preview implements ViewWillEnter {
         kind: this._kindOf(exercise),
         thumbnailUrl: exercise.exercise?.thumbnailUrl ?? null,
       },
-      prescription: prescriptionLine(exercise.sets ?? []),
+      prescription: prescriptionLine(exercise.sets ?? [], this._kindOf(exercise)),
     })),
   );
 

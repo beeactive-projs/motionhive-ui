@@ -45,7 +45,7 @@ export class DiscoverGroupRow {
   });
 
   /**
-   * The width the verb takes from the label: the capsule's 2rem of padding
+   * The width the verb takes from the label: the button's 2rem of padding
    * and a 1rem gap before it, plus about half an em a letter at its
    * 0.75rem semibold (0.375rem). In rem, so it grows with the text size
    * like the button does.

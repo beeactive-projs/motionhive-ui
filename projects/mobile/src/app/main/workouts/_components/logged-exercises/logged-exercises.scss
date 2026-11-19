@@ -6,10 +6,6 @@ ion-accordion-group {
   display: block;
 }
 
-ion-accordion {
-  background: var(--ion-item-background);
-}
-
 /* A skipped exercise stays in the record, quieter. */
 ion-item.skipped h2 {
   color: var(--ion-color-medium);

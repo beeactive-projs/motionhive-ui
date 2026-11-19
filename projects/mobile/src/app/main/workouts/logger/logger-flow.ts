@@ -9,12 +9,15 @@ import {
   RestSources,
   SetField,
   SetFields,
+  SupersetChange,
   enumLabel,
+  linkWithNext,
   setFieldsFor,
   translate,
+  unlinkFromNext,
 } from 'core';
 
-import { formatMeasure, secondsToClock } from '../workouts.config';
+import { KeypadField, KeypadFields, formatMeasure, secondsToClock } from '../workouts.config';
 
 /**
  * The logger's flow, as plain functions: which set has the focus, what a set
@@ -108,6 +111,100 @@ export function exerciseBlocks(exercises: readonly LoggedExercise[]): ExerciseBl
   return blocks;
 }
 
+// ─── Superset links ──────────────────────────────────────────────
+// The routine builder's rules (core's `linkWithNext`, `unlinkFromNext`),
+// over the workout's exercises. Each returns only the exercises whose group
+// changed: what the API is sent.
+
+/** The exercises' groups, as core's link rules read them. */
+function linkRows(exercises: readonly LoggedExercise[]): SupersetChange[] {
+  return exercises.map((e) => ({ id: e.id, supersetGroupId: e.supersetGroupId ?? null }));
+}
+
+function changedLinks(
+  before: readonly SupersetChange[],
+  after: readonly SupersetChange[],
+): SupersetChange[] {
+  return after.filter((row, i) => row.supersetGroupId !== before[i]?.supersetGroupId);
+}
+
+/** Exercise `index` is linked with the one after it. */
+export function linkedToNext(exercises: readonly LoggedExercise[], index: number): boolean {
+  const group = exercises[index]?.supersetGroupId ?? null;
+  return group !== null && (exercises[index + 1]?.supersetGroupId ?? null) === group;
+}
+
+/** Exercise `index` is linked with the one before it or the one after. */
+export function inSuperset(exercises: readonly LoggedExercise[], index: number): boolean {
+  return linkedToNext(exercises, index) || (index > 0 && linkedToNext(exercises, index - 1));
+}
+
+/**
+ * The chip between exercise `index` and the next: links the two (joining
+ * the superset either is in, merging two), or undoes that link.
+ */
+export function toggledLinks(exercises: readonly LoggedExercise[], index: number): SupersetChange[] {
+  const rows = linkRows(exercises);
+  const next = linkedToNext(exercises, index)
+    ? unlinkFromNext(rows, index)
+    : linkWithNext(rows, index);
+  return changedLinks(rows, next);
+}
+
+/**
+ * Exercise `index` out of its superset: unlinked from the exercises before
+ * and after it. What is left of a longer superset stays linked; a superset
+ * left with one exercise is none.
+ */
+export function withoutSuperset(exercises: readonly LoggedExercise[], index: number): SupersetChange[] {
+  const rows = linkRows(exercises);
+  let next = unlinkFromNext(rows, index);
+  if (index > 0) next = unlinkFromNext(next, index - 1);
+  return changedLinks(rows, next);
+}
+
+/** The exercises with `changes`' groups put in: the workout once a link is saved. */
+export function withLinks(
+  exercises: readonly LoggedExercise[],
+  changes: readonly SupersetChange[],
+): LoggedExercise[] {
+  const groups = new Map(changes.map((change) => [change.id, change.supersetGroupId]));
+  return exercises.map((e) =>
+    groups.has(e.id) ? { ...e, supersetGroupId: groups.get(e.id) ?? null } : e,
+  );
+}
+
+/**
+ * The cards the list draws, by key (an exercise's own id, a superset's
+ * first member's), each with the exercises it holds. With rounds off every
+ * exercise is a card of its own.
+ */
+function cardsOf(exercises: readonly LoggedExercise[], rounds: boolean): Map<string, string> {
+  const blocks: { exercises: LoggedExercise[] }[] = rounds
+    ? exerciseBlocks(exercises)
+    : exercises.map((e) => ({ exercises: [e] }));
+  return new Map(
+    blocks.map((block) => [block.exercises[0].id, block.exercises.map((e) => e.id).join(' ')]),
+  );
+}
+
+/**
+ * The cards a link change reshapes, by key: each that holds other exercises
+ * afterwards, or is new, or is gone. A superset the change only renumbers
+ * keeps its key and its exercises, so it is not one of them; with rounds
+ * off no card is.
+ */
+export function reshapedCards(
+  before: readonly LoggedExercise[],
+  after: readonly LoggedExercise[],
+  rounds: boolean,
+): Set<string> {
+  const was = cardsOf(before, rounds);
+  const now = cardsOf(after, rounds);
+  const keys = new Set([...was.keys(), ...now.keys()]);
+  return new Set([...keys].filter((key) => was.get(key) !== now.get(key)));
+}
+
 /** "A1", "A2": a superset member's tag, or null outside a superset. */
 export function memberTag(block: ExerciseBlock, exerciseId: string): string | null {
   if (block.letter === null) return null;
@@ -118,6 +215,30 @@ export function memberTag(block: ExerciseBlock, exerciseId: string): string | nu
 /** How many rounds a superset has: its longest member. */
 export function roundCount(block: ExerciseBlock): number {
   return Math.max(0, ...block.exercises.map((e) => (e.sets ?? []).length));
+}
+
+/** The columns a set table's heading names: the fields, and whether reps are per side. */
+export interface SetColumns {
+  fields: SetField[];
+  unilateral: boolean;
+}
+
+/**
+ * The one heading a superset's rounds can share, as an exercise's sets
+ * have: when every member still in play records the same fields the same
+ * way (reps per side or not), those columns. Null when they differ, or with
+ * nobody in play: then there is no heading, and each cell names its unit.
+ */
+export function sharedColumns(members: readonly SetColumns[]): SetColumns | null {
+  const [first, ...rest] = members;
+  if (!first) return null;
+  const same = rest.every(
+    (member) =>
+      member.unilateral === first.unilateral &&
+      member.fields.length === first.fields.length &&
+      member.fields.every((field, i) => field === first.fields[i]),
+  );
+  return same ? { fields: [...first.fields], unilateral: first.unilateral } : null;
 }
 
 /**
@@ -147,12 +268,26 @@ export function loggingOrder(exercises: readonly LoggedExercise[], rounds = true
   return out;
 }
 
-/** The first set not yet ticked, in logging order: the one the screen points at. */
-export function focusOf(exercises: readonly LoggedExercise[], rounds = true): SetRef | null {
+/** No set passed over: the default for `focusOf` and `nextAfter`. */
+const NONE_PASSED: ReadonlySet<string> = new Set();
+
+/**
+ * The first set not yet ticked, in logging order: the one the screen points
+ * at. Sets in `passed` ("Skip set" on the lock screen) stay as they are,
+ * unticked, and the focus goes on past them.
+ */
+export function focusOf(
+  exercises: readonly LoggedExercise[],
+  rounds = true,
+  passed: ReadonlySet<string> = NONE_PASSED,
+): SetRef | null {
   const sets = new Map(
     exercises.flatMap((exercise) => (exercise.sets ?? []).map((set) => [set.id, set] as const)),
   );
-  return loggingOrder(exercises, rounds).find((ref) => !sets.get(ref.setId)?.isCompleted) ?? null;
+  const found = loggingOrder(exercises, rounds).find(
+    (ref) => !sets.get(ref.setId)?.isCompleted && !passed.has(ref.setId),
+  );
+  return found ?? null;
 }
 
 /** The set after `ref` in logging order that is still to do, or null. */
@@ -160,11 +295,15 @@ export function nextAfter(
   exercises: readonly LoggedExercise[],
   ref: SetRef,
   rounds = true,
+  passed: ReadonlySet<string> = NONE_PASSED,
 ): { exercise: LoggedExercise; set: LoggedSet; index: number } | null {
   const order = loggingOrder(exercises, rounds);
   const at = order.findIndex((r) => r.setId === ref.setId);
   const rest = at >= 0 ? [...order.slice(at + 1), ...order.slice(0, at)] : order;
   for (const r of rest) {
+    if (passed.has(r.setId)) {
+      continue;
+    }
     const exercise = exercises.find((e) => e.id === r.exerciseId);
     const sets = exercise?.sets ?? [];
     const index = sets.findIndex((s) => s.id === r.setId);
@@ -172,6 +311,34 @@ export function nextAfter(
     if (exercise && set && !set.isCompleted) return { exercise, set, index };
   }
   return null;
+}
+
+/**
+ * The exercises as they would be once `setId` is ticked: for working out
+ * what the lock screen shows after its ✓, before the app has saved it.
+ * `values` are what that ✓ logs, so the set after it pre-fills from them
+ * as it would after a real tick.
+ */
+export function withTicked(
+  exercises: readonly LoggedExercise[],
+  setId: string,
+  values: Partial<Record<PayloadKey, number>> = {},
+): LoggedExercise[] {
+  return exercises.map((exercise) => {
+    const sets = exercise.sets ?? [];
+    if (!sets.some((set) => set.id === setId)) {
+      return exercise;
+    }
+    return {
+      ...exercise,
+      sets: sets.map((set) => {
+        if (set.id !== setId) {
+          return set;
+        }
+        return { ...set, ...values, isCompleted: true };
+      }),
+    };
+  });
 }
 
 /**
@@ -231,7 +398,7 @@ export interface SetBadge {
   /** "Set 2", "Warm-up": what the focus card calls the set. */
   name: string;
   /**
-   * What labels elsewhere (the pad, the rest bar, "Back to…") call it after
+   * What labels elsewhere (the pad, the rest bar) call it after
    * the exercise's name, when that differs from `name`: "Round 2" in a superset.
    */
   short?: string;
@@ -242,7 +409,7 @@ export interface SetBadge {
  * and a typed set wears its letter where the number would be.
  */
 export function setBadge(
-  sets: readonly LoggedSet[],
+  sets: readonly Pick<LoggedSet, 'setType'>[],
   index: number,
   /** In a superset: the member's tag ("A1") and the exercise's name. */
   member: { tag: string; name: string } | null = null,
@@ -279,18 +446,85 @@ export function setBadge(
 }
 
 /** Which log column each set field writes to. */
-export const PAYLOAD_KEY: Record<
-  SetField,
-  'weightKg' | 'reps' | 'durationSeconds' | 'distanceMeters'
-> = {
+export const PAYLOAD_KEY = {
   [SetFields.Weight]: 'weightKg',
   [SetFields.Reps]: 'reps',
   [SetFields.Duration]: 'durationSeconds',
   [SetFields.Distance]: 'distanceMeters',
+} as const satisfies Record<SetField, keyof LoggedSet>;
+
+/** A log column a set field writes to: what a set's values are keyed by. */
+export type PayloadKey = (typeof PAYLOAD_KEY)[SetField];
+
+/**
+ * A set's values, keyed as the log keys them. A logged set is one; so is a
+ * routine's planned set in the builder, which holds targets under the same
+ * names so the set table reads both.
+ */
+export type SetValues = Pick<LoggedSet, PayloadKey>;
+
+export function cellValue(set: SetValues | null | undefined, field: SetField): number | null {
+  return set?.[PAYLOAD_KEY[field]] ?? null;
+}
+
+/** The keypad's step size is keyed to the field, not the exercise kind. */
+export const KEYPAD_FIELD: Record<SetField, KeypadField> = {
+  [SetFields.Weight]: KeypadFields.Weight,
+  [SetFields.Reps]: KeypadFields.Reps,
+  [SetFields.Duration]: KeypadFields.Duration,
+  [SetFields.Distance]: KeypadFields.Distance,
 };
 
-export function cellValue(set: LoggedSet | null | undefined, field: SetField): number | null {
-  return set?.[PAYLOAD_KEY[field]] ?? null;
+/** What the pad's label calls each field ("Set 2 · kg"): translation keys. */
+export const COLUMN_LABELS: Record<SetField, string> = {
+  [SetFields.Weight]: 'workouts.logger.columns.weight',
+  [SetFields.Reps]: 'workouts.logger.columns.reps',
+  [SetFields.Duration]: 'workouts.logger.columns.time',
+  [SetFields.Distance]: 'workouts.logger.columns.distance',
+};
+
+/** The pad's label word for `field`; reps read as per side on split squats and one-arm work. */
+export function columnLabelKey(field: SetField, unilateral: boolean): string {
+  return field === SetFields.Reps && unilateral
+    ? 'workouts.logger.columns.repsEach'
+    : COLUMN_LABELS[field];
+}
+
+/** A set as the list draws it, as much as `shownValue` reads. */
+export interface ShownSet {
+  set: LoggedSet;
+  prefill: Partial<Record<SetField, number | null>>;
+}
+
+/** What a set shows: what was typed, else its pre-fill. */
+export function shownValue(row: ShownSet, field: SetField): number | null {
+  const typed = cellValue(row.set, field);
+  if (typed !== null) {
+    return typed;
+  }
+  const prefill = row.prefill[field];
+  if (prefill === undefined) {
+    return null;
+  }
+  return prefill;
+}
+
+/**
+ * What a copy of a set holds: the number each of `fields` shows, typed or
+ * grey, so the copy reads like the set it came from. An unticked set in a
+ * plan shows the plan's numbers, and the copy has no plan of its own to show
+ * them from. Fields showing nothing stay out.
+ */
+export function copiedValues(
+  row: ShownSet,
+  fields: readonly SetField[],
+): Partial<Record<PayloadKey, number>> {
+  const values: Partial<Record<PayloadKey, number>> = {};
+  for (const field of fields) {
+    const value = shownValue(row, field);
+    if (value !== null) values[PAYLOAD_KEY[field]] = value;
+  }
+  return values;
 }
 
 /**
@@ -298,14 +532,19 @@ export function cellValue(set: LoggedSet | null | undefined, field: SetField): n
  * over: the plan's target, else what the same set held last time, else what
  * the set before it in this session holds. A rep range pre-fills last time's
  * reps when they fall inside it, otherwise its bottom: the floor you aim at.
+ *
+ * The set before counts only once it is ticked (user decision, 2026-11-10):
+ * a number typed into a set is still being decided, so it does not spill
+ * into the next set the moment the pad moves from kg to reps.
  */
 export function prefillValue(
   set: LoggedSet,
   field: SetField,
   previous: LoggedSet | null,
-  sessionBefore: LoggedSet | null,
+  setBefore: LoggedSet | null,
 ): number | null {
   const plan = planOf(set);
+  const sessionBefore = setBefore?.isCompleted ? setBefore : null;
   switch (field) {
     case SetFields.Weight:
       return (
@@ -389,6 +628,25 @@ export function setLine(
   return values.map((v) => fieldText(v.field, v.value, withUnit)).join(joiner);
 }
 
+/** The exercise has one set left to tick: the one about to be done is its last. */
+export function isLastLeft(sets: readonly LoggedSet[]): boolean {
+  return sets.filter((set) => !set.isCompleted).length === 1;
+}
+
+/**
+ * The set to do next in one line, what to load first: "Set 3 · 62.5 kg × 8
+ * · Bench press · Last set". The same on the rest bar, the lock screen and
+ * the rest-over alert. `lastSet` is the "Last set" words, or empty.
+ */
+export function nextSetLine(
+  set: string,
+  target: string,
+  exercise: string,
+  lastSet: string,
+): string {
+  return [set, target, exercise, lastSet].filter(Boolean).join(' · ');
+}
+
 /** "last 60 × 8": the same set last time, short. Empty when there was none. */
 export function lastLine(fields: readonly SetField[], previous: LoggedSet | null): string {
   if (!previous) return '';
@@ -437,6 +695,28 @@ export function restAfterTick(
   );
 }
 
+/**
+ * What follows ticking `done` (at `ref`): the rest after it, from the set
+ * after it in logging order (none within a superset round), and whether
+ * nothing is left to do after it.
+ */
+export function afterTick(
+  exercises: readonly LoggedExercise[],
+  ref: SetRef,
+  done: LoggedSet,
+  rounds: boolean,
+  passed: ReadonlySet<string>,
+  choices: Omit<RestChoices, 'sameRound'>,
+): { rest: number | null; final: boolean } {
+  const after = nextAfter(exercises, ref, rounds, passed);
+  if (!after) {
+    return { rest: restAfterTick(done, null, choices), final: true };
+  }
+  const afterRef = { exerciseId: after.exercise.id, setId: after.set.id };
+  const inRound = sameRound(exercises, ref, afterRef, rounds);
+  return { rest: restAfterTick(done, after.set, { ...choices, sameRound: inRound }), final: false };
+}
+
 /** A rest under this is not worth storing: it was a fumble, not a rest. */
 export const MIN_STORED_REST_SECONDS = 5;
 /** A gap over this (or over three planned rests) is a break, not a rest. */
@@ -446,7 +726,7 @@ export const BREAK_AFTER_SECONDS = 600;
  * How long a set takes, to take off the gap between two ticks: the logged
  * time for a timed set, else about 3 s a rep, between 20 s and 90 s.
  */
-export function setLengthSeconds(set: LoggedSet): number {
+export function setLengthSeconds(set: Pick<LoggedSet, 'durationSeconds' | 'reps'>): number {
   if (set.durationSeconds != null) return set.durationSeconds;
   const reps = set.reps ?? 8;
   return Math.min(90, Math.max(20, reps * 3));
@@ -467,7 +747,7 @@ export interface MeasuredRest {
 export function estimatedRest(
   gapSeconds: number,
   plannedSeconds: number,
-  nextSet: LoggedSet,
+  nextSet: Pick<LoggedSet, 'durationSeconds' | 'reps'>,
 ): MeasuredRest | null {
   if (gapSeconds > Math.max(BREAK_AFTER_SECONDS, 3 * plannedSeconds)) {
     return { seconds: null, source: RestSources.Break };
@@ -500,13 +780,19 @@ export function asksEffort(set: LoggedSet, askAlways: boolean): boolean {
 }
 
 /**
- * "4 sets · best 65 × 8" for a finished exercise folded to one line. Best is
- * the heaviest weight × reps among the working sets; without weight, the
- * most reps, the longest hold or the furthest distance.
+ * "4 sets · best 65 × 8" for a finished exercise folded to one line, and
+ * "1 of 3 sets · best 60 × 8" for one folded while still being worked. Best
+ * is the heaviest weight × reps among the ticked working sets; without
+ * weight, the most reps, the longest hold or the furthest distance.
  */
 export function foldedSummary(exercise: LoggedExercise, kind: ExerciseKind | null): string {
-  const done = (exercise.sets ?? []).filter((set) => set.isCompleted);
-  const parts = [translate('count.sets', { count: done.length })];
+  const sets = exercise.sets ?? [];
+  const done = sets.filter((set) => set.isCompleted);
+  const parts = [
+    done.length === sets.length
+      ? translate('count.sets', { count: done.length })
+      : translate('workouts.meta.setsDone', { done: done.length, total: sets.length }),
+  ];
   const working = done.filter((set) => set.setType !== ExerciseSetType.Warmup);
   const fields = setFieldsFor(kind);
   const score = (set: LoggedSet): number =>

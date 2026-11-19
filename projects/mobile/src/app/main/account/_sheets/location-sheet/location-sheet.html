@@ -9,7 +9,10 @@
     (ionInput)="onSearch($event.detail.value ?? '')"
   />
 
-  @if (searching()) {
+  <!-- The places found stay while the next search runs; the spinner only
+       fills an empty list. A search that failed says so, rather than
+       "nothing found". -->
+  @if (searching() && results().length === 0) {
     <div class="searching">
       <ion-spinner name="crescent" />
     </div>
@@ -25,6 +28,10 @@
         </ion-item>
       }
     </ion-list>
+  } @else if (failed()) {
+    <p class="mh-helper">{{ 'accountSheets.location.unavailable' | translate }}</p>
+  } @else if (searched()) {
+    <p class="mh-helper">{{ 'accountSheets.location.noResults' | translate }}</p>
   }
 
   @if (selected(); as place) {

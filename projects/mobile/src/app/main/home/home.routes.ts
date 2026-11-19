@@ -12,7 +12,7 @@ import { programPageRoutes } from '../programs/program-pages.routes';
  * day's session or booking (or the whole day's when there are several), a
  * plan day's preview, a client's workout, a record's progress and the
  * workout behind it, Discover's coaches, groups and search, the invite
- * page, the coaching profile and the role switch open in this stack, so
+ * page and the role switch open in this stack, so
  * back returns to Home instead of to a list the reader never came from
  * (`stack-paths.ts`, `clients/client-paths.ts`, `home-stack.config.ts`).
  */
@@ -181,13 +181,6 @@ export const homeRoutes: Routes = [
         loadComponent: () =>
           import('../clients/invite-client/invite-client').then((m) => m.InviteClient),
         title: 'pageTitle.inviteClient',
-      },
-      {
-        // The first week's "Add your specialties".
-        path: 'coaching',
-        loadComponent: () =>
-          import('../account/coaching-profile/coaching-profile').then((m) => m.CoachingProfile),
-        title: 'pageTitle.coachingProfile',
       },
       {
         // The header's role pill.

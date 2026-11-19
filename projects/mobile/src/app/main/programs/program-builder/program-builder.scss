@@ -26,15 +26,15 @@
   display: none;
 }
 
-/* A rail of same-sized pills — a grid control, on tokens, like the sessions
-   week strip. */
+/* A rail of same-sized squares — a grid control, on tokens, like the
+   sessions week strip. The week number is words, so the control radius. */
 .week-pill {
   position: relative;
   flex: none;
   width: 2.25rem;
   height: 2.25rem;
   border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-pill);
+  border-radius: var(--mh-radius-control);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);

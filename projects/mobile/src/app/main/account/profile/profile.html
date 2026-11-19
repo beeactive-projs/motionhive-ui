@@ -21,7 +21,14 @@
       />
     } @else {
       <div class="portrait">
-        <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
+        <mh-hex-avatar
+          size="2xl"
+          [name]="store.fullName()"
+          [imageUrl]="store.avatarUrl()"
+          [mhViewPhoto]="store.avatarUrl()"
+          [mhViewPhotoAlt]="'photoViewer.alt.profile' | translate"
+          [mhViewPhotoLabel]="'photoViewer.open.profile' | translate"
+        />
         <ion-button fill="clear" size="small" (click)="photoSheetOpen.set(true)">
           {{ 'account.profile.editPhoto' | translate }}
         </ion-button>

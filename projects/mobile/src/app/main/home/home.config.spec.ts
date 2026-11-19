@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CoachActivityItem,
+  NavModes,
   Post,
   ProgramAssignment,
   ProgressRecord,
@@ -15,6 +16,8 @@ import {
 import { HexShape, HexShapes } from '../../_shared/config/hexagon.config';
 import {
   COACH_SHORTCUTS,
+  GROUP_SETUP_SNOOZE_DAYS,
+  WELCOME_CARDS,
   ClientHiveStates,
   EndDays,
   GreetingPeriods,
@@ -69,6 +72,8 @@ import {
   weekPlaces,
   weekSummary,
   withinDays,
+  parseHiddenInvites,
+  snoozeActive,
 } from './home.config';
 
 function client(overrides: Partial<RosterClient> = {}): RosterClient {
@@ -810,6 +815,11 @@ describe('coachLatest and traineeLatest', () => {
     expect(entries.map((e) => e.kind)).toEqual([LatestKinds.Record, LatestKinds.Post]);
   });
 
+  it('says no "New record" for the first time on a lift', () => {
+    const entries = traineeLatest([], [{ ...record('2026-10-30T10:00:00Z'), first: true }], now);
+    expect(entries).toEqual([]);
+  });
+
   describe('latestRow', () => {
     const copy: LatestCopy = {
       t: echo,
@@ -884,5 +894,39 @@ describe('coachLatest and traineeLatest', () => {
       const first = traineeLatest([], [record('2026-10-31T09:00:00Z', 104.5)], now)[0]!;
       expect(latestRow(first, copy).parts).toHaveLength(1);
     });
+  });
+});
+
+describe('welcome cards', () => {
+  it('has words and a registered glyph for both homes', () => {
+    for (const kind of Object.values(NavModes)) {
+      expect(WELCOME_CARDS[kind].title).toMatch(/^home\.welcomeCard\./);
+      expect(WELCOME_CARDS[kind].detail).toMatch(/^home\.welcomeCard\./);
+    }
+    // Registered in HOME_ICONS (`home.icons.spec.ts` checks the templates).
+    expect(WELCOME_CARDS[NavModes.Train].icon).toBe('compass-outline');
+    expect(WELCOME_CARDS[NavModes.Coach].icon).toBe('ribbon-outline');
+  });
+});
+
+describe('group offers on Home', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+
+  it('keeps "Not now" for 30 days, then offers again', () => {
+    const at = 1_000_000;
+    expect(snoozeActive(String(at), at + 29 * DAY, GROUP_SETUP_SNOOZE_DAYS)).toBe(true);
+    expect(snoozeActive(String(at), at + 30 * DAY, GROUP_SETUP_SNOOZE_DAYS)).toBe(false);
+  });
+
+  it('reads nothing stored, or junk, as not snoozed', () => {
+    expect(snoozeActive(null, 0, GROUP_SETUP_SNOOZE_DAYS)).toBe(false);
+    expect(snoozeActive('soon', 0, GROUP_SETUP_SNOOZE_DAYS)).toBe(false);
+  });
+
+  it('reads the hidden invitations as a list of ids, and anything else as none', () => {
+    expect(parseHiddenInvites('["a","b"]')).toEqual(['a', 'b']);
+    expect(parseHiddenInvites('[1,"a"]')).toEqual(['a']);
+    expect(parseHiddenInvites('{')).toEqual([]);
+    expect(parseHiddenInvites(null)).toEqual([]);
   });
 });

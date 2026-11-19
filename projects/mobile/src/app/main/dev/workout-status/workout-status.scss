@@ -1,0 +1,37 @@
+/* Two fields a row; the names take a row each. */
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--mh-page-rhythm) 0.5rem;
+}
+
+.fields .wide {
+  grid-column: 1 / -1;
+}
+
+/* The mini-bar and the rest timer pad their own sides, as they do edge to
+   edge over the tab bar and in the logger's footer. */
+.bleed {
+  margin-inline: calc(-1 * var(--mh-page-gutter));
+}
+
+.scenario-title {
+  margin: var(--mh-page-rhythm) 0 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+  font-weight: 600;
+}
+
+.island-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.state {
+  margin: 0;
+  overflow-x: auto;
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-tight);
+}

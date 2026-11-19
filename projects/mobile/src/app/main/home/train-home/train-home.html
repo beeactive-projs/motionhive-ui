@@ -74,7 +74,7 @@
             <p class="hive-kicker">{{ 'home.train.today.inProgress' | translate }}</p>
             <h3>{{ log.name }}</h3>
           </div>
-          <ion-button shape="round" (click)="resume()">
+          <ion-button (click)="resume()">
             {{ 'button.continue' | translate }}
           </ion-button>
         </div>
@@ -87,7 +87,7 @@
               <p class="hive-sub">{{ meta }}</p>
             }
           </div>
-          <ion-button shape="round" (click)="openNext()">
+          <ion-button (click)="openNext()">
             {{ 'button.start' | translate }}
           </ion-button>
         </div>
@@ -104,6 +104,12 @@
     <p class="slow-note" role="status">{{ 'home.slowLoad' | translate }}</p>
   }
 </div>
+
+<!-- The welcome questions passed over, offered once more; gone when answered or closed. -->
+<mh-welcome-card [kind]="NavModes.Train" />
+
+<!-- A coach's invitation to their group, waiting on the reader. -->
+<mh-group-invites (joined)="onGroupJoined()" />
 
 <!-- A session booked for today, only on a day that has one: one small row. -->
 @if (todayFirst(); as first) {

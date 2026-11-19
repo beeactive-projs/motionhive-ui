@@ -337,6 +337,31 @@ export class GroupDetailStore {
       .pipe(take(1), takeUntilDestroyed(this._destroyRef));
   }
 
+  /** The owner closing the group for everyone. */
+  deleteGroup(): Observable<void> {
+    return this._groupService
+      .delete(this._groupId)
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef));
+  }
+
+  /** A post edited from its ⋯, patched in place. */
+  patchPost(post: Post): void {
+    this._posts.update((list) =>
+      list.map((row) => {
+        if (row.id === post.id) {
+          return { ...row, ...post };
+        }
+        return row;
+      }),
+    );
+  }
+
+  /** A post deleted from its ⋯ (the sheet already asked the API). */
+  removePost(postId: string): void {
+    this._posts.update((list) => list.filter((row) => row.id !== postId));
+    this._postsTotal.update((total) => Math.max(0, total - 1));
+  }
+
   // ── Fetching ───────────────────────────────────────────────────────────
 
   private _loadGroup(force = false): void {

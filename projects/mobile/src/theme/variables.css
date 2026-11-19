@@ -34,8 +34,9 @@
  *   shade / tint    = ramp steps 600 / 400 of the base 500
  *   wash (light)    = step 100 fill + step 700 ink   (honey: 800 — 700 is
  *                     the honey-deep accent and too light for tile ink)
- *   wash (dark)     = step 900 fill + step 200 ink   (honey: 950 + 300 —
- *                     amber's 900 reads as milk chocolate next to navy)
+ *   wash (dark)     = step 900 fill + step 200 ink   (honey: the honey at
+ *                     16% over the card grey + 300 ink; every dark amber
+ *                     step is a brown on the grey page)
  * Contrast colours are chosen for WCAG AA on the base colour. `-rgb`
  * triplets are raw values by necessity — keep them in sync with their hex.
  *
@@ -256,6 +257,13 @@
   --mh-row-line: 1.5rem;
 
   /*
+   * One line of a compact row (`.mh-compact-row`, ion-list.css), the exercise
+   * rows. Two of them are an md tile's 2.5rem, so a compact row is
+   * 0.5 + 1.25 + 1.25 + 0.5 = 3.5rem in either kind of list.
+   */
+  --mh-row-line-compact: 1.25rem;
+
+  /*
    * The page's layout primitives (layout.css). Components carry no margins;
    * a screen opts into these and gets the app's one gutter and one rhythm.
    */
@@ -330,6 +338,18 @@
   --mh-color-chart-idle: var(--mh-slate-300);
 
   /*
+   * The round − and + of a stepper (layout.css). A step above the divider the
+   * value's well is drawn on, so the sign reads as a button beside the number
+   * rather than merging with it into one bar. Neutral by rule: a stepper
+   * selects nothing, and the honey the signs used to wear is the selection
+   * fill, which left a card of targets looking lit up and spent the one
+   * colour that means "the pad is typing here". It matches the border colour
+   * in both palettes today; it is its own token because it is a fill, and a
+   * border may move without the buttons moving with it.
+   */
+  --mh-color-stepper-sign: var(--mh-slate-300);
+
+  /*
    * The hairline between rows of a grouped list (ion-list.css). Not the
    * divider above: that one doubles as a soft fill (pills) and is
    * too pale to read as a line on a card. Mixed from the ink rather
@@ -356,12 +376,57 @@
   --mh-color-selected-background: var(--mh-primary-50);
 
   /*
-   * A honey-tinted capsule that is not a selection: Home's role pill,
-   * Discover's city. Honey at 12% over the white page in light. Over
+   * The fill behind something done, a ticked set in the logger. The success
+   * wash in light; in dark the wash (emerald 900) read as a heavy band, so
+   * the dark block lifts it (user decision, 2026-11-09). Status, not
+   * selection.
+   */
+  --mh-color-done-background: var(--ion-color-success-wash);
+
+  /*
+   * A selected row in a table of rows, the logger's set open in the number
+   * pad: the selection fill in light. Its own role because dark lifts it the
+   * way it lifts the done row (user decision, 2026-11-09), while a selected
+   * chip, tile or day keeps the deep honey there.
+   */
+  --mh-color-selected-row: var(--mh-color-selected-background);
+
+  /*
+   * The logger's number pad, drawn as the phone's own keypad is: the pad a
+   * slate step below the white digit keys, each key on a 1px darker base,
+   * and the keys that change rather than type (±step, backspace, clear) a
+   * step darker again. Navy ink is 17:1 on a digit, 11.6:1 on a function
+   * key; the base is 2.1:1 on the pad. Dark lifts the keys off the card
+   * instead (the dark block).
+   */
+  --mh-color-keypad: var(--mh-slate-200);
+  --mh-color-keypad-key: #ffffff;
+  --mh-color-keypad-key-function: var(--mh-slate-300);
+  --mh-color-keypad-key-edge: var(--mh-slate-400);
+
+  /*
+   * A suggested value, not a typed one: a set's pre-fill in the logger,
+   * drawn as a placeholder is (this ink, regular weight) so it never reads
+   * as a number someone entered. Slate 500 is 4.8:1 on the white field,
+   * against the navy semibold of a typed value.
+   */
+  --mh-color-prefill: var(--mh-slate-500);
+
+  /*
+   * A honey tint that is not a selection: Home's role switch, Discover's
+   * city. Honey at 12% over the white page in light. Over
    * navy any see-through honey mixes to a grey, so dark uses the honey wash
    * fill instead (the dark block).
    */
   --mh-color-honey-tint: rgba(245, 158, 11, 0.12);
+
+  /*
+   * Muted ink on a wash surface: the line under a tinted hero's name, the
+   * summary on a post's workout card, a session block's time. The muted
+   * slate in light (6.2:1 or more on every 100 wash); dark steps it up, as a
+   * sheet's cards do, because slate 400 is under AA on the dark washes.
+   */
+  --mh-color-wash-muted: var(--mh-slate-600);
 
   /*
    * A day a coach's plan was trained on, in the workout history calendar.
@@ -397,6 +462,16 @@
   --mh-color-hive-honey-top: var(--mh-warning-200);
 
   /*
+   * The corner print (design "Discover Header Clean", A; owner, 2026-11-07):
+   * the outlined honeycomb in the top right of Discover's header, and
+   * nowhere else. Its line colour and how strongly it shows: amber 600 at
+   * about 30% on the white page, the honey at about 45% on the grey (the
+   * dark block below). The page fades it out towards the middle.
+   */
+  --mh-color-corner-print: var(--mh-primary-600);
+  --mh-corner-print-opacity: 0.32;
+
+  /*
    * The navy card: the brand's navy as a surface on a light page (the next
    * session tile, a client with no plan, the rest timer, a memory card, a
    * profile's navy band). In dark it is simply the card step, since navy
@@ -405,12 +480,18 @@
    *   raised            a track or a box on it (navy 700)
    *   ink / muted       text on it (navy 50, 15.6:1; navy 300, 8:1)
    *   accent            its warm label (amber 300, 11.9:1)
+   *   honey-light       a lighter honey: the rest timer's last ten seconds
+   *                     (primary 200), the same in dark
+   *   success           green as text on it: the rest timer's "Go"
+   *                     (success 400, over 8:1), the same in dark
    */
   --mh-color-navy-card: var(--mh-navy-900);
   --mh-color-navy-card-raised: var(--mh-navy-700);
   --mh-color-navy-card-ink: var(--mh-navy-50);
   --mh-color-navy-card-muted: var(--mh-navy-300);
   --mh-color-navy-card-accent: var(--mh-warning-300);
+  --mh-color-navy-card-honey-light: var(--mh-primary-200);
+  --mh-color-navy-card-success: var(--mh-success-400);
 
   /*
    * The shadow under a floating overlay: a picker popup, a select's list,
@@ -724,9 +805,40 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   /* Selection inverts like the washes: deep honey fill, light ink. */
   --mh-color-selected-background: var(--mh-warning-950);
 
-  /* The honey capsule takes the honey wash's fill, opaque, so it stays warm
-     on the grey. Honey ink on it is 7:1. */
+  /* Done is lighter than the grey card, not darker, as the workout prototype
+     draws it: emerald at 18% over the card mixes to a muted green a step
+     above it (about #27453d), where the 900 wash sat below it as a heavy
+     band. See-through is safe here, unlike on navy: over grey the green
+     stays green. White ink on it is about 10:1. */
+  --mh-color-done-background: rgba(var(--ion-color-success-rgb), 0.18);
+
+  /* The selected row the same way, in honey: 8% over the card mixes to a
+     warm step above it (about #3c352b), where the deep honey sat below the
+     card as a heavy band. No more than 8%: the row's muted Previous
+     (slate-400) is 4.7:1 on it, and at 16% (#4c3e28) it fell to 4.0:1, under
+     AA. White ink on it is about 12:1. */
+  --mh-color-selected-row: rgba(var(--ion-color-primary-rgb), 0.08);
+
+  /* The number pad keeps the card's grey; its keys are the lighter greys
+     above it, digits brightest (2.3:1 on the pad), function keys a step
+     under them (1.5:1). Light ink is 5.4:1 on a digit, 8.3:1 on a function
+     key. The base is a black edge, never mixed from the light ink. */
+  --mh-color-keypad: #2c2c2e;
+  --mh-color-keypad-key: #636366;
+  --mh-color-keypad-key-function: #48484a;
+  --mh-color-keypad-key-edge: rgba(0, 0, 0, 0.4);
+
+  /* The suggestion ink a neutral grey, dimmer than the muted slate: 5:1 on
+     the page-grey field, where slate 500 would be 3.5:1. */
+  --mh-color-prefill: #8e8e93;
+
+  /* The honey tint takes the honey wash's fill, opaque, so it stays warm
+     on the grey. Honey ink on it is 4.8:1. */
   --mh-color-honey-tint: var(--ion-color-primary-wash);
+
+  /* Muted ink on a wash steps up to slate 300: 7:1 on the honey wash, 6.4:1
+     on the teal and sky washes, where slate 400 was 4:1 and 3.7:1. */
+  --mh-color-wash-muted: var(--mh-slate-300);
 
   /* The hive card is a navy box on the grey page, honey on it, as in the
      light block. The empty cells are the design's #1D2E4C, which sits
@@ -742,6 +854,8 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --mh-color-hive-cell: var(--mh-navy-600);
   --mh-color-hive-ghost: var(--mh-navy-700);
   --mh-color-hive-pattern: var(--ion-color-primary);
+  --mh-color-corner-print: var(--ion-color-primary);
+  --mh-corner-print-opacity: 0.45;
 
   /* The navy card matches the hive card's step, with its track a step up
      (navy 600, 1.2:1 on it), light ink and the honey accent. */
@@ -762,11 +876,25 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --mh-color-chip-idle: var(--mh-navy-500);
   --mh-color-chip-idle-contrast: var(--mh-navy-100);
 
-  /* Wash inverts: deep fill (step 900; honey 950), light ink (step 200;
-     honey 300). */
-  --ion-color-primary-wash: var(--mh-warning-950);
+  /* Wash inverts: deep fill (step 900), light ink (step 200).
+
+     Honey is the exception (2026-11-18). Every dark step of the amber ramp
+     is a brown: 950 (#451a03) was picked against the navy page, and on the
+     grey one it read as a muddy band under every note and caution box. So
+     its fill is the honey at 16% over the card grey, a warm grey a step
+     above the card (about #4c3e28), the way the done and selected rows tint
+     the grey. It is mixed once, here, against the page's card (#2c2c2e), so
+     it stays the same opaque colour in a sheet and on the navy hive card,
+     where see-through honey would turn grey. Honey 300 ink on it is 7.2:1,
+     the body ink 9.4:1. The page's muted slate is 4:1 on it, so muted text
+     on any wash reads `--mh-color-wash-muted`, never `--ion-color-medium`. */
+  --ion-color-primary-wash: color-mix(
+    in srgb,
+    var(--ion-color-primary) 16%,
+    var(--ion-card-background)
+  );
   --ion-color-primary-wash-contrast: var(--mh-warning-300);
-  --ion-color-warning-wash: var(--mh-warning-950);
+  --ion-color-warning-wash: var(--ion-color-primary-wash);
   --ion-color-warning-wash-contrast: var(--mh-warning-300);
   --ion-color-success-wash: var(--mh-success-900);
   --ion-color-success-wash-contrast: var(--mh-success-200);
@@ -854,6 +982,7 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --ion-border-color: #48484a;
   --mh-color-divider: #3a3a3c;
   --mh-color-chart-idle: #636366;
+  --mh-color-stepper-sign: #48484a;
 
   /* The page is near-black, so Ionic's 0.32 / 0.4 scrim barely darkens it,
      and a sheet scales the scrim by how far it is open. */

@@ -64,15 +64,15 @@
           <ion-icon slot="top" name="create-outline" aria-hidden="true" />
           {{ 'clients.actions.notes' | translate }}
         </ion-item-option>
-        <!-- Violet, not red: archiving is undone in one tap and loses nothing. -->
+        <!-- Violet, not red: archiving loses nothing, the client keeps their history. -->
         <ion-item-option color="violet" (click)="emitAndClose(sliding, archive)">
           <ion-icon slot="top" name="archive-outline" aria-hidden="true" />
           {{ 'button.archive' | translate }}
         </ion-item-option>
       } @else if (isArchived()) {
-        <ion-item-option color="success" (click)="emitAndClose(sliding, unarchive)">
-          <ion-icon slot="top" name="arrow-undo-outline" aria-hidden="true" />
-          {{ 'button.unarchive' | translate }}
+        <ion-item-option color="success" (click)="emitAndClose(sliding, inviteAgain)">
+          <ion-icon slot="top" name="person-add-outline" aria-hidden="true" />
+          {{ 'clients.actions.inviteAgain' | translate }}
         </ion-item-option>
       } @else {
         <ion-item-option color="danger" (click)="emitAndClose(sliding, withdraw)">

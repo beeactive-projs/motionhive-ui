@@ -3,14 +3,17 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import {
+  ExerciseSetType,
   LogSetPayload,
   LoggedExercise,
   LoggedSet,
+  SupersetChange,
   WorkoutLog,
   WorkoutLogService,
 } from 'core';
 
 import { DEFAULT_SETS } from '../workouts.config';
+import { withLinks } from './logger-flow';
 
 /**
  * One live workout.
@@ -115,17 +118,22 @@ export class LoggerStore {
   }
 
   /**
-   * Coming back to a paused workout starts its clock again. Optimistic: the
-   * pause is folded in here at once so the clock moves on from where it
-   * stopped, and the server's sum replaces it when it answers.
+   * Coming back to a paused workout starts its clock again (`at`: Continue
+   * tapped then, on the lock screen). Optimistic: the pause is folded in
+   * here at once so the clock moves on from where it stopped, and the
+   * server's sum replaces it when it answers.
    */
-  resumeClock(): void {
+  resumeClock(at: number | null = null): void {
     const log = this._log();
     if (!log?.pausedAt) return;
-    const open = Math.max(0, Math.round((Date.now() - new Date(log.pausedAt).getTime()) / 1000));
+    let end = Date.now();
+    if (at !== null) {
+      end = at;
+    }
+    const open = Math.max(0, Math.round((end - new Date(log.pausedAt).getTime()) / 1000));
     this._patchClock({ pausedAt: null, pausedSeconds: (log.pausedSeconds ?? 0) + open });
     this._workoutLogService
-      .resume(log.id)
+      .resume(log.id, at)
       .pipe(
         take(1),
         catchError(() => of(null)),
@@ -221,30 +229,75 @@ export class LoggerStore {
   }
 
   /**
-   * Optimistic like every write here, but a failed delete cannot be shrugged
-   * off — the row would be gone locally and back on the next load. So a
-   * failure re-reads the log and tells the caller.
+   * A second set of `setType` holding `values`, unticked, so the next set is
+   * one tap away. The API appends, so the copy lands last on the exercise.
+   * `onError` gets the server's refusal, so the page can show its message
+   * and take down the error dialog the interceptor opened for it.
    */
-  removeSet(exerciseId: string, setId: string, onError?: () => void): void {
+  copySet(
+    exerciseId: string,
+    setType: ExerciseSetType,
+    values: LogSetPayload,
+    onError?: (error: unknown) => void,
+  ): void {
     const log = this._log();
     if (!log) return;
-    // Edits still waiting on an in-flight write would only 404 once it lands.
-    this._queued.delete(setId);
-    this._updateExercise(exerciseId, (ex) => ({
-      ...ex,
-      sets: (ex.sets ?? []).filter((s) => s.id !== setId),
-    }));
     this._workoutLogService
-      .removeSet(log.id, setId)
+      .addSet(log.id, exerciseId, { setType })
       .pipe(take(1))
       .subscribe({
-        error: () => {
-          onError?.();
+        next: (set) => {
+          this._updateExercise(exerciseId, (ex) => ({
+            ...ex,
+            sets: [...(ex.sets ?? []), set],
+          }));
+          if (Object.keys(values).length) this.logSet(exerciseId, set.id, values);
+        },
+        error: (error: unknown) => onError?.(error),
+      });
+  }
+
+  /**
+   * One set or several (a whole round of a superset): off the screen now, in
+   * one call to the server, all or none. Optimistic like every write here,
+   * but a failed delete cannot be shrugged off — the rows would be gone
+   * locally and back on the next load. So a failure re-reads the log and
+   * tells the caller why.
+   */
+  removeSets(
+    sets: readonly { exerciseId: string; setId: string }[],
+    onError?: (error: unknown) => void,
+  ): void {
+    const log = this._log();
+    if (!log || sets.length === 0) {
+      return;
+    }
+    const gone = new Set<string>();
+    for (const { setId } of sets) {
+      gone.add(setId);
+      // Edits still waiting on an in-flight write would only 404 once it lands.
+      this._queued.delete(setId);
+    }
+    const exerciseIds = new Set(sets.map((entry) => entry.exerciseId));
+    for (const exerciseId of exerciseIds) {
+      this._updateExercise(exerciseId, (ex) => ({
+        ...ex,
+        sets: (ex.sets ?? []).filter((s) => !gone.has(s.id)),
+      }));
+    }
+    this._workoutLogService
+      .removeSets(log.id, [...gone])
+      .pipe(take(1))
+      .subscribe({
+        error: (error: unknown) => {
+          onError?.(error);
           this._workoutLogService
             .get(log.id)
             .pipe(take(1), catchError(() => of(null)))
             .subscribe((fresh) => {
-              if (fresh) this._log.set(fresh);
+              if (fresh) {
+                this._log.set(fresh);
+              }
             });
         },
       });
@@ -252,6 +305,11 @@ export class LoggerStore {
 
   // ─── Exercises ────────────────────────────────────────────────
 
+  /**
+   * The reply is the bare row: no sets, no exercise, no link to the plan.
+   * Only its flag is taken, since swapping it in whole made Finish read a
+   * skipped routine exercise as one the workout removed.
+   */
   setSkipped(exerciseId: string, skipped: boolean): void {
     const log = this._log();
     if (!log) return;
@@ -260,7 +318,40 @@ export class LoggerStore {
       .setExerciseSkipped(log.id, exerciseId, skipped)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((updated) => {
-        if (updated) this._updateExercise(exerciseId, () => updated);
+        if (!updated) return;
+        this._updateExercise(exerciseId, (ex) => ({ ...ex, isSkipped: updated.isSkipped }));
+      });
+  }
+
+  /**
+   * New superset groups (the link chip, or Unlink in an exercise's ⋮): on
+   * screen now, saved in one call, all or none. A refusal puts the old
+   * groups back, tells the caller why, and re-reads the log quietly (the
+   * caller has already said it failed), so the screen never keeps a
+   * superset the server does not have, even when that read fails too.
+   */
+  setSupersets(changes: readonly SupersetChange[], onError?: (error: unknown) => void): void {
+    const log = this._log();
+    if (!log || changes.length === 0) return;
+    const changed = new Set(changes.map((change) => change.id));
+    const before: SupersetChange[] = (log.exercises ?? [])
+      .filter((e) => changed.has(e.id))
+      .map((e) => ({ id: e.id, supersetGroupId: e.supersetGroupId ?? null }));
+    this._updateLog((l) => ({ ...l, exercises: withLinks(l.exercises ?? [], changes) }));
+    this._workoutLogService
+      .setSupersets(log.id, [...changes])
+      .pipe(take(1))
+      .subscribe({
+        error: (error: unknown) => {
+          this._updateLog((l) => ({ ...l, exercises: withLinks(l.exercises ?? [], before) }));
+          onError?.(error);
+          this._workoutLogService
+            .get(log.id, { silent: true })
+            .pipe(take(1), catchError(() => of(null)))
+            .subscribe((fresh) => {
+              if (fresh) this._log.set(fresh);
+            });
+        },
       });
   }
 
@@ -299,6 +390,12 @@ export class LoggerStore {
       });
   }
 
+  /**
+   * The reply is the bare row, without its sets (the server keeps them on the
+   * swapped exercise) or the new movement's kind, so the log is read again.
+   * Should that read fail, the reply is laid over the row on screen, which
+   * keeps its sets and its link to the plan.
+   */
   swapExercise(exerciseId: string, newExerciseId: string, done?: () => void): void {
     const log = this._log();
     if (!log) return;
@@ -306,18 +403,49 @@ export class LoggerStore {
       .swapExercise(log.id, exerciseId, newExerciseId)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((swapped) => {
-        if (swapped) this._updateExercise(exerciseId, () => swapped);
-        done?.();
+        if (!swapped) {
+          done?.();
+          return;
+        }
+        this._workoutLogService
+          .get(log.id)
+          .pipe(take(1), catchError(() => of(null)))
+          .subscribe((fresh) => {
+            if (fresh) {
+              this._log.set(fresh);
+            } else {
+              this._updateExercise(exerciseId, (ex) => ({
+                ...swapped,
+                sets: ex.sets,
+                assignedExercise: ex.assignedExercise,
+                prescribedExercise: ex.prescribedExercise,
+              }));
+            }
+            done?.();
+          });
       });
   }
 
+  /**
+   * The API unlinks the one exercise a superset is left with, so the screen
+   * does too. Left holding its old group, that exercise read as unchanged
+   * when it was next linked, the save skipped it, and the server kept no
+   * superset where the screen showed one.
+   */
   removeExercise(exerciseId: string): void {
     const log = this._log();
     if (!log) return;
-    this._updateLog((l) => ({
-      ...l,
-      exercises: (l.exercises ?? []).filter((e) => e.id !== exerciseId),
-    }));
+    this._updateLog((l) => {
+      const exercises = l.exercises ?? [];
+      const group = exercises.find((e) => e.id === exerciseId)?.supersetGroupId ?? null;
+      const rest = exercises.filter((e) => e.id !== exerciseId);
+      const left = group === null ? [] : rest.filter((e) => e.supersetGroupId === group);
+      return {
+        ...l,
+        exercises:
+          left.length === 1 ? withLinks(rest, [{ id: left[0].id, supersetGroupId: null }]) : rest,
+      };
+    });
     this._workoutLogService
       .removeExercise(log.id, exerciseId)
       .pipe(take(1), catchError(() => of(null)))
@@ -368,10 +496,26 @@ export class LoggerStore {
     }));
   }
 
+  /**
+   * The server's row for a set, over the one on screen. A set write answers
+   * with the bare row: the plan the set came from (`assignedSet`,
+   * `prescribedSet`) and its planned rest come only with the workout's read.
+   * They are kept from the row on screen, or a ticked set forgot its plan,
+   * and Finish took a routine's own set for one the workout added.
+   */
   private _replaceSet(exerciseId: string, saved: LoggedSet): void {
     this._updateExercise(exerciseId, (ex) => ({
       ...ex,
-      sets: (ex.sets ?? []).map((s) => (s.id === saved.id ? saved : s)),
+      sets: (ex.sets ?? []).map((s) =>
+        s.id === saved.id
+          ? {
+              ...saved,
+              assignedSet: saved.assignedSet ?? s.assignedSet,
+              prescribedSet: saved.prescribedSet ?? s.prescribedSet,
+              plannedRestSeconds: saved.plannedRestSeconds ?? s.plannedRestSeconds,
+            }
+          : s,
+      ),
     }));
   }
 }

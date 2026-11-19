@@ -1,12 +1,20 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
-import { ExerciseSetType, OneRepMaxSource, ProgramAssignmentKind, WorkoutLogStatus } from 'core';
+import {
+  ExerciseKind,
+  ExerciseSetType,
+  OneRepMaxSource,
+  ProgramAssignmentKind,
+  WorkoutLogStatus,
+} from 'core';
 
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   CalendarDayStates,
+  FinishChoices,
   HeroStates,
+  KeypadFields,
   LogSources,
   RoutineActionIds,
   WORKOUT_ICONS,
@@ -19,12 +27,15 @@ import {
   clockDigitsToDisplay,
   clockDigitsToSeconds,
   compactPrescription,
+  contentsLine,
   dateRail,
   durationClock,
   heroState,
   exerciseSessionLine,
   exerciseDoneSummary,
   exerciseSetSummary,
+  finishOptions,
+  fitsKeypadLimit,
   isExerciseDone,
   lastTimeSummary,
   setPlaceholder,
@@ -50,7 +61,9 @@ import {
   routineActions,
   routineTileColor,
   secondsToClock,
+  secondsToClockDigits,
   niceBounds,
+  nudgeRest,
   trendGeometry,
   unbreakable,
   volumeGainPercent,
@@ -431,14 +444,28 @@ describe('workouts config', () => {
       exercise: { id: 'e', name: 'Bench press', slug: 'bench', kind: 'STRENGTH', thumbnailUrl: null },
       oneRepMaxSeries: [
         { weightKg: 84, recordedAt: new Date(2026, 8, 10, 21).toISOString(), source: OneRepMaxSource.EstimatedEpley },
+        { weightKg: 80, recordedAt: new Date(2026, 8, 1, 18).toISOString(), source: OneRepMaxSource.EstimatedEpley },
         { weightKg: 90, recordedAt: new Date(2026, 8, 5, 9).toISOString(), source: OneRepMaxSource.Tested },
       ],
       sessions: [
         { workoutLogId: 'a', performedAt: new Date(2026, 8, 10, 7).toISOString() },
         { workoutLogId: 'b', performedAt: new Date(2026, 8, 5, 9).toISOString() },
+        { workoutLogId: 'c', performedAt: new Date(2026, 8, 1, 18).toISOString() },
       ],
     } as never;
+    // 'c' was the first time on the lift: a best, not a record beaten.
     expect([...recordSessionIds(progress)]).toEqual(['a']);
+  });
+
+  it('marks no record for the first time on a lift', () => {
+    const progress = {
+      exercise: { id: 'e', name: 'Bench press', slug: 'bench', kind: 'STRENGTH', thumbnailUrl: null },
+      oneRepMaxSeries: [
+        { weightKg: 84, recordedAt: new Date(2026, 8, 10, 21).toISOString(), source: OneRepMaxSource.EstimatedEpley },
+      ],
+      sessions: [{ workoutLogId: 'a', performedAt: new Date(2026, 8, 10, 7).toISOString() }],
+    } as never;
+    expect([...recordSessionIds(progress)]).toEqual([]);
   });
 
   it('reads a session as its sets and the top set, or its best for a hold', () => {
@@ -539,6 +566,23 @@ describe('workouts config', () => {
     expect(prescriptionLine([])).toBe('');
   });
 
+  // The builder plans distances now; the read view never showed them, and
+  // called a run's time a hold.
+  it('describes a run by its distance, and its time as a time', () => {
+    const interval = {
+      targetRepsMin: null,
+      targetRepsMax: null,
+      targetWeightKg: null,
+      targetDurationSeconds: 105,
+      targetDistanceMeters: 400,
+    };
+    expect(prescriptionLine([interval, interval, interval, interval])).toBe('4 sets · 400 m · 1:45');
+
+    const timed = { ...interval, targetDistanceMeters: null, targetDurationSeconds: 1200 };
+    expect(prescriptionLine([timed], ExerciseKind.Cardio)).toBe('1 set · 20:00');
+    expect(prescriptionLine([timed], ExerciseKind.Duration)).toBe('1 set · 1200 sec hold');
+  });
+
   it('cuts a prescription down to the hero card column', () => {
     const set = {
       targetRepsMin: 8,
@@ -635,6 +679,15 @@ describe('workouts config', () => {
     expect(secondsToClock(0)).toBe('0:00');
   });
 
+  // A rest's − and + move 15 seconds and stop at 0:15 and 10:00.
+  it('nudges a rest a step at a time, within its bounds', () => {
+    expect(nudgeRest(90, 1)).toBe(105);
+    expect(nudgeRest(90, -1)).toBe(75);
+    expect(nudgeRest(15, -1)).toBe(15);
+    expect(nudgeRest(20, -1)).toBe(15);
+    expect(nudgeRest(600, 1)).toBe(600);
+  });
+
   // Keypad digits fill right to left, the way every timer input works —
   // typing 1,3,0 means a minute and a half, not a hundred and thirty seconds.
   it('reads keypad digits right to left into seconds', () => {
@@ -645,11 +698,38 @@ describe('workouts config', () => {
     expect(clockDigitsToSeconds('')).toBeNull();
   });
 
+  // A stored 2:30 is 150 seconds; read as digits it would be 1:50. The pad is
+  // seeded in digits, so the round trip has to come back to the same seconds.
+  it('turns seconds into the digits the pad builds, and back', () => {
+    expect(secondsToClockDigits(150)).toBe('230');
+    expect(secondsToClockDigits(45)).toBe('45');
+    expect(secondsToClockDigits(5)).toBe('5');
+    expect(secondsToClockDigits(0)).toBe('0');
+    expect(secondsToClockDigits(1200)).toBe('2000');
+    for (const seconds of [0, 5, 45, 100, 150, 599, 1200, 5999]) {
+      expect(clockDigitsToSeconds(secondsToClockDigits(seconds))).toBe(seconds);
+    }
+  });
+
   it('shows those digits back as the clock they are building', () => {
     expect(clockDigitsToDisplay('1')).toBe('0:01');
     expect(clockDigitsToDisplay('13')).toBe('0:13');
     expect(clockDigitsToDisplay('130')).toBe('1:30');
     expect(clockDigitsToDisplay('')).toBe('0:00');
+  });
+
+  // A weight holds four whole digits and two decimals, reps three digits: a
+  // key that would go past that is ignored, so the cell never overflows.
+  it('caps what the keypad builds per field', () => {
+    expect(fitsKeypadLimit(KeypadFields.Weight, '9999.99')).toBe(true);
+    expect(fitsKeypadLimit(KeypadFields.Weight, '9999.')).toBe(true);
+    expect(fitsKeypadLimit(KeypadFields.Weight, '10000')).toBe(false);
+    expect(fitsKeypadLimit(KeypadFields.Weight, '82.555')).toBe(false);
+    expect(fitsKeypadLimit(KeypadFields.Reps, '999')).toBe(true);
+    expect(fitsKeypadLimit(KeypadFields.Reps, '1000')).toBe(false);
+    expect(fitsKeypadLimit(KeypadFields.Reps, '')).toBe(true);
+    // No cap where none is set: a distance in metres runs to a marathon.
+    expect(fitsKeypadLimit(KeypadFields.Distance, '42195')).toBe(true);
   });
 
   // One formatter for a workout's length, delegating to core's.
@@ -711,6 +791,23 @@ describe('workouts config', () => {
     ]);
   });
 
+  // One kg rule with the API: a bodyweight move is reps, a skipped exercise nothing.
+  it('keeps bodyweight moves and skipped exercises out of the kg total', () => {
+    const mixed = log({
+      exercises: [
+        { isSkipped: false, exercise: { kind: 'STRENGTH' }, sets: [set({ weightKg: 100, reps: 5 })] },
+        { isSkipped: false, exercise: { kind: 'BODYWEIGHT' }, sets: [set({ weightKg: 20, reps: 8 })] },
+        { isSkipped: true, exercise: { kind: 'STRENGTH' }, sets: [set({ weightKg: 60, reps: 10 })] },
+      ],
+    });
+    expect(workoutVolume(mixed)).toBe(500);
+    expect(workoutTiles(mixed)).toEqual([
+      { label: 'Sets', value: '2' },
+      { label: 'Volume', value: '500 kg' },
+      { label: 'Reps', value: '8' },
+    ]);
+  });
+
   // A skip is a decision; "0 of 4" would read as a failure.
   it('summarises an exercise as done-of-total, and a skip as a skip', () => {
     expect(exerciseSetSummary({ isSkipped: false, sets: [set(), set({ isCompleted: false })] } as never)).toBe('1 of 2 sets');
@@ -753,6 +850,21 @@ describe('the finish summary', () => {
   });
 });
 
+describe('finishOptions', () => {
+  it('offers to save what is ticked, or discard it', () => {
+    expect(finishOptions(3).map((option) => option.id)).toEqual([
+      FinishChoices.Save,
+      FinishChoices.Discard,
+    ]);
+  });
+
+  // Completing an empty workout would mark a coach's plan day done with no
+  // sets and tell the coach so: with nothing ticked, the only verb is Discard.
+  it('offers only Discard with nothing ticked', () => {
+    expect(finishOptions(0).map((option) => option.id)).toEqual([FinishChoices.Discard]);
+  });
+});
+
 describe('loggerRedirect', () => {
   it('logs a workout that is still running', () => {
     expect(loggerRedirect({ id: 'wl-1', status: WorkoutLogStatus.InProgress })).toBeNull();
@@ -769,6 +881,18 @@ describe('loggerRedirect', () => {
     for (const status of [WorkoutLogStatus.Skipped, WorkoutLogStatus.Abandoned]) {
       expect(loggerRedirect({ id: 'wl-2', status })).toEqual(['/tabs/workouts/finish', 'wl-2']);
     }
+  });
+});
+
+describe('contentsLine', () => {
+  it('says how many exercises and sets a workout holds', () => {
+    expect(contentsLine(6, 19)).toBe('6 exercises · 19 sets');
+    expect(contentsLine(1, 1)).toBe('1 exercise · 1 set');
+  });
+
+  it('leaves the sets out while none are counted, and says nothing for an empty workout', () => {
+    expect(contentsLine(4, 0)).toBe('4 exercises');
+    expect(contentsLine(0, 0)).toBe('');
   });
 });
 

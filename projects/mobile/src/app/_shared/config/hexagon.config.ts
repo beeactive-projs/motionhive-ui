@@ -75,6 +75,12 @@ export const SHARE_HEX_SHAPE: HexShape = HexShapes.Logo;
  * 2026-11-02). Lists, avatars and tiles keep the app's own.
  */
 export const TIMER_HEX_SHAPE: HexShape = HexShapes.Logo;
+/**
+ * Discover's page draws its avatars standing on a point, as its design does
+ * ("Discover Header Clean", A; owner, 2026-11-07): Discover only, the rest
+ * of the app keeps the classic shape.
+ */
+export const DISCOVER_HEX_SHAPE: HexShape = HexShapes.Logo;
 
 /** The size of a hexagon `width` wide, in the given shape and orientation. */
 export function hexSize(
@@ -265,23 +271,40 @@ export function combLayout(
 }
 
 /**
- * A small comb drawn as one path, for a decoration: the shape's pointy
- * figure (100 from point to point) at each `[column, row]`, a half column
- * shifting a row, `gap` apart in the same units. Its box starts at 0, 0.
+ * The corner print (design "Discover Header Clean", A; owner, 2026-11-07):
+ * a honeycomb in a `width` × `height` box, laid from its top right corner,
+ * where a cell is centred. The cells are regular hexagons standing on a
+ * point, `radius` from the centre to a point, with sharp corners and
+ * shared edges, as the design drew them; only the cells that reach into
+ * the box are drawn. One path of closed outlines, in the box's units, for
+ * the page to stroke and fade towards the middle.
  */
-export function combFigure(
-  shape: HexShape,
-  places: readonly (readonly [number, number])[],
-  gap: number,
-): { d: string; viewBox: string; width: number; height: number } {
-  const cell = hexFigure(shape, HexOrientations.Pointy);
-  const { dx, dy } = combStep(shape, cell.width, gap);
-  const at = ([col, row]: readonly [number, number]) =>
-    hexShapePath(shape, cell.width, HexOrientations.Pointy, col * dx, row * dy);
-  const d = places.map(at).join(' ');
-  const width = Math.max(0, ...places.map(([col]) => col)) * dx + cell.width;
-  const height = Math.max(0, ...places.map(([, row]) => row)) * dy + cell.height;
-  return { d, viewBox: `0 0 ${short(width)} ${short(height)}`, width, height };
+export function cornerPrintPath(width: number, height: number, radius: number): string {
+  const cell = Math.sqrt(3) * radius;
+  const half = cell / 2;
+  const rowStep = 1.5 * radius;
+  const outlines: string[] = [];
+  // Row 0 runs through the corner; the row above it would lie outside.
+  for (let row = 0; row * rowStep - radius < height; row++) {
+    const y = row * rowStep;
+    // Rows alternate by half a cell; even rows have a centre on the corner.
+    const start = width + (row % 2 === 0 ? 0 : half);
+    for (let x = start; x + half > 0; x -= cell) {
+      if (x - half >= width) {
+        continue;
+      }
+      const points: [number, number][] = [
+        [x, y - radius],
+        [x + half, y - radius / 2],
+        [x + half, y + radius / 2],
+        [x, y + radius],
+        [x - half, y + radius / 2],
+        [x - half, y - radius / 2],
+      ];
+      outlines.push(`M ${points.map(([px, py]) => `${num(px)} ${num(py)}`).join(' L ')} Z`);
+    }
+  }
+  return outlines.join(' ');
 }
 
 // ─── Measures for drawing on a canvas (the share images) ──────────────────

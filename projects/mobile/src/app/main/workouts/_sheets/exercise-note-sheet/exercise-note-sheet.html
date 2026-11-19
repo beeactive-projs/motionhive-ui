@@ -1,27 +1,28 @@
 <ng-template #body>
-  <div class="mh-stack">
-    <ion-textarea
-      mode="md"
-      fill="outline"
-      [autoGrow]="true"
-      [autofocus]="true"
-      [maxlength]="max"
-      [counter]="draft().length > max - 40"
-      [label]="'workouts.exerciseNote.label' | translate"
-      labelPlacement="stacked"
-      [placeholder]="'workouts.exerciseNote.placeholder' | translate"
-      [value]="draft()"
-      (ionInput)="draft.set($any($event).detail.value ?? '')"
-    />
-    <p class="mh-helper">{{ 'workouts.exerciseNote.private' | translate }}</p>
-  </div>
+  <ion-textarea
+    mode="md"
+    fill="outline"
+    [autoGrow]="true"
+    [autofocus]="true"
+    [maxlength]="max"
+    [counter]="draft().length > max - 40"
+    [label]="'workouts.exerciseNote.label' | translate"
+    labelPlacement="stacked"
+    [placeholder]="'workouts.exerciseNote.placeholder' | translate"
+    [value]="draft()"
+    (ionInput)="draft.set($event.detail.value ?? '')"
+  />
+  <p class="mh-helper">{{ 'workouts.exerciseNote.private' | translate }}</p>
 </ng-template>
 
+<!-- A text field, so the sheet opens tall: the keyboard takes the bottom
+     half, and a fitted sheet would sit under it. -->
 <mh-sheet-shell
   [(open)]="open"
   [title]="exerciseName()"
   [body]="body"
-  [fit]="true"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
   [saving]="saving()"
   [canSave]="!saving()"
   (save)="submit()"

@@ -1,0 +1,19 @@
+@if (visible()) {
+<!-- Two controls side by side, never one inside the other: the card opens
+     the setup, the X puts it away for 30 days. -->
+<div class="welcome-card">
+  <button type="button" class="open" (click)="open()">
+    <mh-hex-avatar size="lg" color="violet" tone="wash" aria-hidden="true" icon="people-outline" />
+    <span class="copy">
+      <span class="title">{{ 'home.groupSetup.title' | translate }}</span>
+      <span class="detail">{{ 'home.groupSetup.detail' | translate }}</span>
+    </span>
+  </button>
+  <ion-button class="close" fill="clear" color="medium" [attr.aria-label]="'home.groupSetup.notNow' | translate"
+    (click)="dismiss()">
+    <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
+  </ion-button>
+</div>
+}
+
+<mh-client-group-sheet (created)="onCreated($event)" />

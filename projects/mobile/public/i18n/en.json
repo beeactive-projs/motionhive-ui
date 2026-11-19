@@ -45,12 +45,7 @@
         "notAccepting": "Not accepting clients"
       },
       "venues": {
-        "clientHome": "At the client's home",
-        "empty": "No venues yet. Venues are managed on the web app.",
-        "loadFailed": "Could not load your venues.",
-        "managedOnWeb": "Venues are managed on the web app.",
-        "online": "Online",
-        "title": "Venues"
+        "title": "Places you coach"
       }
     },
     "hero": {
@@ -106,7 +101,10 @@
       "resendVerification": "Resend verification email",
       "unverified": "{email} isn't verified yet.",
       "deleteAccount": "Delete account",
-      "workouts": "Workouts"
+      "workouts": "Workouts",
+      "coachCategories": "What you coach",
+      "interests": "What you like to train",
+      "becomeCoach": "Become a coach"
     },
     "sections": {
       "account": "Account",
@@ -137,6 +135,10 @@
     "choice": {
       "noMatches": "No matches"
     },
+    "sensitive": {
+      "title": "Sensitive actions",
+      "intro": "What can't be undone lives here. Each one explains what happens and asks you to confirm before anything changes."
+    },
     "privacy": {
       "intro": "Your name and photo are always visible. Choose who sees each of these.",
       "hint": {
@@ -144,7 +146,8 @@
         "COACHES_ONLY": "Only the coaches you train with",
         "ONLY_ME": "No one but you"
       },
-      "saveFailed": "Couldn't save that. Try again."
+      "saveFailed": "Couldn't save that. Try again.",
+      "yourData": "Your data"
     },
     "delete": {
       "title": "Delete account",
@@ -225,11 +228,15 @@
       "acceptingHint": "Shows on your public profile so people know they can reach out.",
       "showSocialLinks": "Show social links",
       "showSocialLinksHint": "Your links stay hidden while this is off.",
-      "specializationsHint": "Separate each one with a comma.",
       "title": "Coaching profile",
       "toast": {
         "failed": "Could not update your coaching profile.",
         "updated": "Coaching profile updated"
+      },
+      "specializations": {
+        "placeholder": "Add one, like Kettlebell",
+        "add": "Add specialization",
+        "list": "Your specializations"
       }
     },
     "handle": {
@@ -263,7 +270,9 @@
       "toast": {
         "failed": "Could not update your location.",
         "updated": "Location updated"
-      }
+      },
+      "noResults": "No place found by that name.",
+      "unavailable": "Place search isn't answering. Try again in a moment."
     },
     "name": {
       "hint": "This is how your name appears on your profile and in messages.",
@@ -294,8 +303,17 @@
         "failed": "Could not upload the picture.",
         "updated": "Photo updated"
       },
-      "tooLarge": "Images must be under {size} MB."
+      "tooLarge": "Images must be under {size} MB.",
+      "view": "See photo"
     }
+  },
+  "chipInput": {
+    "added": "Added {value}",
+    "duplicate": "You already added {value}.",
+    "excluded": "{value} is already on the list.",
+    "full": "You've reached the limit of {max}. Remove one to make room.",
+    "removed": "Removed {value}",
+    "tooLong": "Keep each one to {max, plural, one {# character} other {# characters}}."
   },
   "clientHive": {
     "board": "Your clients",
@@ -376,7 +394,7 @@
       "notes": "Notes",
       "resendInvitation": "Resend invitation",
       "resent": "Invitation resent",
-      "unarchiveClient": "Unarchive client",
+      "inviteAgain": "Invite again",
       "viewProfile": "View profile",
       "withdraw": "Withdraw",
       "withdrawInvitationEllipsis": "Withdraw invitation…"
@@ -387,7 +405,7 @@
     "clientFallback": "Client",
     "confirm": {
       "archive": {
-        "body": "They keep their account and history, and you can unarchive them later. They will not be told.",
+        "body": "They keep their account and history, but your coaching ends: they will be told, and their training is no longer open to you. To work together again, send them an invitation to accept.",
         "title": "Archive {name}?",
         "titleFallback": "Archive this client?"
       },
@@ -429,6 +447,10 @@
         "planWaiting": "Plan · waiting"
       },
       "pastWindow": "Last {count, plural, one {# day} other {# days}}",
+      "ended": {
+        "title": "Coaching with {name} ended",
+        "body": "Their training is closed to you now. To work together again, invite them again: they become your client once they accept."
+      },
       "pending": {
         "title": "Waiting for {name}",
         "body": "Plans, training and progress open up once the invite is accepted."
@@ -442,7 +464,7 @@
       "profileAria": "{name}, view profile",
       "sections": {
         "plans": "Plans",
-        "thisWeek": "This week"
+        "lastSevenDays": "Last 7 days"
       },
       "sessions": {
         "label": "Which sessions",
@@ -614,6 +636,7 @@
     },
     "thisPerson": "this person",
     "toast": {
+      "alreadyClient": "They are already your client.",
       "alreadyInvited": "They already have an invitation from you.",
       "archiveFailed": "Could not archive this client.",
       "archived": "Client archived",
@@ -628,8 +651,7 @@
       "resendFailed": "Could not resend the invitation.",
       "sendFailed": "Could not send the invitation.",
       "shareFailed": "Could not share the link.",
-      "unarchiveFailed": "Could not unarchive this client.",
-      "unarchived": "Client unarchived",
+      "invitedAgain": "Invitation sent. They become your client again once they accept.",
       "withdrawFailed": "Could not withdraw the invitation."
     }
   },
@@ -667,7 +689,7 @@
         "name": "Name",
         "recommended": "Recommended"
       },
-      "speciality": "Speciality",
+      "coaches": "What they coach",
       "yearsPlus": "{count, plural, one {#+ year} other {#+ years}}"
     },
     "filters": {
@@ -726,6 +748,73 @@
       "left": "Coaching ended"
     }
   },
+  "dev": {
+    "workoutStatus": {
+      "android": "Android ongoing notification (it sounds at Go)",
+      "data": "Mock data",
+      "dataNote": "Every clock counts from the moment a field changes. A rest left below 0 is overtime.",
+      "field": {
+        "done": "Exercise sets done",
+        "elapsed": "Workout time (min)",
+        "exercise": "Exercise",
+        "lastReps": "Last reps",
+        "lastWeight": "Last weight (kg)",
+        "name": "Workout name",
+        "reps": "Reps",
+        "restLeft": "Rest left (s)",
+        "restPlanned": "Rest planned (s)",
+        "setNumber": "Set number",
+        "total": "Exercise sets",
+        "weight": "Weight (kg)",
+        "workoutDone": "Workout sets done",
+        "workoutTotal": "Workout sets"
+      },
+      "intro": "Every place a workout in progress shows itself, on mock data. Nothing here is saved, and the clocks run.",
+      "islandExpanded": "Dynamic Island, expanded",
+      "islandSmall": "Dynamic Island, compact and minimal",
+      "lockScreen": "iOS lock screen (Live Activity)",
+      "menuRow": "Workout status preview",
+      "menuSection": "Developer",
+      "miniBar": "Mini-bar, above the tab bar",
+      "mock": {
+        "exercise": "Bench press",
+        "partner": "Push-ups",
+        "workout": "Push day"
+      },
+      "mode": {
+        "every": "Every scenario",
+        "one": "One scenario"
+      },
+      "nativeNote": "The lock screen and notification pictures are mock-ups of the native layouts (ios/App/RestTimer and RestLive.java), drawn from the state the app sends. The phone draws the real ones.",
+      "noRest": "No rest is running.",
+      "restAlert": "Rest over alert, app in the background: iOS, and Android once its notification is swiped away",
+      "restart": "Restart the clocks",
+      "restBar": "Rest timer, in the workout screen's footer",
+      "resumeCard": "Resume card, on the Workouts tab",
+      "scenario": "Scenario",
+      "scenarios": {
+        "allDone": "All sets done",
+        "betweenSets": "Between sets",
+        "go": "Rest over",
+        "overtime": "Overtime",
+        "paused": "Workout paused",
+        "restHidden": "Rest bar hidden",
+        "resting": "Resting",
+        "soon": "Last 10 seconds",
+        "superset": "Superset"
+      },
+      "state": "Sent to the lock screen",
+      "stillTraining": "Still training reminder, 30 minutes after the last set",
+      "title": "Workout status",
+      "toggle": {
+        "ahead": "Sets left to do",
+        "paused": "Workout paused",
+        "restHidden": "Rest bar hidden",
+        "resting": "A rest is running",
+        "superset": "In a superset"
+      }
+    }
+  },
   "discover": {
     "allGroups": {
       "empty": {
@@ -735,13 +824,7 @@
       "loadError": "Couldn't load groups"
     },
     "browse": {
-      "beginners": "Total beginner",
-      "fatLoss": "Lose fat",
-      "mobility": "Move better",
-      "online": "Online coaching",
-      "running": "Start running",
-      "strength": "Get stronger",
-      "title": "Browse by goal"
+      "title": "Browse by activity"
     },
     "city": {
       "everywhere": "Everywhere",
@@ -756,19 +839,15 @@
       "years": "{count, plural, one {# yr} other {# yrs}}"
     },
     "coachRow": {
-      "online": "Online",
+      "online": "Coaches online",
       "requestSent": "Request sent",
       "takingClients": "Taking clients",
       "yourCoach": "Your coach"
     },
     "coaches": {
-      "all": "{count, plural, one {See all} other {All #}}",
-      "near": "Coaches near you",
-      "title": "Coaches"
+      "more": "See more"
     },
     "featured": {
-      "kicker": "Coach of the week",
-      "kickerCity": "Coach of the week · {city}",
       "message": "Message",
       "quote": "“{text}”",
       "viewProfile": "View profile"
@@ -780,8 +859,13 @@
       },
       "loadError": "Couldn't load sessions",
       "noMatches": "No upcoming sessions match these filters.",
+      "noneForTopic": "Nothing coming up for {topic}",
+      "noneForTopicMessage": "See every session coming up, or pick another activity.",
+      "noneForYou": "Nothing coming up for you yet",
       "noneInCity": "Nothing coming up in {city}",
       "noneInCityMessage": "Try another city, or look everywhere.",
+      "noneOnline": "No online sessions coming up",
+      "seeAll": "See all sessions",
       "title": "Coming up"
     },
     "filterSheet": {
@@ -798,12 +882,9 @@
       "title": "Filter sessions"
     },
     "goals": {
-      "beginners": "Beginners",
-      "label": "Goals",
-      "mobility": "Mobility",
+      "label": "Activities",
       "online": "Online",
-      "running": "Running",
-      "strength": "Strength"
+      "forYou": "For you"
     },
     "groupsRail": {
       "all": "All",
@@ -819,7 +900,7 @@
     "search": {
       "accents": "Showing matches for “{typed}” and “{variant}”. Accents don't matter.",
       "clear": "Clear",
-      "clearGoal": "{goal}, clear this goal",
+      "clearGoal": "{goal}, clear this filter",
       "coaches": "Coaches",
       "empty": "No coaches, groups or sessions match that. Try fewer words.",
       "error": {
@@ -828,7 +909,7 @@
       },
       "fieldPlaceholder": "Search",
       "filterLabel": "Filter results",
-      "goalEmpty": "No coaches, groups or sessions for this goal yet.",
+      "goalEmpty": "No coaches, groups or sessions for this yet.",
       "groups": "Groups",
       "hint": "Type at least two letters to search coaches, groups and sessions.",
       "join": "Join",
@@ -842,6 +923,12 @@
       "request": "Request",
       "sessions": "Sessions",
       "title": "Search"
+    },
+    "spotlight": {
+      "position": "{position} of {total}",
+      "show": "Show {name}",
+      "slide": "coach",
+      "title": "In the spotlight"
     }
   },
   "exercises": {
@@ -1032,7 +1119,8 @@
         "confirmSingle": "Create and swap",
         "hint": "“{query}” · only you can see it",
         "title": "Can't find it? Create it"
-      }
+      },
+      "noFilterMatch": "No exercise matches these filters."
     },
     "row": {
       "equipmentMore": "{name} +{count}",
@@ -1062,8 +1150,7 @@
       "deleteHint": "Past workouts keep it",
       "editHint": "Change the name, what it tracks or your note",
       "emptyAction": "Create an exercise",
-      "emptyMessage": "Missing an exercise, like a machine at your gym? Create it and only you will see it.",
-      "menuFor": "More for {name}"
+      "emptyMessage": "Missing an exercise, like a machine at your gym? Create it and only you will see it."
     },
     "simpleForm": {
       "more": "More…",
@@ -1085,12 +1172,21 @@
       },
       "picture": "Picture",
       "addPicture": "Add a picture",
-      "changePicture": "Change",
-      "removePicture": "Remove",
+      "changePicture": "Change picture",
+      "removePicture": "Remove picture",
       "pictureHint": "A photo of the machine or the move. Anyone who can see the exercise sees it."
     }
   },
   "groups": {
+    "actions": {
+      "edit": "Edit group",
+      "invite": "Invite people",
+      "requests": "Join requests",
+      "reviewPosts": "Review posts",
+      "youAreIn": "You're in this group",
+      "youModerate": "You moderate this group",
+      "youRun": "You run this group"
+    },
     "addMembers": {
       "empty": {
         "message": "Everyone you coach is already in this group.",
@@ -1119,6 +1215,7 @@
       "nobodyMatches": "Nobody matches",
       "postContent": "Post content",
       "posts": "Posts",
+      "runBy": "Run by",
       "where": "Where"
     },
     "compose": {
@@ -1146,6 +1243,7 @@
     "detail": {
       "a11y": {
         "manage": "Review requests and posts",
+        "options": "Group options",
         "settings": "Group settings"
       },
       "announce": {
@@ -1182,6 +1280,7 @@
         },
         "loadError": "Couldn't load posts"
       },
+      "postsToReview": "Posts to review",
       "toast": {
         "leaveFailed": "Could not leave this group.",
         "left": "You left the group"
@@ -1189,6 +1288,9 @@
     },
     "edit": {
       "addTag": "Add tag",
+      "categories": "What the group trains",
+      "categoriesFailed": "Couldn't load the activities.",
+      "categoriesHint": "People find the group by these in Discover.",
       "delete": {
         "body": "Its posts, members and comments go with it.",
         "button": "Delete group",
@@ -1210,7 +1312,7 @@
         "hint": "Anyone can find it in Discover.",
         "label": "Public group"
       },
-      "removeTag": "Remove tag {tag}",
+      "removeTag": "Remove tag {name}",
       "saveCreate": "Create group",
       "tagLabel": "Add a tag",
       "tagPlaceholder": "strength",
@@ -1227,6 +1329,34 @@
     "gallery": {
       "openPhoto": "Open photo {index} of {total}",
       "openPhotoBy": "Open photo {index} of {total} by {name}"
+    },
+    "invite": {
+      "invitedYou": "{name} invited you",
+      "invitedYouNoName": "You're invited",
+      "join": "Join group",
+      "notNow": "Not now",
+      "privacy": "Members see your name, photo and the workouts you choose to post. You can leave at any time.",
+      "toast": {
+        "declineFailed": "Could not decline that invitation.",
+        "declined": "Invitation declined",
+        "joinFailed": "Could not join this group.",
+        "joined": "You joined {group}"
+      }
+    },
+    "invitePeople": {
+      "clients": "Your clients",
+      "empty": {
+        "title": "Nobody left to invite"
+      },
+      "note": "They get an invite and join only if they accept. Members see each other's names and photos.",
+      "save": "{count, plural, =0 {Invite} other {Invite #}}",
+      "selectAll": "Select all",
+      "selectNone": "Select none",
+      "toast": {
+        "alreadyInvited": "They're already invited or in the group",
+        "failed": "Could not send those invites.",
+        "sent": "{count, plural, one {# invite sent} other {# invites sent}}"
+      }
     },
     "join": {
       "closed": "Invite only",
@@ -1263,6 +1393,9 @@
       "OPEN": "Anyone can join instantly."
     },
     "list": {
+      "a11y": {
+        "waiting": "{count, plural, one {# thing waiting for you} other {# things waiting for you}}"
+      },
       "announce": {
         "count": "{count, plural, one {# group} other {# groups}}.",
         "none": "No groups match that."
@@ -1283,6 +1416,8 @@
         },
         "seeGroups": "See your groups"
       },
+      "joinedHeading": "Groups you joined",
+      "lastPost": "last post {time}",
       "loadError": "Couldn't load groups",
       "mine": {
         "empty": {
@@ -1290,18 +1425,26 @@
           "title": "You're not in any groups"
         }
       },
+      "needsYou": "Needs you",
       "noGroups": {
         "coachMessage": "Create a group to bring your clients together in one place.",
         "memberMessage": "Join a group and posts from it show up here.",
         "title": "No groups yet"
       },
+      "noPosts": "no posts yet",
       "private": "Private",
+      "runBy": "Run by {name}",
+      "runHeading": "Groups you run",
       "search": "Search groups",
       "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search.",
       "segments": {
         "discover": "Discover",
         "feed": "Feed",
         "mine": "Your groups"
+      },
+      "waiting": {
+        "posts": "{count, plural, one {# post to review} other {# posts to review}}",
+        "requests": "{count, plural, one {# join request} other {# join requests}}"
       }
     },
     "manage": {
@@ -1342,6 +1485,25 @@
       },
       "written": "Written {time}"
     },
+    "members": {
+      "makeModerator": "Make moderator",
+      "makeModeratorHint": "Can review and remove posts",
+      "message": "Message",
+      "remove": "Remove from group",
+      "removeConfirm": {
+        "body": "They stop seeing the group's posts and members. You can invite them again later.",
+        "title": "Remove {name} from the group?"
+      },
+      "removeModerator": "Remove as moderator",
+      "removeModeratorHint": "Stays in the group as a member",
+      "toast": {
+        "moderatorMade": "{name} is now a moderator",
+        "moderatorRemoved": "{name} is no longer a moderator",
+        "removeFailed": "Could not remove that member.",
+        "removed": "{name} is no longer in the group",
+        "roleFailed": "Could not change that role."
+      }
+    },
     "photos": {
       "alt": "Photo {index} of {total}",
       "counter": "{index} of {total}",
@@ -1362,8 +1524,10 @@
         "editThis": "Edit this post",
         "like": "Like post by {name}",
         "likeThis": "Like this post",
+        "more": "Options for the post by {name}",
         "openBy": "Open post by {name}",
         "openByMember": "Open post by a member",
+        "options": "Post options",
         "postComment": "Post comment",
         "unlike": "Unlike post by {name}",
         "unlikeThis": "Unlike this post",
@@ -1381,6 +1545,7 @@
         "body": "It will be removed for everyone, along with its comments.",
         "title": "Delete this post?"
       },
+      "deleteVerb": "Delete post",
       "editTitle": "Edit post",
       "empty": {
         "message": "Be the first to say something.",
@@ -1434,6 +1599,18 @@
         "withdrawn": "Request withdrawn"
       },
       "withdraw": "Withdraw"
+    },
+    "setup": {
+      "defaultName": "{name}'s crew",
+      "inviteClients": "Invite your clients",
+      "save": "{count, plural, =0 {Create group} other {Create and invite #}}",
+      "subtitle": "You can change all of this later",
+      "title": "Your client group",
+      "toast": {
+        "created": "{count, plural, =0 {Group created} one {Group created, # invite sent} other {Group created, # invites sent}}",
+        "invitesFailed": "The group is ready, but the invites did not go out. Try Invite people on the group."
+      },
+      "whoCanPost": "Who can post"
     }
   },
   "home": {
@@ -1445,8 +1622,8 @@
           "title": "Create your first program"
         },
         "specialties": {
-          "detail": "They help people find you in Discover.",
-          "title": "Add your specializations"
+          "detail": "It helps people find you in Discover.",
+          "title": "Say what you coach"
         },
         "steps": "Next steps",
         "sub": "The first ring has room for six.",
@@ -1531,6 +1708,11 @@
       "evening": "Good evening.",
       "morning": "Good morning."
     },
+    "groupSetup": {
+      "detail": "A private group where they share workouts and cheer each other on.",
+      "notNow": "Not now",
+      "title": "Bring your clients together"
+    },
     "latest": {
       "capped": "{count, plural, one {The most recent workout} other {The # most recent workouts}}",
       "empty": {
@@ -1599,6 +1781,17 @@
         "streak": "{count, plural, one {# week in a row} other {# weeks in a row}}",
         "todayMakes": "Today would make it {count}."
       }
+    },
+    "welcomeCard": {
+      "train": {
+        "title": "Tell us what you like to train",
+        "detail": "We will suggest coaches, groups and sessions that fit."
+      },
+      "coach": {
+        "title": "Finish your coach profile",
+        "detail": "Say what you coach and where, so people find you."
+      },
+      "dismiss": "Hide this"
     }
   },
   "messages": {
@@ -1609,7 +1802,7 @@
       "unmute": "Unmute notifications"
     },
     "blockSheet": {
-      "body": "They will not be able to message you, and you will not see this conversation.",
+      "body": "They will not be able to message you, and you will not see this conversation. If one of you coaches the other, that coaching ends too.",
       "title": "Block {name}?"
     },
     "bubble": {
@@ -1925,12 +2118,11 @@
       "deleted": "Deleted"
     },
     "webOnlyPlace": {
-      "coaches": "Coaches",
-      "memberships": "Memberships",
-      "myPlans": "My plans"
+      "memberships": "Memberships"
     }
   },
   "pageTitle": {
+    "sensitiveActions": "Sensitive actions",
     "account": "Account",
     "assignments": "Assignments",
     "billing": "Billing",
@@ -1990,7 +2182,9 @@
     "clientHive": "Your hive",
     "monthHive": "Your month",
     "workoutSettings": "Workout settings",
-    "archivedRoutines": "Archived routines"
+    "archivedRoutines": "Archived routines",
+    "welcome": "Welcome",
+    "workoutStatus": "Workout status"
   },
   "payments": {
     "badge": {
@@ -2319,6 +2513,8 @@
       "note": "Note",
       "program": "Program",
       "schedule": "Schedule",
+      "searchClients": "Search clients",
+      "noClientMatch": "No client matches that.",
       "searchPrograms": "Search programs",
       "starts": "Starts",
       "title": "Assign program",
@@ -2327,7 +2523,7 @@
     "assignment": {
       "notStarted": "Not started",
       "pause": "Pause",
-      "pausedSubline": "Paused. Resuming shifts the remaining schedule forward",
+      "pausedSubline": "Paused. Days missed during the pause are marked skipped once it resumes",
       "percentDone": "{percent}% done",
       "startedPercent": "Started {date} · {percent}% done",
       "starts": "Starts {date}"
@@ -2888,7 +3084,9 @@
       "unskip": "Unskip exercise",
       "history": "Exercise history",
       "addNote": "Add your note",
-      "editNote": "Edit your note"
+      "collapse": "Collapse exercise",
+      "editNote": "Edit your note",
+      "unlink": "Unlink from superset"
     },
     "exerciseCard": {
       "actionsFor": "Actions for {name}"
@@ -3066,7 +3264,8 @@
     "logRow": {
       "coach": "Coach",
       "repeat": "Repeat {name}",
-      "records": "{count, plural, one {# record} other {# records}}"
+      "records": "{count, plural, one {# record} other {# records}}",
+      "withPhoto": "With a photo"
     },
     "logger": {
       "addExercise": "Add exercise",
@@ -3083,22 +3282,24 @@
       "discard": {
         "irreversible": "This cannot be undone",
         "message": "Everything logged in this session is deleted. Skipping a planned workout is a different thing: that keeps the record.",
-        "nothingTicked": "No sets are ticked, so there is nothing to finish yet. Discard the workout, or keep going and tick what you did.",
         "title": "Discard workout"
       },
       "empty": {
         "message": "Pick the movements as you go. Nothing has to be planned up front.",
         "title": "Add your first exercise"
       },
-      "expand": "Show the sets for {name}",
+      "expand": "{name}, {summary}. Show the sets",
       "finish": "Finish",
-      "finishConfirm": {
-        "message": "{count, plural, one {# set is still unticked. Finishing now records the workout as it stands.} other {# sets are still unticked. Finishing now records the workout as it stands.}}",
-        "title": "Finish workout"
-      },
+      "finishEarly": "{total, plural, one {Finish workout early · {done}/# exercise} other {Finish workout early · {done}/# exercises}}",
       "gridHead": {
-        "prev": "Prev",
-        "set": "Set"
+        "distance": "m",
+        "done": "Done",
+        "previous": "Previous",
+        "reps": "Reps",
+        "repsEach": "Reps each",
+        "set": "Set",
+        "time": "Time",
+        "weight": "kg"
       },
       "leave": "Leave the workout",
       "leaveSheet": {
@@ -3128,12 +3329,13 @@
         "pauseFailed": "Could not pause the workout",
         "removeSetFailed": "Could not remove that set",
         "removed": "Removed {name}",
-        "repeatFailed": "Could not load that workout to repeat"
+        "repeatFailed": "Could not load that workout to repeat",
+        "removeRoundFailed": "Could not delete that round",
+        "copySetFailed": "Could not copy that set",
+        "supersetFailed": "Could not change the superset"
       },
       "last": "last {value}",
       "best": "best {value}",
-      "editing": "editing",
-      "backTo": "Back to {value}",
       "plan": {
         "effort": "effort {value}",
         "rest": "rest {value}"
@@ -3143,6 +3345,17 @@
         "message": "Pause the workout for that time? It won't count toward the duration.",
         "pause": "Pause it",
         "keep": "Keep it"
+      },
+      "finishSheet": {
+        "early": {
+          "message": "{count, plural, one {# set still unticked. Finish the workout now?} other {# sets still unticked. Finish the workout now?}}",
+          "title": "Finish early?"
+        },
+        "nothing": {
+          "message": "You haven't ticked any sets, so there is nothing to save yet. Discard the workout, or keep going and tick what you did.",
+          "title": "Nothing logged yet"
+        },
+        "save": "Finish and save"
       }
     },
     "meta": {
@@ -3169,12 +3382,28 @@
     "plan": {
       "allWeeks": "All weeks",
       "doneCount": "{done} / {total} done",
+      "coachNote": "A note from your coach",
       "fromCoachStarted": "From {coach} · Started {date}",
       "position": "Week {week} of {total}",
       "started": "Started {date}",
       "thisWeek": "This week",
       "title": "Plan",
       "yourCoach": "your coach"
+    },
+    "postToGroup": {
+      "caption": "Caption",
+      "captionPlaceholder": "Say something about it",
+      "card": "Workout card",
+      "cardHint": "The name and a summary, as a card",
+      "changePhoto": "Change photo",
+      "kindLabel": "What to post",
+      "noGroups": "None of your groups takes posts from you right now.",
+      "photoHint": "The details float on your photo",
+      "privacyCard": "The group sees the name and a summary. Never your notes, weights or photo.",
+      "privacyPhoto": "The group sees your photo, the name and a summary. Never your notes or weights.",
+      "submit": "Post to {group}",
+      "title": "Post to a group",
+      "yourPhoto": "Your photo"
     },
     "prescription": {
       "compact": "{sets} × {reps}",
@@ -3197,7 +3426,9 @@
         "skipFailed": "Could not skip that",
         "skipped": "Marked as skipped"
       },
-      "todaysWorkout": "Today's workout"
+      "todaysWorkout": "Today's workout",
+      "dayClosed": "You did this day.",
+      "planClosed": "{status, select, PAUSED {This plan is paused.} COMPLETED {This plan is finished.} CANCELLED {This plan was cancelled.} other {This plan is not active.}}"
     },
     "progress": {
       "clientPrivacyNote": "Workouts your client does outside your plans stay private unless they share them, so these numbers may not count everything they did.",
@@ -3243,35 +3474,105 @@
       "change": "Change the rest"
     },
     "routineBuilder": {
+      "actions": {
+        "moveDown": "Move down",
+        "moveUp": "Move up",
+        "reorder": "Reorder exercises"
+      },
+      "archive": {
+        "action": "Archive",
+        "done": "Archived. It waits under Archived routines.",
+        "failed": "Couldn't change it. Try again.",
+        "unarchived": "Unarchived. It is back in your routines."
+      },
       "copyConfirm": {
         "body": "You get your own copy of {name} to change freely. The original stays as it is.",
         "title": "Make a copy?"
       },
       "delete": {
-        "message": "Delete {name}? Workouts already logged from it are kept.",
+        "message": "Delete {name}? Workouts already logged from it are kept, and its scheduled days still ahead are cancelled.",
         "title": "Delete routine"
+      },
+      "discard": {
+        "editBody": "Your changes to {name} will be lost.",
+        "keep": "Keep editing",
+        "newBody": "This routine has not been saved, so its exercises and sets will be lost.",
+        "title": "Discard changes?"
+      },
+      "keypad": {
+        "nextSet": "Next set"
       },
       "makeCopy": "Make a copy",
       "name": {
         "label": "Routine name",
-        "placeholder": "Push day"
+        "placeholder": "Push day",
+        "required": "Give the routine a name."
       },
-      "noExercises": "No exercises yet. Add the movements in the order you do them.",
+      "noExercises": "Add the movements in the order you do them.",
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Heavy squats first, then accessories."
+      },
+      "options": {
+        "discardEdit": "Discard changes",
+        "discardNew": "Discard routine"
+      },
+      "plan": {
+        "addSetFor": "Add set to {name}",
+        "addWeightFor": "Add weight to {name}",
+        "perSet": "Set by set",
+        "perSetFor": "Set by set, {name}",
+        "sameForAll": "Same for every set",
+        "sameForAllFor": "Same for every set, {name}"
+      },
+      "reorder": {
+        "hint": "Drag the handles to change the order.",
+        "title": "Reorder exercises"
+      },
+      "rest": {
+        "chip": "Rest",
+        "exercise": "Rest for {name}",
+        "exerciseInherited": "Rest for {name}, same as the routine ({value})",
+        "exerciseOwn": "Rest for {name}, {value}",
+        "hint": "For every exercise",
+        "row": "Rest between sets",
+        "sameAsRoutine": "Same as the routine ({value})",
+        "yourDefault": "Default ({value})"
+      },
+      "saveAndStart": "Save and start",
       "starterNote": "A MotionHive starter. Start it and it becomes yours to edit.",
       "starterNoteCoach": "A MotionHive starter. Make a copy to change it for your clients.",
       "stepper": {
         "fewer": "One set fewer for {name}",
         "group": "Sets for {name}",
-        "more": "One set more for {name}",
-        "unit": "{count, plural, one {set} other {sets}}"
+        "more": "One set more for {name}"
+      },
+      "superset": {
+        "hint": "Link two exercises to do them back to back, then rest.",
+        "link": "Link as superset",
+        "linkFor": "Link {a} and {b} as a superset",
+        "unlink": "Superset · tap to unlink",
+        "unlinkFor": "Unlink {a} and {b}"
       },
       "targets": {
+        "distance": "Distance",
+        "group": "Target {field} for {name}",
+        "lower": "Lower the {field} for {name}",
+        "raise": "Raise the {field} for {name}",
         "reps": "Reps",
-        "repsFor": "Target reps for {name}",
-        "repsKeypad": "Target reps",
+        "repsEach": "Reps each",
+        "sets": "Sets",
+        "time": "Time",
+        "type": "Type the {field} for {name}, now {value}",
         "weight": "Weight",
-        "weightFor": "Target weight for {name}",
-        "weightKeypad": "Target weight (kg)"
+        "withUnit": "{field} ({unit})",
+        "words": {
+          "distance": "distance",
+          "reps": "reps",
+          "repsEach": "reps each side",
+          "time": "time",
+          "weight": "weight"
+        }
       },
       "thisRoutine": "this routine",
       "title": "Routine",
@@ -3284,26 +3585,6 @@
         "saveFailed": "Could not save the routine",
         "saved": "Routine saved",
         "startFailed": "Could not start that routine"
-      },
-      "rest": {
-        "row": "Rest between sets",
-        "hint": "For every exercise in this routine",
-        "yourDefault": "Your default ({value})",
-        "sameAsRoutine": "Same as the routine ({value})",
-        "exercise": "Rest for {name}",
-        "chip": "Rest"
-      },
-      "superset": {
-        "link": "Link as superset",
-        "unlink": "Superset · tap to unlink",
-        "linkFor": "Link {a} and {b} as a superset",
-        "unlinkFor": "Unlink {a} and {b}"
-      },
-      "archive": {
-        "action": "Archive",
-        "done": "Archived. It waits under Archived routines.",
-        "failed": "Couldn't change it. Try again.",
-        "unarchived": "Unarchived. It is back in your routines."
       }
     },
     "routineRow": {
@@ -3325,8 +3606,9 @@
       "lastTime": "Last time: {value}",
       "options": "Options for set {number}",
       "menu": "Options for {name}",
-      "edit": "Edit {name}",
-      "untick": "Mark {name} as not done"
+      "untick": "Mark {name} as not done",
+      "usePrevious": "Use last time for {name}: {value}",
+      "noPrevious": "{name}, nothing from last time"
     },
     "setTypeMark": {
       "DROPSET": "Dropset",
@@ -3393,7 +3675,7 @@
       "group": {
         "done": "Posted in {group}",
         "failed": "Could not post it in the group",
-        "hint": "Members see a card with the workout's name and the numbers. Never your note, weights or photo.",
+        "hint": "Pick a group to post your photo or the workout card. Never your note or weights.",
         "pending": "Sent to {group}. It shows once the group approves it.",
         "posting": "Posting in {group}",
         "title": "Or post it in a group"
@@ -3481,7 +3763,8 @@
       "sets": "Sets",
       "time": "Time",
       "volume": "Volume",
-      "workouts": "Workouts"
+      "workouts": "Workouts",
+      "durationUnknown": "Unknown"
     },
     "todayHero": {
       "done": "Done for today. Nice work.",
@@ -3544,7 +3827,10 @@
       "note": "Note on this set",
       "addNote": "Add a note",
       "notePlaceholder": "For example: the last rep was assisted",
-      "remove": "Remove set"
+      "remove": "Remove set",
+      "removeRound": "Remove round {number}",
+      "removeRoundHint": "Every set in this round, of every exercise",
+      "copy": "Copy set"
     },
     "effort": {
       "title": "How hard?",
@@ -3574,10 +3860,9 @@
     "superset": {
       "kicker": "Superset · round {round} of {total}",
       "round": "Round {number}",
-      "done": "done",
+      "memberSkipped": "Skipped",
       "skipped": "skipped",
       "addRound": "Add round",
-      "restAfterRound": "Rest after the round: {value}",
       "rounds": "{count, plural, one {# round} other {# rounds}}",
       "summary": "Superset · {count, plural, one {# round} other {# rounds}}"
     },
@@ -3586,7 +3871,8 @@
       "restForAll": "Rest for every exercise",
       "pause": "Pause workout",
       "footnote": "Only this workout changes. Your defaults are in Settings › Workouts.",
-      "more": "More for this workout"
+      "more": "More for this workout",
+      "addExercises": "Add exercises"
     },
     "archived": {
       "link": "{count, plural, one {# archived routine} other {# archived routines}}",
@@ -3679,7 +3965,32 @@
     "live": {
       "next": "Next: {next}",
       "workout": "Workout",
-      "plus": "+{seconds} s"
+      "plus": "+{seconds} s",
+      "done": "Done",
+      "target": "Target {value}",
+      "progress": "{done} of {total, plural, one {# set} other {# sets}}",
+      "planned": "of {total}",
+      "skipSet": "Skip set",
+      "otherValue": "Other value",
+      "allDone": "All sets done"
+    },
+    "updateRoutine": {
+      "added": "You added {names}.",
+      "keep": "Keep it as it was",
+      "keepHint": "Only this workout has the changes.",
+      "more": "{count, plural, one {# more} other {# more}}",
+      "removed": "You removed {names}.",
+      "reordered": "You changed the order of the exercises.",
+      "sets": "You changed the sets of {names}.",
+      "supersets": "You changed the supersets.",
+      "swapped": "You swapped in {names}.",
+      "title": "Update {name}?",
+      "toast": {
+        "failed": "Could not update {name}. Your workout is saved.",
+        "updated": "{name} updated"
+      },
+      "update": "Update routine",
+      "updateHint": "Next time starts with these changes."
     }
   },
   "feedback": {
@@ -3731,5 +4042,154 @@
     "takenDown": "Removed from your profile after a report, so it can't be public or shared.",
     "visibleTo": "Visible to",
     "youAndCoach": "You and {name}"
+  },
+  "welcome": {
+    "stepOf": "Step {step} of {total}",
+    "optional": "Optional",
+    "categoriesFailed": "We couldn't load the choices",
+    "role": {
+      "title": "How will you use MotionHive?",
+      "intro": "We show you what fits first. You can change it later.",
+      "note": "Coaches can train too, and switch between the two any time.",
+      "train": {
+        "label": "To train",
+        "detail": "Follow plans, log workouts and find coaches, groups and sessions."
+      },
+      "coach": {
+        "label": "To coach",
+        "detail": "Work with clients, run groups and sessions, and get paid."
+      }
+    },
+    "interests": {
+      "title": "What do you like to train?",
+      "intro": "Pick as many as you like. We use them to suggest coaches, groups and sessions."
+    },
+    "level": {
+      "title": "Where are you starting from?",
+      "intro": "So the plans and coaches we suggest fit you.",
+      "goals": "What are you after?",
+      "beginner": {
+        "label": "Just starting",
+        "detail": "New to training, or back after a long break."
+      },
+      "intermediate": {
+        "label": "Training now and then",
+        "detail": "I know the basics and train when I can."
+      },
+      "advanced": {
+        "label": "Training regularly",
+        "detail": "I train most weeks and know my way around."
+      }
+    },
+    "coachCategories": {
+      "title": "What do you coach?",
+      "intro": "People find you in Discover by these. Pick all that apply.",
+      "other": "Anything else?",
+      "otherAdd": "Add speciality",
+      "otherHint": "Add them one at a time. They show on your profile.",
+      "otherLabel": "Add what's missing",
+      "otherList": "Your own specialities",
+      "otherOnList": "{value} is already on the list above, so we picked it there.",
+      "otherPlaceholder": "Kettlebells"
+    },
+    "coachDetails": {
+      "title": "Where do you coach?",
+      "intro": "Your city helps people near you find you.",
+      "addCity": "Add your city",
+      "changeCity": "Change city",
+      "cityHint": "It shows on your profile. Your exact address never does.",
+      "citySearch": "Search for your city",
+      "noPlaces": "No city found. Check the spelling or try one nearby.",
+      "accepting": "Taking new clients",
+      "acceptingHint": "People can ask you to coach them. Turn it off when you are full.",
+      "places": "Places you coach"
+    }
+  },
+  "venues": {
+    "kind": {
+      "GYM": "Gym",
+      "STUDIO": "Studio",
+      "PARK": "Park",
+      "OUTDOOR": "Outdoors",
+      "CLIENT_HOME": "At clients' homes",
+      "ONLINE": "Online",
+      "OTHER": "Other"
+    },
+    "provider": {
+      "OTHER": "Other"
+    },
+    "defaultName": {
+      "online": "Online",
+      "clientHome": "At clients' homes"
+    },
+    "list": {
+      "add": "Add a place",
+      "more": "More for {name}",
+      "loadFailed": "Could not load your places.",
+      "hint": "Your gym or studio, or online on Zoom. Your profile shows each name and city, never the street or a meeting link."
+    },
+    "sheet": {
+      "addTitle": "Add a place",
+      "editTitle": "Edit place",
+      "kind": "What kind of place?",
+      "platform": "Where you meet online",
+      "name": "Name",
+      "namePlaceholder": {
+        "GYM": "For example FitZone Downtown",
+        "STUDIO": "For example Studio Ana",
+        "PARK": "For example Herăstrău Park",
+        "OUTDOOR": "For example the lake trail",
+        "CLIENT_HOME": "At clients' homes",
+        "ONLINE": "Online",
+        "OTHER": "For example the school gym"
+      },
+      "address": "Address",
+      "searchAddress": "Search the address",
+      "addressSearch": "Street, place or city",
+      "addressHint": "Only the city shows on your profile.",
+      "area": "Area you cover",
+      "addArea": "Add the area you cover",
+      "areaSearch": "Search for a city",
+      "areaHint": "The city you travel around.",
+      "clearArea": "Remove the area",
+      "noResults": "Nothing found. Try the street and city, or just the city.",
+      "link": "Meeting link",
+      "linkHint": "Optional, and never shown on your profile.",
+      "linkInvalid": "This is not a web link. Check it or leave the field empty.",
+      "travel": "How far you travel (km)",
+      "travelPlaceholder": "For example 15",
+      "travelHint": "Optional. Up to {max} km."
+    },
+    "actions": {
+      "edit": "Edit details",
+      "remove": "Remove"
+    },
+    "remove": {
+      "title": "Remove {name}?",
+      "body": "{name} leaves your profile. Sessions already planned there keep their details.",
+      "confirm": "Remove"
+    },
+    "toast": {
+      "added": "Place added",
+      "updated": "Place updated",
+      "removed": "Place removed",
+      "saveFailed": "Could not save this place.",
+      "removeFailed": "Could not remove this place."
+    }
+  },
+  "photoViewer": {
+    "counter": "{index} of {total}",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "open": {
+      "profile": "See the profile photo",
+      "group": "See the group's photo",
+      "workout": "See the workout photo"
+    },
+    "alt": {
+      "profile": "Profile photo",
+      "group": "Group photo",
+      "workout": "Workout photo"
+    }
   }
 }

@@ -1,6 +1,7 @@
-// The role pill, per the design: honey-tinted capsule with a hairline, the
-// role's hexagon tile, plain sentence-case label, a small chevron. Every value
-// comes from the palette, not a literal.
+// The role switch, per the design: honey-tinted with a hairline, the role's
+// hexagon tile, plain sentence-case label, a small chevron. It has words, so
+// it wears the control radius like every other button, not a capsule. Every
+// value comes from the palette, not a literal.
 //
 // It must stay `fill="clear"`. A *solid* button inside a toolbar is styled by
 // Ionic as an inverted chip — `color: var(--ion-toolbar-background, var(--color))`
@@ -8,7 +9,7 @@
 // ignored. The clear variant leaves the background to `--background` and honours
 // `--color`, which is what the pill needs.
 .role-pill {
-  // The honey capsule token: see-through honey in light, the opaque honey
+  // The honey tint token: see-through honey in light, the opaque honey
   // wash in dark, where see-through honey over navy read as grey. Pressed,
   // Ionic fades a clear button, so the fill stays the same.
   --background: var(--mh-color-honey-tint);
@@ -52,8 +53,8 @@
     font-size: var(--mh-icon-sm);
   }
 
-  // A finger's 44px to press it by: an invisible box past the capsule, so
-  // the pill keeps the avatar's optical line to the eye.
+  // A finger's 44px to press it by: an invisible box past the button, so
+  // it keeps the avatar's optical line to the eye.
   &::after {
     content: '';
     position: absolute;

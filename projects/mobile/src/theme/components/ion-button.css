@@ -8,6 +8,14 @@ ion-button {
 /* One radius for everything you can tap — Ionic ships 4px, which reads as a
    different design language next to the 12px tiles around it.
 
+   A button with words is always this rounded rectangle, whatever its size:
+   the block CTA, a header's Save or Finish, a row's Resume or Invite, an
+   option chip in a form, Home's role switch, Discover's city (user decision,
+   2026-11-17). Only two things may be round, with `shape="round"`: icon-only
+   buttons (circles) and filter chips (pills), in a strip or a filter sheet,
+   the Filters and calendar buttons and the narrowed day's chip included. An
+   icon-only button may also stay square, as `.mh-remove` does below.
+
    `!important` because Ionic ships scoped CSS that outranks any selector we
    can write against the element (see ion-input.css for the full note).
 
@@ -119,8 +127,8 @@ ion-button.mh-day-chip ion-icon {
 }
 
 /* Every button in a chip strip or cloud (the chips, the Filters trigger, the
-   calendar and Today pills) stays a 2rem pill to the eye but takes a
-   finger's 44px: an invisible box grows past the pill, never the pill. The
+   calendar and Today chips) stays 2rem to the eye but takes a finger's
+   44px: an invisible box grows past the chip, never the chip. The
    strip's own block padding (0.625rem, layout.css) is wider than the
    overhang, so its sideways scroll does not clip it; wrapped rows are spaced
    so two rows' boxes meet without overlapping (layout.css). */
@@ -150,6 +158,17 @@ ion-button.mh-day-chip ion-icon {
   --background-hover: var(--ion-color-primary);
   --background-activated: var(--ion-color-primary-shade);
   --color: var(--ion-color-primary-contrast);
+}
+
+/* "More…" at the end of a chip cloud opens the rest of it in place (the
+   filter sheet's "All 17 muscles…", the short exercise form's muscles and
+   equipment): a disclosure, not a choice, so no fill and the accent ink every
+   other in-place expansion wears. Round or not follows the chips beside it. */
+.mh-chip-cloud .chip.more {
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: transparent;
+  --color: var(--mh-color-honey-deep);
 }
 
 /* A count riding inside a chip ("Unread 3"), as WhatsApp does. Full ink: a
@@ -195,7 +214,7 @@ ion-item ion-button[fill='clear'] {
   --color: var(--mh-color-honey-deep);
 }
 
-/* A verb at the end of a flat-list row ("Invite"): a solid honey capsule in
+/* A verb at the end of a flat-list row ("Invite"): a solid honey button in
    `slot="end"`, centred on the row rather than in one of its 1.5rem lines.
    The chips' 2rem, not Ionic's small-button floor, so it fits the row's 3rem
    content box and never moves the row off its 4.5rem grid. */
@@ -213,9 +232,9 @@ ion-item ion-button.mh-row-action {
   letter-spacing: normal;
 }
 
-/* …and a finger's 44px to press it by: an invisible box past the capsule,
+/* …and a finger's 44px to press it by: an invisible box past the button,
    inside the row's own padding (a 3rem row has 0.5rem to spare above and
-   below). Wider too, should a short verb make the capsule narrower. */
+   below). Wider too, should a short verb make the button narrower. */
 ion-item ion-button.mh-row-action::after {
   content: '';
   position: absolute;
@@ -269,11 +288,12 @@ ion-button.mh-quiet::part(native) {
 
 /* "Add …" as a dashed outline: reads as "make something", not as a filled
    row that already exists. An outline ion-button with the border restyled —
-   Ionic exposes the style and width, so no wrapper is needed. */
+   Ionic exposes the style and width, so no wrapper is needed. The width is
+   pinned: Ionic's own is 2px in md and 1px in iOS. */
 ion-button.mh-add-dashed {
+  --border-width: var(--mh-ring-width);
   --border-style: dashed;
-  --border-width: var(--mh-hairline);
-  --border-color: var(--ion-border-color);
+  --border-color: var(--mh-color-honey-deep);
   --color: var(--mh-color-honey-deep);
   margin: 0;
   font-weight: 600;

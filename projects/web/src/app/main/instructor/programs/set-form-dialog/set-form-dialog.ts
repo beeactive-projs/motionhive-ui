@@ -238,7 +238,7 @@ export class SetFormDialog {
           this.workout().id,
           this.exercise().id,
           existing.id,
-          payload as UpdatePrescribedSetPayload,
+          setEditPayload(value),
         )
         .subscribe({
           next: (s) => {
@@ -347,4 +347,44 @@ export class SetFormDialog {
       this.showAdvanced.set(false);
     }
   }
+}
+
+/** The form's values, as the set-form fields hold them. */
+export interface SetFormValue {
+  setType: ExerciseSetType;
+  repsMin: number | null;
+  repsMax: number | null;
+  weightKg: number | null;
+  restSeconds: number | null;
+  notes: string;
+  weightPercent1rm: number | null;
+  durationSeconds: number | null;
+  distanceMeters: number | null;
+  rpe: number | null;
+  rir: number | null;
+  tempo: string;
+}
+
+/**
+ * An edited set, every field sent: an emptied one as `null`, so the API
+ * clears it rather than keeping the old value (switching a set from kg to
+ * %1RM used to keep the kg and fail as both).
+ */
+export function setEditPayload(value: SetFormValue): UpdatePrescribedSetPayload {
+  const notes = value.notes.trim();
+  const tempo = value.tempo.trim();
+  return {
+    setType: value.setType,
+    targetRepsMin: value.repsMin,
+    targetRepsMax: value.repsMax,
+    targetWeightKg: value.weightKg,
+    restAfterSeconds: value.restSeconds,
+    notes: notes || null,
+    targetWeightPercent1rm: value.weightPercent1rm,
+    targetDurationSeconds: value.durationSeconds,
+    targetDistanceMeters: value.distanceMeters,
+    targetRpe: value.rpe,
+    targetRir: value.rir,
+    tempo: tempo || null,
+  };
 }

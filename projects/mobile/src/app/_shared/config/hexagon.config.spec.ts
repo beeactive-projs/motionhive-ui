@@ -8,9 +8,9 @@ import {
   TILE_FRAME,
   TILE_ORIENTATION,
   brandEdgeDash,
-  combFigure,
   combLayout,
   combStep,
+  cornerPrintPath,
   hexFigure,
   hexInset,
   hexOutline,
@@ -179,32 +179,39 @@ describe('combLayout', () => {
   });
 });
 
-describe('combFigure', () => {
-  const twoThreeTwo: [number, number][] = [
-    [0.5, 0],
-    [1.5, 0],
-    [0, 1],
-    [1, 1],
-    [2, 1],
-    [0.5, 2],
-    [1.5, 2],
-  ];
+describe('cornerPrintPath', () => {
+  // The design's print: a 170 × 120 box, cells 22 from centre to point.
+  const print = cornerPrintPath(170, 120, 22);
+  const outlines = print.split(' Z').filter((part) => part.trim());
+  const points = (outline: string) =>
+    [...outline.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
 
-  it('draws one hexagon per place in a single path', () => {
-    const comb = combFigure(HexShapes.Logo, twoThreeTwo, 8);
-    expect(comb.d.match(/M /g)).toHaveLength(7);
-    const short = (value: number) => Number(value.toFixed(2));
-    expect(comb.viewBox).toBe(`0 0 ${short(comb.width)} ${short(comb.height)}`);
+  it('draws closed, sharp six-point outlines', () => {
+    expect(print).not.toContain('Q');
+    for (const outline of outlines) {
+      expect(points(outline)).toHaveLength(6);
+    }
   });
 
-  // Discover's band drew this comb by hand: cells 86.6 wide, 94.6 across
-  // and 82 down, in a 276 × 264 box.
-  it('lays the classic comb out as the band drew it', () => {
-    const comb = combFigure(HexShapes.Classic, twoThreeTwo, 8);
-    expect(comb.width).toBeCloseTo(275.8, 1);
-    expect(comb.height).toBeCloseTo(264, 0);
-    // The second row's first cell: its top point, one row (81.96) down.
-    expect(comb.d).toContain('Q 43.30 81.96 ');
+  it('centres a cell on the top right corner, as the design did', () => {
+    expect(print).toContain('M 170.00 -22.00 L 189.05 -11.00 L 189.05 11.00 L 170.00 22.00');
+  });
+
+  it('shares edges: a neighbour starts where the corner cell ends', () => {
+    expect(print).toContain('M 150.95 11.00 L 170.00 22.00');
+  });
+
+  it('draws only the cells that reach into the box, down to its bottom', () => {
+    for (const outline of outlines) {
+      const xs = points(outline).map(([x]) => x);
+      const ys = points(outline).map(([, y]) => y);
+      expect(Math.min(...xs)).toBeLessThan(170);
+      expect(Math.max(...xs)).toBeGreaterThan(0);
+      expect(Math.min(...ys)).toBeLessThan(120);
+      expect(Math.max(...ys)).toBeGreaterThan(0);
+    }
+    const bottoms = outlines.map((outline) => Math.max(...points(outline).map(([, y]) => y)));
+    expect(Math.max(...bottoms)).toBeGreaterThanOrEqual(120);
   });
 });
 

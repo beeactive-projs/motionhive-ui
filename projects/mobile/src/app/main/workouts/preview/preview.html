@@ -20,8 +20,8 @@
     <div class="mh-page">
       <div class="hero-skeleton">
         <ion-skeleton-text [animated]="true" style="width: 45%; height: 0.75rem" />
-        <ion-skeleton-text [animated]="true" style="width: 65%; height: 1.5rem" />
-        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 65%; height: 1.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1rem" />
       </div>
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
@@ -46,7 +46,7 @@
       <mh-workout-overview
         [eyebrow]="eyebrow()"
         [title]="workout.name"
-        [chips]="chips()"
+        [meta]="meta()"
         [note]="workout.notes"
         [noteLabel]="noteLabel()"
         [exercises]="exercises()"
@@ -56,18 +56,26 @@
   }
 </ion-content>
 
-@if (workout()) {
+@if (closedNote(); as note) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <p class="mh-footnote closed-note">{{ note }}</p>
+    </ion-toolbar>
+  </ion-footer>
+} @else if (workout()) {
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
         <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
         <!-- Quiet: skipping keeps the day visible in history as skipped, and
              it is a decision, not the thing we are asking for. -->
-        <div class="mh-quiet-actions">
-          <ion-button fill="clear" size="small" (click)="skip()">
-            {{ 'workouts.preview.skipToday' | translate }}
-          </ion-button>
-        </div>
+        @if (canSkip()) {
+          <div class="mh-quiet-actions">
+            <ion-button fill="clear" size="small" (click)="skip()">
+              {{ 'workouts.preview.skipToday' | translate }}
+            </ion-button>
+          </div>
+        }
       </div>
     </ion-toolbar>
   </ion-footer>

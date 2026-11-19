@@ -1,4 +1,4 @@
-/* Navy, like the resume banner: the session talking, not an action. Honey
+/* Navy, like the resume card: the session talking, not an action. Honey
    is kept for the hexagon draining and for Start set. */
 :host {
   display: block;
@@ -11,7 +11,7 @@
   flex-direction: column;
   gap: 0.375rem;
   padding: 0.625rem 0.75rem;
-  border-radius: 1.125rem;
+  border-radius: var(--mh-radius-card);
   background: var(--mh-color-navy-card);
   color: var(--mh-color-navy-card-ink);
 }
@@ -29,16 +29,28 @@
 
 /* ─── The clock: hexagon and time ───────────────────────────────── */
 
-.clock {
-  display: flex;
+/* A clear Ionic button holding the hexagon and the time: no padding of its
+   own, the card's ink, and as tall as what it holds. */
+ion-button.clock {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --color: var(--mh-color-navy-card-ink);
+  --background-hover: transparent;
   flex: none;
+  height: auto;
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
+
+.clock-inner {
+  display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  cursor: pointer;
   text-align: start;
 }
 
@@ -64,10 +76,11 @@
   transition: y 250ms linear, height 250ms linear;
 }
 
+/* Half the hexagon's width, as a tile keeps its glyph (icons.md). */
 .hex ion-icon {
   position: absolute;
-  color: #fff;
-  font-size: 1.125rem;
+  color: var(--mh-color-navy-card-ink);
+  font-size: var(--mh-icon-md);
 }
 
 .time-block {
@@ -76,13 +89,13 @@
   min-width: 3.75rem;
 }
 
-/* Tabular so the digits don't jitter as they count. */
+/* A display figure: Inter at 700, as the invoice totals are. Tabular so
+   the digits don't jitter as they count. */
 .time {
-  font-family: var(--mh-font-heading);
   font-size: var(--mh-text-2xl);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: var(--mh-leading-none);
 }
 
 .sub {
@@ -92,19 +105,22 @@
 }
 
 /* The last ten seconds: lighter. */
-.state-soon .time,
-.state-soon .hex-fill {
-  color: var(--mh-primary-200);
-  fill: var(--mh-primary-200);
+.state-soon .time {
+  color: var(--mh-color-navy-card-honey-light);
 }
 
-/* Zero: green, "Go". */
+.state-soon .hex-fill {
+  fill: var(--mh-color-navy-card-honey-light);
+}
+
+/* Zero: green, "Go". The hexagon takes the 600 step, so the tick on it
+   clears 3:1 (the 500 step is 2.2:1 under a light glyph). */
 .state-go .time {
-  color: var(--ion-color-success-tint);
+  color: var(--mh-color-navy-card-success);
 }
 
 .state-go .hex-fill {
-  fill: var(--ion-color-success);
+  fill: var(--ion-color-success-shade);
 }
 
 /* Overtime: a calm grey that counts up, never red. */
@@ -153,37 +169,47 @@
   margin-inline-start: auto;
 }
 
-.actions button {
+/* Every key a finger's size: the steppers and the Ionic buttons alike. */
+.step,
+.actions ion-button {
   min-width: var(--mh-tap-target);
   height: var(--mh-tap-target);
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+/* −15 / +15, plain buttons like the number pad's keys (they repeat while
+   held), on the card's raised step. */
+.step {
   padding: 0 0.625rem;
   border: 0;
   border-radius: var(--mh-radius-control);
+  background: var(--mh-color-navy-card-raised);
   color: inherit;
   cursor: pointer;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.actions .step {
-  background: var(--mh-color-navy-card-raised);
-  font-variant-numeric: tabular-nums;
+.step:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
 }
 
-.actions .quiet {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--mh-color-navy-card-muted);
+.actions ion-button {
+  --padding-start: 0.625rem;
+  --padding-end: 0.625rem;
+  --box-shadow: none;
+  letter-spacing: normal;
 }
 
-.actions .start {
-  background: var(--ion-color-primary);
-  color: var(--ion-color-primary-contrast);
-}
-
-button:focus-visible {
-  outline: 2px solid var(--ion-color-primary);
-  outline-offset: 2px;
+/* Skip and Hide: an outline in the card's muted ink, not the honey. */
+ion-button.quiet {
+  --border-color: var(--mh-color-navy-card-muted);
+  --border-width: var(--mh-hairline);
+  --color: var(--mh-color-navy-card-ink);
+  --background-hover: transparent;
 }
