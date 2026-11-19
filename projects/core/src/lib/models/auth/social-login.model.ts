@@ -2,8 +2,30 @@ export interface GoogleLoginRequest {
   idToken: string;
 }
 
-export interface FacebookLoginRequest {
+/**
+ * A completed Facebook sign in, for `POST /auth/facebook`, in one of two
+ * shapes. The API answers 400 to any other mix (both tokens, a nonce with
+ * the access token).
+ */
+export type FacebookLoginRequest = FacebookAccessTokenLogin | FacebookLimitedLogin;
+
+/** Facebook Login's Graph access token: the web popup and the Android app. */
+export interface FacebookAccessTokenLogin {
   accessToken: string;
+  idToken?: never;
+  rawNonce?: never;
+}
+
+/**
+ * Limited Login on iPhone, which never asks for tracking: Facebook's OpenID
+ * Connect ID token, and the nonce the app gave Facebook. Facebook copies the
+ * nonce into the token as is (no hash, unlike Apple), and the API checks the
+ * two match.
+ */
+export interface FacebookLimitedLogin {
+  idToken: string;
+  rawNonce: string;
+  accessToken?: never;
 }
 
 /**

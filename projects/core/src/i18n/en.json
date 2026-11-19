@@ -31,9 +31,11 @@
     "common": {
       "appleFailed": "Sign in with Apple failed. Please try again.",
       "continueWithApple": "Continue with Apple",
+      "continueWithFacebook": "Continue with Facebook",
       "continueWithGoogle": "Continue with Google",
       "createOneFree": "Create one for free",
       "emailAddress": "Email address",
+      "facebookFailed": "Facebook sign-in failed. Please try again.",
       "forgotPassword": "Forgot password?",
       "googleFailed": "Google sign-in failed. Please try again.",
       "haveAccount": "Already have an account?",

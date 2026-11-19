@@ -31,9 +31,11 @@
     "common": {
       "appleFailed": "Autentificarea cu Apple a eșuat. Încearcă din nou.",
       "continueWithApple": "Continuă cu Apple",
+      "continueWithFacebook": "Continuă cu Facebook",
       "continueWithGoogle": "Continuă cu Google",
       "createOneFree": "Creează unul gratuit",
       "emailAddress": "Adresă de email",
+      "facebookFailed": "Autentificarea cu Facebook a eșuat. Încearcă din nou.",
       "forgotPassword": "Ai uitat parola?",
       "googleFailed": "Autentificarea cu Google a eșuat. Încearcă din nou.",
       "haveAccount": "Ai deja cont?",

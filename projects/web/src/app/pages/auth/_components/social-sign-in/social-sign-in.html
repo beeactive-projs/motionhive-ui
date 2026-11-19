@@ -3,8 +3,16 @@
 </p-divider>
 
 <div class="providers">
+  <div #googleButton class="google flex justify-center" [class.hidden]="googleUnavailable()"></div>
+  @if (googleUnavailable()) {
+    <button pButton type="button" fluid size="large" severity="secondary" outlined disabled>
+      <i class="pi pi-google"></i>
+      Google
+    </button>
+  }
+
   @if (appleAvailable) {
-    <button type="button" class="apple" [disabled]="disabled() || applePending()" (click)="signInWithApple()">
+    <button type="button" class="provider apple" [disabled]="disabled() || applePending()" (click)="signInWithApple()">
       @if (applePending()) {
         <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
       } @else {
@@ -18,11 +26,13 @@
     </button>
   }
 
-  <div #googleButton class="google flex justify-center" [class.hidden]="googleUnavailable()"></div>
-  @if (googleUnavailable()) {
-    <button pButton type="button" fluid size="large" severity="secondary" outlined disabled>
-      <i class="pi pi-google"></i>
-      Google
-    </button>
-  }
+  <button type="button" class="provider facebook" [disabled]="disabled() || facebookPending()"
+    (click)="signInWithFacebook()">
+    @if (facebookPending()) {
+      <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+    } @else {
+      <i class="pi pi-facebook" aria-hidden="true"></i>
+    }
+    <span>{{ 'auth.common.continueWithFacebook' | translate }}</span>
+  </button>
 </div>

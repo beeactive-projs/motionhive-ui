@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -64,6 +65,38 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/mh_notification_accent" />
 
+        <!-- Facebook sign-in (FacebookSignInService). The ids are in
+             res/values/strings.xml; the client token is meant to be in the
+             app, it is not the App Secret. Event logging and advertising id
+             collection are off, so the SDK sends no app events and reads no
+             advertising id. -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
+        <meta-data
+            android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
+            android:value="false" />
+        <meta-data
+            android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled"
+            android:value="false" />
+
+        <!-- Where Facebook's login in a browser tab comes back to the app
+             (fb + the app id). The SDK declares the activity itself; this
+             adds the app's own scheme, as Meta's setup asks. -->
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
         <!-- The buttons on the workout's ongoing notification (RestLive.java). -->
         <receiver
             android:name=".RestLiveReceiver"
@@ -83,6 +116,29 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Facebook's SDK asks for the advertising id, the Privacy Sandbox ad
+         APIs and the Play install referrer. It uses them only to measure ads
+         and attribute app events, never to log in, and the app does neither
+         (collection is off above), so they are taken out of the merged
+         manifest and Play's advertising id answer stays "no". -->
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_AD_ID"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_CUSTOM_AUDIENCE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_ADSERVICES_TOPICS"
+        tools:node="remove" />
+    <uses-permission
+        android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"
+        tools:node="remove" />
     <!-- Save to Photos on Android 9 and older. From 10 the gallery takes a
          new picture through MediaStore with no permission at all. -->
     <uses-permission

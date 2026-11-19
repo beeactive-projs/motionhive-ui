@@ -28,6 +28,7 @@ import {
   AuthService,
   AuthStore,
   ClientInviteService,
+  FacebookLoginRequest,
   FieldErrorPipe,
   RegisterRequest,
   apiErrorMessage,
@@ -49,8 +50,8 @@ import { InviteLandingService } from '../invite-landing.service';
  * Sign up, which is also where a coach's client invite lands (`?token=`): the
  * email is fixed to the invited one, and the invite is accepted once the
  * account exists. Someone already signed in gets the accept card instead of
- * the form. Signing up with Apple or Google is the same call as signing in
- * with it: it makes the account when there is none.
+ * the form. Signing up with Google, Apple or Facebook is the same call as
+ * signing in with it: it makes the account when there is none.
  */
 @Component({
   selector: 'mh-sign-up',
@@ -170,6 +171,14 @@ export class SignUp {
 
   protected onAppleFailed(): void {
     this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
+  }
+
+  protected onFacebookCredential(request: FacebookLoginRequest): void {
+    this.signUp(this._authService.facebookLogin(request), 'auth.common.facebookFailed');
+  }
+
+  protected onFacebookFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.facebookFailed'));
   }
 
   private signUp(request: Observable<unknown>, fallbackKey: string): void {

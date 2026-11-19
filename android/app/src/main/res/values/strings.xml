@@ -4,4 +4,9 @@
     <string name="title_activity_main">MotionHive</string>
     <string name="package_name">fit.motionhive.app</string>
     <string name="custom_url_scheme">fit.motionhive.app</string>
+    <!-- Facebook sign-in (FacebookSignInService). The client token is meant to
+         be in the app; it is not the App Secret. -->
+    <string name="facebook_app_id" translatable="false">888056193830836</string>
+    <string name="facebook_client_token" translatable="false">46d4a897078e2a1ef8a421a78f97b449</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb888056193830836</string>
 </resources>

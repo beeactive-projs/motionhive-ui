@@ -23,6 +23,7 @@ import {
   AppleLoginRequest,
   AuthService,
   ClientInviteService,
+  FacebookLoginRequest,
   FieldErrorPipe,
   ScheduledDeletion,
   apiErrorMessage,
@@ -147,7 +148,15 @@ export class Login {
     this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
   }
 
-  /** Email and password, Apple or Google: each may hit the deletion cooling-off. */
+  protected onFacebookCredential(request: FacebookLoginRequest): void {
+    this.signIn(this._authService.facebookLogin(request), 'auth.common.facebookFailed');
+  }
+
+  protected onFacebookFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.facebookFailed'));
+  }
+
+  /** Email and password, Google, Apple or Facebook: each may hit the deletion cooling-off. */
   private signIn(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);

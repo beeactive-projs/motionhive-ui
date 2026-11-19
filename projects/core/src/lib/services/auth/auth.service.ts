@@ -147,6 +147,10 @@ export class AuthService implements OnDestroy {
       );
   }
 
+  /**
+   * Signs in with a completed Facebook sign in: the access token (web,
+   * Android) or the iPhone's Limited Login ID token with its nonce.
+   */
   facebookLogin(request: FacebookLoginRequest): Observable<User> {
     return this._http
       .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.FACEBOOK}`, this.withLanguage(request))

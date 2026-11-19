@@ -125,7 +125,8 @@
 
   <mh-social-sign-in [disabled]="isLoading()" (googleCredential)="onGoogleCredential($event)"
     (googleFailed)="onGoogleFailed()" (appleCredential)="onAppleCredential($event)"
-    (appleFailed)="onAppleFailed()" />
+    (appleFailed)="onAppleFailed()" (facebookCredential)="onFacebookCredential($event)"
+    (facebookFailed)="onFacebookFailed()" />
 
   <mh-terms-notice intro="auth.signUp.termsIntro" />
 </div>

@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
+import { FacebookLoginRequest } from '../../models/auth/social-login.model';
 import { User } from '../../models/user/user.model';
 import { AuthStore } from '../../stores/auth.store';
 import { LanguageService } from '../i18n/language.service';
@@ -18,6 +19,7 @@ import { TokenService } from './token.service';
 
 const LOGOUT_URL = `${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGOUT}`;
 const APPLE_URL = `${environment.apiUrl}${API_ENDPOINTS.AUTH.APPLE}`;
+const FACEBOOK_URL = `${environment.apiUrl}${API_ENDPOINTS.AUTH.FACEBOOK}`;
 const ME_URL = `${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`;
 
 describe('AuthService.logout', () => {
@@ -129,5 +131,64 @@ describe('AuthService.appleLogin', () => {
     httpMock.expectOne(APPLE_URL).flush({ message: 'down' }, { status: 503, statusText: 'Unavailable' });
 
     expect(forgetSharedName).not.toHaveBeenCalled();
+  });
+});
+
+describe('AuthService.facebookLogin', () => {
+  let service: AuthService;
+  let httpMock: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withXhr()),
+        provideHttpClientTesting(),
+        { provide: Router, useValue: {} },
+        { provide: LanguageService, useValue: { syncFromUser: () => undefined } },
+      ],
+    });
+    service = TestBed.inject(AuthService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+    service.ngOnDestroy();
+    localStorage.clear();
+  });
+
+  it('posts the access token alone, as web and Android send it, then signs in', () => {
+    let user: User | undefined;
+    service.facebookLogin({ accessToken: 'graph-token' }).subscribe((signedIn) => (user = signedIn));
+
+    const post = httpMock.expectOne(FACEBOOK_URL);
+    expect(post.request.method).toBe('POST');
+    expect(post.request.body).toEqual({ accessToken: 'graph-token', language: expect.any(String) });
+    post.flush({ accessToken: 'access', refreshToken: 'refresh', user: { id: 'u1' } });
+
+    httpMock.expectOne(ME_URL).flush({ id: 'u1' });
+    expect(user).toEqual({ id: 'u1' });
+  });
+
+  it("posts the iPhone's Limited Login ID token with its nonce, and no access token", () => {
+    const rawNonce = 'b'.repeat(64);
+    service.facebookLogin({ idToken: 'facebook.id.token', rawNonce }).subscribe();
+
+    const post = httpMock.expectOne(FACEBOOK_URL);
+    expect(post.request.body).toEqual({
+      idToken: 'facebook.id.token',
+      rawNonce,
+      language: expect.any(String),
+    });
+    post.flush({ accessToken: 'access', refreshToken: 'refresh', user: { id: 'u1' } });
+    httpMock.expectOne(ME_URL).flush({ id: 'u1' });
+  });
+
+  it('allows only the two shapes the API takes', () => {
+    // @ts-expect-error the nonce belongs to the ID token, never to the access token
+    const nonceWithAccessToken: FacebookLoginRequest = { accessToken: 'graph-token', rawNonce: 'b'.repeat(64) };
+    // @ts-expect-error an ID token always comes with its nonce
+    const idTokenAlone: FacebookLoginRequest = { idToken: 'facebook.id.token' };
+    expect([nonceWithAccessToken, idTokenAlone]).toHaveLength(2);
   });
 });

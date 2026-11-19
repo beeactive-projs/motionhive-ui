@@ -2,11 +2,16 @@ import { Component, ElementRef, afterNextRender, inject, input, output, signal, 
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Divider } from 'primeng/divider';
-import { AppleAuthService, AppleLoginRequest, GoogleAuthService } from 'core';
+import { AppleAuthService, AppleLoginRequest, FacebookAuthService, GoogleAuthService } from 'core';
 
 /**
- * The "or" divider, then "Continue with Apple" and Google's button, under
- * the sign in and sign up forms.
+ * The "or" divider, then Google's button, "Continue with Apple" and
+ * "Continue with Facebook", under the sign in and sign up forms.
+ *
+ * The order is the same everywhere: Google first (most people have an
+ * account, and its button names the account it will use), Apple next (the
+ * natural pick on an iPhone or a Mac), Facebook last (the fewest people pick
+ * it, and it never joins an existing account by email).
  *
  * Google draws its own sign-in button (an iframe) and it is shown as drawn.
  * Laying it invisibly over a button of ours made taps do nothing in iOS
@@ -21,9 +26,10 @@ import { AppleAuthService, AppleLoginRequest, GoogleAuthService } from 'core';
  * web app's own https origin (localhost, preview deploys) or without a
  * Services ID.
  *
- * Facebook is off until Meta approves the app. To bring it back, add its
- * button here with an output the pages handle with core's
- * `FacebookAuthService.signIn()` then `AuthService.facebookLogin()`.
+ * Facebook's button follows Meta's: Facebook blue, the white "f" logo and
+ * "Continue with Facebook", the same size as the others. It opens Facebook's
+ * dialog in a popup (`FacebookAuthService.signIn()`), and the page signs in
+ * with the token through `AuthService.facebookLogin()`.
  */
 @Component({
   selector: 'mh-social-sign-in',
@@ -34,6 +40,7 @@ import { AppleAuthService, AppleLoginRequest, GoogleAuthService } from 'core';
 export class SocialSignIn {
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _appleAuthService = inject(AppleAuthService);
+  private readonly _facebookAuthService = inject(FacebookAuthService);
   private readonly _googleButton = viewChild.required<ElementRef<HTMLElement>>('googleButton');
 
   /** The page is already signing in. */
@@ -47,12 +54,18 @@ export class SocialSignIn {
   readonly appleCredential = output<AppleLoginRequest>();
   /** Apple's sign in ended without a token, other than by the person closing it. */
   readonly appleFailed = output<void>();
+  /** The access token of a completed Facebook sign-in, for `AuthService.facebookLogin()`. */
+  readonly facebookCredential = output<string>();
+  /** Facebook's sign in ended without a token, other than by the person closing it or pressing Cancel. */
+  readonly facebookFailed = output<void>();
 
   /** Google's script is blocked or offline, so there is no button to click. */
   protected readonly googleUnavailable = signal(false);
   protected readonly appleAvailable = this._appleAuthService.available;
   /** Apple's popup is open. */
   protected readonly applePending = signal(false);
+  /** Facebook's popup is open. */
+  protected readonly facebookPending = signal(false);
 
   constructor() {
     afterNextRender(async () => {
@@ -84,6 +97,24 @@ export class SocialSignIn {
       this.appleFailed.emit();
     } finally {
       this.applePending.set(false);
+    }
+  }
+
+  protected async signInWithFacebook(): Promise<void> {
+    if (this.facebookPending()) {
+      return;
+    }
+    this.facebookPending.set(true);
+    try {
+      // First thing in the click: the popup must open while it is handled.
+      const result = await this._facebookAuthService.signIn();
+      if (result.status === 'signed-in') {
+        this.facebookCredential.emit(result.accessToken);
+      }
+    } catch {
+      this.facebookFailed.emit();
+    } finally {
+      this.facebookPending.set(false);
     }
   }
 }

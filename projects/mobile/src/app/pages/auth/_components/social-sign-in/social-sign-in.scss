@@ -21,18 +21,14 @@
   &::after {
     content: '';
     flex: 1;
-    border-top: 1px solid var(--mh-color-separator);
+    border-top: var(--mh-hairline) solid var(--mh-color-separator);
   }
 }
 
-// Google's neutral button (its branding rules: a plain surface, a thin grey
-// outline, the mark and the label), at the height and type of the auth pages'
-// submit button so the two read as a pair.
-ion-button.google {
-  --background: var(--ion-color-light);
-  --border-color: var(--ion-border-color);
-  --border-width: 1px;
-  --color: var(--ion-text-color);
+// One size for every provider, the height and type of the auth pages'
+// submit button, so no provider outranks another. Each brand's colours are
+// below: they are brand requirements, so no theme token.
+ion-button {
   --box-shadow: none;
   height: 2.875rem;
   margin: 0;
@@ -47,30 +43,25 @@ ion-button.google {
   }
 }
 
+// Google's neutral button (its branding rules: a plain surface, a thin grey
+// outline, the mark and the label).
+ion-button.google {
+  --background: var(--ion-color-light);
+  --border-color: var(--ion-border-color);
+  --border-width: var(--mh-hairline);
+  --color: var(--ion-text-color);
+}
+
 // Apple's rules for a custom Sign in with Apple button: black with a white
-// logo and title on the light theme, white with black on the dark one (a
-// brand requirement, like Google's colours, so no theme token), and the same
-// height, type and corner as Google's button, so neither outranks the other.
+// logo and title on the light theme, white with black on the dark one. A
+// press shows as a slightly lighter black (and grey on white below), never
+// the theme's primary.
 ion-button.apple {
-  // A press shows as a slightly lighter black (and grey on white below),
-  // never the theme's primary.
   --background: #000;
   --background-activated: #333;
   --background-focused: #333;
   --background-hover: #333;
   --color: #fff;
-  --box-shadow: none;
-  height: 2.875rem;
-  margin: 0;
-  font-size: var(--mh-text-md);
-  font-weight: 600;
-  letter-spacing: normal;
-
-  svg {
-    width: var(--mh-icon-md);
-    height: var(--mh-icon-md);
-    margin-inline-end: 0.75rem;
-  }
 }
 
 :host-context(.ion-palette-dark) ion-button.apple {
@@ -79,4 +70,15 @@ ion-button.apple {
   --background-focused: #ddd;
   --background-hover: #ddd;
   --color: #000;
+}
+
+// Meta's rules for a custom Facebook login button: Facebook blue with the
+// white "f" and a white title, on both themes. A press shows as Facebook's
+// own darker blue.
+ion-button.facebook {
+  --background: #1877f2;
+  --background-activated: #166fe5;
+  --background-focused: #166fe5;
+  --background-hover: #166fe5;
+  --color: #fff;
 }

@@ -153,6 +153,14 @@ export class SignUp {
     this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
   }
 
+  protected onFacebookCredential(accessToken: string): void {
+    this.signUp(this._authService.facebookLogin({ accessToken }), 'auth.common.facebookFailed');
+  }
+
+  protected onFacebookFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.facebookFailed'));
+  }
+
   private loadInvitation(token: string): void {
     this._clientInviteService.load(token).subscribe({
       // An imported invite also carries the name the coach typed: a start

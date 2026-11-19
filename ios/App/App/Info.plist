@@ -38,7 +38,33 @@
 				<string>motionhive</string>
 			</array>
 		</dict>
+		<dict>
+			<!-- Facebook sign-in: fb + the Meta app id (FacebookAppID below).
+			     Facebook's SDK refuses to log in without it, and answers
+			     through it (SceneDelegate hands the link to the SDK). -->
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb888056193830836</string>
+			</array>
+		</dict>
 	</array>
+	<!-- Facebook sign-in (FacebookSignInService, Limited Login: the app never
+	     asks for tracking). The client token is meant to be in the app; it is
+	     not the App Secret. Event logging, advertiser id collection and the
+	     SDK's SKAdNetwork ad reporting are off, so it sends no app events
+	     and reads no IDFA. -->
+	<key>FacebookAppID</key>
+	<string>888056193830836</string>
+	<key>FacebookClientToken</key>
+	<string>46d4a897078e2a1ef8a421a78f97b449</string>
+	<key>FacebookDisplayName</key>
+	<string>MotionHive</string>
+	<key>FacebookAutoLogAppEventsEnabled</key>
+	<false/>
+	<key>FacebookAdvertiserIDCollectionEnabled</key>
+	<false/>
+	<key>FacebookSKAdNetworkReportEnabled</key>
+	<false/>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
@@ -96,11 +122,17 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>MotionHive saves your workout card to Photos only when you ask it to.</string>
 	<!-- Instagram Stories (Quick share) and Open Instagram (after Save to
-	     Photos). Without these, canOpenURL says Instagram is never there. -->
+	     Photos). Without these, canOpenURL says Instagram is never there.
+	     The fb ones let Facebook's SDK see whether the Facebook app is
+	     there; its sharing schemes are left out, as the app shares nothing
+	     to Facebook. -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>instagram-stories</string>
 		<string>instagram</string>
+		<string>fbapi</string>
+		<string>fbauth</string>
+		<string>fbauth2</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>MotionHive uses the camera when you take a photo for a workout or a post.</string>

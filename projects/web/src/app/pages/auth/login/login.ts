@@ -106,6 +106,14 @@ export class Login {
     this.errorMessage.set(this._translateService.instant('auth.common.appleFailed'));
   }
 
+  protected onFacebookCredential(accessToken: string): void {
+    this.signIn(this._authService.facebookLogin({ accessToken }), 'auth.common.facebookFailed');
+  }
+
+  protected onFacebookFailed(): void {
+    this.errorMessage.set(this._translateService.instant('auth.common.facebookFailed'));
+  }
+
   private signIn(request: Observable<unknown>, fallbackKey: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);

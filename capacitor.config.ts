@@ -23,15 +23,22 @@ const config: CapacitorConfig = {
     Badge: {
       persist: false,
     },
-    // Google, and Apple on iPhone. The others would bundle their SDKs
-    // (Facebook's adds its own permissions); turning one on needs a
-    // `cap sync`. Apple on iOS is the system's own framework, and the app
-    // offers it on iOS only (AppleSignInService); on Android this flag only
-    // bundles androidx.browser, which the plugin already compiles against.
+    // Google, Apple on iPhone, and Facebook. A flag decides whether the
+    // provider's SDK is bundled, so changing one needs a `cap sync` (the
+    // plugin's sync hook rewrites its Package.swift and gradle.properties).
+    // Apple on iOS is the system's own framework, and the app offers it on
+    // iOS only (AppleSignInService); on Android this flag only bundles
+    // androidx.browser, which the plugin already compiles against.
+    // Facebook bundles Meta's SDK on both platforms (FacebookSignInService).
+    // Its native setup lives in ios/App/App/Info.plist, AppDelegate.swift,
+    // SceneDelegate.swift and android/app/src/main/AndroidManifest.xml +
+    // res/values/strings.xml, with event logging and the advertising id off;
+    // turning it off again means taking the FBSDKCoreKit calls out of
+    // AppDelegate.swift and SceneDelegate.swift, or the iOS build fails.
     SocialLogin: {
       providers: {
         google: true,
-        facebook: false,
+        facebook: true,
         apple: true,
         twitter: false,
       },
