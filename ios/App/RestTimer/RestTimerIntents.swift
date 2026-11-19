@@ -22,8 +22,8 @@ enum RestTimerActions {
     static let restAlertId = "1"
     /// The same nudge as the rest bar's (`NUDGE_SECONDS`).
     static let nudgeSeconds: TimeInterval = 15
-    /// "+30 s" once the rest is over (`MORE_REST_SECONDS`).
-    static let moreSeconds: TimeInterval = 30
+    /// "+15 s" once the rest is over (`MORE_REST_SECONDS`), the same step as the nudge.
+    static let moreSeconds: TimeInterval = 15
     /// The intents add notes on their own thread while the plugin takes them
     /// on its queue: one at a time, so none is lost or handed over twice.
     private static let queueLock = NSLock()
@@ -82,7 +82,7 @@ enum RestTimerActions {
         await moveRest(to: endsAt)
     }
 
-    /// "+30 s" with the rest over: a little more, counted from now.
+    /// "+15 s" with the rest over: a little more, counted from now.
     @available(iOS 16.2, *)
     static func more() async {
         guard currentEnd() != nil else { return }
@@ -135,6 +135,8 @@ enum RestTimerActions {
         var state = activity.content.state
         guard let shown = state.steps?.first, shown.setId == setId, !shown.values.isEmpty else { return }
         guard let step = state.moveOn(past: setId) else { return }
+        // The workout's last set ticked: Open and Finish workout, the green ring.
+        state.allDone = step.completes ?? false
         let now = Date()
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [restAlertId])
@@ -222,7 +224,7 @@ enum RestTimerActions {
     }
 
     /// The alert keeps what Capacitor put in it (its text, its data); only the
-    /// moment changes. After "+30 s" it has already gone off: the one shown is
+    /// moment changes. After "+15 s" it has already gone off: the one shown is
     /// taken down and comes again at the new end.
     private static func moveRestAlert(to date: Date) async {
         let center = UNUserNotificationCenter.current()
@@ -274,7 +276,7 @@ struct ShortenRestIntent: LiveActivityIntent {
 
 @available(iOS 17.0, *)
 struct MoreRestIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Rest 30 seconds more"
+    static var title: LocalizedStringResource = "Rest 15 seconds more"
     static var isDiscoverable: Bool = false
 
     func perform() async throws -> some IntentResult {

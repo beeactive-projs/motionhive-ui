@@ -149,7 +149,12 @@ export class WorkoutsStore {
       archived: this._routineService
         .list({ library: 'mine', archived: 'only', limit: 1 })
         .pipe(catchError(() => of(null))),
-      inProgress: this._workoutLogService.getInProgress().pipe(catchError(() => of(null))),
+      // Silent, as the mini-bar's own read: a failure only means no resume
+      // card, so it must not raise the "No connection" alert over a page whose
+      // routines did load.
+      inProgress: this._workoutLogService
+        .getInProgress({ silent: true })
+        .pipe(catchError(() => of(null))),
     })
       .pipe(take(1))
       .subscribe({

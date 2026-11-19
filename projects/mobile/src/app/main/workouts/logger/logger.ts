@@ -956,15 +956,29 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
         this._activeSession.setRest(rest ? { logId: log.id, ...rest, endsAt, next } : null),
       );
     });
-    // What comes next, for the lock screen between rests too.
+    // What comes next, for the lock screen between rests too, and how far
+    // the workout has come, for the resume card.
     effect(() => {
       const log = this.store.log();
       const next = this.nextLine();
       const steps = this.liveSteps();
+      const progress = this.store.progress();
       if (!log) {
         return;
       }
-      untracked(() => this._activeSession.setNext(log.id, next, steps));
+      untracked(() => this._activeSession.setNext(log.id, next, steps, progress));
+    });
+    // Finish workout on the lock screen with this workout already in front:
+    // its link lands on this page, which nothing enters again to take it.
+    effect(() => {
+      const finishing = this._activeWorkoutService.finishing();
+      const log = this.store.log();
+      if (!finishing || !log || finishing !== log.id || !this._onScreen()) return;
+      untracked(() => {
+        if (this._activeWorkoutService.takeFinish(log.id)) {
+          this._loadSourceRoutine(() => this._finishOnScreen());
+        }
+      });
     });
 
     // Opening the workout brings the set you are on into view, once. After
@@ -1047,13 +1061,19 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
       );
       return;
     }
+    // Opened by the resume card's Finish: taken now, before the load, so a
+    // load that fails or is left behind never finishes the workout on a
+    // later visit (a Resume, the mini-bar).
+    const finishNow = this._activeWorkoutService.takeFinish(id);
     this.store.load(
       id,
       () => {
         // Back at the workout is back to work: a paused clock starts again.
         this.store.resumeClock();
         this._loadLastTimes();
-        this._loadSourceRoutine();
+        // Finished here, once the routine it came from is read, so the
+        // "Update routine?" question still comes.
+        this._loadSourceRoutine(finishNow ? () => this._finishOnScreen() : undefined);
         this._adoptRest();
         // A Repeat just started: its movements, into this page's store.
         const from = this._activeWorkoutService.takeCarryOver(id);
@@ -1062,6 +1082,11 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
       },
       (log) => this._toSummaryIfClosed(log),
     );
+  }
+
+  /** The resume card's Finish, only while this page is still the one in front. */
+  private _finishOnScreen(): void {
+    if (this._onScreen()) this.finish();
   }
 
   /** The first workout: say why notifications help, then let the system ask. */
@@ -1104,9 +1129,33 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
   /**
    * The lock screen's buttons, as if tapped here at that moment: +15, Skip
    * and Start set on the bar, ✓ on the set, Skip set passing it over,
-   * Continue on a paused workout.
+   * Continue on a paused workout. Then the store is told at once, not left
+   * to the effects that usually carry it: this page may be hidden behind
+   * another tab, where Ionic has stopped checking it and its effects wait,
+   * so the mini-bar, the resume card and the lock screen would keep the old
+   * set, count and rest.
    */
   private _onLockScreen(action: RestLiveAction): void {
+    this._applyLockScreen(action);
+    this._carryToStore();
+  }
+
+  /** What the effects above carry into the store, written now. */
+  private _carryToStore(): void {
+    const log = this.store.log();
+    if (!log) return;
+    const next = this.nextLine();
+    this._activeSession.track(log);
+    if (this._restAdopted) {
+      const rest = this._rest();
+      this._activeSession.setRest(
+        rest ? { logId: log.id, ...rest, endsAt: this.restEndsAt(), next } : null,
+      );
+    }
+    this._activeSession.setNext(log.id, next, this.liveSteps(), this.store.progress());
+  }
+
+  private _applyLockScreen(action: RestLiveAction): void {
     if (action.type === RestLiveActionTypes.Extend) {
       if (action.endsAt && this.restEndsAt() !== null) {
         this.restEndsAt.set(action.endsAt);
@@ -1221,7 +1270,14 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
     this._rest.set(null);
     void this._stillTraining.cancel();
     this.store.pause(
-      () => this._goBack(),
+      () => {
+        // Told here, not left to the effect that tracks the log: Ionic stops
+        // checking a page as it leaves, so that effect never saw the pause and
+        // the mini-bar and the lock screen kept the clock running.
+        const log = this.store.log();
+        if (log) this._activeSession.track(log);
+        this._goBack();
+      },
       () =>
         void this._feedbackService.error(
           null,
@@ -1329,6 +1385,7 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
         round: round.index + 1,
         total: block.total,
       }),
+      round: round.index + 1,
       order,
     };
   }
@@ -2231,16 +2288,21 @@ export class Logger implements ViewWillEnter, ViewDidEnter, ViewWillLeave {
    * Yours, and started as a routine: read now, quietly. Without it Finish
    * simply does not ask.
    */
-  private _loadSourceRoutine(): void {
+  /** `then` runs once the routine is known: read, or none to read. */
+  private _loadSourceRoutine(then?: () => void): void {
     const log = this.store.log();
     const id = log ? updatableRoutineId(log) : null;
-    if (!id || this._sourceRoutine()?.id === id) return;
+    if (!id || this._sourceRoutine()?.id === id) {
+      then?.();
+      return;
+    }
     this._routineService
       .get(id)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((routine) => {
         const own = routine && isOwnRoutine(routine, this._authStore.user()?.id);
         this._sourceRoutine.set(own ? routine : null);
+        then?.();
       });
   }
 

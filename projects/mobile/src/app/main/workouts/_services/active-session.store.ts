@@ -1,11 +1,11 @@
-import { DestroyRef, Service, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { WorkoutLog, WorkoutLogService, WorkoutLogStatus } from 'core';
+import { AuthStore, WorkoutLog, WorkoutLogService, WorkoutLogStatus } from 'core';
 
 import type { PayloadKey } from '../logger/logger-flow';
 import { StillTrainingService } from './still-training.service';
@@ -58,6 +58,8 @@ export interface LiveNext {
   workoutTotal: number;
   /** In a superset: "Superset · round 2 of 3"; empty otherwise. */
   kicker: string;
+  /** In a superset: the round this set is in, from 1 (of `total`). Absent otherwise. */
+  round?: number;
   /** In a superset: "A1 Incline press 22 × 10 → A2 Push-ups × 15". */
   order: string;
 }
@@ -91,6 +93,17 @@ interface PassedSets {
   setIds: string[];
 }
 
+/** Sets ticked in the whole workout, of how many, as the logger counts them. */
+export interface SetProgress {
+  done: number;
+  total: number;
+}
+
+/** Every set is ticked, and there was one to tick. */
+export function allSetsDone(progress: SetProgress | null): boolean {
+  return !!progress && progress.total > 0 && progress.done >= progress.total;
+}
+
 /**
  * What comes next in one workout, as the logger last said: kept, so the
  * lock screen keeps its ✓, Other value and Skip set after the app restarts.
@@ -99,8 +112,21 @@ interface AheadSets {
   logId: string;
   next: string;
   steps: LiveStep[];
+  /** Missing from what an older build kept. */
+  progress?: SetProgress;
 }
 
+/**
+ * The open workout as last known, with whose it is: kept so a phone that
+ * restarts with no signal at the gym still shows the mini-bar (user decision,
+ * 2026-11-19), until the API says otherwise. Restored for the same account
+ * only, since nothing here is cleared at sign out.
+ */
+interface KeptSession extends ActiveSession {
+  userId: string;
+}
+
+const SESSION_KEY = 'mh-active-session';
 const REST_KEY = 'mh-active-rest';
 const NO_SETS: ReadonlySet<string> = new Set();
 const NO_STEPS: readonly LiveStep[] = [];
@@ -118,9 +144,12 @@ const AHEAD_KEY = 'mh-live-steps';
 export class ActiveSessionStore {
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _stillTrainingService = inject(StillTrainingService);
+  private readonly _authStore = inject(AuthStore);
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _session = signal<ActiveSession | null>(null);
+  /** The last session saved, so an unchanged one is not written again. */
+  private _sessionSaved = '';
   private readonly _rest = signal<ActiveRest | null>(null);
   private readonly _ahead = signal<AheadSets | null>(null);
   /** The last `_ahead` saved, so an unchanged one is not written again. */
@@ -149,6 +178,20 @@ export class ActiveSessionStore {
     }
     return ahead.steps;
   });
+  /**
+   * Sets ticked of how many, as the logger last counted: the resume card's
+   * "7 of 13 sets". Null until the logger has opened on this workout (the
+   * API's in-progress answer carries no sets).
+   */
+  readonly progress = computed<SetProgress | null>(() => {
+    const ahead = this._aheadOfSession();
+    if (!ahead || !ahead.progress) {
+      return null;
+    }
+    return ahead.progress;
+  });
+  /** Every set of the running workout is ticked: Finish is what is left. */
+  readonly allDone = computed(() => allSetsDone(this.progress()));
   /** The sets of the running workout passed over with "Skip set": left unticked, and the focus goes past them. */
   readonly passed = computed<ReadonlySet<string>>(() => {
     const passed = this._passed();
@@ -166,9 +209,29 @@ export class ActiveSessionStore {
    */
   readonly ready = computed(() => this._checked() && this._local());
 
+  /**
+   * The time, once a second while a workout is open: the mini-bar and the
+   * resume card count from this one clock, so the same rest never reads two
+   * different seconds on one screen (each kept its own and drifted apart).
+   */
+  private readonly _now = signal(Date.now());
+  readonly now = this._now.asReadonly();
+  private readonly _open = computed(() => this._session() !== null);
+
   constructor() {
+    effect((onCleanup) => {
+      if (!this._open()) return;
+      this._now.set(Date.now());
+      const handle = setInterval(() => this._now.set(Date.now()), 1000);
+      onCleanup(() => clearInterval(handle));
+    });
     // Each restore keeps its own failures, so this always arrives.
-    const restores = [this._restoreRest(), this._restorePassed(), this._restoreAhead()];
+    const restores = [
+      this._restoreSession(),
+      this._restoreRest(),
+      this._restorePassed(),
+      this._restoreAhead(),
+    ];
     void Promise.all(restores).then(() => this._local.set(true));
     this.refresh();
     if (Capacitor.isNativePlatform()) {
@@ -201,21 +264,31 @@ export class ActiveSessionStore {
       if (this._session()?.id === log.id) this.end();
       return;
     }
-    this._session.set({
+    const session: ActiveSession = {
       id: log.id,
       name: log.name,
       startedAt: log.startedAt,
       pausedAt: log.pausedAt ?? null,
       pausedSeconds: log.pausedSeconds ?? 0,
-    });
+    };
+    this._session.set(session);
+    this._keepSession(session);
     this._checked.set(true);
     const rest = this._rest();
     if (rest && rest.logId !== log.id) this.setRest(null);
   }
 
-  /** What comes next in workout `logId`, kept for after a restart. */
-  setNext(logId: string, next: string, steps: readonly LiveStep[] = []): void {
+  /** What comes next in workout `logId`, and how far it has come, kept for after a restart. */
+  setNext(
+    logId: string,
+    next: string,
+    steps: readonly LiveStep[] = [],
+    progress: SetProgress | null = null,
+  ): void {
     const ahead: AheadSets = { logId, next, steps: [...steps] };
+    if (progress) {
+      ahead.progress = { done: progress.done, total: progress.total };
+    }
     const saved = JSON.stringify(ahead);
     if (saved === this._aheadSaved) {
       return;
@@ -228,9 +301,9 @@ export class ActiveSessionStore {
   /**
    * The lock screen moved on past `setId` (its ✓ or Skip set) while the
    * logger was closed: what comes next is the step after it, as the lock
-   * screen already shows.
+   * screen already shows. A ✓ (`ticked`) counts the set as done.
    */
-  moveOnFrom(setId: string): LiveStep | null {
+  moveOnFrom(setId: string, ticked = false): LiveStep | null {
     const ahead = this._aheadOfSession();
     if (!ahead) {
       return null;
@@ -245,7 +318,11 @@ export class ActiveSessionStore {
     if (rest.length > 0) {
       next = rest[0].line;
     }
-    this.setNext(ahead.logId, next, rest);
+    let progress = ahead.progress ?? null;
+    if (progress && ticked) {
+      progress = { done: Math.min(progress.total, progress.done + 1), total: progress.total };
+    }
+    this.setNext(ahead.logId, next, rest, progress);
     return steps[at];
   }
 
@@ -278,6 +355,8 @@ export class ActiveSessionStore {
     void this._stillTrainingService.cancel();
     this._checked.set(true);
     this._session.set(null);
+    this._sessionSaved = '';
+    void this._save(SESSION_KEY, null);
     this._ahead.set(null);
     this._aheadSaved = '';
     void this._save(AHEAD_KEY, null);
@@ -294,6 +373,54 @@ export class ActiveSessionStore {
       return null;
     }
     return ahead;
+  }
+
+  /** Kept for after a restart, with whose it is; never without an account to key it to. */
+  private _keepSession(session: ActiveSession): void {
+    const userId = this._authStore.user()?.id;
+    if (!userId) {
+      return;
+    }
+    const kept: KeptSession = { ...session, userId };
+    const saved = JSON.stringify(kept);
+    if (saved === this._sessionSaved) {
+      return;
+    }
+    this._sessionSaved = saved;
+    void this._save(SESSION_KEY, kept);
+  }
+
+  /**
+   * The open workout as last known, for a start with no signal: shown until
+   * the API answers, and kept when it cannot. Never over an answer already
+   * in (`checked`), and only for the account it was kept for.
+   */
+  private async _restoreSession(): Promise<void> {
+    try {
+      const { value } = await Preferences.get({ key: SESSION_KEY });
+      if (!value || this._checked() || this._session()) {
+        return;
+      }
+      const kept = JSON.parse(value) as KeptSession;
+      const valid =
+        !!kept &&
+        typeof kept.id === 'string' &&
+        typeof kept.name === 'string' &&
+        typeof kept.startedAt === 'string' &&
+        kept.userId === this._authStore.user()?.id;
+      if (!valid) {
+        return;
+      }
+      this._session.set({
+        id: kept.id,
+        name: kept.name,
+        startedAt: kept.startedAt,
+        pausedAt: kept.pausedAt ?? null,
+        pausedSeconds: kept.pausedSeconds ?? 0,
+      });
+    } catch {
+      // Nothing to restore: the bar shows once the API answers.
+    }
   }
 
   private async _restoreRest(): Promise<void> {
@@ -341,6 +468,12 @@ export class ActiveSessionStore {
         typeof ahead.next === 'string' &&
         Array.isArray(ahead.steps);
       if (valid) {
+        const progress = ahead.progress;
+        const counted =
+          !!progress && typeof progress.done === 'number' && typeof progress.total === 'number';
+        if (!counted) {
+          delete ahead.progress;
+        }
         this._ahead.set(ahead);
       }
     } catch {

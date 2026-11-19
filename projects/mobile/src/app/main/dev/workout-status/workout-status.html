@@ -103,6 +103,10 @@
           class="bleed"
           [session]="view.world.session"
           [rest]="view.world.rest"
+          [progress]="view.world.progress"
+          [steps]="view.world.steps"
+          [next]="view.world.next"
+          [now]="now()"
         />
       </section>
 
@@ -129,7 +133,8 @@
         <mh-resume-card
           [name]="view.world.session.name"
           [elapsed]="view.elapsed"
-          [paused]="!!view.world.session.pausedAt"
+          [status]="view.status"
+          [progress]="view.world.progress"
         />
       </section>
 
@@ -162,6 +167,11 @@
           [progress]="view.android.progress"
           [actions]="view.android.actions"
         />
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.androidCard' | translate }}</span>
+        <mh-live-activity-mock [state]="view.live" [now]="now()" [layout]="Layouts.Android" />
       </section>
 
       @if (mode() === Modes.One) {

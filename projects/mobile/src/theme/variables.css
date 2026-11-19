@@ -473,25 +473,47 @@
 
   /*
    * The navy card: the brand's navy as a surface on a light page (the next
-   * session tile, a client with no plan, the rest timer, a memory card, a
-   * profile's navy band). In dark it is simply the card step, since navy
-   * 900 is the page there and a navy 900 box would vanish into it.
+   * session tile, a client with no plan, a memory card, a profile's navy
+   * band). In dark it is simply the card step, since navy 900 is the page
+   * there and a navy 900 box would vanish into it. (The rest timer is on
+   * the status bar set below.)
    *   navy-card         the surface
    *   raised            a track or a box on it (navy 700)
    *   ink / muted       text on it (navy 50, 15.6:1; navy 300, 8:1)
    *   accent            its warm label (amber 300, 11.9:1)
-   *   honey-light       a lighter honey: the rest timer's last ten seconds
-   *                     (primary 200), the same in dark
-   *   success           green as text on it: the rest timer's "Go"
-   *                     (success 400, over 8:1), the same in dark
    */
   --mh-color-navy-card: var(--mh-navy-900);
   --mh-color-navy-card-raised: var(--mh-navy-700);
   --mh-color-navy-card-ink: var(--mh-navy-50);
   --mh-color-navy-card-muted: var(--mh-navy-300);
   --mh-color-navy-card-accent: var(--mh-warning-300);
-  --mh-color-navy-card-honey-light: var(--mh-primary-200);
-  --mh-color-navy-card-success: var(--mh-success-400);
+
+  /**
+   * The hex meter's track: the part of the rest ring still to drain. The
+   * honey's own hue, paler, so the ring reads as one colour at two strengths.
+   */
+  --mh-color-meter-track: var(--mh-warning-200);
+  /**
+   * The tick on the meter's green fill once the rest is over: success 50 on
+   * the 600 step (3.6:1, past the 3:1 a glyph needs), as the lock screens
+   * draw it white. The same in dark, since the fill does not change.
+   */
+  --mh-color-meter-tick: var(--mh-success-50);
+
+  /**
+   * The status bar set: the mini-bar and the rest timer, a workout in
+   * progress talking over the page. The brand navy in both themes, the same
+   * value, so it never blends into the grey cards around it (owner,
+   * 2026-11-19): 11.5:1 against the white page, lighter and bluer than the
+   * dark one. Ink 10.4:1, muted 7.0:1, the honey 5.4:1 on it. The track is
+   * the honey at 40%, which stays warm over navy where 30% turns olive.
+   */
+  --mh-color-status-bar: var(--mh-navy-500);
+  --mh-color-status-bar-ink: var(--mh-navy-50);
+  --mh-color-status-bar-muted: var(--mh-navy-200);
+  --mh-color-status-bar-key: rgba(255, 255, 255, 0.12);
+  --mh-color-status-bar-track: rgba(245, 158, 11, 0.4);
+  --mh-color-status-bar-success: var(--mh-success-400);
 
   /*
    * The shadow under a floating overlay: a picker popup, a select's list,
@@ -864,6 +886,8 @@ ion-button.ion-color-success:is(.button-clear, .button-outline) {
   --mh-color-navy-card-ink: var(--ion-text-color);
   --mh-color-navy-card-muted: var(--mh-navy-300);
   --mh-color-navy-card-accent: var(--ion-color-primary);
+  /* The honey at 30% over any dark surface: the same hue, not the 900 step's brown. */
+  --mh-color-meter-track: rgba(245, 158, 11, 0.3);
 
   /* The coach day lifts off the navy card: light navy fill, deep navy ink
      (5.9:1). */

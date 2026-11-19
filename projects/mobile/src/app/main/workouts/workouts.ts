@@ -62,7 +62,10 @@ import { ProgressBody } from './_components/progress-body/progress-body';
 import { RoutineRow } from './_components/routine-row/routine-row';
 import { ResumeCard } from './_components/resume-card/resume-card';
 import { TodayHero } from './_components/today-hero/today-hero';
+import { ActiveSessionStore } from './_services/active-session.store';
+import { activeStatus, freshestClock } from './_services/active-status.config';
 import { ActiveWorkoutService } from './_services/active-workout.service';
+import { ResumeCardService } from './_services/resume-card.service';
 import { RoutineActionsService } from './_services/routine-actions.service';
 import { HistoryStore } from './history/history.store';
 import {
@@ -78,6 +81,7 @@ import {
   planWeekLabel,
   routineActions,
   routineTileColor,
+  showsResumeCard,
   workoutClock,
   workoutStartActions,
   workoutTabFrom,
@@ -158,6 +162,8 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   private readonly _translateService = inject(TranslateService);
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _activeSessionStore = inject(ActiveSessionStore);
+  private readonly _resumeCardService = inject(ResumeCardService);
 
   /**
    * The resume banner's clock. It counts live — a running workout must not
@@ -218,14 +224,59 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
 
   private readonly _todayKey = computed(() => localDayKey(new Date(this._clockService.now())));
 
-  /** How long the open session has been trained, for the resume banner. */
-  readonly elapsed = computed(() => {
-    const log = this.store.inProgress();
-    return log ? workoutClock(log, this._now()) : '';
+  /** The open workout's clock, as the mini-bar reads it when it can. */
+  private readonly _openClock = computed(() =>
+    freshestClock(this.store.inProgress(), this._activeSessionStore.session()),
+  );
+
+  /** The store's copy is of this workout: its rest, sets, count and clock apply. */
+  private readonly _tracked = computed(() => {
+    const clock = this._openClock();
+    return clock !== null && clock.id === this._activeSessionStore.session()?.id;
   });
 
-  /** A paused session's clock stands still, so the banner says why. */
-  readonly isPaused = computed(() => !!this.store.inProgress()?.pausedAt);
+  /**
+   * The mini-bar's clock while it shows this same workout, so the two never
+   * read different seconds side by side; this page's own otherwise (a
+   * workout the store has not picked up yet).
+   */
+  private readonly _clockNow = computed(() =>
+    this._tracked() ? this._activeSessionStore.now() : this._now(),
+  );
+
+  /** How long the open session has been trained, for the resume banner. */
+  readonly elapsed = computed(() => {
+    const clock = this._openClock();
+    return clock ? workoutClock(clock, this._clockNow()) : '';
+  });
+
+  /** A paused session's clock stands still: nothing to tick. */
+  private readonly _isPaused = computed(() => !!this._openClock()?.pausedAt);
+
+  /** The banner's ring and line: the mini-bar's own answer, rest included. */
+  readonly openStatus = computed(() =>
+    activeStatus(
+      this._openClock(),
+      this._activeSessionStore.rest(),
+      this._clockNow(),
+      this._tracked() && this._activeSessionStore.allDone(),
+    ),
+  );
+
+  /** "7 of 13 sets" on the banner, once the logger has counted them. */
+  readonly openProgress = computed(() =>
+    this._tracked() ? this._activeSessionStore.progress() : null,
+  );
+
+  /** The resume card is on this page now: the mini-bar steps aside for it. */
+  private readonly _showsResumeCard = computed(() =>
+    showsResumeCard({
+      tab: this.tab(),
+      loading: this.store.showSkeleton(),
+      failed: this.store.showError(),
+      open: this.store.inProgress() !== null,
+    }),
+  );
 
   constructor() {
     addIcons(WORKOUT_ICONS);
@@ -243,12 +294,20 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
       if (body) untracked(() => body.load());
     });
 
+    // A workout the store already tracks counts on its clock instead (`_clockNow`).
     effect((onCleanup) => {
-      if (!this._visible() || !this.store.inProgress() || this.isPaused()) return;
+      if (!this._visible() || !this.store.inProgress() || this._isPaused() || this._tracked()) {
+        return;
+      }
       this._now.set(Date.now());
       const handle = setInterval(() => this._now.set(Date.now()), 1000);
       onCleanup(() => clearInterval(handle));
     });
+
+    // Told to the tab shell, which hides the mini-bar while this page is the
+    // one on screen and the card shows (user decision, 2026-11-19).
+    effect(() => this._resumeCardService.set(this._showsResumeCard()));
+    this._destroyRef.onDestroy(() => this._resumeCardService.set(false));
   }
 
   // Not ngOnInit: Ionic keeps the page in its tab stack, so a plan finished
@@ -333,6 +392,12 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   resume(): void {
     const log = this.store.inProgress();
     if (log) void this._router.navigate(['/tabs/workouts/log', log.id]);
+  }
+
+  /** Every set ticked: the banner's Finish finishes it in the logger. */
+  finishOpen(): void {
+    const log = this.store.inProgress();
+    if (log) this._activeWorkoutService.finishOnOpen(log.id);
   }
 
   openToday(): void {

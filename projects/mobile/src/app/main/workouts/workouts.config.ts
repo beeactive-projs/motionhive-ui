@@ -71,6 +71,7 @@ import {
   searchOutline,
   shareOutline,
   timeOutline,
+  timerOutline,
   trashOutline,
   trendingUpOutline,
   trophyOutline,
@@ -130,6 +131,7 @@ export const WORKOUT_ICONS = {
   searchOutline,
   shareOutline,
   timeOutline,
+  timerOutline,
   trashOutline,
   trendingUpOutline,
   trophyOutline,
@@ -156,6 +158,21 @@ export function workoutTabFrom(value: unknown): WorkoutTab {
     value === WorkoutTabs.Exercises
     ? value
     : WorkoutTabs.Routines;
+}
+
+/**
+ * The Routines tab is showing the resume card: it is the tab on screen, its
+ * content has loaded (no skeleton, no error), and a workout is open. The
+ * same conditions the template shows the card under, so the mini-bar steps
+ * aside exactly while the card says what it would.
+ */
+export function showsResumeCard(state: {
+  tab: WorkoutTab;
+  loading: boolean;
+  failed: boolean;
+  open: boolean;
+}): boolean {
+  return state.tab === WorkoutTabs.Routines && !state.loading && !state.failed && state.open;
 }
 
 /** The two ways to begin, behind the Workouts page's "+". */

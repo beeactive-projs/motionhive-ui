@@ -113,6 +113,17 @@ describe('LockScreenService, the lock screen buttons with the logger closed', ()
     expect(store.liveSteps().map((s) => s.setId)).toEqual(['set-3']);
   });
 
+  // The resume card's "7 of 8 sets", the mini-bar's trophy and Finish.
+  it('counts a ✓ as a set done, and the last one as all done', () => {
+    const { store, apply } = setup();
+    store.setNext('wl-1', '', [step('set-8', { rest: null, final: true })], { done: 7, total: 8 });
+
+    apply({ type: RestLiveActionTypes.Log, at: START, setId: 'set-8', exerciseId: 'ex-1', values: { reps: 8 } });
+
+    expect(store.progress()).toEqual({ done: 8, total: 8 });
+    expect(store.allDone()).toBe(true);
+  });
+
   it('starts no rest after a ✓ that has none', () => {
     const { store, apply } = setup();
     store.setNext('wl-1', '', [step('set-2', { rest: null, final: true })]);

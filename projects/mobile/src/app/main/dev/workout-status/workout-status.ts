@@ -22,6 +22,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RestLiveState } from '../../../_shared/native/rest-live';
 import { RestTimerBar } from '../../workouts/_components/rest-timer-bar/rest-timer-bar';
 import { ResumeCard } from '../../workouts/_components/resume-card/resume-card';
+import { allSetsDone } from '../../workouts/_services/active-session.store';
+import { ActiveStatus, activeStatus } from '../../workouts/_services/active-status.config';
 import { Translate, liveState } from '../../workouts/_services/lock-screen.config';
 import { workoutClock } from '../../workouts/workouts.config';
 import { ActiveBarPreview } from './_components/active-bar-preview/active-bar-preview';
@@ -64,6 +66,8 @@ interface PreviewView extends PreviewItem {
   /** The rest timer's times; null while no rest runs or its bar is hidden. */
   restBar: { endsAt: number; startedAt: number } | null;
   elapsed: string;
+  /** What the mini-bar and the resume card show of it. */
+  status: ActiveStatus;
   restAlert: string;
   stillTraining: string;
 }
@@ -130,8 +134,9 @@ export class WorkoutStatus {
   readonly views = computed<PreviewView[]>(() => {
     const now = this.now();
     return this._items().map((item) => {
-      const { session, rest, next, steps } = item.world;
-      const live = liveState(session, rest, next, this._translate, now, steps);
+      const { session, rest, next, steps, progress } = item.world;
+      const done = allSetsDone(progress);
+      const live = liveState(session, rest, next, this._translate, now, steps, done);
       return {
         ...item,
         live,
@@ -141,6 +146,7 @@ export class WorkoutStatus {
             ? { endsAt: rest.endsAt, startedAt: rest.startedAt }
             : null,
         elapsed: workoutClock(session, now),
+        status: activeStatus(session, rest, now, allSetsDone(item.world.progress)),
         restAlert: next || this._translate('workouts.restAlert.body'),
         stillTraining: this._translate('workouts.stillTraining.body', { name: session.name }),
       };

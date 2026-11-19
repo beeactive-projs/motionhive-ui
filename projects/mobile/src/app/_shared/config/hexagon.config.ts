@@ -70,11 +70,12 @@ export const APP_HEX_SHAPE: HexShape = HexShapes.Classic;
 export const SHARE_HEX_SHAPE: HexShape = HexShapes.Logo;
 
 /**
- * The rest timer's hexagon, which drains as the rest passes: the brand's
- * squarer shape, the one place in the app that uses it (owner's call,
- * 2026-11-02). Lists, avatars and tiles keep the app's own.
+ * The rest timer's hexagon, the ring that drains as the rest passes: the
+ * app's own classic shape standing on a point, as the month hive draws its
+ * cells (Hex meter design, owner, 2026-11-19; it was the logo's squarer
+ * shape from 2026-11-02).
  */
-export const TIMER_HEX_SHAPE: HexShape = HexShapes.Logo;
+export const TIMER_HEX_SHAPE: HexShape = HexShapes.Classic;
 /**
  * Discover's page draws its avatars standing on a point, as its design does
  * ("Discover Header Clean", A; owner, 2026-11-07): Discover only, the rest

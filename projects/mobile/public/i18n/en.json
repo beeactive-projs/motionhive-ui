@@ -751,6 +751,7 @@
   "dev": {
     "workoutStatus": {
       "android": "Android ongoing notification (it sounds at Go)",
+      "androidCard": "Android notification, custom card",
       "data": "Mock data",
       "dataNote": "Every clock counts from the moment a field changes. A rest left below 0 is overtime.",
       "field": {
@@ -3215,6 +3216,7 @@
       "countSearch": "{count, plural, one {# workout} other {# workouts}}"
     },
     "home": {
+      "allDone": "All sets done · {elapsed}",
       "coldStart": {
         "action": "Start an empty workout",
         "browseStarters": "Browse starter routines",
@@ -3222,15 +3224,20 @@
         "message": "Workouts you start, save or follow will live here.",
         "title": "Let's get you moving"
       },
+      "finish": "Finish",
       "fromYourCoach": "From your coach",
-      "inProgress": "In progress · {elapsed}",
       "noRoutines": "Save a workout as a routine and it will show up here, ready to repeat.",
       "paused": "Paused · {elapsed}",
       "percentDone": "{percent}% done",
+      "restOver": "Rest over",
+      "restOvertime": "Rest over · {over} over",
+      "resting": "Rest · {left} of {planned}",
       "startActions": "Start or create",
       "startEmpty": "Start empty workout",
       "startsOn": "Starts {date}",
       "weekOf": "Week {week} of {total}",
+      "workout": "Workout · {elapsed}",
+      "workoutSets": "Workout · {elapsed} · {done} of {total, plural, one {# set} other {# sets}}",
       "yourCoach": "Your coach",
       "yourRoutinesCount": "Your routines · {count}"
     },
@@ -3463,15 +3470,17 @@
       "plusSeconds": "Plus {seconds} seconds",
       "rest": "Rest",
       "restOver": "Rest over",
-      "of": "of {total} · rest",
-      "getReady": "get ready",
+      "getReady": "Get ready",
       "go": "Go",
-      "restDone": "rest done",
-      "over": "over {total} rest",
       "next": "Next",
       "startSet": "Start set",
       "hide": "Hide",
-      "change": "Change the rest"
+      "changeLeft": "Change the rest, {time} left",
+      "changeOver": "Change the rest. Rest over",
+      "changeOvertime": "Change the rest. Rest ended {over} ago",
+      "minusShort": "−{seconds} s",
+      "plusShort": "+{seconds} s",
+      "nextLabel": "Next:"
     },
     "routineBuilder": {
       "actions": {
@@ -3886,10 +3895,13 @@
     },
     "activeBar": {
       "resting": "Rest · next {next}",
-      "restDone": "Rest done · next {next}",
+      "restOver": "Rest over · {next}",
+      "nextSet": "Next: {exercise} · {set}",
+      "nextRound": "Next: round {round} of {total}",
       "inProgress": "Workout in progress",
       "paused": "Paused",
-      "open": "Back to {name}",
+      "openStatus": "Back to {name}. {status}",
+      "openStatusNext": "Back to {name}. {status}. {next}",
       "dot": "A workout is in progress"
     },
     "stillTraining": {
@@ -3972,7 +3984,10 @@
       "planned": "of {total}",
       "skipSet": "Skip set",
       "otherValue": "Other value",
-      "allDone": "All sets done"
+      "allDone": "All sets done",
+      "logSet": "Log set",
+      "editSet": "Edit set",
+      "finishWorkout": "Finish workout"
     },
     "updateRoutine": {
       "added": "You added {names}.",

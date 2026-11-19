@@ -169,6 +169,7 @@ export class LockScreenService {
       (key, params) => this._translateService.instant(key, params),
       Date.now(),
       this._store.liveSteps(),
+      this._store.allDone(),
     );
   }
 
@@ -271,7 +272,7 @@ export class LockScreenService {
       .pipe(take(1))
       .subscribe({ error: () => undefined });
 
-    const step = this._store.moveOnFrom(setId);
+    const step = this._store.moveOnFrom(setId, true);
     this._store.setRest(liveTickRest(logId, action, step, this._store.next()));
   }
 }

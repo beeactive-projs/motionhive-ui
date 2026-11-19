@@ -1,62 +1,65 @@
 @let f = face();
 
-<!-- The status hexagon: honey resting, green with a tick at Done, an outline
-     between sets, grey with a pause sign while paused. -->
-<ng-template #timerHex let-size="size">
-  <span [class]="'hex ' + size + ' phase-' + f.phase" aria-hidden="true">
-    <svg [attr.viewBox]="hex.viewBox" [style.aspect-ratio]="hex.aspect">
-      <path [attr.d]="hex.d" />
-    </svg>
-    @if (f.phase === Phases.Go) {
-      <ion-icon name="checkmark-outline" />
-    } @else if (f.phase === Phases.Paused) {
-      <ion-icon name="pause-outline" />
-    }
-  </span>
+<!-- The large ring: the time inside while a clock counts, a glyph for a status. -->
+<ng-template #largeRing>
+  <mh-hex-meter
+    size="lg"
+    [phase]="meterPhase()"
+    [left]="f.restLeft ?? 0"
+    [icon]="timeInRing() ? null : icon()"
+  >
+    <strong class="ring-time">{{ f.big }}</strong>
+    <span class="ring-caption">{{ caption() }}</span>
+  </mh-hex-meter>
 </ng-template>
 
-<!-- The big number, and beside it "of 1:30" or "7 of 13 sets". -->
-<ng-template #numbers>
-  <span class="big-row">
-    <span class="big" [class.muted]="f.phase === Phases.Paused">
-      <span [class.done]="f.phase === Phases.Go">{{ f.big }}</span>
-      @if (f.over) {
-        <span class="muted">&nbsp;&nbsp;{{ f.over }}</span>
+<!-- Ring, then the kicker, the next set, its target and the set dots. -->
+<ng-template #lockBody>
+  <div class="top">
+    <ng-container *ngTemplateOutlet="largeRing" />
+    <span class="numbers">
+      <span class="kicker-row">
+        <span class="kicker" [class.ok]="f.phase === Phases.Go || f.allDone">{{ kicker() }}</span>
+        @if (f.over) {
+          <span class="over">{{ f.over }}</span>
+        }
+      </span>
+      @if (f.nextLine.shown) {
+        <span class="next" [class.muted]="!!f.nextLine.plain">
+          @if (f.nextLine.plain) {
+            {{ f.nextLine.plain }}
+          } @else {
+            {{ f.nextLine.lead }}@if (f.nextLine.set) {&nbsp;· {{ f.nextLine.set }}}
+          }
+        </span>
+      }
+      @if (f.lockDetail) {
+        <span class="detail">{{ f.lockDetail }}</span>
+      }
+      @if (f.dotsText) {
+        <span class="dots-text">{{ f.dotsText }}</span>
+      } @else if (f.dots.length) {
+        <span class="dots" aria-hidden="true">
+          @for (dot of f.dots; track $index) {
+            <svg [attr.viewBox]="hex.viewBox" [class]="'dot ' + dot"><path [attr.d]="hex.d" /></svg>
+          }
+        </span>
       }
     </span>
-    @if (f.aside) {
-      <span class="aside">{{ f.aside }}</span>
-    }
-  </span>
-  @if (f.restLeft !== null) {
-    <span class="track"><span class="fill" [style.width.%]="f.restLeft * 100"></span></span>
-  }
-</ng-template>
-
-<ng-template #nextLine>
-  @if (f.nextLine.shown) {
-    <p class="next">
-      @if (f.nextLine.plain) {
-        <span class="muted">{{ f.nextLine.plain }}</span>
-      } @else {
-        <span class="lead">{{ f.nextLine.lead }}</span>
-        @if (f.nextLine.set) {
-          <span class="whole">&nbsp;· {{ f.nextLine.set }}</span>
-        }
-        @if (f.nextLine.target) {
-          <span class="whole">&nbsp;·&nbsp;</span>
-          <span class="whole honey">{{ f.nextLine.target }}</span>
-        }
-      }
-    </p>
-  }
+  </div>
+  <ng-container *ngTemplateOutlet="chips; context: { actions: f.actions }" />
 </ng-template>
 
 <ng-template #chips let-actions="actions">
   @if (actions.length) {
     <span class="chips">
       @for (chip of actions; track $index) {
-        <span class="chip" [class.primary]="chip.primary">{{ chip.text }}</span>
+        <span class="chip" [class.primary]="chip.primary">
+          @if (chip.tick) {
+            <ion-icon name="checkmark-outline" aria-hidden="true" />
+          }
+          {{ chip.text }}
+        </span>
       }
     </span>
   }
@@ -65,66 +68,90 @@
 @switch (layout()) {
   @case (Layouts.Lock) {
     <div class="activity">
+      <ng-container *ngTemplateOutlet="lockBody" />
+    </div>
+  }
+  @case (Layouts.Android) {
+    @let c = card();
+    <div class="android">
+      <div class="android-head">
+        <svg class="mark" [attr.viewBox]="hex.viewBox" aria-hidden="true"><path [attr.d]="hex.d" /></svg>
+        <span class="app">{{ 'common.appName' | translate }}</span>
+        <span class="android-sub">· {{ android().sub }}</span>
+      </div>
+      <!-- RestLive.java's card: the ring with its Chronometer, no set dots. -->
       <div class="top">
-        <ng-container *ngTemplateOutlet="timerHex; context: { size: 'lg' }" />
+        <mh-hex-meter size="lg" [phase]="cardMeterPhase()" [left]="c.restLeft">
+          <strong class="ring-time">{{ c.clock }}</strong>
+          <span class="ring-caption">{{ c.caption }}</span>
+        </mh-hex-meter>
         <span class="numbers">
-          <span class="kicker">{{ f.kicker }}</span>
-          <ng-container *ngTemplateOutlet="numbers" />
+          <span class="kicker-row">
+            <span class="kicker" [class.ok]="c.ok">{{ c.kicker }}</span>
+            @if (c.over) {
+              <span class="over">{{ c.over }}</span>
+            }
+          </span>
+          @if (c.next) {
+            <span class="next">{{ c.next }}</span>
+          }
+          @if (c.detail) {
+            <span class="detail">{{ c.detail }}</span>
+          }
         </span>
       </div>
-      <ng-container *ngTemplateOutlet="nextLine" />
-      @if (f.detail || f.dots.length || f.dotsText) {
-        <span class="detail">
-          <span class="detail-text">{{ f.detail }}</span>
-          @if (f.dotsText) {
-            <span class="dots-text">{{ f.dotsText }}</span>
-          } @else {
-            <span class="dots" aria-hidden="true">
-              @for (dot of f.dots; track $index) {
-                <svg
-                  [attr.viewBox]="hex.viewBox"
-                  [style.aspect-ratio]="hex.aspect"
-                  [class]="'dot ' + dot"
-                >
-                  <path [attr.d]="hex.d" />
-                </svg>
-              }
-            </span>
+      <!-- The system's buttons under the card, as text in the notification's accent. -->
+      @if (android().actions.length) {
+        <span class="android-actions">
+          @for (action of android().actions; track $index) {
+            <span class="android-action">{{ action }}</span>
           }
         </span>
       }
-      <ng-container *ngTemplateOutlet="chips; context: { actions: f.actions }" />
     </div>
   }
   @case (Layouts.Expanded) {
     <div class="island expanded">
-      <span class="kicker centred">{{ f.kicker }}</span>
-      <div class="top">
-        <ng-container *ngTemplateOutlet="timerHex; context: { size: 'md' }" />
-        <span class="numbers">
-          <ng-container *ngTemplateOutlet="numbers" />
+      <div class="island-top">
+        <mh-hex-meter size="md" [phase]="meterPhase()" [left]="f.restLeft ?? 0" [icon]="icon()" />
+        <span class="trail">
+          @if (f.phase === Phases.Go) {
+            <!-- IslandTrail: "Rest over" in green, the overtime under it. -->
+            <span class="trail-label ok">{{ kicker() }}</span>
+            <span class="trail-time muted">{{ f.over }}</span>
+          } @else {
+            <span class="trail-time" [class.muted]="f.phase === Phases.Paused">{{ f.big }}</span>
+            <span class="trail-caption" [class.ok]="f.allDone">{{ islandCaption() }}</span>
+          }
         </span>
       </div>
-      <ng-container *ngTemplateOutlet="nextLine" />
+      @if (f.nextLine.shown) {
+        <span class="next" [class.muted]="!!f.nextLine.plain">{{ f.nextLine.plain || f.nextLine.lead }}@if (f.nextLine.set) {&nbsp;· {{ f.nextLine.set }}}</span>
+      }
       <ng-container *ngTemplateOutlet="chips; context: { actions: f.islandActions }" />
     </div>
   }
   @case (Layouts.Compact) {
     <div class="island compact">
-      <ng-container *ngTemplateOutlet="timerHex; context: { size: 'sm' }" />
+      <mh-hex-meter size="sm" [phase]="meterPhase()" [left]="f.restLeft ?? 0" />
       <span class="camera" aria-hidden="true"></span>
+      <!-- CompactClock: the ✓ in green for the whole of Go, never the overtime. -->
       <span
         class="compact-clock"
-        [class.honey]="f.phase === Phases.Rest"
-        [class.done]="f.phase === Phases.Go"
+        [class.ok]="f.phase === Phases.Go"
         [class.muted]="f.phase === Phases.Paused"
-        >{{ f.compact }}</span
       >
+        @if (f.phase === Phases.Go) {
+          <ion-icon name="checkmark-outline" aria-hidden="true" />
+        } @else {
+          {{ f.compact }}
+        }
+      </span>
     </div>
   }
   @case (Layouts.Minimal) {
     <div class="island minimal">
-      <ng-container *ngTemplateOutlet="timerHex; context: { size: 'sm' }" />
+      <mh-hex-meter size="sm" [phase]="meterPhase()" [left]="f.restLeft ?? 0" />
     </div>
   }
 }

@@ -1,35 +1,23 @@
-@if (session(); as running) {
-  <ion-item
-    button
-    detail="false"
-    lines="none"
-    class="bar"
-    [class.resting]="resting()"
-    [attr.aria-label]="'workouts.activeBar.open' | translate: { name: running.name }"
-    (click)="open()"
-  >
-    <span slot="start" class="hex" aria-hidden="true">
-      <svg [attr.viewBox]="hex.viewBox">
-        <defs>
-          <clipPath [attr.id]="clipId"><path [attr.d]="hex.d" /></clipPath>
-        </defs>
-        <path class="hex-base" [attr.d]="hex.d" />
-        @if (resting()) {
-          <rect
-            class="hex-fill"
-            [attr.x]="hex.x"
-            [attr.y]="fillY()"
-            [attr.width]="hex.width"
-            [attr.height]="fillHeight()"
-            [attr.clip-path]="'url(#' + clipId + ')'"
-          />
-        }
-      </svg>
-    </span>
-    <ion-label>
+@if (session()) {
+  <!-- Named by the hidden line, not an aria-label: ion-item copies an
+       aria-label to its button once, when it loads, so the name never
+       followed the rest. The button's content is read as it is now. -->
+  <ion-item button detail="false" lines="none" class="bar" (click)="open()">
+    <mh-hex-meter slot="start" size="md" [phase]="meterPhase()" [left]="left()" [icon]="icon()" />
+    <ion-label aria-hidden="true">
       <span class="title">{{ title() }}</span>
       <span class="sub">{{ sub() }}</span>
     </ion-label>
-    <span slot="end" class="right">{{ right() }}</span>
+    @if (right()) {
+      <span
+        slot="end"
+        class="right"
+        aria-hidden="true"
+        [class.muted]="paused()"
+        [class.small]="over()"
+        >{{ right() }}</span
+      >
+    }
+    <span class="mh-visually-hidden">{{ label() }}</span>
   </ion-item>
 }

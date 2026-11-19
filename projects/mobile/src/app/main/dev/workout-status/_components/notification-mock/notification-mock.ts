@@ -4,8 +4,9 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { TIMER_HEX_SHAPE, cellFigure } from '../../../../../_shared/config/hexagon.config';
 
 /**
- * A picture of a notification in the shade: the app's honey mark and name,
- * what it is about, the text, and its buttons as text. Two shapes: the
+ * A picture of a notification in the shade: the app's mark on its navy
+ * accent (`mh_notification_accent`) and its name, what it is about, the
+ * text, and its buttons as text in that accent. Two shapes: the
  * ongoing workout notification (`RestLive.java`), whose custom view puts the
  * title, the clock and the line on one row with the rest's bar under it,
  * and a plain alert (rest over, still training), title over body. Its

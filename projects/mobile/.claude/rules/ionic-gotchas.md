@@ -49,6 +49,7 @@ Each of these has caused a real bug or a false QA finding in this app.
 ## Accessible names on Ionic buttons
 
 - Ionic moves `aria-label` from the `ion-button` / `ion-fab-button` host onto the shadow `<button>`. A host query (`ion-button[aria-label]`) finds nothing; that is not a missing label. Check the shadow button (`host.shadowRoot.querySelector('button')`), and in Playwright target `button[aria-label="…"]`.
+- A name that changes (a clock, a status) works on `ion-button`, which copies a new `aria-label` to its shadow button, but not on `ion-item`: it copies the label once, when it loads, and keeps it. On a tappable `ion-item` put the changing name in a `.mh-visually-hidden` span inside it and `aria-hidden="true"` on the visible parts, since the button's content is read as it is now (the mini-bar said "Workout" through a whole rest until 2026-11-19).
 - Every `ion-back-button` carries `[attr.aria-label]="'a11y.back' | translate"`. Without it Ionic names the button with its English default "back" (`backButtonText` is empty in `app.config.ts`, so there is no text to fall back on).
 
 ## The keyboard

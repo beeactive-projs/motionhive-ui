@@ -143,6 +143,11 @@ ion-list:is(.mh-card-list, .mh-flat-list) ion-item:has(> mh-hex-avatar[slot='sta
   --mh-row-lead: 3.25rem;
 }
 
+/* The hex meter leading a row (the Workouts resume card): its md ring. */
+ion-list:is(.mh-card-list, .mh-flat-list) ion-item:has(> mh-hex-meter[slot='start'][data-size='md']) {
+  --mh-row-lead: 2.75rem;
+}
+
 /* ─── The flat list ────────────────────────────────────────────────────
    WhatsApp's chat list: a wall of rows on white, edge to edge, no card.
    Each row is an avatar and two lines, a title with its time on the first

@@ -107,8 +107,10 @@
             <mh-resume-card
               [name]="log.name"
               [elapsed]="elapsed()"
-              [paused]="isPaused()"
+              [status]="openStatus()"
+              [progress]="openProgress()"
               (resume)="resume()"
+              (finish)="finishOpen()"
             />
           }
           @if (store.isColdStart()) {

@@ -115,3 +115,35 @@ describe('ActiveWorkoutService.takeCarryOver', () => {
     expect(service.takeCarryOver('wl-9')).toBeNull();
   });
 });
+
+describe('ActiveWorkoutService.finishOnOpen', () => {
+  // The resume card's Finish workout: the logger finishes it, so the summary
+  // and "Update routine?" come as from its own Finish.
+  it('opens the logger and asks it to finish that workout, once', () => {
+    const { service, navigate } = setup();
+
+    service.finishOnOpen('wl-9');
+
+    expect(navigate).toHaveBeenCalledWith(['/tabs/workouts/log', 'wl-9']);
+    expect(service.takeFinish('wl-other')).toBe(false);
+    expect(service.takeFinish('wl-9')).toBe(true);
+    expect(service.takeFinish('wl-9')).toBe(false);
+  });
+
+  // A logger already in front, which the navigation does not enter again, reads it.
+  it('says which workout waits to be finished until its logger takes it', () => {
+    const { service } = setup();
+    expect(service.finishing()).toBeNull();
+
+    service.finishOnOpen('wl-9');
+    expect(service.finishing()).toBe('wl-9');
+
+    service.takeFinish('wl-9');
+    expect(service.finishing()).toBeNull();
+  });
+
+  it('asks nothing of a logger opened any other way', () => {
+    const { service } = setup();
+    expect(service.takeFinish('wl-9')).toBe(false);
+  });
+});

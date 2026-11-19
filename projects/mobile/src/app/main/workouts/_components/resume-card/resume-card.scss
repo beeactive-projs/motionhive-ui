@@ -1,18 +1,52 @@
-/* Navy, not honey. Resuming an abandoned session and starting a new one are
-   different offers, and the design is explicit that these must never be
-   mistaken for each other. The navy card set, like the mini-bar and the
-   rest timer, so all three are one navy in dark mode too; its warm label
-   names the moment. */
-.resume ion-item {
-  --background: var(--mh-color-navy-card);
-  --color: var(--mh-color-navy-card-ink);
+/* The card surface, like the mini-bar and the rest timer: the Hex meter
+   design. The ring tells running from paused; Resume stays the one honey.
+   The meter's spacing is the card list's (`ion-list.css`), like any
+   leading item's. The card measures itself so the button can make room. */
+:host {
+  display: block;
+  container-type: inline-size;
 }
 
-.resume .mh-kicker {
-  color: var(--mh-color-navy-card-accent);
-}
-
+/* The face, weight and leading are every heading's (`typography.css`). */
 .resume h2 {
-  color: inherit;
-  font-weight: 600;
+  margin: 0;
+  font-size: var(--mh-text-md);
+}
+
+/* Secondary by colour first. Tabular, so the clock does not jitter. */
+.meta {
+  display: block;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+
+  /* Rest over, all sets done: green, as the ring beside it. */
+  &.ok {
+    color: var(--mh-color-success-deep);
+  }
+}
+
+/* Narrower than this (an iPhone SE from about 115% text, any phone at 130%)
+   the button squeezed the name to a word a line ("Push / day"): it goes
+   under the text instead, on the text's own edge, as `mh-person-row`'s verb
+   does, and the ring lines up with the text rather than the taller block. */
+@container (max-width: 19rem) {
+  .resume ion-item::part(inner) {
+    flex-wrap: wrap;
+  }
+
+  .resume ion-item::part(container) {
+    flex: 1 0 100%;
+  }
+
+  .resume ion-item > ion-button.mh-row-action {
+    margin-block-start: 0.5rem;
+    margin-inline-start: 0;
+  }
+
+  .resume ion-item > mh-hex-meter[slot='start'] {
+    align-self: flex-start;
+    margin-block-start: 0.5rem;
+  }
 }

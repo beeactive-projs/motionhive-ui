@@ -58,11 +58,37 @@ export function resolveAppLink(url: string, host: string): DeepLink | null {
 export const APP_SCHEME = 'motionhive:';
 
 /**
- * Where a link from the lock screen opens: "Other value" is
+ * Where a link from the lock screen opens: Edit set is
  * `motionhive://log/<logId>?set=<setId>`, the logger on that set. Null for
  * anything else.
  */
 export function resolveLiveLink(url: string): DeepLink | null {
+  const live = parseLiveLink(url);
+  if (!live) {
+    return null;
+  }
+  const set = live.params.get('set');
+  let queryParams: Record<string, string> | null = null;
+  if (set) {
+    queryParams = { set };
+  }
+  return { commands: ['/tabs/workouts/log', live.logId], queryParams };
+}
+
+/**
+ * The workout the lock screen's Finish workout finishes:
+ * `motionhive://log/<logId>?finish=1`. Null for any other link, which
+ * `resolveLiveLink` opens instead.
+ */
+export function liveFinishLogId(url: string): string | null {
+  const live = parseLiveLink(url);
+  if (!live || live.params.get('finish') !== '1') {
+    return null;
+  }
+  return live.logId;
+}
+
+function parseLiveLink(url: string): { logId: string; params: URLSearchParams } | null {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -76,10 +102,5 @@ export function resolveLiveLink(url: string): DeepLink | null {
   if (segments.length !== 1) {
     return null;
   }
-  const set = parsed.searchParams.get('set');
-  let queryParams: Record<string, string> | null = null;
-  if (set) {
-    queryParams = { set };
-  }
-  return { commands: ['/tabs/workouts/log', segments[0]], queryParams };
+  return { logId: segments[0], params: parsed.searchParams };
 }

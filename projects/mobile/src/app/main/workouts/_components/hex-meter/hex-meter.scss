@@ -1,0 +1,115 @@
+/* The ring's stroke is in the 100 square's units, so it scales with the
+   meter: thicker on the small ones, where a thin line would vanish. Its inks
+   come from the page, unless the surface it sits on says otherwise
+   (`--meter-ink`, `--meter-muted`, `--meter-track`, `--meter-ok`,
+   `--meter-tick`): the status bars set them for their navy, the dev page's
+   lock screen mock-ups for the native colours. */
+:host {
+  --meter-stroke: 9;
+
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  aspect-ratio: 1;
+  color: var(--meter-ink, var(--ion-text-color));
+}
+
+:host([data-size='sm']) {
+  --meter-stroke: 11;
+
+  width: 1.5rem;
+}
+
+:host([data-size='lg']) {
+  --meter-stroke: 6;
+
+  width: 5.5rem;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ring path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--meter-stroke);
+}
+
+/* Rest: the honey drains clockwise from the top point over its pale track. */
+.track {
+  stroke: var(--meter-track, var(--mh-color-meter-track));
+}
+
+.progress {
+  stroke: var(--ion-color-primary);
+  transition: stroke-dasharray 250ms linear;
+}
+
+/* Between sets: a thin outline in the ink, no progress. On `.ring path`,
+   or that rule's stroke width (more specific) wins over this one. */
+.ring path.outline {
+  stroke: currentColor;
+  stroke-width: calc(var(--meter-stroke) * 0.6);
+}
+
+/* Paused: dashed, with square ends. Round caps add half the stroke at both
+   ends of every dash, which filled the gaps and drew a solid ring. On
+   `.ring path`, or that rule's round cap (more specific) wins over this one. */
+.ring path.paused {
+  stroke: var(--meter-muted, var(--ion-color-medium));
+  stroke-dasharray: 4 5;
+  stroke-linecap: butt;
+}
+
+/* All sets done: a full green ring. */
+.done {
+  stroke: var(--meter-ok, var(--mh-color-success-deep));
+}
+
+/* Rest over: filled, the 600 step, so the light tick on it clears 3:1. */
+.ring path.fill-over {
+  fill: var(--ion-color-success-shade);
+  stroke: none;
+}
+
+.middle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Half the hexagon's width, as a tile keeps its glyph. */
+.middle ion-icon {
+  font-size: var(--mh-icon-md);
+}
+
+:host([data-size='sm']) .middle ion-icon {
+  font-size: var(--mh-icon-sm);
+}
+
+:host([data-size='lg']) .middle ion-icon {
+  font-size: var(--mh-icon-2xl);
+}
+
+:host([data-phase='paused']) {
+  color: var(--meter-muted, var(--ion-color-medium));
+}
+
+:host([data-phase='done']) .middle ion-icon {
+  color: var(--meter-ok, var(--mh-color-success-deep));
+}
+
+:host([data-phase='over']) .middle ion-icon {
+  color: var(--meter-tick, var(--mh-color-meter-tick));
+}

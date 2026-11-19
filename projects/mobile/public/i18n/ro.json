@@ -751,6 +751,7 @@
   "dev": {
     "workoutStatus": {
       "android": "Notificarea permanentă Android (sună când pauza s-a terminat)",
+      "androidCard": "Notificarea Android, card personalizat",
       "data": "Date de test",
       "dataNote": "Fiecare ceas pornește din momentul în care se schimbă un câmp. O pauză rămasă sub 0 e depășită.",
       "field": {
@@ -3215,6 +3216,7 @@
       "countSearch": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
     },
     "home": {
+      "allDone": "Toate seriile gata · {elapsed}",
       "coldStart": {
         "action": "Începe un antrenament nou",
         "browseStarters": "Vezi antrenamentele predefinite",
@@ -3222,15 +3224,20 @@
         "message": "Antrenamentele pe care le începi, le salvezi sau le urmezi vor apărea aici.",
         "title": "Hai să ne mișcăm"
       },
+      "finish": "Termină",
       "fromYourCoach": "De la antrenorul tău",
-      "inProgress": "În desfășurare · {elapsed}",
       "noRoutines": "Salvează un antrenament ca rutină și va apărea aici, gata de repetat.",
       "paused": "Pe pauză · {elapsed}",
       "percentDone": "{percent}% gata",
+      "restOver": "Pauza s-a terminat",
+      "restOvertime": "Pauza s-a terminat · {over} în plus",
+      "resting": "Pauză · {left} din {planned}",
       "startActions": "Începe sau creează",
       "startEmpty": "Începe un antrenament nou",
       "startsOn": "Începe {date}",
       "weekOf": "Săptămâna {week} din {total}",
+      "workout": "Antrenament · {elapsed}",
+      "workoutSets": "Antrenament · {elapsed} · {done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
       "yourCoach": "Antrenorul tău",
       "yourRoutinesCount": "Rutinele tale · {count}"
     },
@@ -3463,15 +3470,17 @@
       "plusSeconds": "Plus {seconds} secunde",
       "rest": "Pauză",
       "restOver": "Pauza s-a terminat",
-      "of": "din {total} · pauză",
-      "getReady": "pregătește-te",
+      "getReady": "Pregătește-te",
       "go": "Start",
-      "restDone": "pauză încheiată",
-      "over": "peste pauza de {total}",
       "next": "Urmează",
       "startSet": "Începe seria",
       "hide": "Ascunde",
-      "change": "Schimbă pauza"
+      "changeLeft": "Schimbă pauza, mai sunt {time}",
+      "changeOver": "Schimbă pauza. Pauza s-a terminat",
+      "changeOvertime": "Schimbă pauza. Pauza s-a terminat acum {over}",
+      "minusShort": "−{seconds} s",
+      "plusShort": "+{seconds} s",
+      "nextLabel": "Urmează:"
     },
     "routineBuilder": {
       "actions": {
@@ -3886,10 +3895,13 @@
     },
     "activeBar": {
       "resting": "Pauză · urmează {next}",
-      "restDone": "Pauză încheiată · urmează {next}",
+      "restOver": "Pauza s-a terminat · {next}",
+      "nextSet": "Urmează: {exercise} · {set}",
+      "nextRound": "Urmează: runda {round} din {total}",
       "inProgress": "Antrenament în desfășurare",
       "paused": "Pe pauză",
-      "open": "Înapoi la {name}",
+      "openStatus": "Înapoi la {name}. {status}",
+      "openStatusNext": "Înapoi la {name}. {status}. {next}",
       "dot": "Un antrenament e în desfășurare"
     },
     "stillTraining": {
@@ -3972,7 +3984,10 @@
       "planned": "din {total}",
       "skipSet": "Sari seria",
       "otherValue": "Altă valoare",
-      "allDone": "Toate seriile gata"
+      "allDone": "Toate seriile gata",
+      "logSet": "Bifează seria",
+      "editSet": "Modifică seria",
+      "finishWorkout": "Termină antrenamentul"
     },
     "updateRoutine": {
       "added": "Ai adăugat {names}.",

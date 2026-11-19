@@ -3,12 +3,13 @@ import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
 /**
  * The app's own native plugin for the workout on the lock screen (Workouts
  * R2, Active Workout, "Outside the app"): a Live Activity with the Dynamic
- * Island on iOS, an ongoing notification on Android. Both show the rest
- * counting down with +15 and Skip (iOS adds −15), Go with Start set at zero
- * (iOS adds +30 s), and the workout's clock between sets. On iOS the next
- * set comes in pieces: exercise, set, weight, last time, the set dots. The
- * system keeps their time from the dates given here, so nothing has to run
- * while the phone is locked. On Android the notification sounds at Go
+ * Island on iOS, an ongoing notification on Android, both in the Hex meter
+ * design. Both show the rest counting down with −15 s, +15 s and Skip; once
+ * it is over, +15 s, Log set and Start set; between sets, Edit set and Log
+ * set; once every set is logged (`allDone`), Open and Finish workout. The
+ * next set comes in pieces: exercise, set, weight, last time, the set dots.
+ * The system keeps their time from the dates given here, so nothing has to
+ * run while the phone is locked. On Android the notification sounds at Go
  * itself, from an exact alarm; on iOS a Live Activity cannot, so the
  * rest-over alert (`RestAlertService`) sounds instead.
  *
@@ -21,7 +22,8 @@ import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
  * withdraw the rest-over alert, and leave a note. On iOS, ✓ ticks the next
  * set as planned, Skip set passes it over and Continue ends a pause; the
  * note is saved here when the app runs again, at the moment of the tap.
- * "Other value" opens `motionhive://log/<logId>?set=<setId>`.
+ * Edit set opens `motionhive://log/<logId>?set=<setId>`, and Finish workout
+ * `motionhive://log/<logId>?finish=1`, which finishes it in the logger.
  * `takeActions` hands the notes over once; the `action` event says there
  * are some while the app runs.
  */
@@ -85,6 +87,12 @@ export interface RestLiveState {
    * rest, Skip set passes it over, and either shows the one after.
    */
   steps: RestLiveStep[];
+  /**
+   * Every set is ticked, as the app counts them (`allSetsDone`): Open and
+   * Finish workout, the green ring. Never read off an empty `steps`, which
+   * is also what an empty workout or an unknown one sends.
+   */
+  allDone: boolean;
   labels: RestLiveLabels;
 }
 
@@ -102,6 +110,8 @@ export interface RestLiveStep {
   line: string;
   /** Nothing is left to do after it. */
   final: boolean;
+  /** ✓ on it ticks the workout's last set: the lock screen then turns to `allDone` by itself. */
+  completes: boolean;
   exercise: string;
   set: string;
   target: string;
@@ -126,9 +136,9 @@ export interface RestLiveLabels {
   next: string;
   skip: string;
   startSet: string;
-  /** "+15 s" (Android; iOS shows "+15"). */
+  /** "+15 s", while resting and once the rest is over (both phones). */
   plus: string;
-  /** "+30 s", once the rest is over (iOS). */
+  /** "+15 s", once the rest is over: a little more, counted from then. */
   more: string;
   open: string;
   paused: string;
@@ -137,6 +147,12 @@ export interface RestLiveLabels {
   otherValue: string;
   /** "Continue", on a paused workout (iOS). */
   resume: string;
+  /** Hex meter design: ✓ the next set as planned. */
+  logSet: string;
+  /** Hex meter design: the app, opened on the next set to change it. */
+  editSet: string;
+  /** Hex meter design, once every set is logged: the app, on the workout to finish it. */
+  finishWorkout: string;
   /** Under the clock once nothing is left (iOS). */
   allDone: string;
   /** The rest-over alert the lock screen schedules itself after its ✓ (iOS). */

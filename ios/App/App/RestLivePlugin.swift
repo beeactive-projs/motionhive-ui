@@ -148,6 +148,7 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
             kicker: call.getString("kicker"),
             order: call.getString("order"),
             steps: (call.getArray("steps") ?? []).compactMap { step(from: $0) },
+            allDone: call.getBool("allDone") ?? false,
             labels: RestTimerAttributes.Labels(
                 go: label("go"),
                 skip: label("skip"),
@@ -163,6 +164,9 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
                 skipSet: label("skipSet"),
                 otherValue: label("otherValue"),
                 resume: label("resume"),
+                logSet: label("logSet"),
+                editSet: label("editSet"),
+                finishWorkout: label("finishWorkout"),
                 allDone: label("allDone"),
                 alertTitle: label("alertTitle"),
                 alertBody: label("alertBody")
@@ -196,6 +200,7 @@ public class RestLivePlugin: CAPPlugin, CAPBridgedPlugin {
             rest: number("rest"),
             line: text("line") ?? "",
             final: object["final"] as? Bool ?? false,
+            completes: object["completes"] as? Bool ?? false,
             exercise: text("exercise"),
             setName: text("set"),
             target: text("target"),

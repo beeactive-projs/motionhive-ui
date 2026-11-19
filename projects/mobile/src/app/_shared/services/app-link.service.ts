@@ -1,10 +1,11 @@
-import { DestroyRef, Service, inject } from '@angular/core';
+import { DestroyRef, Injector, Service, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { APP_HOME_URL, WEB_APP_URL } from 'core';
 
-import { resolveAppLink, resolveLiveLink } from '../config/app-link.config';
+import { ActiveWorkoutService } from '../../main/workouts/_services/active-workout.service';
+import { liveFinishLogId, resolveAppLink, resolveLiveLink } from '../config/app-link.config';
 
 /**
  * A cold start can report its link twice (as the launch URL and as an
@@ -31,6 +32,8 @@ export class AppLinkService {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _appHomeUrl = inject(APP_HOME_URL);
+  /** For the workouts service, taken only when a Finish link comes: not at app start. */
+  private readonly _injector = inject(Injector);
   private readonly _host = new URL(WEB_APP_URL).host;
 
   private lastUrl: string | null = null;
@@ -55,6 +58,12 @@ export class AppLinkService {
     this.lastUrl = url;
     this.lastAt = now;
 
+    // Finish workout on the lock screen: the logger opens and finishes it.
+    const finish = liveFinishLogId(url);
+    if (finish) {
+      this._injector.get(ActiveWorkoutService).finishOnOpen(finish);
+      return;
+    }
     const live = resolveLiveLink(url);
     if (live) {
       void this._router.navigate(live.commands, { queryParams: live.queryParams ?? undefined });

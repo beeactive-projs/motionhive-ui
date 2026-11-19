@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveAppLink, resolveLiveLink } from './app-link.config';
+import { liveFinishLogId, resolveAppLink, resolveLiveLink } from './app-link.config';
 
 const HOST = 'dev.app.motionhive.fit';
 const at = (path: string) => resolveAppLink(`https://${HOST}${path}`, HOST);
@@ -79,5 +79,20 @@ describe('resolveLiveLink', () => {
     expect(resolveLiveLink('motionhive://profile/me')).toBeNull();
     expect(resolveLiveLink('motionhive://log/')).toBeNull();
     expect(resolveLiveLink('not a url')).toBeNull();
+  });
+});
+
+describe('liveFinishLogId', () => {
+  // Finish workout on the lock screen: the logger opens and finishes it.
+  it('names the workout the lock screen’s Finish workout finishes', () => {
+    expect(liveFinishLogId('motionhive://log/log-1?finish=1')).toBe('log-1');
+  });
+
+  it('is nothing for Open, Edit set or any other link', () => {
+    expect(liveFinishLogId('motionhive://log/log-1')).toBeNull();
+    expect(liveFinishLogId('motionhive://log/log-1?set=set-2')).toBeNull();
+    expect(liveFinishLogId('motionhive://log/log-1?finish=0')).toBeNull();
+    expect(liveFinishLogId(`https://${HOST}/log/log-1?finish=1`)).toBeNull();
+    expect(liveFinishLogId('not a url')).toBeNull();
   });
 });

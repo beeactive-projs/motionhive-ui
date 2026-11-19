@@ -6,6 +6,7 @@ import {
   HexOrientations,
   HexShapes,
   TILE_FRAME,
+  TIMER_HEX_SHAPE,
   TILE_ORIENTATION,
   brandEdgeDash,
   combLayout,
@@ -250,5 +251,15 @@ describe('hexagon measures for a canvas', () => {
     expect(dash.reduce((sum, part) => sum + part, 0)).toBeCloseTo(length, 5);
     expect(dash).toHaveLength(BRAND_EDGE.dashArray.length);
     expect(offset).toBe(-firstCorner);
+  });
+});
+
+describe('TIMER_HEX_SHAPE', () => {
+  // The hex meter's ring, and the lock screens that draw it again in Swift
+  // and Java (`hexPath` in RestLive.java): the app's own classic hexagon,
+  // √3 : 2, as the owner chose for the Hex meter design (2026-11-19).
+  it('is the classic hexagon the lock screens draw too', () => {
+    expect(TIMER_HEX_SHAPE).toBe(HexShapes.Classic);
+    expect(HEX_GEOMETRY[TIMER_HEX_SHAPE].ratio).toBeCloseTo(Math.sqrt(3) / 2, 10);
   });
 });

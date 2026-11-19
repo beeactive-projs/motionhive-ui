@@ -62,6 +62,8 @@ import {
   routineTileColor,
   secondsToClock,
   secondsToClockDigits,
+  showsResumeCard,
+  WorkoutTabs,
   niceBounds,
   nudgeRest,
   trendGeometry,
@@ -901,5 +903,27 @@ describe('unbreakable', () => {
     expect(unbreakable('53.665 kg')).toBe('53.665\u00a0kg');
     expect(unbreakable('1 h 30 min')).toBe('1\u00a0h\u00a030\u00a0min');
     expect(unbreakable('18')).toBe('18');
+  });
+});
+
+// The mini-bar steps aside exactly while the card is on screen (user
+// decision, 2026-11-19), so it is never hidden with nothing in its place.
+describe('showsResumeCard', () => {
+  const shown = { tab: WorkoutTabs.Routines, loading: false, failed: false, open: true };
+
+  it('is the Routines tab, loaded, with a workout open', () => {
+    expect(showsResumeCard(shown)).toBe(true);
+  });
+
+  it('is not the other tabs, which have no card', () => {
+    expect(showsResumeCard({ ...shown, tab: WorkoutTabs.History })).toBe(false);
+    expect(showsResumeCard({ ...shown, tab: WorkoutTabs.Progress })).toBe(false);
+    expect(showsResumeCard({ ...shown, tab: WorkoutTabs.Exercises })).toBe(false);
+  });
+
+  it('is not while the page loads or failed, nor with nothing open', () => {
+    expect(showsResumeCard({ ...shown, loading: true })).toBe(false);
+    expect(showsResumeCard({ ...shown, failed: true })).toBe(false);
+    expect(showsResumeCard({ ...shown, open: false })).toBe(false);
   });
 });

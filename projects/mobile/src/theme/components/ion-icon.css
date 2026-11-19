@@ -27,7 +27,8 @@ ion-icon:is(
     [name='globe-outline'],
     [name='refresh-outline'],
     [name='sync-outline'],
-    [name='time-outline']
+    [name='time-outline'],
+    [name='timer-outline']
   ) {
   scale: 1.06;
 }

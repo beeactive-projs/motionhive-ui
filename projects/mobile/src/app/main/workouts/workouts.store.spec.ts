@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProgramAssignmentService, RoutineService, WorkoutLogService } from 'core';
@@ -27,5 +27,31 @@ describe('WorkoutsStore, today', () => {
     TestBed.inject(WorkoutsStore).load();
 
     expect(trainingDay).toHaveBeenCalledWith('2026-11-19');
+  });
+});
+
+describe('WorkoutsStore, the open workout', () => {
+  // Not silent, a failed read raised the "No connection" alert over a page
+  // whose routines had loaded, for a card the page simply leaves out.
+  it('asks for it silently, and shows none when the read fails', () => {
+    const getInProgress = vi.fn(() => throwError(() => new Error('offline')));
+    const page = { items: [], total: 0 };
+    TestBed.configureTestingModule({
+      providers: [
+        WorkoutsStore,
+        {
+          provide: ProgramAssignmentService,
+          useValue: { trainingDay: () => of({ today: null, week: [] }) },
+        },
+        { provide: RoutineService, useValue: { list: () => of(page) } },
+        { provide: WorkoutLogService, useValue: { getInProgress } },
+      ],
+    });
+    const store = TestBed.inject(WorkoutsStore);
+
+    store.load();
+
+    expect(getInProgress).toHaveBeenCalledWith({ silent: true });
+    expect(store.inProgress()).toBeNull();
   });
 });

@@ -8,8 +8,8 @@ export type Translate = (key: string, params?: Record<string, unknown>) => strin
 
 /** The +15 on the lock screen, the same as the rest bar's. */
 const NUDGE_SECONDS = 15;
-/** "+30 s" once the rest is over: a little more, counted from then. */
-const MORE_REST_SECONDS = 30;
+/** "+15 s" once the rest is over: a little more, counted from then, the same step as the rest bar's. */
+const MORE_REST_SECONDS = 15;
 /**
  * What the steps may take of the Live Activity, in bytes: iOS refuses a
  * state over 4 KB, and the rest of it (the texts, the words) takes about
@@ -24,8 +24,9 @@ const VALUE_KEYS: readonly PayloadKey[] = Object.values(PAYLOAD_KEY);
  * What the lock screen shows for the workout in progress, from the same
  * timestamps the mini-bar reads. The rest counts only while it is still one
  * (until ten minutes over, as in the app); a paused workout shows its time
- * standing still. `steps` are the next sets in pieces, for the iOS layouts
- * and their buttons; without them they fall back on the one-line texts.
+ * standing still. `steps` are the next sets in pieces, for the layouts and
+ * their buttons; without them they fall back on the one-line texts.
+ * `allDone` is the store's (`allSetsDone`): every set is ticked.
  */
 export function liveState(
   session: ActiveSession,
@@ -34,6 +35,7 @@ export function liveState(
   translate: Translate,
   now: number,
   steps: readonly LiveStep[] = [],
+  allDone = false,
 ): RestLiveState {
   const paused = !!session.pausedAt;
   const resting =
@@ -62,6 +64,7 @@ export function liveState(
     ...nextPieces(first, translate),
     planned: plannedLine(resting ? rest : null, translate),
     steps: fitSteps(steps.map((step) => liveStep(step, translate))),
+    allDone,
     labels: {
       rest: translate('workouts.restTimer.rest'),
       restOver: translate('workouts.restTimer.restOver'),
@@ -78,6 +81,9 @@ export function liveState(
       skipSet: translate('workouts.live.skipSet'),
       otherValue: translate('workouts.live.otherValue'),
       resume: translate('button.continue'),
+      logSet: translate('workouts.live.logSet'),
+      editSet: translate('workouts.live.editSet'),
+      finishWorkout: translate('workouts.live.finishWorkout'),
       allDone: translate('workouts.live.allDone'),
       alertTitle: translate('workouts.restAlert.title'),
       alertBody: translate('workouts.restAlert.body'),
@@ -222,6 +228,7 @@ function liveStep(step: LiveStep, translate: Translate): RestLiveStep {
     rest: step.rest,
     line: step.line,
     final: step.final,
+    completes: step.workoutTotal > 0 && step.workoutDone + 1 >= step.workoutTotal,
     ...nextPieces(step, translate),
   };
 }

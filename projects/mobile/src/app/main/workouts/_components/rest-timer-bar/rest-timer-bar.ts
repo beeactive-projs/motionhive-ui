@@ -9,11 +9,13 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { addIcons } from 'ionicons';
+import { timerOutline } from 'ionicons/icons';
 
-import { TIMER_HEX_SHAPE, cellFigure } from '../../../../_shared/config/hexagon.config';
 import { secondsToClock } from '../../workouts.config';
+import { HexMeter, HexMeterPhase, HexMeterPhases } from '../hex-meter/hex-meter';
 
 /** How much a nudge moves the finish line. */
 export const NUDGE_SECONDS = 15;
@@ -36,17 +38,19 @@ export const RestStates = {
 } as const;
 export type RestState = (typeof RestStates)[keyof typeof RestStates];
 
-let clipIds = 0;
-
 /**
- * The rest timer, docked where the number pad sits (Workouts R2, section 4).
+ * The rest timer, docked where the number pad sits (Workouts R2, section 4),
+ * in the Hex meter design, compact: the medium ring (a timer glyph in it)
+ * with the time beside it and the keys on the same row, what comes next on
+ * its own line under them.
  *
- * A honey hexagon drains as the rest passes, so how much is left reads
- * without the numbers. Four states: counting; the last ten seconds, lighter;
- * zero, a green "Go"; then overtime, a calm grey "+0:25" counting up, never
- * red, because a longer rest is not a mistake. At zero the honey Start set
- * ends the rest (and so measures it exactly); Skip does the same before
- * zero. Tapping the hexagon or the time changes the rest.
+ * The honey ring drains as the rest passes, so how much is left reads
+ * without the numbers. Four states: counting; the last ten seconds ("Get
+ * ready"); zero, a filled green hexagon and "Rest over"; then overtime, the
+ * same hexagon with a calm grey "+0:25" counting up, never red, because a
+ * longer rest is not a mistake. At zero the honey Start set ends the rest
+ * (and so measures it exactly); Skip does the same before zero. Tapping the
+ * ring changes the rest.
  *
  * Deadline-based: it holds the instant rest ends, not a number it counts
  * down, so a WebView suspended in the background is right again on return.
@@ -54,7 +58,7 @@ let clipIds = 0;
  */
 @Component({
   selector: 'mh-rest-timer-bar',
-  imports: [IonButton, IonIcon, TranslatePipe],
+  imports: [HexMeter, IonButton, TranslatePipe],
   templateUrl: './rest-timer-bar.html',
   styleUrl: './rest-timer-bar.scss',
 })
@@ -87,8 +91,6 @@ export class RestTimerBar {
 
   readonly States = RestStates;
   readonly nudgeSeconds = NUDGE_SECONDS;
-  readonly hex = cellFigure(TIMER_HEX_SHAPE);
-  readonly clipId = `rest-hex-${++clipIds}`;
 
   private readonly _now = signal(Date.now());
   private _handle: ReturnType<typeof setInterval> | null = null;
@@ -131,17 +133,35 @@ export class RestTimerBar {
     }
   });
 
-  readonly sub = computed(() => {
-    const total = secondsToClock(this.planned());
+  /**
+   * The line under the count, shown only while it counts ("of 1:30", then
+   * "Get ready"). From zero on the bar says "Rest over" instead (`kicker`).
+   */
+  readonly sub = computed(() =>
+    this.state() === RestStates.Soon
+      ? this._translateService.instant('workouts.restTimer.getReady')
+      : this._translateService.instant('workouts.live.planned', {
+          total: secondsToClock(this.planned()),
+        }),
+  );
+
+  /**
+   * The clock button's name: what it does, and how the rest stands, since a
+   * label replaces what the button shows ("Change the rest, 1:01 left").
+   */
+  readonly clockLabel = computed(() => {
+    const left = this.remaining();
     switch (this.state()) {
-      case RestStates.Counting:
-        return this._translateService.instant('workouts.restTimer.of', { total });
-      case RestStates.Soon:
-        return this._translateService.instant('workouts.restTimer.getReady');
       case RestStates.Go:
-        return this._translateService.instant('workouts.restTimer.restDone');
+        return this._translateService.instant('workouts.restTimer.changeOver');
       case RestStates.Over:
-        return this._translateService.instant('workouts.restTimer.over', { total });
+        return this._translateService.instant('workouts.restTimer.changeOvertime', {
+          over: secondsToClock(Math.floor(-left)),
+        });
+      default:
+        return this._translateService.instant('workouts.restTimer.changeLeft', {
+          time: secondsToClock(Math.ceil(left)),
+        });
     }
   });
 
@@ -161,17 +181,26 @@ export class RestTimerBar {
     }
   });
 
-  /** The honey left in the hexagon, as a share of its height. */
-  private readonly _fill = computed(() => {
-    if (!this.counting()) return 1;
+  /** The honey left in the ring, as a share of the planned rest. */
+  readonly left = computed(() => {
     const planned = this.planned();
     return planned > 0 ? Math.min(1, Math.max(0, this.remaining() / planned)) : 0;
   });
 
-  readonly fillHeight = computed(() => this.hex.height * this._fill());
-  readonly fillY = computed(() => this.hex.y + this.hex.height - this.fillHeight());
+  /** The ring: draining while it counts, the green tick from zero on. */
+  readonly meterPhase = computed<HexMeterPhase>(() =>
+    this.counting() ? HexMeterPhases.Rest : HexMeterPhases.Over,
+  );
+
+  /** Over the next set: "Rest" while it counts, "Rest over" from zero on. */
+  readonly kicker = computed(() =>
+    this._translateService.instant(
+      this.counting() ? 'workouts.restTimer.rest' : 'workouts.restTimer.restOver',
+    ),
+  );
 
   constructor() {
+    addIcons({ timerOutline });
     effect(() => {
       const end = this.endsAt();
       this._stop();
@@ -187,16 +216,25 @@ export class RestTimerBar {
     });
   }
 
-  /** −15 / +15: one step on press, repeating while held. */
+  /**
+   * −15 / +15: one step on press, repeating while held. The repeat stops by
+   * itself once the rest reaches zero: the keys leave the bar then, so the
+   * finger's `pointerup` never arrives to stop it, and it went on nudging the
+   * rest back to zero forever, with no rest-over cue.
+   */
   holdStart(direction: 1 | -1, event: PointerEvent): void {
     event.preventDefault();
     this.holdEnd();
     this.nudge.emit(direction * NUDGE_SECONDS);
+    const repeat = () => {
+      if (!this.counting()) {
+        this.holdEnd();
+        return;
+      }
+      this.nudge.emit(direction * NUDGE_SECONDS);
+    };
     this._hold = setTimeout(() => {
-      this._hold = setInterval(
-        () => this.nudge.emit(direction * NUDGE_SECONDS),
-        HOLD_REPEAT_MS,
-      );
+      this._hold = setInterval(repeat, HOLD_REPEAT_MS);
     }, HOLD_DELAY_MS);
   }
 

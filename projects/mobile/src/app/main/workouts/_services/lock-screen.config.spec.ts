@@ -113,6 +113,21 @@ describe('liveState', () => {
     expect(state.steps).toEqual([]);
   });
 
+  // An empty workout, or one the logger never counted, sends no steps too:
+  // the lock screen reads done-ness from here, never from an empty list.
+  it('says all done only when the app counts every set ticked', () => {
+    expect(liveState(session, null, '', translate, NOW).allDone).toBe(false);
+    expect(liveState(session, null, '', translate, NOW, [], true).allDone).toBe(true);
+  });
+
+  // ✓ on the lock screen, with the app asleep, turns it to all done by itself.
+  it('marks the step whose ✓ ticks the workout’s last set', () => {
+    const last: LiveStep = { ...bench, setId: 'set-13', workoutDone: 12, workoutTotal: 13 };
+    const none: LiveStep = { ...bench, setId: 'set-x', workoutDone: 0, workoutTotal: 0 };
+    const state = liveState(session, null, '', translate, NOW, [bench, last, none]);
+    expect(state.steps.map((step) => step.completes)).toEqual([false, true, false]);
+  });
+
   it('sends the sets ahead, with what ✓ saves and the rest after each', () => {
     const next: LiveStep = { ...bench, setId: 'set-4', set: 'Set 4', done: 3, workoutDone: 8, final: true, rest: null };
     const state = liveState(session, null, '', translate, NOW, [bench, next]);
@@ -128,6 +143,9 @@ describe('liveState', () => {
     expect(state.steps[1]).toMatchObject({ set: 'Set 4', rest: null, final: true });
     expect(state.labels.skipSet).toBe('workouts.live.skipSet');
     expect(state.labels.resume).toBe('button.continue');
+    expect(state.labels.logSet).toBe('workouts.live.logSet');
+    expect(state.labels.editSet).toBe('workouts.live.editSet');
+    expect(state.labels.finishWorkout).toBe('workouts.live.finishWorkout');
   });
 
   it('leaves out the sets ahead that would make the Live Activity too big, never the next one', () => {

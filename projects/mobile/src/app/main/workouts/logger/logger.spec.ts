@@ -9,7 +9,7 @@ import {
   Platform,
 } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
-import { NEVER, of } from 'rxjs';
+import { NEVER, Observable, Subject, of, throwError } from 'rxjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -24,9 +24,11 @@ import {
   RoutineService,
   WorkoutLog,
   WorkoutLogService,
+  WorkoutLogStatus,
   WorkoutSettings,
 } from 'core';
 
+import { RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { ActiveSessionStore } from '../_services/active-session.store';
@@ -36,7 +38,7 @@ import { RestCueService } from '../_services/rest-cue.service';
 import { ScreenAwakeService } from '../_services/screen-awake.service';
 import { StillTrainingService } from '../_services/still-training.service';
 import { WorkoutSettingsStore } from '../_services/workout-settings.store';
-import { ExerciseActionIds, FinishChoices } from '../workouts.config';
+import { ExerciseActionIds, FinishChoices, LeaveChoices } from '../workouts.config';
 import { Logger } from './logger';
 import { BadgeTones } from './logger-flow';
 import { RoutineUpdateChoices } from './routine-update';
@@ -77,6 +79,9 @@ function workout(...exercises: LoggedExercise[]): WorkoutLog {
   return { id: 'wl-1', name: 'Push day', exercises } as unknown as WorkoutLog;
 }
 
+/** When the pause reply says the clock stopped. */
+const PAUSED_AT = '2026-11-19T10:00:00.000Z';
+
 let destroy: (() => void) | null = null;
 afterEach(() => {
   // Stops the page's clock.
@@ -90,8 +95,16 @@ afterEach(() => {
  * spec calls `fixture.detectChanges()`, so the clock, the lock screen and
  * the scroll stay out otherwise.
  */
-function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | null = null) {
+function setup(
+  log: WorkoutLog,
+  mode: 'ios' | 'md' = 'ios',
+  source: Routine | null = null,
+  routeId: string | null = null,
+) {
   const service = {
+    // What opening the page on `routeId` loads.
+    get: vi.fn((): Observable<WorkoutLog> => of(log)),
+    lastForExercise: vi.fn(() => of([] as LoggedSet[])),
     // A write that never answers: the store keeps its optimistic copy.
     logSet: vi.fn(() => NEVER),
     addSet: vi.fn(() => of(set('s-copy'))),
@@ -99,12 +112,16 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | nu
     setSupersets: vi.fn(() => of(undefined)),
     removeSets: vi.fn(() => of(undefined)),
     removeExercise: vi.fn(() => of(undefined)),
+    pause: vi.fn(() => of({ ...log, pausedAt: PAUSED_AT, pausedSeconds: 0 })),
   };
   const routineService = {
     get: vi.fn(() => of(source)),
     update: vi.fn(() => of(source)),
   };
   const navigate = vi.fn(() => Promise.resolve(true));
+  const navigateBack = vi.fn(() => Promise.resolve(true));
+  // What the mini-bar and the lock screen are told about the workout.
+  const track = vi.fn();
   const outlet = { swipeGesture: true };
   // Android's back: the handler the page holds, null while it holds none.
   const back = {
@@ -124,6 +141,14 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | nu
     ),
   };
   const stub = vi.fn();
+  // What the logger tells the store, which the mini-bar and the resume card read.
+  const setNext = vi.fn();
+  // The resume card's (or the lock screen's) Finish, waiting for this logger.
+  const activeWorkout = {
+    finishing: signal<string | null>(null),
+    takeFinish: vi.fn((_logId: string) => false),
+    takeCarryOver: vi.fn(() => null),
+  };
   TestBed.configureTestingModule({
     providers: [
       { provide: WorkoutLogService, useValue: service },
@@ -133,14 +158,17 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | nu
       {
         provide: ActivatedRoute,
         useValue: {
-          snapshot: { paramMap: convertToParamMap({}), queryParamMap: convertToParamMap({}) },
+          snapshot: {
+            paramMap: convertToParamMap(routeId ? { id: routeId } : {}),
+            queryParamMap: convertToParamMap({}),
+          },
           queryParamMap: of(convertToParamMap({})),
         },
       },
       { provide: TranslateService, useValue: { instant: (key: string) => key } },
       { provide: FeedbackService, useValue: { error: stub, info: stub, success: stub } },
-      { provide: RestAlertService, useValue: {} },
-      { provide: NavController, useValue: {} },
+      { provide: RestAlertService, useValue: { shouldAsk: () => Promise.resolve(false) } },
+      { provide: NavController, useValue: { navigateBack } },
       { provide: IonRouterOutlet, useValue: outlet },
       { provide: Platform, useValue: { backButton } },
       {
@@ -150,21 +178,22 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | nu
           getBoolean: (_key: string, fallback = false) => fallback,
         },
       },
-      { provide: ActiveWorkoutService, useValue: {} },
+      { provide: ActiveWorkoutService, useValue: activeWorkout },
       { provide: RestCueService, useValue: {} },
       {
         provide: ActiveSessionStore,
         useValue: {
           passed: signal(new Set<string>()),
+          rest: signal(null),
           end: stub,
-          track: stub,
+          track,
           setRest: stub,
-          setNext: stub,
+          setNext,
         },
       },
-      { provide: StillTrainingService, useValue: { cancel: stub } },
+      { provide: StillTrainingService, useValue: { cancel: stub, remind: stub } },
       { provide: ScreenAwakeService, useValue: { hold: stub, release: stub } },
-      { provide: LockScreenService, useValue: {} },
+      { provide: LockScreenService, useValue: { attach: () => () => undefined } },
       {
         provide: WorkoutSettingsStore,
         useValue: { settings: signal(DEFAULT_WORKOUT_SETTINGS), load: stub },
@@ -177,7 +206,19 @@ function setup(log: WorkoutLog, mode: 'ios' | 'md' = 'ios', source: Routine | nu
   destroy = () => fixture.destroy();
   const logger = fixture.componentInstance;
   logger.store.adopt(log);
-  return { logger, fixture, service, routineService, navigate, outlet, back };
+  return {
+    logger,
+    fixture,
+    service,
+    routineService,
+    navigate,
+    navigateBack,
+    track,
+    setNext,
+    activeWorkout,
+    outlet,
+    back,
+  };
 }
 
 /** Your routine "Leg day", one exercise of one set: what `routineWorkout` was started from. */
@@ -243,6 +284,27 @@ function routineWorkout(added = false): WorkoutLog {
 describe('Logger finish, from a routine', () => {
   /** The routine is read with the workout; the specs read it here instead. */
   const readSource = (logger: Logger) => logger['_loadSourceRoutine']();
+
+  // The resume card's Finish waits on this, so "Update routine?" still asks.
+  it('runs what waits on the routine once it has been read', () => {
+    const { logger, routineService } = setup(routineWorkout(true), 'ios', legDay());
+    let seen: string | undefined;
+
+    logger['_loadSourceRoutine'](() => (seen = logger['_sourceRoutine']()?.id));
+
+    expect(routineService.get).toHaveBeenCalledWith('r-1');
+    expect(seen).toBe('r-1');
+  });
+
+  it('runs it at once when there is no routine to read', () => {
+    const { logger, routineService } = setup(workout(exercise('a', [set('a1')])));
+    const then = vi.fn();
+
+    logger['_loadSourceRoutine'](then);
+
+    expect(routineService.get).not.toHaveBeenCalled();
+    expect(then).toHaveBeenCalledOnce();
+  });
 
   it('asks whether the routine changes too, and Update saves its new shape', () => {
     const { logger, service, routineService } = setup(routineWorkout(true), 'ios', legDay());
@@ -379,6 +441,118 @@ describe('Logger finish', () => {
     );
 
     expect(logger.exerciseProgress()).toEqual({ done: 1, total: 2 });
+  });
+});
+
+describe('Logger pause', () => {
+  // The page goes back as the pause lands, and Ionic stops checking a page
+  // as it leaves, so its effects never run again: no `detectChanges()` here.
+  // Without being told, the mini-bar kept the clock running.
+  it('tells the mini-bar and the lock screen the clock stopped, then goes back', () => {
+    const { logger, service, track, navigateBack } = setup(workout(exercise('a', [set('a1')])));
+
+    logger.onLeaveChoice(LeaveChoices.Pause);
+
+    expect(service.pause).toHaveBeenCalledWith('wl-1');
+    expect(track).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'wl-1', pausedAt: PAUSED_AT }),
+    );
+    expect(navigateBack).toHaveBeenCalledWith('/tabs/workouts');
+    expect(track.mock.invocationCallOrder[0]).toBeLessThan(
+      navigateBack.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('tells nobody and stays when the pause fails', () => {
+    const { logger, service, track, navigateBack } = setup(workout(exercise('a', [set('a1')])));
+    service.pause.mockReturnValue(throwError(() => new Error('offline')));
+
+    logger.onLeaveChoice(LeaveChoices.Pause);
+
+    expect(track).not.toHaveBeenCalled();
+    expect(navigateBack).not.toHaveBeenCalled();
+  });
+});
+
+/** A workout still running, every set ticked: Finish asks nothing. */
+function doneWorkout(): WorkoutLog {
+  return {
+    ...workout(exercise('a', [set('a1', { isCompleted: true, reps: 8 })])),
+    status: WorkoutLogStatus.InProgress,
+  } as WorkoutLog;
+}
+
+describe('Logger finish, from the resume card or the lock screen', () => {
+  it('finishes the workout once it has loaded, when Finish opened it', () => {
+    const { logger, service, activeWorkout } = setup(doneWorkout(), 'ios', null, 'wl-1');
+    activeWorkout.takeFinish.mockReturnValue(true);
+
+    logger.ionViewWillEnter();
+
+    expect(service.complete).toHaveBeenCalledWith('wl-1');
+  });
+
+  // Taken before the load, so a load that fails cannot leave it for a later
+  // visit, where a Resume would have finished the workout.
+  it('takes Finish before the load, so a failed load drops it', () => {
+    const { logger, service, activeWorkout } = setup(doneWorkout(), 'ios', null, 'wl-1');
+    activeWorkout.takeFinish.mockReturnValue(true);
+    service.get.mockReturnValue(throwError(() => new Error('offline')));
+
+    logger.ionViewWillEnter();
+
+    expect(activeWorkout.takeFinish).toHaveBeenCalledWith('wl-1');
+    expect(service.complete).not.toHaveBeenCalled();
+  });
+
+  it('does not finish a workout left while it was still loading', () => {
+    const { logger, service, activeWorkout } = setup(doneWorkout(), 'ios', null, 'wl-1');
+    activeWorkout.takeFinish.mockReturnValue(true);
+    const answer = new Subject<WorkoutLog>();
+    service.get.mockReturnValue(answer);
+
+    logger.ionViewWillEnter();
+    logger.ionViewWillLeave();
+    answer.next(doneWorkout());
+
+    expect(service.complete).not.toHaveBeenCalled();
+  });
+
+  // The lock screen's link lands on the page already in front: nothing enters it.
+  it('finishes the workout in front when Finish asks for it', () => {
+    const { logger, fixture, service, activeWorkout } = setup(doneWorkout());
+    logger['_onScreen'].set(true);
+    activeWorkout.takeFinish.mockReturnValue(true);
+
+    activeWorkout.finishing.set('wl-1');
+    fixture.detectChanges();
+
+    expect(activeWorkout.takeFinish).toHaveBeenCalledWith('wl-1');
+    expect(service.complete).toHaveBeenCalledWith('wl-1');
+  });
+});
+
+describe('Logger, the lock screen', () => {
+  // The page may be hidden behind another tab, where Ionic stopped checking
+  // it: its effects never run, so no `detectChanges()` here. Without being
+  // told, the mini-bar and the resume card kept the old count.
+  it('tells the store at once when a ✓ there ticks a set', () => {
+    const log = workout(exercise('a', [set('a1', { reps: 8 }), set('a2')]));
+    const { logger, setNext, track } = setup(log);
+
+    logger['_onLockScreen']({
+      type: RestLiveActionTypes.Log,
+      at: Date.parse(PAUSED_AT),
+      setId: 'a1',
+      exerciseId: 'a',
+      values: { reps: 8 },
+    });
+
+    expect(track).toHaveBeenCalledWith(expect.objectContaining({ id: 'wl-1' }));
+    expect(setNext).toHaveBeenCalledWith('wl-1', expect.any(String), expect.any(Array), {
+      done: 1,
+      total: 2,
+    });
   });
 });
 

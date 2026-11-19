@@ -46,11 +46,15 @@ import { NotificationBanner } from '../../_shared/components/notification-banner
 import { PhotoViewer } from '../../_shared/components/photo-viewer/photo-viewer';
 import { ActiveWorkoutBar } from '../../main/workouts/_components/active-workout-bar/active-workout-bar';
 import { ActiveSessionStore } from '../../main/workouts/_services/active-session.store';
+import { ResumeCardService } from '../../main/workouts/_services/resume-card.service';
 import { LockScreenService } from '../../main/workouts/_services/lock-screen.service';
 import { StartConflictSheet } from '../../main/workouts/_sheets/start-conflict-sheet/start-conflict-sheet';
 import { SaveRoutineSheet } from '../../main/workouts/_sheets/save-routine-sheet/save-routine-sheet';
 import { TabIds, TabItem } from '../../_shared/models/tab.model';
 import { MoreBadgesService } from '../../_shared/services/more-badges.service';
+
+/** The Workouts tab's root page, where the resume card lives. */
+const WORKOUTS_HOME = '/tabs/workouts';
 
 /** What `addListener` resolves to; only `remove` matters here. */
 interface PluginHandle {
@@ -129,6 +133,35 @@ function appReturns(): Observable<void> {
   );
 
   return merge(resumed, reactivated);
+}
+
+/**
+ * The Workouts tab's own page, whatever its query (`?tab=history`), and not
+ * a page in its stack (`/tabs/workouts/log/…`).
+ *
+ * Exported for the spec.
+ */
+export function isWorkoutsHome(url: string): boolean {
+  const path = url.split(/[?#]/)[0]?.replace(/\/+$/, '') ?? '';
+  return path === WORKOUTS_HOME;
+}
+
+/**
+ * Whether the keyboard is up, from the keyboard plugin's window events: up
+ * on `keyboardWillShow`, down on either hide event and on `appReturns`, since
+ * coming back from the background closes the keyboard on both platforms.
+ *
+ * Exported for the spec.
+ */
+export function keyboardUpdates(appReturns: Observable<void>): Observable<boolean> {
+  return merge(
+    fromEvent(window, 'keyboardWillShow').pipe(map(() => true)),
+    merge(
+      fromEvent(window, 'keyboardWillHide'),
+      fromEvent(window, 'keyboardDidHide'),
+      appReturns,
+    ).pipe(map(() => false)),
+  ).pipe(distinctUntilChanged());
 }
 
 /**
@@ -271,6 +304,35 @@ export class Tabs {
     ),
     { initialValue: this._router.url.includes('/workouts/log/') },
   );
+
+  /** The Workouts tab's own page is on screen, not one opened over it. */
+  private readonly _onWorkoutsHome = toSignal(
+    this._settled.pipe(
+      map(() => isWorkoutsHome(this._router.url)),
+      distinctUntilChanged(),
+    ),
+    { initialValue: isWorkoutsHome(this._router.url) },
+  );
+
+  private readonly _resumeCardService = inject(ResumeCardService);
+
+  /**
+   * The Workouts page is showing its resume card, which says what the
+   * mini-bar would, a card apart: the bar steps aside there (user decision,
+   * 2026-11-19). By the URL, which moves only once a navigation lands: the
+   * page stays alive under the pages opened over it, and an iOS swipe back
+   * let go fires its `ionViewWillEnter` with nothing to undo it.
+   */
+  readonly resumeCardOnScreen = computed(
+    () => this._onWorkoutsHome() && this._resumeCardService.shown(),
+  );
+
+  /**
+   * The keyboard is up: the mini-bar steps aside with the tab bar, which
+   * hides itself then (Ionic, on `keyboardWillShow`). Left alone, the bar
+   * rode on top of the keyboard, over whatever was being typed into.
+   */
+  readonly keyboardUp = toSignal(keyboardUpdates(this._appReturns), { initialValue: false });
 
   /**
    * The button to light: the stack's own tab, or the Menu for every stack

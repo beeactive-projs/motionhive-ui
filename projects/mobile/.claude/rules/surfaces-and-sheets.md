@@ -21,7 +21,7 @@ Light mirrors dark (user decision, 2026-10-27): one page colour for every screen
 - `--ion-border-color` is one step above that: slate-300 in light, #48484a in dark, so an outline still shows on a sheet's cards.
 - Every context sets `--ion-item-background` to the same value as `--ion-card-background`. A card list and its rows paint through Ionic's own item background and set none of their own.
 - Muted text is `--ion-color-medium`: slate-600 in light, because slate-500 is under AA on the slate cards (4.3:1). In dark it is slate-400, and slate-300 inside a sheet, where slate-400 is 4.4:1 on the sheet's cards. Never set a muted grey per component; read the token.
-- A navy box (a next-session tile, the rest timer, a memory card) reads `--mh-color-navy-card` and its set, never `--mh-navy-900`, so its dark step stays in one place (navy 800, the hive card's).
+- A navy box (a next-session tile, a memory card) reads `--mh-color-navy-card` and its set, never `--mh-navy-900`, so its dark step stays in one place (navy 800, the hive card's). The mini-bar and the rest timer are not boxes: they read the status bar set (`--mh-color-status-bar` and its inks), the brand navy in both themes (user decision, 2026-11-19).
 - A bar is the page it sits on: never give a header or footer toolbar or the tab bar its own `--background`.
 - No app bar has a shadow or a hairline: headers (`ion-header.css`), footers (`ion-footer.css`) and the tab bar (`ion-tab-bar.css`). Don't add `ion-no-border` or a `--border-*` to one. Sheets keep the shell's footer hairline.
 - Don't mint a token for a surface in one context. Redefine the Ionic token in the context instead.

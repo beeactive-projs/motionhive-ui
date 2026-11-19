@@ -1,0 +1,35 @@
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+  @switch (phase()) {
+    @case (Phases.Over) {
+      <path class="fill-over" [attr.d]="d" />
+    }
+    @case (Phases.Rest) {
+      <path class="track" [attr.d]="d" />
+      @if (left() > 0) {
+        <path
+          class="progress"
+          pathLength="100"
+          [attr.d]="d"
+          [attr.stroke-dasharray]="dashArray()"
+          [attr.stroke-dashoffset]="dashOffset"
+        />
+      }
+    }
+    @case (Phases.Paused) {
+      <path class="paused" [attr.d]="d" />
+    }
+    @case (Phases.Done) {
+      <path class="done" [attr.d]="d" />
+    }
+    @default {
+      <path class="outline" [attr.d]="d" />
+    }
+  }
+</svg>
+<span class="middle">
+  @if (glyph(); as name) {
+    <ion-icon [name]="name" aria-hidden="true" />
+  } @else {
+    <ng-content />
+  }
+</span>

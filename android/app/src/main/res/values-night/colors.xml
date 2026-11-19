@@ -2,4 +2,9 @@
 <resources>
     <!-- Android 12+ system splash background. Matches the dark Ionic background colour (navy-900). -->
     <color name="mh_splash_background">#0e1b31</color>
+    <!-- The Hex meter in dark: the honey at 30% for the track, light inks. -->
+    <color name="mh_meter_track">#4Df59e0b</color>
+    <color name="mh_meter_ink">#f0f4f8</color>
+    <color name="mh_meter_muted">#94a3b8</color>
+    <color name="mh_meter_ok">#34d399</color>
 </resources>

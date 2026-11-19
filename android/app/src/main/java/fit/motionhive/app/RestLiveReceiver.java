@@ -5,7 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * The buttons on the workout's ongoing notification (+15 s, Skip, Start set),
+ * The buttons on the workout's ongoing notification (−15 s, +15 s, Skip, Log
+ * set, Start set),
  * its swipe away, and the alarm at the rest's end that turns it to Go. Each
  * does its work at once, app running or not; see {@link RestLive}. Declared
  * in AndroidManifest.xml, not exported.
@@ -19,6 +20,15 @@ public class RestLiveReceiver extends BroadcastReceiver {
         switch (action) {
             case RestLive.ACTION_EXTEND:
                 RestLive.extend(context);
+                break;
+            case RestLive.ACTION_SHORTEN:
+                RestLive.shorten(context);
+                break;
+            case RestLive.ACTION_MORE:
+                RestLive.more(context);
+                break;
+            case RestLive.ACTION_LOG:
+                RestLive.logSet(context, RestLive.loggedSetId(intent));
                 break;
             case RestLive.ACTION_SKIP:
                 RestLive.endRest(context, "skip");

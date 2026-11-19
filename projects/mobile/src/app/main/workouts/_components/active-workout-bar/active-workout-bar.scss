@@ -4,53 +4,37 @@
   position: relative;
   z-index: 10;
   display: block;
-  padding: 0 0.75rem 0.5rem;
+  /* On the page's gutter, so its edges line up with the cards above it. */
+  padding: 0 var(--mh-page-gutter) 0.5rem;
   background: transparent;
 }
 
-/* Navy, the session talking, like the rest bar it mirrors. A tappable
-   `ion-item`, so the press, focus and ripple are Ionic's; its shape and
-   colours go through the item's own variables. It floats over the page,
-   so it wears the overlay shadow. */
+/* The status bar navy, floating over the page so it is never missed among
+   the grey cards: it wears the overlay shadow. A tappable `ion-item`, so
+   the press, focus and ripple are Ionic's; its shape and colours go through
+   the item's own variables. */
 .bar {
-  --background: var(--mh-color-navy-card);
-  --color: var(--mh-color-navy-card-ink);
+  --background: var(--mh-color-status-bar);
+  --color: var(--mh-color-status-bar-ink);
+  --meter-ink: var(--mh-color-status-bar-ink);
+  --meter-muted: var(--mh-color-status-bar-muted);
+  --meter-track: var(--mh-color-status-bar-track);
+  --meter-ok: var(--mh-color-status-bar-success);
   --border-radius: var(--mh-radius-card);
-  /* Inside the padding: 2.25rem and 0.5rem above and below make 3.25rem. */
-  --min-height: 2.25rem;
-  --padding-start: 0.875rem;
-  --inner-padding-end: 0.875rem;
-  --padding-top: 0.5rem;
-  --padding-bottom: 0.5rem;
+  /* The medium ring, 2.75rem, and 0.625rem above and below. */
+  --min-height: 2.75rem;
+  --padding-start: 0.625rem;
+  --inner-padding-end: 1rem;
+  --padding-top: 0.625rem;
+  --padding-bottom: 0.625rem;
   border-radius: var(--mh-radius-card);
   box-shadow: var(--mh-shadow-overlay);
 }
 
-.hex {
-  flex: none;
-  width: 1.625rem;
-  margin-inline-end: 0.75rem;
-}
-
-.hex svg {
-  display: block;
-  width: 100%;
-}
-
-/* Workout time: an outline. Rest: filled, draining. */
-.hex-base {
-  fill: none;
-  stroke: var(--ion-color-primary);
-  stroke-width: 8;
-}
-
-.resting .hex-base {
-  fill: var(--mh-color-navy-card-raised);
-  stroke: none;
-}
-
-.hex-fill {
-  fill: var(--ion-color-primary);
+/* No block margin: iOS gives a slotted start item 2px above and below,
+   which made the bar 68px there against 64px on Android. */
+mh-hex-meter {
+  margin: 0 0.75rem 0 0;
 }
 
 ion-label {
@@ -70,20 +54,32 @@ ion-label {
 }
 
 .title {
-  font-size: var(--mh-text-sm);
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
 .sub {
-  color: var(--mh-color-navy-card-muted);
-  font-size: var(--mh-text-xs);
+  color: var(--mh-color-status-bar-muted);
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
 }
 
 /* A display figure: Inter at 700, as the rest timer's. */
 .right {
   flex: none;
   margin-inline-start: 0.75rem;
-  font-size: var(--mh-text-lg);
+  font-size: var(--mh-text-xl);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
+}
+
+/* Paused: the clock standing still, in the muted ink. */
+.right.muted {
+  color: var(--mh-color-status-bar-muted);
+}
+
+/* Overtime is a small inline figure, not a display one. */
+.right.small {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
 }

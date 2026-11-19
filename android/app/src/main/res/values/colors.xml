@@ -8,4 +8,13 @@
     <color name="mh_notification_accent">#1e3a5f</color>
     <!-- The rest's bar on the workout notification: the app honey, the same as the web theme. -->
     <color name="mh_honey">#f59e0b</color>
+    <!-- The Hex meter on the workout notification's card (owner, 2026-11-19): the
+         ring's track, its ink between sets, the muted ink, and green as text.
+         Light here, dark in values-night, as the app's theme. -->
+    <color name="mh_meter_track">#fde68a</color>
+    <color name="mh_meter_ink">#0e1b31</color>
+    <color name="mh_meter_muted">#64748b</color>
+    <color name="mh_meter_ok">#047857</color>
+    <!-- Rest over: the success green's 600 step, so the white tick clears 3:1. -->
+    <color name="mh_meter_go">#059669</color>
 </resources>

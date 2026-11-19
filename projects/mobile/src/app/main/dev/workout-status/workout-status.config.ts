@@ -6,6 +6,7 @@ import {
   ActiveSession,
   LiveStep,
   LiveValues,
+  SetProgress,
 } from '../../workouts/_services/active-session.store';
 import { Translate } from '../../workouts/_services/lock-screen.config';
 import { OVERTIME_CEILING_SECONDS } from '../../workouts/_components/rest-timer-bar/rest-timer-bar';
@@ -185,6 +186,8 @@ export interface PreviewWorld {
   /** "Set 3 · 62.5 kg × 8 · Bench press": the store's `next()`. */
   next: string;
   steps: LiveStep[];
+  /** Sets ticked of how many: the store's `progress()`. */
+  progress: SetProgress;
 }
 
 /** The mock, as the store would hold it at `now`. */
@@ -203,6 +206,7 @@ export function previewWorld(mock: PreviewMock, now: number, translate: Translat
     rest: previewRest(mock, now, next),
     next,
     steps,
+    progress: { done: mock.workoutDone, total: mock.workoutTotal },
   };
 }
 
@@ -270,6 +274,7 @@ function previewSteps(mock: PreviewMock, translate: Translate): LiveStep[] {
       kicker: mock.superset
         ? translate('workouts.superset.kicker', { round, total: mock.total })
         : '',
+      ...(mock.superset ? { round } : {}),
       order: mock.superset
         ? [
             ['A1', mock.exercise, short],
@@ -303,16 +308,20 @@ export type LivePhase = (typeof LivePhases)[keyof typeof LivePhases];
 /** The layouts the Live Activity has. */
 export const LiveLayouts = {
   Lock: 'lock',
+  /** The Android ongoing notification as a custom card: the lock screen under Android's header. */
+  Android: 'android',
   Expanded: 'expanded',
   Compact: 'compact',
   Minimal: 'minimal',
 } as const;
 export type LiveLayout = (typeof LiveLayouts)[keyof typeof LiveLayouts];
 
-/** One button on the Live Activity: honey for the main one. */
+/** One button on the Live Activity: honey for the main one, always last (on the right). */
 export interface LiveChip {
   text: string;
   primary: boolean;
+  /** Drawn with a tick before the text: Log set. */
+  tick?: boolean;
 }
 
 /** One small hexagon in the set dots. */
@@ -326,15 +335,24 @@ export interface LiveFace {
   kicker: string;
   /** The countdown, "Done", the workout clock, or the clock standing still. */
   big: string;
-  /** "+0:25" after Done, muted. */
+  /** "+0:25" in overtime, muted, counting up from zero as the system's timer does. */
   over: string;
+  /** Every set is logged: the ring turns into a full green one. */
+  allDone: boolean;
   /** "of 1:30" beside the countdown, or "7 of 13 sets" beside the clock. */
   aside: string;
   /** The rest left, as a share of the planned; null when no rest runs. */
   restLeft: number | null;
-  /** The line under the number. `plain` is muted; otherwise the pieces, target in honey. */
+  /**
+   * The line under the number. `plain` (no pieces sent) is muted; otherwise
+   * the pieces, with "Next: " before them while resting and once it is over.
+   * `target` goes on the line under it, before the last time (`lockDetail`).
+   */
   nextLine: { shown: boolean; plain: string; lead: string; set: string; target: string };
+  /** Swift's `detail`: the last time, or the aim and the last time between sets. */
   detail: string;
+  /** The lock screen's line under the next set: the target and the last time, resting or not. */
+  lockDetail: string;
   dots: DotState[];
   /** "3/10" in place of the dots past eight. */
   dotsText: string;
@@ -395,6 +413,7 @@ export function liveFace(state: RestLiveState, now: number): LiveFace {
       break;
     case LivePhases.Go:
       big = or(labels.done, labels.go);
+      // Swift's `Overtime`: the system's timer, counting up from the end at once.
       over = `+${liveClock((now - end) / 1000)}`;
       compact = '✓';
       break;
@@ -415,7 +434,8 @@ export function liveFace(state: RestLiveState, now: number): LiveFace {
     [LivePhases.Workout]: hasPieces ? joined([state.set, state.progress]) : state.workoutLine,
     [LivePhases.Paused]: labels.paused,
   }[phase];
-  const prefix = resting ? `${nextLabel}: ` : '';
+  // Swift's `NextLine`: "Next: " while resting and once the rest is over.
+  const prefix = inRest ? `${nextLabel}: ` : '';
   // No pieces sent (an app that never opened the logger): the one-line texts.
   const plainOnly = !hasPieces;
   const nextLine = {
@@ -430,13 +450,20 @@ export function liveFace(state: RestLiveState, now: number): LiveFace {
   if (hasPieces) {
     detail = inRest ? (isSuperset ? '' : state.last) : joined([state.aim, state.last]);
   }
+  // Swift's `lockDetail`: the target before the last time, resting or rest over.
+  const lockDetail = joined([nextLine.target, detail]);
 
+  // As the app counts them, never read off empty steps (Swift's `Face.allDone`).
+  const allDone = phase === LivePhases.Workout && state.allDone;
+
+  // `RichView` leaves the set dots out once every set is logged, the count too.
+  const total = allDone ? 0 : state.total;
   const dots: DotState[] = [];
   let dotsText = '';
-  if (state.total > MOST_DOTS) {
-    dotsText = `${Math.min(state.done + 1, state.total)}/${state.total}`;
+  if (total > MOST_DOTS) {
+    dotsText = `${Math.min(state.done + 1, total)}/${total}`;
   } else {
-    for (let index = 0; index < state.total; index++) {
+    for (let index = 0; index < total; index++) {
       if (index < state.done) dots.push(DotStates.Done);
       else if (index === state.done) dots.push(DotStates.Next);
       else dots.push(DotStates.Todo);
@@ -457,46 +484,61 @@ export function liveFace(state: RestLiveState, now: number): LiveFace {
     restLeft,
     nextLine,
     detail,
+    lockDetail,
     dots,
     dotsText,
     compact,
+    allDone,
     actions: liveActions(state, phase, 3),
     islandActions: liveActions(state, phase, 2),
   };
 }
 
 /**
- * Every face's buttons, the main one in honey (Swift's `Actions`). Resting:
- * −15, +15, Skip. Rest over: Start set, +30 s, ✓ the next set. Between
- * sets: ✓, Other value, Skip set. Paused: Continue.
+ * Every face's buttons in the Hex meter design, the main one in honey and
+ * last, on the right. Resting: −15 s, +15 s, Skip. Rest over: +15 s, ✓ Log
+ * set, Start set. Between sets: Edit set, ✓ Log set. All sets done: Open,
+ * Finish workout. Paused: Continue. Where only two fit (the island), the
+ * first gives way, and Edit set becomes Open.
  */
 function liveActions(state: RestLiveState, phase: LivePhase, limit: number): LiveChip[] {
   const labels = state.labels;
   const step = state.steps.length > 0 ? state.steps[0] : null;
+  // Swift's `canLog`: ✓ needs values to save and the short text that says them.
   const canLog = !!step && Object.keys(step.values).length > 0 && step.short !== '';
-  const log = step ? `✓ ${step.short}` : '';
+  const plus = labels.plus;
+  const minus = plus.replace('+', '−');
   const chips: LiveChip[] = [];
-  const add = (text: string, primary = false) => {
-    if (text) chips.push({ text, primary });
+  const add = (text: string, primary = false, tick = false) => {
+    if (text) chips.push({ text, primary, tick });
   };
-  // The nudges and the tick are drawn in the Swift, not sent as labels.
   switch (phase) {
     case LivePhases.Rest:
-      if (limit >= 3) add('−15');
-      add('+15');
+      if (limit >= 3) add(minus);
+      add(plus);
       add(labels.skip);
       break;
     case LivePhases.Go:
+      if (limit >= 3 || !canLog) add(plus);
+      if (canLog) add(labels.logSet, false, true);
       add(labels.startSet, true);
-      // "+30 s" gives way to ✓ where only two fit.
-      if (limit >= 3 || !canLog) add(labels.more);
-      if (canLog) add(log);
       break;
     case LivePhases.Workout:
-      if (!step) break;
-      if (canLog) add(log, true);
-      add(limit >= 3 ? labels.otherValue : labels.open, !canLog);
-      if (limit >= 3) add(labels.skipSet);
+      // As Swift's `Actions`: the next set first; with none, Open and Finish
+      // once every set is ticked, and nothing for a workout not counted yet.
+      if (!step) {
+        if (state.allDone) {
+          add(labels.open);
+          add(labels.finishWorkout, true);
+        }
+        break;
+      }
+      if (!canLog) {
+        add(labels.open, true);
+        break;
+      }
+      add(limit >= 3 ? labels.editSet : labels.open);
+      add(labels.logSet, true, true);
       break;
     default:
       add(labels.resume, true);
@@ -509,7 +551,7 @@ export interface AndroidLiveFace {
   phase: LivePhase;
   /** Beside the app's name in the header. */
   sub: string;
-  /** Bold, before the clock: "Go", "Push day · ", "Push day · 23:00". */
+  /** Bold, before the clock: "Rest over", "Push day · ", "Push day · 23:00". */
   title: string;
   /** The system's Chronometer: "01:02", counting down or up; empty when hidden. */
   clock: string;
@@ -528,11 +570,21 @@ export function chronometer(seconds: number): string {
   return hours > 0 ? `${hours}:${minutes}:${rest}` : `${minutes}:${rest}`;
 }
 
+/**
+ * A port of `RestLive.java`'s `render`: the folded view, and the buttons
+ * under both views, the main one last. Resting: −15 s, +15 s, Skip. Rest
+ * over: +15 s, Log set, Start set. Between sets: Edit set and Log set, or
+ * Open when nothing is planned; once every set is ticked, Open and Finish
+ * workout. Paused: Open.
+ */
 export function androidLiveFace(state: RestLiveState, now: number): AndroidLiveFace {
   const labels = state.labels;
   const end = state.restEndsAt ?? 0;
   const start = state.restStartedAt ?? end;
+  const step = state.steps.length > 0 ? state.steps[0] : null;
+  const canLog = !!step && Object.keys(step.values).length > 0;
   if (end > 0 && now < end) {
+    const plus = labels.plus || '+15 s';
     return {
       phase: LivePhases.Rest,
       sub: labels.rest,
@@ -540,21 +592,30 @@ export function androidLiveFace(state: RestLiveState, now: number): AndroidLiveF
       clock: chronometer(Math.ceil((end - now) / 1000)),
       line: state.workoutLine,
       progress: Math.min(1, (end - now) / Math.max(1, end - Math.min(start, end))),
-      actions: [labels.plus, labels.skip, labels.open],
+      actions: [plus.replace('+', '−'), plus, labels.skip],
     };
   }
   if (end > 0 && now < end + OVERTIME_CEILING_SECONDS * 1000) {
+    const actions = [labels.more || '+15 s'];
+    if (canLog) actions.push(labels.logSet);
+    actions.push(labels.startSet);
     return {
       phase: LivePhases.Go,
       sub: labels.restOver,
-      title: labels.go,
+      title: labels.restOver,
       clock: '',
       line: state.goLine,
       progress: null,
-      actions: [labels.startSet, labels.open],
+      actions,
     };
   }
   if (state.clockFrom !== null) {
+    let actions = [labels.open];
+    if (state.allDone) {
+      actions = [labels.open, labels.finishWorkout];
+    } else if (canLog) {
+      actions = [labels.editSet, labels.logSet];
+    }
     return {
       phase: LivePhases.Workout,
       sub: labels.workout,
@@ -562,7 +623,7 @@ export function androidLiveFace(state: RestLiveState, now: number): AndroidLiveF
       clock: chronometer((now - state.clockFrom) / 1000),
       line: state.workoutLine,
       progress: null,
-      actions: [labels.open],
+      actions,
     };
   }
   return {
@@ -573,5 +634,94 @@ export function androidLiveFace(state: RestLiveState, now: number): AndroidLiveF
     line: labels.paused,
     progress: null,
     actions: [labels.open],
+  };
+}
+
+/** The ongoing notification unfolded (`RestLive.java`, `card`); its buttons are the folded's. */
+export interface AndroidCardFace {
+  phase: LivePhase;
+  /** Every set is logged: the ring turns green, and the clock still counts inside it. */
+  allDone: boolean;
+  /** The rest left, as a share of the planned; 0 when no rest runs. */
+  restLeft: number;
+  /** "Rest", "Rest over", "Workout · Push day", "Paused · Push day": the word first. */
+  kicker: string;
+  /** The kicker in green: rest over, or every set logged. */
+  ok: boolean;
+  /** The Chronometer in the ring: "01:02", "23:00"; empty in Go, where the ring holds its tick. */
+  clock: string;
+  /** Under the clock: "of 1:30", "Workout", "Paused". */
+  caption: string;
+  /** "+00:25" beside the kicker in Go, a Chronometer counting up from the end. */
+  over: string;
+  /** "Next: Bench press · Set 3", or the one-line text when no pieces came. */
+  next: string;
+  /** The target (the aim between sets) and the last time. */
+  detail: string;
+}
+
+/**
+ * A port of `RestLive.java`'s `card`: the ring with the time inside it, the
+ * kicker, the next set and the line under it. No set dots; the buttons are
+ * the system's, under the card (`androidLiveFace`).
+ */
+export function androidCardFace(state: RestLiveState, now: number): AndroidCardFace {
+  const labels = state.labels;
+  const { phase } = androidLiveFace(state, now);
+  const end = state.restEndsAt ?? 0;
+  const start = state.restStartedAt ?? end;
+  const total = Math.max(1, end - Math.min(start, end));
+  const allDone = phase === LivePhases.Workout && state.allDone;
+
+  let kicker: string;
+  let clock = '';
+  let caption = '';
+  let over = '';
+  switch (phase) {
+    case LivePhases.Rest:
+      kicker = state.kicker || labels.rest;
+      clock = chronometer(Math.ceil((end - now) / 1000));
+      caption = state.planned;
+      break;
+    case LivePhases.Go:
+      kicker = labels.restOver;
+      over = `+${chronometer((now - end) / 1000)}`;
+      break;
+    case LivePhases.Workout:
+      kicker = allDone ? labels.allDone : joined([labels.workout, state.title]);
+      clock = chronometer((now - (state.clockFrom ?? now)) / 1000);
+      caption = labels.workout;
+      break;
+    default:
+      kicker = joined([labels.paused, state.title]);
+      // A stopped Chronometer given the time as text: Java's `clock`.
+      clock = liveClock(state.pausedSeconds ?? 0);
+      caption = labels.paused;
+  }
+
+  const resting = phase === LivePhases.Rest || phase === LivePhases.Go;
+  let next: string;
+  let detail = '';
+  if (state.exercise === '') {
+    next = phase === LivePhases.Go ? state.goLine : state.workoutLine;
+  } else {
+    const set = state.order === '' ? joined([state.exercise, state.set]) : state.order;
+    next = resting ? `${labels.next}: ${set}` : set;
+    if (state.order === '') {
+      detail = resting ? joined([state.target, state.last]) : joined([state.aim, state.last]);
+    }
+  }
+
+  return {
+    phase,
+    allDone,
+    restLeft: phase === LivePhases.Rest ? Math.min(1, Math.max(0, (end - now) / total)) : 0,
+    kicker,
+    ok: phase === LivePhases.Go || allDone,
+    clock,
+    caption,
+    over,
+    next,
+    detail,
   };
 }

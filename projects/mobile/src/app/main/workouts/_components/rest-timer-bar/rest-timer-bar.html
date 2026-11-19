@@ -1,42 +1,34 @@
 <div [class]="'bar state-' + state()">
   <div class="top">
-    <!-- The hexagon and the time are one button: tap to change the rest. -->
+    <!-- The ring and the time beside it are one button: tap to change the rest. -->
     <ion-button
       fill="clear"
       class="clock"
-      [attr.aria-label]="'workouts.restTimer.change' | translate"
+      [attr.aria-label]="clockLabel()"
       (click)="change.emit()"
     >
       <span class="clock-inner">
-        <span class="hex" aria-hidden="true">
-          <svg [attr.viewBox]="hex.viewBox">
-            <defs>
-              <clipPath [attr.id]="clipId"><path [attr.d]="hex.d" /></clipPath>
-            </defs>
-            <path class="hex-base" [attr.d]="hex.d" />
-            <rect
-              class="hex-fill"
-              [attr.x]="hex.x"
-              [attr.y]="fillY()"
-              [attr.width]="hex.width"
-              [attr.height]="fillHeight()"
-              [attr.clip-path]="'url(#' + clipId + ')'"
-            />
-          </svg>
-          @if (state() === States.Go) {
-            <ion-icon name="checkmark-outline" />
-          } @else if (state() === States.Over) {
-            <ion-icon name="add-outline" />
-          }
-        </span>
+        <mh-hex-meter size="md" [phase]="meterPhase()" [left]="left()" icon="timer-outline" />
         <span class="time-block">
-          <strong class="time">{{ display() }}</strong>
-          <span class="sub">{{ sub() }}</span>
+          @switch (state()) {
+            @case (States.Go) {
+              <strong class="status">{{ kicker() }}</strong>
+            }
+            @case (States.Over) {
+              <strong class="overtime">{{ display() }}</strong>
+              <span class="sub status">{{ kicker() }}</span>
+            }
+            @default {
+              <strong class="time">{{ display() }}</strong>
+              <span class="sub">{{ sub() }}</span>
+            }
+          }
         </span>
       </span>
     </ion-button>
 
-    <span class="actions">
+    <!-- The keys beside the time, the honey one last, on the right. -->
+    <div class="actions">
       @if (counting()) {
         <!-- The steppers stay plain buttons, like the number pad's: they
              repeat while held, which needs the pointer events. -->
@@ -50,7 +42,7 @@
           (pointercancel)="holdEnd()"
           (click)="stepByKey(-1, $event)"
         >
-          −{{ nudgeSeconds }}
+          {{ 'workouts.restTimer.minusShort' | translate: { seconds: nudgeSeconds } }}
         </button>
         <button
           type="button"
@@ -62,27 +54,28 @@
           (pointercancel)="holdEnd()"
           (click)="stepByKey(1, $event)"
         >
-          +{{ nudgeSeconds }}
+          {{ 'workouts.restTimer.plusShort' | translate: { seconds: nudgeSeconds } }}
         </button>
-        <ion-button fill="outline" class="quiet" (click)="skip.emit()">
+        <ion-button class="quiet" (click)="skip.emit()">
           {{ 'button.skip' | translate }}
         </ion-button>
       } @else {
+        <ion-button class="quiet" (click)="hide.emit()">
+          {{ 'workouts.restTimer.hide' | translate }}
+        </ion-button>
         <ion-button class="start" (click)="start.emit()">
           {{ 'workouts.restTimer.startSet' | translate }}
         </ion-button>
-        <ion-button fill="outline" class="quiet" (click)="hide.emit()">
-          {{ 'workouts.restTimer.hide' | translate }}
-        </ion-button>
       }
-    </span>
+    </div>
   </div>
 
-  <!-- Its own line, the bar's full width: next to the keys it was squeezed
-       to nothing, in Romanian most of all. -->
+  <!-- What comes next, on its own line under the clock and the keys. -->
   @if (next()) {
     <p class="next">
-      <span class="next-label">{{ 'workouts.restTimer.next' | translate }}</span>
+      <!-- The space is real (inside the label), not a margin, so a screen
+           reader does not run "Next:" into the set. -->
+      <span class="next-label">{{ 'workouts.restTimer.nextLabel' | translate }} </span>
       <span class="next-text">{{ next() }}</span>
     </p>
   }

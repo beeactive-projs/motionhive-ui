@@ -1,6 +1,11 @@
 <ion-tabs (ionTabsDidChange)="onTabsDidChange()">
-  <!-- The workout in progress, over the tab bar on every screen but its own. -->
-  <mh-active-workout-bar slot="bottom" [class.ion-hide]="onLogger() || hideTabBar()" />
+  <!-- The workout in progress, over the tab bar on every screen but its own
+       and the Workouts page while its resume card shows, and out of the way
+       with the tab bar while the keyboard is up. -->
+  <mh-active-workout-bar
+    slot="bottom"
+    [class.ion-hide]="onLogger() || hideTabBar() || keyboardUp() || resumeCardOnScreen()"
+  />
   <ion-tab-bar
     slot="bottom"
     [selectedTab]="litTab()"

@@ -57,6 +57,13 @@ export class ActiveWorkoutService {
 
   /** A Repeat's source, waiting for the logger that opens the new workout. */
   private _carryOver: { logId: string; from: string } | null = null;
+  /**
+   * The workout the resume card's (or the lock screen's) Finish opened,
+   * waiting for its logger to finish it. A signal, so a logger already in
+   * front, which the navigation does not enter again, hears it too.
+   */
+  private readonly _finishing = signal<string | null>(null);
+  readonly finishing = this._finishing.asReadonly();
   /** A freestyle start in flight: a second tap must not start a second one. */
   private _startingFreestyle = false;
 
@@ -107,6 +114,24 @@ export class ActiveWorkoutService {
     if (!pending || pending.logId !== logId) return null;
     this._carryOver = null;
     return pending.from;
+  }
+
+  /**
+   * "Finish workout" on the resume card or the lock screen: the logger opens
+   * on `logId` and finishes it there, so the summary and the "Update
+   * routine?" question come as they do from its own Finish. Held here
+   * rather than in the URL, which back would replay.
+   */
+  finishOnOpen(logId: string): void {
+    this._finishing.set(logId);
+    void this._router.navigate(['/tabs/workouts/log', logId]);
+  }
+
+  /** True once, for the logger that Finish opened. */
+  takeFinish(logId: string): boolean {
+    if (this._finishing() !== logId) return false;
+    this._finishing.set(null);
+    return true;
   }
 
   startOrResume(start: () => void, options: StartOptions = {}): void {

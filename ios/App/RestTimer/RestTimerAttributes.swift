@@ -53,6 +53,10 @@ struct RestTimerAttributes: ActivityAttributes {
         /// the app asleep: ✓ saves the first one and starts its rest, Skip
         /// set passes it over; either then shows the one after.
         var steps: [Step]?
+        /// Every set is ticked, as the app counts them; a ✓ here on a step
+        /// that `completes` sets it too. Never read off an empty `steps`.
+        /// Optional, so a state from an older app still reads.
+        var allDone: Bool?
         var labels: Labels
 
         /// ✓ or Skip set moved on past `setId`: the step after it is shown,
@@ -109,6 +113,8 @@ struct RestTimerAttributes: ActivityAttributes {
         var line: String
         /// Nothing is left to do after it.
         var final: Bool
+        /// ✓ on it ticks the workout's last set: the lock screen turns to all done.
+        var completes: Bool?
         var exercise: String?
         var setName: String?
         var target: String?
@@ -138,6 +144,11 @@ struct RestTimerAttributes: ActivityAttributes {
         var skipSet: String?
         var otherValue: String?
         var resume: String?
+        /// Hex meter design: ✓ the next set, the app on it to change it, and,
+        /// once every set is logged, the app on the workout to finish it.
+        var logSet: String?
+        var editSet: String?
+        var finishWorkout: String?
         var allDone: String?
         var alertTitle: String?
         var alertBody: String?
