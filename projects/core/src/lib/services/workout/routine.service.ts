@@ -113,6 +113,10 @@ export class RoutineService {
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.library) p = p.set('library', query.library);
+    const search = query.search?.trim();
+    if (search) {
+      p = p.set('search', search);
+    }
     p = p.set('archived', query.archived ?? 'exclude');
     return this._http
       .get<{

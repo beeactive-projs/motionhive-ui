@@ -214,8 +214,14 @@
             appendTo="body"
             [touchUI]="isMobile()"
             fluid
+            [disabled]="isEdit()"
             [placeholder]="'sessions.formDialog.pickDateTime' | translate"
           />
+          <!-- Editing keeps the start: the update has no start field, and the
+               picker used to say "Updated" while nothing moved. -->
+          @if (isEdit()) {
+            <small class="text-muted-color">{{ 'sessions.formDialog.startLocked' | translate }}</small>
+          }
         </div>
 
         <div class="mh-sf__field">

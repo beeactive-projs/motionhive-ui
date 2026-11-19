@@ -63,7 +63,9 @@
   </div>
   } @else if (isRequests()) {
   <div class="mh-page">
-    @if (store.requests().length === 0) {
+    @if (store.requestsRefilling()) {
+    <div class="refilling"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+    } @else if (store.requests().length === 0) {
     <mh-empty-state icon="checkmark-circle-outline" [heading]="'groups.manage.requests.empty.title' | translate"
       [message]="'groups.manage.requests.empty.message' | translate" />
     } @else {
@@ -104,7 +106,9 @@
   </div>
   } @else {
   <div class="mh-page">
-    @if (store.posts().length === 0) {
+    @if (store.postsRefilling()) {
+    <div class="refilling"><ion-spinner name="crescent" [attr.aria-label]="'a11y.loading' | translate" /></div>
+    } @else if (store.posts().length === 0) {
     <mh-empty-state icon="checkmark-circle-outline" [heading]="'groups.manage.posts.empty.title' | translate"
       [message]="'groups.manage.posts.empty.message' | translate" />
     } @else {

@@ -7,6 +7,7 @@ import {
   CoachDirectoryParams,
   CoachDirectorySorts,
   DiscoverGroup,
+  DiscoverGroupsQuery,
   GroupService,
   InstructorSearchResult,
   ProfileService,
@@ -408,7 +409,7 @@ export class DiscoverGroupsStore {
   readonly loaded = this._loaded.asReadonly();
   readonly hasMore = computed(() => this._groups().length < this._total());
 
-  /** The groups of the topic's categories, from the API (`useTopic`). */
+  /** The groups of the topic's categories and the city, from the API (`useTopic`). */
   private readonly _topic = new TopicList<DiscoverGroup>();
   readonly topicGroups = this._topic.items;
   readonly topicLoading = this._topic.loading;
@@ -419,12 +420,26 @@ export class DiscoverGroupsStore {
    * Narrow `topicGroups` to any of these categories, on the server, so a
    * group past the first page is not missed; null for no topic.
    */
-  useTopic(categoryIds: readonly string[] | null): void {
-    this._topic.use(categoriesKey(categoryIds), () =>
-      this._groupService
-        .discoverGroups({ categoryIds: categoryIds ?? [], page: 1, limit: GROUP_PAGE_LIMIT })
-        .pipe(map((page) => page.items)),
-    );
+  useTopic(categoryIds: readonly string[] | null, city: string | null = null): void {
+    const categories = categoriesKey(categoryIds);
+    // Neither: the tab's own read already is that list.
+    let key: string | null = null;
+    if (categories !== null || city) {
+      key = `${city ?? ''}|${categories ?? ''}`;
+    }
+    this._topic.use(key, () => {
+      const query: DiscoverGroupsQuery = {
+        categoryIds: categoryIds ?? [],
+        page: 1,
+        limit: GROUP_PAGE_LIMIT,
+      };
+      // On the server: the 50 biggest groups filtered on the phone left a
+      // Cluj reader with nothing while Cluj groups sat further down.
+      if (city) {
+        query.city = city;
+      }
+      return this._groupService.discoverGroups(query).pipe(map((page) => page.items));
+    });
   }
 
   /** Pull to refresh for the topic's groups. */

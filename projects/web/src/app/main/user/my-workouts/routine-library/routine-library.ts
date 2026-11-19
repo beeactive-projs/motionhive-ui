@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
@@ -21,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
+  appendUnique,
   ProgramLibrary,
   Routine,
   RoutineLibrary as RoutineScope,
@@ -55,6 +57,9 @@ interface RoutineGroup {
  * owned by nobody, so they are never editable in place; the row offers
  * "save a copy" where a routine of your own offers edit and delete.
  */
+/** How long typing pauses before the search goes to the server. */
+const SEARCH_DEBOUNCE_MS = 300;
+
 @Component({
   selector: 'mh-routine-library',
   standalone: true,
@@ -85,6 +90,10 @@ export class RoutineLibrary implements OnInit {
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
   private readonly _translateService = inject(TranslateService);
+  private readonly _destroyRef = inject(DestroyRef);
+  private _searchTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Only the latest read may land: an older search answering late is dropped. */
+  private _routinesRequest = 0;
 
   protected readonly isMobile = injectIsMobile();
 
@@ -124,7 +133,11 @@ export class RoutineLibrary implements OnInit {
   /** id of the routine being started — drives the per-row spinner. */
   readonly startingRoutineId = signal<string | null>(null);
 
-  /** Search over the loaded page (name + folder + notes). */
+  /**
+   * The search box. Sent to the server (names, in any language, over every
+   * routine); the loaded rows are narrowed at once while it answers, by
+   * name, folder and notes.
+   */
   readonly routineSearch = signal('');
 
   readonly filteredRoutines = computed(() => {
@@ -166,6 +179,7 @@ export class RoutineLibrary implements OnInit {
   readonly routinesGrouped = computed(() => this.routineGroups().length > 1);
 
   ngOnInit(): void {
+    this._destroyRef.onDestroy(() => this._cancelSearchTimer());
     this._loadRoutines();
   }
 
@@ -178,11 +192,33 @@ export class RoutineLibrary implements OnInit {
   }
 
   onRoutineSearch(value: string): void {
+    const before = this.routineSearch().trim();
     this.routineSearch.set(value);
+    if (value.trim() === before) {
+      return;
+    }
+    // One read once typing pauses, not one per key.
+    this._cancelSearchTimer();
+    this._searchTimer = setTimeout(() => {
+      this._searchTimer = null;
+      this._loadRoutines();
+    }, SEARCH_DEBOUNCE_MS);
   }
 
   clearRoutineSearch(): void {
+    const hadSearch = this.routineSearch().trim() !== '';
     this.routineSearch.set('');
+    this._cancelSearchTimer();
+    if (hadSearch) {
+      this._loadRoutines();
+    }
+  }
+
+  private _cancelSearchTimer(): void {
+    if (this._searchTimer) {
+      clearTimeout(this._searchTimer);
+      this._searchTimer = null;
+    }
   }
 
   loadMoreRoutines(): void {
@@ -323,19 +359,31 @@ export class RoutineLibrary implements OnInit {
    */
   private _loadRoutines(append = false): void {
     const page = append ? this.routinesPage() + 1 : 1;
+    const request = ++this._routinesRequest;
     this.routinesLoading.set(true);
     this._routineService
-      .list({ page, limit: this.routinesPageSize, library: this.library() })
+      .list({
+        page,
+        limit: this.routinesPageSize,
+        library: this.library(),
+        search: this.routineSearch(),
+      })
       .subscribe({
         next: (res) => {
+          if (request !== this._routinesRequest) {
+            return;
+          }
           this.routines.update((cur) =>
-            append ? [...cur, ...res.items] : res.items,
+            append ? appendUnique(cur, res.items) : res.items,
           );
           this.routinesTotal.set(res.total);
           this.routinesPage.set(page);
           this.routinesLoading.set(false);
         },
         error: (err) => {
+          if (request !== this._routinesRequest) {
+            return;
+          }
           this.routinesLoading.set(false);
           this._apiError('myWorkouts.library.toast.loadFailed', err);
         },
@@ -346,6 +394,7 @@ export class RoutineLibrary implements OnInit {
     this._routineService.remove(r.id, cancelScheduled).subscribe({
       next: () => {
         this.routines.update((cur) => cur.filter((x) => x.id !== r.id));
+        this.routinesTotal.update((total) => Math.max(0, total - 1));
         this._messageService.add({
           severity: 'success',
           summary: this._translateService.instant('myWorkouts.library.toast.deleted'),

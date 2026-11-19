@@ -42,6 +42,20 @@ export function resolveAppLink(url: string, host: string): DeepLink | null {
       : null;
   }
 
+  // Two group emails link pages the push map has no screen for. The
+  // rejected request links the web's group discovery, whose mobile home is
+  // the Discover tab (as a group id it opened a group called "discover");
+  // a join request links the group's members, which the app keeps in the
+  // group's Manage page (it opened Home).
+  if (segments[0] === 'groups') {
+    if (segments.length === 2 && segments[1] === 'discover') {
+      return { commands: ['/tabs/discover'], queryParams };
+    }
+    if (segments.length === 3 && segments[2] === 'members') {
+      return { commands: ['/tabs/groups', segments[1], 'manage'], queryParams };
+    }
+  }
+
   // A screen can contain a slash itself (`coaching/sessions`), so the whole
   // path is tried as the screen first, then the last segment as its id.
   const query = queryParams ?? undefined;

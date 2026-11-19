@@ -696,66 +696,6 @@
       }
     }
   },
-  "coachDashboard": {
-    "activity": {
-      "allEvents": "Toate evenimentele",
-      "allLocations": "Toate locațiile",
-      "completedSetup": "s-a conectat pentru prima dată și și-a configurat aplicația.",
-      "empty": "Nicio activitate recentă.",
-      "hoursAgo": "{count, plural, one {acum # oră} few {acum # ore} other {acum # de ore}}",
-      "minutesAgo": "{count, plural, one {acum # minut} few {acum # minute} other {acum # de minute}}",
-      "noFilter": "Fără filtru",
-      "title": "Activități recente"
-    },
-    "clients": {
-      "empty": "Încă nu ai clienți. Începe prin a invita pe cineva.",
-      "title": "Clienți recenți"
-    },
-    "groups": {
-      "empty": "Încă nu ai grupuri."
-    },
-    "growth": {
-      "title": "Creșterea afacerii (ultimele 12 luni)"
-    },
-    "header": {
-      "subtitle": "Iată o privire de ansamblu asupra activității tale de antrenor.",
-      "title": "Bine ai revenit, {name}"
-    },
-    "invoices": {
-      "due": "Scadentă pe {date}",
-      "empty": "Încă nu ai facturi.",
-      "noDueDate": "Fără scadență",
-      "title": "Facturi recente"
-    },
-    "kpi": {
-      "activeClients": "Clienți activi",
-      "outstanding": "De încasat",
-      "overdue": "{count, plural, one {# restantă} few {# restante} other {# de restante}}",
-      "pending": "{count} în așteptare",
-      "revenueThisMonth": "Venituri luna aceasta"
-    },
-    "stats": {
-      "exercise": {
-        "emptyHint": "Asigură-te că ai adăugat clienți și le-ai configurat planurile de exerciții. Rezumatele săptămânale se calculează în fiecare duminică noaptea.",
-        "title": "Respectarea planului de exerciții (medie)"
-      },
-      "noStatsYet": "Hmmm... încă nu găsim statistici pentru grafic",
-      "nutrition": {
-        "emptyHint": "Asigură-te că ai adăugat clienți și le-ai stabilit obiectivele nutriționale și monitorizarea meselor. Rezumatele săptămânale se calculează în fiecare duminică noaptea.",
-        "title": "Respectarea medie a planului alimentar"
-      },
-      "signIns": {
-        "emptyHint": "Indicatorii săptămânali ai afacerii tale se calculează în fiecare duminică noaptea.",
-        "emptyTitle": "Rezumatul săptămânal vine în curând",
-        "title": "Media conectărilor clienților pe săptămână"
-      },
-      "workouts": {
-        "emptyHint": "Asigură-te că ai adăugat clienți și le-ai programat câteva antrenamente. Rezumatele săptămânale se calculează în fiecare duminică noaptea.",
-        "title": "Media antrenamentelor pe săptămână"
-      }
-    },
-    "viewAll": "Vezi tot"
-  },
   "components": {
     "accessChip": {
       "approvalRequired": "Necesită aprobare",
@@ -2415,7 +2355,6 @@
     "newPassword": "Parolă nouă",
     "newPost": "Postare nouă",
     "onboarding": "Configurare",
-    "overview": "Prezentare generală",
     "pageNotFound": "Pagina nu a fost găsită",
     "payment": "Plată",
     "payments": "Plăți",
@@ -4178,7 +4117,8 @@
       "waitlist": "Activează lista de așteptare când sesiunea e plină",
       "when": "Când",
       "where": "Unde",
-      "whoCanBook": "Cine poate rezerva"
+      "whoCanBook": "Cine poate rezerva",
+      "startLocked": "Ora de început nu se poate schimba aici. Ca s-o muți, anulează sesiunea și creează una nouă."
     },
     "list": {
       "cancelledCapped": "100+ anulate (se afișează ultimele 100)",

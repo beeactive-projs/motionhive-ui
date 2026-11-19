@@ -75,6 +75,7 @@ import {
   SessionPrefill,
   SessionSurfaces,
   formatRecurrenceSummary,
+  onTheRoster,
   prefillFromInstance,
 } from '../sessions.config';
 
@@ -513,7 +514,10 @@ export class SessionDetail implements ViewWillEnter {
   });
 
   /**
-   * Everyone but the waitlist — those get their own section below.
+   * The people with a place, and the requests waiting on one. The waitlist
+   * gets its own section below; cancelled and declined bookings have no
+   * place, so they are neither listed nor counted for attendance (the API
+   * refuses to mark them).
    *
    * Requests waiting on a decision come first: the roster collapses behind
    * "Show all" once it is long, and an approval hidden below the fold is one
@@ -522,7 +526,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly attendees = computed(() =>
     this.store
       .participants()
-      .filter((p) => p.status !== SessionParticipantStatus.Waitlisted)
+      .filter(onTheRoster)
       .sort((a, b) => Number(this.isPending(b)) - Number(this.isPending(a))),
   );
 

@@ -8,8 +8,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, debounceTime, switchMap } from 'rxjs/operators';
 import {
   displayName,
   groupMessages,
@@ -100,19 +100,17 @@ export class NewMessagePicker {
             return [];
           }
           this.searching.set(true);
-          return this._userService.search({ q: trimmed, limit: 10 });
+          // A failed search answers nothing for that term only: an error
+          // reaching the outer stream ended it, and later typing did nothing.
+          return this._userService
+            .search({ q: trimmed, limit: 10 })
+            .pipe(catchError(() => of<UserSearchResult[]>([])));
         }),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe({
-        next: (rows) => {
-          this.results.set(rows);
-          this.searching.set(false);
-        },
-        error: () => {
-          this.searching.set(false);
-          this.results.set([]);
-        },
+      .subscribe((rows) => {
+        this.results.set(rows);
+        this.searching.set(false);
       });
   }
 

@@ -44,6 +44,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { take } from 'rxjs';
 import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-client-dialog';
+import { withChipFilter } from '../table-chip';
 
 @Component({
   selector: 'mh-pending-requests',
@@ -213,10 +214,11 @@ export class PendingRequests {
   }
 
   lazyLoadRequests(event: TableLazyLoadEvent): void {
-    this.lastLazyEvent = event;
+    const withType = withChipFilter(event, 'type', this.typeFilter(), 'equals');
+    this.lastLazyEvent = withType;
     this.loading.set(true);
     this._clientService
-      .filterPendingRequests(event)
+      .filterPendingRequests(withType)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
@@ -237,10 +239,7 @@ export class PendingRequests {
       this.loadMobilePage(true);
       return;
     }
-    this.lastLazyEvent.first = 0;
-    this.lastLazyEvent.rows = this.rows;
-    this.lastLazyEvent.filters = type ? { type: { value: type, matchMode: 'equals' } } : {};
-    this.lazyLoadRequests(this.lastLazyEvent);
+    this.lazyLoadRequests({ ...this.lastLazyEvent, first: 0, rows: this.rows });
   }
 
   openInviteDialog(): void {

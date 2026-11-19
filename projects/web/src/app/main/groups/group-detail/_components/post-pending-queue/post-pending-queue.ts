@@ -50,8 +50,10 @@ export class PostPendingQueue {
   readonly loading = signal(true);
   readonly pending = signal<Post[]>([]);
   readonly busyId = signal<string | null>(null);
+  private readonly _total = signal(0);
 
-  readonly count = computed(() => this.pending().length);
+  /** How many wait on the server, not how many are on screen. */
+  readonly count = this._total.asReadonly();
   readonly isAnyBusy = computed(() => this.busyId() !== null);
 
   protected readonly skeletonRows = [1, 2];
@@ -79,7 +81,11 @@ export class PostPendingQueue {
     this.loading.set(true);
     this._postService.getPendingForGroup(groupId, 1, PAGE_SIZE).subscribe({
       next: (res) => {
+        if (this.groupId() !== groupId) {
+          return;
+        }
         this.pending.set(res.items);
+        this._total.set(res.total);
         this.loading.set(false);
       },
       error: (err) => {
@@ -101,6 +107,12 @@ export class PostPendingQueue {
       next: () => {
         this.busyId.set(null);
         this.pending.update((list) => list.filter((p) => p.id !== post.id));
+        this._total.update((total) => Math.max(0, total - 1));
+        // The last one on screen decided is not the end while the server
+        // still holds more: read the next ones in.
+        if (this.pending().length === 0 && this._total() > 0) {
+          this._load(this.groupId());
+        }
         this._messageService.add({
           severity: 'success',
           summary: this._translateService.instant(

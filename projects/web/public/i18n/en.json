@@ -696,66 +696,6 @@
       }
     }
   },
-  "coachDashboard": {
-    "activity": {
-      "allEvents": "All events",
-      "allLocations": "All locations",
-      "completedSetup": "signed in for the first time and completed their app setup.",
-      "empty": "No recent activities.",
-      "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
-      "minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
-      "noFilter": "No filter",
-      "title": "Recent activities"
-    },
-    "clients": {
-      "empty": "No clients yet. Start by inviting someone.",
-      "title": "Recent clients"
-    },
-    "groups": {
-      "empty": "No groups yet."
-    },
-    "growth": {
-      "title": "Business growth (past 12 months)"
-    },
-    "header": {
-      "subtitle": "Here's your coaching overview.",
-      "title": "Welcome back, {name}"
-    },
-    "invoices": {
-      "due": "Due {date}",
-      "empty": "No invoices yet.",
-      "noDueDate": "No due date",
-      "title": "Recent invoices"
-    },
-    "kpi": {
-      "activeClients": "Active clients",
-      "outstanding": "Outstanding",
-      "overdue": "{count} overdue",
-      "pending": "{count} pending",
-      "revenueThisMonth": "Revenue this month"
-    },
-    "stats": {
-      "exercise": {
-        "emptyHint": "Make sure you've added clients and set up their exercise plans. Weekly snapshots are calculated every Sunday night.",
-        "title": "Average exercise compliance"
-      },
-      "noStatsYet": "Hmmm... we can't find any stats to graph yet",
-      "nutrition": {
-        "emptyHint": "Make sure you've added clients and set up their nutrition goals and meal tracking. Weekly snapshots are calculated every Sunday night.",
-        "title": "Average nutrition compliance"
-      },
-      "signIns": {
-        "emptyHint": "Your weekly business metrics are calculated every week on Sunday night.",
-        "emptyTitle": "Weekly snapshot coming soon",
-        "title": "Average client sign-ins per week"
-      },
-      "workouts": {
-        "emptyHint": "Make sure you've added clients and scheduled some workouts for them. Weekly snapshots are calculated every Sunday night.",
-        "title": "Average workouts per week"
-      }
-    },
-    "viewAll": "View all"
-  },
   "components": {
     "accessChip": {
       "approvalRequired": "Approval required",
@@ -2415,7 +2355,6 @@
     "newPassword": "New password",
     "newPost": "New post",
     "onboarding": "Onboarding",
-    "overview": "Overview",
     "pageNotFound": "Page not found",
     "payment": "Payment",
     "payments": "Payments",
@@ -4178,7 +4117,8 @@
       "waitlist": "Enable waitlist when full",
       "when": "When",
       "where": "Where",
-      "whoCanBook": "Who can book"
+      "whoCanBook": "Who can book",
+      "startLocked": "The start can't be changed here. Cancel this session and create a new one to move it."
     },
     "list": {
       "cancelledCapped": "100+ cancelled (showing latest 100)",

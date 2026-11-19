@@ -83,7 +83,7 @@
       }
       }
     </div>
-    @if (routinesHasMore() && !routineSearch().trim()) {
+    @if (routinesHasMore()) {
     <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-3"
       [disabled]="routinesLoading()" (click)="loadMoreRoutines()">
       <i class="pi" [class]="routinesLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>

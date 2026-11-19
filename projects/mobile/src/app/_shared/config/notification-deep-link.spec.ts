@@ -110,9 +110,9 @@ describe('deep links', () => {
       tab: 'invoices',
     });
     expect(queryParamsFor({ screen: 'coaching/payments' })).toBeNull();
-    // An unrouted screen has nowhere to forward them to. `groups` used to be
-    // the example here; it is routed now, so this uses one that still isn't.
-    expect(queryParamsFor({ screen: 'coaching/exercises', queryParams: { x: '1' } })).toBeNull();
+    // An unrouted screen has nowhere to forward them to. `groups` and then
+    // `coaching/exercises` were the example here; both are routed now.
+    expect(queryParamsFor({ screen: 'coaching/subscriptions', queryParams: { x: '1' } })).toBeNull();
     expect(queryParamsFor({ screen: 'groups', queryParams: { x: '1' } })).toEqual({ x: '1' });
   });
 
@@ -164,6 +164,11 @@ describe('deep links', () => {
       'client-1',
     ]);
     expect(routeFor({ screen: 'coaching/clients' })).toEqual(['/tabs/clients']);
+  });
+
+  it("opens the coach's exercises when one of theirs was copied", () => {
+    expect(routeFor({ screen: 'coaching/exercises' })).toEqual(['/tabs/exercises']);
+    expect(webOnlyLabel({ screen: 'coaching/exercises' })).toBeNull();
   });
 
   it('says nothing about a screen it has never heard of', () => {

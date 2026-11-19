@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
@@ -88,6 +88,7 @@ export class MySessions implements OnInit {
   protected readonly store = inject(SessionsMyStore);
   private readonly _bookings = inject(MyBookingsIndexStore);
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
@@ -169,6 +170,13 @@ export class MySessions implements OnInit {
   });
 
   ngOnInit(): void {
+    // A link can name the tab: a cancelled or declined booking's alert sends
+    // `tab=cancelled`, which used to land on Upcoming, where it is not listed.
+    const asked = this._route.snapshot.queryParamMap.get('tab');
+    if (asked && VALID_TABS.has(asked) && asked !== this.store.tab()) {
+      this.store.setTab(asked as MyTab);
+      return;
+    }
     this.store.load();
   }
 

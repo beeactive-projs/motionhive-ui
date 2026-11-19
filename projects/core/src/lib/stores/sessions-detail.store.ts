@@ -126,7 +126,13 @@ export class SessionsDetailStore {
     if (!i) return;
     this._markBusy(participantId, true);
     this._svc.approveParticipant(i.id, participantId).pipe(
-      tap(() => this._patchParticipant(participantId, { status: 'CONFIRMED' })),
+      // The status the API decided: a full session waitlists or declines
+      // the person, and showing "Confirmed" then was untrue.
+      tap((result) =>
+        this._patchParticipant(participantId, {
+          status: result.status as SessionParticipant['status'],
+        }),
+      ),
       takeUntilDestroyed(this._destroyRef),
     ).subscribe({
       complete: () => this._markBusy(participantId, false),

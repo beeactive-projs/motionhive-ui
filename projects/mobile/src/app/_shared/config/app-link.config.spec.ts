@@ -36,6 +36,16 @@ describe('resolveAppLink', () => {
     expect(at('/groups/g-1')?.commands).toEqual(['/tabs/groups', 'g-1']);
   });
 
+  it('opens the two group emails on the screens the app has', () => {
+    expect(at('/groups/discover')).toEqual({ commands: ['/tabs/discover'], queryParams: null });
+    expect(at('/groups/g-1/members?requestId=r-1')).toEqual({
+      commands: ['/tabs/groups', 'g-1', 'manage'],
+      queryParams: { requestId: 'r-1' },
+    });
+    // A plain group link still opens the group.
+    expect(at('/groups/g-1')?.commands).toEqual(['/tabs/groups', 'g-1']);
+  });
+
   it('lands a request email on the Requests chip', () => {
     expect(at('/coaching/pending-requests')).toEqual({
       commands: ['/tabs/clients'],

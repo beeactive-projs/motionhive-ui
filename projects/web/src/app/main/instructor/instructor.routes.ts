@@ -2,10 +2,12 @@ import { Routes } from '@angular/router';
 
 export const instructorRoutes: Routes = [
   // Coaching
+  // The Overview page showed sample rows, never the coach's own, and is
+  // gone. Kept as a redirect so old links and bookmarks still land.
   {
     path: 'overview',
-    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
-    title: 'pageTitle.overview',
+    redirectTo: 'clients',
+    pathMatch: 'full',
   },
   // The roster is a lens on /coaching/clients now, not a page. Kept as a
   // redirect so existing links and bookmarks still land somewhere useful.

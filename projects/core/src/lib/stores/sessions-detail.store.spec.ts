@@ -170,6 +170,17 @@ describe('SessionsDetailStore', () => {
     expect(p?.status).toBe('CONFIRMED');
   });
 
+  it('approve() shows the status the API decided, a waitlist on a full session', () => {
+    store.load('inst-1');
+    flushLoad();
+    store.approve('p-2');
+    httpMock
+      .expectOne(`${BASE}/sessions/instances/inst-1/participants/p-2/approve`)
+      .flush({ status: 'WAITLISTED' });
+    const p = store.participants().find((x) => x.id === 'p-2');
+    expect(p?.status).toBe('WAITLISTED');
+  });
+
   it('setAttendance() updates the row from server response', () => {
     store.load('inst-1');
     flushLoad();

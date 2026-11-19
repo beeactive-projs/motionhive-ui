@@ -7,6 +7,7 @@ import {
   inject,
   Injectable,
   signal,
+  untracked,
 } from '@angular/core';
 import { translate } from '../i18n/translator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -451,7 +452,23 @@ export class MessagingStore {
     return this._sending()[key] === true;
   }
 
+  /** The stream status last seen, to tell "back after a drop" from a first open. */
+  private lastStreamStatus: string = 'idle';
+
   constructor() {
+    // Back after a drop (closed, then open again): events sent while it
+    // was down never arrive, the server's replay is best effort, so the
+    // inbox and the open thread are read again. A first open, or the
+    // cycle `resync()` runs itself (idle, then open), reads nothing extra.
+    effect(() => {
+      const status = this._realtime.status();
+      const previous = this.lastStreamStatus;
+      this.lastStreamStatus = status;
+      if (status === 'open' && previous === 'closed') {
+        untracked(() => this.rereadAfterAway());
+      }
+    });
+
     // Transition-only effect. We read `isAuthenticated()` so the
     // effect re-runs when it changes, but we only act when the
     // observed value differs from the previous one. This collapses
@@ -511,7 +528,16 @@ export class MessagingStore {
       }
       const away = this.hiddenAt === null ? 0 : Date.now() - this.hiddenAt;
       this.hiddenAt = null;
-      if (away >= RESYNC_AFTER_HIDDEN_MS) this.resync();
+      if (away >= RESYNC_AFTER_HIDDEN_MS) {
+        this.resync();
+        return;
+      }
+      // A short time away: what arrived meanwhile in the open thread was not
+      // marked read (nobody was looking), and is on screen now.
+      const active = this._activeId();
+      if (active && this._auth.isAuthenticated()) {
+        this.markReadOnEntry(active);
+      }
     };
     this._document.addEventListener('visibilitychange', onVisibility);
     this._destroyRef.onDestroy(() =>
@@ -542,6 +568,19 @@ export class MessagingStore {
     this.lastResyncAt = now;
 
     this._realtime.reconnect();
+    this.rereadAfterAway();
+  }
+
+  /**
+   * The inbox and the open thread, read again after time away (a resume, or
+   * the stream back after a drop). The open thread is marked read too when it
+   * is on screen: what came in meanwhile is being looked at now, and the list
+   * refresh would otherwise bring its unread count back over the thread.
+   */
+  private rereadAfterAway(): void {
+    if (!this._auth.isAuthenticated()) {
+      return;
+    }
     this.loadConversations({ force: true });
     const active = this._activeId();
     this._messagesByConv.update((all) =>
@@ -552,7 +591,17 @@ export class MessagingStore {
         ]),
       ),
     );
-    if (active) this.loadMessages(active, { force: true });
+    if (active) {
+      this.loadMessages(active, { force: true });
+      if (this.pageVisible()) {
+        this.markReadOnEntry(active);
+      }
+    }
+  }
+
+  /** Whether the person can see the app: a hidden tab or a locked phone reads nothing. */
+  private pageVisible(): boolean {
+    return this._document.visibilityState !== 'hidden';
   }
 
   // ─── Inbox UI actions ─────────────────────────────────────────
@@ -1480,7 +1529,9 @@ export class MessagingStore {
     // burst of incoming messages doesn't fan out into one PATCH per
     // message — the recipient's UI shows the messages instantly,
     // the BE just needs to land the cursor eventually.
-    if (isActive && !isMine) {
+    // Only while the page is visible: a message that arrives on a locked
+    // phone or a hidden tab has not been seen, whatever thread is open.
+    if (isActive && !isMine && this.pageVisible()) {
       this.scheduleLiveMarkRead(conversationId);
     }
 

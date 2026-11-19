@@ -101,6 +101,16 @@ export const PAYMENT_SEGMENTS = [
 
 export type PaymentSegment = (typeof PAYMENT_SEGMENTS)[number]['value'];
 
+/** The segment a `tab` query param names, or null for none or anything else. */
+export function segmentFrom(tab: string | null): PaymentSegment | null {
+  for (const segment of PAYMENT_SEGMENTS) {
+    if (segment.value === tab) {
+      return segment.value;
+    }
+  }
+  return null;
+}
+
 /** Stripe's refund window, mirrored from `RefundService` on the API. */
 export const REFUND_WINDOW_DAYS = 14;
 

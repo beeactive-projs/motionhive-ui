@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
@@ -44,7 +44,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { InvoiceRow } from '../_components/invoice-row/invoice-row';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
-import { PAYMENT_ICONS, PAYMENT_SEGMENTS, PaymentSegment } from '../payments.config';
+import { PAYMENT_ICONS, PAYMENT_SEGMENTS, PaymentSegment, segmentFrom } from '../payments.config';
 
 const PAGE_SIZE = 20;
 
@@ -96,6 +96,7 @@ export class ClientPayments implements ViewWillEnter {
   private readonly _service = inject(ClientPaymentService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4];
@@ -176,6 +177,12 @@ export class ClientPayments implements ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
+    // A membership alert (subscription started, cancelled, card expiring)
+    // sends `tab=memberships`: open on that segment, not on Invoices.
+    const asked = segmentFrom(this._route.snapshot.queryParamMap.get('tab'));
+    if (asked) {
+      this.segment.set(asked);
+    }
     this._load();
     this._loadSubscriptions();
   }

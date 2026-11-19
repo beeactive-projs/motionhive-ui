@@ -100,12 +100,26 @@ export class ConversationPane {
 
   protected readonly otherId = computed(() => this.conversation()?.otherUser?.id ?? null);
 
+  /** The thread this pane shows, so leaving can let go of it. */
+  private _paneId: string | null = null;
+
   constructor() {
+    // Leaving the thread (to Clients, the dashboard, browser Back) must stop
+    // it counting as on screen: new messages were marked read and kept off
+    // the badge with nobody looking. Only if it is still this pane's: a pane
+    // replaced by another thread finds the new one already claimed it.
+    this._destroyRef.onDestroy(() => {
+      if (this._paneId && this.store.activeId() === this._paneId) {
+        this.store.setActiveId(null);
+      }
+    });
+
     this._route.paramMap
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((params) => {
         const id = params.get('id');
         if (!id) return;
+        this._paneId = id;
 
         // Close any safety dialog left open — the user navigated to
         // a different conversation while the dialog targeted the

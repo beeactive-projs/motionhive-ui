@@ -219,7 +219,7 @@
             <section class="mh-section">
               <span class="mh-kicker">
                 {{
-                  'workouts.home.yourRoutinesCount' | translate: { count: store.routines().length }
+                  'workouts.home.yourRoutinesCount' | translate: { count: store.routineTotal() }
                 }}
               </span>
               @if (store.routines().length) {
@@ -236,6 +236,12 @@
                     />
                   }
                 </ion-list>
+                @if (store.hasMoreRoutines()) {
+                  <ion-button class="show-more mh-text-link" fill="clear" expand="block"
+                    [disabled]="store.routinesLoadingMore()" (click)="store.loadMoreRoutines()">
+                    {{ 'button.showMoreItems' | translate }}
+                  </ion-button>
+                }
               } @else {
                 <ion-note class="mh-note-block">
                   {{ 'workouts.home.noRoutines' | translate }}

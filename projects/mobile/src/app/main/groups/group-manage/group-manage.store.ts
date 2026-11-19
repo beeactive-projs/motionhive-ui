@@ -28,11 +28,13 @@ export class GroupManageStore {
   private _groupId = '';
 
   private readonly _requests = signal<GroupJoinRequest[]>([]);
+  private readonly _requestsTotal = signal(0);
   private readonly _requestsLoading = signal(false);
   private readonly _requestsError = signal(false);
   private readonly _requestsLoaded = signal(false);
 
   private readonly _posts = signal<Post[]>([]);
+  private readonly _postsTotal = signal(0);
   private readonly _postsLoading = signal(false);
   private readonly _postsError = signal(false);
   private readonly _postsLoaded = signal(false);
@@ -59,8 +61,18 @@ export class GroupManageStore {
   readonly requests = this._requests.asReadonly();
   readonly posts = this._posts.asReadonly();
 
-  readonly requestCount = computed(() => this._requests().length);
-  readonly postCount = computed(() => this._posts().length);
+  /**
+   * How many wait on the server, not how many are on screen: a queue reads
+   * a page of 20, so 35 requests used to show as 20.
+   */
+  readonly requestCount = this._requestsTotal.asReadonly();
+  readonly postCount = this._postsTotal.asReadonly();
+
+  /** The page on screen is decided and the next one is on its way. */
+  readonly requestsRefilling = computed(
+    () => this._requests().length === 0 && this._requestsLoading(),
+  );
+  readonly postsRefilling = computed(() => this._posts().length === 0 && this._postsLoading());
 
   readonly loading = computed(() => this._requestsLoading() || this._postsLoading());
 
@@ -118,6 +130,12 @@ export class GroupManageStore {
       finalize(() => this._markBusy(request.id, false)),
       tap(() => {
         this._requests.update((list) => list.filter((row) => row.id !== request.id));
+        this._requestsTotal.update((total) => Math.max(0, total - 1));
+        // Deciding the last one on screen is not the end of the queue while
+        // the server still holds more: read the next ones in.
+        if (this._requests().length === 0 && this._requestsTotal() > 0) {
+          this._loadRequests(true, noop);
+        }
       }),
       takeUntilDestroyed(this._destroyRef),
     );
@@ -130,6 +148,10 @@ export class GroupManageStore {
       finalize(() => this._markBusy(post.id, false)),
       tap(() => {
         this._posts.update((list) => list.filter((row) => row.id !== post.id));
+        this._postsTotal.update((total) => Math.max(0, total - 1));
+        if (this._posts().length === 0 && this._postsTotal() > 0) {
+          this._loadPosts(true, noop);
+        }
       }),
       takeUntilDestroyed(this._destroyRef),
     );
@@ -164,6 +186,7 @@ export class GroupManageStore {
       .subscribe({
         next: (response) => {
           this._requests.set(response.items);
+          this._requestsTotal.set(response.total);
           this._requestsLoaded.set(true);
           done();
         },
@@ -195,6 +218,7 @@ export class GroupManageStore {
       .subscribe({
         next: (response) => {
           this._posts.set(response.items);
+          this._postsTotal.set(response.total);
           this._postsLoaded.set(true);
           done();
         },
@@ -211,15 +235,21 @@ export class GroupManageStore {
 
   private _resetAll(): void {
     this._requests.set([]);
+    this._requestsTotal.set(0);
     this._requestsLoaded.set(false);
     this._requestsError.set(false);
     this._posts.set([]);
+    this._postsTotal.set(0);
     this._postsLoaded.set(false);
     this._postsError.set(false);
     this._busyIds.set(new Set());
     this._requestsForbidden.set(false);
     this._postsForbidden.set(false);
   }
+}
+
+function noop(): void {
+  // A refill has no refresher waiting on it.
 }
 
 /** A refusal rather than a failure: the queue was never this viewer's. */

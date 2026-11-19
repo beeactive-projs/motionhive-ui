@@ -8,6 +8,7 @@ import {
   SESSION_ICONS,
   SESSION_TYPE_OPTIONS,
   SessionActionIds,
+  onTheRoster,
 } from './sessions.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -471,5 +472,15 @@ describe('window fitting', () => {
     expect(windowDays(out)).toBeLessThanOrEqual(MAX_RANGE_DAYS);
     // Still covers what was asked for, just without the rounding.
     expect(out.start.getTime()).toBeLessThanOrEqual(day('2026-01-20').getTime());
+  });
+});
+
+describe('onTheRoster', () => {
+  it('lists people with a place and requests waiting, never cancelled or declined bookings', () => {
+    expect(onTheRoster({ status: 'CONFIRMED' })).toBe(true);
+    expect(onTheRoster({ status: 'PENDING_APPROVAL' })).toBe(true);
+    expect(onTheRoster({ status: 'CANCELLED' })).toBe(false);
+    expect(onTheRoster({ status: 'DECLINED' })).toBe(false);
+    expect(onTheRoster({ status: 'WAITLISTED' })).toBe(false);
   });
 });

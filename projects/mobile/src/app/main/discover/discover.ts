@@ -197,7 +197,6 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
       const topic = this.selectedTopic();
       untracked(() => {
         const categoryIds = topicCategoryIds(topic);
-        this.groupsStore.useTopic(categoryIds);
         const agendaTopic = { categoryIds: categoryIds ?? undefined, online: !!topic?.online };
         if (this._agendaStarted()) {
           this.sessionsStore.setTopic(agendaTopic);
@@ -210,6 +209,18 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
           this.sessionsStore.reload();
         }
       });
+    });
+
+    // The group cards are the server's for the city and the topic, asked
+    // again whenever either changes. The tab's own read stays every city's:
+    // the city list and the chips are drawn from it.
+    effect(() => {
+      if (!this._topicReady()) {
+        return;
+      }
+      const categoryIds = topicCategoryIds(this.selectedTopic());
+      const city = this.city()?.label ?? null;
+      untracked(() => this.groupsStore.useTopic(categoryIds, city));
     });
 
     // The coach sections are the directory's for the city and the topic,
@@ -457,9 +468,14 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
 
   // ─── Groups ─────────────────────────────────────────────────────────────
 
-  /** As the coaches: the topic's own groups from the API, else the tab's. */
+  /** The cards come from their own server read once a city or a topic narrows them. */
+  private readonly _groupsNarrowed = computed(
+    () => !!topicCategoryIds(this.selectedTopic()) || this._cityKey() !== null,
+  );
+
+  /** As the coaches: the city's and topic's own groups from the API, else the tab's. */
   private readonly _topicGroups = computed(() => {
-    if (topicCategoryIds(this.selectedTopic())) {
+    if (this._groupsNarrowed()) {
       return this.groupsStore.topicGroups();
     }
     return this.groupsStore.groups();
@@ -469,8 +485,10 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     if (this.groupsStore.loading() && !this.groupsStore.loaded()) {
       return true;
     }
-    if (topicCategoryIds(this.selectedTopic())) {
-      return this.groupsStore.topicLoading() && !this.groupsStore.topicLoaded();
+    if (this._groupsNarrowed()) {
+      // Until the narrowed read lands (it starts once the topic settles), so
+      // the rail does not vanish and come back.
+      return !this.groupsStore.topicLoaded() && !this.groupsStore.topicError();
     }
     return false;
   });

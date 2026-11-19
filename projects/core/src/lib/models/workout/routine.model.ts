@@ -189,6 +189,8 @@ export interface ListRoutinesQuery {
   library?: RoutineLibrary;
   /** Archived routines: left out unless asked for (`only` lists just them). */
   archived?: 'include' | 'exclude' | 'only';
+  /** Matches the name in any language, on the server, across every page. */
+  search?: string;
 }
 
 export interface PaginatedRoutines {

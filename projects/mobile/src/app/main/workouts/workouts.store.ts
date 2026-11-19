@@ -3,6 +3,7 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import {
+  appendUnique,
   ProgramAssignmentService,
   Routine,
   RoutineService,
@@ -37,6 +38,10 @@ export class WorkoutsStore {
 
   private readonly _trainingDay = signal<TrainingDay | null>(null);
   private readonly _routines = signal<Routine[]>([]);
+  /** All of your routines on the server; the list holds pages of 50. */
+  private readonly _routineTotal = signal(0);
+  private _routinePages = 0;
+  private readonly _routinesLoadingMore = signal(false);
   private readonly _starters = signal<Routine[]>([]);
   private readonly _starterTotal = signal(0);
   /** How many of your routines are archived, for the way back to them. */
@@ -53,6 +58,10 @@ export class WorkoutsStore {
 
   readonly inProgress = this._inProgress.asReadonly();
   readonly routines = this._routines.asReadonly();
+  readonly routineTotal = this._routineTotal.asReadonly();
+  readonly routinesLoadingMore = this._routinesLoadingMore.asReadonly();
+  /** Routine 51 and on were out of reach from the tab. */
+  readonly hasMoreRoutines = computed(() => this._routines().length < this._routineTotal());
   readonly starters = this._starters.asReadonly();
   /** The whole starter catalogue, for the "See all" count — not just the page we read. */
   readonly starterTotal = this._starterTotal.asReadonly();
@@ -119,7 +128,37 @@ export class WorkoutsStore {
   /** A routine deleted from the list leaves it at once, without a reload. */
   dropRoutine(id: string): void {
     this._routineEdits++;
+    const before = this._routines().length;
     this._routines.update((routines) => routines.filter((routine) => routine.id !== id));
+    if (this._routines().length < before) {
+      this._routineTotal.update((total) => Math.max(0, total - 1));
+    }
+  }
+
+  /** Your next routines, after the ones on screen. */
+  loadMoreRoutines(): void {
+    if (this._routinesLoadingMore() || !this.hasMoreRoutines()) {
+      return;
+    }
+    const edits = this._routineEdits;
+    const nextPage = this._routinePages + 1;
+    this._routinesLoadingMore.set(true);
+    this._routineService
+      .list({ library: 'mine', page: nextPage, limit: ROUTINE_LIMIT })
+      .pipe(take(1))
+      .subscribe({
+        next: (page) => {
+          this._routinesLoadingMore.set(false);
+          // The page number moves only once the page is in, so a failed
+          // Show more asks for the same page again instead of skipping it.
+          this._routinePages = nextPage;
+          this._routines.update((rows) => appendUnique(rows, page.items));
+          if (edits === this._routineEdits) {
+            this._routineTotal.set(page.total);
+          }
+        },
+        error: () => this._routinesLoadingMore.set(false),
+      });
   }
 
   /** An archived one leaves it too, and joins the way back to the archive. */
@@ -162,7 +201,11 @@ export class WorkoutsStore {
           const current = edits === this._routineEdits;
           if (archived && current) this._archivedTotal.set(archived.total);
           if (day) this._trainingDay.set(day);
-          if (routines && current) this._routines.set(routines.items);
+          if (routines && current) {
+            this._routines.set(routines.items);
+            this._routineTotal.set(routines.total);
+            this._routinePages = 1;
+          }
           if (starters) {
             this._starters.set(starters.items);
             this._starterTotal.set(starters.total);

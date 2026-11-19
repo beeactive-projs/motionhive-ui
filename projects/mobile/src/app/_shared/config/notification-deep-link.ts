@@ -84,6 +84,9 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
       params(d),
     ),
   'coaching/payments': (d) => link(['/tabs/more/payments'], params(d)),
+  // An exercise of theirs was copied: the coach's exercises, which the app
+  // has (it used to say "on the web").
+  'coaching/exercises': (d) => link(['/tabs/exercises'], params(d)),
   'profile/invoices': (d) =>
     link(d.entityId ? ['/tabs/more/billing', d.entityId] : ['/tabs/more/billing'], params(d)),
   sessions: traineeSessions,
@@ -121,7 +124,6 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
  * every screen the API emits.
  */
 const NOT_ON_MOBILE: Record<string, string> = {
-  'coaching/exercises': 'nav.exercises',
   // Subscriptions a coach *sells* stay on the web; the client's own
   // memberships are a segment on their billing screen.
   'coaching/subscriptions': 'notifications.webOnlyPlace.memberships',

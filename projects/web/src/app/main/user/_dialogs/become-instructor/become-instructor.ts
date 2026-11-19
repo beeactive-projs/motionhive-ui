@@ -175,7 +175,9 @@ export class BecomeInstructor {
         }
         this.isLoading.set(false);
         this.visible.set(false);
-        this._router.navigate(['/coaching/overview']);
+        // Their clients, where a new coach starts: the Overview page still
+        // shows sample rows, never the coach's own.
+        this._router.navigate(['/coaching/clients']);
       },
       error: (err) => {
         this.isLoading.set(false);

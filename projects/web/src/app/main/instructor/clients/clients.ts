@@ -34,6 +34,7 @@ import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 
 import { showInviteAgainError } from './invite-again';
+import { withChipFilter } from './table-chip';
 import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DataView } from 'primeng/dataview';
@@ -242,10 +243,11 @@ export class Clients implements OnInit {
   }
 
   lazyLoadClients(event: TableLazyLoadEvent): void {
-    this.lastLazyEvent = event;
+    const withStatus = withChipFilter(event, 'status', this.statusFilter());
+    this.lastLazyEvent = withStatus;
     this.loading.set(true);
     this._clientService
-      .filterClients(event)
+      .filterClients(withStatus)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
@@ -293,10 +295,7 @@ export class Clients implements OnInit {
       this.loadMobilePage(true);
       return;
     }
-    this.lastLazyEvent.first = 0;
-    this.lastLazyEvent.rows = this.rows;
-    this.lastLazyEvent.filters = { status: { value: status } };
-    this.lazyLoadClients(this.lastLazyEvent);
+    this.lazyLoadClients({ ...this.lastLazyEvent, first: 0, rows: this.rows });
   }
 
   goToPendingRequests(): void {

@@ -98,6 +98,19 @@ describe('RoutineService', () => {
     expect(routine.exercises?.[0].hasVariedSets).toBe(true);
   });
 
+  // The web library searched only the page it had loaded.
+  it('sends a search to the server, and leaves a blank one out', () => {
+    service.list({ library: 'mine', search: '  leg day ' }).subscribe();
+    const req = httpMock.expectOne((r) => r.url === `${BASE}/programs`);
+    expect(req.request.params.get('search')).toBe('leg day');
+    req.flush({ items: [], total: 0, page: 1, pageSize: 20 });
+
+    service.list({ library: 'mine', search: '   ' }).subscribe();
+    const blank = httpMock.expectOne((r) => r.url === `${BASE}/programs`);
+    expect(blank.request.params.has('search')).toBe(false);
+    blank.flush({ items: [], total: 0, page: 1, pageSize: 20 });
+  });
+
   // The builder draws its own "Couldn't open this routine"; the global
   // dialog opened over it as well.
   it('reads silently when asked, so the screen reports its own failure', () => {

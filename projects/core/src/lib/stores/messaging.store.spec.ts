@@ -542,8 +542,10 @@ describe('MessagingStore — catching up after the background', () => {
     listConversations: ReturnType<typeof vi.fn>;
     listMessages: ReturnType<typeof vi.fn>;
     getConversation: ReturnType<typeof vi.fn>;
+    markRead: ReturnType<typeof vi.fn>;
   };
   let authed: WritableSignal<boolean>;
+  let status: WritableSignal<'idle' | 'connecting' | 'open' | 'closed'>;
 
   function setVisibility(state: DocumentVisibilityState): void {
     Object.defineProperty(document, 'visibilityState', {
@@ -558,11 +560,13 @@ describe('MessagingStore — catching up after the background', () => {
     vi.setSystemTime(new Date('2026-10-20T12:00:00Z'));
 
     realtime = { reconnect: vi.fn() };
+    status = signal<'idle' | 'connecting' | 'open' | 'closed'>('open');
     api = {
       listConversations: vi.fn(() => of({ items: [], total: 0 })),
       listMessages: vi.fn(() => of({ items: [], nextBefore: null })),
       // An open thread missing from the (empty) inbox is fetched on its own.
       getConversation: vi.fn(() => EMPTY),
+      markRead: vi.fn(() => of({ lastReadAt: '2026-10-20T12:00:00Z' })),
     };
     authed = signal(true);
 
@@ -575,7 +579,7 @@ describe('MessagingStore — catching up after the background', () => {
           provide: MessagingRealtimeService,
           useValue: {
             events$: new Subject(),
-            status: signal('open').asReadonly(),
+            status: status.asReadonly(),
             lastEventId: signal<string | null>(null),
             connect: vi.fn(),
             disconnect: vi.fn(),
@@ -608,6 +612,26 @@ describe('MessagingStore — catching up after the background', () => {
     expect(realtime.reconnect).toHaveBeenCalledTimes(1);
     expect(api.listConversations).toHaveBeenCalledTimes(1);
     expect(api.listMessages).toHaveBeenCalledWith(REAL_CONV, expect.anything());
+    // What came in while away is on screen now: read.
+    expect(api.markRead).toHaveBeenCalledWith(REAL_CONV);
+  });
+
+  it('re-reads the inbox and the open thread when the stream is back after a drop', () => {
+    store.setActiveId(REAL_CONV);
+    // Sign in's own first load runs on the first tick: settle it first.
+    TestBed.tick();
+    api.listConversations.mockClear();
+    api.listMessages.mockClear();
+
+    status.set('closed');
+    TestBed.tick();
+    status.set('open');
+    TestBed.tick();
+
+    expect(api.listConversations).toHaveBeenCalledTimes(1);
+    expect(api.listMessages).toHaveBeenCalledWith(REAL_CONV, expect.anything());
+    // No new cycle: the stream is already back.
+    expect(realtime.reconnect).not.toHaveBeenCalled();
   });
 
   it('re-reads a cached thread on its next open, since it missed the same messages', () => {

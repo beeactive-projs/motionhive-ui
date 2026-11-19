@@ -5,16 +5,21 @@ import {
   AuthStore,
   Group,
   GroupMember,
+  GroupMemberRole,
   GroupMemberPostPolicies,
   GroupMemberRoles,
   GroupService,
   GroupsRefreshService,
+  GroupWithMyRole,
   Post,
   escapeHtml,
   showApiError,
   UpdateMemberRolePayload,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
+
+/** Members per page of the table. */
+export const MEMBERS_PAGE_SIZE = 50;
 
 @Injectable()
 export class GroupDetailContext {
@@ -26,13 +31,18 @@ export class GroupDetailContext {
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
   private readonly _translateService = inject(TranslateService);
 
-  readonly group = signal<Group | null>(null);
+  readonly group = signal<GroupWithMyRole | null>(null);
   readonly members = signal<GroupMember[]>([]);
   readonly myGroups = signal<Group[]>([]);
 
   readonly loading = signal(true);
   readonly membersLoading = signal(false);
+  readonly membersLoadingMore = signal(false);
   readonly totalMembers = signal(0);
+  private _membersPage = 1;
+
+  /** More members on the server than the table holds. */
+  readonly hasMoreMembers = computed(() => this.members().length < this.totalMembers());
   readonly generatingLink = signal(false);
   readonly promotingMemberId = signal<string | null>(null);
 
@@ -56,20 +66,25 @@ export class GroupDetailContext {
     return group.memberPostPolicy !== GroupMemberPostPolicies.Disabled;
   });
 
-  readonly canModerate = computed(() => {
-    if (this.isOwner()) return true;
-    const userId = this._authStore.user()?.id;
-    if (!userId) return false;
-    const me = this.members().find((m) => m.userId === userId);
-    return me?.role === GroupMemberRoles.Owner || me?.role === GroupMemberRoles.Moderator;
+  /**
+   * The viewer's role, as the server read it for this group. Never looked up
+   * in the member list: that list is paged, so a moderator who joined 21st
+   * read as nobody and lost moderation and the Leave button.
+   */
+  readonly viewerRole = computed((): GroupMemberRole | null => {
+    if (this.isOwner()) {
+      return GroupMemberRoles.Owner;
+    }
+    const group = this.group();
+    if (!group) {
+      return null;
+    }
+    return group.myRole ?? null;
   });
 
-  readonly viewerRole = computed(() => {
-    if (this.isOwner()) return GroupMemberRoles.Owner;
-    const userId = this._authStore.user()?.id;
-    if (!userId) return null;
-    const me = this.members().find((m) => m.userId === userId);
-    return me?.role ?? null;
+  readonly canModerate = computed(() => {
+    const role = this.viewerRole();
+    return role === GroupMemberRoles.Owner || role === GroupMemberRoles.Moderator;
   });
 
   readonly canLeave = computed(() => {
@@ -109,7 +124,8 @@ export class GroupDetailContext {
 
   loadMembers(groupId: string): void {
     this.membersLoading.set(true);
-    this._groupService.getMembers(groupId).subscribe({
+    this._membersPage = 1;
+    this._groupService.getMembers(groupId, 1, MEMBERS_PAGE_SIZE).subscribe({
       next: (response) => {
         this.members.set(response.items);
         this.totalMembers.set(response.total);
@@ -117,6 +133,40 @@ export class GroupDetailContext {
       },
       error: (err) => {
         this.membersLoading.set(false);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.membersLoadFailed'),
+          '',
+          err,
+        );
+      },
+    });
+  }
+
+  /** The next page of members, after the ones already in the table. */
+  loadMoreMembers(): void {
+    const groupId = this.group()?.id;
+    if (!groupId || this.membersLoadingMore() || !this.hasMoreMembers()) {
+      return;
+    }
+    const nextPage = this._membersPage + 1;
+    this.membersLoadingMore.set(true);
+    this._groupService.getMembers(groupId, nextPage, MEMBERS_PAGE_SIZE).subscribe({
+      next: (response) => {
+        this.membersLoadingMore.set(false);
+        if (this.group()?.id !== groupId) {
+          return;
+        }
+        // The page number moves only once the page has arrived, so a failed
+        // Show more retries the same page instead of skipping it.
+        this._membersPage = nextPage;
+        const known = new Set(this.members().map((m) => m.userId));
+        const fresh = response.items.filter((m) => !known.has(m.userId));
+        this.members.update((list) => [...list, ...fresh]);
+        this.totalMembers.set(response.total);
+      },
+      error: (err) => {
+        this.membersLoadingMore.set(false);
         showApiError(
           this._messageService,
           this._translateService.instant('groups.toast.membersLoadFailed'),

@@ -65,6 +65,8 @@ export class MembersTab {
   readonly searchTerm = signal('');
 
   readonly joinRequests = signal<GroupJoinRequest[]>([]);
+  /** How many wait on the server: the list holds one page of 20. */
+  readonly joinRequestsTotal = signal(0);
   readonly loadingRequests = signal(false);
   readonly busyRequestIds = signal<Set<string>>(new Set());
 
@@ -94,6 +96,7 @@ export class MembersTab {
       const isOwner = this.context.isOwner();
 
       this.joinRequests.set([]);
+      this.joinRequestsTotal.set(0);
       this.busyRequestIds.set(new Set());
       this.loadingRequests.set(false);
 
@@ -118,6 +121,7 @@ export class MembersTab {
       next: (res) => {
         if (this.context.group()?.id !== groupId) return;
         this.joinRequests.set(res.items);
+        this.joinRequestsTotal.set(res.total);
         this.loadingRequests.set(false);
       },
       error: () => {
@@ -165,6 +169,12 @@ export class MembersTab {
           this.joinRequests.update((list) =>
             list.filter((r) => r.id !== request.id),
           );
+          this.joinRequestsTotal.update((total) => Math.max(0, total - 1));
+          // The last one on screen decided is not the end of the queue while
+          // the server still holds more.
+          if (this.joinRequests().length === 0 && this.joinRequestsTotal() > 0) {
+            this._loadJoinRequests(id);
+          }
           if (action === 'APPROVE') {
             // Approved request creates a member — refresh the table.
             this.context.loadMembers(id);

@@ -5,7 +5,7 @@
     <div class="flex items-center gap-2">
       <h2 class="font-semibold">{{ 'groups.members.pendingRequests' | translate }}</h2>
       @if (!loadingRequests()) {
-      <p-badge [value]="joinRequests().length.toString()" severity="warn" size="small" />
+      <p-badge [value]="joinRequestsTotal().toString()" severity="warn" size="small" />
       }
     </div>
 
@@ -206,5 +206,15 @@
       </ng-template>
     </p-table>
   </div>
+
+  @if (context.hasMoreMembers()) {
+  <div class="flex justify-center p-4">
+    <button pButton type="button" severity="secondary" [outlined]="true" (click)="context.loadMoreMembers()"
+      [disabled]="context.membersLoadingMore()">
+      @if (context.membersLoadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+      {{ 'button.loadMore' | translate }}
+    </button>
+  </div>
+  }
   }
 </div>

@@ -19,6 +19,7 @@ import {
   startOfDay,
   translate,
   weekdayNames,
+  SessionParticipantStatus,
 } from 'core';
 
 import {
@@ -824,4 +825,16 @@ export function fitWindow(anchor: DayWindow, extras: readonly DayWindow[]): DayW
   }
 
   return result;
+}
+
+/**
+ * On a session's roster: the people with a place and the requests waiting
+ * on one. The waitlist has its own section; a cancelled or declined booking
+ * has no place, so it is neither listed nor counted for attendance.
+ */
+export function onTheRoster(participant: { status: string }): boolean {
+  return (
+    participant.status === SessionParticipantStatus.Confirmed ||
+    participant.status === SessionParticipantStatus.PendingApproval
+  );
 }
