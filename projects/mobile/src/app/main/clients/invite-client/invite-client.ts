@@ -52,8 +52,9 @@ import { CLIENT_ICONS } from '../clients.icons';
 import {
   inviteEmail,
   inviteLink,
+  InviteConflicts,
+  inviteConflict,
   inviteRowState,
-  isDuplicateInvite,
   isEmailQuery,
 } from '../invite.utils';
 
@@ -243,7 +244,15 @@ export class InviteClient implements ViewWillEnter {
           // Already invited is not a failure — the row should say what is
           // true. The people search may not exclude PENDING relationships,
           // so someone invited earlier can come back in a later result set.
-          if (isDuplicateInvite(error)) {
+          const conflict = inviteConflict(error);
+          if (conflict === InviteConflicts.Client) {
+            this._mark(person.id);
+            void this._feedbackService.success(
+              this._translateService.instant('clients.toast.alreadyClient'),
+            );
+            return;
+          }
+          if (conflict === InviteConflicts.Pending) {
             this._mark(person.id);
             void this._feedbackService.success(
               this._translateService.instant('clients.toast.alreadyInvited'),

@@ -1,5 +1,7 @@
 import { NotificationData, translate } from 'core';
 
+import { ProfileStacks } from '../utils/stack-paths';
+
 /**
  * Where a notification opens on mobile.
  *
@@ -62,7 +64,14 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
       d.entityId ? ['/tabs/coach/sessions', d.entityId] : ['/tabs/coach/sessions'],
       params(d),
     ),
-  'coaching/clients': (d) => link(['/tabs/clients'], params(d)),
+  // A finished workout or plan names the client: their page, where the
+  // workout is. The relationship alerts name nobody: the list.
+  'coaching/clients': (d) => {
+    if (d.entityId) {
+      return link(['/tabs/clients', d.entityId], params(d));
+    }
+    return link(['/tabs/clients'], params(d));
+  },
   // No page of their own: the Clients tab on its Requests chip, where a tap
   // on the row opens the request. `filter` is `CLIENT_FILTER_PARAM`.
   'coaching/pending-requests': (d) =>
@@ -121,11 +130,10 @@ const NOT_ON_MOBILE: Record<string, string> = {
 /**
  * `screen: 'profile'` always carries the tab that holds the thing being talked
  * about, so the tab is what names it — "your profile" would be wrong for all
- * three.
+ * three. Every tab the server sends now has a mobile screen, so this is
+ * empty; it stays as the place to name the next one that does not.
  */
-const PROFILE_TABS: Record<string, string> = {
-  coaches: 'notifications.webOnlyPlace.coaches',
-};
+const PROFILE_TABS: Record<string, string> = {};
 
 /**
  * `screen: 'profile'` with a billing tab is really a billing link — the web
@@ -137,11 +145,25 @@ const PROFILE_TAB_ROUTES: Record<string, string[]> = {
   invoices: ['/tabs/more/billing'],
 };
 
+/**
+ * The trainee's coaching alerts (an invitation, a request answered, coaching
+ * ended): the Coaches screen on Yours, the only place on mobile where their
+ * coaches and the invitations waiting on them are. `tab` is consumed here.
+ */
+function traineeCoaches(data: NotificationData): DeepLink {
+  const { tab: _tab, ...rest } = params(data);
+  return link([ProfileStacks.Coaches], { ...rest, filter: 'yours' });
+}
+
 /** The resolved link, or null when the notification has nowhere to go. */
 export function resolveDeepLink(data: NotificationData | null): DeepLink | null {
   if (!data?.screen) return null;
   if (data.screen === 'profile') {
-    const commands = PROFILE_TAB_ROUTES[data.queryParams?.['tab'] ?? ''];
+    const tab = data.queryParams?.['tab'] ?? '';
+    if (tab === 'coaches') {
+      return traineeCoaches(data);
+    }
+    const commands = PROFILE_TAB_ROUTES[tab];
     return commands ? link(commands, params(data)) : null;
   }
   return SCREEN_ROUTES[data.screen]?.(data) ?? null;

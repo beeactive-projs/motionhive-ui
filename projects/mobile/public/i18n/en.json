@@ -394,7 +394,7 @@
       "notes": "Notes",
       "resendInvitation": "Resend invitation",
       "resent": "Invitation resent",
-      "unarchiveClient": "Unarchive client",
+      "inviteAgain": "Invite again",
       "viewProfile": "View profile",
       "withdraw": "Withdraw",
       "withdrawInvitationEllipsis": "Withdraw invitation…"
@@ -405,7 +405,7 @@
     "clientFallback": "Client",
     "confirm": {
       "archive": {
-        "body": "They keep their account and history, and you can unarchive them later. They will not be told.",
+        "body": "They keep their account and history, but your coaching ends: they will be told, and their training is no longer open to you. To work together again, send them an invitation to accept.",
         "title": "Archive {name}?",
         "titleFallback": "Archive this client?"
       },
@@ -447,6 +447,10 @@
         "planWaiting": "Plan · waiting"
       },
       "pastWindow": "Last {count, plural, one {# day} other {# days}}",
+      "ended": {
+        "title": "Coaching with {name} ended",
+        "body": "Their training is closed to you now. To work together again, invite them again: they become your client once they accept."
+      },
       "pending": {
         "title": "Waiting for {name}",
         "body": "Plans, training and progress open up once the invite is accepted."
@@ -632,6 +636,7 @@
     },
     "thisPerson": "this person",
     "toast": {
+      "alreadyClient": "They are already your client.",
       "alreadyInvited": "They already have an invitation from you.",
       "archiveFailed": "Could not archive this client.",
       "archived": "Client archived",
@@ -646,8 +651,7 @@
       "resendFailed": "Could not resend the invitation.",
       "sendFailed": "Could not send the invitation.",
       "shareFailed": "Could not share the link.",
-      "unarchiveFailed": "Could not unarchive this client.",
-      "unarchived": "Client unarchived",
+      "invitedAgain": "Invitation sent. They become your client again once they accept.",
       "withdrawFailed": "Could not withdraw the invitation."
     }
   },
@@ -2047,7 +2051,6 @@
       "deleted": "Deleted"
     },
     "webOnlyPlace": {
-      "coaches": "Coaches",
       "memberships": "Memberships"
     }
   },
@@ -2442,6 +2445,8 @@
       "note": "Note",
       "program": "Program",
       "schedule": "Schedule",
+      "searchClients": "Search clients",
+      "noClientMatch": "No client matches that.",
       "searchPrograms": "Search programs",
       "starts": "Starts",
       "title": "Assign program",
@@ -2450,7 +2455,7 @@
     "assignment": {
       "notStarted": "Not started",
       "pause": "Pause",
-      "pausedSubline": "Paused. Resuming shifts the remaining schedule forward",
+      "pausedSubline": "Paused. Days missed during the pause are marked skipped once it resumes",
       "percentDone": "{percent}% done",
       "startedPercent": "Started {date} · {percent}% done",
       "starts": "Starts {date}"
@@ -3308,6 +3313,7 @@
     "plan": {
       "allWeeks": "All weeks",
       "doneCount": "{done} / {total} done",
+      "coachNote": "A note from your coach",
       "fromCoachStarted": "From {coach} · Started {date}",
       "position": "Week {week} of {total}",
       "started": "Started {date}",

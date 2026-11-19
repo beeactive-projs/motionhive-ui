@@ -7,6 +7,7 @@ import {
   ClientService,
   CoachLogKind,
   InstructorClient,
+  InstructorClientStatuses,
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
@@ -262,12 +263,15 @@ export class ClientDetailStore {
     this._month.set(startOfMonth(new Date()));
     this._monthLogs.set([]);
     this._error.set(null);
-    this._fetchClient(false);
-    this._fetchRoster();
-    this._fetchPlans();
-    this._fetchLastLog();
-    this._training.reset();
-    this._fetchMonth();
+    // Training reads wait for the client: a former client's are closed to
+    // the coach, and asking anyway raised a "Not found" dialog.
+    this._fetchClient(false, () => {
+      this._fetchRoster();
+      this._fetchPlans();
+      this._fetchLastLog();
+      this._training.reset();
+      this._fetchMonth();
+    });
     this._upcoming.reset();
     this._past.reset();
     this._fetchSessionMonth();
@@ -275,12 +279,13 @@ export class ClientDetailStore {
 
   /** Silent refresh keeps the current screen when the network lets us down. */
   reload(opts: { silent?: boolean } = {}): void {
-    this._fetchClient(!!opts.silent);
-    this._fetchRoster();
-    this._fetchPlans();
-    this._fetchLastLog();
-    this._training.refresh();
-    this._fetchMonth();
+    this._fetchClient(!!opts.silent, () => {
+      this._fetchRoster();
+      this._fetchPlans();
+      this._fetchLastLog();
+      this._training.refresh();
+      this._fetchMonth();
+    });
     this._upcoming.refresh();
     this._past.refresh();
     this._fetchSessionMonth();
@@ -376,8 +381,13 @@ export class ClientDetailStore {
     return this._verb((clientId) => this._clientService.archiveClient(clientId));
   }
 
-  unarchive(): Observable<InstructorClient> {
-    return this._verb((clientId) => this._clientService.unarchiveClient(clientId));
+  /** A former client is asked again; nothing changes here until they accept. */
+  inviteAgain(): Observable<unknown> {
+    const clientId = this._clientId();
+    if (!clientId) {
+      throw new Error('No client loaded');
+    }
+    return this._clientService.sendInvitation({ userId: clientId }).pipe(take(1));
   }
 
   private _verb(
@@ -405,7 +415,11 @@ export class ClientDetailStore {
     );
   }
 
-  private _fetchClient(silent: boolean): void {
+  /**
+   * `whileCoaching` runs once the client is here and still a client: the
+   * reads only an active coach may make.
+   */
+  private _fetchClient(silent: boolean, whileCoaching: () => void): void {
     const clientId = this._clientId();
     if (!clientId || this._loading()) return;
     this._loading.set(true);
@@ -419,6 +433,9 @@ export class ClientDetailStore {
           this._client.set(client);
           this._error.set(null);
           this._loading.set(false);
+          if (client.status === InstructorClientStatuses.Active) {
+            whileCoaching();
+          }
         },
         error: (error: unknown) => {
           if (!silent || !this._client()) {

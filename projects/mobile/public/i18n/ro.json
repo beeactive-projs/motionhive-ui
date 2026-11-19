@@ -394,7 +394,7 @@
       "notes": "Notițe",
       "resendInvitation": "Retrimite invitația",
       "resent": "Invitație retrimisă",
-      "unarchiveClient": "Dezarhivează clientul",
+      "inviteAgain": "Invită din nou",
       "viewProfile": "Vezi profilul",
       "withdraw": "Retrage",
       "withdrawInvitationEllipsis": "Retrage invitația…"
@@ -405,7 +405,7 @@
     "clientFallback": "Client",
     "confirm": {
       "archive": {
-        "body": "Își păstrează contul și istoricul, iar tu îl poți dezarhiva mai târziu. Nu va fi anunțat.",
+        "body": "Își păstrează contul și istoricul, dar colaborarea se încheie: va fi anunțat, iar antrenamentele lui nu îți mai sunt deschise. Ca să lucrați din nou împreună, trimite-i o invitație pe care s-o accepte.",
         "title": "Arhivezi clientul {name}?",
         "titleFallback": "Arhivezi acest client?"
       },
@@ -447,6 +447,10 @@
         "planWaiting": "Plan · în așteptare"
       },
       "pastWindow": "{count, plural, one {Ultima zi} few {Ultimele # zile} other {Ultimele # de zile}}",
+      "ended": {
+        "title": "Colaborarea cu {name} s-a încheiat",
+        "body": "Antrenamentele lui nu îți mai sunt deschise. Ca să lucrați din nou împreună, invită-l din nou: redevine clientul tău după ce acceptă."
+      },
       "pending": {
         "title": "{name} nu a răspuns încă",
         "body": "Planurile, antrenamentele și progresul apar după ce invitația e acceptată."
@@ -632,6 +636,7 @@
     },
     "thisPerson": "această persoană",
     "toast": {
+      "alreadyClient": "Este deja clientul tău.",
       "alreadyInvited": "Are deja o invitație de la tine.",
       "archiveFailed": "Clientul nu a putut fi arhivat.",
       "archived": "Client arhivat",
@@ -646,8 +651,7 @@
       "resendFailed": "Invitația nu a putut fi retrimisă.",
       "sendFailed": "Invitația nu a putut fi trimisă.",
       "shareFailed": "Linkul nu a putut fi distribuit.",
-      "unarchiveFailed": "Clientul nu a putut fi dezarhivat.",
-      "unarchived": "Client dezarhivat",
+      "invitedAgain": "Invitația a fost trimisă. Redevine clientul tău după ce acceptă.",
       "withdrawFailed": "Invitația nu a putut fi retrasă."
     }
   },
@@ -2047,7 +2051,6 @@
       "deleted": "Notificare ștearsă"
     },
     "webOnlyPlace": {
-      "coaches": "Antrenori",
       "memberships": "Abonamente"
     }
   },
@@ -2442,6 +2445,8 @@
       "note": "Notă",
       "program": "Program",
       "schedule": "Calendar",
+      "searchClients": "Caută clienți",
+      "noClientMatch": "Niciun client nu se potrivește.",
       "searchPrograms": "Caută programe",
       "starts": "Data de început",
       "title": "Atribuie programul",
@@ -2450,7 +2455,7 @@
     "assignment": {
       "notStarted": "Neînceput",
       "pause": "Pune pe pauză",
-      "pausedSubline": "Pe pauză. La reluare, restul programului se amână corespunzător",
+      "pausedSubline": "Pe pauză. Zilele ratate în pauză sunt marcate ca sărite la reluare",
       "percentDone": "{percent}% realizat",
       "startedPercent": "A început {date} · {percent}% realizat",
       "starts": "Începe {date}"
@@ -3308,6 +3313,7 @@
     "plan": {
       "allWeeks": "Toate săptămânile",
       "doneCount": "{done} / {total} gata",
+      "coachNote": "Un mesaj de la antrenorul tău",
       "fromCoachStarted": "De la {coach} · Început {date}",
       "position": "Săptămâna {week} din {total}",
       "started": "Început {date}",

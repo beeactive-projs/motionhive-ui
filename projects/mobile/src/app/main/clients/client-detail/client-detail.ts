@@ -82,6 +82,7 @@ import {
 } from '../clients.config';
 import { CLIENT_ICONS } from '../clients.icons';
 import { coachStackOf } from '../client-paths';
+import { InviteConflicts, inviteConflict } from '../invite.utils';
 import { adherenceLabel, attentionReason, lastActiveLabel } from '../roster-labels';
 import {
   ClientDetailStore,
@@ -218,9 +219,19 @@ export class ClientDetail implements ViewWillEnter {
   private readonly _tab = signal<ClientTab>(
     clientTabFrom(this._route.snapshot.queryParamMap.get('tab')),
   );
-  /** A pending invite has only the Overview: nothing else exists yet. */
-  readonly tab = computed<ClientTab>(() => (this.isPending() ? ClientTabs.Overview : this._tab()));
-  readonly showTabs = computed(() => !!this.store.client() && !this.isPending());
+  /**
+   * A pending invite has only the Overview: nothing else exists yet. A
+   * former client has only it too: their training closed with the coaching.
+   */
+  readonly tab = computed<ClientTab>(() => {
+    if (this.isPending() || this.isArchived()) {
+      return ClientTabs.Overview;
+    }
+    return this._tab();
+  });
+  readonly showTabs = computed(
+    () => !!this.store.client() && !this.isPending() && !this.isArchived(),
+  );
 
   private readonly _progressBody = viewChild(ProgressBody);
 
@@ -546,8 +557,8 @@ export class ClientDetail implements ViewWillEnter {
       case ClientActionIds.Archive:
         this.confirmArchive();
         return;
-      case ClientActionIds.Unarchive:
-        this.unarchive();
+      case ClientActionIds.InviteAgain:
+        this.inviteAgain();
         return;
     }
   }
@@ -604,17 +615,24 @@ export class ClientDetail implements ViewWillEnter {
     });
   }
 
-  unarchive(): void {
-    this.store.unarchive().subscribe({
+  inviteAgain(): void {
+    this.store.inviteAgain().subscribe({
       next: () =>
         void this._feedbackService.success(
-          this._translateService.instant('clients.toast.unarchived'),
+          this._translateService.instant('clients.toast.invitedAgain'),
         ),
-      error: (error: unknown) =>
+      error: (error: unknown) => {
+        if (inviteConflict(error) === InviteConflicts.Pending) {
+          void this._feedbackService.success(
+            this._translateService.instant('clients.toast.alreadyInvited'),
+          );
+          return;
+        }
         void this._feedbackService.error(
           error,
-          this._translateService.instant('clients.toast.unarchiveFailed'),
-        ),
+          this._translateService.instant('clients.toast.sendFailed'),
+        );
+      },
     });
   }
 

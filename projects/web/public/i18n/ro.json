@@ -228,7 +228,7 @@
       "archive": {
         "accept": "Da, arhivează",
         "header": "Arhivează clientul",
-        "message": "Sigur vrei să arhivezi relația cu {name}?"
+        "message": "Arhivezi relația cu {name}? Colaborarea se încheie: va fi anunțat, iar antrenamentele lui nu îți mai sunt deschise. Ca să lucrați din nou împreună, trimite-i o invitație pe care s-o accepte."
       },
       "cancelInvitation": {
         "accept": "Anulează invitația",
@@ -245,10 +245,10 @@
         "header": "Retrimite invitația",
         "message": "Retrimiți invitația către {name}?"
       },
-      "unarchive": {
-        "accept": "Da, dezarhivează",
-        "header": "Dezarhivează clientul",
-        "message": "Sigur vrei să dezarhivezi relația cu {name}?"
+      "inviteAgain": {
+        "header": "Invită din nou",
+        "message": "Îi trimiți o invitație lui {name}? Redevine clientul tău după ce acceptă.",
+        "accept": "Trimite invitația"
       }
     },
     "import": {
@@ -473,7 +473,7 @@
       "actions": {
         "archive": "Arhivează clientul",
         "message": "Trimite mesaj",
-        "unarchive": "Dezarhivează clientul"
+        "inviteAgain": "Invită din nou"
       },
       "back": "Înapoi la clienți",
       "info": {
@@ -585,14 +585,16 @@
           "dropped": "A scăzut de la {previous}% la {current}% față de perioada anterioară.",
           "neverStarted": "Are un plan atribuit, dar nu a înregistrat niciun antrenament.",
           "silent": "{due, plural, one {{completed} din # sesiune făcută în această perioadă.} few {{completed} din # sesiuni făcute în această perioadă.} other {{completed} din # de sesiuni făcute în această perioadă.}}",
-          "silentNoDue": "Niciun antrenament înregistrat recent."
+          "silentNoDue": "Niciun antrenament înregistrat recent.",
+          "noPlan": "Nu are acum niciun plan de urmat."
         },
         "hint": "cele mai urgente primele",
         "reason": {
           "behind": "Rămas în urmă cu planul",
           "dropped": "În scădere",
           "neverStarted": "Nu a început",
-          "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}"
+          "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}",
+          "noPlan": "Fără plan"
         },
         "title": "Necesită atenție"
       },
@@ -679,13 +681,17 @@
         "detail": "Nu am putut trimite invitația. Încearcă din nou.",
         "summary": "Invitația nu a putut fi trimisă"
       },
-      "unarchiveFailed": {
-        "detail": "Clientul nu a putut fi dezarhivat",
-        "summary": "Dezarhivarea a eșuat"
+      "inviteAgainFailed": {
+        "summary": "Invitația nu a fost trimisă",
+        "detail": "Nu am putut trimite invitația. Încearcă din nou."
       },
-      "unarchived": {
-        "detail": "Relația cu clientul a fost restaurată",
-        "summary": "Client dezarhivat"
+      "invitedAgain": {
+        "summary": "Invitație trimisă",
+        "detail": "Redevine clientul tău după ce acceptă."
+      },
+      "alreadyInvited": {
+        "summary": "Deja invitat",
+        "detail": "Are deja o invitație de la tine."
       }
     }
   },

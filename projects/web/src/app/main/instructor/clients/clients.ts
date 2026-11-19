@@ -32,6 +32,8 @@ import {
 } from 'core';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
+
+import { showInviteAgainError } from './invite-again';
 import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DataView } from 'primeng/dataview';
@@ -354,42 +356,40 @@ export class Clients implements OnInit {
       });
   }
 
-  confirmUnarchive(client: InstructorClient): void {
+  /**
+   * A former client comes back only by saying yes: an invitation, never a
+   * quiet unarchive (the API refuses that now).
+   */
+  confirmInviteAgain(client: InstructorClient): void {
     this._confirmationService.confirm({
-      header: this._translateService.instant('clients.confirm.unarchive.header'),
-      message: this._translateService.instant('clients.confirm.unarchive.message', {
+      header: this._translateService.instant('clients.confirm.inviteAgain.header'),
+      message: this._translateService.instant('clients.confirm.inviteAgain.message', {
         name: `<strong>${escapeHtml(this.clientName(client))}</strong>`,
       }),
-      acceptIcon: 'pi pi-inbox',
+      acceptIcon: 'pi pi-user-plus',
       acceptButtonProps: {
-        label: this._translateService.instant('clients.confirm.unarchive.accept'),
+        label: this._translateService.instant('clients.confirm.inviteAgain.accept'),
         iconPos: 'left',
       },
       rejectButtonProps: { text: 'true', severity: 'contrast' },
-      accept: () => this.unarchiveClient(client),
+      accept: () => this.inviteAgain(client),
     });
   }
 
-  private unarchiveClient(client: InstructorClient): void {
+  private inviteAgain(client: InstructorClient): void {
     this._clientService
-      .unarchiveClient(client.clientId)
+      .sendInvitation({ userId: client.clientId })
       .pipe(take(1))
       .subscribe({
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: this._translateService.instant('clients.toast.unarchived.summary'),
-            detail: this._translateService.instant('clients.toast.unarchived.detail'),
+            summary: this._translateService.instant('clients.toast.invitedAgain.summary'),
+            detail: this._translateService.instant('clients.toast.invitedAgain.detail'),
           });
           this.loadClients();
         },
-        error: (err) =>
-          showApiError(
-            this._messageService,
-            this._translateService.instant('toast.summary.error'),
-            this._translateService.instant('clients.toast.unarchiveFailed.detail'),
-            err,
-          ),
+        error: (err: unknown) => showInviteAgainError(this._messageService, this._translateService, err),
       });
   }
 

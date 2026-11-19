@@ -47,6 +47,19 @@ export class PlanStore {
 
   readonly showError = computed(() => this._error() && !this._assignment());
 
+  /** The coach's note on this plan, when a coach gave it and wrote one. */
+  readonly coachNote = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment || !this.coachName()) {
+      return null;
+    }
+    const note = assignment.notes?.trim();
+    if (!note) {
+      return null;
+    }
+    return note;
+  });
+
   readonly coachName = computed(() => {
     const assignment = this._assignment();
     // Your own scheduled routine has no coach to name, whatever the row's

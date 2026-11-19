@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
     LEAVE_INSTRUCTOR: (instructorId: string) => `/clients/my-instructors/${instructorId}`,
     PENDING_REQUESTS: '/clients/requests/pending',
     PENDING_REQUESTS_COUNT: '/clients/requests/pending/count',
+    SENT_REQUESTS: '/clients/requests/sent',
     FILTER_REQUESTS: '/clients/requests/filter',
     INVITE: '/clients/invite',
     IMPORT: '/clients/import',

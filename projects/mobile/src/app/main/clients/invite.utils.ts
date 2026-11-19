@@ -102,9 +102,37 @@ export function inviteRowState(
  * so an already-invited person can come back in a later result set.
  */
 export function isDuplicateInvite(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    (error as { status?: unknown }).status === 409
-  );
+  return inviteConflict(error) !== null;
+}
+
+export const InviteConflicts = {
+  /** An invitation or a request between the two is already waiting. */
+  Pending: 'pending',
+  /** They are already this coach's client. */
+  Client: 'client',
+} as const;
+
+export type InviteConflict = (typeof InviteConflicts)[keyof typeof InviteConflicts];
+
+/**
+ * Which 409 an invitation got, read from the API's message key: "already
+ * invited" and "already your client" are different things to tell a coach.
+ * Null for anything that is not a 409.
+ */
+export function inviteConflict(error: unknown): InviteConflict | null {
+  if (typeof error !== 'object' || error === null) {
+    return null;
+  }
+  if ((error as { status?: unknown }).status !== 409) {
+    return null;
+  }
+  const body = (error as { error?: unknown }).error;
+  let key: unknown = null;
+  if (typeof body === 'object' && body !== null) {
+    key = (body as { messageKey?: unknown }).messageKey;
+  }
+  if (key === 'client.alreadyYourClient') {
+    return InviteConflicts.Client;
+  }
+  return InviteConflicts.Pending;
 }

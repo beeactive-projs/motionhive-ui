@@ -25,8 +25,11 @@ import { NewMessagePicker } from '../../components/new-message-picker/new-messag
  *
  * `?to=<userId>` opens a direct thread with that person — the entry
  * point used by "Message" buttons elsewhere in the app (client roster,
- * client profile, public profile). Those links already existed and
- * silently did nothing, because nothing ever read the parameter.
+ * client profile, public profile). With no thread yet the picker opens
+ * addressed to them (`name` says who); it used to open empty.
+ *
+ * `?conversationId=<id>` is what the bell and the message emails send
+ * (`data.queryParams.conversationId`): it opens that thread.
  */
 @Component({
   selector: 'mh-inbox-page',
@@ -41,9 +44,20 @@ export class InboxPage {
 
   /** Set from `?to=`; cleared once resolved so it fires exactly once. */
   private readonly _pendingDirectUserId = signal<string | null>(null);
+  /** The name that came with `?to=`, for the picker's heading. */
+  private readonly _pendingName: string | null;
 
   constructor() {
-    const to = this._route.snapshot.queryParamMap.get('to');
+    const query = this._route.snapshot.queryParamMap;
+    this._pendingName = query.get('name');
+
+    const conversationId = query.get('conversationId');
+    if (conversationId) {
+      void this._router.navigate(['/messages', conversationId], { replaceUrl: true });
+      return;
+    }
+
+    const to = query.get('to');
     if (to) {
       this._pendingDirectUserId.set(to);
       this.store.loadConversations();
@@ -68,8 +82,15 @@ export class InboxPage {
         return;
       }
 
-      // No thread yet — open the picker so the first message starts one.
-      this.store.enterComposeMode();
+      // No thread among those loaded: the picker, addressed to them. The
+      // first send starts a thread or finds the one past the loaded page.
+      this.store.enterComposeMode({
+        id: userId,
+        firstName: this._pendingName,
+        lastName: null,
+        avatarUrl: null,
+        handle: null,
+      });
     });
   }
 

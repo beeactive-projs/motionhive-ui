@@ -62,6 +62,8 @@ import {
   recentFromClient,
 } from './clients.config';
 import { CLIENT_INVITE_PATH } from './client-paths';
+import { InviteConflicts, inviteConflict } from './invite.utils';
+import { requestIsGone } from './requests.utils';
 import {
   CLIENT_FILTERS,
   ClientFilterId,
@@ -191,6 +193,8 @@ export class Clients implements ViewWillEnter {
    * back to the tab allows another.
    */
   private readonly _resent = signal<ReadonlySet<string>>(new Set());
+  /** The request an accept or decline is in flight for, so a second tap waits. */
+  private readonly _answering = signal<string | null>(null);
 
   readonly requestResent = computed(() => {
     const client = this.requestClient();
@@ -432,18 +436,25 @@ export class Clients implements ViewWillEnter {
     });
   }
 
-  /** Restoring is its own undo, so no sheet — one swipe, done. */
-  unarchive(client: InstructorClient): void {
-    this.store.unarchive(client).subscribe({
+  /** An invitation they answer, so no sheet: one swipe sends it. */
+  inviteAgain(client: InstructorClient): void {
+    this.store.inviteAgain(client).subscribe({
       next: () =>
         void this._feedbackService.success(
-          this._translateService.instant('clients.toast.unarchived'),
+          this._translateService.instant('clients.toast.invitedAgain'),
         ),
-      error: (error: unknown) =>
+      error: (error: unknown) => {
+        if (inviteConflict(error) === InviteConflicts.Pending) {
+          void this._feedbackService.success(
+            this._translateService.instant('clients.toast.alreadyInvited'),
+          );
+          return;
+        }
         void this._feedbackService.error(
           error,
-          this._translateService.instant('clients.toast.unarchiveFailed'),
-        ),
+          this._translateService.instant('clients.toast.sendFailed'),
+        );
+      },
     });
   }
 
@@ -475,31 +486,51 @@ export class Clients implements ViewWillEnter {
   }
 
   accept(client: InstructorClient): void {
+    if (this._answering() === client.id) {
+      return;
+    }
+    this._answering.set(client.id);
     this.store.accept(client).subscribe({
-      next: () =>
+      next: () => {
+        this._answering.set(null);
         void this._feedbackService.success(
           this._translateService.instant('clients.toast.requestAccepted'),
-        ),
-      error: (error: unknown) =>
-        void this._feedbackService.error(
-          error,
-          this._translateService.instant('clients.toast.requestFailed'),
-        ),
+        );
+      },
+      error: (error: unknown) => this._requestFailed(error),
     });
   }
 
   decline(client: InstructorClient): void {
+    if (this._answering() === client.id) {
+      return;
+    }
+    this._answering.set(client.id);
     this.store.decline(client).subscribe({
-      next: () =>
+      next: () => {
+        this._answering.set(null);
         void this._feedbackService.success(
           this._translateService.instant('clients.toast.requestDeclined'),
-        ),
-      error: (error: unknown) =>
-        void this._feedbackService.error(
-          error,
-          this._translateService.instant('clients.toast.requestFailed'),
-        ),
+        );
+      },
+      error: (error: unknown) => this._requestFailed(error),
     });
+  }
+
+  /**
+   * Said, and when the request is no longer waiting the list reloads, so
+   * the stale row goes instead of failing on every tap.
+   */
+  private _requestFailed(error: unknown): void {
+    this._answering.set(null);
+    if (requestIsGone(error)) {
+      this.store.loadList({ force: true });
+      this.store.loadPendingCount(true);
+    }
+    void this._feedbackService.error(
+      error,
+      this._translateService.instant('clients.toast.requestFailed'),
+    );
   }
 
   resend(client: InstructorClient): void {
@@ -539,6 +570,10 @@ export class Clients implements ViewWillEnter {
       },
       error: (error: unknown) => {
         this.withdrawSaving.set(false);
+        if (requestIsGone(error)) {
+          this.withdrawOpen.set(false);
+          this.store.loadList({ force: true });
+        }
         void this._feedbackService.error(
           error,
           this._translateService.instant('clients.toast.withdrawFailed'),

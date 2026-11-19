@@ -147,10 +147,23 @@ describe('deep links', () => {
     expect(routeFor({ screen: 'profile', queryParams: { tab: 'memberships' } })).toEqual([
       '/tabs/more/billing',
     ]);
-    expect(routeFor({ screen: 'profile', queryParams: { tab: 'coaches' } })).toBeNull();
-    expect(webOnlyLabel({ screen: 'profile', queryParams: { tab: 'coaches' } })).toBe('Coaches');
     // No tab means we cannot say what it is about, so we say nothing.
     expect(webOnlyLabel({ screen: 'profile' })).toBeNull();
+  });
+
+  it("opens a trainee's coaching alerts on their own coaches", () => {
+    const invited = { screen: 'profile', queryParams: { tab: 'coaches' } };
+    expect(routeFor(invited)).toEqual(['/tabs/coaches']);
+    expect(queryParamsFor(invited)).toEqual({ filter: 'yours' });
+    expect(webOnlyLabel(invited)).toBeNull();
+  });
+
+  it('opens the client a finished workout or plan names, else the list', () => {
+    expect(routeFor({ screen: 'coaching/clients', entityId: 'client-1' })).toEqual([
+      '/tabs/clients',
+      'client-1',
+    ]);
+    expect(routeFor({ screen: 'coaching/clients' })).toEqual(['/tabs/clients']);
   });
 
   it('says nothing about a screen it has never heard of', () => {

@@ -25,8 +25,8 @@ import {
   IonTextarea,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
-import { catchError, take } from 'rxjs/operators';
+import { EMPTY, Observable, of } from 'rxjs';
+import { catchError, expand, map, reduce, take } from 'rxjs/operators';
 
 import {
   ClientService,
@@ -82,6 +82,12 @@ const PROGRAM_LIMIT = 100;
 
 /** Below this a list reads at a glance and a search field is only clutter. */
 const SEARCH_FROM = 8;
+
+/** The API's page ceiling; the sheet reads page after page until it has them all. */
+const CLIENT_PAGE_SIZE = 100;
+
+/** A guard on the page loop, far past any real roster (1,000 clients). */
+const MAX_CLIENT_PAGES = 10;
 
 /**
  * Assign a program to a client.
@@ -205,9 +211,22 @@ export class AssignSheet {
   });
 
   readonly clients = signal<InstructorClient[]>([]);
+  readonly clientQuery = signal('');
+  readonly showClientSearch = computed(() => this.clients().length >= SEARCH_FROM);
+  /** The active clients, narrowed by the name typed. */
+  readonly visibleClients = computed(() => {
+    const query = this.clientQuery().trim().toLocaleLowerCase(appLocale());
+    const rows = this.clients();
+    if (!query) {
+      return rows;
+    }
+    return rows.filter((row) => this.name(row).toLocaleLowerCase(appLocale()).includes(query));
+  });
   readonly loading = signal(false);
   readonly clientId = signal<string | null>(null);
   readonly startDate = signal(todayIso());
+  /** Today, the earliest start the picker offers. */
+  readonly minStartDate = todayIso();
   readonly notes = signal('');
 
   readonly canAssign = computed(
@@ -404,20 +423,52 @@ export class AssignSheet {
     return row.status === ProgramStatus.Draft;
   }
 
+  /**
+   * Every active client, page after page: one default page used to stop at
+   * the 20 newest rows of any status, so a coach could not find an older
+   * client here at all.
+   */
   private _loadClients(): void {
-    if (this.clients().length || this.loading()) return;
+    if (this.clients().length || this.loading()) {
+      return;
+    }
     this.loading.set(true);
-    this._clientService
-      .getClients()
-      .pipe(take(1), catchError(() => of(null)))
-      .subscribe((page) => {
+    this._activeClientsFrom(1)
+      .pipe(
+        expand((result) => {
+          if (result.done || result.page >= MAX_CLIENT_PAGES) {
+            return EMPTY;
+          }
+          return this._activeClientsFrom(result.page + 1);
+        }),
+        reduce((all: InstructorClient[], result) => all.concat(result.rows), []),
+        catchError(() => of<InstructorClient[]>([])),
+      )
+      .subscribe((rows) => {
         this.loading.set(false);
-        const rows = Array.isArray(page) ? page : (page?.items ?? []);
-        // Only an active relationship can be given work.
-        this.clients.set(
-          rows.filter((row: InstructorClient) => row.status === InstructorClientStatuses.Active),
-        );
+        // Only an active relationship can be given work; the status filter
+        // already asks for that, and this keeps an old API honest.
+        this.clients.set(rows.filter((row) => row.status === InstructorClientStatuses.Active));
       });
+  }
+
+  private _activeClientsFrom(
+    page: number,
+  ): Observable<{ rows: InstructorClient[]; page: number; done: boolean }> {
+    return this._clientService
+      .getClients(
+        { status: InstructorClientStatuses.Active, page, limit: CLIENT_PAGE_SIZE },
+        { silent: true },
+      )
+      .pipe(
+        take(1),
+        map((response) => {
+          const rows = response.items ?? [];
+          const total = response.total ?? rows.length;
+          const done = rows.length === 0 || page * CLIENT_PAGE_SIZE >= total;
+          return { rows, page, done };
+        }),
+      );
   }
 
   name(row: InstructorClient): string {
@@ -460,6 +511,7 @@ export class AssignSheet {
     this.programQuery.set('');
     this.programOrigin.set(ProgramOrigins.Mine);
     this.startDate.set(todayIso());
+    this.clientQuery.set('');
     this.notes.set('');
   }
 }

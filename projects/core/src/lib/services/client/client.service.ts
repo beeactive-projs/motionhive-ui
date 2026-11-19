@@ -101,6 +101,17 @@ export class ClientService {
   }
 
   /**
+   * The requests the signed-in person sent to coaches, still waiting on an
+   * answer. `getPendingRequests` lists only the ones sent to them.
+   */
+  getSentRequests(opts?: { silent?: boolean }): Observable<ClientRequest[]> {
+    return this._http.get<ClientRequest[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.SENT_REQUESTS}`,
+      opts?.silent ? { context: silentRequest() } : {},
+    );
+  }
+
+  /**
    * Feeds a dot and a badge, never layout. Silent because nobody asked for
    * it: it rides along with every entry into the coach's tabs, and a failed
    * count is not worth a modal over whatever the screen did manage to load.
@@ -206,9 +217,5 @@ export class ClientService {
 
   archiveClient(clientId: string): Observable<InstructorClient> {
     return this._http.delete<InstructorClient>(`${this.baseUrl}/${clientId}`);
-  }
-
-  unarchiveClient(clientId: string): Observable<InstructorClient> {
-    return this._http.patch<InstructorClient>(`${this.baseUrl}/${clientId}`, { status: 'ACTIVE' });
   }
 }

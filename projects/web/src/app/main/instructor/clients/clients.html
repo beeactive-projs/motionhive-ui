@@ -166,12 +166,12 @@
                 rounded
                 severity="success"
                 tooltipPosition="left"
-                [pTooltip]="'button.unarchive' | translate"
-                (click)="confirmUnarchive(client)"
-                [attr.aria-label]="'button.unarchive' | translate"
+                [pTooltip]="'clients.profile.actions.inviteAgain' | translate"
+                (click)="confirmInviteAgain(client)"
+                [attr.aria-label]="'clients.profile.actions.inviteAgain' | translate"
                 iconOnly
               >
-                <i class="pi pi-inbox"></i>
+                <i class="pi pi-user-plus"></i>
               </button>
               }
             </div>
@@ -304,9 +304,9 @@
                 {{ 'button.archive' | translate }}
               </button>
               } @else if (client.status === Statuses.Archived) {
-              <button pButton type="button" rounded size="small" severity="success" (click)="confirmUnarchive(client)">
-                <i class="pi pi-inbox"></i>
-                {{ 'button.unarchive' | translate }}
+              <button pButton type="button" rounded size="small" severity="success" (click)="confirmInviteAgain(client)">
+                <i class="pi pi-user-plus"></i>
+                {{ 'clients.profile.actions.inviteAgain' | translate }}
               </button>
               }
             </div>

@@ -53,3 +53,33 @@ describe('PlanStore, the week the trainee is in', () => {
     expect(plan.currentWeek()).toBe(2);
   });
 });
+
+describe("PlanStore, the coach's note", () => {
+  function withAssignment(fields: Record<string, unknown>): PlanStore {
+    const assignment = { id: 'pa-1', workouts: [], ...fields } as unknown as ProgramAssignment;
+    TestBed.configureTestingModule({
+      providers: [
+        PlanStore,
+        { provide: ProgramAssignmentService, useValue: { get: () => of(assignment) } },
+        { provide: TranslateService, useValue: { instant: (key: string) => key } },
+      ],
+    });
+    const plan = TestBed.inject(PlanStore);
+    plan.load('pa-1');
+    return plan;
+  }
+
+  it('shows what the coach wrote when they gave the plan', () => {
+    const plan = withAssignment({
+      notes: '  Easy first week.  ',
+      instructor: { id: 'coach-1', firstName: 'Alex', lastName: 'Rivera' },
+    });
+    expect(plan.coachNote()).toBe('Easy first week.');
+  });
+
+  it('shows nothing for an empty note, or a plan with no coach', () => {
+    expect(withAssignment({ notes: '   ', instructor: { id: 'c', firstName: 'A' } }).coachNote()).toBeNull();
+    TestBed.resetTestingModule();
+    expect(withAssignment({ notes: 'Mine', instructor: null }).coachNote()).toBeNull();
+  });
+});
