@@ -133,6 +133,8 @@ export interface ListAssignmentsQuery {
   status?: ProgramAssignmentStatus;
   /** Instructor-side only — narrows to one client. */
   clientId?: string;
+  /** Instructor-side only: the assignments made from one program. */
+  programId?: string;
   /** Case-insensitive match on the assigned program name. */
   search?: string;
 }

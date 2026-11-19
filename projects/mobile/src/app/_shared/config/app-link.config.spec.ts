@@ -43,8 +43,15 @@ describe('resolveAppLink', () => {
     });
   });
 
+  it("opens a trainee's coaching email on their own coaches", () => {
+    expect(at('/profile?tab=coaches')).toEqual({
+      commands: ['/tabs/coaches'],
+      queryParams: { filter: 'yours' },
+    });
+  });
+
   it('returns null for a page the app does not have', () => {
-    expect(at('/profile?tab=coaches')).toBeNull();
+    expect(at('/profile?tab=settings')).toBeNull();
     expect(at('/')).toBeNull();
   });
 

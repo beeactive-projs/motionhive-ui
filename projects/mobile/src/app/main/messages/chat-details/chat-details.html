@@ -21,6 +21,9 @@
           [name]="name()"
           [imageUrl]="avatarUrl()"
           [color]="tone()"
+          [mhViewPhoto]="avatarUrl()"
+          [mhViewPhotoAlt]="'photoViewer.alt.profile' | translate"
+          [mhViewPhotoLabel]="'photoViewer.open.profile' | translate"
         />
         <h1>{{ name() }}</h1>
         @if (handle(); as tag) {

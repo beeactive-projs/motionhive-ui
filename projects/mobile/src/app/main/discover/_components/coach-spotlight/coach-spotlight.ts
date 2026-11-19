@@ -10,10 +10,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
-import { addIcons } from 'ionicons';
-import { pauseOutline, playOutline } from 'ionicons/icons';
 
 import { InstructorSearchResult } from 'core';
 
@@ -34,19 +31,40 @@ const SWIPE_PX = 40;
 const ON_SCREEN_RATIO = 0.5;
 
 /**
+ * After the reader touches the spotlight (a tap, a swipe, a dot), the turns
+ * wait this long before they go on: one more turn's time to read the coach
+ * they chose.
+ */
+export const RESUME_AFTER_MS = SPOTLIGHT_INTERVAL_MS;
+
+/** Focus a keyboard or a screen reader moved, as opposed to a tap's. */
+function isVisibleFocus(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) {
+    return true;
+  }
+  try {
+    return target.matches(':focus-visible');
+  } catch {
+    // A browser without the selector: hold, the careful answer.
+    return true;
+  }
+}
+
+/**
  * Discover's spotlight: a few coaches taking turns in one card
  * (the directory's `spotlight` order picks who and in what order).
  *
- * Built to the usual rules for content that moves by itself (WCAG 2.2.2,
- * the ARIA carousel pattern, NN/g on auto-forwarding): a turn lasts long
- * enough to read the card (`SPOTLIGHT_INTERVAL_MS`), the coming change is
- * shown on the lit dot as it fills, and a visible Pause stops it. A finger
- * on the card holds the turn; a tap, a swipe, a dot or focus (a keyboard,
- * VoiceOver) stops the turns for good, since the reader is now doing the
- * choosing. Turns wait while the page is behind another, the app is in the
- * background or the card is scrolled away, and never start under Reduce
- * Motion (Play still starts them). A tap that lands just as the next coach
- * comes in opens nobody.
+ * The turns start by themselves and have no Play or Pause button (owner,
+ * 2026-11-18). A turn lasts long enough to read the card
+ * (`SPOTLIGHT_INTERVAL_MS`) and the coming change is shown on the lit dot
+ * as it fills. A finger on the card holds the turn; a tap, a swipe or a dot
+ * picks a coach and the turns wait `RESUME_AFTER_MS` before going on, and
+ * focus inside (a keyboard, VoiceOver) holds them until it leaves. Turns
+ * also wait while the page is behind another, the app is in the background
+ * or the card is scrolled away. Under Reduce Motion they never start: the
+ * reader moves the coaches with the dots or a swipe, which is the way to
+ * keep them still. A tap that lands just as the next coach comes in opens
+ * nobody.
  *
  * Every card sits in the same grid cell, so the spotlight keeps the height
  * of its tallest card and nothing under it moves when the coach changes;
@@ -54,12 +72,13 @@ const ON_SCREEN_RATIO = 0.5;
  */
 @Component({
   selector: 'mh-coach-spotlight',
-  imports: [FeaturedCoach, IonButton, IonIcon, TranslatePipe],
+  imports: [FeaturedCoach, TranslatePipe],
   templateUrl: './coach-spotlight.html',
   styleUrl: './coach-spotlight.scss',
   host: {
     '[style.--mh-spotlight-turn]': 'turnDuration',
-    '(focusin)': 'stop()',
+    '(focusin)': 'onFocusIn($event)',
+    '(focusout)': 'onFocusOut($event)',
   },
 })
 export class CoachSpotlight {
@@ -80,34 +99,27 @@ export class CoachSpotlight {
     computation: () => 0,
   });
 
-  /** Stopped by the reader for this visit (or by Reduce Motion until they press Play). */
-  private readonly _stopped = signal(prefersReducedMotion());
+  /** Reduce Motion: the turns never start; the reader moves the coaches. */
+  private readonly _still = signal(prefersReducedMotion());
+  /** The reader just picked a coach: the turns wait a turn's time. */
+  private readonly _resting = signal(false);
+  /** Focus is inside (a keyboard, VoiceOver): the turns wait until it leaves. */
+  private readonly _focused = signal(false);
   /** A finger is resting on the card. */
   private readonly _held = signal(false);
   private readonly _onScreen = signal(true);
   private readonly _appVisible = signal(document.visibilityState !== 'hidden');
+  private _restTimer: ReturnType<typeof setTimeout> | null = null;
 
-  /** The turns are on: what Pause and Play say. */
-  readonly rotating = computed(() => this.coaches().length > 1 && !this._stopped());
+  /** The turns are on: nobody is choosing and the reader allows motion. */
+  readonly rotating = computed(
+    () => this.coaches().length > 1 && !this._still() && !this._resting() && !this._focused(),
+  );
 
   /** The turns are on and moving now. */
   readonly playing = computed(
     () => this.rotating() && this.active() && this._onScreen() && this._appVisible() && !this._held(),
   );
-
-  readonly toggleLabel = computed(() => {
-    if (this.rotating()) {
-      return 'discover.spotlight.pause';
-    }
-    return 'discover.spotlight.play';
-  });
-
-  readonly toggleIcon = computed(() => {
-    if (this.rotating()) {
-      return 'pause-outline';
-    }
-    return 'play-outline';
-  });
 
   /**
    * Screen readers hear nothing while the turns run (a card read out every
@@ -126,8 +138,6 @@ export class CoachSpotlight {
   private _pointer: { x: number; y: number } | null = null;
 
   constructor() {
-    addIcons({ pauseOutline, playOutline });
-
     // One turn at a time: the timer starts over whenever the turns pause,
     // as the lit dot's fill does.
     effect((onCleanup) => {
@@ -140,6 +150,7 @@ export class CoachSpotlight {
     });
 
     const destroyRef = inject(DestroyRef);
+    destroyRef.onDestroy(() => this._clearRest());
 
     const onVisibility = () => this._appVisible.set(document.visibilityState !== 'hidden');
     document.addEventListener('visibilitychange', onVisibility);
@@ -167,24 +178,41 @@ export class CoachSpotlight {
     return coachName(coach);
   }
 
-  /** A dot: that coach, and the reader chooses from here on. */
+  /** A dot: that coach, and the turns wait a turn's time before going on. */
   show(position: number): void {
-    this.stop();
+    this.rest();
     this.index.set(position);
   }
 
-  /** Pause or Play. */
-  toggle(): void {
-    if (this.rotating()) {
-      this.stop();
-      return;
-    }
-    this._stopped.set(false);
-    this._turn();
+  /** The reader chose: the turns wait `RESUME_AFTER_MS`, counted from the last choice. */
+  rest(): void {
+    this._clearRest();
+    this._resting.set(true);
+    this._restTimer = setTimeout(() => {
+      this._restTimer = null;
+      this._resting.set(false);
+    }, RESUME_AFTER_MS);
   }
 
-  stop(): void {
-    this._stopped.set(true);
+  /**
+   * Keyboard or VoiceOver focus holds the turns. A tap focuses a button on
+   * Android and the desktop too; that is a touch, which only rests them.
+   */
+  onFocusIn(event?: FocusEvent): void {
+    if (event && !isVisibleFocus(event.target)) {
+      return;
+    }
+    this._focused.set(true);
+  }
+
+  /** Focus moved out of the spotlight: the turns go on after a rest. */
+  onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget;
+    if (next instanceof Node && this._host.nativeElement.contains(next)) {
+      return;
+    }
+    this._focused.set(false);
+    this.rest();
   }
 
   onPointerDown(event: PointerEvent): void {
@@ -201,7 +229,7 @@ export class CoachSpotlight {
     if (!start) {
       return;
     }
-    this.stop();
+    this.rest();
     const dx = event.clientX - start.x;
     const dy = event.clientY - start.y;
     if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) {
@@ -232,6 +260,13 @@ export class CoachSpotlight {
       return;
     }
     this.message.emit(coach);
+  }
+
+  private _clearRest(): void {
+    if (this._restTimer) {
+      clearTimeout(this._restTimer);
+      this._restTimer = null;
+    }
   }
 
   private _consumeLateTap(): boolean {

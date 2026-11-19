@@ -82,4 +82,10 @@ describe('progress exercises', () => {
     expect(latestSetRecord(bench, on('2026-10-21T16:20:00Z'))).toBe(false);
     expect(latestSetRecord(bench, [])).toBe(false);
   });
+
+  it('gives a first time on the lift no record badge', () => {
+    const bench = { exerciseId: 'bench', lastPerformedAt: '2026-10-28T16:20:00Z' } as TrainedExercise;
+    const first = [{ exerciseId: 'bench', recordedAt: '2026-10-28T16:25:00Z', first: true }] as ProgressRecord[];
+    expect(latestSetRecord(bench, first)).toBe(false);
+  });
 });

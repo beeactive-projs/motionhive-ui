@@ -12,7 +12,11 @@ import {
   ProgramService,
 } from 'core';
 
-/** The instructor endpoint spans every program; one page covers a coach's roster. */
+/**
+ * The API's page ceiling. Asked for one program's assignments, a page holds
+ * every client on it; it used to be the 100 newest across all programs,
+ * filtered here, so an older program's clients fell off.
+ */
 const PAGE_SIZE = 100;
 
 /**
@@ -69,7 +73,7 @@ export class AssignmentsStore {
     this._error.set(false);
 
     forkJoin({
-      page: this._programAssignmentService.listForInstructor({ limit: PAGE_SIZE }),
+      page: this._programAssignmentService.listForInstructor({ programId, limit: PAGE_SIZE }),
       program: this._programService.get(programId).pipe(catchError(() => of(null))),
     })
       .pipe(take(1))
@@ -79,8 +83,8 @@ export class AssignmentsStore {
             done?.();
             return;
           }
-          // The endpoint spans every program this coach runs; this screen is
-          // about one of them.
+          // The API narrows to this program; the filter stays for an API
+          // that predates `programId` and would send every program.
           this._rows.set(page.items.filter((row) => row.masterProgramId === programId));
           if (program) this._program.set(program);
           this._loaded.set(true);

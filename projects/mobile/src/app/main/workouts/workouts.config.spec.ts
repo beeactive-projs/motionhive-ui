@@ -444,14 +444,28 @@ describe('workouts config', () => {
       exercise: { id: 'e', name: 'Bench press', slug: 'bench', kind: 'STRENGTH', thumbnailUrl: null },
       oneRepMaxSeries: [
         { weightKg: 84, recordedAt: new Date(2026, 8, 10, 21).toISOString(), source: OneRepMaxSource.EstimatedEpley },
+        { weightKg: 80, recordedAt: new Date(2026, 8, 1, 18).toISOString(), source: OneRepMaxSource.EstimatedEpley },
         { weightKg: 90, recordedAt: new Date(2026, 8, 5, 9).toISOString(), source: OneRepMaxSource.Tested },
       ],
       sessions: [
         { workoutLogId: 'a', performedAt: new Date(2026, 8, 10, 7).toISOString() },
         { workoutLogId: 'b', performedAt: new Date(2026, 8, 5, 9).toISOString() },
+        { workoutLogId: 'c', performedAt: new Date(2026, 8, 1, 18).toISOString() },
       ],
     } as never;
+    // 'c' was the first time on the lift: a best, not a record beaten.
     expect([...recordSessionIds(progress)]).toEqual(['a']);
+  });
+
+  it('marks no record for the first time on a lift', () => {
+    const progress = {
+      exercise: { id: 'e', name: 'Bench press', slug: 'bench', kind: 'STRENGTH', thumbnailUrl: null },
+      oneRepMaxSeries: [
+        { weightKg: 84, recordedAt: new Date(2026, 8, 10, 21).toISOString(), source: OneRepMaxSource.EstimatedEpley },
+      ],
+      sessions: [{ workoutLogId: 'a', performedAt: new Date(2026, 8, 10, 7).toISOString() }],
+    } as never;
+    expect([...recordSessionIds(progress)]).toEqual([]);
   });
 
   it('reads a session as its sets and the top set, or its best for a hold', () => {
@@ -774,6 +788,23 @@ describe('workouts config', () => {
     expect(workoutTiles(hold)).toEqual([
       { label: 'Sets', value: '1' },
       { label: 'Time', value: '1 min' },
+    ]);
+  });
+
+  // One kg rule with the API: a bodyweight move is reps, a skipped exercise nothing.
+  it('keeps bodyweight moves and skipped exercises out of the kg total', () => {
+    const mixed = log({
+      exercises: [
+        { isSkipped: false, exercise: { kind: 'STRENGTH' }, sets: [set({ weightKg: 100, reps: 5 })] },
+        { isSkipped: false, exercise: { kind: 'BODYWEIGHT' }, sets: [set({ weightKg: 20, reps: 8 })] },
+        { isSkipped: true, exercise: { kind: 'STRENGTH' }, sets: [set({ weightKg: 60, reps: 10 })] },
+      ],
+    });
+    expect(workoutVolume(mixed)).toBe(500);
+    expect(workoutTiles(mixed)).toEqual([
+      { label: 'Sets', value: '2' },
+      { label: 'Volume', value: '500 kg' },
+      { label: 'Reps', value: '8' },
     ]);
   });
 

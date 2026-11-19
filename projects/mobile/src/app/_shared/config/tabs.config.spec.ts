@@ -134,6 +134,13 @@ describe('tab set configuration', () => {
     expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.Workouts)).toBe(true);
   });
 
+  it("puts each mode's daily surface in the centre of the bar, Discover beside Home", () => {
+    // With the Menu as the fifth button, the third is the centre.
+    const ids = (set: typeof COACH_TAB_SET) => set.tabs.map((tab) => tab.id);
+    expect(ids(COACH_TAB_SET)).toEqual([TabIds.Home, TabIds.Discover, TabIds.Clients, TabIds.Messages]);
+    expect(ids(TRAIN_TAB_SET)).toEqual([TabIds.Home, TabIds.Discover, TabIds.Workouts, TabIds.Messages]);
+  });
+
   it('puts discover in the tab bar of both modes, and not again in the menu', () => {
     for (const set of Object.values(TAB_SETS)) {
       expect(set.tabs.some((tab) => tab.id === TabIds.Discover)).toBe(true);

@@ -86,3 +86,23 @@ export function supersetTags(rows: readonly Linkable[]): (string | null)[] {
     return `${letters.get(group)}${n}`;
   });
 }
+
+/**
+ * The rows whose superset group a change moved, as the one save takes them
+ * (`setSupersets`): `before` and `after` are the same rows in the same
+ * order, before and after `linkWithNext` / `unlinkFromNext`.
+ */
+export function supersetChanges<T extends Linkable & { id: string }>(
+  before: readonly T[],
+  after: readonly T[],
+): { id: string; supersetGroupId: number | null }[] {
+  const changes: { id: string; supersetGroupId: number | null }[] = [];
+  after.forEach((row, index) => {
+    const was = before[index]?.supersetGroupId ?? null;
+    const now = row.supersetGroupId ?? null;
+    if (was !== now) {
+      changes.push({ id: row.id, supersetGroupId: now });
+    }
+  });
+  return changes;
+}

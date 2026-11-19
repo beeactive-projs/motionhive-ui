@@ -49,6 +49,9 @@ export class ProgramAssignmentService {
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.status) p = p.set('status', query.status);
     if (query.clientId) p = p.set('clientId', query.clientId);
+    if (query.programId) {
+      p = p.set('programId', query.programId);
+    }
     if (query.search?.trim()) p = p.set('search', query.search.trim());
     return this._http.get<PaginatedAssignments>(this._base, {
       params: p,

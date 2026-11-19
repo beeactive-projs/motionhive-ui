@@ -1,0 +1,64 @@
+/* Black on every theme, as a post's photos (`PhotoView`): a photo is seen
+   against a neutral surround, and a light page would tint it. Fixed values,
+   not theme tokens, for that reason. */
+.bar {
+  --background: #000;
+  --color: #fff;
+  --border-color: transparent;
+}
+
+/* The theme gives toolbar buttons the page's ink, navy in light: on black
+   the close X needs white. */
+.bar ion-button {
+  --color: #fff;
+}
+
+.stage {
+  --background: #000;
+}
+
+.centre {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 1rem;
+}
+
+/* The whole photo, never cropped: the screen showed it small or in a hexagon. */
+.centre img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100dvh - 8rem);
+  object-fit: contain;
+}
+
+.nav {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding-inline: 0.75rem;
+  /* Only the buttons take a tap; the row only spans the width. */
+  pointer-events: none;
+}
+
+.nav ion-button {
+  pointer-events: auto;
+}
+
+.arrow {
+  --color: #fff;
+  /* A control floating over a photo needs its own backdrop, which no theme
+     surface can give. */
+  --background: rgba(255, 255, 255, 0.14);
+  --background-hover: rgba(255, 255, 255, 0.22);
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+}
+
+.arrow.button-disabled {
+  opacity: 0.35;
+}

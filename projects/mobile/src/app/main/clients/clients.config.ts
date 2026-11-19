@@ -91,7 +91,7 @@ export const ClientActionIds = {
   Message: 'message',
   ViewProfile: 'viewProfile',
   EditNotes: 'editNotes',
-  Unarchive: 'unarchive',
+  InviteAgain: 'inviteAgain',
   Archive: 'archive',
 } as const;
 
@@ -102,9 +102,11 @@ export type ClientAction = SheetAction<ClientActionId>;
 /**
  * The verbs on a client — the ⋮ on the detail screen. Message is the primary
  * one and takes honey; the profile is a person (violet), notes are a document
- * (info), unarchiving is green, and archiving is violet and last. Archiving
- * is not red: the client keeps their account and history, and Unarchive
- * undoes it. None of these encode a state.
+ * (info), inviting a former client again is green, and archiving is violet
+ * and last. Archiving is not red: the client keeps their account and
+ * history. It ends the coaching, though, so only the client can restart
+ * it: a former client gets an invitation, never a quiet unarchive. None of
+ * these encode a state.
  */
 export const CLIENT_ACTIONS: readonly ClientAction[] = [
   {
@@ -127,9 +129,9 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
     tone: 'shade',
   },
   {
-    id: ClientActionIds.Unarchive,
-    label: 'clients.actions.unarchiveClient',
-    icon: 'arrow-undo-outline',
+    id: ClientActionIds.InviteAgain,
+    label: 'clients.actions.inviteAgain',
+    icon: 'person-add-outline',
     color: 'success',
   },
   {
@@ -143,8 +145,8 @@ export const CLIENT_ACTIONS: readonly ClientAction[] = [
 /**
  * Only the verbs that can do something for this row. Messaging and the
  * public profile need an account on the other end; notes and archiving need
- * a settled relationship;
- * archive and unarchive are each other's undo, so exactly one shows.
+ * a settled relationship; archive and invite again sit on the two sides of
+ * it, so exactly one shows.
  */
 export function visibleClientActions(client: InstructorClient): ClientAction[] {
   const active = client.status === InstructorClientStatuses.Active;
@@ -160,7 +162,7 @@ export function visibleClientActions(client: InstructorClient): ClientAction[] {
         return active || archived;
       case ClientActionIds.Archive:
         return active;
-      case ClientActionIds.Unarchive:
+      case ClientActionIds.InviteAgain:
         return archived;
       default:
         return true;

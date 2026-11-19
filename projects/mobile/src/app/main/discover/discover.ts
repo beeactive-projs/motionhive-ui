@@ -9,7 +9,6 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonList,
   IonRefresher,
   IonRefresherContent,
   IonSkeletonText,
@@ -38,13 +37,11 @@ import { AvatarButton } from '../../_shared/components/avatar-button/avatar-butt
 import { ChoiceOption, ChoiceSheet } from '../../_shared/components/choice-sheet/choice-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
-import { RowSkeleton } from '../../_shared/components/row-skeleton/row-skeleton';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { DISCOVER_HEX_SHAPE, cornerPrintPath } from '../../_shared/config/hexagon.config';
 import { ClockService } from '../../_shared/services/clock.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { coachesTopicUrl } from '../coaches/coaches.filters';
-import { CoachRow } from './_components/coach-row/coach-row';
 import { CoachSpotlight } from './_components/coach-spotlight/coach-spotlight';
 import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
 import { GroupCard } from './_components/group-card/group-card';
@@ -58,7 +55,6 @@ import {
   NO_SHEET_FILTERS,
   QUICK_FILTERS,
   QuickFilterId,
-  coachNearLine,
   coachPool,
   compileDatePreset,
   discoverCities,
@@ -73,11 +69,11 @@ import {
   sheetBeyondQuickChips,
   sheetFilterCount,
   topicCategoryIds,
-  withoutReader,
+  spotlightCoaches,
 } from './discover.config';
 import { OnboardingStateService } from '../../_shared/services/onboarding-state.service';
 import { DiscoverPrefs } from './discover-prefs';
-import { DiscoverCoachesStore, DiscoverGroupsStore, NEAR_LIMIT } from './discover.store';
+import { DiscoverCoachesStore, DiscoverGroupsStore } from './discover.store';
 
 /** Group cards, two to a row, before "All" takes over. */
 const GROUP_CARD_LIMIT = 4;
@@ -120,7 +116,6 @@ const PRINT_RADIUS = 22;
   imports: [
     AvatarButton,
     ChoiceSheet,
-    CoachRow,
     CoachSpotlight,
     DiscoverFilterSheet,
     DiscoverSessionRow,
@@ -133,14 +128,12 @@ const PRINT_RADIUS = 22;
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonList,
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
     NotificationBell,
-    RowSkeleton,
     SessionRowSkeleton,
     TranslatePipe,
   ],
@@ -451,43 +444,16 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   /**
    * The coaches who take turns in the spotlight: today's few for the city
    * and topic, picked by the server (a new order every day, the same for
-   * everyone), every city's when the city has nobody.
+   * everyone), every city's when the city has nobody. With nobody taking
+   * clients, the most relevant coaches stand in (`spotlightCoaches`).
    */
   readonly spotlight = computed(() =>
-    withoutReader(this.coachesStore.spotlight().coaches, this._readerId()),
+    spotlightCoaches(
+      this.coachesStore.spotlight().coaches,
+      this.coachesStore.near().coaches,
+      this._readerId(),
+    ),
   );
-
-  /**
-   * The coaches under it, the most relevant to the reader first (the
-   * server's `recommended`): those taking clients, then the most of their
-   * interests coached. Everyone in the spotlight stays out, so nobody
-   * shows twice.
-   */
-  readonly nearCoaches = computed(() => {
-    const inSpotlight = new Set(this.spotlight().map((coach) => coach.id));
-    return withoutReader(this.coachesStore.near().coaches, this._readerId())
-      .filter((coach) => !inSpotlight.has(coach.id))
-      .slice(0, NEAR_LIMIT);
-  });
-
-  /** The city's own coaches are "near you"; every city's (the city had nobody) are just "Coaches". */
-  private readonly _nearInCity = computed(
-    () => !!this._cityKey() && !this.coachesStore.near().everywhere,
-  );
-
-  readonly nearTitle = computed(() => {
-    if (this._nearInCity()) {
-      return 'discover.coaches.near';
-    }
-    return 'discover.coaches.title';
-  });
-
-  /** What "All" opens: every coach of the topic, in any city. */
-  readonly allCoachesCount = computed(() => this.coachesStore.allTotal());
-
-  nearLine(coach: InstructorSearchResult): string {
-    return coachNearLine(coach, !this._nearInCity());
-  }
 
   // ─── Groups ─────────────────────────────────────────────────────────────
 

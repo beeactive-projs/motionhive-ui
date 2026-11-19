@@ -1,4 +1,4 @@
-import { LoggedExercise, LoggedSet, WorkoutLog } from 'core';
+import { ExerciseSetType, LoggedExercise, LoggedSet, WorkoutLog } from 'core';
 import {
   checkmarkOutline,
   copyOutline,
@@ -6,7 +6,7 @@ import {
   logoInstagram,
 } from 'ionicons/icons';
 
-import { FEELINGS, STREAK_WORTH_SAYING, secondsToClock } from '../workouts.config';
+import { FEELINGS, STREAK_WORTH_SAYING, secondsToClock, workoutVolume } from '../workouts.config';
 
 /**
  * What a shared workout says (design "Share v3"), kept apart from where it
@@ -547,14 +547,18 @@ export function workoutStats(
     value: grouped(sets.length, locale),
     label: t('workouts.share.card.sets', { count: sets.length }),
   };
-  const volume = sets.reduce((sum, set) => sum + (set.weightKg ?? 0) * (set.reps ?? 0), 0);
+  // The finish screen's volume (warm-ups and bodyweight moves out), so the
+  // image never says more than the app did.
+  const volume = workoutVolume(log);
   if (kind === WorkoutKinds.Strength && weights && volume > 0) {
     return [
       setStat,
       { value: grouped(Math.round(volume), locale), label: t('workouts.share.card.volume') },
     ];
   }
-  const reps = sets.reduce((sum, set) => sum + (set.reps ?? 0), 0);
+  const reps = sets
+    .filter((set) => set.setType !== ExerciseSetType.Warmup)
+    .reduce((sum, set) => sum + (set.reps ?? 0), 0);
   if (reps > 0) {
     return [
       setStat,

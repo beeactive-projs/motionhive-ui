@@ -114,9 +114,6 @@ export interface CoachPick {
 
 const NO_PICK: CoachPick = { coaches: [], everywhere: false, total: 0 };
 
-/** Coaches past these come from the Coaches screen ("All"). */
-export const NEAR_LIMIT = 3;
-
 /** A topic's coaches on the search screen, the most relevant first. */
 const TOPIC_COACH_LIMIT = 30;
 
@@ -202,8 +199,8 @@ class KeyedValue<T> {
  *   everyone), every city's when the city has nobody. Promoted coaches will
  *   be a pool of their own through the same carousel.
  * - `near`: the city's coaches for the topic, the most relevant to the
- *   reader first (`recommended`), every city's when the city has nobody.
- * - `allTotal`: how many coaches the topic has anywhere: what "All" opens.
+ *   reader first (`recommended`), every city's when the city has nobody:
+ *   who stands in for the spotlight when nobody takes clients.
  * - `topicCoaches`: the search screen's coaches for a browse card.
  */
 @Injectable()
@@ -223,13 +220,11 @@ export class DiscoverCoachesStore {
 
   private readonly _spotlight = new KeyedValue<CoachPick>(NO_PICK);
   private readonly _near = new KeyedValue<CoachPick>(NO_PICK);
-  private readonly _allTotal = new KeyedValue<number>(0);
   private readonly _topic = new KeyedValue<InstructorSearchResult[]>([]);
 
   /** Each line under a coach's name reads their words, else their categories' names. */
   readonly spotlight = computed(() => this._mapPick(this._spotlight.value()));
   readonly near = computed(() => this._mapPick(this._near.value()));
-  readonly allTotal = this._allTotal.value;
   readonly topicCoaches = computed(() => {
     const byId = this._categoryStore.byId();
     return this._topic.value().map((coach) => withCategorySpecialties(coach, byId));
@@ -282,18 +277,12 @@ export class DiscoverCoachesStore {
         limit: SPOTLIGHT_LIMIT,
       }),
     );
-    // Enough to leave out the spotlight's and still fill the list.
+    // Who stands in for the spotlight when nobody takes clients.
     this._near.use(key, () =>
       this._pick(query, {
         sort: CoachDirectorySorts.Recommended,
-        limit: NEAR_LIMIT + SPOTLIGHT_LIMIT,
+        limit: SPOTLIGHT_LIMIT,
       }),
-    );
-    const anyCity = queryKey({ ...query, city: null });
-    this._allTotal.use(anyCity, () =>
-      this._profileService
-        .coachDirectory({ ...topicParams(query), limit: 1 }, { silent: true })
-        .pipe(map((page) => page.total)),
     );
   }
 
@@ -321,7 +310,6 @@ export class DiscoverCoachesStore {
   refresh(done?: () => void): void {
     this.load({ force: true });
     this._spotlight.refresh();
-    this._allTotal.refresh();
     this._near.refresh(done);
   }
 

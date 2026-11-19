@@ -26,7 +26,9 @@ import {
   ProgramAssignment,
   ProgramAssignmentKind,
   ProgramAssignmentService,
+  ProgramAssignmentStatus,
   WorkoutLogService,
+  WorkoutLogStatus,
   localDayKey,
 } from 'core';
 
@@ -101,6 +103,30 @@ export class Preview implements ViewWillEnter {
 
   readonly showSkeleton = computed(() => this.loading() && !this.assignment());
   readonly showError = computed(() => this.error() && !this.assignment());
+
+  /**
+   * Why the day cannot be started, or null when it can: it is already done
+   * (history, which the API refuses to restart), or its plan is paused,
+   * finished or cancelled. A skipped day can still be made up (the nightly
+   * sweep skips every missed day), so it keeps Start.
+   */
+  readonly closedNote = computed<string | null>(() => {
+    const workout = this.workout();
+    const assignment = this.assignment();
+    if (!workout || !assignment) {
+      return null;
+    }
+    if (workout.status === WorkoutLogStatus.Completed) {
+      return this._translateService.instant('workouts.preview.dayClosed');
+    }
+    if (assignment.status && assignment.status !== ProgramAssignmentStatus.Active) {
+      return this._translateService.instant('workouts.preview.planClosed', { status: assignment.status });
+    }
+    return null;
+  });
+
+  /** Skip is for a day still to do; a skipped day only offers Start. */
+  readonly canSkip = computed(() => this.workout()?.status !== WorkoutLogStatus.Skipped);
 
   /** Loaded fine, but the plan holds no days at all — a different problem. */
   readonly isEmptyPlan = computed(

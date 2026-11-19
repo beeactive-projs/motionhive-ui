@@ -49,7 +49,14 @@ export const accountRoutes: Routes = [
     title: 'pageTitle.coachingProfile',
   },
   {
-    // Behind a row at the end of Account, past an explanation, a code and a
+    // Privacy → Sensitive actions: what cannot be undone, one level down.
+    path: 'sensitive',
+    loadComponent: () =>
+      import('./sensitive-actions/sensitive-actions').then((m) => m.SensitiveActions),
+    title: 'pageTitle.sensitiveActions',
+  },
+  {
+    // Behind Privacy → Sensitive actions, past an explanation, a code and a
     // word to type: findable, never one tap away.
     path: 'delete',
     loadComponent: () =>

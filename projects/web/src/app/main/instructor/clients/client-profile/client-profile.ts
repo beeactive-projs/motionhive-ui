@@ -34,6 +34,7 @@ import {
   WorkoutLog,
   WorkoutLogService,
 } from 'core';
+import { showInviteAgainError } from '../invite-again';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -667,7 +668,7 @@ export class ClientProfile {
     const c = this.client();
     if (!c?.clientId) return;
     void this._router.navigate(['/messages'], {
-      queryParams: { to: c.clientId },
+      queryParams: { to: c.clientId, name: this.clientName() },
     });
   }
 
@@ -713,39 +714,37 @@ export class ClientProfile {
     });
   }
 
-  confirmUnarchive(): void {
+  /** A former client comes back only by accepting an invitation. */
+  confirmInviteAgain(): void {
     this._confirmationService.confirm({
-      message: this._translateService.instant('clients.confirm.unarchive.message', {
+      message: this._translateService.instant('clients.confirm.inviteAgain.message', {
         name: escapeHtml(this.clientName()),
       }),
-      header: this._translateService.instant('clients.confirm.unarchive.header'),
-      icon: 'pi pi-exclamation-triangle',
+      header: this._translateService.instant('clients.confirm.inviteAgain.header'),
+      icon: 'pi pi-user-plus',
+      acceptButtonProps: {
+        label: this._translateService.instant('clients.confirm.inviteAgain.accept'),
+      },
       rejectButtonProps: { severity: 'secondary', text: true },
-      accept: () => this.doUnarchive(),
+      accept: () => this.inviteAgain(),
     });
   }
 
-  private doUnarchive(): void {
+  private inviteAgain(): void {
     const c = this.client();
-    if (!c) return;
-    this._clientService.unarchiveClient(c.clientId).subscribe({
+    if (!c) {
+      return;
+    }
+    // The row stays archived until they accept, so nothing changes here.
+    this._clientService.sendInvitation({ userId: c.clientId }).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: this._translateService.instant('clients.toast.unarchived.summary'),
-          detail: this._translateService.instant('clients.toast.unarchived.detail'),
+          summary: this._translateService.instant('clients.toast.invitedAgain.summary'),
+          detail: this._translateService.instant('clients.toast.invitedAgain.detail'),
         });
-        this.client.update((prev) =>
-          prev ? { ...prev, status: InstructorClientStatuses.Active } : prev,
-        );
       },
-      error: (err) =>
-        showApiError(
-          this._messageService,
-          this._translateService.instant('clients.toast.unarchiveFailed.summary'),
-          this._translateService.instant('clients.toast.unarchiveFailed.detail'),
-          err,
-        ),
+      error: (err: unknown) => showInviteAgainError(this._messageService, this._translateService, err),
     });
   }
 }

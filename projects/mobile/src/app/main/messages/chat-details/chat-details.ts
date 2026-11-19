@@ -36,6 +36,7 @@ import { SettingsRow } from '../../../_shared/components/settings-row/settings-r
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { ProfileStacks, personBase, stackRootOf } from '../../../_shared/utils/stack-paths';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { MESSAGING_ICONS } from '../messages.config';
 
 /**
@@ -64,6 +65,7 @@ import { MESSAGING_ICONS } from '../messages.config';
     IonToolbar,
     SettingsRow,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './chat-details.html',
   styleUrl: './chat-details.scss',
@@ -193,8 +195,14 @@ export class ChatDetails {
     // Close before routing, or the sheet is stranded over the inbox.
     await this._deleteSheet()?.close();
     void this._feedbackService.success(this._translateService.instant('messages.toast.deleted'));
-    // Off the thread that no longer exists: to the inbox on the Messages
-    // tab, and elsewhere back past it to the screen that opened it.
+    await this._leaveThread();
+  }
+
+  /**
+   * Off a thread that no longer exists, deleted or blocked: to the inbox on
+   * the Messages tab, and elsewhere back past it to the screen that opened it.
+   */
+  private async _leaveThread(): Promise<void> {
     if (this._stack && this._stack !== ProfileStacks.Messages && this._outlet.canGoBack(2)) {
       await this._outlet.pop(2);
       return;
@@ -224,9 +232,12 @@ export class ChatDetails {
       return;
     }
 
-    // The store drops the conversation and routes back to the inbox itself.
+    // The store drops the conversation; this screen and the thread under it
+    // leave too, or they stay open on a chat that is gone.
+    this.blockOpen.set(false);
     void this._feedbackService.success(
       this._translateService.instant('messages.toast.blocked', { name: this.name() }),
     );
+    await this._leaveThread();
   }
 }

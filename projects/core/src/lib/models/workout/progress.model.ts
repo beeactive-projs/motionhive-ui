@@ -55,6 +55,11 @@ export interface ProgressRecord {
   recordedAt: string;
   /** Improvement on the previous best; equals the weight for a first. */
   deltaKg: number;
+  /**
+   * The first time on this lift: a best, not a record beaten. The finish
+   * screen and History never call it a record, so no other screen may.
+   */
+  first?: boolean;
 }
 
 /** A session's top set, as the history page names it. */

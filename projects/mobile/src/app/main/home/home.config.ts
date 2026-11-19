@@ -1057,7 +1057,9 @@ export function traineeLatest(
         post,
       }),
     ),
-    ...records.map(
+    // A first time on a lift beats nothing, so it is no "New record" here,
+    // as on the finish screen and in History.
+    ...records.filter((record) => !record.first).map(
       (record): LatestEntry => ({
         kind: LatestKinds.Record,
         id: `record-${record.exerciseId}-${record.recordedAt}`,

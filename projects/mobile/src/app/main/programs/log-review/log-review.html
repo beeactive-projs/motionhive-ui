@@ -42,7 +42,14 @@
       </ion-card>
 
       @if (photoUrl(); as src) {
-        <img class="photo" [src]="src" [alt]="'programs.logReview.photoAlt' | translate" />
+        <img
+          class="photo"
+          [src]="src"
+          [alt]="'programs.logReview.photoAlt' | translate"
+          [mhViewPhoto]="src"
+          [mhViewPhotoAlt]="'programs.logReview.photoAlt' | translate"
+          [mhViewPhotoLabel]="'photoViewer.open.workout' | translate"
+        />
       }
 
       <div class="mh-tiles">

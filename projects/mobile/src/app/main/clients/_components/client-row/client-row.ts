@@ -32,7 +32,7 @@ import { EMAIL_ONLY_TILE, clientStatusTone, clientSubline } from '../../clients.
  * pending and archived wear a wash.
  *
  * Swiping reveals the verbs the row can take — Message on the leading edge,
- * Notes and Archive (or Unarchive, or Withdraw for an invitation) on the
+ * Notes and Archive (or Invite again, or Withdraw for an invitation) on the
  * trailing one. An incoming request has none: its verbs are a decision, and
  * those live in the request sheet a tap opens. The row only emits; the page
  * owns the store calls and the confirmations.
@@ -65,7 +65,7 @@ export class ClientRow {
   readonly message = output<void>();
   readonly notes = output<void>();
   readonly archive = output<void>();
-  readonly unarchive = output<void>();
+  readonly inviteAgain = output<void>();
   readonly withdraw = output<void>();
 
   readonly name = computed(() => clientDisplayName(this.client()));

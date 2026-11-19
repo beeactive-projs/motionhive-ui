@@ -228,7 +228,7 @@
       "archive": {
         "accept": "Yes, archive",
         "header": "Archive client",
-        "message": "Are you sure you want to archive {name}?"
+        "message": "Archive {name}? Your coaching ends: they will be told, and their training is no longer open to you. To work together again, send them an invitation to accept."
       },
       "cancelInvitation": {
         "accept": "Cancel invitation",
@@ -245,10 +245,10 @@
         "header": "Resend invitation",
         "message": "Resend the invitation to {name}?"
       },
-      "unarchive": {
-        "accept": "Yes, unarchive",
-        "header": "Unarchive client",
-        "message": "Are you sure you want to unarchive {name}?"
+      "inviteAgain": {
+        "header": "Invite again",
+        "message": "Send {name} an invitation? They become your client again once they accept.",
+        "accept": "Send invitation"
       }
     },
     "import": {
@@ -473,7 +473,7 @@
       "actions": {
         "archive": "Archive client",
         "message": "Message",
-        "unarchive": "Unarchive client"
+        "inviteAgain": "Invite again"
       },
       "back": "Back to clients",
       "info": {
@@ -585,14 +585,16 @@
           "dropped": "Down from {previous}% to {current}% against the previous window.",
           "neverStarted": "Assigned a plan but has never logged a workout.",
           "silent": "{completed} of {due} sessions done in this window.",
-          "silentNoDue": "No workouts logged recently."
+          "silentNoDue": "No workouts logged recently.",
+          "noPlan": "Nothing assigned to follow right now."
         },
         "hint": "most urgent first",
         "reason": {
           "behind": "Behind plan",
           "dropped": "Dropping off",
           "neverStarted": "Has not started",
-          "silent": "{days, plural, one {Quiet # day} other {Quiet # days}}"
+          "silent": "{days, plural, one {Quiet # day} other {Quiet # days}}",
+          "noPlan": "No plan"
         },
         "title": "Needs attention"
       },
@@ -679,13 +681,17 @@
         "detail": "Could not send the invitation. Please try again.",
         "summary": "Failed to send invitation"
       },
-      "unarchiveFailed": {
-        "detail": "Failed to unarchive client",
-        "summary": "Unarchive failed"
+      "inviteAgainFailed": {
+        "summary": "Invitation not sent",
+        "detail": "Could not send the invitation. Please try again."
       },
-      "unarchived": {
-        "detail": "Client relationship has been restored",
-        "summary": "Client unarchived"
+      "invitedAgain": {
+        "summary": "Invitation sent",
+        "detail": "They become your client again once they accept."
+      },
+      "alreadyInvited": {
+        "summary": "Already invited",
+        "detail": "They already have an invitation from you."
       }
     }
   },
@@ -2321,7 +2327,7 @@
       "summary": {
         "block": "{days}, for {count, plural, one {# week} other {# weeks}}.",
         "pickDay": "Pick at least one day.",
-        "weekly": "{days}, every week."
+        "weekly": "{days}, every week for {count, plural, one {# week} other {# weeks}}."
       },
       "title": "Add to your week",
       "toast": {

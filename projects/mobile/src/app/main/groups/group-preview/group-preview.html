@@ -38,7 +38,9 @@
   } @else if (group(); as group) {
   <div class="mh-page">
     <section class="hero">
-      <mh-hex-avatar size="2xl" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl" />
+      <mh-hex-avatar size="2xl" [color]="groupTone" [name]="group.name" [imageUrl]="group.logoUrl"
+        [mhViewPhoto]="group.logoUrl" [mhViewPhotoAlt]="'photoViewer.alt.group' | translate"
+        [mhViewPhotoLabel]="'photoViewer.open.group' | translate" />
       <h2 class="name">{{ group.name }}</h2>
       <div class="meta">
         <span class="count">{{ memberCountLabel() }}</span>

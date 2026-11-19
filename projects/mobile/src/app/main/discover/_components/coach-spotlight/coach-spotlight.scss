@@ -120,12 +120,3 @@
   outline-offset: -0.5rem;
   border-radius: 999px;
 }
-
-.toggle {
-  --padding-start: 0;
-  --padding-end: 0;
-
-  width: var(--mh-tap-target);
-  height: var(--mh-tap-target);
-  margin: 0;
-}

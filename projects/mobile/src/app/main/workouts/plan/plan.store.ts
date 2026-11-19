@@ -16,7 +16,10 @@ import {
 export interface PlanWeek {
   index: number;
   days: AssignedWorkout[];
+  /** Days trained, the week's count. */
   done: number;
+  /** Days dealt with: trained or skipped. */
+  settled: number;
 }
 
 /**
@@ -43,6 +46,19 @@ export class PlanStore {
   readonly showSkeleton = computed(() => this._loading() && !this._assignment());
 
   readonly showError = computed(() => this._error() && !this._assignment());
+
+  /** The coach's note on this plan, when a coach gave it and wrote one. */
+  readonly coachNote = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment || !this.coachName()) {
+      return null;
+    }
+    const note = assignment.notes?.trim();
+    if (!note) {
+      return null;
+    }
+    return note;
+  });
 
   readonly coachName = computed(() => {
     const assignment = this._assignment();
@@ -84,13 +100,24 @@ export class PlanStore {
         index,
         days: days.sort((a, b) => a.dayIndex - b.dayIndex),
         done: days.filter((d) => d.status === WorkoutLogStatus.Completed).length,
+        settled: days.filter(
+          (d) => d.status === WorkoutLogStatus.Completed || d.status === WorkoutLogStatus.Skipped,
+        ).length,
       }));
   });
 
-  /** Which week the trainee is actually in — the first with work left. */
+  /**
+   * Which week the trainee is actually in: the first with a day neither
+   * trained nor skipped. A skipped day is dealt with, so one skip (the
+   * nightly auto-skip too) never pins "This week" to an old week.
+   */
   readonly currentWeek = computed(() => {
-    const week = this.weeks().find((w) => w.done < w.days.length);
-    return week?.index ?? Math.max(0, this.weeks().length - 1);
+    const week = this.weeks().find((w) => w.settled < w.days.length);
+    if (week) {
+      return week.index;
+    }
+    // Every day dealt with: the last week, by its own index.
+    return this.weeks().at(-1)?.index ?? 0;
   });
 
   readonly thisWeek = computed(

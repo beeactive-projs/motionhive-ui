@@ -1,6 +1,7 @@
-<!-- The ARIA carousel pattern: the cards are slides, the dots pick one, and
-     Pause / Play is the visible control for the turns. Only the shown card
-     can be reached; the others are inert until their turn. -->
+<!-- The ARIA carousel pattern: the cards are slides and the dots pick one.
+     The turns have no Pause or Play button (owner, 2026-11-18): a touch
+     rests them, Reduce Motion keeps them still. Only the shown card can be
+     reached; the others are inert until their turn. -->
 <div
   class="stage"
   [attr.aria-live]="live()"
@@ -40,8 +41,5 @@
         </button>
       }
     </div>
-    <ion-button class="toggle" fill="clear" color="medium" [attr.aria-label]="toggleLabel() | translate" (click)="toggle()">
-      <ion-icon slot="icon-only" [name]="toggleIcon()" aria-hidden="true" />
-    </ion-button>
   </div>
 }

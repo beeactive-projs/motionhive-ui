@@ -56,18 +56,26 @@
   }
 </ion-content>
 
-@if (workout()) {
+@if (closedNote(); as note) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <p class="mh-footnote closed-note">{{ note }}</p>
+    </ion-toolbar>
+  </ion-footer>
+} @else if (workout()) {
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
         <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
         <!-- Quiet: skipping keeps the day visible in history as skipped, and
              it is a decision, not the thing we are asking for. -->
-        <div class="mh-quiet-actions">
-          <ion-button fill="clear" size="small" (click)="skip()">
-            {{ 'workouts.preview.skipToday' | translate }}
-          </ion-button>
-        </div>
+        @if (canSkip()) {
+          <div class="mh-quiet-actions">
+            <ion-button fill="clear" size="small" (click)="skip()">
+              {{ 'workouts.preview.skipToday' | translate }}
+            </ion-button>
+          </div>
+        }
       </div>
     </ion-toolbar>
   </ion-footer>

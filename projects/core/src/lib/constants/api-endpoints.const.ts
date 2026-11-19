@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
     LEAVE_INSTRUCTOR: (instructorId: string) => `/clients/my-instructors/${instructorId}`,
     PENDING_REQUESTS: '/clients/requests/pending',
     PENDING_REQUESTS_COUNT: '/clients/requests/pending/count',
+    SENT_REQUESTS: '/clients/requests/sent',
     FILTER_REQUESTS: '/clients/requests/filter',
     INVITE: '/clients/invite',
     IMPORT: '/clients/import',
@@ -256,6 +257,7 @@ export const API_ENDPOINTS = {
       `/programs/${id}/workouts/${workoutId}/exercises`,
     EXERCISES_REORDER: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/reorder`,
+    SUPERSETS: (id: string, workoutId: string) => `/programs/${id}/workouts/${workoutId}/supersets`,
     EXERCISE_BY_ID: (id: string, workoutId: string, exerciseId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}`,
     SETS: (id: string, workoutId: string, exerciseId: string) =>

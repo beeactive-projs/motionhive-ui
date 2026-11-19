@@ -17,8 +17,8 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
-import { defer, forkJoin, from, Observable, of, throwError } from 'rxjs';
-import { catchError, concatMap, finalize, map, toArray } from 'rxjs/operators';
+import { defer, from, Observable, of, throwError } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, toArray } from 'rxjs/operators';
 
 import {
   ActionItem,
@@ -43,6 +43,7 @@ import {
   weekdayNames,
   linkWithNext,
   normalizeSupersets,
+  supersetChanges,
   unlinkFromNext,
 } from 'core';
 
@@ -729,25 +730,45 @@ export class ProgramDetail implements OnInit {
    * Persist a new exercise order. `ordered` is the target visual order;
    * each row still carries its stale `orderIndex`, which is how the
    * changed set is detected. Optimistic local update, one PATCH for
-   * every changed row, full resync on failure.
+   * every changed row, full resync on failure. A superset the move split
+   * is cleaned up as the mobile builders do (`normalizeSupersets`), and
+   * those links are saved too, in one request after the order.
    */
   private _applyExerciseOrder(workout: ProgramWorkout, ordered: PrescribedExercise[]): void {
     const p = this.program();
     if (!p) return;
     const renumbered = ordered.map((e, i) => ({ ...e, orderIndex: i }));
     const changed = renumbered.filter((e, i) => ordered[i].orderIndex !== i);
+    const cleaned = normalizeSupersets(renumbered);
+    const links = supersetChanges(renumbered, cleaned);
 
     this.program.set({
       ...p,
-      workouts: (p.workouts ?? []).map((w) =>
-        w.id === workout.id ? { ...w, exercises: renumbered } : w,
-      ),
-    });
-    if (changed.length === 0) return;
-    this._track(
-      this._programService.reorderExercises(p.id, workout.id, {
-        items: changed.map((e) => ({ id: e.id, orderIndex: e.orderIndex })),
+      workouts: (p.workouts ?? []).map((w) => {
+        if (w.id === workout.id) {
+          return { ...w, exercises: cleaned };
+        }
+        return w;
       }),
+    });
+    if (changed.length === 0 && links.length === 0) {
+      return;
+    }
+    let order: Observable<unknown> = of(null);
+    if (changed.length > 0) {
+      order = this._programService.reorderExercises(p.id, workout.id, {
+        items: changed.map((e) => ({ id: e.id, orderIndex: e.orderIndex })),
+      });
+    }
+    this._track(
+      order.pipe(
+        switchMap(() => {
+          if (links.length === 0) {
+            return of(null);
+          }
+          return this._programService.setSupersets(p.id, workout.id, links);
+        }),
+      ),
     ).subscribe({
       error: (err) => {
         this._apiError('programs.toast.reorderError', err);
@@ -779,8 +800,10 @@ export class ProgramDetail implements OnInit {
 
   /**
    * Link an exercise with the next one as a superset, or undo it, with the
-   * same rules as the mobile builders; only the rows whose group changed
-   * are saved.
+   * same rules as the mobile builders; the rows whose group changed are
+   * saved together, in one request (one PATCH per row raced and could lose
+   * links), and the page reloads if it fails so it never shows links the
+   * database does not have.
    */
   toggleSuperset(workout: ProgramWorkout, index: number): void {
     const p = this.program();
@@ -789,19 +812,11 @@ export class ProgramDetail implements OnInit {
     const group = rows[index]?.supersetGroupId ?? null;
     const linked = group !== null && rows[index + 1]?.supersetGroupId === group;
     const next = linked ? unlinkFromNext(rows, index) : linkWithNext(rows, index);
-    const changed = next.filter(
-      (row, i) => (row.supersetGroupId ?? null) !== (rows[i].supersetGroupId ?? null),
-    );
-    if (!changed.length) return;
-    this._track(
-      forkJoin(
-        changed.map((row) =>
-          this._programService.updateExercise(p.id, workout.id, row.id, {
-            supersetGroupId: row.supersetGroupId ?? null,
-          }),
-        ),
-      ),
-    ).subscribe({
+    const changes = supersetChanges(rows, next);
+    if (!changes.length) {
+      return;
+    }
+    this._track(this._programService.setSupersets(p.id, workout.id, changes)).subscribe({
       next: () => {
         const current = this.program();
         if (!current) return;
@@ -812,7 +827,10 @@ export class ProgramDetail implements OnInit {
           ),
         });
       },
-      error: (err) => this._apiError('programs.superset.saveError', err),
+      error: (err) => {
+        this._apiError('programs.superset.saveError', err);
+        this._refetch();
+      },
     });
   }
 

@@ -63,6 +63,9 @@
         >
           <i class="pi pi-eye"></i>
         </button>
+        <!-- A MotionHive starter is nobody's to schedule (the API answers 404
+             for a routine you don't own): it is copied first, then scheduled. -->
+        @if (!isSystem()) {
         <button pButton
           type="button"
           severity="secondary"
@@ -76,6 +79,7 @@
         >
           <i class="pi pi-calendar-plus"></i>
         </button>
+        }
         @if (isSystem()) {
         <button pButton
           type="button"
@@ -138,6 +142,9 @@
         >
           <i class="pi pi-eye"></i>
         </button>
+        <!-- A MotionHive starter is nobody's to schedule (the API answers 404
+             for a routine you don't own): it is copied first, then scheduled. -->
+        @if (!isSystem()) {
         <button pButton
           type="button"
           severity="secondary"
@@ -151,6 +158,7 @@
         >
           <i class="pi pi-calendar-plus"></i>
         </button>
+        }
         @if (isSystem()) {
         <button pButton
           type="button"

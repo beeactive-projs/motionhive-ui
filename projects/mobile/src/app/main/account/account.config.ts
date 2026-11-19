@@ -34,6 +34,7 @@ import {
   timeOutline,
   trashOutline,
   trophyOutline,
+  warningOutline,
 } from 'ionicons/icons';
 
 import { CATEGORY_ICONS } from '../../_shared/config/notification-categories.config';
@@ -79,6 +80,7 @@ export const ACCOUNT_ICONS = {
   timeOutline,
   trashOutline,
   trophyOutline,
+  warningOutline,
 };
 
 /** The welcome flow's own screens the Profile card opens, as editors. */

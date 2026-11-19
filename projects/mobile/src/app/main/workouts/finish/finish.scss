@@ -212,6 +212,14 @@
   object-fit: cover;
 }
 
+/* The photo takes the taps (it opens full screen): the pattern, the scrim
+   and the numbers on it let them through. Change photo keeps its own. */
+.hero.with-photo::before,
+.hero.with-photo::after,
+.hero.with-photo > :not(.cover):not(.change-photo) {
+  pointer-events: none;
+}
+
 .hero.with-photo::after {
   content: '';
   position: absolute;

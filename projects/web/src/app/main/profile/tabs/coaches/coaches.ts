@@ -19,6 +19,7 @@ import {
   showApiError,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { forkJoin } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -107,16 +108,24 @@ export class ProfileCoaches implements OnInit {
     });
   }
 
+  /**
+   * Incoming: the coaches inviting this person (`requests/pending` lists only
+   * what was sent to them). Outgoing: the coaches they asked, from
+   * `requests/sent`. Splitting the incoming list by type used to show a
+   * coach the trainees asking them as if they had sent those requests, and
+   * never showed a trainee their own.
+   */
   loadPendingRequests(): void {
     this.loadingRequests.set(true);
-    this._clientService.getPendingRequests().subscribe({
-      next: (requests) => {
+    forkJoin({
+      incoming: this._clientService.getPendingRequests(),
+      sent: this._clientService.getSentRequests(),
+    }).subscribe({
+      next: ({ incoming, sent }) => {
         this.incomingRequests.set(
-          requests.filter((r) => r.type === ClientRequestTypes.InstructorToClient),
+          incoming.filter((r) => r.type === ClientRequestTypes.InstructorToClient),
         );
-        this.outgoingRequests.set(
-          requests.filter((r) => r.type === ClientRequestTypes.ClientToInstructor),
-        );
+        this.outgoingRequests.set(sent);
         this.loadingRequests.set(false);
       },
       error: () => {

@@ -52,7 +52,8 @@ export class NewMessagePicker {
   protected readonly query = signal('');
   protected readonly results = signal<UserSearchResult[]>([]);
   protected readonly searching = signal(false);
-  protected readonly selected = signal<UserSearchResult | null>(null);
+  /** Starts on the person a "Message" button named, if any. */
+  protected readonly selected = signal<UserSearchResult | null>(this.store.composeRecipient());
 
   protected readonly canShowResults = computed(
     () =>

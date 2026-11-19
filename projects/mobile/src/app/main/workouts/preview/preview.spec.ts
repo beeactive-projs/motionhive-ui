@@ -7,8 +7,11 @@ import {
   AssignedExercise,
   AssignedSet,
   AssignedWorkout,
+  ProgramAssignment,
   ProgramAssignmentService,
+  ProgramAssignmentStatus,
   WorkoutLogService,
+  WorkoutLogStatus,
 } from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
@@ -78,5 +81,38 @@ describe('Preview, the hero', () => {
 
     page.workout.set(day({ exercises: [] }));
     expect(page.meta()).toBeNull();
+  });
+});
+
+describe('Preview, a day that is already behind you', () => {
+  const plan = (status: ProgramAssignmentStatus) => ({ id: 'pa-1', status }) as unknown as ProgramAssignment;
+
+  it('offers Start and Skip on a day still to do of a running plan', () => {
+    const preview = setup();
+    preview.assignment.set(plan(ProgramAssignmentStatus.Active));
+    preview.workout.set(day());
+    expect(preview.closedNote()).toBeNull();
+  });
+
+  it('says a day is done instead of offering it again', () => {
+    const preview = setup();
+    preview.assignment.set(plan(ProgramAssignmentStatus.Active));
+    preview.workout.set(day({ status: WorkoutLogStatus.Completed }));
+    expect(preview.closedNote()).toBe('workouts.preview.dayClosed');
+  });
+
+  it('lets a skipped day be made up, with Start and no second Skip', () => {
+    const preview = setup();
+    preview.assignment.set(plan(ProgramAssignmentStatus.Active));
+    preview.workout.set(day({ status: WorkoutLogStatus.Skipped }));
+    expect(preview.closedNote()).toBeNull();
+    expect(preview.canSkip()).toBe(false);
+  });
+
+  it('says the plan is not running instead of offering its days', () => {
+    const preview = setup();
+    preview.assignment.set(plan(ProgramAssignmentStatus.Paused));
+    preview.workout.set(day());
+    expect(preview.closedNote()).toBe('workouts.preview.planClosed');
   });
 });

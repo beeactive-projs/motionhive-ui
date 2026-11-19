@@ -45,7 +45,9 @@
          leads with its identity. -->
     <div class="hero">
       <mh-hex-avatar size="xl" aria-hidden="true" [color]="groupTone" [name]="group.name"
-        [imageUrl]="group.logoUrl" />
+        [imageUrl]="group.logoUrl" [mhViewPhoto]="group.logoUrl"
+        [mhViewPhotoAlt]="'photoViewer.alt.group' | translate"
+        [mhViewPhotoLabel]="'photoViewer.open.group' | translate" />
       <h1>{{ group.name }}</h1>
 
       @if (group.owner; as owner) {

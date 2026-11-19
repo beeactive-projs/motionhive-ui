@@ -23,7 +23,7 @@ import { addIcons } from 'ionicons';
 import { Observable, firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { Exercise, PrescribedExercise, Program, ProgramService, ProgramWorkout } from 'core';
+import { Exercise, PrescribedExercise, Program, ProgramService, ProgramWorkout, supersetChanges } from 'core';
 
 import { ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
@@ -282,8 +282,8 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
 
   /**
    * Link with the next exercise, or undo it. The new groups are worked out
-   * here, the same rules as the routine builder, and only the rows whose
-   * group changed are saved.
+   * here, the same rules as the routine builder, and the rows whose group
+   * changed are saved together, in one request.
    */
   toggleLink(index: number): void {
     const programId = this._programId;
@@ -291,17 +291,13 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     const rows = this.exercises();
     if (!programId || !workoutId) return;
     const next = this.linkedToNext(index) ? unlinkFromNext(rows, index) : linkWithNext(rows, index);
-    const changed = next.filter((row, i) => (row.supersetGroupId ?? null) !== (rows[i].supersetGroupId ?? null));
-    if (!changed.length) return;
-    this._write(
-      forkJoin(
-        changed.map((row) =>
-          this._programService.updateExercise(programId, workoutId, row.id, {
-            supersetGroupId: row.supersetGroupId ?? null,
-          }),
-        ),
-      ),
-    );
+    const changes = supersetChanges(rows, next);
+    if (!changes.length) {
+      return;
+    }
+    // One save for every row the link moved: one request per row raced,
+    // and a superset could lose its links.
+    this._write(this._programService.setSupersets(programId, workoutId, changes));
   }
 
   /** "1:30", or the rest it falls back to: "Program (1:30)", "Client's own". */

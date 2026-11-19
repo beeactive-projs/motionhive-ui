@@ -48,6 +48,7 @@ import {
 } from '../../../_shared/config/workout-visibility.config';
 import { APP_HEX_SHAPE, TILE_FRAME, tileFigure } from '../../../_shared/config/hexagon.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
 import { workoutLinks } from '../../home/home-stack.config';
 import { FeelingScale } from '../_components/feeling-scale/feeling-scale';
 import { exerciseBlocks, memberTag } from '../logger/logger-flow';
@@ -151,6 +152,7 @@ interface Highlight {
     ShareWorkoutSheet,
     PostWorkoutSheet,
     TranslatePipe,
+    ViewPhotoDirective,
   ],
   templateUrl: './finish.html',
   styleUrl: './finish.scss',
@@ -329,11 +331,14 @@ export class Finish implements ViewWillEnter {
   readonly heroStats = computed<HeroStat[]>(() => {
     const log = this.log();
     if (!log) return [];
+    // Over six hours of active time is stored as unknown (null): saying
+    // "0:00" would claim a length nobody trained.
+    let duration = this._translateService.instant('workouts.tiles.durationUnknown');
+    if (log.durationSeconds != null) {
+      duration = durationClock(log.durationSeconds);
+    }
     return [
-      {
-        label: this._translateService.instant('workouts.tiles.duration'),
-        value: durationClock(log.durationSeconds),
-      },
+      { label: this._translateService.instant('workouts.tiles.duration'), value: duration },
       ...workoutTiles(log).slice(0, 2),
     ];
   });

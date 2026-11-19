@@ -815,6 +815,11 @@ describe('coachLatest and traineeLatest', () => {
     expect(entries.map((e) => e.kind)).toEqual([LatestKinds.Record, LatestKinds.Post]);
   });
 
+  it('says no "New record" for the first time on a lift', () => {
+    const entries = traineeLatest([], [{ ...record('2026-10-30T10:00:00Z'), first: true }], now);
+    expect(entries).toEqual([]);
+  });
+
   describe('latestRow', () => {
     const copy: LatestCopy = {
       t: echo,

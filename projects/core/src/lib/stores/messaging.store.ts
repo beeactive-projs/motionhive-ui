@@ -24,6 +24,7 @@ import {
   ThreatFlags,
   UserBlockReason,
 } from '../models/messaging';
+import { UserSearchResult } from '../models/user/user.model';
 import { conversationMatches } from '../utils/messaging.utils';
 
 /**
@@ -228,6 +229,8 @@ export class MessagingStore {
    * separate route.
    */
   private readonly _composeMode = signal(false);
+  /** Who the picker opens addressed to, when a "Message" button named them. */
+  private readonly _composeRecipient = signal<UserSearchResult | null>(null);
 
   /**
    * `Date.now()` at which the BE-imposed send rate limit clears, if
@@ -407,6 +410,7 @@ export class MessagingStore {
 
   // ── F4 public read surfaces ─────────────────────────────────
   readonly composeMode = this._composeMode.asReadonly();
+  readonly composeRecipient = this._composeRecipient.asReadonly();
   readonly sendRateLimitedUntil = this._sendRateLimitedUntil.asReadonly();
   readonly sendError = this._sendError.asReadonly();
 
@@ -562,13 +566,19 @@ export class MessagingStore {
     this._composerDraft.update((all) => ({ ...all, [key]: text }));
   }
 
-  /** Open the New Message picker. URL stays /messages. */
-  enterComposeMode(): void {
+  /**
+   * Open the New Message picker. URL stays /messages. With a recipient it
+   * opens addressed to them, for a "Message" button whose person has no
+   * thread yet (or one past the loaded page: the first send finds it).
+   */
+  enterComposeMode(recipient: UserSearchResult | null = null): void {
+    this._composeRecipient.set(recipient);
     this._composeMode.set(true);
   }
 
   exitComposeMode(): void {
     this._composeMode.set(false);
+    this._composeRecipient.set(null);
     // Discard the 'new' draft so the picker starts fresh next time
     // and clear any inline error left from a failed picker send.
     this._composerDraft.update((all) => omitKey(all, 'new'));

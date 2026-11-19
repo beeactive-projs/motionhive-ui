@@ -441,18 +441,6 @@ export function coachSubline(c: InstructorSearchResult): string {
     : translate('discover.coach.newCoach');
 }
 
-/**
- * The line under a name on Discover's "Coaches near you": two of their
- * specialties, then the years they have coached, or the city when the list
- * spans every city (a list of one city does not need it repeated).
- */
-export function coachNearLine(c: InstructorSearchResult, withCity: boolean): string {
-  const specs = trimmed(c.specializations ?? []).slice(0, 2);
-  const tail = withCity ? c.city?.trim() || coachYears(c) : coachYears(c) || c.city?.trim();
-  const parts = trimmed([...specs, tail]);
-  return parts.length > 0 ? parts.join(' · ') : coachSubline(c);
-}
-
 /** The featured card's facts: up to three specialties and the years. */
 export function coachFacts(c: InstructorSearchResult): string {
   return trimmed([...(c.specializations ?? []).slice(0, 3), coachYears(c)]).join(' · ');
@@ -491,6 +479,24 @@ export function coachBadge(
 /** Everyone but the reader: Discover never pitches a coach to themselves. */
 export function withoutReader<T extends { userId: string }>(list: readonly T[], readerId: string | null | undefined): T[] {
   return readerId ? list.filter((item) => item.userId !== readerId) : [...list];
+}
+
+/**
+ * Who takes turns in Discover's spotlight: today's few taking clients, the
+ * reader left out. With nobody taking clients, the most relevant coaches
+ * stand in, so Discover never loses its coaches now that the list under the
+ * spotlight is gone (owner, 2026-11-18). At most `SPOTLIGHT_LIMIT`.
+ */
+export function spotlightCoaches<T extends { userId: string }>(
+  taking: readonly T[],
+  recommended: readonly T[],
+  readerId: string | null | undefined,
+): T[] {
+  let coaches = withoutReader(taking, readerId);
+  if (coaches.length === 0) {
+    coaches = withoutReader(recommended, readerId);
+  }
+  return coaches.slice(0, SPOTLIGHT_LIMIT);
 }
 
 /**

@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
@@ -30,6 +31,7 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ChoiceOption, ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
 import { ACCOUNT_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
+import { ProfileStacks } from '../../../_shared/utils/stack-paths';
 import { DETAIL_TILES } from '../../../_shared/config/detail-tiles.config';
 import {
   WORKOUT_VISIBILITY_LEVELS,
@@ -102,6 +104,7 @@ export class AccountPrivacy implements OnInit {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
+  private readonly _router = inject(Router);
 
   readonly store = inject(AccountStore);
 
@@ -201,5 +204,10 @@ export class AccountPrivacy implements OnInit {
       else next.delete(field);
       return next;
     });
+  }
+
+  /** Sensitive actions: what cannot be undone, Delete account among them. */
+  openSensitive(): void {
+    void this._router.navigateByUrl(`${ProfileStacks.Account}/sensitive`);
   }
 }

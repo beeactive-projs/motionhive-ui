@@ -47,6 +47,17 @@
         </ion-card-content>
       </ion-card>
 
+      <!-- What the coach wrote when they gave this plan; it used to reach
+           only the web. -->
+      @if (store.coachNote(); as note) {
+        <ion-card class="coach-note">
+          <ion-card-content>
+            <span class="mh-kicker">{{ 'workouts.plan.coachNote' | translate }}</span>
+            <p>{{ note }}</p>
+          </ion-card-content>
+        </ion-card>
+      }
+
       <!-- What's today, when it is not already in the week below. -->
       @if (todayApart(); as day) {
         <section class="mh-section">

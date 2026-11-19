@@ -43,14 +43,16 @@ import { candidatesFrom } from './invite-client/group-suggestions.store';
 import {
   INVITE_EXPIRY_DAYS,
   INVITE_MESSAGE_MAX_LENGTH,
+  InviteConflicts,
   InviteRowStates,
+  inviteConflict,
   inviteEmail,
   inviteLink,
   inviteRowState,
   isDuplicateInvite,
   isEmailQuery,
 } from './invite.utils';
-import { receivedLabel, sentMetaLabel } from './requests.utils';
+import { receivedLabel, requestIsGone, sentMetaLabel } from './requests.utils';
 import { adherenceLabel, lastActiveLabel } from './roster-labels';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -433,6 +435,27 @@ describe('invite page', () => {
     expect(isDuplicateInvite('conflict')).toBe(false);
   });
 
+  it('knows a request verb failed because the request is no longer waiting', () => {
+    expect(requestIsGone({ status: 400 })).toBe(true);
+    expect(requestIsGone({ status: 404 })).toBe(true);
+    expect(requestIsGone({ status: 410 })).toBe(true);
+    expect(requestIsGone({ status: 0 })).toBe(false);
+    expect(requestIsGone({ status: 500 })).toBe(false);
+    expect(requestIsGone(null)).toBe(false);
+  });
+
+  it('tells "already invited" from "already your client"', () => {
+    const conflict = (messageKey: string) => ({ status: 409, error: { messageKey } });
+    expect(inviteConflict(conflict('client.invitationAlreadyPending'))).toBe(
+      InviteConflicts.Pending,
+    );
+    expect(inviteConflict(conflict('client.requestAlreadyPending'))).toBe(InviteConflicts.Pending);
+    expect(inviteConflict(conflict('client.alreadyYourClient'))).toBe(InviteConflicts.Client);
+    // An old API with no key still reads as an invitation waiting.
+    expect(inviteConflict({ status: 409 })).toBe(InviteConflicts.Pending);
+    expect(inviteConflict({ status: 403 })).toBeNull();
+  });
+
   describe('group suggestions', () => {
     const member = (overrides: Partial<GroupMember> = {}): GroupMember =>
       ({
@@ -552,7 +575,7 @@ describe('client actions', () => {
     expect(archive.color).toBe('violet');
   });
 
-  it('offers archive or unarchive, never both, and notes only on a settled row', () => {
+  it('offers archive or invite again, never both, and notes only on a settled row', () => {
     const ids = (row: InstructorClient) => visibleClientActions(row).map((a) => a.id);
 
     expect(ids(client())).toEqual([
@@ -563,7 +586,7 @@ describe('client actions', () => {
     expect(ids(client({ status: InstructorClientStatuses.Archived }))).toEqual([
       ClientActionIds.Message,
       ClientActionIds.EditNotes,
-      ClientActionIds.Unarchive,
+      ClientActionIds.InviteAgain,
     ]);
     expect(ids(client({ status: InstructorClientStatuses.Pending }))).toEqual([
       ClientActionIds.Message,

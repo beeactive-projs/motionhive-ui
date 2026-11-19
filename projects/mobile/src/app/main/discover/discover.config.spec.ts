@@ -32,7 +32,6 @@ import {
   coachFacts,
   coachName,
   coachPool,
-  coachNearLine,
   coachSubline,
   compileDatePreset,
   discoverCities,
@@ -58,6 +57,7 @@ import {
   resolveCity,
   onlineTopic,
   sessionInCity,
+  spotlightCoaches,
   sessionMatchesTopic,
   sessionPriceParts,
   sheetBeyondQuickChips,
@@ -517,13 +517,6 @@ describe('discoverGroupMeta', () => {
 });
 
 describe('coach lines and badge', () => {
-  it('coachNearLine shows two specialties, then the years, or the city across cities', () => {
-    const ana = coach({ specializations: ['Forță', 'Alergare', 'Mobilitate'], city: 'Cluj-Napoca', yearsOfExperience: 6 });
-    expect(coachNearLine(ana, false)).toBe('Forță · Alergare · 6 yrs');
-    expect(coachNearLine(ana, true)).toBe('Forță · Alergare · Cluj-Napoca');
-    expect(coachNearLine(coach({ specializations: [], yearsOfExperience: null }), false)).toBe('Bucharest');
-  });
-
   it('coachFacts is up to three specialties and the years', () => {
     expect(coachFacts(coach({ specializations: ['A', 'B', 'C', 'D'], yearsOfExperience: 1 }))).toBe('A · B · C · 1 yr');
     expect(coachFacts(coach({ specializations: null, yearsOfExperience: 0 }))).toBe('');
@@ -590,6 +583,18 @@ describe('coach spotlight', () => {
     expect(SPOTLIGHT_LIMIT).toBeGreaterThan(1);
     expect(SPOTLIGHT_LIMIT).toBeLessThanOrEqual(5);
     expect(SPOTLIGHT_INTERVAL_MS).toBeGreaterThan(5000);
+  });
+
+  it('takes the coaches taking clients, without the reader, a few at most', () => {
+    const taking = ['a', 'b', 'me', 'c', 'd', 'e', 'f'].map((id) => ({ userId: id }));
+    const picked = spotlightCoaches(taking, [{ userId: 'x' }], 'me');
+    expect(picked.map((c) => c.userId)).toEqual(['a', 'b', 'c', 'd', 'e'].slice(0, SPOTLIGHT_LIMIT));
+  });
+
+  it('lets the most relevant coaches stand in when nobody takes clients', () => {
+    const picked = spotlightCoaches([{ userId: 'me' }], [{ userId: 'me' }, { userId: 'x' }], 'me');
+    expect(picked.map((c) => c.userId)).toEqual(['x']);
+    expect(spotlightCoaches([], [], null)).toEqual([]);
   });
 });
 
