@@ -26,8 +26,32 @@
       @if (meta()) {
         <ion-note>{{ meta() }}</ion-note>
       }
+      @if (showPhotoGlyph()) {
+        <ion-icon
+          class="photo-glyph"
+          name="image-outline"
+          role="img"
+          [attr.aria-label]="'workouts.logRow.withPhoto' | translate"
+        />
+      }
     </div>
   </ion-label>
+
+  <!-- The photo, small, in the app's hexagon: the hint that this workout
+       has one. A glyph on the tinted tile holds the place until it loads. -->
+  @if (showThumb()) {
+    <mh-hex-avatar
+      class="thumb"
+      slot="end"
+      size="md"
+      color="medium"
+      tone="wash"
+      role="img"
+      [imageUrl]="thumbUrl()"
+      [icon]="thumbIcon()"
+      [attr.aria-label]="'workouts.logRow.withPhoto' | translate"
+    />
+  }
 
   <!-- A skipped plan day has nothing to repeat or open. -->
   @if (repeatable() && openable()) {

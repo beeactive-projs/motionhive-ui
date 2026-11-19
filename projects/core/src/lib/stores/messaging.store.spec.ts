@@ -3,7 +3,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Subject, throwError } from 'rxjs';
+import { EMPTY, Subject, throwError } from 'rxjs';
 import { of } from 'rxjs';
 
 import {
@@ -541,6 +541,7 @@ describe('MessagingStore — catching up after the background', () => {
   let api: {
     listConversations: ReturnType<typeof vi.fn>;
     listMessages: ReturnType<typeof vi.fn>;
+    getConversation: ReturnType<typeof vi.fn>;
   };
   let authed: WritableSignal<boolean>;
 
@@ -560,6 +561,8 @@ describe('MessagingStore — catching up after the background', () => {
     api = {
       listConversations: vi.fn(() => of({ items: [], total: 0 })),
       listMessages: vi.fn(() => of({ items: [], nextBefore: null })),
+      // An open thread missing from the (empty) inbox is fetched on its own.
+      getConversation: vi.fn(() => EMPTY),
     };
     authed = signal(true);
 
@@ -652,5 +655,84 @@ describe('MessagingStore — catching up after the background', () => {
     vi.advanceTimersByTime(60_000);
     setVisibility('visible');
     expect(realtime.reconnect).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('MessagingStore — a thread past the loaded pages', () => {
+  const FAR = 'conv-far';
+  let store: MessagingStore;
+  let api: {
+    listConversations: ReturnType<typeof vi.fn>;
+    getConversation: ReturnType<typeof vi.fn>;
+    listMessages: ReturnType<typeof vi.fn>;
+    ackStreamEvent: ReturnType<typeof vi.fn>;
+  };
+
+  function row(id: string) {
+    return { ...sendResult().conversation, id, unreadCount: 0 };
+  }
+
+  /** 50 rows on page 1, of 120. */
+  const firstPage = Array.from({ length: 50 }, (_, i) => row(`conv-${i}`));
+
+  beforeEach(() => {
+    api = {
+      listConversations: vi.fn((page: number) =>
+        of({ items: page === 1 ? firstPage : [row(`conv-p${page}`)], total: 120 }),
+      ),
+      getConversation: vi.fn(() => of(row(FAR))),
+      listMessages: vi.fn(() => of({ items: [], nextBefore: null })),
+      ackStreamEvent: vi.fn(() => of(undefined)),
+    };
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        MessagingStore,
+        { provide: MessagingService, useValue: api },
+        {
+          provide: MessagingRealtimeService,
+          useValue: {
+            events$: new Subject(),
+            status: signal('open').asReadonly(),
+            lastEventId: signal<string | null>(null),
+            connect: vi.fn(),
+            disconnect: vi.fn(),
+            reconnect: vi.fn(),
+          },
+        },
+        {
+          provide: AuthStore,
+          useValue: {
+            user: signal({ id: ME }).asReadonly(),
+            isAuthenticated: signal(false).asReadonly(),
+          },
+        },
+        { provide: Router, useValue: { navigate: vi.fn(() => Promise.resolve(true)) } },
+      ],
+    });
+    store = TestBed.inject(MessagingStore);
+    store.loadConversations({ force: true });
+  });
+
+  it('fetches the inbox row of a thread opened outside the loaded pages, once', () => {
+    store.loadMessages(FAR);
+    store.loadMessages(FAR);
+
+    expect(api.getConversation).toHaveBeenCalledTimes(1);
+    expect(store.conversations().some((c) => c.id === FAR)).toBe(true);
+  });
+
+  it('keeps that row through a refresh, so the open thread keeps its header', () => {
+    store.loadMessages(FAR);
+    store.loadConversations({ force: true });
+
+    expect(store.conversations().some((c) => c.id === FAR)).toBe(true);
+  });
+
+  it('still asks for page 2 next: the extra row is not a page', () => {
+    store.loadMessages(FAR);
+    store.loadMoreConversations();
+
+    expect(api.listConversations).toHaveBeenLastCalledWith(2, 50);
   });
 });

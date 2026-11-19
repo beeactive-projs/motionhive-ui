@@ -1802,7 +1802,7 @@
       "unmute": "Unmute notifications"
     },
     "blockSheet": {
-      "body": "They will not be able to message you, and you will not see this conversation.",
+      "body": "They will not be able to message you, and you will not see this conversation. If one of you coaches the other, that coaching ends too.",
       "title": "Block {name}?"
     },
     "bubble": {
@@ -3264,7 +3264,8 @@
     "logRow": {
       "coach": "Coach",
       "repeat": "Repeat {name}",
-      "records": "{count, plural, one {# record} other {# records}}"
+      "records": "{count, plural, one {# record} other {# records}}",
+      "withPhoto": "With a photo"
     },
     "logger": {
       "addExercise": "Add exercise",

@@ -472,6 +472,13 @@ describe('clientActions', () => {
     ]);
   });
 
+  it('does not offer a new plan to a client whose plan is paused', () => {
+    const ids = clientActions(client({ activePlans: 0, pausedPlans: 1 }), false, t).map(
+      (tile) => tile.id,
+    );
+    expect(ids).not.toContain(ClientActions.Assign);
+  });
+
   it('offers the plan when it ends soon', () => {
     const actions = clientActions(client(), true, t);
     expect(actions.map((action) => [action.id, action.main])).toEqual([

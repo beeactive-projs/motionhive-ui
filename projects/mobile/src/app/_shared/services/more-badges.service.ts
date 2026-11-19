@@ -1,4 +1,4 @@
-import { Service, computed, inject, signal } from '@angular/core';
+import { Service, computed, effect, inject, signal, untracked } from '@angular/core';
 import { take } from 'rxjs';
 
 import {
@@ -8,6 +8,7 @@ import {
   ClientService,
   EarningsService,
   NavModes,
+  NotificationStore,
 } from 'core';
 
 import { resolveMode } from '../config/tabs.config';
@@ -32,6 +33,7 @@ export class MoreBadgesService {
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _clientService = inject(ClientService);
   private readonly _earningsService = inject(EarningsService);
+  private readonly _notificationStore = inject(NotificationStore);
 
   private readonly _openInvoices = signal(0);
   private readonly _overdueInvoices = signal(0);
@@ -99,10 +101,31 @@ export class MoreBadgesService {
     () => this._mode() === NavModes.Train && this._coachInvites() > 0,
   );
 
-  refresh(): void {
+  /**
+   * The counts used to move only when the reader changed tab, so a request
+   * or a bill that arrived while they stayed put never showed. They now
+   * also move when a notification arrives (the unread count rises: that is
+   * how a request, an invitation or a bill is announced) and when the app
+   * comes back to the front (the tab shell calls `refresh(true)`).
+   */
+  private _lastUnread: number | null = null;
+
+  constructor() {
+    effect(() => {
+      const unread = this._notificationStore.unreadCount();
+      const before = this._lastUnread;
+      this._lastUnread = unread;
+      if (before !== null && unread > before) {
+        untracked(() => this.refresh(true));
+      }
+    });
+  }
+
+  /** `force` skips the freshness window of the request count. */
+  refresh(force = false): void {
     this.refreshOpenInvoices();
     this.refreshOverdueInvoices();
-    this.refreshPendingRequests();
+    this.refreshPendingRequests(force);
   }
 
   /** Coach mode only: the summary is a coach's read, and only they see the row. */

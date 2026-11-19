@@ -1802,7 +1802,7 @@
       "unmute": "Activează notificările"
     },
     "blockSheet": {
-      "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație.",
+      "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație. Dacă unul dintre voi îl antrenează pe celălalt, colaborarea se încheie și ea.",
       "title": "Vrei să blochezi utilizatorul {name}?"
     },
     "bubble": {
@@ -3264,7 +3264,8 @@
     "logRow": {
       "coach": "Antrenor",
       "repeat": "Repetă {name}",
-      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}"
+      "records": "{count, plural, one {# record} few {# recorduri} other {# de recorduri}}",
+      "withPhoto": "Cu fotografie"
     },
     "logger": {
       "addExercise": "Adaugă exercițiu",

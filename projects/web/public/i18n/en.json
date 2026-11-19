@@ -617,7 +617,8 @@
       "subtitle": {
         "noPlan": "No active plan",
         "nothingScheduled": "Nothing scheduled in this window",
-        "sessions": "{completed} of {due} sessions"
+        "sessions": "{completed} of {due} sessions",
+        "paused": "Plan paused"
       },
       "trainedToday": "trained today",
       "windowAriaLabel": "Time window"
@@ -1763,7 +1764,7 @@
     "blockDialog": {
       "block": "Block",
       "header": "Block this user?",
-      "leadAfterName": "won't be able to message you or see your conversation history with them. You can unblock them later from your safety settings.",
+      "leadAfterName": "won't be able to message you or see your conversation history with them. If one of you coaches the other, that coaching ends too. You can unblock them later from your safety settings.",
       "reason": "Reason (optional)"
     },
     "bubble": {

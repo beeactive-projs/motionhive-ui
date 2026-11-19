@@ -15,6 +15,9 @@ import { InboxSearchBar } from '../inbox-search-bar/inbox-search-bar';
  * Active-row styling is driven by `store.activeId()` (set by the URL
  * route param in F3 + by the row click below).
  */
+/** How close to the end of the list, in pixels, the next page is asked for. */
+const LOAD_MORE_WITHIN_PX = 240;
+
 @Component({
   selector: 'mh-conversation-list',
   imports: [ConversationRow, InboxFilters, InboxSearchBar, TranslatePipe],
@@ -57,5 +60,15 @@ export class ConversationList {
 
   protected onRowSelect(conversationId: string): void {
     this.store.openConversation(conversationId);
+  }
+
+  /** The next page once the list is within a few rows of its end. */
+  protected onScroll(event: Event): void {
+    const list = event.target as HTMLElement;
+    const left = list.scrollHeight - list.scrollTop - list.clientHeight;
+    if (left > LOAD_MORE_WITHIN_PX) {
+      return;
+    }
+    this.store.loadMoreConversations();
   }
 }

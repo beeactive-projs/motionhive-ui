@@ -26,4 +26,22 @@ describe('CoachRoster, needs attention', () => {
     expect(roster.attentionLabel(client)).toBe('clients.roster.attention.reason.noPlan');
     expect(roster.attentionDetail(client)).toBe('clients.roster.attention.detail.noPlan');
   });
+
+  it('says a paused plan is paused, not missing', () => {
+    TestBed.overrideComponent(CoachRoster, { set: { template: '', imports: [] } });
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: RosterService, useValue: { roster: () => of({ clients: [] }) } },
+        { provide: Router, useValue: { navigate: () => Promise.resolve(true) } },
+        { provide: MessageService, useValue: { add: () => undefined } },
+        { provide: TranslateService, useValue: { instant: (key: string) => key } },
+      ],
+    });
+    const roster = TestBed.createComponent(CoachRoster).componentInstance;
+    const paused = { due: 0, activePlans: 0, pausedPlans: 1 } as RosterClient;
+    const none = { due: 0, activePlans: 0, pausedPlans: 0 } as RosterClient;
+
+    expect(roster.subtitleFor(paused)).toBe('clients.roster.subtitle.paused');
+    expect(roster.subtitleFor(none)).toBe('clients.roster.subtitle.noPlan');
+  });
 });

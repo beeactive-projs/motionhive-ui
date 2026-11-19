@@ -322,6 +322,11 @@ export class Tabs {
         if (left) this._moreBadgesService.refreshPendingRequests(true);
       });
 
+    // Back from the background: anything may have arrived meanwhile.
+    this._appReturns
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this._moreBadgesService.refresh(true));
+
     // The keyboard is certainly down once it has finished hiding, and after a
     // return from the background, which closes it on both platforms.
     merge(this._appReturns, fromEvent(window, 'keyboardDidHide'))

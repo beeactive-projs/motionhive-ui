@@ -617,7 +617,8 @@
       "subtitle": {
         "noPlan": "Niciun plan activ",
         "nothingScheduled": "Nimic programat în această perioadă",
-        "sessions": "{due, plural, one {{completed} din # sesiune} few {{completed} din # sesiuni} other {{completed} din # de sesiuni}}"
+        "sessions": "{due, plural, one {{completed} din # sesiune} few {{completed} din # sesiuni} other {{completed} din # de sesiuni}}",
+        "paused": "Plan pe pauză"
       },
       "trainedToday": "s-a antrenat azi",
       "windowAriaLabel": "Interval de timp"
@@ -1763,7 +1764,7 @@
     "blockDialog": {
       "block": "Blochează",
       "header": "Blochezi acest utilizator?",
-      "leadAfterName": "nu îți va mai putea trimite mesaje și nu va mai vedea istoricul conversației voastre. Îl poți debloca oricând din setările de siguranță.",
+      "leadAfterName": "nu îți va mai putea trimite mesaje și nu va mai vedea istoricul conversației voastre. Dacă unul dintre voi îl antrenează pe celălalt, colaborarea se încheie și ea. Îl poți debloca oricând din setările de siguranță.",
       "reason": "Motiv (opțional)"
     },
     "bubble": {

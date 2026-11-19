@@ -186,11 +186,14 @@ export class CoachRoster implements OnInit {
   /** Nothing scheduled is a fact about the plan, not about the person. */
   subtitleFor(c: RosterClient): string {
     if (c.due === 0) {
-      return this._translateService.instant(
-        c.activePlans === 0
-          ? 'clients.roster.subtitle.noPlan'
-          : 'clients.roster.subtitle.nothingScheduled',
-      );
+      if (c.activePlans > 0) {
+        return this._translateService.instant('clients.roster.subtitle.nothingScheduled');
+      }
+      const paused = c.pausedPlans ?? 0;
+      if (paused > 0) {
+        return this._translateService.instant('clients.roster.subtitle.paused');
+      }
+      return this._translateService.instant('clients.roster.subtitle.noPlan');
     }
     return this._translateService.instant('clients.roster.subtitle.sessions', {
       completed: c.completed,
