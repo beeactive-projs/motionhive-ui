@@ -480,12 +480,18 @@
    *   raised            a track or a box on it (navy 700)
    *   ink / muted       text on it (navy 50, 15.6:1; navy 300, 8:1)
    *   accent            its warm label (amber 300, 11.9:1)
+   *   honey-light       a lighter honey: the rest timer's last ten seconds
+   *                     (primary 200), the same in dark
+   *   success           green as text on it: the rest timer's "Go"
+   *                     (success 400, over 8:1), the same in dark
    */
   --mh-color-navy-card: var(--mh-navy-900);
   --mh-color-navy-card-raised: var(--mh-navy-700);
   --mh-color-navy-card-ink: var(--mh-navy-50);
   --mh-color-navy-card-muted: var(--mh-navy-300);
   --mh-color-navy-card-accent: var(--mh-warning-300);
+  --mh-color-navy-card-honey-light: var(--mh-primary-200);
+  --mh-color-navy-card-success: var(--mh-success-400);
 
   /*
    * The shadow under a floating overlay: a picker popup, a select's list,

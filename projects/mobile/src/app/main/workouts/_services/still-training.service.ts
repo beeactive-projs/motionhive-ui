@@ -63,11 +63,17 @@ export class StillTrainingService {
     }
   }
 
-  /** Finished, discarded or paused: nothing to ask. */
+  /**
+   * Finished, discarded, paused or a set done: nothing to ask. Taken off the
+   * lock screen too if it has already gone off, or it would stay there after
+   * the workout it asks about.
+   */
   async cancel(): Promise<void> {
     if (!this._available) return;
     try {
       await LocalNotifications.cancel({ notifications: [{ id: STILL_TRAINING_ID }] });
+      // `cancel` only reaches one still to come.
+      await LocalNotifications.removeDeliveredNotificationsById({ ids: [STILL_TRAINING_ID] });
     } catch {
       // Nothing queued is the same outcome.
     }

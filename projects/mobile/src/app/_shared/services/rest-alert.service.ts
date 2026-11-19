@@ -12,6 +12,19 @@ const ASKED_KEY = 'mh-rest-notifications-asked';
 const REST_NOTIFICATION_ID = 1;
 
 /**
+ * Whether a change of rest takes its alert down, still to come or already
+ * on the lock screen: the rest ended (skipped, started, the workout left),
+ * or nothing runs any more and an alert this side set is still waiting.
+ */
+export function restAlertEnded(
+  before: number | null,
+  after: number | null,
+  scheduled: boolean,
+): boolean {
+  return after === null && (before !== null || scheduled);
+}
+
+/**
  * Tells the user rest is over when they are not looking at the app.
  *
  * The rest timer itself is a docked bar that derives its remainder from a
@@ -35,6 +48,14 @@ const REST_NOTIFICATION_ID = 1;
  * sign-in on, so a rest begun on the lock screen still alerts after the app
  * was opened and left again.
  *
+ * Once the rest is over it comes down again, from the lock screen too: when
+ * the rest ends, when the app comes back to the front, and when it is opened
+ * from cold. Left there, the last one of a workout stayed in Notification
+ * Center for good, under a Live Activity already saying "Done".
+ *
+ * On Android, while the workout's ongoing notification shows, it is never
+ * scheduled: that notification turns to Go and sounds itself (`RestLive.java`).
+ *
  * On the web there is no plugin, so every method is a no-op and the bar
  * behaves as it always did.
  */
@@ -49,6 +70,8 @@ export class RestAlertService {
   private next = '';
   /** True once something is actually scheduled with the OS. */
   private scheduled = false;
+  /** The lock screen's own notification says Go (Android): nothing to schedule here. */
+  private nativeAlert = false;
   /** null until we have asked; false means the user said no and we stop trying. */
   private readonly _permitted = signal<boolean | null>(null);
 
@@ -56,6 +79,15 @@ export class RestAlertService {
 
   constructor() {
     if (!this.available) return;
+
+    // Opened from cold, on screen: an alert left from an earlier rest is old
+    // news. Not when a lock screen button only woke the app behind it, or
+    // this would take down the alert that button has just set.
+    void CapacitorApp.getState()
+      .then(({ isActive }) => {
+        if (isActive) void this.clear(true);
+      })
+      .catch(() => undefined);
 
     const listener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
@@ -77,17 +109,20 @@ export class RestAlertService {
    * Mirror the rest's deadline (`LockScreenService`, from the store). Null
    * when rest ends, is skipped, or the workout is left. Safe to call on
    * every change — nothing reaches the OS until the app is backgrounded.
+   * `nativeAlert`: the lock screen's own notification sounds at Go.
    */
-  track(endsAt: number | null, next = ''): void {
+  track(endsAt: number | null, next = '', nativeAlert = false): void {
+    const ended = restAlertEnded(this.endsAt, endsAt, this.scheduled);
     this.endsAt = endsAt;
     this.next = next;
-    if (endsAt === null) void this.clear();
+    this.nativeAlert = nativeAlert;
+    if (ended) void this.clear(true);
   }
 
   /** Schedule the alert for the deadline we are holding, if it is still ahead. */
   private async arm(): Promise<void> {
     const endsAt = this.endsAt;
-    if (!this.available || endsAt === null || endsAt <= Date.now()) return;
+    if (!this.available || this.nativeAlert || endsAt === null || endsAt <= Date.now()) return;
     if (!(await this.ensurePermission())) return;
 
     try {
@@ -122,8 +157,10 @@ export class RestAlertService {
   }
 
   /**
-   * Withdraw a scheduled alert. Cheap and safe when there is nothing queued.
-   * `always`: one this side did not schedule too.
+   * Withdraw the alert: the one still to come, and the one on the lock
+   * screen once it has gone off. Cheap and safe when there is neither.
+   * `always`: one this side did not schedule too (the lock screen's ✓ sets
+   * its own).
    */
   private async clear(always = false): Promise<void> {
     if (!this.available) {
@@ -137,6 +174,8 @@ export class RestAlertService {
       await LocalNotifications.cancel({
         notifications: [{ id: REST_NOTIFICATION_ID }],
       });
+      // `cancel` only reaches one still to come.
+      await LocalNotifications.removeDeliveredNotificationsById({ ids: [REST_NOTIFICATION_ID] });
     } catch {
       // Nothing to withdraw is the same outcome as withdrawing it.
     }

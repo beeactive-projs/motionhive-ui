@@ -1,0 +1,194 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/more" [attr.aria-label]="'a11y.back' | translate" />
+    </ion-buttons>
+    <ion-title>{{ 'dev.workoutStatus.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    <p class="mh-footnote">{{ 'dev.workoutStatus.intro' | translate }}</p>
+
+    <ion-segment [value]="mode()" (ionChange)="setMode($event.detail.value)">
+      <ion-segment-button [value]="Modes.One">
+        <ion-label>{{ 'dev.workoutStatus.mode.one' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Modes.Every">
+        <ion-label>{{ 'dev.workoutStatus.mode.every' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    @if (mode() === Modes.One) {
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.scenario' | translate }}</span>
+        <div
+          class="mh-chip-cloud"
+          role="group"
+          [attr.aria-label]="'dev.workoutStatus.scenario' | translate"
+        >
+          @for (option of scenarios; track option) {
+            <ion-button
+              class="chip"
+              fill="clear"
+              shape="round"
+              size="small"
+              [class.selected]="scenario() === option"
+              [attr.aria-pressed]="scenario() === option"
+              (click)="pick(option)"
+            >
+              {{ 'dev.workoutStatus.scenarios.' + option | translate }}
+            </ion-button>
+          }
+        </div>
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.data' | translate }}</span>
+        <div class="fields">
+          @for (field of textFields; track field.key) {
+            <ion-input
+              class="wide"
+              mode="md"
+              fill="outline"
+              labelPlacement="stacked"
+              [label]="field.label | translate"
+              [value]="mock()[field.key]"
+              (ionChange)="setText(field.key, $event.detail.value)"
+            />
+          }
+          @for (field of numberFields; track field.key) {
+            <ion-input
+              mode="md"
+              fill="outline"
+              labelPlacement="stacked"
+              type="number"
+              inputmode="decimal"
+              [label]="field.label | translate"
+              [value]="mock()[field.key]"
+              (ionChange)="setNumber(field, $event.detail.value)"
+            />
+          }
+        </div>
+        <p class="mh-footnote">{{ 'dev.workoutStatus.dataNote' | translate }}</p>
+      </section>
+
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (flag of flagFields; track flag.key) {
+          <ion-item>
+            <ion-toggle
+              [checked]="mock()[flag.key]"
+              (ionChange)="edit(flag.key, $event.detail.checked)"
+            >
+              {{ flag.label | translate }}
+            </ion-toggle>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    <ion-button expand="block" (click)="restart()">
+      {{ 'dev.workoutStatus.restart' | translate }}
+    </ion-button>
+
+    @for (view of views(); track view.key) {
+      @if (mode() === Modes.Every) {
+        <h2 class="scenario-title">{{ view.label | translate }}</h2>
+      }
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.miniBar' | translate }}</span>
+        <mh-active-bar-preview
+          class="bleed"
+          [session]="view.world.session"
+          [rest]="view.world.rest"
+        />
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.restBar' | translate }}</span>
+        @if (view.restBar; as bar) {
+          <mh-rest-timer-bar
+            class="bleed"
+            [endsAt]="bar.endsAt"
+            [startedAt]="bar.startedAt"
+            [next]="view.world.next"
+            (nudge)="nudgeRest(view.key, $event)"
+            (skip)="endRest(view.key)"
+            (start)="endRest(view.key)"
+            (hide)="hideRest(view.key)"
+          />
+        } @else {
+          <p class="mh-footnote">{{ 'dev.workoutStatus.noRest' | translate }}</p>
+        }
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.resumeCard' | translate }}</span>
+        <mh-resume-card
+          [name]="view.world.session.name"
+          [elapsed]="view.elapsed"
+          [paused]="!!view.world.session.pausedAt"
+        />
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.lockScreen' | translate }}</span>
+        <mh-live-activity-mock [state]="view.live" [now]="now()" [layout]="Layouts.Lock" />
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.islandExpanded' | translate }}</span>
+        <mh-live-activity-mock [state]="view.live" [now]="now()" [layout]="Layouts.Expanded" />
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.islandSmall' | translate }}</span>
+        <div class="island-row">
+          <mh-live-activity-mock [state]="view.live" [now]="now()" [layout]="Layouts.Compact" />
+          <mh-live-activity-mock [state]="view.live" [now]="now()" [layout]="Layouts.Minimal" />
+        </div>
+      </section>
+
+      <section class="mh-section">
+        <span class="mh-kicker">{{ 'dev.workoutStatus.android' | translate }}</span>
+        <mh-notification-mock
+          [inline]="true"
+          [sub]="view.android.sub"
+          [title]="view.android.title"
+          [clock]="view.android.clock"
+          [text]="view.android.line"
+          [progress]="view.android.progress"
+          [actions]="view.android.actions"
+        />
+      </section>
+
+      @if (mode() === Modes.One) {
+        <section class="mh-section">
+          <span class="mh-kicker">{{ 'dev.workoutStatus.restAlert' | translate }}</span>
+          <mh-notification-mock [title]="view.live.labels.alertTitle" [text]="view.restAlert" />
+        </section>
+
+        <section class="mh-section">
+          <span class="mh-kicker">{{ 'dev.workoutStatus.stillTraining' | translate }}</span>
+          <mh-notification-mock
+            [title]="'workouts.stillTraining.title' | translate"
+            [text]="view.stillTraining"
+          />
+        </section>
+
+        <section class="mh-section">
+          <span class="mh-kicker">{{ 'dev.workoutStatus.state' | translate }}</span>
+          <ion-card>
+            <ion-card-content>
+              <pre class="state">{{ liveJson() }}</pre>
+            </ion-card-content>
+          </ion-card>
+        </section>
+      }
+    }
+
+    <p class="mh-footnote">{{ 'dev.workoutStatus.nativeNote' | translate }}</p>
+  </div>
+</ion-content>

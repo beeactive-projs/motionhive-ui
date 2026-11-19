@@ -9,7 +9,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { TIMER_HEX_SHAPE, cellFigure } from '../../../../_shared/config/hexagon.config';
@@ -54,7 +54,7 @@ let clipIds = 0;
  */
 @Component({
   selector: 'mh-rest-timer-bar',
-  imports: [IonIcon, TranslatePipe],
+  imports: [IonButton, IonIcon, TranslatePipe],
   templateUrl: './rest-timer-bar.html',
   styleUrl: './rest-timer-bar.scss',
 })
@@ -142,6 +142,22 @@ export class RestTimerBar {
         return this._translateService.instant('workouts.restTimer.restDone');
       case RestStates.Over:
         return this._translateService.instant('workouts.restTimer.over', { total });
+    }
+  });
+
+  /**
+   * What a screen reader hears, once each time the rest changes state: the
+   * last ten seconds, then the end. Nothing while it counts, or the count
+   * would be read out every second.
+   */
+  readonly announcement = computed(() => {
+    switch (this.state()) {
+      case RestStates.Soon:
+        return this._translateService.instant('workouts.restTimer.getReady');
+      case RestStates.Go:
+        return this._translateService.instant('workouts.restTimer.restOver');
+      default:
+        return '';
     }
   });
 

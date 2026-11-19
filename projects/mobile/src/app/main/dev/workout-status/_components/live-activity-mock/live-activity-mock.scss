@@ -1,0 +1,293 @@
+/* The Live Activity's own colours, copied from `Palette` in
+   ios/App/RestTimer/RestTimerWidget.swift. They are the phone's, fixed in
+   light and dark, not the app's theme, so this mock holds them itself:
+   change them in the Swift and here together. The island is the system's
+   black. */
+:host {
+  --live-honey: #f59e0b;
+  --live-honey-light: #fde68a;
+  --live-go: #059669;
+  --live-go-text: #34d399;
+  --live-card: #0e1b31;
+  --live-chip: rgba(255, 255, 255, 0.14);
+  --live-muted: #9fb3c8;
+  --live-ink: #fff;
+  --live-island: #000;
+
+  display: block;
+  color: var(--live-ink);
+}
+
+.activity,
+.island.expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-width: 22.5rem;
+}
+
+/* The lock screen card: 14 by 11 points of padding, the system's corners. */
+.activity {
+  padding: 0.75rem 0.875rem;
+  border-radius: 1.375rem;
+  background: var(--live-card);
+}
+
+.island {
+  background: var(--live-island);
+}
+
+.island.expanded {
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 2.75rem;
+}
+
+.island.compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: max-content;
+  min-height: 2.25rem;
+  padding: 0 0.875rem 0 0.75rem;
+  border-radius: var(--mh-radius-pill);
+}
+
+.island.minimal {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--mh-radius-pill);
+}
+
+/* The camera's place between the two ends of the compact island. */
+.camera {
+  width: 7.5rem;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.numbers {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.kicker {
+  overflow: hidden;
+  color: var(--live-muted);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kicker.centred {
+  text-align: center;
+}
+
+.big-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.big {
+  flex: 1;
+  overflow: hidden;
+  font-size: var(--mh-text-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: var(--mh-leading-heading);
+  white-space: nowrap;
+}
+
+.aside {
+  flex: none;
+  color: var(--live-muted);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.track {
+  display: block;
+  height: 0.25rem;
+  margin-top: 0.125rem;
+  overflow: hidden;
+  border-radius: var(--mh-radius-pill);
+  background: var(--live-chip);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--live-honey);
+  transition: width 1s linear;
+}
+
+/* The name gives way first; the set and the weight never do. */
+.next {
+  display: flex;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.next .lead,
+.next .muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.whole {
+  flex: none;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-text {
+  flex: 1;
+  overflow: hidden;
+  color: var(--live-muted);
+  font-size: var(--mh-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dots {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.dot {
+  width: 0.5rem;
+  fill: var(--live-chip);
+}
+
+.dot.done {
+  fill: var(--live-honey);
+}
+
+.dot.next {
+  fill: var(--live-honey-light);
+}
+
+.dots-text {
+  color: var(--live-muted);
+  font-size: var(--mh-text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: 0.125rem;
+}
+
+/* Stretched to share the row; "✓ 62.5 × 8" is never cut, the others give way. */
+.chip {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: var(--live-chip);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip.primary {
+  background: var(--live-honey);
+  color: var(--live-card);
+}
+
+.honey {
+  color: var(--live-honey);
+}
+
+.done {
+  color: var(--live-go-text);
+}
+
+.muted {
+  color: var(--live-muted);
+}
+
+.compact-clock {
+  min-width: 2.5rem;
+  font-size: var(--mh-text-base);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: end;
+}
+
+/* ─── The hexagon, 38, 32 and 18 points from point to point ─────── */
+
+.hex {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.hex svg {
+  display: block;
+  height: 100%;
+}
+
+.hex.lg {
+  height: 2.375rem;
+}
+
+.hex.md {
+  height: 2rem;
+}
+
+.hex.sm {
+  height: 1.125rem;
+}
+
+.hex path {
+  fill: var(--live-honey);
+}
+
+.phase-go path {
+  fill: var(--live-go);
+}
+
+.phase-workout path {
+  fill: none;
+  stroke: var(--live-honey);
+  stroke-width: 8;
+}
+
+.phase-paused path {
+  fill: var(--live-chip);
+}
+
+.hex ion-icon {
+  position: absolute;
+  color: var(--live-ink);
+  font-size: var(--mh-icon-sm);
+}
+
+.hex.sm ion-icon {
+  font-size: 0.625rem;
+}

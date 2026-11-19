@@ -736,6 +736,73 @@
       "left": "Colaborare încheiată"
     }
   },
+  "dev": {
+    "workoutStatus": {
+      "android": "Notificarea permanentă Android (sună când pauza s-a terminat)",
+      "data": "Date de test",
+      "dataNote": "Fiecare ceas pornește din momentul în care se schimbă un câmp. O pauză rămasă sub 0 e depășită.",
+      "field": {
+        "done": "Făcute la exercițiu",
+        "elapsed": "Durată (min)",
+        "exercise": "Exercițiu",
+        "lastReps": "Repetări trecute",
+        "lastWeight": "Greutate trecută (kg)",
+        "name": "Numele antrenamentului",
+        "reps": "Repetări",
+        "restLeft": "Pauză rămasă (s)",
+        "restPlanned": "Pauză planificată (s)",
+        "setNumber": "Numărul seriei",
+        "total": "Serii la exercițiu",
+        "weight": "Greutate (kg)",
+        "workoutDone": "Făcute în antrenament",
+        "workoutTotal": "Serii în antrenament"
+      },
+      "intro": "Toate locurile în care apare un antrenament în desfășurare, cu date de test. Nimic nu se salvează, iar ceasurile merg.",
+      "islandExpanded": "Dynamic Island, extinsă",
+      "islandSmall": "Dynamic Island, compactă și minimă",
+      "lockScreen": "Ecranul de blocare iOS (Live Activity)",
+      "menuRow": "Previzualizarea stării antrenamentului",
+      "menuSection": "Dezvoltator",
+      "miniBar": "Mini-bara, deasupra barei de taburi",
+      "mock": {
+        "exercise": "Împins la piept",
+        "partner": "Flotări",
+        "workout": "Zi de împins"
+      },
+      "mode": {
+        "every": "Toate scenariile",
+        "one": "Un scenariu"
+      },
+      "nativeNote": "Imaginile ecranului de blocare și ale notificărilor imită aranjamentele native (ios/App/RestTimer și RestLive.java), din starea pe care o trimite aplicația. Pe cele reale le desenează telefonul.",
+      "noRest": "Nu este nicio pauză în curs.",
+      "restAlert": "Alerta de final de pauză, cu aplicația în fundal: iOS, și Android după ce notificarea a fost închisă",
+      "restart": "Repornește ceasurile",
+      "restBar": "Cronometrul de pauză, în subsolul ecranului de antrenament",
+      "resumeCard": "Cardul de reluare, în tabul Antrenamente",
+      "scenario": "Scenariu",
+      "scenarios": {
+        "allDone": "Toate seriile făcute",
+        "betweenSets": "Între serii",
+        "go": "Pauza s-a terminat",
+        "overtime": "Pauză depășită",
+        "paused": "Antrenament pe pauză",
+        "restHidden": "Bara de pauză ascunsă",
+        "resting": "Pauză în curs",
+        "soon": "Ultimele 10 secunde",
+        "superset": "Superset"
+      },
+      "state": "Trimis pe ecranul de blocare",
+      "stillTraining": "Mementoul „Încă te antrenezi?”, la 30 de minute după ultima serie",
+      "title": "Starea antrenamentului",
+      "toggle": {
+        "ahead": "Mai sunt serii de făcut",
+        "paused": "Antrenament pe pauză",
+        "restHidden": "Bara de pauză ascunsă",
+        "resting": "O pauză este în curs",
+        "superset": "Într-un superset"
+      }
+    }
+  },
   "discover": {
     "allGroups": {
       "empty": {
@@ -2111,7 +2178,8 @@
     "monthHive": "Luna ta",
     "workoutSettings": "Setări pentru antrenamente",
     "archivedRoutines": "Rutine arhivate",
-    "welcome": "Bun venit"
+    "welcome": "Bun venit",
+    "workoutStatus": "Starea antrenamentului"
   },
   "payments": {
     "badge": {

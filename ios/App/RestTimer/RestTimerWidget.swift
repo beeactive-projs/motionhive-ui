@@ -21,9 +21,11 @@ private enum Palette {
     static let honey = Color(red: 245 / 255, green: 158 / 255, blue: 11 / 255)
     /// The next set's dot, a lighter honey.
     static let honeyLight = Color(red: 253 / 255, green: 230 / 255, blue: 138 / 255)
-    static let go = Color(red: 34 / 255, green: 197 / 255, blue: 94 / 255)
-    /// "Done" on navy, lighter than the hexagon's green so it reads as text.
-    static let goText = Color(red: 74 / 255, green: 222 / 255, blue: 128 / 255)
+    /// The app's success green at its 600 step (Emerald), so the white tick
+    /// on the hexagon clears 3:1; the 500 step is 2.2:1.
+    static let go = Color(red: 5 / 255, green: 150 / 255, blue: 105 / 255)
+    /// "Done" on navy: the success green's 400 step, which reads as text.
+    static let goText = Color(red: 52 / 255, green: 211 / 255, blue: 153 / 255)
     /// The app's navy, opaque in light and dark, so no wallpaper shows through.
     static let card = Color(red: 14 / 255, green: 27 / 255, blue: 49 / 255)
     static let chip = Color.white.opacity(0.14)
@@ -142,21 +144,22 @@ private struct Face {
     var order: String { text(state.order) }
     var isSuperset: Bool { !order.isEmpty }
 
-    /// The small line above the big number.
+    /// The small line above the big number, in sentence case as every kicker
+    /// in the app is: the look comes from its weight and tracking.
     var kicker: String {
         switch phase {
         case .rest:
             let superset = text(state.kicker)
             if !superset.isEmpty {
-                return superset.uppercased()
+                return superset
             }
-            return orFallback(state.labels.rest, "Rest").uppercased()
+            return orFallback(state.labels.rest, "Rest")
         case .go:
-            return orFallback(state.labels.restOver, "Rest over").uppercased()
+            return orFallback(state.labels.restOver, "Rest over")
         case .workout:
-            return joined([state.title, text(state.labels.workout)]).uppercased()
+            return joined([state.title, text(state.labels.workout)])
         case .paused:
-            return joined([state.title, state.labels.paused]).uppercased()
+            return joined([state.title, state.labels.paused])
         }
     }
 

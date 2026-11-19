@@ -8,6 +8,7 @@ import { catchError, take } from 'rxjs/operators';
 import { WorkoutLog, WorkoutLogService, WorkoutLogStatus } from 'core';
 
 import type { PayloadKey } from '../logger/logger-flow';
+import { StillTrainingService } from './still-training.service';
 
 /** The running workout, as much as a screen outside the logger needs. */
 export interface ActiveSession {
@@ -116,6 +117,7 @@ const AHEAD_KEY = 'mh-live-steps';
 @Service()
 export class ActiveSessionStore {
   private readonly _workoutLogService = inject(WorkoutLogService);
+  private readonly _stillTrainingService = inject(StillTrainingService);
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _session = signal<ActiveSession | null>(null);
@@ -267,8 +269,13 @@ export class ActiveSessionStore {
     void this._persist(rest);
   }
 
-  /** Finished or discarded: nothing is running any more. */
+  /**
+   * Finished or discarded: nothing is running any more. Here, in the app or
+   * elsewhere (another phone, the overnight close), so its "Still training?"
+   * goes with it.
+   */
   end(): void {
+    void this._stillTrainingService.cancel();
     this._checked.set(true);
     this._session.set(null);
     this._ahead.set(null);

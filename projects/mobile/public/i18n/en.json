@@ -736,6 +736,73 @@
       "left": "Coaching ended"
     }
   },
+  "dev": {
+    "workoutStatus": {
+      "android": "Android ongoing notification (it sounds at Go)",
+      "data": "Mock data",
+      "dataNote": "Every clock counts from the moment a field changes. A rest left below 0 is overtime.",
+      "field": {
+        "done": "Exercise sets done",
+        "elapsed": "Workout time (min)",
+        "exercise": "Exercise",
+        "lastReps": "Last reps",
+        "lastWeight": "Last weight (kg)",
+        "name": "Workout name",
+        "reps": "Reps",
+        "restLeft": "Rest left (s)",
+        "restPlanned": "Rest planned (s)",
+        "setNumber": "Set number",
+        "total": "Exercise sets",
+        "weight": "Weight (kg)",
+        "workoutDone": "Workout sets done",
+        "workoutTotal": "Workout sets"
+      },
+      "intro": "Every place a workout in progress shows itself, on mock data. Nothing here is saved, and the clocks run.",
+      "islandExpanded": "Dynamic Island, expanded",
+      "islandSmall": "Dynamic Island, compact and minimal",
+      "lockScreen": "iOS lock screen (Live Activity)",
+      "menuRow": "Workout status preview",
+      "menuSection": "Developer",
+      "miniBar": "Mini-bar, above the tab bar",
+      "mock": {
+        "exercise": "Bench press",
+        "partner": "Push-ups",
+        "workout": "Push day"
+      },
+      "mode": {
+        "every": "Every scenario",
+        "one": "One scenario"
+      },
+      "nativeNote": "The lock screen and notification pictures are mock-ups of the native layouts (ios/App/RestTimer and RestLive.java), drawn from the state the app sends. The phone draws the real ones.",
+      "noRest": "No rest is running.",
+      "restAlert": "Rest over alert, app in the background: iOS, and Android once its notification is swiped away",
+      "restart": "Restart the clocks",
+      "restBar": "Rest timer, in the workout screen's footer",
+      "resumeCard": "Resume card, on the Workouts tab",
+      "scenario": "Scenario",
+      "scenarios": {
+        "allDone": "All sets done",
+        "betweenSets": "Between sets",
+        "go": "Rest over",
+        "overtime": "Overtime",
+        "paused": "Workout paused",
+        "restHidden": "Rest bar hidden",
+        "resting": "Resting",
+        "soon": "Last 10 seconds",
+        "superset": "Superset"
+      },
+      "state": "Sent to the lock screen",
+      "stillTraining": "Still training reminder, 30 minutes after the last set",
+      "title": "Workout status",
+      "toggle": {
+        "ahead": "Sets left to do",
+        "paused": "Workout paused",
+        "restHidden": "Rest bar hidden",
+        "resting": "A rest is running",
+        "superset": "In a superset"
+      }
+    }
+  },
   "discover": {
     "allGroups": {
       "empty": {
@@ -2111,7 +2178,8 @@
     "monthHive": "Your month",
     "workoutSettings": "Workout settings",
     "archivedRoutines": "Archived routines",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "workoutStatus": "Workout status"
   },
   "payments": {
     "badge": {

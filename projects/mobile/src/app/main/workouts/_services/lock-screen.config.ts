@@ -87,6 +87,15 @@ export function liveState(
 }
 
 /**
+ * Whether the lock screen sounds the rest's end itself: Android's ongoing
+ * notification does, so no separate "Rest over" is scheduled beside it. An
+ * iOS Live Activity cannot make a sound, so there the alert always comes.
+ */
+export function alertsOnLockScreen(platform: string, lockScreen: boolean): boolean {
+  return platform === 'android' && lockScreen;
+}
+
+/**
  * The values a ✓ note carries, as numbers the API takes: anything else the
  * phone handed back is dropped.
  */

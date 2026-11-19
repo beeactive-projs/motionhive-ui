@@ -60,6 +60,7 @@ import { ExercisesStore } from '../exercises/exercises.store';
 import { HistoryBody } from './_components/history-body/history-body';
 import { ProgressBody } from './_components/progress-body/progress-body';
 import { RoutineRow } from './_components/routine-row/routine-row';
+import { ResumeCard } from './_components/resume-card/resume-card';
 import { TodayHero } from './_components/today-hero/today-hero';
 import { ActiveWorkoutService } from './_services/active-workout.service';
 import { RoutineActionsService } from './_services/routine-actions.service';
@@ -134,6 +135,7 @@ const PLAN_PREVIEW_LIMIT = 3;
     HistoryBody,
     NotificationBell,
     ProgressBody,
+    ResumeCard,
     RoutineRow,
     SessionRowSkeleton,
     TodayHero,

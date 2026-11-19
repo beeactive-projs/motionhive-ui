@@ -8,6 +8,7 @@ import { LoggedSet, RestSources, WorkoutLog, WorkoutLogService, WorkoutLogStatus
 import { RestLiveAction, RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { ActiveSessionStore, LiveStep } from './active-session.store';
 import { LockScreenService } from './lock-screen.service';
+import { StillTrainingService } from './still-training.service';
 import { WorkoutSettingsStore } from './workout-settings.store';
 
 const START = Date.parse('2026-11-07T17:00:00Z');
@@ -56,6 +57,7 @@ function setup() {
         useValue: { logSet, resume, getInProgress: () => of(undefined) },
       },
       { provide: WorkoutSettingsStore, useValue: {} },
+      { provide: StillTrainingService, useValue: { cancel: vi.fn() } },
       { provide: TranslateService, useValue: {} },
     ],
   });

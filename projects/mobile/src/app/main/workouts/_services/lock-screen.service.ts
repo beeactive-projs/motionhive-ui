@@ -15,7 +15,13 @@ import {
 import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { estimatedRest, tappedRest } from '../logger/logger-flow';
 import { ActiveSessionStore } from './active-session.store';
-import { isNextStep, liveState, liveTickRest, liveValues } from './lock-screen.config';
+import {
+  alertsOnLockScreen,
+  isNextStep,
+  liveState,
+  liveTickRest,
+  liveValues,
+} from './lock-screen.config';
 import { WorkoutSettingsStore } from './workout-settings.store';
 
 /** Who applies the lock screen's buttons while the logger is open. */
@@ -87,7 +93,11 @@ export class LockScreenService {
         endsAt = rest.endsAt;
         next = rest.next;
       }
-      untracked(() => this._restAlertService.track(endsAt, next));
+      const nativeAlert = alertsOnLockScreen(
+        Capacitor.getPlatform(),
+        this._settingsStore.settings().lockScreen,
+      );
+      untracked(() => this._restAlertService.track(endsAt, next, nativeAlert));
     });
 
     const words = this._translateService.onLangChange.subscribe(() => this._words.update((n) => n + 1));

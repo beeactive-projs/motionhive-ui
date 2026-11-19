@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from 'core';
+import { authGuard, environment } from 'core';
 
 import { coachGuard } from './_shared/guards/coach.guard';
 import { welcomeGuard } from './_shared/guards/welcome.guard';
@@ -172,6 +172,16 @@ export const routes: Routes = [
         canActivate: [coachGuard],
         loadComponent: () =>
           import('./main/more/switch-role/switch-role').then((m) => m.SwitchRole),
+      },
+      {
+        // Developers only: every place a workout in progress shows itself,
+        // on mock data. A production build never matches it, so there the
+        // address falls through to Home.
+        path: 'more/dev/workout-status',
+        canMatch: [() => !environment.production],
+        loadComponent: () =>
+          import('./main/dev/workout-status/workout-status').then((m) => m.WorkoutStatus),
+        title: 'pageTitle.workoutStatus',
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],

@@ -117,7 +117,11 @@ enum RestTimerActions {
         state.restStartedAt = nil
         state.restEndsAt = nil
         await activity.update(ActivityContent(state: state, staleDate: nil))
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [restAlertId])
+        // The alert still to come, and one already on the lock screen: once
+        // the rest has ended, "Rest over" is old news.
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [restAlertId])
+        center.removeDeliveredNotifications(withIdentifiers: [restAlertId])
         record(["type": type, "at": milliseconds(Date())], logId: activity.attributes.logId)
     }
 

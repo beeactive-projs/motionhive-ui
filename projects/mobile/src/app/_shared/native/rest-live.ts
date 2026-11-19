@@ -8,7 +8,9 @@ import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
  * (iOS adds +30 s), and the workout's clock between sets. On iOS the next
  * set comes in pieces: exercise, set, weight, last time, the set dots. The
  * system keeps their time from the dates given here, so nothing has to run
- * while the phone is locked.
+ * while the phone is locked. On Android the notification sounds at Go
+ * itself, from an exact alarm; on iOS a Live Activity cannot, so the
+ * rest-over alert (`RestAlertService`) sounds instead.
  *
  * Native code: `ios/App/App/RestLivePlugin.swift` with the
  * `RestTimerExtension` target (`ios/App/RestTimer/`), and

@@ -1,5 +1,6 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { IonItem, IonLabel } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { TIMER_HEX_SHAPE, cellFigure } from '../../../../_shared/config/hexagon.config';
@@ -15,7 +16,7 @@ import { OVERTIME_CEILING_SECONDS } from '../rest-timer-bar/rest-timer-bar';
  */
 @Component({
   selector: 'mh-active-workout-bar',
-  imports: [TranslatePipe],
+  imports: [IonItem, IonLabel, TranslatePipe],
   templateUrl: './active-workout-bar.html',
   styleUrl: './active-workout-bar.scss',
 })

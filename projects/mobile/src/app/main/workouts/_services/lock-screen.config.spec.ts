@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { RestLiveActionTypes } from '../../../_shared/native/rest-live';
 import { ActiveRest, ActiveSession, LiveStep } from './active-session.store';
 import {
+  alertsOnLockScreen,
   isNextStep,
   liveState,
   liveTickRest,
@@ -203,5 +204,17 @@ describe('liveTickRest', () => {
   it('starts none when neither the step nor the note says one started', () => {
     expect(liveTickRest('log-1', { ...tick, endsAt: undefined }, null, '')).toBeNull();
     expect(liveTickRest('log-1', { ...tick, setId: undefined }, bench, '')).toBeNull();
+  });
+});
+
+describe('alertsOnLockScreen', () => {
+  it('lets Android\'s ongoing notification sound at Go, while it shows', () => {
+    expect(alertsOnLockScreen('android', true)).toBe(true);
+    expect(alertsOnLockScreen('android', false)).toBe(false);
+  });
+
+  it('never on iOS, where a Live Activity cannot make a sound', () => {
+    expect(alertsOnLockScreen('ios', true)).toBe(false);
+    expect(alertsOnLockScreen('web', true)).toBe(false);
   });
 });

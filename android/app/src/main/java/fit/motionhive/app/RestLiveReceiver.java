@@ -5,9 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * The buttons on the workout's ongoing notification (+15 s, Skip, Start set)
- * and its swipe away. Each does its work at once, app running or not; see
- * {@link RestLive}. Declared in AndroidManifest.xml, not exported.
+ * The buttons on the workout's ongoing notification (+15 s, Skip, Start set),
+ * its swipe away, and the alarm at the rest's end that turns it to Go. Each
+ * does its work at once, app running or not; see {@link RestLive}. Declared
+ * in AndroidManifest.xml, not exported.
  */
 public class RestLiveReceiver extends BroadcastReceiver {
 
@@ -27,6 +28,9 @@ public class RestLiveReceiver extends BroadcastReceiver {
                 break;
             case RestLive.ACTION_DISMISSED:
                 RestLive.dismissed(context);
+                break;
+            case RestLive.ACTION_GO:
+                RestLive.restOver(context);
                 break;
             default:
                 break;
