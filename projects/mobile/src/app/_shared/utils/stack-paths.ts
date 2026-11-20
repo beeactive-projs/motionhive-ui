@@ -12,6 +12,9 @@
  *   Groups:    /tabs/groups/:groupId       the tab's own group pages
  *   elsewhere: <stack>/groups/:groupId     (`group/` is Discover's preview)
  *
+ * A card sent in a chat opens under that chat's base too, at
+ * `<chat base>/shared/<kind>/:id` (`sharedPagesBase`).
+ *
  * A screen whose stack mounts none of them falls back to the tabs.
  */
 export const ProfileStacks = {
@@ -50,6 +53,28 @@ export function stackRootOf(url: string): string | null {
 /** Where chats open from this stack. */
 export function chatBase(root: string | null): string {
   return !root || root === ProfileStacks.Messages ? ProfileStacks.Messages : `${root}/chat`;
+}
+
+/**
+ * Where a share card's page (a session, an exercise, a routine) opens from a
+ * chat in this stack: under the chat's own address, so back returns to the
+ * conversation (`chat-pages.routes.ts`).
+ */
+export function sharedPagesBase(root: string | null): string {
+  return `${chatBase(root)}/shared`;
+}
+
+/**
+ * The `shared/` base of a page opened from a card in a chat, or null when
+ * the URL is not one. Its own pushes (an exercise from a routine) go there.
+ */
+export function sharedBase(url: string): string | null {
+  const path = url.split(/[?#]/)[0];
+  const at = path.indexOf('/shared/');
+  if (at < 0) {
+    return null;
+  }
+  return path.slice(0, at + '/shared'.length);
 }
 
 /** Where group pages open from this stack. */

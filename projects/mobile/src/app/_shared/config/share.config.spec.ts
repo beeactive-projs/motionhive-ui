@@ -16,22 +16,49 @@ function attachment(card: MessageAttachment['card'], id = 'x-1'): MessageAttachm
 }
 
 describe('shareLink', () => {
-  it('opens each kind where its page lives', () => {
-    expect(
-      shareLink(
-        attachment({ type: 'SESSION', state: 'AVAILABLE' } as MessageAttachment['card'], 's-1'),
-        '/tabs/messages/c-1',
-      ),
-    ).toEqual(['/tabs/discover', 's-1']);
-    expect(
-      shareLink(attachment({ type: 'GROUP', state: 'AVAILABLE' } as MessageAttachment['card'], 'g-1'), '/'),
-    ).toEqual(['/tabs/discover', 'group', 'g-1']);
-    expect(
-      shareLink(attachment({ type: 'EXERCISE', state: 'AVAILABLE' } as MessageAttachment['card'], 'e-1'), '/'),
-    ).toEqual(['/tabs/workouts', 'exercise', 'e-1']);
-    expect(
-      shareLink(attachment({ type: 'PROGRAM', state: 'AVAILABLE' } as MessageAttachment['card'], 'p-1'), '/'),
-    ).toEqual(['/tabs/workouts', 'routine', 'p-1']);
+  const available = (type: string) => ({ type, state: 'AVAILABLE' }) as MessageAttachment['card'];
+
+  it('opens each kind in the Messages tab, so back returns to the chat', () => {
+    const chat = '/tabs/messages/c-1';
+    expect(shareLink(attachment(available('SESSION'), 's-1'), chat)).toEqual([
+      '/tabs/messages/shared',
+      'session',
+      's-1',
+    ]);
+    expect(shareLink(attachment(available('GROUP'), 'g-1'), chat)).toEqual([
+      '/tabs/messages/groups',
+      'preview',
+      'g-1',
+    ]);
+    expect(shareLink(attachment(available('EXERCISE'), 'e-1'), chat)).toEqual([
+      '/tabs/messages/shared',
+      'exercise',
+      'e-1',
+    ]);
+    expect(shareLink(attachment(available('PROGRAM'), 'p-1'), chat)).toEqual([
+      '/tabs/messages/shared',
+      'routine',
+      'p-1',
+    ]);
+  });
+
+  it('opens each kind in the stack of a chat opened from a profile', () => {
+    const chat = '/tabs/clients/chat/c-1';
+    expect(shareLink(attachment(available('SESSION'), 's-1'), chat)).toEqual([
+      '/tabs/clients/chat/shared',
+      'session',
+      's-1',
+    ]);
+    expect(shareLink(attachment(available('GROUP'), 'g-1'), chat)).toEqual([
+      '/tabs/clients/groups',
+      'preview',
+      'g-1',
+    ]);
+    expect(shareLink(attachment(available('EXERCISE'), 'e-1'), chat)).toEqual([
+      '/tabs/clients/chat/shared',
+      'exercise',
+      'e-1',
+    ]);
   });
 
   it('opens a coach in the stack the chat is in, and nothing without a handle', () => {

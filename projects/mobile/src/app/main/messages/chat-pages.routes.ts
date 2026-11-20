@@ -13,6 +13,29 @@ import { Routes } from '@angular/router';
  * on the same screen; the URL keeps `new?to=`, which resolves to the thread.
  */
 export const chatPageRoutes: Routes = [
+  // What a share card opens, pushed onto the chat's own stack so back
+  // returns to the conversation (`shareLink` in `share.config.ts`). The
+  // pages read their stack from the URL (`sharedBase`). A group opens its
+  // preview under `groups/` and a coach their profile, both already mounted
+  // next to the chat.
+  {
+    path: 'shared/session/:id',
+    loadComponent: () =>
+      import('../user/sessions/booking-detail/booking-detail').then((m) => m.BookingDetail),
+    title: 'pageTitle.session',
+  },
+  {
+    path: 'shared/exercise/:exerciseId',
+    loadComponent: () =>
+      import('../exercises/exercise-detail/exercise-detail').then((m) => m.ExerciseDetail),
+    title: 'pageTitle.exercise',
+  },
+  {
+    path: 'shared/routine/:id',
+    loadComponent: () =>
+      import('../workouts/routine-builder/routine-builder').then((m) => m.RoutineBuilder),
+    title: 'pageTitle.routine',
+  },
   {
     // The composer owns the bottom edge — the keyboard opens straight onto it,
     // and a tab bar wedged between the two costs a message of visible thread.

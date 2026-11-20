@@ -75,6 +75,7 @@ import { resolveMode } from '../../../_shared/config/tabs.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { SendToService } from '../../../_shared/services/send-to.service';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
+import { ProfileStacks, sharedBase, stackRootOf } from '../../../_shared/utils/stack-paths';
 import { PAGE_BACK_PRIORITY, swipeBackDefault } from '../../../_shared/utils/swipe-back';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { kindIcon, kindTone, levelLabel } from '../../exercises/exercises.config';
@@ -305,13 +306,27 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
 
   /**
    * The stack this page was pushed onto. It is mounted under the trainee's
-   * Workouts tab and the coach's Programs tab, and back returns to origin,
-   * so the back fallback and every way out of the page stay in that stack.
-   * Pushing an exercise onto the other tab left back nowhere to return to.
+   * Workouts tab, the coach's Programs tab and a chat (`shared/routine/:id`,
+   * a starter sent as a card), and back returns to origin, so the back
+   * fallback and every way out of the page stay in that stack. Pushing an
+   * exercise onto the other tab left back nowhere to return to.
    */
-  readonly stackBase = computed(() =>
-    this._router.url.startsWith('/tabs/programs') ? '/tabs/programs' : '/tabs/workouts',
-  );
+  readonly stackBase = computed(() => {
+    const url = this._router.url;
+    if (sharedBase(url)) {
+      return stackRootOf(url) ?? ProfileStacks.Messages;
+    }
+    if (url.startsWith('/tabs/programs')) {
+      return '/tabs/programs';
+    }
+    return '/tabs/workouts';
+  });
+
+  /**
+   * Where this page's own pages open (an exercise, the copy that replaces
+   * it): the stack's root, or under a chat its `shared/`, which mounts them.
+   */
+  readonly pagesBase = computed(() => sharedBase(this._router.url) ?? this.stackBase());
 
   // ─── The draft ────────────────────────────────────────────────
 
@@ -1029,7 +1044,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
       this.routine.update((routine) => (routine ? { ...routine, archived: saved.archived } : routine));
       if (archive) {
         this._exiting = true;
-        void this._router.navigate([this.stackBase()]);
+        this._leaveForList();
       }
     });
   }
@@ -1059,7 +1074,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
       .subscribe(async (copy) => {
         await this._copySheet()?.close();
         this._exiting = true;
-        void this._router.navigate([this.stackBase(), 'routine', copy.id], { replaceUrl: true });
+        void this._router.navigate([this.pagesBase(), 'routine', copy.id], { replaceUrl: true });
       });
   }
 
@@ -1115,6 +1130,18 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
       return;
     }
     void this._navController.navigateBack(this.stackBase());
+  }
+
+  /**
+   * Out of the page once the routine is put away (archived, deleted): to the
+   * list it has left, or, opened from a chat, back down to the conversation.
+   */
+  private _leaveForList(replaceUrl = false): void {
+    if (sharedBase(this._router.url) && this._ionRouterOutlet?.canGoBack()) {
+      void this._ionRouterOutlet.pop();
+      return;
+    }
+    void this._router.navigate([this.stackBase()], { replaceUrl });
   }
 
   onName(value: string): void {
@@ -1177,7 +1204,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
   }
 
   openExerciseById(exerciseId: string): void {
-    void this._router.navigate([this.stackBase(), 'exercise', exerciseId]);
+    void this._router.navigate([this.pagesBase(), 'exercise', exerciseId]);
   }
 
   setsLabel(row: DraftExercise): string {
@@ -1651,7 +1678,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
       .subscribe(async () => {
         await this._deleteSheet()?.close();
         this._exiting = true;
-        void this._router.navigate([this.stackBase()], { replaceUrl: true });
+        this._leaveForList(true);
       });
   }
 
@@ -1727,7 +1754,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
     // Kept under what the page holds, not where it was opened: a "Save and
     // start" whose start was put off leaves a saved routine at `new`, and
     // its edits came back as a new routine there, so Save made a copy.
-    const key = this.isNew() ? this._path : `${this.stackBase()}/routine/${this._id()}`;
+    const key = this.isNew() ? this._path : `${this.pagesBase()}/routine/${this._id()}`;
     this._routineDraftStore.park(key, draft);
   }
 

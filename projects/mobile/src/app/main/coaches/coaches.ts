@@ -45,6 +45,7 @@ import { ClockService } from '../../_shared/services/clock.service';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { SearchHeaderFold } from '../../_shared/utils/fold';
+import { dismissKeyboard } from '../../_shared/utils/keyboard';
 import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { personBase } from '../../_shared/utils/stack-paths';
 import { CoachRow } from '../discover/_components/coach-row/coach-row';
@@ -383,7 +384,7 @@ export class Coaches implements ViewWillEnter {
     // tap on it fires no focus event to open search again.
     void this._searchbar()
       ?.getInputElement()
-      .then((input) => input.blur());
+      .then((input) => dismissKeyboard(input));
   }
 
   onQuery(value: string): void {

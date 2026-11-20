@@ -42,6 +42,7 @@ import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchb
 import { SearchbarLabelDirective } from '../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { GROUP_AVATAR_TONE, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
+import { dismissKeyboard } from '../../../_shared/utils/keyboard';
 import { CoachRow } from '../_components/coach-row/coach-row';
 import { DiscoverGroupRow } from '../_components/group-row/group-row';
 import { SessionResultRow } from '../_components/session-result-row/session-result-row';
@@ -451,7 +452,7 @@ export class DiscoverSearchPage implements ViewWillEnter {
   /** The keyboard's Search key: remember the term and put the keyboard away. */
   onSubmit(event: Event): void {
     this._rememberQuery();
-    (event.target as HTMLElement | null)?.blur();
+    void dismissKeyboard(event.target as HTMLElement | null);
   }
 
   /** A browse card: every kind narrowed to it on the server. */

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { chatBase, groupBase, groupLinks, personBase, stackRootOf } from './stack-paths';
+import {
+  chatBase,
+  groupBase,
+  groupLinks,
+  personBase,
+  sharedBase,
+  sharedPagesBase,
+  stackRootOf,
+} from './stack-paths';
 
 describe('stack paths', () => {
   it('finds the stack a URL is in, the deepest root winning', () => {
@@ -16,6 +24,15 @@ describe('stack paths', () => {
     expect(chatBase('/tabs/clients')).toBe('/tabs/clients/chat');
     expect(chatBase('/tabs/home')).toBe('/tabs/home/chat');
     expect(chatBase(null)).toBe('/tabs/messages');
+  });
+
+  it("opens a share card's page under the chat's shared/, and reads that base back from the URL", () => {
+    expect(sharedPagesBase('/tabs/messages')).toBe('/tabs/messages/shared');
+    expect(sharedPagesBase('/tabs/home')).toBe('/tabs/home/chat/shared');
+    expect(sharedBase('/tabs/messages/shared/routine/r-1?x=1')).toBe('/tabs/messages/shared');
+    expect(sharedBase('/tabs/home/chat/shared/exercise/e-1')).toBe('/tabs/home/chat/shared');
+    expect(sharedBase('/tabs/workouts/routine/r-1')).toBeNull();
+    expect(sharedBase('/tabs/messages/c-1')).toBeNull();
   });
 
   it("opens a group on the Groups tab there, and under groups/ anywhere else, clear of Discover's group/", () => {

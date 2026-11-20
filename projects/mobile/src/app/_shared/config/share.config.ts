@@ -7,7 +7,7 @@ import {
   ShareTargetType,
 } from 'core';
 
-import { personBase, stackRootOf } from '../utils/stack-paths';
+import { groupBase, personBase, sharedPagesBase, stackRootOf } from '../utils/stack-paths';
 
 /**
  * Share cards (things sent into a chat) and sending them. Only public things
@@ -37,31 +37,33 @@ export function shareActionKey(card: ShareCard): string {
 }
 
 /**
- * Where a card opens. Sessions and groups open in Discover and exercises and
- * starters in Workouts, the stacks that hold their pages; a coach opens in
- * the stack the chat is in, which mounts profiles. Null when there is
- * nothing to open: gone, private, or a coach with no handle yet. An ended
- * session still opens, its page says so.
+ * Where a card opens: always in the stack the chat is in, so back returns
+ * to the conversation. Sessions, exercises and starters under the chat's
+ * `shared/`, a group's preview and a coach's profile where that stack
+ * mounts them. Null when there is nothing to open: gone, private, or a
+ * coach with no handle yet. An ended session still opens, its page says so.
  */
 export function shareLink(attachment: MessageAttachment, url: string): string[] | null {
   const { card, id } = attachment;
   if (card.state === ShareCardState.Unavailable) {
     return null;
   }
+  const root = stackRootOf(url);
+  const shared = sharedPagesBase(root);
   switch (card.type) {
     case 'SESSION':
-      return ['/tabs/discover', id];
+      return [shared, 'session', id];
     case 'GROUP':
-      return ['/tabs/discover', 'group', id];
+      return [groupBase(root), 'preview', id];
     case 'COACH':
       if (!card.handle) {
         return null;
       }
-      return [personBase(stackRootOf(url)), card.handle];
+      return [personBase(root), card.handle];
     case 'EXERCISE':
-      return ['/tabs/workouts', 'exercise', id];
+      return [shared, 'exercise', id];
     case 'PROGRAM':
-      return ['/tabs/workouts', 'routine', id];
+      return [shared, 'routine', id];
   }
   return null;
 }

@@ -14,6 +14,7 @@ import {
   IonLabel,
   IonList,
   IonProgressBar,
+  IonRouterOutlet,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -52,6 +53,7 @@ import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { SendToService } from '../../../../_shared/services/send-to.service';
 import { injectOpenDirectMessage } from '../../../../_shared/utils/direct-message';
 import { copyToClipboard } from '../../../../_shared/utils/share';
+import { ProfileStacks, sharedBase, stackRootOf } from '../../../../_shared/utils/stack-paths';
 import { BookingOutcomeSheet } from '../_sheets/booking-outcome-sheet/booking-outcome-sheet';
 import { CancelBookingSheet } from '../_sheets/cancel-booking-sheet/cancel-booking-sheet';
 import {
@@ -125,20 +127,31 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
   private readonly _sendTo = inject(SendToService);
+  private readonly _outlet = inject(IonRouterOutlet, { optional: true });
 
   readonly Views = DetailViews;
 
+  /** Opened from a card in a chat (`chat-pages.routes.ts`): leaving returns there. */
+  private readonly _fromChat = sharedBase(this._router.url) !== null;
+
   /**
-   * The stack this page was pushed onto. It is mounted in three stacks —
-   * the trainee sessions area, Discover (`discover/:id`) and Home
-   * (`home/booking/:id`) — and the settled rule is that back returns to
-   * origin, so the back fallback and both in-page navigations follow
-   * whichever stack the URL is in.
+   * The stack this page was pushed onto. It is mounted in the trainee
+   * sessions area, Discover (`discover/:id`), Home (`home/booking/:id`) and
+   * under a chat (`shared/session/:id`), and the settled rule is that back
+   * returns to origin, so the back fallback and both in-page navigations
+   * follow whichever stack the URL is in.
    */
   readonly stackBase = computed(() => {
     const url = this._router.url;
-    if (url.startsWith('/tabs/discover')) return '/tabs/discover';
-    if (url.startsWith('/tabs/home')) return '/tabs/home';
+    if (sharedBase(url)) {
+      return stackRootOf(url) ?? ProfileStacks.Messages;
+    }
+    if (url.startsWith('/tabs/discover')) {
+      return '/tabs/discover';
+    }
+    if (url.startsWith('/tabs/home')) {
+      return '/tabs/home';
+    }
     return '/tabs/user/sessions';
   });
 
@@ -368,9 +381,21 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     );
   });
 
-  readonly whereCity = computed(
-    () => this.publicInstance()?.venueOverride?.city ?? null,
-  );
+  /** The city of the place named above: this occurrence's own, else the series'. */
+  readonly whereCity = computed(() => {
+    const instance = this.publicInstance();
+    if (!instance) {
+      return null;
+    }
+    if (instance.venueOverride) {
+      return instance.venueOverride.city;
+    }
+    const venue = instance.template?.venue;
+    if (venue) {
+      return venue.city;
+    }
+    return null;
+  });
 
   readonly isOnlineSession = computed(
     () =>
@@ -548,6 +573,11 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     this.store.clearStateParticipant();
     this._myBookingsIndexStore.invalidate();
     this._myBookingsIndexStore.ensureLoaded(true);
+    // From a chat, back down to the conversation rather than its tab's list.
+    if (this._fromChat && this._outlet?.canGoBack()) {
+      void this._outlet.pop();
+      return;
+    }
     void this._router.navigate([this.stackBase()]);
   }
 

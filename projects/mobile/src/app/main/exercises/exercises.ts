@@ -44,6 +44,7 @@ import {
 } from '../../_shared/config/recent-searches.config';
 import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { SearchHeaderFold } from '../../_shared/utils/fold';
+import { dismissKeyboard } from '../../_shared/utils/keyboard';
 import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { CreateExerciseRow } from './_components/create-exercise-row/create-exercise-row';
 import { ExerciseFlatRow } from './_components/exercise-flat-row/exercise-flat-row';
@@ -249,7 +250,7 @@ export class Exercises implements ViewWillEnter {
     // tap on it fires no focus event to open search again.
     void this._searchbar()
       ?.getInputElement()
-      .then((input) => input.blur());
+      .then((input) => dismissKeyboard(input));
   }
 
   onQuery(value: string): void {

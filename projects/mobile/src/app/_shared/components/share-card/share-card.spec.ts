@@ -50,13 +50,13 @@ describe('ShareCard', () => {
     },
   };
 
-  it('draws a session with its place and seats, and opens it in Discover', () => {
+  it('draws a session with its place and seats, and opens it in the chat stack', () => {
     const view = card(session);
     expect(view.sessionPlace()).toBe('Herăstrău');
     expect(view.seatsFill()).toBeCloseTo(8 / 12);
     expect(view.stripColor()).toBe('var(--ion-color-info)');
     view.open();
-    expect(navigate).toHaveBeenCalledWith(['/tabs/discover', 's-1']);
+    expect(navigate).toHaveBeenCalledWith(['/tabs/messages/shared', 'session', 's-1']);
   });
 
   it('says online, never a place, for an online session', () => {

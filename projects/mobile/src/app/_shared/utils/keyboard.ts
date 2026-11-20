@@ -93,12 +93,29 @@ export function focusedTextEntry(): HTMLElement | null {
 }
 
 /**
- * Close the keyboard: blur the field, and ask the native side too. There is
- * no Keyboard plugin on the web build, where the blur is enough.
+ * Close the keyboard; the field loses focus with it.
+ *
+ * On iOS only the native side is asked: it resigns the field the way a tap
+ * outside one does, and WebKit blurs it. A `blur()` from the page while the
+ * keyboard is still updating its autocorrect suggestion deadlocks UIKit's
+ * keyboard queue on the main thread, and iOS kills the frozen app (the
+ * watchdog crash in TestFlight build 63, 2026-11-20, a tap on a chat just
+ * after typing). So nothing on iOS blurs a field itself: it comes here.
+ *
+ * Elsewhere the field is blurred too: the web build has no Keyboard plugin,
+ * and on Android hiding the keyboard leaves the caret in the field.
  */
-export async function dismissKeyboard(field: HTMLElement | null | undefined): Promise<void> {
+export async function dismissKeyboard(
+  field: HTMLElement | null | undefined,
+  platform: string = Capacitor.getPlatform(),
+  keyboard: Pick<typeof Keyboard, 'hide'> = Keyboard,
+): Promise<void> {
+  if (platform === 'ios') {
+    await keyboard.hide().catch(() => undefined);
+    return;
+  }
   if (field) {
     field.blur();
   }
-  await Keyboard.hide().catch(() => undefined);
+  await keyboard.hide().catch(() => undefined);
 }

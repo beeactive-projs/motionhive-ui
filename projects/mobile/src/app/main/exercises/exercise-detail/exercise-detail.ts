@@ -15,6 +15,7 @@ import {
   IonLabel,
   IonList,
   IonNote,
+  IonRouterOutlet,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -45,6 +46,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { SendToService } from '../../../_shared/services/send-to.service';
+import { ProfileStacks, sharedBase, stackRootOf } from '../../../_shared/utils/stack-paths';
 import { OwnExerciseSheets } from '../_components/own-exercise-sheets/own-exercise-sheets';
 import {
   EXERCISE_ICONS,
@@ -116,6 +118,7 @@ export class ExerciseDetail implements ViewWillEnter {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _sendTo = inject(SendToService);
   private readonly _navController = inject(NavController);
+  private readonly _outlet = inject(IonRouterOutlet, { optional: true });
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
@@ -178,13 +181,23 @@ export class ExerciseDetail implements ViewWillEnter {
   /**
    * Where back lands when there is no history to pop (a deep link, a
    * restored app). The page is pushed onto the Workouts and Programs stacks
-   * as well as its own, and back returns to origin, so it follows the URL.
+   * and under a chat (`shared/exercise/:id`) as well as its own, and back
+   * returns to origin, so it follows the URL.
    */
   readonly backHref = computed(() => {
     const url = this._router.url;
-    if (url.startsWith('/tabs/home')) return '/tabs/home';
-    if (url.startsWith('/tabs/workouts')) return '/tabs/workouts';
-    if (url.startsWith('/tabs/programs')) return '/tabs/programs';
+    if (sharedBase(url)) {
+      return stackRootOf(url) ?? ProfileStacks.Messages;
+    }
+    if (url.startsWith('/tabs/home')) {
+      return '/tabs/home';
+    }
+    if (url.startsWith('/tabs/workouts')) {
+      return '/tabs/workouts';
+    }
+    if (url.startsWith('/tabs/programs')) {
+      return '/tabs/programs';
+    }
     return '/tabs/exercises';
   });
 
@@ -403,6 +416,11 @@ export class ExerciseDetail implements ViewWillEnter {
 
   /** Gone: back to wherever this page was opened from, which re-reads its list. */
   onOwnDeleted(): void {
+    // From a chat, back down to the conversation rather than its tab's list.
+    if (sharedBase(this._router.url) && this._outlet?.canGoBack()) {
+      void this._outlet.pop();
+      return;
+    }
     void this._navController.navigateBack(this.backHref());
   }
 

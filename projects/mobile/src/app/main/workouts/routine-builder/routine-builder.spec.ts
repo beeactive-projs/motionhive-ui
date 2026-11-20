@@ -86,16 +86,28 @@ function savedRoutine(id: string): Routine {
 
 interface Setup {
   id?: string;
+  /** Where the page is open; the Workouts tab's own address by default. */
+  url?: string;
   coach?: boolean;
   /** The stack's outlet, to watch the edge swipe; there is none by default. */
-  outlet?: { swipeGesture: boolean };
+  outlet?: { swipeGesture: boolean; canGoBack?: () => boolean; pop?: () => Promise<boolean> };
+  /** Archive, copy and delete. */
+  actions?: Record<string, unknown>;
   /** iOS mode, where the edge swipe is on by default. */
   ios?: boolean;
   /** Another workout is open: every start is put off. */
   blocked?: boolean;
 }
 
-function setup({ id = 'new', coach = false, outlet, ios = false, blocked = false }: Setup = {}) {
+function setup({
+  id = 'new',
+  url,
+  coach = false,
+  outlet,
+  ios = false,
+  blocked = false,
+  actions = {},
+}: Setup = {}) {
   const routineService = {
     get: vi.fn((rid: string, _opts?: { silent?: boolean }) => of(savedRoutine(rid))),
     create: vi.fn((_: CreateRoutinePayload) => of(savedRoutine('r-new'))),
@@ -103,7 +115,7 @@ function setup({ id = 'new', coach = false, outlet, ios = false, blocked = false
     start: vi.fn(() => of({ id: 'log-1' })),
   };
   const router = {
-    url: `/tabs/workouts/routine/${id}`,
+    url: url ?? `/tabs/workouts/routine/${id}`,
     navigate: vi.fn(() => Promise.resolve(true)),
   };
   const navController = { navigateBack: vi.fn() };
@@ -140,7 +152,7 @@ function setup({ id = 'new', coach = false, outlet, ios = false, blocked = false
             blocked ? options.onBlocked?.() : start(),
         },
       },
-      { provide: RoutineActionsService, useValue: {} },
+      { provide: RoutineActionsService, useValue: actions },
       { provide: AuthStore, useValue: { isInstructor: () => coach, user: () => ({ id: 'me' }) } },
       { provide: AppModeStore, useValue: { mode: () => (coach ? 'coach' : 'train') } },
       { provide: WorkoutSettingsStore, useValue: settingsStore },
@@ -1042,5 +1054,54 @@ describe('RoutineBuilder, saving and starting', () => {
     page.ionViewWillEnter();
 
     expect(page.showStart()).toBe(false);
+  });
+});
+
+describe('RoutineBuilder, opened from a card in a chat', () => {
+  const url = '/tabs/messages/shared/routine/r-1';
+
+  it('opens its exercises in the chat stack, back falling back to Messages', () => {
+    const { page, router } = setup({ id: 'r-1', url });
+    page.ionViewWillEnter();
+
+    expect(page.stackBase()).toBe('/tabs/messages');
+    page.openExerciseById('ex-1');
+    expect(router.navigate).toHaveBeenCalledWith(['/tabs/messages/shared', 'exercise', 'ex-1']);
+  });
+
+  it('lands a copy in its place, still in the chat stack', async () => {
+    const copy = vi.fn(() => of(savedRoutine('r-copy')));
+    const { page, router } = setup({ id: 'r-1', url, coach: true, actions: { copy } });
+    page.ionViewWillEnter();
+
+    page.makeCopy();
+    await vi.waitFor(() => expect(router.navigate).toHaveBeenCalled());
+    expect(router.navigate).toHaveBeenCalledWith(
+      ['/tabs/messages/shared', 'routine', 'r-copy'],
+      { replaceUrl: true },
+    );
+  });
+
+  it('goes back down to the chat once the routine is deleted', async () => {
+    const outlet = { swipeGesture: true, canGoBack: () => true, pop: vi.fn(() => Promise.resolve(true)) };
+    const remove = vi.fn(() => of(undefined));
+    const { page, router } = setup({ id: 'r-1', url, outlet, actions: { remove } });
+    page.ionViewWillEnter();
+
+    page.confirmDelete();
+    await vi.waitFor(() => expect(outlet.pop).toHaveBeenCalled());
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('still goes to the list from the Workouts tab', async () => {
+    const outlet = { swipeGesture: true, canGoBack: () => true, pop: vi.fn(() => Promise.resolve(true)) };
+    const remove = vi.fn(() => of(undefined));
+    const { page, router } = setup({ id: 'r-1', outlet, actions: { remove } });
+    page.ionViewWillEnter();
+
+    page.confirmDelete();
+    await vi.waitFor(() => expect(router.navigate).toHaveBeenCalled());
+    expect(router.navigate).toHaveBeenCalledWith(['/tabs/workouts'], { replaceUrl: true });
+    expect(outlet.pop).not.toHaveBeenCalled();
   });
 });

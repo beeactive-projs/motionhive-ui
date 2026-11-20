@@ -44,6 +44,7 @@ import { NotificationBell } from '../../_shared/components/notification-bell/not
 import { SearchStart } from '../../_shared/components/search-start/search-start';
 import { RecentPerson, RecentSearchScopes } from '../../_shared/config/recent-searches.config';
 import { SearchHeaderFold } from '../../_shared/utils/fold';
+import { dismissKeyboard } from '../../_shared/utils/keyboard';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
 import { injectRecentSearches } from '../../_shared/utils/recent-searches';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
@@ -287,7 +288,7 @@ export class Messages implements ViewWillEnter {
     // tap on it fires no focus event to open search again.
     void this._searchbar()
       ?.getInputElement()
-      .then((input) => input.blur());
+      .then((input) => dismissKeyboard(input));
   }
 
   onQueryChange(value: string): void {
