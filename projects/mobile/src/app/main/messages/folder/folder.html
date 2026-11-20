@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/messages" />
+    </ion-buttons>
+    <ion-title>{{ copy.title | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!-- A flat list, like the chats it came from. -->
+<ion-content [fullscreen]="true" class="mh-flat-page">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  <ion-note class="mh-note-block">{{ copy.note | translate }}</ion-note>
+
+  @if (showSkeleton()) {
+    <ion-list class="mh-flat-list">
+      @for (_ of skeletonRows; track $index) {
+        <mh-row-skeleton [index]="$index" [time]="true" />
+      }
+    </ion-list>
+  } @else if (isEmpty()) {
+    <mh-empty-state [icon]="copy.emptyIcon" [heading]="copy.emptyHeading | translate" />
+  } @else {
+    <ion-list class="mh-flat-list">
+      @for (conversation of rows(); track conversation.id) {
+        <!-- A request is only opened; an archived chat swipes left to come back. -->
+        <mh-conversation-row
+          [conversation]="conversation"
+          [swipeable]="!isRequests"
+          [showMore]="false"
+          (select)="open(conversation)"
+          (archive)="unarchive(conversation)"
+        />
+      }
+    </ion-list>
+  }
+</ion-content>

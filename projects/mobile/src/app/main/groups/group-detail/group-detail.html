@@ -5,6 +5,11 @@
     </ion-buttons>
     <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="end">
+      @if (canSend()) {
+      <ion-button [attr.aria-label]="'share.send.action' | translate" (click)="send()">
+        <ion-icon slot="icon-only" name="paper-plane-outline" />
+      </ion-button>
+      }
       @if (groupActions().length > 0) {
       <!-- One ⋯ for every verb about the group, by role. -->
       <ion-button shape="round" [attr.aria-label]="'groups.detail.a11y.options' | translate"

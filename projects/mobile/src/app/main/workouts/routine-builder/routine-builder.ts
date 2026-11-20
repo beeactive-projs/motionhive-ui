@@ -59,6 +59,7 @@ import {
   RoutineService,
   RoutineSources,
   SetField,
+  ShareTargetType,
   WorkoutLogService,
   dayInSentence,
   localDayKey,
@@ -72,6 +73,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { resolveMode } from '../../../_shared/config/tabs.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { SendToService } from '../../../_shared/services/send-to.service';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
 import { PAGE_BACK_PRIORITY, swipeBackDefault } from '../../../_shared/utils/swipe-back';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
@@ -286,6 +288,7 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
   private readonly _ionRouterOutlet = inject(IonRouterOutlet, { optional: true });
   private readonly _config = inject(Config);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _sendTo = inject(SendToService);
   private readonly _activeWorkoutService = inject(ActiveWorkoutService);
   private readonly _translateService = inject(TranslateService);
   private readonly _routineActionsService = inject(RoutineActionsService);
@@ -403,6 +406,20 @@ export class RoutineBuilder implements ViewWillEnter, ViewDidEnter, ViewWillLeav
 
   /** A starter belongs to nobody: runnable and copyable, never editable. */
   readonly readOnly = computed(() => this.routine()?.source === RoutineSources.System);
+
+  /** A starter on its read view can be sent into a chat as a card. */
+  readonly canSend = computed(() => this.readOnly() && !!this.routine() && this.showOverview());
+
+  send(): void {
+    const routine = this.routine();
+    if (!routine) {
+      return;
+    }
+    this._sendTo.open({
+      ref: { type: ShareTargetType.Program, id: routine.id },
+      title: this.title(),
+    });
+  }
 
   /**
    * The role this person chose, which decides what the page offers. A coach

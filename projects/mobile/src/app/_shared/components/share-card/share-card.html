@@ -1,0 +1,113 @@
+<!-- The owner's sketch: a strip in the kind's colour, a lead tile, the name
+     and its facts, then one action row. The whole card is the button. -->
+<ion-card
+  class="share"
+  [button]="!!link()"
+  [class.off]="isUnavailable() || isEnded()"
+  [style.--share-strip]="stripColor()"
+  (click)="open()"
+>
+  <div class="body">
+    @if (session(); as item) {
+      @if (sessionDate(); as date) {
+        <div class="date" aria-hidden="true">
+          <span class="dow">{{ date.weekday }}</span>
+          <span class="day">{{ date.day }}</span>
+          <span class="mon">{{ date.month }}</span>
+        </div>
+      }
+      <div class="text">
+        <span class="title">{{ item.name }}</span>
+        <span class="meta">
+          {{ sessionDate()?.time }}
+          @if (item.durationMinutes) {
+            · {{ 'share.minutes' | translate: { count: item.durationMinutes } }}
+          }
+          · {{ sessionPlace() }}
+        </span>
+        @if (isEnded()) {
+          <span class="meta">{{ 'share.ended' | translate }}</span>
+        } @else if (seatsFill() !== null) {
+          <div class="seats">
+            <ion-progress-bar color="primary" [value]="seatsFill()" aria-hidden="true" />
+            <span
+              class="count"
+              [attr.aria-label]="'share.seatsAria' | translate: { taken: item.confirmedCount, total: item.capacity }"
+            >
+              {{ item.confirmedCount }} / {{ item.capacity }}
+            </span>
+          </div>
+        }
+      </div>
+    } @else if (group(); as item) {
+      <mh-hex-avatar size="md" aria-hidden="true" [name]="item.name" [imageUrl]="item.logoUrl" color="violet" />
+      <div class="text">
+        <span class="title">{{ item.name }}</span>
+        <span class="meta">
+          {{ 'share.members' | translate: { count: item.memberCount } }}
+          @if (item.city) {
+            · {{ item.city }}
+          }
+        </span>
+      </div>
+    } @else if (coach(); as item) {
+      <mh-hex-avatar size="md" aria-hidden="true" [name]="item.name" [imageUrl]="item.avatarUrl" color="violet" />
+      <div class="text">
+        <span class="title">{{ item.name }}</span>
+        <span class="meta">
+          {{ 'share.coach' | translate }}
+          @if (item.city) {
+            · {{ item.city }}
+          }
+        </span>
+        @if (item.takingClients) {
+          <span class="meta">{{ 'share.takingClients' | translate }}</span>
+        }
+      </div>
+    } @else if (exercise(); as item) {
+      @if (item.thumbnailUrl) {
+        <img class="thumb" alt="" [src]="item.thumbnailUrl" />
+      } @else {
+        <mh-hex-avatar size="md" tone="wash" aria-hidden="true" icon="barbell-outline" color="primary" />
+      }
+      <div class="text">
+        <span class="title">{{ item.name }}</span>
+        <span class="meta">
+          {{ muscles() }}
+          @if (item.level) {
+            @if (muscles()) {
+              ·
+            }
+            {{ 'enum.exerciseLevel.' + item.level | translate }}
+          }
+        </span>
+      </div>
+    } @else if (program(); as item) {
+      <mh-hex-avatar size="md" tone="wash" aria-hidden="true" icon="list-outline" color="primary" />
+      <div class="text">
+        <span class="title">{{ item.name }}</span>
+        <span class="meta">
+          {{ programKind() | translate }}
+          @if (item.level) {
+            · {{ 'enum.exerciseLevel.' + item.level | translate }}
+          }
+          @if (!item.isSingleWorkout) {
+            · {{ 'share.workouts' | translate: { count: item.workoutCount } }}
+          }
+        </span>
+      </div>
+    } @else {
+      <mh-hex-avatar size="md" tone="wash" aria-hidden="true" icon="eye-off-outline" color="medium" />
+      <div class="text">
+        <span class="title">{{ 'share.unavailable' | translate }}</span>
+      </div>
+    }
+  </div>
+
+  @if (link()) {
+    <div class="action">
+      <span>{{ actionKey() | translate }}</span>
+      <ion-icon name="chevron-forward-outline" aria-hidden="true" />
+    </div>
+  }
+</ion-card>

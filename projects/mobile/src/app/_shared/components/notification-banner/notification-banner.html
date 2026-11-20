@@ -1,17 +1,29 @@
-@if (current(); as item) {
+@if (view(); as item) {
   <div #banner class="banner" role="status" [class.settling]="settling()">
     <ion-button class="body" fill="clear" (click)="open()">
-      <mh-hex-avatar
-        slot="start"
-        size="sm"
-        tone="wash"
-        aria-hidden="true"
-        [icon]="style()?.icon ?? 'notifications-outline'"
-        [color]="style()?.color ?? 'medium'"
-      />
+      <!-- A person's photo for a message; the category's tile otherwise. -->
+      @if (item.name) {
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          aria-hidden="true"
+          [name]="item.name"
+          [imageUrl]="item.imageUrl"
+          [color]="item.color"
+        />
+      } @else {
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          tone="wash"
+          aria-hidden="true"
+          [icon]="item.icon"
+          [color]="item.color"
+        />
+      }
       <span class="text">
         <span class="title">{{ item.title }}</span>
-        <span class="detail">{{ item.body }}</span>
+        <span class="detail">{{ item.detail }}</span>
       </span>
     </ion-button>
 

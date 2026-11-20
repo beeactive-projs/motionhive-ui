@@ -5,9 +5,17 @@ import { ConversationListItem, MyInstructor, SuggestedCoach } from 'core';
 
 import {
   ConversationActions,
+  FOLDER_COPY,
   MESSAGING_ICONS,
+  composerClosed,
   conversationActions,
+  folderOf,
+  folderRows,
   frequentContacts,
+  reachNote,
+  requestContextLines,
+  sharedKindKey,
+  waitingNote,
   personFromMyCoach,
   personFromSuggestedCoach,
   recentFromPerson,
@@ -55,13 +63,24 @@ function iconNamesInTemplates(): string[] {
   return [...names];
 }
 
+/**
+ * Icons named in code: the More sheet's verbs (`conversationActions`), in
+ * every state they can be in. They render through the action sheet, which
+ * no template here names.
+ */
+function iconNamesInCode(): string[] {
+  return [true, false].flatMap((on) =>
+    conversationActions(on, true, on).flatMap((action) => (action.icon ? [action.icon] : [])),
+  );
+}
+
 const registered = new Set(Object.keys(MESSAGING_ICONS));
 
 describe('MESSAGING_ICONS', () => {
   // An unregistered name renders as a blank box with no error anywhere, which
   // is exactly the kind of thing that ships. Same guard as ACCOUNT_ICONS.
   it('registers every icon the messages templates render', () => {
-    const used = iconNamesInTemplates();
+    const used = [...iconNamesInTemplates(), ...iconNamesInCode()];
     expect(used.length).toBeGreaterThan(0);
 
     for (const name of used) {
@@ -70,8 +89,8 @@ describe('MESSAGING_ICONS', () => {
   });
 
   // The opposite drift: icons kept around for screens that changed.
-  it('registers nothing the templates do not use', () => {
-    const used = new Set(iconNamesInTemplates().map(toCamelCase));
+  it('registers nothing the templates or the sheets do not use', () => {
+    const used = new Set([...iconNamesInTemplates(), ...iconNamesInCode()].map(toCamelCase));
 
     for (const key of registered) {
       expect(used, `${key} is registered but unused`).toContain(key);
@@ -80,10 +99,11 @@ describe('MESSAGING_ICONS', () => {
 });
 
 describe('conversationActions', () => {
-  it('offers profile, mute, delete, then block for a person with a handle', () => {
+  it('offers profile, mute, archive, delete, then block for a person with a handle', () => {
     expect(conversationActions(false, true).map((a) => a.id)).toEqual([
       ConversationActions.Profile,
       ConversationActions.Mute,
+      ConversationActions.Archive,
       ConversationActions.Delete,
       ConversationActions.Block,
     ]);
@@ -92,6 +112,7 @@ describe('conversationActions', () => {
   it('leaves out the profile row when there is no handle to open', () => {
     expect(conversationActions(false, false).map((a) => a.id)).toEqual([
       ConversationActions.Mute,
+      ConversationActions.Archive,
       ConversationActions.Delete,
       ConversationActions.Block,
     ]);
@@ -220,5 +241,109 @@ describe('search start', () => {
       ['u1', 'Your coach'],
       ['u2', '@radu'],
     ]);
+  });
+});
+
+// ── Message requests, archive, shares ───────────────────────────────────────
+
+function row(id: string, patch: Partial<ConversationListItem> = {}): ConversationListItem {
+  return {
+    id,
+    type: 'DIRECT',
+    name: null,
+    avatarUrl: null,
+    lastMessageAt: null,
+    lastMessagePreview: null,
+    unreadCount: 0,
+    muted: false,
+    otherUser: null,
+    lastReadByOther: null,
+    ...patch,
+  };
+}
+
+describe('conversationActions, archive', () => {
+  it('offers Archive, or Unarchive on an archived chat, violet and never destructive', () => {
+    const archive = conversationActions(false, true).find(
+      (action) => action.id === ConversationActions.Archive,
+    );
+    expect(archive).toMatchObject({ label: 'messages.actions.archive', color: 'violet' });
+    expect(archive?.destructive).toBeFalsy();
+
+    const unarchive = conversationActions(false, true, true).find(
+      (action) => action.id === ConversationActions.Archive,
+    );
+    expect(unarchive?.label).toBe('messages.actions.unarchive');
+  });
+});
+
+describe('requestContextLines', () => {
+  it('says the writer coaches, then a group in common', () => {
+    expect(
+      requestContextLines({ isCoach: true, sharedGroupName: 'Runners', sharedGroupCount: 3 }),
+    ).toEqual([
+      { key: 'messages.request.context.coach' },
+      { key: 'messages.request.context.group', params: { name: 'Runners', more: 2 } },
+    ]);
+  });
+
+  it('says plainly when nothing is shared', () => {
+    expect(requestContextLines(null)).toEqual([{ key: 'messages.request.context.noGroup' }]);
+  });
+});
+
+describe('waitingNote and composerClosed', () => {
+  it('counts down while a request waits, then closes the composer', () => {
+    expect(waitingNote({ remaining: 2 }, 'Ana')).toEqual({
+      key: 'messages.request.waiting',
+      params: { name: 'Ana', count: 2 },
+    });
+    expect(waitingNote({ remaining: 0 }, 'Ana')?.key).toBe('messages.request.waitingFull');
+    expect(composerClosed({ remaining: 0 }, null)).toBe(true);
+    expect(composerClosed({ remaining: 1 }, null)).toBe(false);
+    expect(waitingNote(null, 'Ana')).toBeNull();
+  });
+
+  it('closes the composer for someone who cannot be written to', () => {
+    expect(composerClosed(null, { status: 'CONNECTIONS_ONLY', requestLimit: null })).toBe(true);
+    expect(composerClosed(null, { status: 'REQUEST', requestLimit: 3 })).toBe(false);
+    expect(composerClosed(null, { status: 'DIRECT', requestLimit: null })).toBe(false);
+  });
+});
+
+describe('reachNote', () => {
+  it('says what a first message will do, and nothing when it goes straight in', () => {
+    expect(reachNote({ status: 'REQUEST', requestLimit: 10 }, 'Ana')).toEqual({
+      key: 'messages.reach.request',
+      params: { name: 'Ana', count: 10 },
+    });
+    expect(reachNote({ status: 'CONNECTIONS_ONLY', requestLimit: null }, 'Ana')?.key).toBe(
+      'messages.reach.connectionsOnly',
+    );
+    expect(reachNote({ status: 'DIRECT', requestLimit: null }, 'Ana')).toBeNull();
+    expect(reachNote(null, 'Ana')).toBeNull();
+  });
+});
+
+describe('folderRows', () => {
+  it('shows each folder only when something is in it', () => {
+    expect(folderRows([], [])).toEqual([]);
+    const rows = folderRows([row('r1'), row('r2')], [row('a1')]);
+    expect(rows.map((r) => [r.route, r.count, r.badge])).toEqual([
+      ['requests', 2, '2'],
+      ['archived', 1, ''],
+    ]);
+  });
+});
+
+describe('folder copy and routes', () => {
+  it('reads the folder from route data, requests by default', () => {
+    expect(folderOf({ folder: 'archived' })).toBe('archived');
+    expect(folderOf({})).toBe('requests');
+    expect(FOLDER_COPY.requests.title).toBe('messages.requests.title');
+  });
+
+  it('names each shared kind for the chat list', () => {
+    expect(sharedKindKey('SESSION')).toBe('messages.shared.SESSION');
   });
 });

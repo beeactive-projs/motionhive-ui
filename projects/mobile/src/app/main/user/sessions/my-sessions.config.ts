@@ -8,8 +8,9 @@ import {
   copyOutline,
   documentTextOutline,
   hourglassOutline,
-  lockClosedOutline,
   locationOutline,
+  lockClosedOutline,
+  paperPlaneOutline,
   peopleOutline,
   pricetagOutline,
   timeOutline,
@@ -47,6 +48,7 @@ import {
 
 /** Every icon this feature renders — same guard idea as the coach config. */
 export const MY_SESSION_ICONS = {
+  paperPlaneOutline,
   alertCircleOutline,
   calendarOutline,
   checkmarkCircleOutline,

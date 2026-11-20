@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
+  IonButton,
   IonBadge,
   NavController,
   IonButtons,
@@ -31,7 +32,9 @@ import {
   ExerciseMediaKind,
   ExerciseOwnershipFilter,
   ExerciseService,
+  ExerciseSource,
   ExerciseVisibility,
+  ShareTargetType,
   YoutubeEmbed,
   displayName,
 } from 'core';
@@ -41,6 +44,7 @@ import { prefersReducedMotion } from '../../../_shared/utils/motion';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { SendToService } from '../../../_shared/services/send-to.service';
 import { OwnExerciseSheets } from '../_components/own-exercise-sheets/own-exercise-sheets';
 import {
   EXERCISE_ICONS,
@@ -85,6 +89,7 @@ const SWIPE_PX = 30;
     EmptyState,
     HexAvatar,
     IonBackButton,
+    IonButton,
     IonBadge,
     IonButtons,
     IonContent,
@@ -109,6 +114,7 @@ export class ExerciseDetail implements ViewWillEnter {
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _sendTo = inject(SendToService);
   private readonly _navController = inject(NavController);
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
@@ -119,6 +125,29 @@ export class ExerciseDetail implements ViewWillEnter {
   readonly exerciseId = signal('');
 
   readonly exercise = signal<Exercise | null>(null);
+
+  /** MotionHive's own exercises and public ones can be sent into a chat. */
+  readonly canSend = computed(() => {
+    const exercise = this.exercise();
+    if (!exercise) {
+      return false;
+    }
+    return (
+      exercise.source === ExerciseSource.System ||
+      exercise.visibility === ExerciseVisibility.Public
+    );
+  });
+
+  send(): void {
+    const exercise = this.exercise();
+    if (!exercise) {
+      return;
+    }
+    this._sendTo.open({
+      ref: { type: ShareTargetType.Exercise, id: exercise.id },
+      title: this.name(),
+    });
+  }
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 

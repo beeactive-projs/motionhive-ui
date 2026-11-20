@@ -11,7 +11,7 @@ import { ButtonDirective } from 'primeng/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrivacyPolicyComponent {
-  readonly lastUpdated = signal(new Date(2026, 9, 18));
+  readonly lastUpdated = signal(new Date(2026, 10, 20));
 
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });

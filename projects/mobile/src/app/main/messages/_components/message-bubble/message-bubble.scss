@@ -20,6 +20,25 @@
   max-width: 82%;
 }
 
+/* A card takes the whole row: at 82% a narrow phone at large text leaves it
+   too thin to read. */
+.row:has(mh-share-card) {
+  max-width: 100%;
+}
+
+/* A shared card under its caption, on the same side as the bubble. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+:host(.mine) .stack {
+  align-items: flex-end;
+}
+
 /* Reserved even when empty, so every bubble in a "them" run lines up with the
    avatar under the last one instead of stepping left. */
 .gutter {

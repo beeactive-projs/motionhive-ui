@@ -39,6 +39,7 @@ import {
   GroupMember,
   GroupsRefreshService,
   Post,
+  ShareTargetType,
   displayName,
 } from 'core';
 
@@ -50,6 +51,7 @@ import { StaleBar } from '../../../_shared/components/stale-bar/stale-bar';
 import { ACTIVITY_ICONS, categoryIcon } from '../../../_shared/config/category-icons.config';
 import { SearchbarLabelDirective } from '../../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { SendToService } from '../../../_shared/services/send-to.service';
 import { GROUP_AVATAR_TONE, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
@@ -135,6 +137,7 @@ import { GroupDetailStore } from './group-detail.store';
 })
 export class GroupDetail implements ViewWillEnter {
   readonly store = inject(GroupDetailStore);
+  private readonly _sendTo = inject(SendToService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _navController = inject(NavController);
@@ -178,6 +181,20 @@ export class GroupDetail implements ViewWillEnter {
 
   readonly isPosts = computed(() => this.store.tab() === GroupTabs.Posts);
   readonly isMembers = computed(() => this.store.tab() === GroupTabs.Members);
+
+  /** A public, active group can be sent into a chat as a card. */
+  readonly canSend = computed(() => {
+    const group = this.store.group();
+    return !!group && group.isPublic && group.isActive;
+  });
+
+  send(): void {
+    const group = this.store.group();
+    if (!group) {
+      return;
+    }
+    this._sendTo.open({ ref: { type: ShareTargetType.Group, id: group.id }, title: group.name });
+  }
 
   readonly title = computed(() => {
     const group = this.store.group();

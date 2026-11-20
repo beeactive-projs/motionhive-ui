@@ -2,6 +2,8 @@ import { OnboardingSteps, SocialPlatformKey } from 'core';
 import type { OnboardingStep } from 'core';
 import {
   alertCircleOutline,
+  searchOutline,
+  chatbubblesOutline,
   atOutline,
   banOutline,
   barbellOutline,
@@ -48,6 +50,8 @@ import { CATEGORY_ICONS } from '../../_shared/config/notification-categories.con
 export const ACCOUNT_ICONS = {
   ...CATEGORY_ICONS,
   alertCircleOutline,
+  searchOutline,
+  chatbubblesOutline,
   atOutline,
   banOutline,
   barbellOutline,

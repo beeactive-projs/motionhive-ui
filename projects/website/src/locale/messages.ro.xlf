@@ -4624,6 +4624,14 @@
           <context context-type="linenumber">217</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="privacy.s2.messages" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Messages.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> When you write to someone in MotionHive, we keep the conversation so both of you can read it. Messages from people you don't train with arrive as message requests, and you choose who can message you in your privacy settings. We check messages automatically for payment details and contacts outside MotionHive, so we can show a safety warning. Our team reads a conversation only when someone reports it, and every such read is logged. Your messages are deleted when you delete your account.</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Mesaje.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Când scrii cuiva în MotionHive, păstrăm conversația ca să o poată citi amândouă părțile. Mesajele de la persoane cu care nu te antrenezi ajung ca solicitări de mesaj, iar în setările de confidențialitate alegi cine îți poate scrie. Verificăm automat mesajele după date de plată și contacte din afara MotionHive, ca să putem afișa un avertisment de siguranță. Echipa noastră citește o conversație doar când cineva o raportează, iar fiecare astfel de citire este înregistrată. Mesajele tale sunt șterse când îți ștergi contul.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">220</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="privacy.s3.h2" datatype="html">
         <source>3. What legal bases do we rely on to process your information? </source>
         <target state="translated">3. Pe ce temeiuri legale ne bazăm pentru a prelucra informațiile tale?</target>

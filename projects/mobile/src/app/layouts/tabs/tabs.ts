@@ -44,6 +44,7 @@ import {
 } from '../../_shared/config/tabs.config';
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
 import { PhotoViewer } from '../../_shared/components/photo-viewer/photo-viewer';
+import { SendToSheet } from '../../_shared/components/send-to-sheet/send-to-sheet';
 import { ActiveWorkoutBar } from '../../main/workouts/_components/active-workout-bar/active-workout-bar';
 import { ActiveSessionStore } from '../../main/workouts/_services/active-session.store';
 import { ResumeCardService } from '../../main/workouts/_services/resume-card.service';
@@ -194,6 +195,7 @@ export function keyboardUpdates(appReturns: Observable<void>): Observable<boolea
     ActiveWorkoutBar,
     NotificationBanner,
     PhotoViewer,
+    SendToSheet,
     SaveRoutineSheet,
     StartConflictSheet,
     TranslatePipe,
@@ -349,7 +351,10 @@ export class Tabs {
    */
   readonly tabs = computed(() =>
     this._tabSet().tabs.map((tab): TabItem => {
-      if (tab.id === TabIds.Messages) return { ...tab, badge: this._messagingStore.unreadTotal };
+      // Chats only: requests have their own count, archived chats stay quiet.
+      if (tab.id === TabIds.Messages) {
+        return { ...tab, badge: this._messagingStore.chatsUnreadTotal };
+      }
       if (tab.id === TabIds.Clients) {
         return {
           ...tab,

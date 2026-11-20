@@ -22,11 +22,12 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { GroupsRefreshService, SelfJoinResult } from 'core';
+import { GroupsRefreshService, SelfJoinResult, ShareTargetType } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { SendToService } from '../../../_shared/services/send-to.service';
 import { GROUP_AVATAR_TONE } from '../../../_shared/utils/avatar-tone.utils';
 import { groupLinks } from '../../../_shared/utils/stack-paths';
 import { ViewPhotoDirective } from '../../../_shared/directives/view-photo.directive';
@@ -87,6 +88,7 @@ export class GroupPreview {
     untracked(() => this._router.currentNavigation()?.previousNavigation?.finalUrl?.toString() ?? null),
   );
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _sendTo = inject(SendToService);
   private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
@@ -98,6 +100,15 @@ export class GroupPreview {
   readonly joining = signal(false);
 
   readonly group = computed(() => this.store.profile()?.group ?? null);
+
+  send(): void {
+    const group = this.group();
+    const id = this.store.groupId();
+    if (!group || !id) {
+      return;
+    }
+    this._sendTo.open({ ref: { type: ShareTargetType.Group, id }, title: group.name });
+  }
 
   readonly memberCountLabel = computed(() =>
     this._translateService.instant('count.members', { count: this.group()?.memberCount ?? 0 }),

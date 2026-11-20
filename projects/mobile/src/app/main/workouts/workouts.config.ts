@@ -56,9 +56,10 @@ import {
   flashOutline,
   globeOutline,
   imageOutline,
-  listOutline,
   linkOutline,
+  listOutline,
   lockClosedOutline,
+  paperPlaneOutline,
   pauseOutline,
   peopleOutline,
   personOutline,
@@ -88,6 +89,7 @@ import { BadgeTone, BadgeTones } from '../exercises/exercises.config';
  * `workouts.config.spec.ts` checks it against every template.
  */
 export const WORKOUT_ICONS = {
+  paperPlaneOutline,
   addOutline,
   alertCircleOutline,
   archiveOutline,

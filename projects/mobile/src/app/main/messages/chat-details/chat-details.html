@@ -58,6 +58,23 @@
             </ion-label>
           </ion-toggle>
         </ion-item>
+        <!-- Out of the chats and quiet; it stays there when messages arrive.
+             Not on a message request, which is accepted first. -->
+        @if (!conversation()?.isRequest) {
+          <ion-item>
+            <ion-toggle
+              justify="space-between"
+              [checked]="archived()"
+              [disabled]="archiving() || !conversation()"
+              (ionChange)="toggleArchive()"
+            >
+              <ion-label>
+                <h3>{{ 'messages.details.archive' | translate }}</h3>
+                <p>{{ 'messages.details.archiveHint' | translate }}</p>
+              </ion-label>
+            </ion-toggle>
+          </ion-item>
+        }
       </ion-list>
     </section>
 

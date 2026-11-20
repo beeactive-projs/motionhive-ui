@@ -35,14 +35,18 @@ import { addIcons } from 'ionicons';
 
 import {
   AuthStore,
+  MessagingReach,
   MessagingStore,
+  UserBlockReason,
   dayDividerLabel,
   displayName,
   groupMessages,
   isOptimisticMessageId,
 } from 'core';
 
+import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { FeedbackService } from '../../../_shared/services/feedback.service';
 import {
   ProfileStacks,
   chatBase,
@@ -60,7 +64,14 @@ import {
 import { ChatComposer } from '../_components/chat-composer/chat-composer';
 import { MessageBubble } from '../_components/message-bubble/message-bubble';
 import { ThreadSkeleton } from '../_components/thread-skeleton/thread-skeleton';
-import { MESSAGING_ICONS } from '../messages.config';
+import { BlockUserSheet } from '../_sheets/block-user-sheet/block-user-sheet';
+import {
+  MESSAGING_ICONS,
+  composerClosed,
+  reachNote,
+  requestContextLines,
+  waitingNote,
+} from '../messages.config';
 
 /** How close to the bottom counts as "following the conversation". */
 const FOLLOW_THRESHOLD_PX = 120;
@@ -92,7 +103,9 @@ const INTERACTIVE = 'a, button, ion-button, input, textarea, [role="button"]';
 @Component({
   selector: 'mh-chat',
   imports: [
+    BlockUserSheet,
     ChatComposer,
+    ConfirmSheet,
     HexAvatar,
     IonBackButton,
     IonButton,
@@ -233,6 +246,43 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
 
   readonly otherReadAt = computed(() => this.conversation()?.lastReadByOther ?? null);
 
+  // ── Message requests ──────────────────────────────────────────
+
+  private readonly _feedbackService = inject(FeedbackService);
+
+  /** The reader hasn't taken this chat in: Accept, Delete or Block instead of the composer. */
+  readonly isRequest = computed(() => !!this.conversation()?.isRequest);
+
+  /** How the writer and the reader might know each other, over the thread. */
+  readonly requestLines = computed(() =>
+    requestContextLines(this.conversation()?.requestContext),
+  );
+
+  readonly firstName = computed(() => this.title().split(' ')[0] ?? '');
+
+  /** For a draft: what a first message to them will do, asked before typing. */
+  readonly reach = signal<MessagingReach | null>(null);
+
+  /** The line over the composer: a draft's reach, or a request of the reader's that waits. */
+  readonly composerNote = computed(() => {
+    if (this.isDraft()) {
+      return reachNote(this.reach(), this.firstName());
+    }
+    return waitingNote(this.conversation()?.waiting, this.firstName());
+  });
+
+  /** Nothing more can be sent: the request is full, or they can't be written to. */
+  readonly isComposerClosed = computed(() => {
+    if (this.isDraft()) {
+      return composerClosed(null, this.reach());
+    }
+    return composerClosed(this.conversation()?.waiting, null);
+  });
+
+  readonly answering = signal(false);
+  readonly deleteRequestOpen = signal(false);
+  readonly blockOpen = signal(false);
+
   readonly placeholder = computed(() => {
     const firstName = this.otherUser()
       ? this.title().split(' ')[0]
@@ -277,6 +327,26 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
         this._draftRecipientName.set(params.get('name') ?? '');
       });
 
+    // A draft asks once per recipient what a first message will do. An
+    // answer for someone else (the draft moved on) is dropped.
+    effect(() => {
+      let recipientId: string | null = null;
+      if (this.isDraft()) {
+        recipientId = this._draftRecipientId();
+      }
+      untracked(() => {
+        this.reach.set(null);
+        if (!recipientId) {
+          return;
+        }
+        void this.store.reach(recipientId).then((reach) => {
+          if (this._draftRecipientId() === recipientId) {
+            this.reach.set(reach);
+          }
+        });
+      });
+    });
+
     this._watchKeyboard();
     afterNextRender(() => this._watchThreadTouches());
 
@@ -306,6 +376,66 @@ export class Chat implements ViewWillEnter, ViewWillLeave, ViewDidLeave {
       // had before them.
       queueMicrotask(() => void this._settleScroll(grewAtBottom, sentHere));
     });
+  }
+
+  /** Accept the request: the composer opens and the chat joins the chats. */
+  async acceptRequest(): Promise<void> {
+    const id = this.conversationId();
+    if (!id || this.answering()) {
+      return;
+    }
+    this.answering.set(true);
+    const ok = await this.store.acceptRequest(id);
+    this.answering.set(false);
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.request.toast.acceptFailed'),
+      );
+    }
+  }
+
+  /** Delete the request. The store leaves the thread; the sender is never told. */
+  async deleteRequest(): Promise<void> {
+    const id = this.conversationId();
+    if (!id || this.answering()) {
+      return;
+    }
+    this.answering.set(true);
+    const ok = await this.store.declineRequest(id);
+    this.answering.set(false);
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.request.toast.deleteFailed'),
+      );
+      return;
+    }
+    this.deleteRequestOpen.set(false);
+    void this._feedbackService.success(
+      this._translateService.instant('messages.request.toast.deleted'),
+    );
+  }
+
+  /** Block from the request, as from chat details; the store leaves the thread. */
+  async block(reason: UserBlockReason): Promise<void> {
+    const blockedId = this.otherUser()?.id;
+    const conversationId = this.conversationId();
+    if (!blockedId || !conversationId) {
+      return;
+    }
+    const name = this.title();
+    const ok = await this.store.blockUser({ blockedId, reason, conversationId });
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.blockFailed'),
+      );
+      return;
+    }
+    void this._feedbackService.success(
+      this._translateService.instant('messages.toast.blocked', { name }),
+    );
   }
 
   private _enterThread(id: string | null): void {

@@ -32,7 +32,7 @@ export class AppBadgeService {
         return;
       }
       if (!this._messagingStore.hasLoaded() || !this._notificationStore.countLoaded()) return;
-      void this.write(this._messagingStore.unreadTotal() + this._notificationStore.unreadCount());
+      void this.write(this._messagingStore.chatsUnreadTotal() + this._notificationStore.unreadCount());
     });
   }
 

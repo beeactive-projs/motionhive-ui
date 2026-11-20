@@ -23,6 +23,21 @@ export const messagesRoutes: Routes = [
     loadComponent: () => import('./new-message/new-message').then((m) => m.NewMessage),
     title: 'pageTitle.newMessage',
   },
+  {
+    // Message requests and archived chats: one screen over a folder of the
+    // inbox, named by `data.folder`. Before the chat pages, whose `:id`
+    // would take the words.
+    path: 'requests',
+    loadComponent: () => import('./folder/folder').then((m) => m.ConversationFolderPage),
+    title: 'pageTitle.messageRequests',
+    data: { folder: 'requests' },
+  },
+  {
+    path: 'archived',
+    loadComponent: () => import('./folder/folder').then((m) => m.ConversationFolderPage),
+    title: 'pageTitle.archivedChats',
+    data: { folder: 'archived' },
+  },
   ...personRoutes,
   ...chatPageRoutes,
 ];

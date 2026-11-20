@@ -1,0 +1,89 @@
+<ng-template #sticky>
+  <ion-searchbar
+    searchIcon="search-outline"
+    clearIcon="close-outline"
+    inputmode="search"
+    [placeholder]="'share.send.search' | translate"
+    [attr.aria-label]="'share.send.search' | translate"
+    [value]="people.query()"
+    (ionInput)="onQuery($event.detail.value ?? '')"
+  />
+</ng-template>
+
+<ng-template #body>
+  <div class="mh-stack">
+    @if (showSkeleton()) {
+      <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
+        @for (_ of [1, 2, 3]; track $index) {
+          <ion-item>
+            <mh-hex-avatar slot="start" size="sm" color="medium" tone="wash" />
+            <ion-label><ion-skeleton-text [animated]="true" style="width: 45%" /></ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (isEmpty()) {
+      <mh-empty-state icon="search-outline" [heading]="emptyHeading() | translate" />
+    } @else {
+      <section class="mh-section">
+        <div class="mh-section-label">{{ sectionLabel() | translate }}</div>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (person of rows(); track person.id) {
+            <ion-item button [detail]="false" (click)="toggle(person)">
+              <mh-hex-avatar
+                slot="start"
+                size="sm"
+                aria-hidden="true"
+                [name]="person.name"
+                [imageUrl]="person.avatarUrl"
+                [color]="tone(person)"
+              />
+              <ion-label>
+                <h2>{{ person.name }}</h2>
+                @if (person.subline) {
+                  <p>{{ person.subline }}</p>
+                }
+              </ion-label>
+              <!-- The row is the target; the box reports. -->
+              <ion-checkbox
+                slot="end"
+                [checked]="isSelected(person)"
+                [attr.aria-label]="person.name"
+                (click)="$event.preventDefault()"
+              />
+            </ion-item>
+          }
+        </ion-list>
+        <p class="mh-footnote">{{ 'share.send.note' | translate: { count: limit } }}</p>
+      </section>
+    }
+
+    <ion-textarea
+      mode="md"
+      fill="outline"
+      labelPlacement="stacked"
+      autocapitalize="sentences"
+      [autoGrow]="true"
+      [rows]="1"
+      [maxlength]="4000"
+      [label]="'share.send.caption' | translate"
+      [placeholder]="'share.send.captionPlaceholder' | translate"
+      [value]="caption()"
+      (ionInput)="caption.set($event.detail.value ?? '')"
+    />
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'share.send.title' | translate"
+  [subtitle]="title()"
+  [body]="body"
+  [sticky]="sticky"
+  [saveLabel]="saveLabel()"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [initialBreakpoint]="0.95"
+  [breakpoints]="[0, 0.95]"
+  (save)="save()"
+  (dismissed)="onDismissed()"
+/>

@@ -12,6 +12,7 @@ import {
   lockClosedOutline,
   mailOutline,
   openOutline,
+  paperPlaneOutline,
   pulseOutline,
   ribbonOutline,
   starOutline,
@@ -22,6 +23,7 @@ import { monthGroups } from '../workouts/workouts.config';
 
 /** Every icon this screen renders, registered in one place. */
 export const PERSON_ICONS = {
+  paperPlaneOutline,
   alertCircleOutline,
   callOutline,
   chatbubbleEllipsesOutline,

@@ -55,6 +55,14 @@
   @if (loading() && !hasLoaded()) {
     <mh-thread-skeleton />
   }
+  @if (isRequest()) {
+    <!-- A message request: who this is, as far as the two share anything. -->
+    <ion-note class="mh-note-block ion-text-center request-context">
+      @for (line of requestLines(); track line.key) {
+        <span>{{ line.key | translate: line.params }}</span>
+      }
+    </ion-note>
+  }
   @if (isDraft()) {
     <ion-note class="mh-note-block ion-text-center">
       {{ 'messages.chat.draftStart' | translate: { name: title() } }}
@@ -82,10 +90,60 @@
 
 <ion-footer [class.keyboard-open]="keyboardOpen()">
   <ion-toolbar>
-    <mh-chat-composer
-      [conversationId]="conversationId()"
-      [recipientId]="recipientId()"
-      [placeholder]="placeholder()"
-    />
+    @if (isRequest()) {
+      <!-- Instead of the composer: the reader decides first. Replying is
+           accepting, so there is nothing to type until they do. -->
+      <div class="request-bar">
+        <ion-note class="composer-note">
+          {{ 'messages.request.notice' | translate: { name: firstName() } }}
+        </ion-note>
+        <div class="request-actions">
+          <ion-button color="primary" [disabled]="answering()" (click)="acceptRequest()">
+            {{ 'messages.request.accept' | translate }}
+          </ion-button>
+          <ion-button
+            fill="outline"
+            color="danger"
+            [disabled]="answering()"
+            (click)="deleteRequestOpen.set(true)"
+          >
+            {{ 'messages.request.delete' | translate }}
+          </ion-button>
+          <ion-button
+            fill="clear"
+            color="danger"
+            [disabled]="answering()"
+            (click)="blockOpen.set(true)"
+          >
+            {{ 'messages.request.block' | translate }}
+          </ion-button>
+        </div>
+      </div>
+    } @else {
+      @if (composerNote(); as line) {
+        <ion-note class="composer-note" role="status">
+          {{ line.key | translate: line.params }}
+        </ion-note>
+      }
+      @if (!isComposerClosed()) {
+        <mh-chat-composer
+          [conversationId]="conversationId()"
+          [recipientId]="recipientId()"
+          [placeholder]="placeholder()"
+        />
+      }
+    }
   </ion-toolbar>
 </ion-footer>
+
+<mh-confirm-sheet
+  [(open)]="deleteRequestOpen"
+  [title]="'messages.request.deleteSheet.title' | translate"
+  [body]="'messages.request.deleteSheet.body' | translate: { name: firstName() }"
+  [confirmLabel]="'messages.request.delete' | translate"
+  tone="danger"
+  [saving]="answering()"
+  (confirm)="deleteRequest()"
+/>
+
+<mh-block-user-sheet [(open)]="blockOpen" [name]="title()" (confirm)="block($event)" />

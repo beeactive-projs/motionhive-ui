@@ -29,6 +29,7 @@ import {
   ProfilePreviewAs,
   ProfileWorkout,
   PublicSharedGroup,
+  ShareTargetType,
   appLocale,
   countryNameFromCode,
   languageName,
@@ -43,6 +44,7 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 import { FeedbackService } from '../../_shared/services/feedback.service';
+import { SendToService } from '../../_shared/services/send-to.service';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { ProfileStacks, groupLinks, stackRootOf } from '../../_shared/utils/stack-paths';
@@ -121,6 +123,7 @@ export class Person {
   private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
+  private readonly _sendTo = inject(SendToService);
   private readonly _router = inject(Router);
 
   /**
@@ -148,6 +151,23 @@ export class Person {
   readonly isSelf = computed(
     () => !!this.store.profile() && this.store.profile()?.userId === this._authStore.user()?.id,
   );
+
+  /**
+   * A coach's profile, not your own, can be sent into a chat as a card. The
+   * server checks the coach is in the directory and says so if not.
+   */
+  readonly canSend = computed(() => !!this.store.profile()?.isInstructor && !this.isSelf());
+
+  send(): void {
+    const profile = this.store.profile();
+    if (!profile) {
+      return;
+    }
+    this._sendTo.open({
+      ref: { type: ShareTargetType.Coach, id: profile.userId },
+      title: this.name(),
+    });
+  }
 
   /** USER is filtered out server-side, so anything left is worth showing. */
   readonly roles = computed(() => (this.store.profile()?.displayRoles ?? []).map(roleLabel));

@@ -4625,6 +4625,13 @@
           <context context-type="linenumber">217,219</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="privacy.s2.messages" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Messages.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> When you write to someone in MotionHive, we keep the conversation so both of you can read it. Messages from people you don't train with arrive as message requests, and you choose who can message you in your privacy settings. We check messages automatically for payment details and contacts outside MotionHive, so we can show a safety warning. Our team reads a conversation only when someone reports it, and every such read is logged. Your messages are deleted when you delete your account.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">220</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="privacy.s3.h2" datatype="html">
         <source>3. What legal bases do we rely on to process your information? </source>
         <context-group purpose="location">

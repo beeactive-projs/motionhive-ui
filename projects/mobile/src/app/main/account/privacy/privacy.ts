@@ -11,6 +11,7 @@ import {
   IonNote,
   IonSkeletonText,
   IonTitle,
+  IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -21,7 +22,10 @@ import {
   PrivacyControlledField,
   ProfilePrivacy,
   ProfilePrivacyLabels,
+  MessagingService,
   ProfileService,
+  UserService,
+  WhoCanMessage,
   resolveFieldPrivacy,
 } from 'core';
 
@@ -29,6 +33,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ChoiceOption, ChoiceSheet } from '../../../_shared/components/choice-sheet/choice-sheet';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { ACCOUNT_ICONS } from '../account.config';
 import { AccountStore } from '../account.store';
 import { ProfileStacks } from '../../../_shared/utils/stack-paths';
@@ -75,6 +80,38 @@ export const WORKOUTS_PRIVACY_ROW: PrivacyRow = {
 };
 
 /**
+ * "Who can message you" (API migration 090): straight into the chats for
+ * everyone, a message request for anyone not connected (the default), or
+ * nobody but the people one trains with.
+ */
+export const WHO_CAN_MESSAGE_OPTIONS: readonly {
+  value: WhoCanMessage;
+  label: string;
+  /** The row's value: short enough to sit beside its label. */
+  short: string;
+  hint: string;
+}[] = [
+  {
+    value: WhoCanMessage.Everyone,
+    label: 'account.privacy.messages.who.EVERYONE',
+    short: 'account.privacy.messages.whoShort.EVERYONE',
+    hint: 'account.privacy.messages.whoHint.EVERYONE',
+  },
+  {
+    value: WhoCanMessage.Requests,
+    label: 'account.privacy.messages.who.REQUESTS',
+    short: 'account.privacy.messages.whoShort.REQUESTS',
+    hint: 'account.privacy.messages.whoHint.REQUESTS',
+  },
+  {
+    value: WhoCanMessage.Connections,
+    label: 'account.privacy.messages.who.CONNECTIONS',
+    short: 'account.privacy.messages.whoShort.CONNECTIONS',
+    hint: 'account.privacy.messages.whoHint.CONNECTIONS',
+  },
+];
+
+/**
  * "Who can see my details": one row per detail, each opening a choice of
  * Public, Coaches only or Only me. Saves on the tap, optimistically, and puts
  * the old level back if the server refuses.
@@ -94,7 +131,9 @@ export const WORKOUTS_PRIVACY_ROW: PrivacyRow = {
     IonNote,
     IonSkeletonText,
     IonTitle,
+    IonToggle,
     IonToolbar,
+    HexAvatar,
     SettingsRow,
     TranslatePipe,
   ],
@@ -102,6 +141,8 @@ export const WORKOUTS_PRIVACY_ROW: PrivacyRow = {
 })
 export class AccountPrivacy implements OnInit {
   private readonly _profileService = inject(ProfileService);
+  private readonly _messagingService = inject(MessagingService);
+  private readonly _userService = inject(UserService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
   private readonly _router = inject(Router);
@@ -130,6 +171,34 @@ export class AccountPrivacy implements OnInit {
       ),
     }));
   });
+
+  // ── Messages ─────────────────────────────────────────────────────
+
+  readonly whoOpen = signal(false);
+  readonly savingWho = signal(false);
+  readonly savingFind = signal(false);
+
+  readonly whoCanMessage = computed(
+    () => this.account()?.whoCanMessage ?? WhoCanMessage.Requests,
+  );
+  /** On when the API says nothing: the default for everyone. */
+  readonly findByName = computed(() => this.account()?.findByName ?? true);
+
+  readonly whoCanMessageLabel = computed(() => {
+    const option = WHO_CAN_MESSAGE_OPTIONS.find((o) => o.value === this.whoCanMessage());
+    if (!option) {
+      return '';
+    }
+    return this._translateService.instant(option.short);
+  });
+
+  readonly whoOptions = computed<ChoiceOption[]>(() =>
+    WHO_CAN_MESSAGE_OPTIONS.map((option) => ({
+      value: option.value,
+      label: this._translateService.instant(option.label),
+      hint: this._translateService.instant(option.hint),
+    })),
+  );
 
   readonly sheetTitle = computed(() => {
     const row = this.editing();
@@ -189,6 +258,54 @@ export class AccountPrivacy implements OnInit {
         error: (error: unknown) => {
           this._setSaving(field, false);
           this.store.patchAccount({ privacySettings: previous });
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.privacy.saveFailed'),
+          );
+        },
+      });
+  }
+
+  /** Saved on the tap; the old choice comes back if the server refuses. */
+  onWhoPicked(value: string): void {
+    const option = WHO_CAN_MESSAGE_OPTIONS.find((o) => o.value === value);
+    if (!option || option.value === this.whoCanMessage()) {
+      return;
+    }
+    const previous = this.whoCanMessage();
+    this.store.patchAccount({ whoCanMessage: option.value });
+    this.savingWho.set(true);
+    this._messagingService
+      .updateSettings({ whoCanMessage: option.value })
+      .pipe(take(1))
+      .subscribe({
+        next: () => this.savingWho.set(false),
+        error: (error: unknown) => {
+          this.savingWho.set(false);
+          this.store.patchAccount({ whoCanMessage: previous });
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.privacy.saveFailed'),
+          );
+        },
+      });
+  }
+
+  toggleFindByName(): void {
+    if (this.savingFind()) {
+      return;
+    }
+    const next = !this.findByName();
+    this.store.patchAccount({ findByName: next });
+    this.savingFind.set(true);
+    this._userService
+      .updateMe({ findByName: next })
+      .pipe(take(1))
+      .subscribe({
+        next: () => this.savingFind.set(false),
+        error: (error: unknown) => {
+          this.savingFind.set(false);
+          this.store.patchAccount({ findByName: !next });
           void this._feedbackService.error(
             error,
             this._translateService.instant('account.privacy.saveFailed'),

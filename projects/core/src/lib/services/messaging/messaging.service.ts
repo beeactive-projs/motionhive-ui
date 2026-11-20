@@ -6,8 +6,14 @@ import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { silentRequest } from '../../interceptors/silent-request.context';
 import { PaginatedResponse } from '../../models/common/pagination.model';
 import {
+  ConversationFolder,
   ConversationListItem,
   MessagePage,
+  MessagingReach,
+  MessagingSettings,
+  MessagingUnreadCount,
+  ShareRef,
+  ShareResult,
   MessageView,
   ReportMessagePayload,
   SendMessageResult,
@@ -33,13 +39,22 @@ export class MessagingService {
 
   // ─── Conversations ───────────────────────────────────────────
 
+  /**
+   * A page of conversations. `folder` picks chats, requests or archived;
+   * omitted, the API lists everything but deleted requests, as before
+   * requests existed (web reads it this way).
+   */
   listConversations(
     page = 1,
     limit = 20,
+    folder?: ConversationFolder,
   ): Observable<PaginatedResponse<ConversationListItem>> {
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set('page', String(page))
       .set('limit', String(limit));
+    if (folder) {
+      params = params.set('folder', folder);
+    }
     return this._http.get<PaginatedResponse<ConversationListItem>>(
       this.baseUrl + API_ENDPOINTS.MESSAGING.CONVERSATIONS,
       { params },
@@ -72,6 +87,79 @@ export class MessagingService {
     return this._http.post<SendMessageResult>(
       this.baseUrl + API_ENDPOINTS.MESSAGING.MESSAGES,
       { recipientId, body },
+    );
+  }
+
+  /** One message, with its cards in the reader's language. */
+  getMessage(id: string): Observable<MessageView> {
+    return this._http.get<MessageView>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.MESSAGE(id),
+      { context: silentRequest() },
+    );
+  }
+
+  /** Send one public thing to up to 10 people; one result per person. */
+  shareTo(
+    recipientIds: string[],
+    attachment: ShareRef,
+    caption?: string,
+  ): Observable<{ results: ShareResult[] }> {
+    const body: { recipientIds: string[]; attachment: ShareRef; caption?: string } = {
+      recipientIds,
+      attachment,
+    };
+    if (caption) {
+      body.caption = caption;
+    }
+    return this._http.post<{ results: ShareResult[] }>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.SHARES,
+      body,
+    );
+  }
+
+  // ─── Message requests and archive ────────────────────────────
+
+  /** Take a message request in: it becomes a chat. Returns the conversation. */
+  acceptRequest(conversationId: string): Observable<ConversationListItem> {
+    return this._http.post<ConversationListItem>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.CONVERSATION_ACCEPT(conversationId),
+      {},
+    );
+  }
+
+  /** Delete a message request. The sender is never told. */
+  declineRequest(conversationId: string): Observable<{ declinedAt: string }> {
+    return this._http.post<{ declinedAt: string }>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.CONVERSATION_DECLINE(conversationId),
+      {},
+    );
+  }
+
+  setArchived(conversationId: string, archived: boolean): Observable<{ archived: boolean }> {
+    return this._http.patch<{ archived: boolean }>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.CONVERSATION_ARCHIVE(conversationId),
+      { archived },
+    );
+  }
+
+  /** What happens if the reader writes to this person, before they type. */
+  reach(userId: string): Observable<MessagingReach> {
+    return this._http.get<MessagingReach>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.REACH(userId),
+      { context: silentRequest() },
+    );
+  }
+
+  getSettings(): Observable<MessagingSettings> {
+    return this._http.get<MessagingSettings>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.SETTINGS,
+    );
+  }
+
+  updateSettings(settings: MessagingSettings): Observable<MessagingSettings> {
+    return this._http.patch<MessagingSettings>(
+      this.baseUrl + API_ENDPOINTS.MESSAGING.SETTINGS,
+      settings,
     );
   }
 
@@ -161,9 +249,9 @@ export class MessagingService {
 
   // ─── Unread + SSE ack ────────────────────────────────────────
 
-  unreadCount(): Observable<{ count: number }> {
+  unreadCount(): Observable<MessagingUnreadCount> {
     // Polled / called on every event — must be silent.
-    return this._http.get<{ count: number }>(
+    return this._http.get<MessagingUnreadCount>(
       this.baseUrl + API_ENDPOINTS.MESSAGING.UNREAD_COUNT,
       { context: silentRequest() },
     );

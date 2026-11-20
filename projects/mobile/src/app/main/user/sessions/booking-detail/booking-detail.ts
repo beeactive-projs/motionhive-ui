@@ -28,6 +28,8 @@ import { take } from 'rxjs';
 import {
   MyBookingsIndexStore,
   SessionAccess,
+  SessionInstanceStatus,
+  ShareTargetType,
   SessionLocationKind,
   SessionParticipant,
   SessionParticipantStatus,
@@ -47,6 +49,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { ClockService } from '../../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
+import { SendToService } from '../../../../_shared/services/send-to.service';
 import { injectOpenDirectMessage } from '../../../../_shared/utils/direct-message';
 import { copyToClipboard } from '../../../../_shared/utils/share';
 import { BookingOutcomeSheet } from '../_sheets/booking-outcome-sheet/booking-outcome-sheet';
@@ -121,6 +124,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
+  private readonly _sendTo = inject(SendToService);
 
   readonly Views = DetailViews;
 
@@ -169,6 +173,32 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     const instance = this.store.instance();
     return instance && !isBlockedInstance(instance) ? instance : null;
   });
+
+  /**
+   * Open to anyone, not cancelled and not over: something to send into a
+   * chat as a card. A members-only or clients-only session is not.
+   */
+  readonly canSend = computed(() => {
+    const instance = this.publicInstance();
+    if (!instance || instance.template?.access !== SessionAccess.Open) {
+      return false;
+    }
+    if (instance.status === SessionInstanceStatus.Cancelled) {
+      return false;
+    }
+    return sessionLifecycle(instance.startAt, instance.endAt) !== 'past';
+  });
+
+  send(): void {
+    const instance = this.publicInstance();
+    if (!instance) {
+      return;
+    }
+    this._sendTo.open({
+      ref: { type: ShareTargetType.Session, id: instance.id },
+      title: this.title(),
+    });
+  }
 
   readonly blockedInstance = computed(() => {
     const instance = this.store.instance();

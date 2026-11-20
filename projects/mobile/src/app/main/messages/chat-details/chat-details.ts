@@ -122,6 +122,9 @@ export class ChatDetails {
 
   readonly muted = computed(() => this.conversation()?.muted ?? false);
 
+  readonly archived = computed(() => !!this.conversation()?.archived);
+  readonly archiving = signal(false);
+
   /**
    * A permalink lands before the inbox row it reads from. Only while that
    * load runs: a row that never turns up falls back to "this person".
@@ -169,6 +172,32 @@ export class ChatDetails {
         wasMuted ? 'messages.toast.notificationsOn' : 'messages.toast.notificationsMuted',
       ),
     );
+  }
+
+  /** Archive, or bring back from the archive. */
+  async toggleArchive(): Promise<void> {
+    const conversation = this.conversation();
+    if (!conversation || this.archiving()) {
+      return;
+    }
+
+    const archive = !conversation.archived;
+    this.archiving.set(true);
+    const ok = await this.store.setArchived(conversation.id, archive);
+    this.archiving.set(false);
+
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.archiveFailed'),
+      );
+      return;
+    }
+    let done = 'messages.toast.unarchived';
+    if (archive) {
+      done = 'messages.toast.archived';
+    }
+    void this._feedbackService.success(this._translateService.instant(done));
   }
 
   /**

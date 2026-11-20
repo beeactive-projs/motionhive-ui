@@ -147,7 +147,29 @@
         "ONLY_ME": "No one but you"
       },
       "saveFailed": "Couldn't save that. Try again.",
-      "yourData": "Your data"
+      "yourData": "Your data",
+      "messages": {
+        "section": "Messages",
+        "whoCanMessage": "Who can message you",
+        "who": {
+          "EVERYONE": "Everyone",
+          "REQUESTS": "Everyone, as a request",
+          "CONNECTIONS": "Only people I train with"
+        },
+        "whoHint": {
+          "EVERYONE": "Anyone's first message goes straight to your chats.",
+          "REQUESTS": "People you train with go straight to your chats. Anyone else arrives as a message request.",
+          "CONNECTIONS": "Nobody else can start a chat with you."
+        },
+        "findByName": "Let people find me by name",
+        "findByNameHint": "Off, people find you only by your whole email address.",
+        "note": "People you train with are your coaches and clients, the coaches of classes you booked in the last two weeks, and the people who run your groups.",
+        "whoShort": {
+          "EVERYONE": "Everyone",
+          "REQUESTS": "As a request",
+          "CONNECTIONS": "People I train with"
+        }
+      }
     },
     "delete": {
       "title": "Delete account",
@@ -1800,7 +1822,9 @@
       "block": "Block",
       "delete": "Delete chat",
       "mute": "Mute notifications",
-      "unmute": "Unmute notifications"
+      "unmute": "Unmute notifications",
+      "archive": "Archive",
+      "unarchive": "Unarchive"
     },
     "blockSheet": {
       "body": "They will not be able to message you, and you will not see this conversation. If one of you coaches the other, that coaching ends too.",
@@ -1843,7 +1867,9 @@
       "sectionConversation": "Conversation",
       "sectionPrivacy": "Privacy",
       "thisPerson": "this person",
-      "title": "Details"
+      "title": "Details",
+      "archive": "Archive chat",
+      "archiveHint": "Out of your chats and quiet. It stays archived when new messages arrive."
     },
     "frequentContacts": "Frequent contacts",
     "inbox": {
@@ -1886,7 +1912,62 @@
       "muted": "Muted",
       "notificationsMuted": "Notifications muted",
       "notificationsOn": "Notifications on",
-      "unmuted": "Unmuted"
+      "unmuted": "Unmuted",
+      "archived": "Chat archived",
+      "unarchived": "Chat back in your chats",
+      "archiveFailed": "Couldn't change the archive. Try again."
+    },
+    "requests": {
+      "title": "Message requests",
+      "rowHint": "{count, plural, one {# person wants to message you} other {# people want to message you}}",
+      "note": "People you don't train with. They won't know you've seen their message until you accept.",
+      "empty": "No message requests"
+    },
+    "archived": {
+      "title": "Archived",
+      "rowHint": "{count, plural, one {# chat} other {# chats}}",
+      "note": "Archived chats stay here when new messages arrive, and don't notify you.",
+      "empty": "No archived chats"
+    },
+    "request": {
+      "context": {
+        "coach": "Coach on MotionHive",
+        "group": "{more, plural, =0 {Group in common: {name}} other {Groups in common: {name} and # more}}",
+        "noGroup": "No groups in common"
+      },
+      "waiting": "{name} gets this as a message request. You can send {count, plural, one {# more message} other {# more messages}} until it's accepted.",
+      "waitingFull": "You can write more after {name} accepts.",
+      "notice": "{name} won't know you've seen this until you accept. Delete it and they won't be told.",
+      "accept": "Accept",
+      "delete": "Delete",
+      "block": "Block",
+      "deleteSheet": {
+        "title": "Delete this request?",
+        "body": "It leaves your requests. {name} won't be told and can't send you another one."
+      },
+      "toast": {
+        "acceptFailed": "Couldn't accept the request. Try again.",
+        "deleteFailed": "Couldn't delete the request. Try again.",
+        "deleted": "Request deleted"
+      }
+    },
+    "reach": {
+      "request": "Your first message reaches {name} as a message request. You can send up to {count, plural, one {# message} other {# messages}} until it's accepted.",
+      "connectionsOnly": "{name} only takes messages from people they train with.",
+      "youBlocked": "You blocked this person. Unblock them to write.",
+      "newAccount": "New accounts can only message people they train with, or people who wrote to them first.",
+      "suspended": "Your messaging has been restricted. Contact support."
+    },
+    "shared": {
+      "SESSION": "Session",
+      "GROUP": "Group",
+      "COACH": "Coach profile",
+      "EXERCISE": "Exercise",
+      "PROGRAM": "Routine"
+    },
+    "banner": {
+      "request": "{name} wants to message you",
+      "requestDetail": "Open it to read and decide."
     }
   },
   "monthHive": {
@@ -2186,7 +2267,9 @@
     "workoutSettings": "Workout settings",
     "archivedRoutines": "Archived routines",
     "welcome": "Welcome",
-    "workoutStatus": "Workout status"
+    "workoutStatus": "Workout status",
+    "messageRequests": "Message requests",
+    "archivedChats": "Archived chats"
   },
   "payments": {
     "badge": {
@@ -4359,6 +4442,46 @@
       "profile": "Profile photo",
       "group": "Group photo",
       "workout": "Workout photo"
+    }
+  },
+  "share": {
+    "view": {
+      "SESSION": "View session",
+      "GROUP": "View group",
+      "COACH": "View profile",
+      "EXERCISE": "View exercise",
+      "ROUTINE": "View routine",
+      "PROGRAM": "View program"
+    },
+    "minutes": "{count} min",
+    "online": "Online",
+    "ended": "This session has ended",
+    "seatsAria": "{taken} of {total} places taken",
+    "members": "{count, plural, one {# member} other {# members}}",
+    "coach": "Coach",
+    "takingClients": "Taking clients",
+    "routine": "Routine",
+    "program": "Program",
+    "workouts": "{count, plural, one {# workout} other {# workouts}}",
+    "unavailable": "No longer available",
+    "send": {
+      "action": "Send in a message",
+      "title": "Send to",
+      "search": "Search people",
+      "recent": "Recent chats",
+      "results": "People",
+      "noChats": "No chats yet. Search for someone.",
+      "note": "Up to {count} people. Anyone you don't train with gets it as a message request.",
+      "caption": "Message",
+      "captionPlaceholder": "Add a few words (optional)",
+      "save": "{count, plural, =0 {Send} one {Send to # person} other {Send to # people}}",
+      "full": "You can send to {count} people at once."
+    },
+    "toast": {
+      "sent": "{count, plural, one {Sent to # person} other {Sent to # people}}",
+      "partial": "Sent to {count}. {refused, plural, one {# person couldn't get it} other {# people couldn't get it}}.",
+      "none": "Nobody could get it. They may only take messages from people they train with.",
+      "failed": "Couldn't send it. Try again."
     }
   }
 }

@@ -68,7 +68,7 @@
             (click)="setFilter(option.value)"
           >
             {{ option.label | translate }}
-            @if (option.value !== Filters.All && store.filterCounts()[option.value]; as count) {
+            @if (option.value !== Filters.All && store.chatFilterCounts()[option.value]; as count) {
               <span class="count">{{ count }}</span>
             }
           </ion-button>
@@ -89,6 +89,49 @@
 
   @if (store.streamStatus() === 'closed') {
     <ion-note class="mh-note-block">{{ 'messages.inbox.reconnecting' | translate }}</ion-note>
+  }
+
+  <!-- Message requests and archived chats, each on its own screen: rows over
+       the chats, as WhatsApp keeps Archived and Instagram its requests. -->
+  @if (!searchOpen() && folderRows().length > 0) {
+    <ion-list class="mh-flat-list">
+      @for (row of folderRows(); track row.route) {
+        <ion-item button detail="false" (click)="openFolder(row.route)">
+          <!-- Requests are info, like the bell; archived chats violet, like
+               every put-aside verb. -->
+          @if (row.route === 'requests') {
+            <mh-hex-avatar
+              slot="start"
+              size="lg"
+              tone="wash"
+              aria-hidden="true"
+              icon="mail-unread-outline"
+              color="info"
+            />
+          } @else {
+            <mh-hex-avatar
+              slot="start"
+              size="lg"
+              tone="wash"
+              aria-hidden="true"
+              icon="archive-outline"
+              color="violet"
+            />
+          }
+          <ion-label>
+            <div class="mh-row-line">
+              <h2>{{ row.label | translate }}</h2>
+            </div>
+            <div class="mh-row-line">
+              <p>{{ row.hint | translate: { count: row.count } }}</p>
+              @if (row.badge) {
+                <ion-badge color="primary">{{ row.badge }}</ion-badge>
+              }
+            </div>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
   }
 
   @if (showLoadError()) {
@@ -159,6 +202,7 @@
             (markRead)="markRead(conversation.id)"
             (markUnread)="markUnread(conversation.id)"
             (toggleMute)="toggleMute(conversation.id)"
+            (archive)="archive(conversation)"
             (more)="openActions(conversation)"
           />
         }
@@ -182,13 +226,14 @@
     />
   } @else {
     <ion-list class="mh-flat-list">
-      @for (conversation of store.visibleConversations(); track conversation.id) {
+      @for (conversation of store.visibleChats(); track conversation.id) {
         <mh-conversation-row
           [conversation]="conversation"
           (select)="openConversation(conversation.id)"
           (markRead)="markRead(conversation.id)"
           (markUnread)="markUnread(conversation.id)"
           (toggleMute)="toggleMute(conversation.id)"
+          (archive)="archive(conversation)"
           (more)="openActions(conversation)"
         />
       }

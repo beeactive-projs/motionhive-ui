@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
@@ -8,6 +9,8 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonItem,
+  IonLabel,
   IonList,
   IonNote,
   IonRefresher,
@@ -23,6 +26,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
+  ConversationFolder,
   ConversationListItem,
   InboxFilter,
   MessagingStore,
@@ -33,6 +37,7 @@ import {
 import { ActionSheet } from '../../_shared/components/action-sheet/action-sheet';
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SearchbarLabelDirective } from '../../_shared/directives/searchbar-label.directive';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
@@ -50,6 +55,7 @@ import {
   ConversationActions,
   MESSAGING_ICONS,
   conversationActions,
+  folderRows,
   frequentContacts,
   recentFromPerson,
 } from './messages.config';
@@ -74,6 +80,8 @@ import {
     ConfirmSheet,
     ConversationRow,
     EmptyState,
+    HexAvatar,
+    IonBadge,
     IonButton,
     IonButtons,
     IonContent,
@@ -81,6 +89,8 @@ import {
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    IonItem,
+    IonLabel,
     IonList,
     IonNote,
     IonRefresher,
@@ -154,8 +164,16 @@ export class Messages implements ViewWillEnter {
 
   readonly actions = computed(() => {
     const target = this._actionTarget();
-    return conversationActions(target?.muted ?? false, !!target?.otherUser?.handle);
+    if (!target) {
+      return conversationActions(false, false);
+    }
+    return conversationActions(target.muted, !!target.otherUser?.handle, !!target.archived);
   });
+
+  /** The Message requests and Archived rows over the chats, when there are any. */
+  readonly folderRows = computed(() =>
+    folderRows(this.store.requestConversations(), this.store.archivedConversations()),
+  );
 
   /**
    * The people from the latest conversations, as rows under the recents:
@@ -200,16 +218,16 @@ export class Messages implements ViewWillEnter {
     () =>
       this.store.hasLoaded() &&
       !this.people.isActive() &&
-      this.store.conversations().length === 0,
+      this.store.chatConversations().length === 0,
   );
 
-  /** Nothing matched the active filter, but the inbox itself is not empty. */
+  /** Nothing matched the active filter, but there are chats. */
   readonly isFilteredEmpty = computed(
     () =>
       this.store.hasLoaded() &&
       !this.people.isActive() &&
-      this.store.conversations().length > 0 &&
-      this.store.visibleConversations().length === 0,
+      this.store.chatConversations().length > 0 &&
+      this.store.visibleChats().length === 0,
   );
 
   constructor() {
@@ -220,6 +238,35 @@ export class Messages implements ViewWillEnter {
   // run once per app session. The store dedups the extra calls.
   ionViewWillEnter(): void {
     this.store.loadConversations();
+    // Requests and archived chats can sit past the first page; fetched once,
+    // then the live stream keeps them current.
+    for (const folder of [ConversationFolder.Requests, ConversationFolder.Archived]) {
+      if (!this.store.folderLoaded(folder)) {
+        this.store.loadFolder(folder);
+      }
+    }
+  }
+
+  openFolder(route: string): void {
+    void this._router.navigate(['/tabs/messages', route]);
+  }
+
+  /** Archive, or bring back from the archive; the row moves at once. */
+  async archive(conversation: ConversationListItem): Promise<void> {
+    const archived = !conversation.archived;
+    const ok = await this.store.setArchived(conversation.id, archived);
+    if (!ok) {
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.archiveFailed'),
+      );
+      return;
+    }
+    let done = 'messages.toast.unarchived';
+    if (archived) {
+      done = 'messages.toast.archived';
+    }
+    void this._feedbackService.success(this._translateService.instant(done));
   }
 
   setFilter(value: InboxFilter): void {
@@ -331,6 +378,9 @@ export class Messages implements ViewWillEnter {
       case ConversationActions.Mute:
         void this.toggleMute(target.id);
         break;
+      case ConversationActions.Archive:
+        void this.archive(target);
+        break;
       case ConversationActions.Delete:
         this.deleteOpen.set(true);
         break;
@@ -404,5 +454,7 @@ export class Messages implements ViewWillEnter {
 
   onRefresh(event: RefresherCustomEvent): void {
     this.store.loadConversations({ force: true, done: () => void event.target.complete() });
+    this.store.loadFolder(ConversationFolder.Requests);
+    this.store.loadFolder(ConversationFolder.Archived);
   }
 }

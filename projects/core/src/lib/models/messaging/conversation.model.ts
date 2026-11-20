@@ -1,3 +1,6 @@
+import type { RequestContext } from './requests.model';
+import type { ShareTargetType } from './share.model';
+
 /**
  * BE contract for `/messaging/conversations` and `/messaging/conversations/:id`.
  * Camel-case is enforced by the BE's global CamelCaseInterceptor — these
@@ -41,7 +44,24 @@ export interface ConversationListItem {
   /**
    * DIRECT only — ISO timestamp of the other participant's last read.
    * Powers the read receipt on the caller's own messages. Null for groups,
-   * or when the other side has never read the thread.
+   * or when the other side has never read the thread. Null too while they
+   * haven't accepted the reader's message request (no receipts until then).
    */
   lastReadByOther: string | null;
+  /**
+   * The reader hasn't taken this chat in: it waits in their message
+   * requests. Optional: older APIs don't send it (read as false).
+   */
+  isRequest?: boolean;
+  /** For a request: how the two might know each other. */
+  requestContext?: RequestContext | null;
+  /** The reader archived it: out of the chats, and quiet. */
+  archived?: boolean;
+  /**
+   * The other person hasn't accepted the reader's request yet; `remaining`
+   * is how many more messages fit until they do. Null when nothing waits.
+   */
+  waiting?: { remaining: number } | null;
+  /** The last message shared a thing of this type: "Session · <preview>". */
+  lastMessageAttachmentType?: ShareTargetType | null;
 }

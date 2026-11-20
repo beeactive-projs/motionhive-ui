@@ -54,6 +54,8 @@ export interface UpdateUserPayload {
   city?: string | null;
   /** Locked decision §19 — client browse gate on the exercise catalog. */
   exerciseCatalogOptIn?: boolean;
+  /** "Let people find me by name" (API migration 091). */
+  findByName?: boolean;
 }
 
 /**

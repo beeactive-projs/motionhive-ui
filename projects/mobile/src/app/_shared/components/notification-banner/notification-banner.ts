@@ -7,24 +7,33 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { GestureController, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { closeOutline, notificationsOutline } from 'ionicons/icons';
 import { catchError, EMPTY, take } from 'rxjs';
 
-import { BellNotification, NotificationService, NotificationStore } from 'core';
+import {
+  BellNotification,
+  MessagingStore,
+  NotificationService,
+  NotificationStore,
+} from 'core';
 
 import { activeTabIdFromUrl } from '../../config/tabs.config';
 import { categoryStyle } from '../../config/notification-categories.config';
 import { isOnTarget } from '../../config/notification-deep-link';
+import { BannerView, messageBanner } from '../../config/notification-banner.config';
 import { HexAvatar } from '../hex-avatar/hex-avatar';
 
 /** Long enough to read two lines, short enough not to sit over the content. */
 const VISIBLE_MS = 5000;
+/** A message whose chat row arrives later than this is not news any more. */
+const MESSAGE_FRESH_MS = 10_000;
 /** How far up, or how fast, a drag must go before it counts as a dismiss. Gesture math is in px. */
 const DISMISS_DISTANCE_PX = 40;
 const DISMISS_VELOCITY = 0.3;
@@ -53,12 +62,16 @@ const DISMISS_VELOCITY = 0.3;
 })
 export class NotificationBanner {
   private readonly _store = inject(NotificationStore);
+  private readonly _messaging = inject(MessagingStore);
+  private readonly _translateService = inject(TranslateService);
   private readonly _service = inject(NotificationService);
   private readonly _router = inject(Router);
   private readonly _gestureController = inject(GestureController);
   private readonly _banner = viewChild<ElementRef<HTMLElement>>('banner');
 
   readonly current = signal<BellNotification | null>(null);
+  /** A message that just arrived; shown instead of a bell item while it lasts. */
+  readonly message = signal<BannerView | null>(null);
   /** Snapping back after a drag that did not commit — the one time the card animates. */
   readonly settling = signal(false);
 
@@ -66,6 +79,31 @@ export class NotificationBanner {
     const item = this.current();
     return item ? categoryStyle(item.category) : null;
   });
+
+  /** The card's lines and picture: the message, or the bell item. */
+  readonly view = computed<BannerView | null>(() => {
+    const message = this.message();
+    if (message) {
+      return message;
+    }
+    const item = this.current();
+    if (!item) {
+      return null;
+    }
+    const style = this.style();
+    return {
+      title: item.title,
+      detail: item.body,
+      icon: style?.icon ?? 'notifications-outline',
+      color: style?.color ?? 'medium',
+      name: null,
+      imageUrl: null,
+      conversationId: null,
+    };
+  });
+
+  /** The last message announced, so one arrival is announced once. */
+  private _announced: string | null = null;
 
   private _lastCount: number | null = null;
   private _timer?: ReturnType<typeof setTimeout>;
@@ -92,6 +130,38 @@ export class NotificationBanner {
       if (this._router.url.includes('/notifications')) return;
 
       this._fetchNewest();
+    });
+
+    // A message from someone else, straight from the live stream: no minute
+    // poll in between. Waits for the chat's row when it is new (a first
+    // message, a request) and drops it if that takes too long. Quiet in the
+    // chat it belongs to, and for a muted or archived chat.
+    effect(() => {
+      const incoming = this._messaging.incoming();
+      const conversations = this._messaging.conversations();
+      if (!incoming || incoming.messageId === this._announced) {
+        return;
+      }
+      if (Date.now() - incoming.at > MESSAGE_FRESH_MS) {
+        return;
+      }
+      const conversation = conversations.find((c) => c.id === incoming.conversationId);
+      if (!conversation) {
+        return;
+      }
+      this._announced = incoming.messageId;
+      untracked(() => {
+        if (this._router.url.includes(incoming.conversationId)) {
+          return;
+        }
+        const view = messageBanner(incoming, conversation, (key, params) =>
+          this._translateService.instant(key, params),
+        );
+        if (!view) {
+          return;
+        }
+        this._show(view);
+      });
     });
 
     // The card sits behind an @if, so the query only resolves once it has
@@ -138,6 +208,12 @@ export class NotificationBanner {
       this._dragged = false;
       return;
     }
+    const message = this.message();
+    if (message?.conversationId) {
+      this.dismiss();
+      this._messaging.openConversation(message.conversationId);
+      return;
+    }
     const item = this.current();
     if (!item) return;
     this.dismiss();
@@ -151,7 +227,17 @@ export class NotificationBanner {
   dismiss(): void {
     clearTimeout(this._timer);
     this.current.set(null);
+    this.message.set(null);
   }
+
+  /** A message replaces whatever is showing, as the OS does. */
+  private _show(view: BannerView): void {
+    this.current.set(null);
+    this.message.set(view);
+    clearTimeout(this._timer);
+    this._timer = setTimeout(() => this.message.set(null), VISIBLE_MS);
+  }
+
 
   private _fetchNewest(): void {
     this._service
@@ -166,6 +252,7 @@ export class NotificationBanner {
         // The screen it opens is the one you are on: that screen updates
         // itself, and the badge has already moved.
         if (isOnTarget(this._router.url, newest.data)) return;
+        this.message.set(null);
         this.current.set(newest);
         clearTimeout(this._timer);
         this._timer = setTimeout(() => this.current.set(null), VISIBLE_MS);

@@ -21,6 +21,7 @@ import {
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { emitAndClose } from '../../../../_shared/utils/swipe';
+import { sharedKindKey } from '../../messages.config';
 
 /**
  * One row of the inbox. Unread is weight and colour rather than an extra
@@ -58,12 +59,25 @@ export class ConversationRow {
   readonly conversation = input.required<ConversationListItem>();
   /** Off where the row only opens its thread (the new-message results). */
   readonly swipeable = input(true);
+  /** The swipe's More option; off where the list offers only Archive. */
+  readonly showMore = input(true);
 
   readonly select = output<void>();
   readonly markRead = output<void>();
   readonly markUnread = output<void>();
   readonly toggleMute = output<void>();
+  readonly archive = output<void>();
   readonly more = output<void>();
+
+  readonly isArchived = computed(() => !!this.conversation().archived);
+
+  /** The swipe's verb: Archive, or Unarchive on an archived chat. */
+  readonly archiveLabel = computed(() => {
+    if (this.isArchived()) {
+      return 'messages.actions.unarchive';
+    }
+    return 'messages.actions.archive';
+  });
 
   /** Unread messages, or marked unread by the reader. */
   readonly isUnread = computed(() => isConversationUnread(this.conversation()));
@@ -81,11 +95,19 @@ export class ConversationRow {
 
   readonly tone = computed(() => avatarToneFor(this.conversation().otherUser?.id));
 
-  readonly preview = computed(
-    () =>
-      this.conversation().lastMessagePreview ??
-      this._translateService.instant('messages.row.noPreview'),
-  );
+  /** The last message, after what it shared when it shared something ("Session · ..."). */
+  readonly preview = computed(() => {
+    const { lastMessagePreview, lastMessageAttachmentType } = this.conversation();
+    const text = lastMessagePreview ?? this._translateService.instant('messages.row.noPreview');
+    if (!lastMessageAttachmentType) {
+      return text;
+    }
+    const kind = this._translateService.instant(sharedKindKey(lastMessageAttachmentType));
+    if (!lastMessagePreview) {
+      return kind;
+    }
+    return `${kind} · ${lastMessagePreview}`;
+  });
 
   readonly time = computed(() => {
     const iso = this.conversation().lastMessageAt;

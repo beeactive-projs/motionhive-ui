@@ -147,7 +147,29 @@
         "ONLY_ME": "Nimeni în afară de tine"
       },
       "saveFailed": "Nu am putut salva. Încearcă din nou.",
-      "yourData": "Datele tale"
+      "yourData": "Datele tale",
+      "messages": {
+        "section": "Mesaje",
+        "whoCanMessage": "Cine îți poate scrie",
+        "who": {
+          "EVERYONE": "Oricine",
+          "REQUESTS": "Oricine, ca solicitare",
+          "CONNECTIONS": "Doar cei cu care mă antrenez"
+        },
+        "whoHint": {
+          "EVERYONE": "Primul mesaj al oricui ajunge direct în conversațiile tale.",
+          "REQUESTS": "Cei cu care te antrenezi ajung direct în conversații. Restul vin ca solicitare de mesaj.",
+          "CONNECTIONS": "Nimeni altcineva nu poate începe o conversație cu tine."
+        },
+        "findByName": "Lasă-i pe alții să mă găsească după nume",
+        "findByNameHint": "Dacă e oprit, te găsesc doar după adresa de email întreagă.",
+        "note": "Cei cu care te antrenezi sunt antrenorii și clienții tăi, antrenorii sesiunilor rezervate în ultimele două săptămâni și cei care conduc grupurile tale.",
+        "whoShort": {
+          "EVERYONE": "Oricine",
+          "REQUESTS": "Ca solicitare",
+          "CONNECTIONS": "Cei cu care mă antrenez"
+        }
+      }
     },
     "delete": {
       "title": "Șterge contul",
@@ -1800,7 +1822,9 @@
       "block": "Blochează",
       "delete": "Șterge conversația",
       "mute": "Dezactivează notificările",
-      "unmute": "Activează notificările"
+      "unmute": "Activează notificările",
+      "archive": "Arhivează",
+      "unarchive": "Scoate din arhivă"
     },
     "blockSheet": {
       "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație. Dacă unul dintre voi îl antrenează pe celălalt, colaborarea se încheie și ea.",
@@ -1843,7 +1867,9 @@
       "sectionConversation": "Conversație",
       "sectionPrivacy": "Confidențialitate",
       "thisPerson": "această persoană",
-      "title": "Detalii"
+      "title": "Detalii",
+      "archive": "Arhivează conversația",
+      "archiveHint": "Iese din listă și nu te mai anunță. Rămâne arhivată când primești mesaje noi."
     },
     "frequentContacts": "Contacte frecvente",
     "inbox": {
@@ -1886,7 +1912,62 @@
       "muted": "Notificări dezactivate",
       "notificationsMuted": "Notificări dezactivate",
       "notificationsOn": "Notificări activate",
-      "unmuted": "Notificări activate"
+      "unmuted": "Notificări activate",
+      "archived": "Conversație arhivată",
+      "unarchived": "Conversația s-a întors în listă",
+      "archiveFailed": "Arhiva nu a putut fi schimbată. Încearcă din nou."
+    },
+    "requests": {
+      "title": "Solicitări de mesaje",
+      "rowHint": "{count, plural, one {# persoană vrea să-ți scrie} few {# persoane vor să-ți scrie} other {# de persoane vor să-ți scrie}}",
+      "note": "Persoane cu care nu te antrenezi. Nu vor ști că le-ai văzut mesajul până nu accepți.",
+      "empty": "Nicio solicitare de mesaj"
+    },
+    "archived": {
+      "title": "Arhivate",
+      "rowHint": "{count, plural, one {# conversație} few {# conversații} other {# de conversații}}",
+      "note": "Conversațiile arhivate rămân aici când primești mesaje noi și nu te anunță.",
+      "empty": "Nicio conversație arhivată"
+    },
+    "request": {
+      "context": {
+        "coach": "Antrenează pe MotionHive",
+        "group": "{more, plural, =0 {Grup în comun: {name}} one {Grupuri în comun: {name} și încă unul} few {Grupuri în comun: {name} și încă #} other {Grupuri în comun: {name} și încă #}}",
+        "noGroup": "Niciun grup în comun"
+      },
+      "waiting": "{name} primește mesajele ca solicitare. Mai poți trimite {count, plural, one {# mesaj} few {# mesaje} other {# de mesaje}} până e acceptată.",
+      "waitingFull": "Poți scrie din nou după ce {name} acceptă.",
+      "notice": "{name} nu va ști că ai văzut mesajul până nu accepți. Dacă îl ștergi, nu va afla.",
+      "accept": "Acceptă",
+      "delete": "Șterge",
+      "block": "Blochează",
+      "deleteSheet": {
+        "title": "Ștergi solicitarea?",
+        "body": "Dispare din solicitările tale. {name} nu va afla și nu-ți mai poate trimite alta."
+      },
+      "toast": {
+        "acceptFailed": "Solicitarea nu a putut fi acceptată. Încearcă din nou.",
+        "deleteFailed": "Solicitarea nu a putut fi ștearsă. Încearcă din nou.",
+        "deleted": "Solicitare ștearsă"
+      }
+    },
+    "reach": {
+      "request": "Primul tău mesaj ajunge la {name} ca solicitare. Poți trimite cel mult {count, plural, one {# mesaj} few {# mesaje} other {# de mesaje}} până e acceptată.",
+      "connectionsOnly": "{name} primește mesaje doar de la cei cu care se antrenează.",
+      "youBlocked": "Ai blocat această persoană. Deblocheaz-o ca să îi poți scrie.",
+      "newAccount": "Un cont nou poate scrie doar persoanelor cu care se antrenează sau celor care i-au scris primii.",
+      "suspended": "Mesajele tale au fost restricționate. Contactează asistența."
+    },
+    "shared": {
+      "SESSION": "Sesiune",
+      "GROUP": "Grup",
+      "COACH": "Profil de antrenor",
+      "EXERCISE": "Exercițiu",
+      "PROGRAM": "Rutină"
+    },
+    "banner": {
+      "request": "{name} vrea să-ți scrie",
+      "requestDetail": "Deschide ca să citești și să decizi."
     }
   },
   "monthHive": {
@@ -2186,7 +2267,9 @@
     "workoutSettings": "Setări pentru antrenamente",
     "archivedRoutines": "Rutine arhivate",
     "welcome": "Bun venit",
-    "workoutStatus": "Starea antrenamentului"
+    "workoutStatus": "Starea antrenamentului",
+    "messageRequests": "Solicitări de mesaje",
+    "archivedChats": "Conversații arhivate"
   },
   "payments": {
     "badge": {
@@ -4359,6 +4442,46 @@
       "profile": "Fotografie de profil",
       "group": "Fotografia grupului",
       "workout": "Fotografia antrenamentului"
+    }
+  },
+  "share": {
+    "view": {
+      "SESSION": "Vezi sesiunea",
+      "GROUP": "Vezi grupul",
+      "COACH": "Vezi profilul",
+      "EXERCISE": "Vezi exercițiul",
+      "ROUTINE": "Vezi rutina",
+      "PROGRAM": "Vezi programul"
+    },
+    "minutes": "{count} min",
+    "online": "Online",
+    "ended": "Sesiunea s-a încheiat",
+    "seatsAria": "{taken} din {total} locuri ocupate",
+    "members": "{count, plural, one {# membru} few {# membri} other {# de membri}}",
+    "coach": "Antrenor",
+    "takingClients": "Primește clienți noi",
+    "routine": "Rutină",
+    "program": "Program",
+    "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}",
+    "unavailable": "Nu mai este disponibil",
+    "send": {
+      "action": "Trimite într-un mesaj",
+      "title": "Trimite la",
+      "search": "Caută persoane",
+      "recent": "Conversații recente",
+      "results": "Persoane",
+      "noChats": "Nicio conversație încă. Caută pe cineva.",
+      "note": "Cel mult {count} persoane. Cine nu se antrenează cu tine îl primește ca solicitare de mesaj.",
+      "caption": "Mesaj",
+      "captionPlaceholder": "Adaugă câteva cuvinte (opțional)",
+      "save": "{count, plural, =0 {Trimite} one {Trimite la # persoană} few {Trimite la # persoane} other {Trimite la # de persoane}}",
+      "full": "Poți trimite la cel mult {count} persoane odată."
+    },
+    "toast": {
+      "sent": "{count, plural, one {Trimis la # persoană} few {Trimis la # persoane} other {Trimis la # de persoane}}",
+      "partial": "Trimis la {count}. {refused, plural, one {# persoană nu l-a putut primi} few {# persoane nu l-au putut primi} other {# de persoane nu l-au putut primi}}.",
+      "none": "Nimeni nu l-a putut primi. Poate primesc mesaje doar de la cei cu care se antrenează.",
+      "failed": "Nu s-a putut trimite. Încearcă din nou."
     }
   }
 }

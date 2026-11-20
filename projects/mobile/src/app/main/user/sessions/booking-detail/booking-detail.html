@@ -4,6 +4,13 @@
       <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="stackBase()" />
     </ion-buttons>
     <ion-title>{{ 'common.session' | translate }}</ion-title>
+    @if (canSend()) {
+      <ion-buttons slot="end">
+        <ion-button [attr.aria-label]="'share.send.action' | translate" (click)="send()">
+          <ion-icon slot="icon-only" name="paper-plane-outline" />
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 

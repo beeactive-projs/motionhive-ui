@@ -1,3 +1,5 @@
+import type { ShareRef } from './share.model';
+
 /**
  * SSE event payloads delivered by `GET /messaging/stream`.
  *
@@ -14,7 +16,11 @@ export interface MessageCreatedPayload {
     body: string;
     kind: string;
     createdAt: string;
+    /** Type and id only; the card comes with the message's own read. */
+    attachments?: ShareRef[];
   };
+  /** The reader hasn't taken the chat in: it is a message request. */
+  isRequest?: boolean;
 }
 
 export interface MessageDeletedPayload {
@@ -48,6 +54,26 @@ export interface ConversationClearedPayload {
   clearedAt: string;
 }
 
+/** `userId` took the chat in: the reader accepted, or the other side did. */
+export interface ConversationAcceptedPayload {
+  conversationId: string;
+  userId: string;
+  acceptedAt: string;
+}
+
+/** The reader deleted a message request (their own sessions only). */
+export interface ConversationDeclinedPayload {
+  conversationId: string;
+  userId: string;
+}
+
+/** The reader archived or unarchived the chat (their own sessions only). */
+export interface ConversationArchivedPayload {
+  conversationId: string;
+  userId: string;
+  archived: boolean;
+}
+
 export type MessagingStreamEvent =
   | { type: 'message.created'; payload: MessageCreatedPayload }
   | { type: 'message.deleted'; payload: MessageDeletedPayload }
@@ -55,6 +81,9 @@ export type MessagingStreamEvent =
   | { type: 'conversation.muted'; payload: ConversationMutedPayload }
   | { type: 'conversation.unread'; payload: ConversationUnreadPayload }
   | { type: 'conversation.cleared'; payload: ConversationClearedPayload }
+  | { type: 'conversation.accepted'; payload: ConversationAcceptedPayload }
+  | { type: 'conversation.declined'; payload: ConversationDeclinedPayload }
+  | { type: 'conversation.archived'; payload: ConversationArchivedPayload }
   | { type: 'heartbeat'; payload: { ts: number } };
 
 /** Wrapped at the EventSource level — `id` comes from SSE's id: line. */

@@ -1,3 +1,5 @@
+import type { MessageAttachment } from './share.model';
+
 /**
  * BE contract for individual messages. `MessageView` matches the
  * `toMessageView` shape from the API service.
@@ -19,7 +21,15 @@ export interface MessageView {
   /** Null for SYSTEM_* messages. Always set for TEXT. */
   senderId: string | null;
   kind: MessageKind;
+  /**
+   * The text to show. For a share sent without a caption it is the shared
+   * thing's name (for apps that only read `body`).
+   */
   body: string;
+  /** What the sender wrote; empty for a share with no caption. Older APIs omit it. */
+  caption?: string;
+  /** Public things the message carries, each with its card. */
+  attachments?: MessageAttachment[];
   /** ISO timestamp when the sender soft-deleted the message. Null otherwise. */
   deletedAt: string | null;
   createdAt: string;

@@ -1,6 +1,6 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   BubblePosition,
@@ -12,6 +12,7 @@ import {
 } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
+import { ShareCard } from '../../../../_shared/components/share-card/share-card';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 
 /** Outer corner radius of a bubble, and the tight one facing its own run. */
@@ -29,7 +30,7 @@ const TIGHT_RADIUS = 6;
  */
 @Component({
   selector: 'mh-message-bubble',
-  imports: [HexAvatar, IonIcon, TranslatePipe],
+  imports: [HexAvatar, IonIcon, ShareCard, TranslatePipe],
   templateUrl: './message-bubble.html',
   styleUrl: './message-bubble.scss',
   host: {
@@ -38,6 +39,8 @@ const TIGHT_RADIUS = 6;
   },
 })
 export class MessageBubble {
+  private readonly _translateService = inject(TranslateService);
+
   readonly message = input.required<MessageView>();
   readonly position = input.required<BubblePosition>();
   /** True when `message.senderId` matches the signed-in user. */
@@ -53,6 +56,29 @@ export class MessageBubble {
   readonly showReceipt = input(false);
 
   readonly isDeleted = computed(() => !!this.message().deletedAt);
+
+  /** Public things the message shared (none on a deleted one). */
+  readonly attachments = computed(() => {
+    if (this.isDeleted()) {
+      return [];
+    }
+    return this.message().attachments ?? [];
+  });
+
+  /**
+   * The bubble's words: the local "deleted" wording, the caption of a share
+   * (empty when it had none, so no bubble), or the message.
+   */
+  readonly text = computed(() => {
+    if (this.isDeleted()) {
+      return this._translateService.instant('messages.bubble.deleted');
+    }
+    const message = this.message();
+    if (this.attachments().length > 0) {
+      return message.caption ?? '';
+    }
+    return message.body;
+  });
 
   /**
    * On screen but not yet acknowledged by the server. This is where the

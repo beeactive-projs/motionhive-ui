@@ -41,3 +41,38 @@ ion-footer:not(.keyboard-open) ion-toolbar {
 .day > span {
   text-transform: uppercase;
 }
+
+// A message request's context over the thread: one line per thing they share.
+.request-context span {
+  display: block;
+}
+
+// The line over the composer (a request waiting, a draft's reach) and the
+// request bar that stands in for it. Same inset as the composer's bar.
+.composer-note {
+  display: block;
+  padding: var(--mh-row-pad) var(--mh-page-gutter) 0;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.request-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mh-row-pad);
+  padding-bottom: var(--mh-row-pad);
+}
+
+// One row on most phones; with large text the buttons wrap, and each one
+// stretches across what is left of its row rather than sitting stranded.
+.request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mh-row-pad);
+  padding: 0 var(--mh-page-gutter);
+
+  ion-button {
+    flex: 1 1 auto;
+    margin: 0;
+  }
+}

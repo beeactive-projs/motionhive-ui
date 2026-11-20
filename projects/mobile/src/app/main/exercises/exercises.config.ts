@@ -19,6 +19,7 @@ import {
   mapOutline,
   moveOutline,
   optionsOutline,
+  paperPlaneOutline,
   searchOutline,
   syncOutline,
   timeOutline,
@@ -58,6 +59,7 @@ import type { ExerciseFilters } from './exercises.store';
  * reference an icon nobody registered.
  */
 export const EXERCISE_ICONS = {
+  paperPlaneOutline,
   cameraOutline,
   addOutline,
   alertCircleOutline,

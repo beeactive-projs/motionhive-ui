@@ -20,6 +20,7 @@ import {
   locationOutline,
   lockClosedOutline,
   newspaperOutline,
+  paperPlaneOutline,
   peopleOutline,
   personAddOutline,
   personOutline,
@@ -45,6 +46,7 @@ import {
  * works by scanning templates that do not exist yet.
  */
 export const GROUP_ICONS = {
+  paperPlaneOutline,
   addOutline,
   alertCircleOutline,
   barbellOutline,

@@ -16,12 +16,17 @@ import { Router } from '@angular/router';
 import { catchError, EMPTY, finalize, tap, throwError } from 'rxjs';
 import { MESSAGING_ROUTES } from '../constants/messaging-routes.const';
 import {
+  ConversationFolder,
   ConversationListItem,
   MessageView,
+  MessagingReach,
   MessagingStreamEnvelope,
   MessagingStreamEvent,
   ReportMessagePayload,
   SendMessageResult,
+  ShareRef,
+  ShareResult,
+  ShareTargetType,
   ThreatFlags,
   UserBlockReason,
 } from '../models/messaging';
@@ -102,6 +107,45 @@ import { AuthStore } from './auth.store';
 
 /** Filter chip selection driven by the inbox UI. */
 export type InboxFilter = 'all' | 'unread' | 'groups' | 'coaches';
+
+/**
+ * A message someone else just sent, as the store applied it: what an in-app
+ * banner announces. `at` makes two arrivals with the same text distinct.
+ */
+export interface IncomingMessage {
+  conversationId: string;
+  messageId: string;
+  preview: string;
+  /** It arrived as (part of) a message request. */
+  isRequest: boolean;
+  at: number;
+}
+
+/** A folder's own fetch (`loadFolder`): requests and archived chats. */
+interface FolderState {
+  loading: boolean;
+  loaded: boolean;
+}
+
+/** Unread messages in a list, a thread marked unread counting as one. */
+function sumUnread(list: ConversationListItem[]): number {
+  let total = 0;
+  for (const conversation of list) {
+    if (conversation.unreadCount > 0) {
+      total += conversation.unreadCount;
+    } else if (conversation.markedUnread) {
+      total += 1;
+    }
+  }
+  return total;
+}
+
+/** Newest first, as the server orders a page. */
+function byLatest(a: ConversationListItem, b: ConversationListItem): number {
+  const left = a.lastMessageAt ?? '';
+  const right = b.lastMessageAt ?? '';
+  return right.localeCompare(left);
+}
 
 /**
  * Minimum gap between two automatic conversation reloads triggered by
@@ -263,6 +307,12 @@ export class MessagingStore {
    */
   private readonly _threatFlagsByConv = signal<Record<string, ThreatFlags>>({});
 
+  /** Requests and archived chats fetched on their own (`loadFolder`). */
+  private readonly _folders = signal<Partial<Record<ConversationFolder, FolderState>>>({});
+
+  /** The latest message from someone else, for the in-app banner. */
+  private readonly _incoming = signal<IncomingMessage | null>(null);
+
   /**
    * `Date.now()` of the most recent successful or failed load attempt.
    * Used by the dedup window so a noisy auth flow doesn't queue
@@ -345,6 +395,52 @@ export class MessagingStore {
   );
   readonly hasUnread = computed(() => this.unreadTotal() > 0);
 
+  /**
+   * The chats: taken in and not archived. Mobile lists these, with message
+   * requests and archived chats on their own screens. Web still lists every
+   * conversation (`conversations`, `visibleConversations`) until it has
+   * screens for them, so a request reads there as a chat it can answer.
+   */
+  readonly chatConversations = computed(() =>
+    this._conversations().filter((c) => !c.isRequest && !c.archived),
+  );
+  /** Message requests waiting for the reader, newest first. */
+  readonly requestConversations = computed(() =>
+    this._conversations()
+      .filter((c) => !!c.isRequest)
+      .sort(byLatest),
+  );
+  /** Chats the reader archived, newest first. */
+  readonly archivedConversations = computed(() =>
+    this._conversations()
+      .filter((c) => !c.isRequest && !!c.archived)
+      .sort(byLatest),
+  );
+  /** Unread in the chats only: mobile's Messages tab and app badge. */
+  readonly chatsUnreadTotal = computed(() => sumUnread(this.chatConversations()));
+  /** The inbox chips' counts, over the chats only. */
+  readonly chatFilterCounts = computed(() => {
+    const chats = this.chatConversations();
+    return {
+      all: chats.length,
+      unread: chats.filter(isConversationUnread).length,
+    };
+  });
+  /** The chats under the active filter and search. */
+  readonly visibleChats = computed(() => this.applyInboxFilter(this.chatConversations()));
+
+  readonly incoming = this._incoming.asReadonly();
+
+  /** A folder's own fetch is on its way. */
+  folderLoading(folder: ConversationFolder): boolean {
+    return this._folders()[folder]?.loading ?? false;
+  }
+
+  /** A folder's own fetch has answered at least once. */
+  folderLoaded(folder: ConversationFolder): boolean {
+    return this._folders()[folder]?.loaded ?? false;
+  }
+
   /** Per-chip counts used by the inbox filter row. */
   readonly filterCounts = computed(() => {
     const all = this._conversations();
@@ -360,11 +456,16 @@ export class MessagingStore {
    * Sort: pinned-at-top is deferred (no BE field). Server order is
    * `last_message_at DESC NULLS LAST` — exactly what the design wants.
    */
-  readonly visibleConversations = computed(() => {
+  readonly visibleConversations = computed(() =>
+    this.applyInboxFilter(this._conversations()),
+  );
+
+  /** The active filter chip and search over a list of conversations. */
+  private applyInboxFilter(list: ConversationListItem[]): ConversationListItem[] {
     const filter = this._filter();
     const query = this._searchQuery().trim().toLowerCase();
 
-    return this._conversations().filter((c) => {
+    return list.filter((c) => {
       if (filter === 'unread' && !isConversationUnread(c)) return false;
       if (filter === 'groups' && c.type !== 'GROUP') return false;
       // 'coaches' is disabled in the UI for v1; defensive no-op here.
@@ -372,7 +473,7 @@ export class MessagingStore {
 
       return conversationMatches(c, query);
     });
-  });
+  }
 
   /**
    * The DM with a given user, if one is already loaded. Callers starting a new
@@ -839,6 +940,171 @@ export class MessagingStore {
     });
   }
 
+  // ─── Message requests, archive, sharing ──────────────────────
+
+  /**
+   * Make sure a folder's conversations are in the list. Requests and archived
+   * chats can sit past the pages loaded so far, so their screens fetch them
+   * on their own. They join as rows fetched outside the pages
+   * (`_outsidePages`), so paging the list carries on as before. A short
+   * answer is the whole folder: a row still marked that way but missing from
+   * it was accepted, deleted or unarchived elsewhere, and leaves.
+   */
+  loadFolder(folder: ConversationFolder, opts: { done?: () => void } = {}): void {
+    const done = opts.done ?? (() => undefined);
+    if (!this._auth.isAuthenticated() || this.folderLoading(folder)) {
+      done();
+      return;
+    }
+    this.setFolderState(folder, { loading: true });
+
+    this._api
+      .listConversations(1, CONVERSATION_PAGE_SIZE, folder)
+      .pipe(
+        tap((page) => {
+          const fetched = new Map(page.items.map((c) => [c.id, c]));
+          const whole = page.total <= page.items.length;
+          this._conversations.update((list) => {
+            const kept = list
+              .filter((c) => !(whole && inFolder(c, folder) && !fetched.has(c.id)))
+              .map((c) => fetched.get(c.id) ?? c);
+            const known = new Set(kept.map((c) => c.id));
+            const added = page.items.filter((c) => !known.has(c.id));
+            for (const item of added) {
+              this._outsidePages.add(item.id);
+            }
+            return [...kept, ...added];
+          });
+          this.setFolderState(folder, { loaded: true });
+        }),
+        catchError(() => EMPTY),
+        finalize(() => {
+          this.setFolderState(folder, { loading: false });
+          done();
+        }),
+      )
+      .subscribe();
+  }
+
+  /** Take a message request in: it moves to the chats. */
+  acceptRequest(conversationId: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this._api
+        .acceptRequest(conversationId)
+        .pipe(
+          tap((conversation) => {
+            this.upsertConversation(conversation);
+            resolve(true);
+          }),
+          catchError(() => {
+            resolve(false);
+            return EMPTY;
+          }),
+        )
+        .subscribe();
+    });
+  }
+
+  /**
+   * Delete a message request: gone from here, and the sender is never told.
+   * The thread is left if it is the one on screen.
+   */
+  declineRequest(conversationId: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this._api
+        .declineRequest(conversationId)
+        .pipe(
+          tap(() => {
+            this.forgetConversation(conversationId);
+            resolve(true);
+          }),
+          catchError(() => {
+            resolve(false);
+            return EMPTY;
+          }),
+        )
+        .subscribe();
+    });
+  }
+
+  /**
+   * Archive or unarchive a chat. Optimistic: the row moves at once and moves
+   * back if the server refuses.
+   */
+  setArchived(conversationId: string, archived: boolean): Promise<boolean> {
+    const conversation = this._conversations().find((c) => c.id === conversationId);
+    if (!conversation) {
+      return Promise.resolve(false);
+    }
+    const previous = !!conversation.archived;
+    this.patchConversation(conversationId, { archived });
+
+    return new Promise((resolve) => {
+      this._api
+        .setArchived(conversationId, archived)
+        .pipe(
+          tap(() => resolve(true)),
+          catchError(() => {
+            this.patchConversation(conversationId, { archived: previous });
+            resolve(false);
+            return EMPTY;
+          }),
+        )
+        .subscribe();
+    });
+  }
+
+  /** What happens if the reader writes to this person; null when unknown. */
+  reach(userId: string): Promise<MessagingReach | null> {
+    return new Promise((resolve) => {
+      this._api
+        .reach(userId)
+        .pipe(
+          tap((reach) => resolve(reach)),
+          catchError(() => {
+            resolve(null);
+            return EMPTY;
+          }),
+        )
+        .subscribe();
+    });
+  }
+
+  /**
+   * Send one public thing to several people. The chats it touched are read
+   * again: the list for their new rows, and each thread when next opened.
+   * Null when the request itself failed.
+   */
+  shareTo(recipientIds: string[], ref: ShareRef, caption?: string): Promise<ShareResult[] | null> {
+    return new Promise((resolve) => {
+      this._api
+        .shareTo(recipientIds, ref, caption)
+        .pipe(
+          tap(({ results }) => {
+            const touched = new Set(
+              results.map((r) => r.conversationId).filter((id): id is string => !!id),
+            );
+            this._messagesByConv.update((all) => {
+              const next = { ...all };
+              for (const id of touched) {
+                if (next[id]) {
+                  next[id] = { ...next[id], stale: true };
+                }
+              }
+              return next;
+            });
+            this.loadConversations({ force: true });
+            resolve(results);
+          }),
+          catchError(() => {
+            resolve(null);
+            return EMPTY;
+          }),
+        )
+        .subscribe();
+    });
+  }
+
   /**
    * "Mark as unread": the row counts as unread until the thread is next
    * opened (`markReadOnEntry` clears it). Optimistic, rolled back on
@@ -1148,6 +1414,14 @@ export class MessagingStore {
 
             if (err instanceof HttpErrorResponse) {
               if (err.status === 429) {
+                const limited = (err.error ?? {}) as { retryAfter?: number; message?: string };
+                // No window to wait out (a daily cap on new message
+                // requests): say what the server said, and pause nothing.
+                if (!limited.retryAfter && limited.message) {
+                  this._sendError.set(limited.message);
+                  resolve(conversationId);
+                  return EMPTY;
+                }
                 const retryAfter = (err.error as { retryAfter?: number })
                   ?.retryAfter;
                 const windowMs = retryAfter
@@ -1451,6 +1725,18 @@ export class MessagingStore {
       case 'conversation.cleared':
         this.applyConversationCleared(event);
         break;
+      case 'conversation.accepted':
+        this.applyConversationAccepted(event);
+        break;
+      case 'conversation.declined':
+        // Deleted as a request on another device: gone here too.
+        this.forgetConversation(event.payload.conversationId);
+        break;
+      case 'conversation.archived':
+        this.patchConversation(event.payload.conversationId, {
+          archived: event.payload.archived,
+        });
+        break;
       case 'heartbeat':
         // No-op. The realtime service already tracks lastEventId.
         return;
@@ -1520,6 +1806,21 @@ export class MessagingStore {
         // page load by signalling "we have data".
         hasLoaded: existing.length > 0 ? true : this.messagesFor(conversationId).hasLoaded,
       });
+      // A share: the event names the thing only, so the message is read
+      // again for its card, in the reader's language.
+      if (message.attachments?.length) {
+        this.fillAttachments(conversationId, message.id);
+      }
+    }
+
+    if (!isMine) {
+      this._incoming.set({
+        conversationId,
+        messageId: message.id,
+        preview: previewFromBody(message.body),
+        isRequest: !!event.payload.isRequest,
+        at: Date.now(),
+      });
     }
 
     const isActive = this._activeId() === conversationId;
@@ -1542,6 +1843,13 @@ export class MessagingStore {
     //      otherUser snapshot in the SSE payload).
     const present = this._conversations().some((c) => c.id === conversationId);
 
+    // What the message shared, if anything: the row says "Session · ...".
+    const shared = message.attachments ?? [];
+    let sharedType: ShareTargetType | null = null;
+    if (shared.length > 0) {
+      sharedType = shared[0].type;
+    }
+
     if (present) {
       this._conversations.update((list) => {
         const idx = list.findIndex((c) => c.id === conversationId);
@@ -1551,8 +1859,13 @@ export class MessagingStore {
           ...prev,
           lastMessageAt: message.createdAt,
           lastMessagePreview: previewFromBody(message.body),
+          lastMessageAttachmentType: sharedType,
           unreadCount: isMine || isActive ? prev.unreadCount : prev.unreadCount + 1,
         };
+        // Writing in an archived chat brings it back (the server did too).
+        if (isMine) {
+          updated.archived = false;
+        }
         // Promote to the top (server order is last_message_at DESC).
         const without = list.filter((_, i) => i !== idx);
         return [updated, ...without];
@@ -1679,6 +1992,39 @@ export class MessagingStore {
    * another device. A newer message brings it back through the usual
    * missing-row fetch in `applyMessageCreated`.
    */
+  /**
+   * Someone took a chat in. The reader, on another device: it leaves the
+   * requests. The other person: the reader's request was accepted, so the
+   * composer opens and read receipts start.
+   */
+  private applyConversationAccepted(
+    event: Extract<MessagingStreamEvent, { type: 'conversation.accepted' }>,
+  ): void {
+    const { conversationId, userId } = event.payload;
+    const myId = this._auth.user()?.id ?? null;
+    if (userId === myId) {
+      this.patchConversation(conversationId, { isRequest: false, requestContext: null });
+      return;
+    }
+    this.patchConversation(conversationId, { waiting: null });
+  }
+
+  /** Read one message again for its cards, and put it in place. */
+  private fillAttachments(conversationId: string, messageId: string): void {
+    this._api
+      .getMessage(messageId)
+      .pipe(catchError(() => EMPTY))
+      .subscribe((full) => {
+        const items = this.messagesFor(conversationId).items.map((m) => {
+          if (m.id === messageId) {
+            return full;
+          }
+          return m;
+        });
+        this.patchMessages(conversationId, { items });
+      });
+  }
+
   private applyConversationCleared(
     event: Extract<MessagingStreamEvent, { type: 'conversation.cleared' }>,
   ): void {
@@ -1797,6 +2143,28 @@ export class MessagingStore {
    * silently when the row isn't loaded — callers don't need to
    * pre-check existence.
    */
+  private setFolderState(folder: ConversationFolder, patch: Partial<FolderState>): void {
+    this._folders.update((all) => ({
+      ...all,
+      [folder]: { loading: false, loaded: false, ...all[folder], ...patch },
+    }));
+  }
+
+  /** Replace a row in place, or add it to the top. */
+  private upsertConversation(conversation: ConversationListItem): void {
+    this._conversations.update((list) => {
+      if (list.some((c) => c.id === conversation.id)) {
+        return list.map((c) => {
+          if (c.id === conversation.id) {
+            return conversation;
+          }
+          return c;
+        });
+      }
+      return [conversation, ...list];
+    });
+  }
+
   private patchConversation(
     id: string,
     patch: Partial<ConversationListItem>,
@@ -1843,6 +2211,17 @@ export class MessagingStore {
  * collapse, no ellipsis. Match that exactly so the row preview doesn't
  * visually change when the next REST refresh lands.
  */
+/** Whether a loaded row belongs in a folder's own list. */
+function inFolder(conversation: ConversationListItem, folder: ConversationFolder): boolean {
+  if (folder === 'requests') {
+    return !!conversation.isRequest;
+  }
+  if (folder === 'archived') {
+    return !conversation.isRequest && !!conversation.archived;
+  }
+  return !conversation.isRequest && !conversation.archived;
+}
+
 const PREVIEW_MAX = 200;
 function previewFromBody(body: string): string {
   return body.slice(0, PREVIEW_MAX);

@@ -66,21 +66,19 @@
     </ion-label>
   </ion-item>
 
-  <!-- Swipe left: WhatsApp's More + Archive, with mute where archive sits. -->
+  <!-- Swipe left: WhatsApp's More + Archive. Mute lives in More. Archive is
+       violet, like every put-aside-and-undo verb; on the archived list it
+       brings the chat back. -->
   <ion-item-options side="end">
-    <ion-item-option color="medium" (click)="emitAndClose(sliding, more)">
-      <ion-icon slot="top" name="ellipsis-horizontal-outline" aria-hidden="true" />
-      {{ 'messages.row.more' | translate }}
-    </ion-item-option>
-    <!-- Navy in both states, so it never matches More beside it; the icon
-         and the label carry the state. -->
-    <ion-item-option color="secondary" (click)="emitAndClose(sliding, toggleMute)">
-      <ion-icon
-        slot="top"
-        aria-hidden="true"
-        [name]="isMuted() ? 'notifications-outline' : 'notifications-off-outline'"
-      />
-      {{ (isMuted() ? 'messages.row.unmute' : 'messages.row.mute') | translate }}
+    @if (showMore()) {
+      <ion-item-option color="medium" (click)="emitAndClose(sliding, more)">
+        <ion-icon slot="top" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        {{ 'messages.row.more' | translate }}
+      </ion-item-option>
+    }
+    <ion-item-option color="violet" (click)="emitAndClose(sliding, archive)">
+      <ion-icon slot="top" name="archive-outline" aria-hidden="true" />
+      {{ archiveLabel() | translate }}
     </ion-item-option>
   </ion-item-options>
 </ion-item-sliding>

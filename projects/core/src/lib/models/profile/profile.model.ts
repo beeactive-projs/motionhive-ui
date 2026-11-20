@@ -1,3 +1,4 @@
+import type { WhoCanMessage } from '../messaging/requests.model';
 import type {
   InstructorProfile,
   UpdateInstructorProfilePayload,
@@ -82,6 +83,13 @@ export interface AccountInfo {
   privacySettings: UserPrivacySettings;
   /** Locked decision §19 — client browse gate on the exercise catalog. */
   exerciseCatalogOptIn?: boolean;
+  /**
+   * "Let people find me by name": while off, people search finds this
+   * account only by its whole email address. On when the API omits it.
+   */
+  findByName?: boolean;
+  /** "Who can message you". REQUESTS when the API omits it. */
+  whoCanMessage?: WhoCanMessage;
 }
 
 export interface MyProfile {
