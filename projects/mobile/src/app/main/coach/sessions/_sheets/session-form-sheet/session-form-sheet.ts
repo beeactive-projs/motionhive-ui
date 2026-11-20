@@ -56,6 +56,7 @@ import {
 } from 'core';
 
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
+import { DatetimeLocaleDirective } from '../../../../../_shared/directives/datetime-locale.directive';
 import { FeedbackService } from '../../../../../_shared/services/feedback.service';
 import {
   DEFAULT_GENERATED_OCCURRENCES,
@@ -129,6 +130,7 @@ function deviceTimezone(): string {
     IonButton,
     IonChip,
     IonDatetime,
+    DatetimeLocaleDirective,
     IonDatetimeButton,
     IonIcon,
     IonInput,

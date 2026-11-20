@@ -12,6 +12,7 @@ import {
   UNTITLED_PROGRAM_NAMES,
   assignmentChip,
   assignmentSubline,
+  assignmentSublineParts,
   assignmentTone,
   editedLabel,
   hasProgramName,
@@ -208,6 +209,16 @@ describe('programs config', () => {
     // Started is the fact a coach scans for; the percentage alone hid it.
     expect(assignmentSubline(assignment())).toMatch(/^Started .+ · 25% done$/);
     expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Cancelled }))).toBe('');
+  });
+
+  // A narrow row wraps between the parts, so "25% done" never splits.
+  it('gives the line in parts that wrap whole', () => {
+    const parts = assignmentSublineParts(assignment());
+    expect(parts).toHaveLength(2);
+    expect(parts[0]).toMatch(/^Started /);
+    expect(parts[1]).toBe('25% done');
+    expect(assignmentSublineParts(assignment({ status: ProgramAssignmentStatus.Paused }))).toHaveLength(1);
+    expect(assignmentSublineParts(assignment({ status: ProgramAssignmentStatus.Cancelled }))).toEqual([]);
   });
 
   // The ⋯ lists only what applies now (docs/MOBILE-ACTIONS.md): a draft can't

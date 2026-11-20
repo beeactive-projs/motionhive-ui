@@ -2533,7 +2533,7 @@
       "notStarted": "Not started",
       "pausedSubline": "Paused. Its days wait, and resuming moves them forward by whole weeks",
       "percentDone": "{percent}% done",
-      "startedPercent": "Started {date} · {percent}% done",
+      "started": "Started {date}",
       "starts": "Starts {date}"
     },
     "assignments": {

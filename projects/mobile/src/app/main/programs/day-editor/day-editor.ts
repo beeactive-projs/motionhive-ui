@@ -55,7 +55,6 @@ import {
   ProgramService,
   ProgramWorkout,
   SetField,
-  appLocale,
   estimateWorkoutMinutes,
 } from 'core';
 
@@ -65,6 +64,7 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { Notice } from '../../../_shared/components/notice/notice';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
+import { DatetimeLocaleDirective } from '../../../_shared/directives/datetime-locale.directive';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { prefersReducedMotion } from '../../../_shared/utils/motion';
 import { coachStackOf } from '../../clients/client-paths';
@@ -303,6 +303,7 @@ export interface BlockView {
     IonCardContent,
     IonContent,
     IonDatetime,
+    DatetimeLocaleDirective,
     IonDatetimeButton,
     IonFooter,
     IonHeader,
@@ -511,8 +512,6 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     return copy.move.to;
   });
 
-  /** The picker speaks the app's language, not the phone's. */
-  readonly locale = appLocale;
 
   /** The picker's rule, the API's too: inside the plan, from today, and free. */
   readonly dateEnabled = (iso: string): boolean => {

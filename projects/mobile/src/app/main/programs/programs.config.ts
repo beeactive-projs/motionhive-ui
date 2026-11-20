@@ -558,20 +558,29 @@ export function assignmentTone(status: ProgramAssignmentStatus): SpineTone {
  * client is never retroactively behind — is the whole point of pausing.
  */
 export function assignmentSubline(row: ProgramAssignment): string {
+  return assignmentSublineParts(row).join(' · ');
+}
+
+/**
+ * The same line in its parts, for a row narrow enough to wrap it: each part
+ * stays whole ("0% done" never splits from its number), so it breaks only
+ * between them.
+ */
+export function assignmentSublineParts(row: ProgramAssignment): string[] {
   switch (row.status) {
     case ProgramAssignmentStatus.Paused:
-      return translate('programs.assignment.pausedSubline');
+      return [translate('programs.assignment.pausedSubline')];
     case ProgramAssignmentStatus.Pending:
-      return translate('programs.assignment.starts', { date: shortDayLabel(row.startDate) });
+      return [translate('programs.assignment.starts', { date: shortDayLabel(row.startDate) })];
     case ProgramAssignmentStatus.Active:
     case ProgramAssignmentStatus.Completed:
       // The start date tells two runs of the same plan for one client apart.
-      return translate('programs.assignment.startedPercent', {
-        date: shortDayLabel(row.startDate),
-        percent: row.completionPercent,
-      });
+      return [
+        translate('programs.assignment.started', { date: shortDayLabel(row.startDate) }),
+        translate('programs.assignment.percentDone', { percent: row.completionPercent }),
+      ];
     default:
-      return '';
+      return [];
   }
 }
 

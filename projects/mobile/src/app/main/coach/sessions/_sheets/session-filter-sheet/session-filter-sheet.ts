@@ -17,6 +17,7 @@ import { take } from 'rxjs';
 import { Group, GroupService, SessionType, SessionLocationKind } from 'core';
 
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
+import { DatetimeLocaleDirective } from '../../../../../_shared/directives/datetime-locale.directive';
 import {
   AgendaFilters,
   AgendaStatus,
@@ -52,6 +53,7 @@ export { NO_FILTERS, activeFilterCount };
   imports: [
     IonButton,
     IonDatetime,
+    DatetimeLocaleDirective,
     IonDatetimeButton,
     IonItem,
     IonLabel,

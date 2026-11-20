@@ -51,6 +51,7 @@ import {
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { DatetimeLocaleDirective } from '../../../../_shared/directives/datetime-locale.directive';
 import { SearchbarLabelDirective } from '../../../../_shared/directives/searchbar-label.directive';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { ClientTabs, EMAIL_ONLY_TILE } from '../../../clients/clients.config';
@@ -131,6 +132,7 @@ const WEEKDAYS: readonly { iso: number; label: string }[] = weekdayNames('short'
     IonChip,
     HexAvatar,
     IonDatetime,
+    DatetimeLocaleDirective,
     IonDatetimeButton,
     IonIcon,
     IonItem,
@@ -274,8 +276,6 @@ export class AssignSheet {
   readonly startDate = signal(todayIso());
   /** Today, the earliest start the picker offers. */
   readonly minStartDate = todayIso();
-  /** The picker speaks the app's language, not the phone's. */
-  readonly locale = appLocale;
   readonly notes = signal('');
 
   readonly canAssign = computed(

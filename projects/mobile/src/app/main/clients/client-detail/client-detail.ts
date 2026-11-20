@@ -61,7 +61,7 @@ import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { SessionMonth } from '../../coach/sessions/_components/session-month/session-month';
 import { SessionRow } from '../../coach/sessions/_components/session-row/session-row';
 import { instancePlaceLabel } from '../../coach/sessions/sessions.config';
-import { assignmentSubline } from '../../programs/programs.config';
+import { assignmentSublineParts } from '../../programs/programs.config';
 import { logMeta, logWeeks, shortDayLabel } from '../../workouts/workouts.config';
 import { HistoryCalendar } from '../../workouts/_components/history-calendar/history-calendar';
 import { LogRow } from '../../workouts/_components/log-row/log-row';
@@ -451,7 +451,8 @@ export class ClientDetail implements ViewWillEnter {
             ? 'clients.detail.overview.planWaiting'
             : 'clients.detail.overview.planActive',
       ),
-      line: assignmentSubline(row),
+      /** Wraps between its parts, never inside one ("0% done" stays whole). */
+      lineParts: assignmentSublineParts(row),
     };
   });
 

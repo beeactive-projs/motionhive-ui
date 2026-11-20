@@ -2513,14 +2513,14 @@
       "noPrograms": "Niciun program încă. Creează unul mai întâi în Programe.",
       "noteForClient": "Notă pentru client",
       "notePlaceholder": "De ce acest program și la ce să aibă grijă",
-      "assignTo": "Atribuie lui {name}",
+      "assignTo": "Atribuie pentru {name}",
       "daysPicked": "{picked} din {total} alese",
       "firstWeek": "Prima săptămână",
       "lastDay": "Ultima zi: {date}",
       "otherPlan": "{name} urmează deja {program} ({week}). Le va avea pe amândouă în același timp.",
       "otherPlans": "{name} urmează deja {count, plural, one {un alt plan de la tine} few {alte # planuri de la tine} other {alte # de planuri de la tine}}. Le va avea pe toate în același timp.",
       "pendingInvite": "Nu a acceptat invitația încă",
-      "seePlan": "Vezi planul lui {name}",
+      "seePlan": "Vezi-i planul",
       "program": "Program",
       "searchClients": "Caută clienți",
       "noClientMatch": "Niciun client nu se potrivește.",
@@ -2533,7 +2533,7 @@
       "notStarted": "Neînceput",
       "pausedSubline": "Pe pauză. Zilele așteaptă, iar la reluare se mută înainte cu săptămâni întregi",
       "percentDone": "{percent}% realizat",
-      "startedPercent": "A început {date} · {percent}% realizat",
+      "started": "A început {date}",
       "starts": "Începe {date}"
     },
     "assignments": {
@@ -2553,13 +2553,13 @@
     "endPlan": {
       "cancel": {
         "confirm": "Anulează planul",
-        "detail": "Zilele care urmează dispar din calendarul lui {name}. Antrenamentele făcute rămân.",
+        "detail": "{name} nu mai vede în calendar zilele care urmează. Antrenamentele făcute rămân.",
         "title": "Anulează planul"
       },
       "done": "{status, select, PAUSED {Plan pus pe pauză} COMPLETED {Plan marcat ca terminat} CANCELLED {Plan anulat} ACTIVE {Plan reluat} other {Plan actualizat}}",
       "finish": {
         "confirm": "Marchează ca terminat",
-        "detail": "Rămâne în istoricul lui {name} ca terminat, la {percent}% realizat.",
+        "detail": "{name} îl vede în istoric ca terminat, la {percent}% realizat.",
         "title": "Marchează ca terminat"
       },
       "keep": "Renunță",
@@ -2573,7 +2573,7 @@
         "detail": "Îl poți relua oricând. Zilele lui așteaptă, iar la reluare cele rămase se mută înainte cu săptămâni întregi, așa că niciuna nu contează ca ratată.",
         "title": "Pune-l pe pauză"
       },
-      "title": "Planul lui {name}"
+      "title": "Planul pentru {name}"
     },
     "builder": {
       "clearDayAria": "Golește {name}",
@@ -2661,7 +2661,7 @@
       "dayLocked": "{lock, select, DONE {Ziua aceasta e făcută, așa că nu se mai poate schimba.} SKIPPED {Ziua aceasta a fost sărită, așa că nu se mai poate schimba.} STARTED {Ziua aceasta a fost începută, așa că nu se mai poate schimba.} PAST {Data zilei a trecut, așa că ziua nu se mai poate schimba.} other {Planul nu mai e în desfășurare, așa că zilele lui nu se mai pot schimba.}}",
       "doneNotice": "{name} primește o singură notificare despre schimbări când apeși Gata.",
       "doneWeeks": "{count, plural, one {Săptămâna {first} e făcută. O vezi în Antrenament, dar nu o mai poți schimba.} =2 {Săptămânile {first} și {last} sunt făcute. Le vezi în Antrenament, dar nu le mai poți schimba.} few {Săptămânile de la {first} la {last} sunt făcute. Le vezi în Antrenament, dar nu le mai poți schimba.} other {Săptămânile de la {first} la {last} sunt făcute. Le vezi în Antrenament, dar nu le mai poți schimba.}}",
-      "editCopy": "Editează copia lui {name}",
+      "editCopy": "Editează copia pentru {name}",
       "error": "Nu am putut deschide copia",
       "inProgram": "În program: {line}",
       "insteadOf": "În loc de {name}",
@@ -2673,7 +2673,7 @@
         "STARTED": "Începută"
       },
       "planClosed": "Planul nu mai e în desfășurare, așa că zilele lui nu se mai pot schimba.",
-      "removeBody": "Scoți {name} din ziua lui {client}? Programul îl păstrează.",
+      "removeBody": "Scoți {name} doar pentru {client}? Programul îl păstrează.",
       "revert": {
         "action": "Revino la valorile din program",
         "aria": "Readu {name} la valorile din program",
@@ -2681,7 +2681,7 @@
         "confirm": "Folosește valorile din program",
         "title": "Revii la valorile din program?"
       },
-      "title": "Copia lui {name}",
+      "title": "Copia pentru {name}",
       "toast": {
         "doneFailed": "Nu am putut încheia editarea copiei",
         "moveFailed": "Nu am putut muta ziua",
@@ -3542,7 +3542,7 @@
         "byCoachNoDate": "{coach} l-a marcat ca terminat, la {percent}% realizat.",
         "done": "Ai trecut prin toate zilele lui, {percent}% realizat."
       },
-      "messageCoach": "Scrie-i lui {coach}",
+      "messageCoach": "Mesaj pentru {coach}",
       "messageYourCoach": "Scrie-i antrenorului tău",
       "openPlan": "Deschide planul",
       "paused": {

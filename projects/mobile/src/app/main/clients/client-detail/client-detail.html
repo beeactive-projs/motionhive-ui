@@ -195,8 +195,11 @@
       <!-- The plan itself, opened in this stack so back returns here.
                        Paused, Resume is the row's one control: a button inside
                        a button is two controls a screen reader cannot tell apart. -->
+      <!-- With a ⋯ the row has no chevron, as on the assignments list: two
+           trailing marks left the line under the name half the row. -->
       <ion-item [button]="!!plan.row.masterProgramId && !plan.paused"
-        [detail]="!!plan.row.masterProgramId && !plan.paused" (click)="plan.paused || openPlan(plan.row)">
+        [detail]="!!plan.row.masterProgramId && !plan.paused && !plan.canChange"
+        (click)="plan.paused || openPlan(plan.row)">
         <div slot="start" class="tile plain" aria-hidden="true">
           <mh-hex-avatar size="sm" icon="barbell-outline" [color]="plan.paused ? 'medium' : 'primary'" tone="wash" />
         </div>
@@ -208,7 +211,13 @@
             <span [style.width.%]="plan.row.completionPercent"></span>
           </span>
           }
-          <p>{{ plan.line }}</p>
+          <p class="plan-line">
+            <span class="parts">
+              @for (part of plan.lineParts; track $index) {
+              <span>{{ part }}</span>
+              }
+            </span>
+          </p>
         </ion-label>
         @if (plan.paused) {
         <!-- Paused: Resume is the Overview's one honey action. -->
