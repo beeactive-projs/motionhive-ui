@@ -183,15 +183,22 @@ export class AuthService implements OnDestroy {
     this.clearAuthData();
   }
 
-  refreshToken(): Observable<{ accessToken: string }> {
+  refreshToken(): Observable<{ accessToken: string; refreshToken?: string }> {
     const refreshToken = this._tokenService.getRefreshToken();
     return this._http
-      .post<{ accessToken: string }>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REFRESH}`, {
-        refreshToken,
-      })
+      .post<{ accessToken: string; refreshToken?: string }>(
+        `${environment.apiUrl}${API_ENDPOINTS.AUTH.REFRESH}`,
+        { refreshToken },
+      )
       .pipe(
         tap((response) => {
           this._tokenService.setAccessToken(response.accessToken);
+          // The API rotates the refresh token on every use. Kept, the old
+          // one was already revoked, so the next refresh signed the person
+          // out (with the API's 2h default, every 4 hours or so).
+          if (response.refreshToken) {
+            this._tokenService.setRefreshToken(response.refreshToken);
+          }
           this.scheduleTokenRefresh(response.accessToken);
         }),
       );

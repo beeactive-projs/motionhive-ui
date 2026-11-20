@@ -83,7 +83,7 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - Auth interceptor adds Bearer token and auto-refreshes on 401
 - Endpoints defined in `API_ENDPOINTS` constant
 - Import everything from `'core'`: `import { SomeService, SomeModel } from 'core';`
-- **API documentation (Swagger/OpenAPI)**: https://beeactive-api-production.up.railway.app/api/docs
+- **API documentation (Swagger/OpenAPI)**: `http://localhost:3800/api/docs` on a local API only; deployed APIs (dev and production) never serve it
 
 ### Auth & State
 

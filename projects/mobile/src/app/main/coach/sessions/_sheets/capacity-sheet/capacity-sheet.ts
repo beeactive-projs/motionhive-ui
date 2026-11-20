@@ -123,8 +123,8 @@ export class CapacitySheet {
           void this._feedbackService.success(
             this._translateService.instant('sessions.toast.capacityUpdated'),
           );
-          // Raising capacity does NOT sweep the waitlist server-side, so the
-          // roster has to be reloaded rather than assumed to have shifted.
+          // Raising capacity moves the oldest waitlisters into the new seats
+          // server-side; the roster is reloaded to show who moved in.
           this.saved.emit();
         },
         error: (error: unknown) => {

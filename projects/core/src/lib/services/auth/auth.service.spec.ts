@@ -22,6 +22,54 @@ const APPLE_URL = `${environment.apiUrl}${API_ENDPOINTS.AUTH.APPLE}`;
 const FACEBOOK_URL = `${environment.apiUrl}${API_ENDPOINTS.AUTH.FACEBOOK}`;
 const ME_URL = `${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`;
 
+describe('AuthService.refreshToken', () => {
+  let service: AuthService;
+  let httpMock: HttpTestingController;
+  let tokenService: TokenService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withXhr()),
+        provideHttpClientTesting(),
+        { provide: Router, useValue: {} },
+        { provide: LanguageService, useValue: {} },
+      ],
+    });
+    service = TestBed.inject(AuthService);
+    httpMock = TestBed.inject(HttpTestingController);
+    tokenService = TestBed.inject(TokenService);
+    tokenService.setAccessToken('access-1');
+    tokenService.setRefreshToken('refresh-1');
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+    localStorage.clear();
+  });
+
+  // The API rotates refresh tokens. Only the access token was kept, so the
+  // second refresh sent a revoked token and signed the person out.
+  it('keeps the rotated refresh token for the next refresh', () => {
+    service.refreshToken().subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REFRESH}`);
+    expect(req.request.body).toEqual({ refreshToken: 'refresh-1' });
+    req.flush({ accessToken: 'access-2', refreshToken: 'refresh-2' });
+
+    expect(tokenService.getAccessToken()).toBe('access-2');
+    expect(tokenService.getRefreshToken()).toBe('refresh-2');
+  });
+
+  it('keeps the old refresh token when an answer brings none', () => {
+    service.refreshToken().subscribe();
+    httpMock
+      .expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REFRESH}`)
+      .flush({ accessToken: 'access-2' });
+
+    expect(tokenService.getRefreshToken()).toBe('refresh-1');
+  });
+});
+
 describe('AuthService.logout', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
