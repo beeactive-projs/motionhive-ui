@@ -192,3 +192,42 @@ describe('Workouts, telling the tab shell', () => {
     expect(service.shown()).toBe(false);
   });
 });
+
+describe('Workouts, a plan the coach stopped', () => {
+  const coach = { id: 'coach-1', firstName: 'Andrei', lastName: 'Pop', avatarUrl: null, handle: null };
+  const base = {
+    id: 'pa-1',
+    programNameSnapshot: 'Strength Base',
+    completionPercent: 42,
+    startDate: '2026-11-02',
+    endDate: '2026-12-27',
+    assignmentKind: 'COACH',
+    instructor: coach,
+    statusMessage: null,
+    workoutsDone: 7,
+  };
+
+  it('says since when a paused plan waits, and offers to write to the coach', () => {
+    const { page } = setup({ inProgress: null, session: null });
+    const plan = { ...base, status: 'PAUSED', statusChangedAt: '2026-11-19T10:00:00Z' };
+
+    expect(page.stoppedLine(plan)).toBe(
+      "Paused since 19 Nov. Andrei resumes it when it's time. Paused days don't count as missed.",
+    );
+    expect(page.stoppedAction(plan)).toBe('message');
+    expect(page.messageCoachLabel(plan)).toBe('Message Andrei');
+  });
+
+  it('counts what a cancelled plan leaves in the history, and points there', () => {
+    const { page } = setup({ inProgress: null, session: null });
+    const plan = { ...base, status: 'CANCELLED', statusChangedAt: '2026-11-12T10:00:00Z' };
+
+    expect(page.stoppedLine(plan)).toBe(
+      'Andrei cancelled it on 12 Nov. The 7 finished workouts stay in your history.',
+    );
+    expect(page.stoppedAction(plan)).toBe('history');
+    page.openHistory();
+    expect(page.tab()).toBe(WorkoutTabs.History);
+  });
+});
+

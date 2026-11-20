@@ -49,7 +49,30 @@
     </div>
   } @else if (store.program()) {
     <div class="mh-page">
-      <span class="mh-kicker meta">{{ subtitle() }}</span>
+      <div class="status-line">
+        <span class="mh-kicker meta">{{ subtitle() }}</span>
+        @if (store.isPublished()) {
+          <ion-badge data-tone="success">{{ 'enum.programStatus.PUBLISHED' | translate }}</ion-badge>
+        }
+      </div>
+
+      @if (showClientsNotice()) {
+        <!-- Each client trains their own copy, so the coach should know an
+             edit here never reaches them. -->
+        <mh-notice tone="info">
+          <span class="notice-body">
+            <span>{{ clientsNotice() }}</span>
+            <ion-button
+              fill="clear"
+              size="small"
+              class="mh-text-link inline notice-link"
+              (click)="openAssignments()"
+            >
+              {{ 'programs.settings.viewAssignments' | translate }}
+            </ion-button>
+          </span>
+        </mh-notice>
+      }
 
       <!-- The rail jumps anywhere in a twelve-week plan; the dot says which
            weeks actually hold work, so an empty stretch is visible at a glance.
@@ -75,8 +98,8 @@
       @for (week of store.weeks(); track week.index) {
         <section class="mh-section week" [id]="'week-' + week.index">
           <div class="mh-section-head">
-            <!-- The header opens and closes the week. Copy and delete stay
-                 beside it as their own buttons, never inside it. -->
+            <!-- The header opens and closes the week. Copy and the week's ⋯
+                 stay beside it as their own buttons, never inside it. -->
             <ion-button
               fill="clear"
               color="medium"
@@ -95,22 +118,23 @@
               <span class="mh-kicker">{{ weekLabel(week.index) }}</span>
               <ion-note>{{ daysLabel(week) }}</ion-note>
             </ion-button>
-            @if (week.filled > 0) {
-              <ion-button fill="clear" size="small" (click)="openCopy(week.index)">
-                <ion-icon slot="start" name="copy-outline" aria-hidden="true" />
-                {{ 'button.copy' | translate }}
-              </ion-button>
-            }
-            <!-- A program keeps at least one week, so the last one has no delete. -->
-            @if (store.weekCount() > 1) {
+            @if (isOwn()) {
+              @if (week.filled > 0 && store.weekCount() > 1) {
+                <ion-button fill="clear" size="small" (click)="openCopy(week.index)">
+                  <ion-icon slot="start" name="copy-outline" aria-hidden="true" />
+                  {{ 'button.copy' | translate }}
+                </ion-button>
+              }
+              <!-- Everything else about the week: copy to several, add one
+                   after it, clear it, delete it. -->
               <ion-button
                 fill="clear"
-                size="small"
+                shape="round"
                 color="medium"
-                [attr.aria-label]="'programs.builder.deleteWeekAria' | translate: { week: week.index + 1 }"
-                (click)="askDeleteWeek(week.index)"
+                [attr.aria-label]="'programs.builder.weekActionsAria' | translate: { week: week.index + 1 }"
+                (click)="openWeekMenu(week.index)"
               >
-                <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+                <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
               </ion-button>
             }
           </div>
@@ -149,6 +173,7 @@
                   <ion-label>
                     @if (day) {
                       <h2>{{ day.name }}</h2>
+                      <p>{{ dayMeta(day) }}</p>
                     } @else {
                       <!-- A rest day is the absence of work, so it reads as a quiet
                            invitation rather than an empty record. -->
@@ -172,13 +197,14 @@
                         <ion-icon slot="icon-only" name="copy-outline" aria-hidden="true" />
                       </ion-button>
                     }
+                    <!-- Clears at once; the toast offers Undo. -->
                     <ion-button
                       slot="end"
                       fill="clear"
                       shape="round"
                       color="medium"
                       [attr.aria-label]="'programs.builder.clearDayAria' | translate: { name: day.name }"
-                      (click)="askClear(day, $event)"
+                      (click)="clearDay(day, $event)"
                     >
                       <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
                     </ion-button>
@@ -195,16 +221,54 @@
   }
 </ion-content>
 
-@if (showFooter()) {
+@if (showAssignFooter()) {
   <ion-footer [translucent]="true">
     <ion-toolbar>
-      <!-- The one thing a draft needs next. Assigning, once published, is
-           the first verb behind the ⋯. -->
+      <!-- What a published program is for: handing it to a client. -->
       <div class="mh-cta-bar">
-        @if (publishBlocker(); as blocker) {
-          <p class="blocker">{{ blocker }}</p>
+        <ion-button expand="block" (click)="openAssign()">
+          {{ 'programs.assignments.assignToClient' | translate }}
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+} @else if (showPublishFooter()) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <!-- The one thing a draft needs next. Until it can be published the
+           footer lists what is missing, each with the way to fix it. -->
+      <div class="mh-cta-bar">
+        @if (canPublish()) {
+          <p class="publish-ready">{{ publishReady() }}</p>
+        } @else {
+          <ul class="checklist" [attr.aria-label]="'programs.builder.publish.checklist' | translate">
+            <li [class.met]="hasName()">
+              @if (hasName()) {
+                <ion-icon name="checkmark-circle" color="success" aria-hidden="true" />
+                <span class="label">{{ 'programs.builder.publish.named' | translate }}</span>
+              } @else {
+                <ion-icon name="ellipse-outline" color="medium" aria-hidden="true" />
+                <span class="label">{{ 'programs.builder.publish.unnamed' | translate }}</span>
+                <ion-button fill="clear" size="small" class="mh-text-link" (click)="openDetails()">
+                  {{ 'programs.actions.editDetails' | translate }}
+                </ion-button>
+              }
+            </li>
+            <li [class.met]="hasDayWithExercises()">
+              @if (hasDayWithExercises()) {
+                <ion-icon name="checkmark-circle" color="success" aria-hidden="true" />
+                <span class="label">{{ 'programs.builder.publish.hasDays' | translate }}</span>
+              } @else {
+                <ion-icon name="ellipse-outline" color="medium" aria-hidden="true" />
+                <span class="label">{{ 'programs.builder.publish.noDays' | translate }}</span>
+                <ion-button fill="clear" size="small" class="mh-text-link" (click)="openFirstDay()">
+                  {{ 'programs.builder.publish.openFirstDay' | translate }}
+                </ion-button>
+              }
+            </li>
+          </ul>
         }
-        <ion-button expand="block" [disabled]="!!publishBlocker() || store.saving()" (click)="publish()">
+        <ion-button expand="block" [disabled]="!canPublish() || store.saving()" (click)="publish()">
           {{ 'programs.settings.publish' | translate }}
         </ion-button>
       </div>
@@ -273,22 +337,37 @@
   (copy)="onCopy($event)"
 />
 
+<mh-action-sheet
+  [(open)]="weekMenuOpen"
+  [title]="weekMenuTitle()"
+  [subtitle]="weekMenuSubtitle()"
+  [actions]="weekMenuActions()"
+  (chosen)="onWeekAction($event)"
+/>
+
+<!-- The week's days are listed as they go; the weeks after it stay put. -->
 <mh-confirm-sheet
-  [(open)]="clearOpen"
-  [title]="'programs.builder.clear.title' | translate"
-  [body]="clearBody()"
+  [(open)]="clearWeekOpen"
+  [title]="clearWeekTitle()"
+  [body]="clearWeekBody()"
+  [facts]="clearWeekFacts()"
   [confirmLabel]="'button.clear' | translate"
   [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
-  (confirm)="confirmClear()"
+  [saving]="store.saving()"
+  (confirm)="confirmClearWeek()"
 />
 
+<!-- Its days, then what happens to the weeks after it (design "WeekSheet"). -->
 <mh-confirm-sheet
   [(open)]="deleteWeekOpen"
   [title]="deleteWeekTitle()"
   [body]="deleteWeekBody()"
-  [confirmLabel]="'button.delete' | translate"
+  [facts]="deleteWeekFacts()"
+  [irreversible]="deleteWeekShift()"
+  [confirmLabel]="deleteWeekConfirm()"
   [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
+  [saving]="store.saving()"
   (confirm)="confirmDeleteWeek()"
 />

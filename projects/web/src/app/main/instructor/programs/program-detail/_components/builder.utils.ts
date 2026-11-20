@@ -92,17 +92,6 @@ export function setTypeSeverity(s: ExerciseSetType): TagSeverity {
   }
 }
 
-/** Sets prescribed across a whole workout. */
-export function workoutSetCount(workout: ProgramWorkout): number {
-  let n = 0;
-  for (const e of workout.exercises ?? []) n += e.sets?.length ?? 0;
-  return n;
-}
-
-export function workoutExerciseCount(workout: ProgramWorkout): number {
-  return workout.exercises?.length ?? 0;
-}
-
 /** Rest shared by every set of the exercise, or null when they differ / are unset. */
 export function commonRestSeconds(ex: PrescribedExercise): number | null {
   const sets = ex.sets ?? [];
@@ -110,22 +99,6 @@ export function commonRestSeconds(ex: PrescribedExercise): number | null {
   const first = sets[0].restAfterSeconds;
   if (first == null) return null;
   return sets.every((s) => s.restAfterSeconds === first) ? first : null;
-}
-
-/**
- * Duration shown on rail rows + the editor chip. The coach-entered
- * estimate wins; otherwise a rough derivation from set count and rest
- * (~45s of work per set), rounded to the nearest 5 minutes. Null when
- * there is nothing to estimate from — callers hide the chip.
- */
-export function estimateWorkoutMinutes(workout: ProgramWorkout): number | null {
-  if (workout.estimatedDurationMinutes) return workout.estimatedDurationMinutes;
-  if (workoutSetCount(workout) === 0) return null;
-  let seconds = 0;
-  for (const e of workout.exercises ?? []) {
-    for (const s of e.sets ?? []) seconds += 45 + (s.restAfterSeconds ?? 60);
-  }
-  return Math.max(5, Math.round(seconds / 60 / 5) * 5);
 }
 
 /**

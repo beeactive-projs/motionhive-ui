@@ -1256,7 +1256,7 @@
         "none": "Niciun link încă"
       },
       "leave": {
-        "body": "Nu vei mai vedea postările grupului. Poți cere din nou să te alături mai târziu.",
+        "body": "Nu vei mai vedea postările grupului, iar rezervările tale la sesiunile doar pentru membri vor fi anulate. Poți cere din nou să te alături mai târziu.",
         "button": "Părăsește grupul",
         "title": "Părăsești grupul?"
       },
@@ -1293,7 +1293,7 @@
       "categoriesFailed": "Nu am putut încărca activitățile.",
       "categoriesHint": "Oamenii găsesc grupul după ele în Descoperă.",
       "delete": {
-        "body": "Postările, membrii și comentariile dispar odată cu el.",
+        "body": "Postările, membrii și comentariile dispar odată cu el, iar sesiunile doar pentru membri se anulează. Persoanele înscrise sunt anunțate.",
         "button": "Șterge grupul",
         "title": "Ștergi grupul?"
       },
@@ -1492,7 +1492,7 @@
       "message": "Trimite un mesaj",
       "remove": "Scoate din grup",
       "removeConfirm": {
-        "body": "Nu va mai vedea postările și membrii grupului. Îi poți trimite mai târziu o nouă invitație.",
+        "body": "Nu va mai vedea postările și membrii grupului, iar rezervările la sesiunile doar pentru membri se anulează. Îi poți trimite mai târziu o nouă invitație.",
         "title": "Scoți persoana {name} din grup?"
       },
       "removeModerator": "Retrage rolul de moderator",
@@ -2131,6 +2131,7 @@
     "cancelledDeclined": "Anulate și refuzate",
     "chat": "Conversație",
     "client": "Client",
+    "clientCopy": "Copia clientului",
     "clients": "Clienți",
     "coaches": "Antrenori",
     "coachingProfile": "Profil de antrenor",
@@ -2507,13 +2508,20 @@
       },
       "loadingClients": "Se încarcă clienții…",
       "loadingPrograms": "Se încarcă programele…",
-      "more": "+ încă {count}",
       "noClients": "Încă nu ai clienți activi. Un client trebuie să accepte înainte să-i poți atribui ceva.",
       "noProgramMatch": "Niciun program nu se potrivește.",
       "noPrograms": "Niciun program încă. Creează unul mai întâi în Programe.",
-      "note": "Notă",
+      "noteForClient": "Notă pentru client",
+      "notePlaceholder": "De ce acest program și la ce să aibă grijă",
+      "assignTo": "Atribuie lui {name}",
+      "daysPicked": "{picked} din {total} alese",
+      "firstWeek": "Prima săptămână",
+      "lastDay": "Ultima zi: {date}",
+      "otherPlan": "{name} urmează deja {program} ({week}). Le va avea pe amândouă în același timp.",
+      "otherPlans": "{name} urmează deja {count, plural, one {un alt plan de la tine} few {alte # planuri de la tine} other {alte # de planuri de la tine}}. Le va avea pe toate în același timp.",
+      "pendingInvite": "Nu a acceptat invitația încă",
+      "seePlan": "Vezi planul lui {name}",
       "program": "Program",
-      "schedule": "Calendar",
       "searchClients": "Caută clienți",
       "noClientMatch": "Niciun client nu se potrivește.",
       "searchPrograms": "Caută programe",
@@ -2523,8 +2531,7 @@
     },
     "assignment": {
       "notStarted": "Neînceput",
-      "pause": "Pune pe pauză",
-      "pausedSubline": "Pe pauză. Zilele ratate în pauză sunt marcate ca sărite la reluare",
+      "pausedSubline": "Pe pauză. Zilele așteaptă, iar la reluare se mută înainte cu săptămâni întregi",
       "percentDone": "{percent}% realizat",
       "startedPercent": "A început {date} · {percent}% realizat",
       "starts": "Începe {date}"
@@ -2543,28 +2550,70 @@
         "statusFailed": "Nu am putut modifica atribuirea"
       }
     },
-    "builder": {
-      "clear": {
-        "body": "Golești {name}? Ziua devine zi de pauză și exercițiile ei sunt șterse.",
-        "title": "Golește ziua"
+    "endPlan": {
+      "cancel": {
+        "confirm": "Anulează planul",
+        "detail": "Zilele care urmează dispar din calendarul lui {name}. Antrenamentele făcute rămân.",
+        "title": "Anulează planul"
       },
+      "done": "{status, select, PAUSED {Plan pus pe pauză} COMPLETED {Plan marcat ca terminat} CANCELLED {Plan anulat} ACTIVE {Plan reluat} other {Plan actualizat}}",
+      "finish": {
+        "confirm": "Marchează ca terminat",
+        "detail": "Rămâne în istoricul lui {name} ca terminat, la {percent}% realizat.",
+        "title": "Marchează ca terminat"
+      },
+      "keep": "Renunță",
+      "message": "Mesaj pentru {name}",
+      "messagePlaceholder": "Îl trimitem împreună cu notificarea",
+      "notice": "{name} primește o notificare.",
+      "options": "Opțiuni pentru {name}",
+      "optionsLabel": "Ce faci cu planul",
+      "pause": {
+        "confirm": "Pune planul pe pauză",
+        "detail": "Îl poți relua oricând. Zilele lui așteaptă, iar la reluare cele rămase se mută înainte cu săptămâni întregi, așa că niciuna nu contează ca ratată.",
+        "title": "Pune-l pe pauză"
+      },
+      "title": "Planul lui {name}"
+    },
+    "builder": {
       "clearDayAria": "Golește {name}",
+      "clearWeek": {
+        "body": "{days, plural, one {Ziua ei de antrenament dispare, iar săptămâna devine de odihnă.} few {Cele # zile de antrenament ale ei dispar, iar săptămâna devine de odihnă.} other {Cele # de zile de antrenament ale ei dispar, iar săptămâna devine de odihnă.}} Săptămânile de după ea rămân pe loc.",
+        "title": "Golești săptămâna {week}?"
+      },
+      "clientsNotice": "{count, plural, one {Un client urmează deja acest program.} few {# clienți urmează deja acest program.} other {# de clienți urmează deja acest program.}} Ce schimbi aici se aplică doar atribuirilor noi.",
       "copyDayAria": "Copiază {name} în alte săptămâni",
+      "dayEmpty": "Încă nu are exerciții",
+      "dayMeta": "{count, plural, one {# exercițiu} few {# exerciții} other {# de exerciții}} · ~{minutes} min",
       "daysFilled": "{filled} din {total} zile",
       "deleteWeek": {
-        "body": "{days, plural, =0 {Săptămâna aceasta este goală.} one {Se șterge ziua ei de antrenament.} few {Se șterg cele # zile de antrenament din ea.} other {Se șterg cele # de zile de antrenament din ea.}} Săptămânile de după urcă, iar programul va avea {weeks, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}.",
-        "title": "Șterge săptămâna {week}"
+        "body": "{days, plural, =0 {Săptămâna {week} are doar zile libere.} one {Ziua ei de antrenament se șterge odată cu ea.} few {Cele # zile de antrenament ale ei se șterg odată cu ea.} other {Cele # de zile de antrenament ale ei se șterg odată cu ea.}}",
+        "confirm": "Șterge săptămâna {week}",
+        "ends": "Programul rămâne cu {weeks, plural, one {o săptămână} few {# săptămâni} other {# de săptămâni}}.",
+        "shift": "{count, plural, one {Săptămâna {from} urcă o poziție și devine săptămâna {to}.} few {Săptămânile de la {from} la {last} urcă o poziție și devin săptămânile de la {to} la {newLast}.} other {Săptămânile de la {from} la {last} urcă o poziție și devin săptămânile de la {to} la {newLast}.}} Programul rămâne cu {weeks, plural, one {o săptămână} few {# săptămâni} other {# de săptămâni}}.",
+        "title": "Ștergi săptămâna {week}?"
       },
-      "deleteWeekAria": "Șterge săptămâna {week}",
       "emptyWeek": "Încă nu are antrenamente",
       "error": "Nu am putut deschide programul",
       "jumpToWeek": "Mergi la o săptămână",
+      "publish": {
+        "checklist": "Înainte să poți publica",
+        "hasDays": "Cel puțin o zi cu exerciții",
+        "named": "Are un nume",
+        "noDays": "Nicio zi nu are exerciții încă",
+        "openFirstDay": "Deschide ziua 1",
+        "ready": "{weeks, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}, {days, plural, one {# zi} few {# zile} other {# de zile}} cu exerciții. După publicare îl poți atribui.",
+        "unnamed": "Dă-i programului un nume"
+      },
       "restDay": "Zi liberă · atinge ca să adaugi",
       "subtitle": "{weeks, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}} · {days, plural, one {# zi} few {# zile} other {# de zile}} de lucru",
       "titleFallback": "Program",
       "toast": {
+        "addWeekFailed": "Nu am putut adăuga săptămâna",
+        "clearWeekFailed": "Nu am putut goli săptămâna",
         "copyDayFailed": "Nu am putut copia ziua",
         "copyWeekFailed": "Nu am putut copia săptămâna",
+        "dayCleared": "Ziua de {day} e acum liberă",
         "dayCopiedToDay": "Am copiat {name} în {day}, săptămâna {week}",
         "dayCopiedToWeek": "Am copiat {name} în săptămâna {week}",
         "dayCopiedToWeeks": "Am copiat {name} în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
@@ -2572,9 +2621,20 @@
         "startFailed": "Nu am putut porni programul",
         "weekCopiedToWeek": "Săptămâna {from} a fost copiată în săptămâna {week}",
         "weekCopiedToWeeks": "Săptămâna {from} a fost copiată în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
+        "weekAdded": "Am adăugat săptămâna {week} după săptămâna {after}",
+        "weekCleared": "Săptămâna {week} e acum de odihnă",
         "weekDeleted": "Am șters săptămâna {week}"
       },
-      "untitledProgram": "Program fără titlu"
+      "untitledProgram": "Program fără titlu",
+      "weekActionsAria": "Acțiuni pentru săptămâna {week}",
+      "weekMenu": {
+        "clear": "Golește săptămâna (devine odihnă)",
+        "clientsKeepCopy": "{count, plural, one {Clientul care îl urmează își păstrează copia neschimbată.} few {Cei # clienți care îl urmează își păstrează copia neschimbată.} other {Cei # de clienți care îl urmează își păstrează copia neschimbată.}}",
+        "copy": "Copiază în alte săptămâni",
+        "delete": "Șterge săptămâna",
+        "insertAfter": "Adaugă o săptămână după ea",
+        "subtitle": "{count, plural, =0 {Încă fără exerciții} one {O zi cu exerciții} few {# zile cu exerciții} other {# de zile cu exerciții}}"
+      }
     },
     "common": {
       "clientFallback": "Client",
@@ -2585,6 +2645,48 @@
     "copy": {
       "toEllipsis": "Copiază în…",
       "toWeeks": "Copiază în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}"
+    },
+    "clientCopy": {
+      "averageEffort": "Efort mediu {value} din 10",
+      "badge": {
+        "added": "Adăugat pentru {name}",
+        "changed": "Modificat pentru {name}",
+        "replaced": "Înlocuit"
+      },
+      "banner": "Schimbările ajung doar la {name}. {program} rămâne cum e.",
+      "changeStatus": "Pune pe pauză, încheie sau anulează",
+      "date": "Data",
+      "dateHint": "Mut-o pe o zi liberă din plan.",
+      "dayChanged": "Modificată",
+      "dayLocked": "{lock, select, DONE {Ziua aceasta e făcută, așa că nu se mai poate schimba.} SKIPPED {Ziua aceasta a fost sărită, așa că nu se mai poate schimba.} STARTED {Ziua aceasta a fost începută, așa că nu se mai poate schimba.} PAST {Data zilei a trecut, așa că ziua nu se mai poate schimba.} other {Planul nu mai e în desfășurare, așa că zilele lui nu se mai pot schimba.}}",
+      "doneNotice": "{name} primește o singură notificare despre schimbări când apeși Gata.",
+      "doneWeeks": "{count, plural, one {Săptămâna {first} e făcută. O vezi în Antrenament, dar nu o mai poți schimba.} =2 {Săptămânile {first} și {last} sunt făcute. Le vezi în Antrenament, dar nu le mai poți schimba.} few {Săptămânile de la {first} la {last} sunt făcute. Le vezi în Antrenament, dar nu le mai poți schimba.} other {Săptămânile de la {first} la {last} sunt făcute. Le vezi în Antrenament, dar nu le mai poți schimba.}}",
+      "editCopy": "Editează copia lui {name}",
+      "error": "Nu am putut deschide copia",
+      "inProgram": "În program: {line}",
+      "insteadOf": "În loc de {name}",
+      "lastTime": "Data trecută · {date}",
+      "lock": {
+        "DONE": "Făcută",
+        "PAST": "Trecută",
+        "SKIPPED": "Sărită",
+        "STARTED": "Începută"
+      },
+      "planClosed": "Planul nu mai e în desfășurare, așa că zilele lui nu se mai pot schimba.",
+      "removeBody": "Scoți {name} din ziua lui {client}? Programul îl păstrează.",
+      "revert": {
+        "action": "Revino la valorile din program",
+        "aria": "Readu {name} la valorile din program",
+        "body": "Schimbările făcute pentru {client} la {name} sunt înlocuite cu ce cere acum programul.",
+        "confirm": "Folosește valorile din program",
+        "title": "Revii la valorile din program?"
+      },
+      "title": "Copia lui {name}",
+      "toast": {
+        "doneFailed": "Nu am putut încheia editarea copiei",
+        "moveFailed": "Nu am putut muta ziua",
+        "notified": "{name} primește o notificare despre schimbări."
+      }
     },
     "copyDay": {
       "dayGroup": "Ziua în care copiezi",
@@ -2611,6 +2713,8 @@
     },
     "dayEditor": {
       "addExercises": "Adaugă exerciții",
+      "addWarmup": "Încălzire",
+      "addWarmupFor": "Adaugă o serie de încălzire la {name}",
       "contextFallback": "această zi",
       "dayName": "Numele zilei",
       "dayNamePlaceholder": "Zi de împins",
@@ -2621,20 +2725,49 @@
       },
       "exerciseFallback": "Exercițiu",
       "exercises": "Exerciții",
+      "exercisesMeta": "{count} · ~{minutes} min",
       "noteLabel": "Notă pentru client",
       "remove": {
         "body": "Elimini {name} din această zi?",
         "title": "Elimină exercițiul"
       },
+      "superset": {
+        "restAfter": "{count, plural, =2 {Pauză după ambele · {value}} one {Pauză după # · {value}} few {Pauză după toate cele # · {value}} other {Pauză după toate cele # · {value}}}",
+        "restAria": "Pauză după o rundă din supersetul {number}",
+        "title": "Superset",
+        "unlink": "Dezleagă",
+        "unlinkAria": "Dezleagă supersetul {number}"
+      },
+      "targets": {
+        "addNote": "Notă",
+        "addRpe": "RPE țintă",
+        "addTempo": "Tempo",
+        "editNote": "Editează nota",
+        "mode": "Cum setezi țintele pentru {name}",
+        "noRpe": "Fără țintă",
+        "noTempo": "Fără tempo",
+        "noteHint": "Clientul o vede la acest exercițiu.",
+        "noteLabel": "Notă pentru client",
+        "notePlaceholder": "Fă o pauză de o secundă jos",
+        "noteTitle": "Notă pentru client la {name}",
+        "rpe": "RPE {value}",
+        "rpeFootnote": "Cât de grele ar trebui să fie seriile de lucru, din 10: la 10 nu mai rămâne nimic, la 8 mai rămân cam două repetări.",
+        "rpeTitle": "RPE țintă pentru {name}",
+        "tempo": "Tempo {value}",
+        "tempoFootnote": "Secunde la coborâre, ținut jos, la urcare, ținut sus. 3-1-1-0 înseamnă trei la coborâre, una ținută, una la urcare.",
+        "tempoTitle": "Tempo pentru {name}"
+      },
       "titleFallback": "Zi",
       "toast": {
-        "saveFailed": "Nu am putut salva ziua",
-        "someNotAdded": "Unele exerciții nu au fost adăugate"
+        "notAdded": "Nu am putut adăuga exercițiile",
+        "saveFailed": "Nu am putut salva ziua"
       },
       "untitledDay": "Zi fără titlu",
       "rest": {
         "day": "Pauză pentru această zi",
-        "program": "Implicită pentru program",
+        "dayRow": "Pauză între serii, implicit pentru zi",
+        "dayRowHint": "Fiecare exercițiu o poate schimba",
+        "exerciseInherited": "Pauză pentru {name}, la fel ca ziua ({value})",
         "sameAsDay": "La fel ca ziua ({value})",
         "sameAsProgram": "La fel ca programul ({value})",
         "fromProgram": "Programul ({value})",
@@ -2686,8 +2819,14 @@
     },
     "row": {
       "daysPerWeek": "{count, plural, one {# zi/săpt.} few {# zile/săpt.} other {# de zile/săpt.}}",
+      "edited": {
+        "onDate": "{kind, select, routine {Editată {date}} other {Editat {date}}}",
+        "today": "{kind, select, routine {Editată azi} other {Editat azi}}",
+        "yesterday": "{kind, select, routine {Editată ieri} other {Editat ieri}}"
+      },
       "noClients": "Niciun client",
-      "routine": "Rutină"
+      "routine": "Rutină",
+      "routineExercises": "Rutină · {count, plural, one {# exercițiu} few {# exerciții} other {# de exerciții}}"
     },
     "settings": {
       "delete": {
@@ -2699,11 +2838,6 @@
       "length": "Durată",
       "lengthAria": "Durata programului în săptămâni",
       "namePlaceholder": "Bloc de forță de 12 săptămâni",
-      "needs": {
-        "both": "Ca să-l poți atribui, dă-i un nume și adaugă cel puțin o zi de antrenament.",
-        "days": "Ca să-l poți atribui, adaugă cel puțin o zi de antrenament.",
-        "name": "Ca să-l poți atribui, dă-i un nume."
-      },
       "newWeeks": {
         "copy": "{built, plural, one {Copiază antrenamentele din săptămâna 1 în {empty, plural, one {ea} few {ele} other {ele}}} =2 {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile 1 și 2} few {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile de la 1 la {built}} other {Umple-{empty, plural, one {o} few {le} other {le}} repetând săptămânile de la 1 la {built}}}",
         "leaveEmpty": "{empty, plural, one {Las-o goală deocamdată} few {Las-le goale deocamdată} other {Las-le goale deocamdată}}",
@@ -3397,6 +3531,26 @@
       "title": "Plan",
       "yourCoach": "antrenorul tău"
     },
+    "planStatus": {
+      "cancelled": {
+        "line": "{coach} l-a anulat pe {date}. {count, plural, =0 {Nu terminaseși încă niciun antrenament din el.} one {Antrenamentul făcut rămâne în istoricul tău.} few {Cele # antrenamente făcute rămân în istoricul tău.} other {Cele # de antrenamente făcute rămân în istoricul tău.}}",
+        "lineNoDate": "{coach} l-a anulat. {count, plural, =0 {Nu terminaseși încă niciun antrenament din el.} one {Antrenamentul făcut rămâne în istoricul tău.} few {Cele # antrenamente făcute rămân în istoricul tău.} other {Cele # de antrenamente făcute rămân în istoricul tău.}}"
+      },
+      "coachMessage": "De la {coach}",
+      "finished": {
+        "byCoach": "{coach} l-a marcat ca terminat pe {date}, la {percent}% realizat.",
+        "byCoachNoDate": "{coach} l-a marcat ca terminat, la {percent}% realizat.",
+        "done": "Ai trecut prin toate zilele lui, {percent}% realizat."
+      },
+      "messageCoach": "Scrie-i lui {coach}",
+      "messageYourCoach": "Scrie-i antrenorului tău",
+      "openPlan": "Deschide planul",
+      "paused": {
+        "noDate": "Pe pauză. {coach} îl reia când e cazul. Zilele din pauză nu contează ca ratate.",
+        "since": "Pe pauză din {date}. {coach} îl reia când e cazul. Zilele din pauză nu contează ca ratate."
+      },
+      "seeWhatYouDid": "Vezi ce ai făcut"
+    },
     "postToGroup": {
       "caption": "Text",
       "captionPlaceholder": "Spune ceva despre el",
@@ -3531,7 +3685,7 @@
         "addWeightFor": "Adaugă greutate la {name}",
         "perSet": "Serie cu serie",
         "perSetFor": "Serie cu serie, {name}",
-        "sameForAll": "La fel pentru toate seriile",
+        "sameForAll": "La fel la toate",
         "sameForAllFor": "La fel pentru toate seriile, {name}"
       },
       "reorder": {

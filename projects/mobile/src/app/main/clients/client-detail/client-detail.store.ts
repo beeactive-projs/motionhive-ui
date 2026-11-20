@@ -22,6 +22,7 @@ import {
   dayRange,
   monthRange,
   startOfMonth,
+  UpdateAssignmentPayload,
 } from 'core';
 
 import { PagedList } from '../../../_shared/utils/paged-list';
@@ -354,14 +355,22 @@ export class ClientDetailStore {
     );
   }
 
-  /** Pause or resume one plan — one at a time, the same as the program's list. */
+  /**
+   * Pause, resume, finish or cancel one plan, one at a time, the same as the
+   * program's list, with the coach's optional message for the client.
+   */
   setPlanStatus(
     plan: ProgramAssignment,
     status: ProgramAssignmentStatus,
+    message?: string,
   ): Observable<ProgramAssignment> | null {
     if (this._busyPlanId()) return null;
     this._busyPlanId.set(plan.id);
-    return this._assignmentService.update(plan.id, { status }).pipe(
+    const payload: UpdateAssignmentPayload = { status };
+    if (message) {
+      payload.message = message;
+    }
+    return this._assignmentService.update(plan.id, payload).pipe(
       take(1),
       tap((updated) => {
         this._plans.update((plans) =>

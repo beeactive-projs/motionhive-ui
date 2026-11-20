@@ -116,6 +116,11 @@ export class SetRow {
    * typed into: a routine's rep range, "8–12". Fields left out show the value.
    */
   readonly texts = input<Partial<Record<SetField, string>>>({});
+  /**
+   * Off where a set has no last time to show (a coach planning a program
+   * day): no Previous column, and the fields take its room.
+   */
+  readonly history = input(true);
 
   readonly tick = output<void>();
   readonly edit = output<SetField>();

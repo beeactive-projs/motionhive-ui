@@ -7,10 +7,19 @@ import {
   ProgramAssignment,
   ProgramAssignmentKind,
   ProgramAssignmentService,
+  ProgramAssignmentStatus,
   WorkoutLogStatus,
   displayName,
   localDayKey,
 } from 'core';
+
+import { assignmentChip } from '../../programs/programs.config';
+import {
+  PlanStatusAction,
+  coachFirstName,
+  planStatusAction,
+  planStatusLine,
+} from './plan-status.config';
 
 /** One week of the plan, as the list renders it. */
 export interface PlanWeek {
@@ -73,6 +82,87 @@ export class PlanStore {
   });
 
   readonly workouts = computed<AssignedWorkout[]>(() => this._assignment()?.workouts ?? []);
+
+  /**
+   * Running or waiting to start: its days can be started. A paused,
+   * finished or cancelled plan only shows them.
+   */
+  readonly isRunning = computed(() => {
+    const status = this._assignment()?.status;
+    return status === ProgramAssignmentStatus.Active || status === ProgramAssignmentStatus.Pending;
+  });
+
+  /** The coach's first name for the status card; null for your own plan. */
+  readonly coachFirst = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment || assignment.assignmentKind === ProgramAssignmentKind.Self) {
+      return null;
+    }
+    return coachFirstName(assignment.instructor);
+  });
+
+  /** The coach made the last change, rather than the plan finishing on its own. */
+  private readonly _changedByCoach = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment?.statusChangedBy) {
+      return false;
+    }
+    return assignment.statusChangedBy === assignment.instructorId;
+  });
+
+  /** Paused, Completed or Cancelled, as the rows on the coach's side say it. */
+  readonly statusChip = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment || this.isRunning()) {
+      return null;
+    }
+    return assignmentChip(assignment.status);
+  });
+
+  /**
+   * "Paused since 19 Nov. Andrei resumes it when it's time…": what
+   * happened to a stopped plan. Null while it runs.
+   */
+  readonly statusLine = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment) {
+      return null;
+    }
+    let coach = this.coachFirst();
+    if (!coach) {
+      coach = this._translateService.instant('workouts.home.yourCoach');
+    }
+    return planStatusLine({
+      status: assignment.status,
+      statusChangedAt: assignment.statusChangedAt,
+      byCoach: this._changedByCoach(),
+      completionPercent: assignment.completionPercent,
+      workoutsDone: this.doneCount(),
+      coach: coach ?? '',
+    });
+  });
+
+  /** The coach's words with the change, shown as written. */
+  readonly statusMessage = computed(() => {
+    const assignment = this._assignment();
+    if (!assignment || this.isRunning() || !this._changedByCoach()) {
+      return null;
+    }
+    const message = assignment.statusMessage?.trim();
+    if (!message) {
+      return null;
+    }
+    return message;
+  });
+
+  /** Write to the coach, or see what was done; none while it runs. */
+  readonly statusAction = computed<PlanStatusAction | null>(() => {
+    const assignment = this._assignment();
+    if (!assignment) {
+      return null;
+    }
+    return planStatusAction(assignment.status);
+  });
 
   /** Done counts what was actually finished, not what has merely passed. */
   readonly doneCount = computed(

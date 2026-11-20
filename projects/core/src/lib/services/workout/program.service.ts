@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { silentRequest } from '../../interceptors/silent-request.context';
 import type {
+  AddPrescribedExerciseItem,
   CreatePrescribedExercisePayload,
   CreatePrescribedSetPayload,
   CreateProgramPayload,
@@ -14,6 +15,7 @@ import type {
   PaginatedPrograms,
   PrescribedExercise,
   PrescribedSet,
+  PrescribedSetItem,
   Program,
   ProgramWorkout,
   ReorderPrescribedRowsPayload,
@@ -103,19 +105,40 @@ export class ProgramService {
   }
 
   /**
-   * Copy one week onto another — exercises and sets included — in one
-   * request and one server transaction. Replaces a client-side walk that
-   * made one call per row, tripped the global throttle on the second copy,
-   * and was not atomic.
+   * Copy one week onto other weeks — exercises and sets included — in one
+   * request and one server transaction, however many weeks it goes to.
+   * Replaces a client-side walk that made one call per row, then one call
+   * per target week, tripped the global throttle, and was not atomic.
    */
   copyWeek(
     programId: string,
     fromWeekIndex: number,
-    toWeekIndex: number,
+    toWeekIndexes: number[],
   ): Observable<ProgramWorkout[]> {
     return this._http.post<ProgramWorkout[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.COPY_WEEK(programId)}`,
-      { fromWeekIndex, toWeekIndex },
+      { fromWeekIndex, toWeekIndexes },
+    );
+  }
+
+  /**
+   * An empty week right after `weekIndex`: the later weeks move down one and
+   * the program grows by a week. Returns the program with its full tree.
+   */
+  insertWeekAfter(programId: string, weekIndex: number): Observable<Program> {
+    return this._http.post<Program>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WEEK_INSERT_AFTER(programId, weekIndex)}`,
+      {},
+    );
+  }
+
+  /**
+   * Clear one week: every day of it goes, in one request, and it becomes a
+   * week of rest. The weeks keep their places. Returns the program.
+   */
+  clearWeek(programId: string, weekIndex: number): Observable<Program> {
+    return this._http.delete<Program>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WEEK_WORKOUTS(programId, weekIndex)}`,
     );
   }
 
@@ -241,6 +264,21 @@ export class ProgramService {
   }
 
   /**
+   * Several movements added to a day at once, each with its empty sets, in
+   * one request and one transaction: never one request per picked exercise.
+   */
+  addExercises(
+    programId: string,
+    workoutId: string,
+    exercises: AddPrescribedExerciseItem[],
+  ): Observable<PrescribedExercise[]> {
+    return this._http.post<PrescribedExercise[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.EXERCISES_BULK(programId, workoutId)}`,
+      { exercises },
+    );
+  }
+
+  /**
    * Superset links changed on a program day: every exercise whose group
    * changed (`normalizeSupersets` renumbers neighbours), saved in one
    * transaction, all or none. Never one PATCH per row: those raced, and a
@@ -286,6 +324,23 @@ export class ProgramService {
     return this._http.post<PrescribedSet>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.SETS(programId, workoutId, exerciseId)}`,
       payload,
+    );
+  }
+
+  /**
+   * Every set of one exercise, in one request: a set with its id is updated
+   * in place (assigned copies link back to it by id), one without is added,
+   * and one left out is removed. Answers with the sets in order.
+   */
+  setSets(
+    programId: string,
+    workoutId: string,
+    exerciseId: string,
+    sets: PrescribedSetItem[],
+  ): Observable<PrescribedSet[]> {
+    return this._http.put<PrescribedSet[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.SETS(programId, workoutId, exerciseId)}`,
+      { sets },
     );
   }
 

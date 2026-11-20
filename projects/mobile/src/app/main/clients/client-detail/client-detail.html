@@ -218,7 +218,27 @@
           {{ 'button.resume' | translate }}
         </ion-button>
         }
+        @if (plan.canChange) {
+        <!-- Pause, finish or cancel: the sheet says what each does and tells the client. -->
+        <ion-button slot="end" class="plan-more" fill="clear" shape="round" color="medium"
+          [disabled]="store.isPlanBusy(plan.row.id)" [attr.aria-label]="plan.optionsLabel"
+          (click)="openEndPlan(plan.row); $event.stopPropagation()">
+          <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
+        </ion-button>
+        }
       </ion-item>
+      @if (plan.canEditCopy) {
+      <!-- This client's copy of the plan: its days still to come, changed
+           for them alone (teal, the hue of a copy). -->
+      <ion-item button [detail]="true" (click)="openCopy(plan.row)">
+        <div slot="start" class="tile plain" aria-hidden="true">
+          <mh-hex-avatar size="sm" icon="create-outline" color="teal" />
+        </div>
+        <ion-label>
+          <h3>{{ copyLabel() }}</h3>
+        </ion-label>
+      </ion-item>
+      }
       }
       @if (store.lastLog(); as last) {
       <ion-item button [detail]="true" (click)="setTab(Tabs.Training)">
@@ -381,7 +401,7 @@
 
       @for (plan of store.currentPlans(); track plan.id) {
       <mh-assignment-row [assignment]="plan" [subject]="RowSubjects.Program" [busy]="store.isPlanBusy(plan.id)"
-        [tappable]="!!plan.masterProgramId" (pause)="setPlanStatus(plan, PlanStatuses.Paused)"
+        [tappable]="!!plan.masterProgramId" (options)="openEndPlan(plan)"
         (resume)="setPlanStatus(plan, PlanStatuses.Active)" (select)="openPlan(plan)" />
       } @empty {
       <ion-note class="mh-note-block">{{
@@ -496,6 +516,9 @@
 
 <mh-assign-sheet [(open)]="assignOpen" [client]="store.client()" [saving]="assignSaving()"
   (assign)="onAssign($event)" />
+
+<mh-end-plan-sheet [(open)]="endPlanOpen" [assignment]="endPlanRow()" [saving]="endPlanSaving()"
+  (confirm)="onEndPlan($event)" />
 
 <mh-confirm-sheet [(open)]="archiveOpen" [title]="archiveTitle()" [body]="'clients.confirm.archive.body' | translate"
   [confirmLabel]="'clients.actions.archiveClient' | translate" [cancelLabel]="'button.keep' | translate"

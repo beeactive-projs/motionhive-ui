@@ -1,0 +1,28 @@
+/* A card on the page, as every box: its fill is the edge, no outline. */
+:host {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem var(--mh-row-gutter);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.line {
+  font-size: var(--mh-text-sm);
+  line-height: 1.4;
+  color: var(--ion-color-medium);
+}

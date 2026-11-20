@@ -5,20 +5,71 @@ ion-item ion-icon {
   font-size: var(--mh-icon-lg);
 }
 
-/* The week a preview row belongs to, in the kicker face at a fixed width so
-   the names line up under each other. */
-.week {
-  width: 3.5rem;
+/* A first-week row's date, at a fixed width so the day names line up under
+   each other. */
+.date {
+  width: 6rem;
 }
 
-/* The row's separator starts after the week column (theme/components/ion-list.css). */
-ion-item:has(> .week) {
-  --mh-row-lead: 3.5rem;
+/* The row's separator starts after the date column (theme/components/ion-list.css). */
+ion-item:has(> .date) {
+  --mh-row-lead: 6rem;
 }
 
-.more {
-  width: 100%;
-  text-align: center;
+/* The plan's last day, under the first week. */
+.last-day {
+  margin: 0.375rem 0 0;
+}
+
+/* An invitation not accepted yet: greyed by Ionic's disabled item, with
+   the reason on its second line. */
+ion-item.invitee p {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* "Elena already follows…": a warning, in the warning wash, with the way to
+   the other plan. */
+.other-plan {
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.875rem 0.25rem;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-warning-wash);
+  color: var(--ion-color-warning-wash-contrast);
+
+  p {
+    margin: 0;
+    font-size: var(--mh-text-sm);
+    line-height: var(--mh-leading-body);
+  }
+
+  ion-button {
+    --color: var(--ion-color-warning-wash-contrast);
+    --padding-start: 0;
+    margin: 0.125rem 0 0;
+    font-weight: 600;
+  }
+}
+
+/* "Training days" with "2 of 3 picked" at its end. */
+.days-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .picked {
+    color: var(--mh-color-success-deep);
+  }
+
+  .picked.warn {
+    color: var(--ion-color-warning-wash-contrast);
+  }
+}
+
+/* The note keeps the sheet's rhythm above it. */
+ion-textarea.note {
+  margin-top: 1rem;
 }
 
 /* The weekday picker. Wraps rather than scrolling: seven short chips fit a

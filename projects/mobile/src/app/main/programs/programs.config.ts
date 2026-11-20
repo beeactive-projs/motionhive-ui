@@ -4,23 +4,31 @@ import {
   linkOutline,
   albumsOutline,
   alertCircleOutline,
+  arrowForwardOutline,
   barbellOutline,
   calendarOutline,
+  checkmarkCircle,
   checkmarkCircleOutline,
   chevronForwardOutline,
   closeOutline,
   copyOutline,
   createOutline,
+  ellipseOutline,
   ellipsisHorizontalOutline,
   eyeOffOutline,
   flashOutline,
   lockClosedOutline,
+  notificationsOutline,
   optionsOutline,
+  pauseOutline,
   peopleOutline,
   personAddOutline,
+  playSkipForwardOutline,
+  refreshOutline,
   removeOutline,
   repeatOutline,
   trashOutline,
+  unlinkOutline,
 } from 'ionicons/icons';
 
 import {
@@ -31,12 +39,14 @@ import {
   ProgramSizes,
   ProgramSource,
   ProgramStatus,
+  appLocale,
   translate,
   weekdayNames,
 } from 'core';
 
 import { SheetAction } from '../../_shared/components/action-sheet/action-sheet.model';
 import { SpineTone, SpineTones } from '../../_shared/models/spine-tone.model';
+import { daysBetween } from '../../_shared/utils/dates';
 import { BadgeTone, BadgeTones } from '../exercises/exercises.config';
 import { shortDayLabel } from '../workouts/workouts.config';
 
@@ -51,23 +61,31 @@ export const PROGRAM_ICONS = {
   linkOutline,
   albumsOutline,
   alertCircleOutline,
+  arrowForwardOutline,
   barbellOutline,
   calendarOutline,
+  checkmarkCircle,
   checkmarkCircleOutline,
   chevronForwardOutline,
   closeOutline,
   copyOutline,
   createOutline,
+  ellipseOutline,
   ellipsisHorizontalOutline,
   eyeOffOutline,
   flashOutline,
   lockClosedOutline,
+  notificationsOutline,
   optionsOutline,
+  pauseOutline,
   peopleOutline,
   personAddOutline,
+  playSkipForwardOutline,
+  refreshOutline,
   removeOutline,
   repeatOutline,
   trashOutline,
+  unlinkOutline,
 };
 
 /** Days per week, for turning a stored `durationDays` back into weeks. */
@@ -142,22 +160,110 @@ export function programTone(program: Program): SpineTone {
   return program.isSingleWorkout ? SpineTones.Teal : SpineTones.Honey;
 }
 
-/** "12 weeks · 3 days/week" for a program; "6 exercises" for a routine. */
-export function programMeta(program: Program, exerciseCount?: number): string {
+/**
+ * "12 weeks · 3 days/week" for a program; "Routine · 6 exercises" for a
+ * routine, which is how a row tells the two apart in words (the spine says it
+ * in colour). Both counts come with the list row (`GET /programs`), which
+ * carries no tree to count from.
+ */
+export function programMeta(program: Program): string {
   if (program.isSingleWorkout) {
-    const n = exerciseCount ?? 0;
-    // Silent when the count is unknown: the row already wears a Routine
-    // badge, and saying it twice tells you nothing the second time.
-    return n ? translate('count.exercises', { count: n }) : '';
+    const count = program.exerciseCount ?? 0;
+    if (count > 0) {
+      return translate('programs.row.routineExercises', { count });
+    }
+    return translate('programs.row.routine');
   }
-  const weeks = weeksOf(program);
-  const days = (program.workouts ?? []).length;
   const parts: string[] = [];
-  if (weeks) parts.push(translate('count.weeks', { count: weeks }));
-  if (weeks && days) {
-    parts.push(translate('programs.row.daysPerWeek', { count: Math.round(days / weeks) }));
+  const weeks = weeksOf(program);
+  if (weeks) {
+    parts.push(translate('count.weeks', { count: weeks }));
+  }
+  const days = program.daysPerWeek ?? 0;
+  if (days > 0) {
+    parts.push(translate('programs.row.daysPerWeek', { count: days }));
   }
   return parts.join(' · ');
+}
+
+/**
+ * When a draft was last touched: "Edited today", "Edited yesterday", else
+ * "Edited 7 Nov" (with the year once it is not this one). Counted in local
+ * days, so yesterday evening is yesterday rather than "19 hours ago".
+ */
+export function editedLabel(
+  program: Pick<Program, 'updatedAt' | 'isSingleWorkout'>,
+  now: number,
+): string {
+  // Romanian agrees the word with what was edited: a routine is feminine.
+  let kind = 'program';
+  if (program.isSingleWorkout) {
+    kind = 'routine';
+  }
+  const days = daysBetween(program.updatedAt, now);
+  if (days <= 0) {
+    return translate('programs.row.edited.today', { kind });
+  }
+  if (days === 1) {
+    return translate('programs.row.edited.yesterday', { kind });
+  }
+  const edited = new Date(program.updatedAt);
+  const format: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+  if (edited.getFullYear() !== new Date(now).getFullYear()) {
+    format.year = 'numeric';
+  }
+  return translate('programs.row.edited.onDate', {
+    kind,
+    date: edited.toLocaleDateString(appLocale(), format),
+  });
+}
+
+/**
+ * The note at the end of a library row. A draft says when it was last
+ * edited, since nobody can follow it yet. Anything else says how many of
+ * your clients follow it, "No clients" included: nobody on it is worth
+ * knowing. A MotionHive starter speaks only when some do, since it sits in
+ * every coach's library and "No clients" on each would be noise.
+ */
+export function programRowTrailing(program: Program, now: number): string {
+  if (program.status === ProgramStatus.Draft) {
+    if (!program.updatedAt) {
+      return '';
+    }
+    return editedLabel(program, now);
+  }
+  const count = program.clientCount;
+  if (count === undefined) {
+    return '';
+  }
+  if (count > 0) {
+    return translate('count.clients', { count });
+  }
+  if (program.source === ProgramSource.System) {
+    return '';
+  }
+  return translate('programs.row.noClients');
+}
+
+/**
+ * The name a new program is born with, in every language the app speaks:
+ * `programs.builder.untitledProgram` in `public/i18n/en.json` and `ro.json`
+ * (the spec keeps them in step). A draft made in one language and opened in
+ * the other still wears the first one's, so both count as no name. The API
+ * refuses to publish either (`program-publish.ts`).
+ */
+export const UNTITLED_PROGRAM_NAMES: readonly string[] = ['Untitled program', 'Program fără titlu'];
+
+/** A name someone gave the program: not empty, and not the untouched default. */
+export function hasProgramName(name: string | null | undefined): boolean {
+  if (!name) {
+    return false;
+  }
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return false;
+  }
+  return !UNTITLED_PROGRAM_NAMES.includes(trimmed);
 }
 
 /** Whole weeks a program runs for. Null duration means open-ended. */
@@ -217,12 +323,13 @@ export const CREATE_OPTIONS: readonly SheetAction<CreateChoice>[] = [
 // ─── One program's actions ────────────────────────────────────────────────
 
 /**
- * The verbs behind a program's ⋯ (see docs/MOBILE-ACTIONS.md). Publish is not
- * among them: a draft's footer button is the step the screen is waiting on.
- * Once published, the week grid gets the whole screen and Assign leads here.
+ * The verbs behind a program's ⋯ (see docs/MOBILE-ACTIONS.md). Neither
+ * Publish nor Assign is among them: the builder's footer holds the step the
+ * screen is waiting on, Publish while it is a draft and Assign once it is
+ * published (owner decision, 2026-11-20, as the Builder design draws it). A
+ * verb is never in both places, so the ⋯ keeps the rest.
  */
 export const ProgramActionIds = {
-  Assign: 'assign',
   EditDetails: 'editDetails',
   ViewAssignments: 'viewAssignments',
   Duplicate: 'duplicate',
@@ -235,17 +342,11 @@ export type ProgramActionId = (typeof ProgramActionIds)[keyof typeof ProgramActi
 /**
  * `label` and `hint` are translation keys; the sheet translates them. Each
  * tile takes its concept's hue: the assignments are people (violet), the
- * copy teal, unpublishing makes it private (violet). View assignments sits
- * beside Assign, the pair about who has it, so the two honey verbs (Assign,
- * the published program's purpose, and Edit details) never touch.
+ * copy teal, unpublishing makes it private (violet). View assignments leads
+ * a published program's sheet, the one about who has it; Assign itself is
+ * the footer's.
  */
 export const PROGRAM_ACTIONS: readonly SheetAction<ProgramActionId>[] = [
-  {
-    id: ProgramActionIds.Assign,
-    label: 'programs.assignments.assignToClient',
-    icon: 'person-add-outline',
-    color: 'primary',
-  },
   {
     id: ProgramActionIds.ViewAssignments,
     label: 'programs.settings.viewAssignments',
@@ -286,16 +387,15 @@ export function isOwnProgram(program: Program): boolean {
 }
 
 /**
- * Only the verbs that apply to this program as it is now: assigning and
- * assignments exist once it is published, and a starter can be copied and
- * handed out but not changed.
+ * Only the verbs that apply to this program as it is now: assignments exist
+ * once it is published, and a starter can be copied (and assigned, from the
+ * footer) but not changed.
  */
 export function visibleProgramActions(program: Program): SheetAction<ProgramActionId>[] {
   const own = isOwnProgram(program);
   const published = program.status === ProgramStatus.Published;
   return PROGRAM_ACTIONS.filter((action) => {
     switch (action.id) {
-      case ProgramActionIds.Assign:
       case ProgramActionIds.ViewAssignments:
         return published;
       case ProgramActionIds.Unpublish:
@@ -306,6 +406,94 @@ export function visibleProgramActions(program: Program): SheetAction<ProgramActi
       case ProgramActionIds.Delete:
         return own;
     }
+  });
+}
+
+// ─── One week's actions ───────────────────────────────────────────────────
+
+/** The verbs behind a week's ⋯ in the builder (design "WeekSheet"). */
+export const WeekActionIds = {
+  Copy: 'copy',
+  InsertAfter: 'insertAfter',
+  Clear: 'clear',
+  Delete: 'delete',
+} as const;
+
+export type WeekActionId = (typeof WeekActionIds)[keyof typeof WeekActionIds];
+
+/** What decides which of a week's verbs apply. */
+export interface WeekActionContext {
+  /** Days in the week, rest days not counted. */
+  days: number;
+  /** Weeks in the program. */
+  weekCount: number;
+}
+
+/**
+ * Only the verbs that apply to this week now. Copy needs days to copy and
+ * another week to copy into; a week is added only under the 104-week cap;
+ * Clear needs days to clear; a program keeps at least one week, so the last
+ * one cannot be deleted. Copy is teal (a copy), adding one honey (it
+ * creates). Clearing and deleting both lose the week's days, so they are
+ * the red verbs in their own card, each confirmed (docs/MOBILE-ACTIONS.md).
+ */
+export function weekActions(context: WeekActionContext): SheetAction<WeekActionId>[] {
+  const actions: SheetAction<WeekActionId>[] = [];
+  if (context.days > 0 && context.weekCount > 1) {
+    actions.push({
+      id: WeekActionIds.Copy,
+      label: 'programs.builder.weekMenu.copy',
+      icon: 'copy-outline',
+      color: 'teal',
+    });
+  }
+  if (context.weekCount < MAX_PROGRAM_WEEKS) {
+    actions.push({
+      id: WeekActionIds.InsertAfter,
+      label: 'programs.builder.weekMenu.insertAfter',
+      icon: 'add-outline',
+      color: 'primary',
+    });
+  }
+  if (context.days > 0) {
+    actions.push({
+      id: WeekActionIds.Clear,
+      label: 'programs.builder.weekMenu.clear',
+      icon: 'refresh-outline',
+      color: 'danger',
+      destructive: true,
+    });
+  }
+  if (context.weekCount > 1) {
+    actions.push({
+      id: WeekActionIds.Delete,
+      label: 'programs.builder.weekMenu.delete',
+      icon: 'trash-outline',
+      color: 'danger',
+      destructive: true,
+    });
+  }
+  return actions;
+}
+
+/**
+ * What deleting week `weekIndex` (0-based) does to the weeks after it, in
+ * the words the confirm uses: "Weeks 3 to 8 move up and become weeks 2 to
+ * 7. The program ends up with 7 weeks."
+ */
+export function deleteWeekShift(weekIndex: number, weekCount: number): string {
+  const weeks = weekCount - 1;
+  const later = weekCount - weekIndex - 1;
+  if (later <= 0) {
+    return translate('programs.builder.deleteWeek.ends', { weeks });
+  }
+  return translate('programs.builder.deleteWeek.shift', {
+    count: later,
+    from: weekIndex + 2,
+    last: weekCount,
+    to: weekIndex + 1,
+    newLast: weekCount - 1,
+    weeks,
   });
 }
 

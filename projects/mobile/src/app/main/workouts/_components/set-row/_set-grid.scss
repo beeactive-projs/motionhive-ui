@@ -62,3 +62,19 @@ $narrow: 19.25rem;
       repeat(var(--mh-set-fields, 2), minmax(0, 1fr));
   }
 }
+
+/* No last time to show (a program day's planned sets, `history` off): no
+   Previous column at any width, and the fields share its room. Three classes,
+   so it holds inside the narrow query too. */
+.mh-set-grid.no-history {
+  grid-template-columns:
+    2.25rem
+    repeat(var(--mh-set-fields, 2), minmax(0, 1fr))
+    var(--mh-tap-target);
+}
+
+.mh-set-grid.untickable.no-history {
+  grid-template-columns:
+    2.25rem
+    repeat(var(--mh-set-fields, 2), minmax(0, 1fr));
+}

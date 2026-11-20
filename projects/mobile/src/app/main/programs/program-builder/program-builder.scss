@@ -1,8 +1,29 @@
 /* "4 weeks · 9 days of work" — the line that says how big the plan is. A
-   kicker, so it reads as a label rather than a row. */
-.meta {
+   kicker, so it reads as a label rather than a row. A published program
+   wears its badge beside it. */
+.status-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
   padding-inline: 0.875rem;
+}
+
+.meta {
   color: var(--ion-color-medium);
+}
+
+/* The clients notice: the sentence, then the way to the assignments on a
+   line of its own, in the notice's own ink so it reads on the wash. */
+.notice-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.notice-link {
+  --color: var(--ion-color-info-wash-contrast);
 }
 
 /* ─── Week rail ───────────────────────────────────────────────────
@@ -136,11 +157,49 @@ ion-item.rest p {
   color: var(--ion-color-medium);
 }
 
-/* Why Publish is not available yet, said above the button it disables. */
-.blocker {
+/* What Publish still waits for, one line each above the button it
+   disables, ticked as it is met; the way to fix each sits at its end. */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: var(--mh-tap-target);
+  font-size: var(--mh-text-base);
+}
+
+.checklist ion-icon {
+  flex: none;
+  font-size: var(--mh-icon-md);
+}
+
+.checklist .label {
+  flex: 1;
+  min-width: 0;
+  line-height: var(--mh-leading-tight);
+}
+
+/* Done is quieter than what is left to do. */
+.checklist li.met .label {
+  color: var(--ion-color-medium);
+}
+
+.checklist ion-button {
+  flex: none;
+  margin: 0;
+}
+
+/* Once nothing is missing: what will be published, and what comes next. */
+.publish-ready {
   margin: 0 0 0.5rem;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
-  text-align: center;
 }

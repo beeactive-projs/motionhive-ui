@@ -11,6 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  IonBadge,
   IonButton,
   IonButtons,
   IonCard,
@@ -40,8 +41,10 @@ import { finalize, take } from 'rxjs/operators';
 
 import {
   ProgramAssignmentKind,
+  ProgramAssignmentStatus,
   Routine,
   TrainingDayPlan,
+  TrainingDayStoppedPlan,
   WorkoutLogService,
   displayName,
   localDayKey,
@@ -55,6 +58,8 @@ import { NotificationBell } from '../../_shared/components/notification-bell/not
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ClockService } from '../../_shared/services/clock.service';
 import { FeedbackService } from '../../_shared/services/feedback.service';
+import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
+import { assignmentChip } from '../programs/programs.config';
 import { ExerciseLibrary } from '../exercises/_components/exercise-library/exercise-library';
 import { ExercisesStore } from '../exercises/exercises.store';
 import { HistoryBody } from './_components/history-body/history-body';
@@ -87,6 +92,13 @@ import {
   workoutTabFrom,
 } from './workouts.config';
 import { WorkoutsStore } from './workouts.store';
+import {
+  PlanStatusActions,
+  coachFirstName,
+  messageCoachLabel,
+  planStatusAction,
+  planStatusLine,
+} from './plan/plan-status.config';
 
 /** Plans shown before "See all": enough to keep the routines in reach. */
 const PLAN_PREVIEW_LIMIT = 3;
@@ -117,6 +129,7 @@ const PLAN_PREVIEW_LIMIT = 3;
     EmptyState,
     ExerciseLibrary,
     HexAvatar,
+    IonBadge,
     IonButton,
     IonButtons,
     IonCard,
@@ -164,6 +177,9 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _activeSessionStore = inject(ActiveSessionStore);
   private readonly _resumeCardService = inject(ResumeCardService);
+  private readonly _openDirectMessage = injectOpenDirectMessage();
+
+  readonly StatusActions = PlanStatusActions;
 
   /**
    * The resume banner's clock. It counts live — a running workout must not
@@ -522,5 +538,68 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
 
   openPlan(planId: string): void {
     void this._router.navigate(['/tabs/workouts/plan', planId]);
+  }
+
+  // ─── Plans the coach stopped ──────────────────────────────────
+
+  /** Paused, Completed or Cancelled, the coach's own chip for it. */
+  stoppedChip(plan: TrainingDayStoppedPlan) {
+    return assignmentChip(plan.status as ProgramAssignmentStatus);
+  }
+
+  /** What happened to it, in one sentence (design Trainee). */
+  stoppedLine(plan: TrainingDayStoppedPlan): string {
+    let coach = coachFirstName(plan.instructor);
+    if (!coach) {
+      coach = this._translateService.instant('workouts.home.yourCoach');
+    }
+    // Every plan here was stopped by its coach: the API leaves out the
+    // ones that finished on their own.
+    const line = planStatusLine({
+      status: plan.status,
+      statusChangedAt: plan.statusChangedAt,
+      byCoach: true,
+      completionPercent: plan.completionPercent,
+      workoutsDone: plan.workoutsDone,
+      coach: coach ?? '',
+    });
+    if (!line) {
+      return '';
+    }
+    return line;
+  }
+
+  /** "Week 3 of 8 · 42% done" for a paused plan, which is still to finish. */
+  stoppedMeta(plan: TrainingDayStoppedPlan): string {
+    return [
+      planWeekLabel(plan, this._todayKey()),
+      this._translateService.instant('workouts.home.percentDone', {
+        percent: plan.completionPercent,
+      }),
+    ].join(' · ');
+  }
+
+  isPausedPlan(plan: TrainingDayStoppedPlan): boolean {
+    return plan.status === ProgramAssignmentStatus.Paused;
+  }
+
+  /** Write to the coach when it is paused; see what was done when it ended. */
+  stoppedAction(plan: TrainingDayStoppedPlan) {
+    return planStatusAction(plan.status);
+  }
+
+  messageCoachLabel(plan: TrainingDayStoppedPlan): string {
+    return messageCoachLabel(coachFirstName(plan.instructor));
+  }
+
+  messageCoach(plan: TrainingDayStoppedPlan): void {
+    if (plan.instructor) {
+      this._openDirectMessage(plan.instructor);
+    }
+  }
+
+  /** The finished workouts stay in the history: this page's own tab. */
+  openHistory(): void {
+    this.setTab(WorkoutTabs.History);
   }
 }

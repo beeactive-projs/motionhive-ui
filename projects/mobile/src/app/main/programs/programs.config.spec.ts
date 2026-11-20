@@ -3,17 +3,26 @@ import { describe, expect, it } from 'vitest';
 
 import { ProgramAssignmentStatus, ProgramSource, ProgramStatus } from 'core';
 
+import en from '../../../../public/i18n/en.json';
+import ro from '../../../../public/i18n/ro.json';
 import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   PROGRAM_ICONS,
   ProgramActionIds,
+  UNTITLED_PROGRAM_NAMES,
   assignmentChip,
   assignmentSubline,
   assignmentTone,
+  editedLabel,
+  hasProgramName,
   programMeta,
+  programRowTrailing,
   programTone,
   scheduledDateFor,
   visibleProgramActions,
+  WeekActionIds,
+  deleteWeekShift,
+  weekActions,
   weekdayScheduleStart,
   weeksOf,
   weeksToDays,
@@ -91,11 +100,73 @@ describe('programs config', () => {
     );
   });
 
-  it('says nothing about a routine whose exercise count it does not know', () => {
-    // The row already wears a Routine badge; repeating it is noise.
-    expect(programMeta(program({ isSingleWorkout: true }))).toBe('');
-    expect(programMeta(program({ isSingleWorkout: true }), 6)).toBe('6 exercises');
-    expect(programMeta(program({ isSingleWorkout: true }), 1)).toBe('1 exercise');
+  // The row has no Routine badge: its meta line says it, with the count the
+  // list row carries (it has no tree to count from).
+  it('names a routine and counts its exercises from the list row', () => {
+    expect(programMeta(program({ isSingleWorkout: true, exerciseCount: 6 }))).toBe(
+      'Routine · 6 exercises',
+    );
+    expect(programMeta(program({ isSingleWorkout: true, exerciseCount: 1 }))).toBe(
+      'Routine · 1 exercise',
+    );
+    expect(programMeta(program({ isSingleWorkout: true }))).toBe('Routine');
+  });
+
+  // The list carries no workouts, so days per week used to read 0 forever.
+  it("says a program's weeks and the days a week it trains, from the list row", () => {
+    expect(programMeta(program({ durationDays: 56, daysPerWeek: 3 }))).toBe(
+      '8 weeks · 3 days/week',
+    );
+    expect(programMeta(program({ durationDays: 56 }))).toBe('8 weeks');
+    expect(programMeta(program({ durationDays: null, daysPerWeek: 4 }))).toBe('4 days/week');
+  });
+
+  it('says when a draft was edited, in local days', () => {
+    const now = new Date(2026, 10, 20, 9, 0).getTime();
+    const at = (day: number, hour = 22) => new Date(2026, 10, day, hour, 0).toISOString();
+    expect(editedLabel({ updatedAt: at(20, 7), isSingleWorkout: false }, now)).toBe('Edited today');
+    // Last night is yesterday, not "11 hours ago".
+    expect(editedLabel({ updatedAt: at(19), isSingleWorkout: false }, now)).toBe('Edited yesterday');
+    expect(editedLabel({ updatedAt: at(7), isSingleWorkout: true }, now)).toBe('Edited 7 Nov');
+    expect(
+      editedLabel({ updatedAt: new Date(2025, 11, 30).toISOString(), isSingleWorkout: false }, now),
+    ).toBe('Edited 30 Dec 2025');
+  });
+
+  it("ends a row with its clients, or a draft's last edit", () => {
+    const now = new Date(2026, 10, 20, 9, 0).getTime();
+    const yesterday = new Date(2026, 10, 19, 18, 0).toISOString();
+    expect(programRowTrailing(program({ clientCount: 3 }), now)).toBe('3 clients');
+    expect(programRowTrailing(program({ clientCount: 1 }), now)).toBe('1 client');
+    // Nobody on it is worth saying on your own program.
+    expect(programRowTrailing(program({ clientCount: 0 }), now)).toBe('No clients');
+    expect(
+      programRowTrailing(
+        program({ status: ProgramStatus.Draft, clientCount: 2, updatedAt: yesterday }),
+        now,
+      ),
+    ).toBe('Edited yesterday');
+    // A starter is in every library: it speaks only when some follow it.
+    expect(programRowTrailing(program({ source: ProgramSource.System, clientCount: 0 }), now)).toBe('');
+    expect(programRowTrailing(program({ source: ProgramSource.System, clientCount: 2 }), now)).toBe(
+      '2 clients',
+    );
+    expect(programRowTrailing(program(), now)).toBe('');
+  });
+
+  it("knows the name a new program is born with, in both languages' files", () => {
+    expect(UNTITLED_PROGRAM_NAMES).toEqual([
+      en.programs.builder.untitledProgram,
+      ro.programs.builder.untitledProgram,
+    ]);
+    for (const name of UNTITLED_PROGRAM_NAMES) {
+      expect(hasProgramName(name)).toBe(false);
+      expect(hasProgramName(`  ${name} `)).toBe(false);
+    }
+    expect(hasProgramName('')).toBe(false);
+    expect(hasProgramName('   ')).toBe(false);
+    expect(hasProgramName(null)).toBe(false);
+    expect(hasProgramName('Strength base')).toBe(true);
   });
 
   it('converts between the weeks it is authored in and the days it is stored as', () => {
@@ -130,8 +201,9 @@ describe('programs config', () => {
   // The paused promise is the whole point of pausing.
   it('says what resuming a paused assignment does', () => {
     expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Paused }))).toMatch(
-      // What really happens: the nightly sweep skips the missed days.
-      /marked skipped once it resumes/,
+      // What really happens: resuming moves the open days forward by whole
+      // weeks, so nothing missed during the pause counts against the client.
+      /resuming moves them forward by whole weeks/,
     );
     // Started is the fact a coach scans for; the percentage alone hid it.
     expect(assignmentSubline(assignment())).toMatch(/^Started .+ · 25% done$/);
@@ -140,10 +212,10 @@ describe('programs config', () => {
 
   // The ⋯ lists only what applies now (docs/MOBILE-ACTIONS.md): a draft can't
   // be handed out yet, and a starter is MotionHive's to change, not the coach's.
+  // Assign is the published program's footer button, so never in the ⋯ too.
   it('offers only the actions that apply to the program as it is', () => {
     const ids = (over: Record<string, unknown>) => visibleProgramActions(program(over)).map((a) => a.id);
     expect(ids({ source: ProgramSource.Instructor })).toEqual([
-      ProgramActionIds.Assign,
       ProgramActionIds.ViewAssignments,
       ProgramActionIds.EditDetails,
       ProgramActionIds.Duplicate,
@@ -156,10 +228,43 @@ describe('programs config', () => {
       ProgramActionIds.Delete,
     ]);
     expect(ids({ source: ProgramSource.System })).toEqual([
-      ProgramActionIds.Assign,
       ProgramActionIds.ViewAssignments,
       ProgramActionIds.Duplicate,
     ]);
+  });
+
+  // A week's ⋯ (design "WeekSheet"): only the verbs that can apply to it.
+  it("offers a week's verbs only where they apply", () => {
+    const ids = (days: number, weekCount: number) =>
+      weekActions({ days, weekCount }).map((action) => action.id);
+    expect(ids(3, 8)).toEqual([
+      WeekActionIds.Copy,
+      WeekActionIds.InsertAfter,
+      WeekActionIds.Clear,
+      WeekActionIds.Delete,
+    ]);
+    // Nothing to copy or clear in a week of rest.
+    expect(ids(0, 8)).toEqual([WeekActionIds.InsertAfter, WeekActionIds.Delete]);
+    // The only week: nowhere to copy to, and a program keeps one week.
+    expect(ids(2, 1)).toEqual([WeekActionIds.InsertAfter, WeekActionIds.Clear]);
+    // At 104 weeks there is no room for another.
+    expect(ids(2, 104)).not.toContain(WeekActionIds.InsertAfter);
+    // Both verbs that lose days are red, in their own card.
+    const red = weekActions({ days: 3, weekCount: 8 }).filter((action) => action.destructive);
+    expect(red.map((action) => action.id)).toEqual([WeekActionIds.Clear, WeekActionIds.Delete]);
+  });
+
+  it('says where the weeks after a deleted one go, with no dash between them', () => {
+    expect(deleteWeekShift(1, 8)).toBe(
+      'Weeks 3 to 8 move up and become weeks 2 to 7. The program ends up with 7 weeks.',
+    );
+    expect(deleteWeekShift(6, 8)).toBe(
+      'Week 8 moves up and becomes week 7. The program ends up with 7 weeks.',
+    );
+    expect(deleteWeekShift(7, 8)).toBe('The program ends up with 7 weeks.');
+    expect(deleteWeekShift(0, 2)).toBe(
+      'Week 2 moves up and becomes week 1. The program ends up with 1 week.',
+    );
   });
 
   // The assign preview is only as good as this maths: a start date on the

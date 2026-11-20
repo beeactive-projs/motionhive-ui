@@ -9,6 +9,7 @@ import {
   RoutineService,
   TrainingDay,
   TrainingDayPlan,
+  TrainingDayStoppedPlan,
   TrainingDayWorkout,
   WorkoutLog,
   WorkoutLogService,
@@ -78,6 +79,18 @@ export class WorkoutsStore {
   );
 
   /**
+   * The coach's plans that are not running: paused ones, and the ones the
+   * coach ended lately, so the trainee sees what changed where the plan was.
+   */
+  readonly stoppedPlans = computed<TrainingDayStoppedPlan[]>(() => {
+    const plans = this._trainingDay()?.stoppedPlans;
+    if (!plans) {
+      return [];
+    }
+    return plans;
+  });
+
+  /**
    * The next scheduled day when today is a rest day — so the hero always has
    * something to point at rather than going blank between sessions.
    */
@@ -113,6 +126,7 @@ export class WorkoutsStore {
       !this.today() &&
       !this.upNext() &&
       this.activePlans().length === 0 &&
+      this.stoppedPlans().length === 0 &&
       this._routines().length === 0 &&
       this._archivedTotal() === 0,
   );

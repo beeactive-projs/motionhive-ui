@@ -18,14 +18,14 @@ import { Menu } from 'primeng/menu';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
 
-import { ProgramWorkout } from 'core';
-
 import {
-  WeekGroup,
+  ProgramWorkout,
   estimateWorkoutMinutes,
   workoutExerciseCount,
   workoutSetCount,
-} from '../builder.utils';
+} from 'core';
+
+import { WeekGroup } from '../builder.utils';
 
 /** A workout dropped in the rail — same-week reorder or cross-week move. */
 export interface RailWorkoutDrop {

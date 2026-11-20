@@ -250,6 +250,12 @@ export const API_ENDPOINTS = {
     COPY_DAY: (programId: string) => `/programs/${programId}/workouts/copy-day`,
     REPEAT_WEEKS: (programId: string) => `/programs/${programId}/workouts/repeat-weeks`,
     WEEK: (programId: string, weekIndex: number) => `/programs/${programId}/weeks/${weekIndex}`,
+    /** An empty week after this one, in one request. */
+    WEEK_INSERT_AFTER: (programId: string, weekIndex: number) =>
+      `/programs/${programId}/weeks/${weekIndex}/insert-after`,
+    /** Every day of one week, cleared in one request. */
+    WEEK_WORKOUTS: (programId: string, weekIndex: number) =>
+      `/programs/${programId}/weeks/${weekIndex}/workouts`,
     DUPLICATE: (programId: string) => `/programs/${programId}/duplicate`,
     WORKOUT_BY_ID: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}`,
@@ -257,6 +263,9 @@ export const API_ENDPOINTS = {
       `/programs/${id}/workouts/${workoutId}/exercises`,
     EXERCISES_REORDER: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/reorder`,
+    /** Several movements added to a day in one request. */
+    EXERCISES_BULK: (id: string, workoutId: string) =>
+      `/programs/${id}/workouts/${workoutId}/exercises/bulk`,
     SUPERSETS: (id: string, workoutId: string) => `/programs/${id}/workouts/${workoutId}/supersets`,
     EXERCISE_BY_ID: (id: string, workoutId: string, exerciseId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}`,
@@ -281,6 +290,22 @@ export const API_ENDPOINTS = {
     /** Self-scheduling one of your own routines across the week. */
     MY_SCHEDULED_ROUTINES: '/my/scheduled-routines',
     /** Self-assignment: schedule your own routine across the week. */
+    /** A coach editing one client's copy of a plan: its days, then Done. */
+    COPY: (id: string) => `/program-assignments/${id}/copy`,
+    COPY_DONE: (id: string) => `/program-assignments/${id}/copy/done`,
+    COPY_DAY: (id: string, dayId: string) => `/program-assignments/${id}/copy/days/${dayId}`,
+    COPY_DAY_DATE: (id: string, dayId: string) =>
+      `/program-assignments/${id}/copy/days/${dayId}/date`,
+    COPY_EXERCISES_BULK: (id: string, dayId: string) =>
+      `/program-assignments/${id}/copy/days/${dayId}/exercises/bulk`,
+    COPY_EXERCISES_REORDER: (id: string, dayId: string) =>
+      `/program-assignments/${id}/copy/days/${dayId}/exercises/reorder`,
+    COPY_EXERCISE_BY_ID: (id: string, dayId: string, exerciseId: string) =>
+      `/program-assignments/${id}/copy/days/${dayId}/exercises/${exerciseId}`,
+    COPY_EXERCISE_REVERT: (id: string, dayId: string, exerciseId: string) =>
+      `/program-assignments/${id}/copy/days/${dayId}/exercises/${exerciseId}/revert`,
+    COPY_SETS: (id: string, dayId: string, exerciseId: string) =>
+      `/program-assignments/${id}/copy/days/${dayId}/exercises/${exerciseId}/sets`,
   },
   WORKOUT_LOGS: {
     BASE: '/workout-logs',

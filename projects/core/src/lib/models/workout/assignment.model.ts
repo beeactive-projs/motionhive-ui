@@ -30,7 +30,18 @@ export interface ProgramAssignment {
   /** ISO date or null when the program has no fixed duration. */
   endDate: string | null;
   completionPercent: number;
+  /** The coach's note for the client, written when assigning; the client reads it. */
   notes: string | null;
+  /**
+   * When the status last changed (ISO instant); while PAUSED, when the pause
+   * began. Null when it never changed since assigning. Absent from an API
+   * older than migration 088.
+   */
+  statusChangedAt?: string | null;
+  /** Who changed it: the coach's id, or null when the plan finished on its own. */
+  statusChangedBy?: string | null;
+  /** The coach's message with that change, as written; null when none. */
+  statusMessage?: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -168,4 +179,12 @@ export interface AssignProgramPayload {
 export interface UpdateAssignmentPayload {
   status?: ProgramAssignmentStatus;
   notes?: string;
+  /**
+   * Sent to the client with the notice about a status change, quoted as
+   * written (up to `ASSIGNMENT_STATUS_MESSAGE_MAX`). Ignored without one.
+   */
+  message?: string;
 }
+
+/** The longest message the API takes with a status change. */
+export const ASSIGNMENT_STATUS_MESSAGE_MAX = 500;

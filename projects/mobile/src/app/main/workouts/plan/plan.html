@@ -47,6 +47,37 @@
         </ion-card-content>
       </ion-card>
 
+      <!-- Paused, finished or cancelled: what happened, the coach's words,
+           and the one thing to do about it (design Trainee). -->
+      @if (store.statusLine(); as line) {
+        <ion-card class="plan-status">
+          <ion-card-content>
+            @if (store.statusChip(); as chip) {
+              <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+            }
+            <p class="line">{{ line }}</p>
+            @if (store.statusMessage(); as message) {
+              <span class="mh-kicker">{{ coachMessageLabel() }}</span>
+              <p class="quote">{{ message }}</p>
+            }
+            @switch (store.statusAction()) {
+              @case (StatusActions.Message) {
+                @if (plan.instructor) {
+                  <ion-button class="mh-text-link action" fill="clear" size="small" (click)="messageCoach()">
+                    {{ messageLabel() }}
+                  </ion-button>
+                }
+              }
+              @case (StatusActions.History) {
+                <ion-button class="mh-text-link action" fill="clear" size="small" (click)="openHistory()">
+                  {{ 'workouts.planStatus.seeWhatYouDid' | translate }}
+                </ion-button>
+              }
+            }
+          </ion-card-content>
+        </ion-card>
+      }
+
       <!-- What the coach wrote when they gave this plan; it used to reach
            only the web. -->
       @if (store.coachNote(); as note) {
@@ -58,21 +89,24 @@
         </ion-card>
       }
 
-      <!-- What's today, when it is not already in the week below. -->
-      @if (todayApart(); as day) {
-        <section class="mh-section">
-          <div class="mh-section-head warm">
-            <span class="mh-kicker">{{ 'time.today' | translate }}</span>
-          </div>
-          <mh-assigned-day-row [day]="day" [startable]="true" (select)="open(day)" (start)="open(day)" />
-        </section>
-      } @else if (upNextApart(); as day) {
-        <section class="mh-section">
-          <div class="mh-section-head">
-            <span class="mh-kicker">{{ 'workouts.common.upNext' | translate }}</span>
-          </div>
-          <mh-assigned-day-row [day]="day" (select)="open(day)" />
-        </section>
+      <!-- What's today, when it is not already in the week below. Only a
+           running plan has a today: a stopped one's days wait or are gone. -->
+      @if (store.isRunning()) {
+        @if (todayApart(); as day) {
+          <section class="mh-section">
+            <div class="mh-section-head warm">
+              <span class="mh-kicker">{{ 'time.today' | translate }}</span>
+            </div>
+            <mh-assigned-day-row [day]="day" [startable]="true" (select)="open(day)" (start)="open(day)" />
+          </section>
+        } @else if (upNextApart(); as day) {
+          <section class="mh-section">
+            <div class="mh-section-head">
+              <span class="mh-kicker">{{ 'workouts.common.upNext' | translate }}</span>
+            </div>
+            <mh-assigned-day-row [day]="day" (select)="open(day)" />
+          </section>
+        }
       }
 
       <!-- What's this week. -->
@@ -86,7 +120,7 @@
             @for (day of store.thisWeek(); track day.id) {
               <mh-assigned-day-row
                 [day]="day"
-                [startable]="isToday(day)"
+                [startable]="isToday(day) && store.isRunning()"
                 (select)="open(day)"
                 (start)="open(day)"
               />

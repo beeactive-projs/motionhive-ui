@@ -1,0 +1,28 @@
+<ng-template #body>
+  <ion-textarea
+    mode="md"
+    fill="outline"
+    [autoGrow]="true"
+    [autofocus]="true"
+    [maxlength]="max"
+    [label]="'programs.dayEditor.targets.noteLabel' | translate"
+    labelPlacement="stacked"
+    [placeholder]="'programs.dayEditor.targets.notePlaceholder' | translate"
+    [value]="draft()"
+    (ionInput)="draft.set($event.detail.value ?? '')"
+  />
+  <p class="mh-helper">{{ 'programs.dayEditor.targets.noteHint' | translate }}</p>
+</ng-template>
+
+<!-- A text field, so the sheet opens tall: the keyboard takes the bottom
+     half, and a fitted sheet would sit under it. -->
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="exerciseName()"
+  [body]="body"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  [saving]="saving()"
+  [canSave]="!saving()"
+  (save)="submit()"
+/>

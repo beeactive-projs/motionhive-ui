@@ -10,6 +10,7 @@ import {
   ProgramAssignmentService,
   ProgramAssignmentStatus,
   ProgramService,
+  UpdateAssignmentPayload,
 } from 'core';
 
 /**
@@ -130,15 +131,24 @@ export class AssignmentsStore {
       });
   }
 
+  /**
+   * Pause, resume, finish or cancel one plan, with the coach's optional
+   * message for the client (the API sends it with the notification).
+   */
   setStatus(
     row: ProgramAssignment,
     status: ProgramAssignmentStatus,
     done: (error?: unknown) => void,
+    message?: string,
   ): void {
     if (this._busyId()) return;
     this._busyId.set(row.id);
+    const payload: UpdateAssignmentPayload = { status };
+    if (message) {
+      payload.message = message;
+    }
     this._programAssignmentService
-      .update(row.id, { status })
+      .update(row.id, payload)
       .pipe(take(1))
       .subscribe({
         next: (updated) => {

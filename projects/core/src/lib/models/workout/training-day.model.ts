@@ -14,6 +14,22 @@ export interface TrainingDay {
   /** Monday to Sunday around the requested date, oldest first. */
   week: TrainingDayWorkout[];
   activePlans: TrainingDayPlan[];
+  /**
+   * The coach's plans that are not running: every paused one, and those the
+   * coach cancelled or marked finished in the last 14 days. Absent from an
+   * API older than migration 088.
+   */
+  stoppedPlans?: TrainingDayStoppedPlan[];
+}
+
+/** A plan on hold or ended by the coach, with what changed and what was done. */
+export interface TrainingDayStoppedPlan extends TrainingDayPlan {
+  /** ISO instant of the change; null for a plan paused before it was recorded. */
+  statusChangedAt: string | null;
+  /** The coach's message with the change, as written. */
+  statusMessage: string | null;
+  /** Its workouts finished, which stay in the history whatever happens. */
+  workoutsDone: number;
 }
 
 export interface TrainingDayWorkout {

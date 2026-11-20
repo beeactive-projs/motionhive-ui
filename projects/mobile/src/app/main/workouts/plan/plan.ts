@@ -2,6 +2,8 @@ import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
+  IonBadge,
+  IonButton,
   IonButtons,
   IonCard,
   IonCardContent,
@@ -24,8 +26,10 @@ import { AssignedWorkout } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { AssignedDayRow } from '../_components/assigned-day-row/assigned-day-row';
-import { WORKOUT_ICONS, shortDayLabel } from '../workouts.config';
+import { WORKOUT_ICONS, WorkoutTabs, shortDayLabel } from '../workouts.config';
+import { PlanStatusActions, messageCoachLabel } from './plan-status.config';
 import { PlanStore } from './plan.store';
 
 /**
@@ -43,6 +47,8 @@ import { PlanStore } from './plan.store';
     AssignedDayRow,
     EmptyState,
     IonBackButton,
+    IonBadge,
+    IonButton,
     IonButtons,
     IonCard,
     IonCardContent,
@@ -68,8 +74,22 @@ export class Plan implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _translateService = inject(TranslateService);
+  private readonly _openDirectMessage = injectOpenDirectMessage();
 
   readonly skeletonRows = [1, 2, 3];
+  readonly StatusActions = PlanStatusActions;
+
+  /** "Message Andrei" on a paused plan's card. */
+  readonly messageLabel = computed(() => messageCoachLabel(this.store.coachFirst()));
+
+  /** "From Andrei" over the coach's words. */
+  readonly coachMessageLabel = computed(() => {
+    let coach = this.store.coachFirst();
+    if (!coach) {
+      coach = this._translateService.instant('workouts.plan.yourCoach');
+    }
+    return this._translateService.instant('workouts.planStatus.coachMessage', { coach });
+  });
 
   readonly title = computed(
     () =>
@@ -141,6 +161,21 @@ export class Plan implements ViewWillEnter {
 
   isCurrentWeek(index: number): boolean {
     return index === this.store.currentWeek();
+  }
+
+  /** A paused plan waits on the coach: the conversation with them. */
+  messageCoach(): void {
+    const coach = this.store.assignment()?.instructor;
+    if (coach) {
+      this._openDirectMessage(coach);
+    }
+  }
+
+  /** The finished workouts stay in the history; that is where they are. */
+  openHistory(): void {
+    void this._router.navigate(['/tabs/workouts'], {
+      queryParams: { tab: WorkoutTabs.History },
+    });
   }
 
   /** From here on it is just a workout — the same preview the hero uses. */

@@ -167,7 +167,7 @@
                 />
               }
             }
-            @if (store.activePlans().length) {
+            @if (store.activePlans().length || store.stoppedPlans().length) {
               <section class="mh-section">
                 <div class="mh-section-head">
                   <span class="mh-kicker">{{ 'workouts.home.fromYourCoach' | translate }}</span>
@@ -180,39 +180,82 @@
                     </ion-button>
                   }
                 </div>
-                <ion-list [inset]="true" class="mh-card-list plans">
-                  @for (plan of visiblePlans(); track plan.id) {
-                    <ion-item button [detail]="true" (click)="openPlan(plan.id)">
-                      <!-- The coach's face for their plan; a plan you scheduled yourself
-                       has no one to show, so it takes the repeat glyph instead. -->
-                      @if (planCoach(plan); as coach) {
-                        <mh-hex-avatar
-                          slot="start"
-                          size="md"
-                          [name]="coach"
-                          [imageUrl]="plan.instructor?.avatarUrl ?? null"
-                        />
-                      } @else {
-                        <mh-hex-avatar
-                          slot="start"
-                          size="md"
-                          color="teal"
-                          tone="wash"
-                          icon="repeat-outline"
-                          [name]="plan.programNameSnapshot"
-                        />
-                      }
-                      <ion-label>
+                @if (visiblePlans().length) {
+                  <ion-list [inset]="true" class="mh-card-list plans">
+                    @for (plan of visiblePlans(); track plan.id) {
+                      <ion-item button [detail]="true" (click)="openPlan(plan.id)">
+                        <!-- The coach's face for their plan; a plan you scheduled yourself
+                         has no one to show, so it takes the repeat glyph instead. -->
+                        @if (planCoach(plan); as coach) {
+                          <mh-hex-avatar
+                            slot="start"
+                            size="md"
+                            [name]="coach"
+                            [imageUrl]="plan.instructor?.avatarUrl ?? null"
+                          />
+                        } @else {
+                          <mh-hex-avatar
+                            slot="start"
+                            size="md"
+                            color="teal"
+                            tone="wash"
+                            icon="repeat-outline"
+                            [name]="plan.programNameSnapshot"
+                          />
+                        }
+                        <ion-label>
+                          <h2>{{ plan.programNameSnapshot }}</h2>
+                          <p>{{ planSubline(plan) }}</p>
+                          <ion-progress-bar
+                            [value]="plan.completionPercent / 100"
+                            [attr.aria-label]="planProgressLabel(plan)"
+                          />
+                        </ion-label>
+                      </ion-item>
+                    }
+                  </ion-list>
+                }
+                <!-- Paused, or ended lately by the coach: what happened and
+                     the one thing to do about it (design Trainee). -->
+                @for (plan of store.stoppedPlans(); track plan.id) {
+                  <ion-card class="stopped-plan">
+                    <ion-card-content>
+                      <div class="stopped-head">
                         <h2>{{ plan.programNameSnapshot }}</h2>
-                        <p>{{ planSubline(plan) }}</p>
+                        @if (stoppedChip(plan); as chip) {
+                          <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+                        }
+                      </div>
+                      @if (isPausedPlan(plan)) {
+                        <p class="stopped-meta">{{ stoppedMeta(plan) }}</p>
                         <ion-progress-bar
                           [value]="plan.completionPercent / 100"
                           [attr.aria-label]="planProgressLabel(plan)"
                         />
-                      </ion-label>
-                    </ion-item>
-                  }
-                </ion-list>
+                      }
+                      <p class="stopped-line">{{ stoppedLine(plan) }}</p>
+                      <div class="stopped-actions">
+                        @switch (stoppedAction(plan)) {
+                          @case (StatusActions.Message) {
+                            @if (plan.instructor) {
+                              <ion-button class="mh-text-link" fill="clear" size="small" (click)="messageCoach(plan)">
+                                {{ messageCoachLabel(plan) }}
+                              </ion-button>
+                            }
+                          }
+                          @case (StatusActions.History) {
+                            <ion-button class="mh-text-link" fill="clear" size="small" (click)="openHistory()">
+                              {{ 'workouts.planStatus.seeWhatYouDid' | translate }}
+                            </ion-button>
+                          }
+                        }
+                        <ion-button class="mh-text-link" fill="clear" size="small" (click)="openPlan(plan.id)">
+                          {{ 'workouts.planStatus.openPlan' | translate }}
+                        </ion-button>
+                      </div>
+                    </ion-card-content>
+                  </ion-card>
+                }
               </section>
             }
 

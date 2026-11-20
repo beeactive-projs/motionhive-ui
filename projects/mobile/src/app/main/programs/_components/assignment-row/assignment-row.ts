@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, output } from '@angular/core';
-import { IonBadge, IonButton, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ProgramAssignment, ProgramAssignmentStatus, displayName } from 'core';
@@ -7,8 +7,9 @@ import { ProgramAssignment, ProgramAssignmentStatus, displayName } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { assignmentChip, assignmentSubline, assignmentTone } from '../../programs.config';
+import { canChangePlan } from '../../_sheets/end-plan-sheet/end-plan.config';
 import { addIcons } from 'ionicons';
-import { barbellOutline } from 'ionicons/icons';
+import { barbellOutline, ellipsisHorizontalOutline } from 'ionicons/icons';
 
 /** Who the row is about: the client (on a program) or the plan (on a client). */
 export const AssignmentRowSubjects = {
@@ -24,12 +25,14 @@ export type AssignmentRowSubject =
  * line that says where they are in it.
  *
  * The spine is keyed to the assignment's state — honey waiting, emerald
- * under way, muted paused, teal finished, red cancelled — and the one verb
- * the state allows sits at the end of the row.
+ * under way, muted paused, teal finished, red cancelled. A paused row keeps
+ * Resume as its one direct verb; any plan still open has a ⋯ that opens the
+ * sheet to pause, finish or cancel it (`EndPlanSheet`), since each of those
+ * tells the client and may carry a message.
  */
 @Component({
   selector: 'mh-assignment-row',
-  imports: [HexAvatar, IonBadge, IonButton, IonItem, IonLabel, IonNote, TranslatePipe],
+  imports: [HexAvatar, IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './assignment-row.html',
   styleUrl: './assignment-row.scss',
 })
@@ -43,7 +46,8 @@ export class AssignmentRow {
   /** The whole row opens something; the verb at the end still only does its own job. */
   readonly tappable = input(false);
 
-  readonly pause = output<void>();
+  /** The ⋯: open the sheet that pauses, finishes or cancels the plan. */
+  readonly options = output<void>();
   readonly resume = output<void>();
   readonly select = output<void>();
 
@@ -66,8 +70,12 @@ export class AssignmentRow {
 
   readonly subline = computed(() => assignmentSubline(this.assignment()));
 
-  readonly canPause = computed(
-    () => this.assignment().status === ProgramAssignmentStatus.Active,
+  /** Still open, so it can be paused, finished or cancelled. */
+  readonly canChange = computed(() => canChangePlan(this.assignment().status));
+
+  /** "Options for Anna", or for the plan when the row names the plan. */
+  readonly optionsLabel = computed(() =>
+    this._translateService.instant('programs.endPlan.options', { name: this.name() }),
   );
 
   readonly canResume = computed(
@@ -76,7 +84,7 @@ export class AssignmentRow {
 
   constructor() {
     // Its own glyphs: the row sits on pages that register others.
-    addIcons({ barbellOutline });
+    addIcons({ barbellOutline, ellipsisHorizontalOutline });
   }
 
   onRowClick(): void {

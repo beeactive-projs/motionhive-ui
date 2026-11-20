@@ -63,6 +63,13 @@ export enum NotificationType {
   ProgramAssigned = 'PROGRAM_ASSIGNED',
   ClientCompletedWorkout = 'CLIENT_COMPLETED_WORKOUT',
   ClientCompletedPlan = 'CLIENT_COMPLETED_PLAN',
+  // The coach changed the client's plan; each opens the plan.
+  PlanPaused = 'PLAN_PAUSED',
+  PlanResumed = 'PLAN_RESUMED',
+  PlanFinishedByCoach = 'PLAN_FINISHED_BY_COACH',
+  PlanCancelled = 'PLAN_CANCELLED',
+  /** The coach changed days of the client's copy of the plan; opens the plan. */
+  PlanAdjusted = 'PLAN_ADJUSTED',
 }
 
 /**

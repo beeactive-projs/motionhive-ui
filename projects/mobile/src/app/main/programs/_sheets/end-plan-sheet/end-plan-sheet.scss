@@ -1,0 +1,41 @@
+/* Each choice is a title and the sentence saying what it does to the
+   client's days; the sentence wraps, and the radio sits by the title. */
+ion-radio::part(label) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  white-space: normal;
+  line-height: var(--mh-leading-body);
+}
+
+.option-title {
+  font-weight: 600;
+}
+
+.option-detail {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* Cancel ends the plan for good: its title and its ring are red. */
+ion-item.danger .option-title {
+  color: var(--mh-color-danger-deep);
+}
+
+ion-item.danger ion-radio {
+  --color-checked: var(--ion-color-danger);
+}
+
+/* "Anna gets a notification", with the bell before it. */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+
+  ion-icon {
+    flex: none;
+    font-size: var(--mh-icon-sm);
+  }
+}

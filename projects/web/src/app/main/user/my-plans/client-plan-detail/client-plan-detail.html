@@ -167,7 +167,7 @@
                   <div class="flex items-center gap-1">
                     @switch (workoutCta(w)) {
                     @case ('start') {
-                    <button pButton type="button" size="small" [disabled]="(isPaused()) || starting() === w.id" (click)="startWorkout(w)">
+                    <button pButton type="button" size="small" [disabled]="isClosed() || starting() === w.id" (click)="startWorkout(w)">
                       <i class="pi" [class]="starting() === w.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
                       {{ 'button.start' | translate }}
                     </button>
@@ -177,7 +177,7 @@
                       severity="secondary"
                       [text]="true"
                       [rounded]="true"
-                      [disabled]="isPaused()"
+                      [disabled]="isClosed()"
                       [pTooltip]="'training.planDetail.skipWorkout' | translate"
                       (click)="confirmSkip(w)"
                       [attr.aria-label]="'training.planDetail.skipWorkout' | translate"
@@ -187,7 +187,7 @@
                     </button>
                     }
                     @case ('resume') {
-                    <button pButton type="button" size="small" [disabled]="(isPaused()) || starting() === w.id" (click)="startWorkout(w)">
+                    <button pButton type="button" size="small" [disabled]="isClosed() || starting() === w.id" (click)="startWorkout(w)">
                       <i class="pi" [class]="starting() === w.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
                       {{ 'button.resume' | translate }}
                     </button>
@@ -197,7 +197,7 @@
                       severity="secondary"
                       [text]="true"
                       [rounded]="true"
-                      [disabled]="isPaused()"
+                      [disabled]="isClosed()"
                       [pTooltip]="'training.planDetail.skipWorkout' | translate"
                       (click)="confirmSkip(w)"
                       [attr.aria-label]="'training.planDetail.skipWorkout' | translate"
@@ -332,16 +332,21 @@
             }
             @case (Status.Paused) {
             <strong>{{ 'training.planDetail.status.paused.title' | translate }}</strong>
-            <small class="text-surface-500">{{ 'training.planDetail.status.paused.message' | translate }}</small>
+            <small class="text-surface-500">{{ statusDetail() ?? ('training.planDetail.status.paused.message' | translate) }}</small>
             }
             @case (Status.Completed) {
             <strong>{{ 'training.planDetail.status.completed.title' | translate }}</strong>
-            <small class="text-surface-500">{{ 'training.planDetail.status.completed.message' | translate }}</small>
+            <small class="text-surface-500">{{ statusDetail() ?? ('training.planDetail.status.completed.message' | translate) }}</small>
             }
             @case (Status.Cancelled) {
             <strong>{{ 'training.planDetail.cta.cancelled' | translate }}</strong>
-            <small class="text-surface-500">{{ 'training.planDetail.status.cancelled.message' | translate }}</small>
+            <small class="text-surface-500">{{ statusDetail() ?? ('training.planDetail.status.cancelled.message' | translate) }}</small>
             }
+            }
+            <!-- The coach's own words with the change, as written. -->
+            @if (statusMessage(); as message) {
+            <small class="mt-2 font-semibold">{{ 'training.planDetail.status.coachMessage' | translate: { coach: instructorName() } }}</small>
+            <small class="whitespace-pre-line">{{ message }}</small>
             }
           </span>
         </p-message>

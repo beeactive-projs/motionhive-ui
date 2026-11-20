@@ -48,6 +48,7 @@ import {
 import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
+import { canStartIn, planStatusDetail, planStatusMessage } from './plan-status.utils';
 
 interface WeekGroup {
   week: number;
@@ -78,7 +79,8 @@ interface PlanCta {
  * Per the locked V1 decisions: dates are guidance not gates (anything
  * not-started can be started early); auto-skip happens BE-side when
  * a scheduled date passes with no log; paused plans hide the Start
- * CTA until the coach resumes.
+ * CTA until the coach resumes, and a cancelled or finished one never offers
+ * it (the API refuses with `workout.planNotActive`).
  */
 @Component({
   selector: 'mh-client-plan-detail',
@@ -158,6 +160,27 @@ export class ClientPlanDetail implements OnInit {
   readonly completedCount = computed(
     () => this.workouts().filter((w) => w.status === WorkoutLogStatus.Completed).length,
   );
+
+  /**
+   * "Paused since 19 Nov. Andrei resumes it…": what happened to a plan its
+   * coach stopped, when the change was recorded. Null keeps the general line.
+   */
+  readonly statusDetail = computed(() => {
+    const plan = this.assignment();
+    if (!plan) {
+      return null;
+    }
+    return planStatusDetail(plan, this.instructorName(), this.completedCount());
+  });
+
+  /** The coach's words with that change, shown as written. */
+  readonly statusMessage = computed(() => {
+    const plan = this.assignment();
+    if (!plan) {
+      return null;
+    }
+    return planStatusMessage(plan);
+  });
 
   /**
    * "Current" week = the one containing the next not-started or in-progress
@@ -291,12 +314,27 @@ export class ClientPlanDetail implements OnInit {
 
   startWorkout(w: AssignedWorkout): void {
     if (this.starting() === w.id) return;
+    const status = this.assignment()?.status;
     // Paused plan → no Start (coach must resume first).
-    if (this.assignment()?.status === ProgramAssignmentStatus.Paused) {
+    if (status === ProgramAssignmentStatus.Paused) {
       this._messageService.add({
         severity: 'info',
         summary: this._translateService.instant('training.planDetail.toast.paused.summary'),
         detail: this._translateService.instant('training.planDetail.toast.paused.detail'),
+        life: 3500,
+      });
+      return;
+    }
+    // Cancelled or finished: nothing left to start (the API would 409).
+    if (!canStartIn(status)) {
+      this._messageService.add({
+        severity: 'info',
+        summary: this._translateService.instant('training.planDetail.toast.closed.summary', {
+          status,
+        }),
+        detail: this._translateService.instant('training.planDetail.toast.closed.detail', {
+          status,
+        }),
         life: 3500,
       });
       return;
@@ -591,6 +629,11 @@ export class ClientPlanDetail implements OnInit {
 
   isPaused(): boolean {
     return this.assignment()?.status === ProgramAssignmentStatus.Paused;
+  }
+
+  /** Paused, cancelled or finished: its days are shown, never started or skipped. */
+  isClosed(): boolean {
+    return !canStartIn(this.assignment()?.status);
   }
 
   // ── Internals ────────────────────────────────────────────────────

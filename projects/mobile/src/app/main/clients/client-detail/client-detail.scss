@@ -384,3 +384,10 @@
 .show-more {
   margin-top: 0.25rem;
 }
+
+/* The Overview plan card's ⋯ keeps a finger's 44px inside the row. */
+ion-button.plan-more {
+  min-width: var(--mh-tap-target);
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}

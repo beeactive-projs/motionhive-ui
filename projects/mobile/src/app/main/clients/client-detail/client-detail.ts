@@ -71,6 +71,12 @@ import {
   AssignmentRowSubjects,
 } from '../../programs/_components/assignment-row/assignment-row';
 import { AssignRequest, AssignSheet } from '../../programs/_sheets/assign-sheet/assign-sheet';
+import { canChangePlan } from '../../programs/_sheets/end-plan-sheet/end-plan.config';
+import { canEditCopy } from '../../programs/client-copy/client-copy.config';
+import {
+  EndPlanRequest,
+  EndPlanSheet,
+} from '../../programs/_sheets/end-plan-sheet/end-plan-sheet';
 import { ClientActionsSheet } from '../_sheets/client-actions-sheet/client-actions-sheet';
 import { ClientNotesSheet } from '../_sheets/client-notes-sheet/client-notes-sheet';
 import {
@@ -123,6 +129,7 @@ type SessionScope = (typeof SessionScopes)[keyof typeof SessionScopes];
   imports: [
     AssignmentRow,
     AssignSheet,
+    EndPlanSheet,
     ClientActionsSheet,
     ClientNotesSheet,
     ConfirmSheet,
@@ -191,6 +198,11 @@ export class ClientDetail implements ViewWillEnter {
   readonly archiveSaving = signal(false);
   readonly assignOpen = signal(false);
   readonly assignSaving = signal(false);
+
+  /** The plan whose ⋯ was tapped: the end-plan sheet acts on it. */
+  readonly endPlanRow = signal<ProgramAssignment | null>(null);
+  readonly endPlanOpen = signal(false);
+  readonly endPlanSaving = signal(false);
   /** Past plans are a record; folded away until asked for. */
   readonly pastPlansOpen = signal(false);
   /** Null until the coach picks: the default follows what there is to show. */
@@ -424,6 +436,13 @@ export class ClientDetail implements ViewWillEnter {
     return {
       row,
       paused,
+      /** Still open: its ⋯ pauses, finishes or cancels it. */
+      canChange: canChangePlan(row.status),
+      /** Running or paused: the coach can edit this client's copy of it. */
+      canEditCopy: canEditCopy(row.status),
+      optionsLabel: this._translateService.instant('programs.endPlan.options', {
+        name: row.programNameSnapshot,
+      }),
       showBar: !paused && !waiting,
       kicker: this._translateService.instant(
         paused
@@ -435,6 +454,11 @@ export class ClientDetail implements ViewWillEnter {
       line: assignmentSubline(row),
     };
   });
+
+  /** "Edit Anna's copy", the door to this client's copy of the plan. */
+  readonly copyLabel = computed(() =>
+    this._translateService.instant('programs.clientCopy.editCopy', { name: this.firstName() }),
+  );
 
   /** Nothing to follow: the Overview's next step is to assign something. */
   readonly showNoPlan = computed(
@@ -654,6 +678,11 @@ export class ClientDetail implements ViewWillEnter {
     }
   }
 
+  /** This client's copy of the plan, its days still to come, in this stack. */
+  openCopy(plan: ProgramAssignment): void {
+    void this._router.navigate([this._stack, 'copy', plan.id]);
+  }
+
   /** A logged workout, read in full — pushed onto this stack. A skip has none. */
   openLog(log: WorkoutLog): void {
     if (log.status === WorkoutLogStatus.Skipped) return;
@@ -736,6 +765,52 @@ export class ClientDetail implements ViewWillEnter {
           error,
           this._translateService.instant('programs.assignments.toast.statusFailed'),
         ),
+    });
+  }
+
+  openEndPlan(plan: ProgramAssignment): void {
+    // The plan rows carry no client; the page knows who it is about.
+    let client = plan.client;
+    const person = this.store.client()?.client;
+    if (!client && person) {
+      client = {
+        id: person.id,
+        firstName: person.firstName,
+        lastName: person.lastName,
+        avatarUrl: person.avatarUrl ?? null,
+        handle: person.handle ?? null,
+      };
+    }
+    this.endPlanRow.set({ ...plan, client });
+    this.endPlanOpen.set(true);
+  }
+
+  /** Sent from the sheet; it closes once the change is saved and the client told. */
+  onEndPlan(request: EndPlanRequest): void {
+    const plan = this.endPlanRow();
+    if (!plan || this.endPlanSaving()) {
+      return;
+    }
+    const call = this.store.setPlanStatus(plan, request.status, request.message);
+    if (!call) {
+      return;
+    }
+    this.endPlanSaving.set(true);
+    call.subscribe({
+      next: () => {
+        this.endPlanSaving.set(false);
+        this.endPlanOpen.set(false);
+        void this._feedbackService.success(
+          this._translateService.instant('programs.endPlan.done', { status: request.status }),
+        );
+      },
+      error: (error: unknown) => {
+        this.endPlanSaving.set(false);
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.assignments.toast.statusFailed'),
+        );
+      },
     });
   }
 

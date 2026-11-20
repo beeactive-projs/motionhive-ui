@@ -1,0 +1,101 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" [defaultHref]="backUrl()" />
+    </ion-buttons>
+    <ion-title>{{ header().title }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [disabled]="finishing() || !overview()" (click)="done()">
+        {{ 'button.done' | translate }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      [heading]="'programs.clientCopy.error' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
+      (action)="load()"
+    />
+  } @else if (showSkeleton()) {
+    <div class="mh-page">
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 4rem" />
+      <ion-skeleton-text [animated]="true" style="width: 30%; height: 0.75rem" />
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item>
+            <mh-hex-avatar slot="start" size="sm" color="medium" tone="wash" aria-hidden="true" />
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 40%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  } @else if (overview(); as copy) {
+    <div class="mh-page">
+      <!-- Whose copy this is, and that the program stays as it is. -->
+      <mh-copy-banner
+        [client]="copy.assignment.client"
+        [title]="copy.assignment.programNameSnapshot"
+        [line]="header().banner"
+      />
+
+      @if (closed()) {
+        <mh-notice role="status">{{ 'programs.clientCopy.planClosed' | translate }}</mh-notice>
+      }
+
+      <!-- The weeks before the first one with a day still to come, in one line. -->
+      @if (doneLine()) {
+        <mh-notice tone="success">{{ doneLine() }}</mh-notice>
+      }
+
+      @for (week of openWeeks(); track week.weekIndex) {
+        <section class="mh-section">
+          <span class="mh-section-label">{{ week.label }}</span>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (row of week.rows; track row.id) {
+              <!-- A day still to come opens its editor; a locked one says why. -->
+              <ion-item
+                [button]="row.editable"
+                [detail]="row.editable"
+                [attr.aria-disabled]="!row.editable"
+                (click)="openDay(row)"
+              >
+                <mh-hex-avatar
+                  slot="start"
+                  size="sm"
+                  tone="wash"
+                  aria-hidden="true"
+                  [icon]="row.icon"
+                  [color]="row.color"
+                />
+                <ion-label>
+                  <h3>{{ row.name }}</h3>
+                  <p>{{ row.line }}</p>
+                </ion-label>
+                @if (row.changed && row.editable) {
+                  <ion-badge slot="end" data-tone="neutral">{{
+                    'programs.clientCopy.dayChanged' | translate
+                  }}</ion-badge>
+                }
+                @if (row.lockLabel) {
+                  <ion-note slot="end">{{ row.lockLabel }}</ion-note>
+                }
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+
+      @if (!closed()) {
+        <p class="mh-footnote">{{ notice() }}</p>
+      }
+    </div>
+  }
+</ion-content>

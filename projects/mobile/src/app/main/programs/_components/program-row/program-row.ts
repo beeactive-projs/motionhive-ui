@@ -1,21 +1,17 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
-import {
-  Program,
-  ProgramSource,
-  ProgramStatus,
-  dayShortLabel,
-  localDayKey,
-} from 'core';
+import { Program, ProgramSource, ProgramStatus } from 'core';
 
-import { programMeta, programTone } from '../../programs.config';
+import { ClockService } from '../../../../_shared/services/clock.service';
+import { programMeta, programRowTrailing, programTone } from '../../programs.config';
 
 /**
  * One row of the library — a program or a routine, told apart by its spine
- * rather than by being in a different list. A draft dims, because a draft is
- * the one state you cannot assign from.
+ * and by its meta line ("Routine · 6 exercises"), rather than by being in a
+ * different list. A draft dims, because a draft is the one state you cannot
+ * assign from.
  */
 @Component({
   selector: 'mh-program-row',
@@ -24,11 +20,9 @@ import { programMeta, programTone } from '../../programs.config';
   styleUrl: './program-row.scss',
 })
 export class ProgramRow {
-  private readonly _translateService = inject(TranslateService);
+  private readonly _clockService = inject(ClockService);
 
   readonly program = input.required<Program>();
-  /** Clients currently on it. Null while unknown, which is not the same as 0. */
-  readonly clientCount = input<number | null>(null);
 
   readonly select = output<void>();
 
@@ -38,30 +32,19 @@ export class ProgramRow {
 
   readonly isDraft = computed(() => this.program().status === ProgramStatus.Draft);
 
-  readonly isRoutine = computed(() => this.program().isSingleWorkout);
-
   /**
    * MotionHive's own starter content, which appears in everyone's library.
-   * Badged because a coach opening their programs has no other way to tell
-   * a starter from something they wrote.
+   * Badged, with a lock, because a coach opening their programs has no other
+   * way to tell a starter from something they wrote, nor that it cannot be
+   * changed in place.
    */
   readonly isStarter = computed(() => this.program().source === ProgramSource.System);
 
   /**
-   * The right-hand block: who is on it for a coach, or when it was last
-   * touched. A count of zero is worth saying — "nobody is on this yet" is
-   * information; an unknown count is not, so it stays silent.
+   * The right-hand note: how many of your clients follow it, or for a draft
+   * when it was last edited. The counts ride on the list row itself.
    */
-  readonly trailing = computed(() => {
-    const count = this.clientCount();
-    if (count !== null) {
-      return count === 0
-        ? this._translateService.instant('programs.row.noClients')
-        : this._translateService.instant('count.clients', { count });
-    }
-    // The short form ("29 Oct"): the long one ("Wednesday 21 October") took
-    // half the row and wrapped the title word by word.
-    const at = this.program().updatedAt;
-    return at ? dayShortLabel(localDayKey(new Date(at))) : '';
-  });
+  readonly trailing = computed(() =>
+    programRowTrailing(this.program(), this._clockService.now()),
+  );
 }

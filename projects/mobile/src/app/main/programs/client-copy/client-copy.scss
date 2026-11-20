@@ -1,0 +1,4 @@
+/* A locked day stays legible: it is history, not an absence. */
+ion-item[aria-disabled='true'] {
+  cursor: default;
+}

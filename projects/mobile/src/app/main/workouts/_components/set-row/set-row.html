@@ -1,6 +1,7 @@
 <div
   class="mh-set-grid row"
   [class.untickable]="!tickable()"
+  [class.no-history]="!history()"
   [class.done]="mode() === Modes.Done"
   [class.selected]="editing() !== null"
 >
@@ -16,24 +17,27 @@
 
   <!-- Last time's numbers for this set; a tap copies them in. In its column
        the numbers alone, under the heading; too narrow for the column, a
-       line under the fields that says what they are. -->
-  <button
-    type="button"
-    class="previous"
-    [class.empty]="!previous()"
-    [disabled]="!previous() || done()"
-    [attr.aria-label]="
-      previous()
-        ? ('workouts.setRow.usePrevious' | translate: { name: badge().name, value: previous() })
-        : ('workouts.setRow.noPrevious' | translate: { name: badge().name })
-    "
-    (click)="usePrevious.emit()"
-  >
-    <span class="in-column">{{ previous() || '–' }}</span>
-    @if (previous()) {
-      <span class="in-line">{{ 'workouts.logger.last' | translate: { value: previous() } }}</span>
-    }
-  </button>
+       line under the fields that says what they are. Not drawn where a set
+       has no last time (`history` off). -->
+  @if (history()) {
+    <button
+      type="button"
+      class="previous"
+      [class.empty]="!previous()"
+      [disabled]="!previous() || done()"
+      [attr.aria-label]="
+        previous()
+          ? ('workouts.setRow.usePrevious' | translate: { name: badge().name, value: previous() })
+          : ('workouts.setRow.noPrevious' | translate: { name: badge().name })
+      "
+      (click)="usePrevious.emit()"
+    >
+      <span class="in-column">{{ previous() || '–' }}</span>
+      @if (previous()) {
+        <span class="in-line">{{ 'workouts.logger.last' | translate: { value: previous() } }}</span>
+      }
+    </button>
+  }
 
   @for (cell of cells(); track cell.field) {
     <button

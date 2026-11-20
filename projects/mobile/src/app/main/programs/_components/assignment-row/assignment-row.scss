@@ -20,6 +20,13 @@ mh-hex-avatar {
   margin-inline-end: 0.875rem;
 }
 
+/* The ⋯ keeps a finger's 44px inside the row. */
+ion-button.more {
+  min-width: var(--mh-tap-target);
+  min-height: var(--mh-tap-target);
+  margin: 0;
+}
+
 /* The paused promise is a sentence, and it may wrap. */
 .tags ion-note {
   white-space: normal;

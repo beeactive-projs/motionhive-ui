@@ -3,6 +3,7 @@ import {
   Injector,
   afterNextRender,
   computed,
+  effect,
   inject,
   signal,
   viewChild,
@@ -10,6 +11,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
@@ -37,11 +39,16 @@ import {
   ProgramService,
   ProgramStatus,
   ProgramWorkout,
+  estimateWorkoutMinutes,
+  weekdayNames,
+  workoutExerciseCount,
 } from 'core';
 
-import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
+import { ActionSheet } from '../../../_shared/components/action-sheet/action-sheet';
+import { ConfirmFact, ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { Notice } from '../../../_shared/components/notice/notice';
+import { FeedbackService, UndoToast } from '../../../_shared/services/feedback.service';
 import { CoachStacks, coachStackOf } from '../../clients/client-paths';
 import { AssignRequest, AssignSheet } from '../_sheets/assign-sheet/assign-sheet';
 import { CopyDaySheet } from '../_sheets/copy-day-sheet/copy-day-sheet';
@@ -51,10 +58,15 @@ import { ProgramDetailsSheet } from '../_sheets/program-details-sheet/program-de
 import {
   DEFAULT_PROGRAM_WEEKS,
   dayLabels,
+  deleteWeekShift,
+  hasProgramName,
   isOwnProgram,
   PROGRAM_ICONS,
   ProgramActionId,
   ProgramActionIds,
+  WeekActionId,
+  WeekActionIds,
+  weekActions,
   weekLabel,
   weeksToDays,
 } from '../programs.config';
@@ -94,12 +106,14 @@ let handedDraft: Program | null = null;
 @Component({
   selector: 'mh-program-builder',
   imports: [
+    ActionSheet,
     AssignSheet,
     ConfirmSheet,
     CopyDaySheet,
     CopyWeekSheet,
     EmptyState,
     IonBackButton,
+    IonBadge,
     IonButton,
     IonButtons,
     IonContent,
@@ -113,6 +127,7 @@ let handedDraft: Program | null = null;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    Notice,
     ProgramActionsSheet,
     ProgramDetailsSheet,
     TranslatePipe,
@@ -135,14 +150,14 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   private readonly _injector = inject(Injector);
 
   readonly dayLabels = dayLabels();
+  /** Whole weekday names, for the sentence a cleared day's toast says. */
+  private readonly _longDayLabels = weekdayNames('long');
   readonly weekLabel = weekLabel;
   readonly skeletonWeeks = [1, 2];
   readonly skeletonRows = [1, 2, 3];
 
   readonly copyOpen = signal(false);
   readonly copyFrom = signal(0);
-  readonly clearTarget = signal<ProgramWorkout | null>(null);
-  readonly clearOpen = signal(false);
 
   private _id: string | null = null;
   /**
@@ -167,25 +182,52 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     () => this.store.program()?.name ?? this._translateService.instant('programs.builder.titleFallback'),
   );
 
-  /** "4 weeks · 8 days of work · Draft": its size, then whether it can be assigned yet. */
+  /**
+   * "4 weeks · 8 days of work · Draft": its size, then a state that is not
+   * the published one. Published is said by the badge beside this line.
+   */
   readonly subtitle = computed(() => {
     const program = this.store.program();
     const size = this._translateService.instant('programs.builder.subtitle', {
       weeks: this.store.weekCount(),
       days: this.store.filledDays(),
     });
-    if (!program) return size;
+    if (!program) {
+      return size;
+    }
+    if (program.status === ProgramStatus.Published) {
+      return size;
+    }
     const status = this._translateService.instant(`enum.programStatus.${program.status}`);
     return `${size} · ${status}`;
   });
 
-  readonly clearBody = computed(() => {
-    const day = this.clearTarget();
-    return day ? this._translateService.instant('programs.builder.clear.body', { name: day.name }) : '';
-  });
+  /**
+   * Said above the weeks of a published program clients follow: edits here
+   * reach only new assignments, since each client trains their own copy.
+   */
+  readonly showClientsNotice = computed(
+    () => this.store.isPublished() && this.isOwn() && this.store.clientCount() > 0,
+  );
+
+  readonly clientsNotice = computed(() =>
+    this._translateService.instant('programs.builder.clientsNotice', {
+      count: this.store.clientCount(),
+    }),
+  );
+
+  /** The undo offered for the last cleared day, while it is on screen. */
+  private _undoToast: UndoToast | null = null;
 
   constructor() {
     addIcons(PROGRAM_ICONS);
+    // A held clear sent for another reason (a copy, a publish) can no longer
+    // be undone, so its toast goes with it.
+    effect(() => {
+      if (this.store.pendingClearId() === null) {
+        void this._dismissUndo();
+      }
+    });
   }
 
   /**
@@ -198,6 +240,11 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
    * nothing scheduled.
    */
   ionViewWillLeave(): void {
+    // A cleared day is deleted for real once the coach moves on, and its
+    // undo goes with the page it was offered on.
+    this.store.flushClear();
+    void this._dismissUndo();
+
     if (this._replacedByDraft) {
       this._replacedByDraft = false;
       return;
@@ -291,48 +338,299 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     });
   }
 
-  askClear(day: ProgramWorkout, event: Event): void {
+  /**
+   * The X on a day: the day leaves the grid at once, with no confirm (owner
+   * decision, 2026-11-20). Its delete waits for the undo toast to close, so
+   * Undo puts it back as it was without asking the server.
+   */
+  clearDay(day: ProgramWorkout, event: Event): void {
     // Inside the row's own tap target; without this the tap also opens the day.
     event.stopPropagation();
-    this.clearTarget.set(day);
-    this.clearOpen.set(true);
+    const cleared = this.store.clearDay(day.id);
+    if (!cleared) {
+      return;
+    }
+    void this._offerUndo(cleared);
   }
 
-  confirmClear(): void {
-    const day = this.clearTarget();
-    this.clearOpen.set(false);
-    this.clearTarget.set(null);
-    if (day) this.store.clearDay(day.id);
+  /** "5 exercises · ~55 min": what a day holds, and about how long it takes. */
+  dayMeta(day: ProgramWorkout): string {
+    const count = workoutExerciseCount(day);
+    if (count === 0) {
+      return this._translateService.instant('programs.builder.dayEmpty');
+    }
+    const minutes = estimateWorkoutMinutes(day);
+    if (minutes === null) {
+      return this._translateService.instant('count.exercises', { count });
+    }
+    return this._translateService.instant('programs.builder.dayMeta', { count, minutes });
+  }
+
+  private async _offerUndo(day: ProgramWorkout): Promise<void> {
+    await this._dismissUndo();
+    const toast = await this._feedbackService.undoable(
+      this._translateService.instant('programs.builder.toast.dayCleared', {
+        day: this._longDayLabels[day.dayIndex],
+      }),
+      this._translateService.instant('button.undo'),
+    );
+    // Sent already (the page left, another write went first): nothing to undo.
+    if (this.store.pendingClearId() !== day.id) {
+      await toast.dismiss();
+      return;
+    }
+    this._undoToast = toast;
+    const undone = await toast.undone;
+    if (this._undoToast === toast) {
+      this._undoToast = null;
+    }
+    if (undone) {
+      this.store.undoClear(day.id);
+      return;
+    }
+    this.store.flushClear(day.id);
+  }
+
+  private async _dismissUndo(): Promise<void> {
+    const toast = this._undoToast;
+    if (!toast) {
+      return;
+    }
+    this._undoToast = null;
+    await toast.dismiss();
+  }
+
+  // ─── A week's ⋯ ───────────────────────────────────────────────
+
+  /** The week whose ⋯ sheet, or one of its confirms, is open. */
+  readonly weekMenuIndex = signal<number | null>(null);
+  readonly weekMenuOpen = signal(false);
+
+  private readonly _weekMenuWeek = computed<WeekCard | null>(() => {
+    const index = this.weekMenuIndex();
+    if (index === null) {
+      return null;
+    }
+    const week = this.store.weeks()[index];
+    if (!week) {
+      return null;
+    }
+    return week;
+  });
+
+  readonly weekMenuTitle = computed(() => {
+    const index = this.weekMenuIndex();
+    if (index === null) {
+      return '';
+    }
+    return weekLabel(index);
+  });
+
+  /** "3 days with exercises", under the week's name. */
+  readonly weekMenuSubtitle = computed(() => {
+    const week = this._weekMenuWeek();
+    if (!week) {
+      return '';
+    }
+    return this._translateService.instant('programs.builder.weekMenu.subtitle', {
+      count: this._daysWithExercises(week),
+    });
+  });
+
+  readonly weekMenuActions = computed(() => {
+    const week = this._weekMenuWeek();
+    if (!week) {
+      return [];
+    }
+    return weekActions({ days: week.filled, weekCount: this.store.weekCount() });
+  });
+
+  openWeekMenu(weekIndex: number): void {
+    this.weekMenuIndex.set(weekIndex);
+    this.weekMenuOpen.set(true);
+  }
+
+  /** The sheet reports the verb once it has gone; the page does it. */
+  onWeekAction(id: WeekActionId): void {
+    const index = this.weekMenuIndex();
+    if (index === null) {
+      return;
+    }
+    switch (id) {
+      case WeekActionIds.Copy:
+        this.openCopy(index);
+        return;
+      case WeekActionIds.InsertAfter:
+        this.insertWeekAfter(index);
+        return;
+      case WeekActionIds.Clear:
+        this.clearWeekOpen.set(true);
+        return;
+      case WeekActionIds.Delete:
+        this.deleteWeekOpen.set(true);
+        return;
+    }
+  }
+
+  /** Days of a week that hold at least one exercise. */
+  private _daysWithExercises(week: WeekCard): number {
+    let count = 0;
+    for (const day of week.days) {
+      if (day && workoutExerciseCount(day) > 0) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  /** The week's days as the confirms list them: "Mon · Push A". */
+  private _weekDayFacts(week: WeekCard | null): ConfirmFact[] {
+    if (!week) {
+      return [];
+    }
+    const facts: ConfirmFact[] = [];
+    week.days.forEach((day, index) => {
+      if (day) {
+        facts.push({ label: this.dayLabels[index], value: day.name });
+      }
+    });
+    return facts;
+  }
+
+  /** The clients sentence a week's confirm ends on, or nothing when none follow it. */
+  private _clientsKeepCopy(): string {
+    const count = this.store.clientCount();
+    if (count === 0) {
+      return '';
+    }
+    return this._translateService.instant('programs.builder.weekMenu.clientsKeepCopy', { count });
+  }
+
+  // ─── Add a week after one ─────────────────────────────────────
+
+  insertWeekAfter(weekIndex: number): void {
+    this.store.insertWeekAfter(weekIndex, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.builder.toast.addWeekFailed'),
+        );
+        return;
+      }
+      // The weeks after it moved down one, so their open state moves too,
+      // and the new week opens where the coach will fill it.
+      this.openWeeks.update((open) => {
+        const next = new Set<number>();
+        for (const week of open) {
+          if (week > weekIndex) {
+            next.add(week + 1);
+          } else {
+            next.add(week);
+          }
+        }
+        next.add(weekIndex + 1);
+        return next;
+      });
+      void this._feedbackService.success(
+        this._translateService.instant('programs.builder.toast.weekAdded', {
+          week: weekIndex + 2,
+          after: weekIndex + 1,
+        }),
+      );
+    });
+  }
+
+  // ─── Clear a week ─────────────────────────────────────────────
+
+  readonly clearWeekOpen = signal(false);
+
+  readonly clearWeekTitle = computed(() =>
+    this._translateService.instant('programs.builder.clearWeek.title', {
+      week: (this.weekMenuIndex() ?? 0) + 1,
+    }),
+  );
+
+  /** What goes (its days, listed below), what stays, and who keeps a copy. */
+  readonly clearWeekBody = computed(() => {
+    const week = this._weekMenuWeek();
+    if (!week) {
+      return '';
+    }
+    const lead = this._translateService.instant('programs.builder.clearWeek.body', {
+      days: week.filled,
+    });
+    return [lead, this._clientsKeepCopy()].filter(Boolean).join(' ');
+  });
+
+  readonly clearWeekFacts = computed(() => this._weekDayFacts(this._weekMenuWeek()));
+
+  confirmClearWeek(): void {
+    const index = this.weekMenuIndex();
+    this.clearWeekOpen.set(false);
+    if (index === null) {
+      return;
+    }
+    this.store.clearWeek(index, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.builder.toast.clearWeekFailed'),
+        );
+        return;
+      }
+      void this._feedbackService.success(
+        this._translateService.instant('programs.builder.toast.weekCleared', { week: index + 1 }),
+      );
+    });
   }
 
   // ─── Delete a week ────────────────────────────────────────────
 
-  readonly deleteWeekIndex = signal<number | null>(null);
   readonly deleteWeekOpen = signal(false);
 
   readonly deleteWeekTitle = computed(() =>
     this._translateService.instant('programs.builder.deleteWeek.title', {
-      week: (this.deleteWeekIndex() ?? 0) + 1,
+      week: (this.weekMenuIndex() ?? 0) + 1,
     }),
   );
 
-  /** Says what goes and what the program becomes, before anything does. */
+  readonly deleteWeekConfirm = computed(() =>
+    this._translateService.instant('programs.builder.deleteWeek.confirm', {
+      week: (this.weekMenuIndex() ?? 0) + 1,
+    }),
+  );
+
+  /**
+   * Says what goes and who keeps a copy, before anything does (design
+   * "WeekSheet"): its days are listed below, and the clients following the
+   * program keep theirs unchanged.
+   */
   readonly deleteWeekBody = computed(() => {
-    const index = this.deleteWeekIndex();
-    if (index === null) return '';
-    return this._translateService.instant('programs.builder.deleteWeek.body', {
-      days: this.store.weeks()[index]?.filled ?? 0,
-      weeks: this.store.weekCount() - 1,
+    const index = this.weekMenuIndex();
+    const week = this._weekMenuWeek();
+    if (index === null || !week) {
+      return '';
+    }
+    const lead = this._translateService.instant('programs.builder.deleteWeek.body', {
+      week: index + 1,
+      days: week.filled,
     });
+    return [lead, this._clientsKeepCopy()].filter(Boolean).join(' ');
   });
 
-  askDeleteWeek(weekIndex: number): void {
-    this.deleteWeekIndex.set(weekIndex);
-    this.deleteWeekOpen.set(true);
-  }
+  readonly deleteWeekFacts = computed(() => this._weekDayFacts(this._weekMenuWeek()));
+
+  /** "Weeks 3 to 8 move up and become weeks 2 to 7. The program ends up with 7 weeks." */
+  readonly deleteWeekShift = computed(() => {
+    const index = this.weekMenuIndex();
+    if (index === null) {
+      return null;
+    }
+    return deleteWeekShift(index, this.store.weekCount());
+  });
 
   confirmDeleteWeek(): void {
-    const index = this.deleteWeekIndex();
+    const index = this.weekMenuIndex();
     this.deleteWeekOpen.set(false);
     if (index === null) return;
 
@@ -464,39 +762,39 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
     ),
   );
 
+  /**
+   * One request for every target week, never one per week: the server copies
+   * them all in one transaction, so a failure leaves none half-copied.
+   */
   onCopy(targets: number[]): void {
     const from = this.copyFrom();
     this.copyOpen.set(false);
     if (!targets.length) return;
 
-    // One at a time so the later copies see the earlier ones committed.
-    const next = (i: number): void => {
-      if (i >= targets.length) {
-        void this._feedbackService.success(
-          targets.length === 1
-            ? this._translateService.instant('programs.builder.toast.weekCopiedToWeek', {
-                from: from + 1,
-                week: targets[0] + 1,
-              })
-            : this._translateService.instant('programs.builder.toast.weekCopiedToWeeks', {
-                from: from + 1,
-                count: targets.length,
-              }),
+    this.store.copyWeek(from, targets, (error) => {
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.builder.toast.copyWeekFailed'),
         );
         return;
       }
-      this.store.copyWeek(from, targets[i], (error) => {
-        if (error) {
-          void this._feedbackService.error(
-            error,
-            this._translateService.instant('programs.builder.toast.copyWeekFailed'),
-          );
-          return;
-        }
-        next(i + 1);
-      });
-    };
-    next(0);
+      if (targets.length === 1) {
+        void this._feedbackService.success(
+          this._translateService.instant('programs.builder.toast.weekCopiedToWeek', {
+            from: from + 1,
+            week: targets[0] + 1,
+          }),
+        );
+        return;
+      }
+      void this._feedbackService.success(
+        this._translateService.instant('programs.builder.toast.weekCopiedToWeeks', {
+          from: from + 1,
+          count: targets.length,
+        }),
+      );
+    });
   }
 
   // ─── Chrome ───────────────────────────────────────────────────
@@ -508,23 +806,77 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   });
 
   /**
-   * Publish, while your program is a draft: the step this screen is waiting
-   * on. Once published the grid gets the whole screen, and Assign leads the
-   * ⋯ sheet (see docs/MOBILE-ACTIONS.md).
+   * The step this screen is waiting on, in the footer: Publish while your
+   * program is a draft, then Assign once it is published, a starter's too
+   * (owner decision, 2026-11-20, as the Builder design draws it; Assign is
+   * no longer behind the ⋯).
    */
-  readonly showFooter = computed(
-    () => !!this.store.program() && !this.store.isPublished() && this.isOwn(),
+  readonly showPublishFooter = computed(() => {
+    const program = this.store.program();
+    if (!program || !this.isOwn()) {
+      return false;
+    }
+    return program.status === ProgramStatus.Draft;
+  });
+
+  readonly showAssignFooter = computed(() => !!this.store.program() && this.store.isPublished());
+
+  readonly showFooter = computed(() => this.showPublishFooter() || this.showAssignFooter());
+
+  openAssign(): void {
+    this.assignOpen.set(true);
+  }
+
+  /**
+   * The publish rule, as the footer's checklist: a name someone gave it (the
+   * untouched birth name, in either language, is none) and at least one day
+   * with an exercise in it. The API refuses the same two.
+   */
+  readonly hasName = computed(() => {
+    const program = this.store.program();
+    if (!program) {
+      return false;
+    }
+    return hasProgramName(program.name);
+  });
+
+  readonly hasDayWithExercises = computed(() => this.store.exerciseDays() > 0);
+
+  readonly canPublish = computed(() => this.hasName() && this.hasDayWithExercises());
+
+  /** "8 weeks, 24 days with exercises. After publishing you can assign it." */
+  readonly publishReady = computed(() =>
+    this._translateService.instant('programs.builder.publish.ready', {
+      weeks: this.store.weekCount(),
+      days: this.store.exerciseDays(),
+    }),
   );
 
-  /** What is still missing before this can be published, in one sentence; empty when nothing is. */
-  readonly publishBlocker = computed(() => {
-    const needsName = !this.store.program()?.name.trim();
-    const needsDays = this.store.filledDays() === 0;
-    if (needsName && needsDays) return this._translateService.instant('programs.settings.needs.both');
-    if (needsName) return this._translateService.instant('programs.settings.needs.name');
-    if (needsDays) return this._translateService.instant('programs.settings.needs.days');
-    return '';
-  });
+  /** The checklist's way to a name. */
+  openDetails(): void {
+    this.detailsOpen.set(true);
+  }
+
+  /**
+   * The checklist's way to exercises: the first day there is, or else a new
+   * one on the first week's first day, opened the way a rest cell opens.
+   */
+  openFirstDay(): void {
+    const program = this.store.program();
+    if (!program) {
+      return;
+    }
+    const first = this.store.firstDay();
+    if (first) {
+      void this._router.navigate([this.stack, 'program', program.id, 'day', first.id]);
+      return;
+    }
+    const week = this.store.weeks()[0];
+    if (!week) {
+      return;
+    }
+    this.openDay(week, 0);
+  }
 
   /** Both lead off this page, so each is closed before navigating (see ConfirmSheet.close). */
   private readonly _duplicateSheet = viewChild<ConfirmSheet>('duplicateSheet');
@@ -557,9 +909,6 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   /** The sheet reports the verb; this screen decides what it means. */
   onAction(id: ProgramActionId): void {
     switch (id) {
-      case ProgramActionIds.Assign:
-        this.assignOpen.set(true);
-        return;
       case ProgramActionIds.EditDetails:
         this.detailsOpen.set(true);
         return;
@@ -603,7 +952,9 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
 
   /** Straight away: it undoes cleanly from the ⋯, and nobody sees a draft change. */
   publish(): void {
-    if (this.publishBlocker()) return;
+    if (!this.canPublish()) {
+      return;
+    }
     this.store.setStatus(ProgramStatus.Published, (error) => {
       if (error) {
         void this._feedbackService.error(

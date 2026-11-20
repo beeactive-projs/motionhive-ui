@@ -107,3 +107,61 @@ describe('WorkoutsStore, your routines', () => {
     expect(store.routineTotal()).toBe(51);
   });
 });
+
+describe('WorkoutsStore, plans the coach stopped', () => {
+  it('lists them, and a trainee with only a paused plan is not a cold start', () => {
+    const paused = {
+      id: 'pa-1',
+      programNameSnapshot: 'Strength Base',
+      status: 'PAUSED',
+      completionPercent: 42,
+      startDate: '2026-11-02',
+      endDate: '2026-12-27',
+      assignmentKind: 'COACH',
+      instructor: null,
+      statusChangedAt: '2026-11-19T10:00:00Z',
+      statusMessage: null,
+      workoutsDone: 5,
+    };
+    const page = { items: [], total: 0 };
+    TestBed.configureTestingModule({
+      providers: [
+        WorkoutsStore,
+        {
+          provide: ProgramAssignmentService,
+          useValue: {
+            trainingDay: () => of({ today: null, week: [], activePlans: [], stoppedPlans: [paused] }),
+          },
+        },
+        { provide: RoutineService, useValue: { list: () => of(page) } },
+        { provide: WorkoutLogService, useValue: { getInProgress: () => of(null) } },
+      ],
+    });
+    const store = TestBed.inject(WorkoutsStore);
+
+    store.load();
+
+    expect(store.stoppedPlans().map((plan) => plan.id)).toEqual(['pa-1']);
+    expect(store.isColdStart()).toBe(false);
+  });
+
+  it('reads an API without them as none', () => {
+    const page = { items: [], total: 0 };
+    TestBed.configureTestingModule({
+      providers: [
+        WorkoutsStore,
+        {
+          provide: ProgramAssignmentService,
+          useValue: { trainingDay: () => of({ today: null, week: [], activePlans: [] }) },
+        },
+        { provide: RoutineService, useValue: { list: () => of(page) } },
+        { provide: WorkoutLogService, useValue: { getInProgress: () => of(null) } },
+      ],
+    });
+    const store = TestBed.inject(WorkoutsStore);
+
+    store.load();
+
+    expect(store.stoppedPlans()).toEqual([]);
+  });
+});

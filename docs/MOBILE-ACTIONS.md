@@ -14,8 +14,8 @@ document is about placement and flow, not styling.
 2. **A footer button is for the one step the screen is waiting on**: publishing a draft, starting
    a routine, copying a starter. It lives in `mh-cta-bar`, except on a routine's page, which puts
    it at the end of the content as the routine builder does (below). Once an item is ready, what
-   you do with it (Assign included) is in the ⋯, the main verb first. A verb is never in both
-   places.
+   you do with it is in the ⋯, the main verb first; the program builder keeps Assign in its footer
+   once published (owner decision, 2026-11-20, below). A verb is never in both places.
 3. **The sheet lists only what applies now.** Hide a verb that cannot apply to this item in this
    state (a draft has nobody assigned, a MotionHive starter cannot be deleted). Show it disabled,
    with a hint saying why, only when the person can make it possible from here.
@@ -124,17 +124,24 @@ void this._router.navigate([...]);
 
 | Action             | Shown when            | Then                                                                                         |
 | ------------------ | --------------------- | -------------------------------------------------------------------------------------------- |
-| Assign to a client | published             | the assign sheet opens from the bottom                                                       |
 | View assignments   | published             | the assignments page                                                                         |
 | Edit details       | yours                 | sheet: name, description, length in weeks. Growing asks whether to repeat the existing weeks or leave the new ones empty; shrinking warns how many days go. |
 | Duplicate          | always                | confirm, then opens the draft copy                                                           |
 | Unpublish          | yours and published   | immediate, toast; the footer turns into Publish                                              |
 | Delete program     | yours                 | red confirm, then back to the library                                                        |
 
-Footer: only on your draft, **Publish**, disabled with the reason above it until the program has a
-name and at least one day of work. Once published the footer goes and the week grid gets the whole
-screen. A MotionHive starter shows Duplicate (plus Assign and View assignments once published) and
-nothing it cannot change.
+Footer: on your draft, **Publish**, disabled with the checklist above it until the program has a
+name and at least one day with an exercise. Once published, **Assign to a client** (the assign sheet
+from the bottom), a starter's too: the owner moved Assign out of the ⋯ into the footer
+(2026-11-20, design "Builder"), so it is never in both. A MotionHive starter shows Duplicate (plus
+View assignments once published) and nothing it cannot change.
+
+Each week's head has Copy and its own ⋯ (`weekActions`, design "WeekSheet"): Copy to other weeks
+(teal, one request for every week picked), Add a week after it (honey, immediate, toast), then in
+the red card Clear the week and Delete the week, each a red confirm listing the week's days. Delete
+says where the later weeks go and that the clients following the program keep their copy; both are
+allowed while clients follow it (owner decision, 2026-11-20). A day's X clears it at once, with
+Undo on the toast and no confirm.
 
 **Routine builder** (`workouts/routine-builder`, `routineActions`)
 

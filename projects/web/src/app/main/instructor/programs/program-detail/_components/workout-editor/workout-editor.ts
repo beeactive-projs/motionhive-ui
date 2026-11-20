@@ -6,10 +6,15 @@ import { Chip } from 'primeng/chip';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
 
-import { PrescribedExercise, PrescribedSet, ProgramWorkout } from 'core';
+import {
+  PrescribedExercise,
+  PrescribedSet,
+  ProgramWorkout,
+  estimateWorkoutMinutes,
+  workoutSetCount,
+} from 'core';
 
 import { ListEmptyState } from '../../../../../../_shared/components/list-empty-state/list-empty-state';
-import { estimateWorkoutMinutes, workoutSetCount } from '../builder.utils';
 import { ExerciseRow } from '../exercise-row/exercise-row';
 
 /**

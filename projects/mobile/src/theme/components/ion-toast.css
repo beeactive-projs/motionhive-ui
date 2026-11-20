@@ -7,3 +7,25 @@
 ion-toast {
   --border-radius: var(--mh-radius-control);
 }
+
+/* Success, error and warning toasts wear their tone's wash, the same soft
+   colours as the chips and notices of that tone ("Începător", "Publicat",
+   `mh-notice`): dark text on a pale ground in light, light text on a deep
+   ground in dark, so a success and an error read as one family. Ionic paints
+   a coloured toast from --ion-color-base / contrast, which `.ion-color-*`
+   sets with !important, so these element + class rules (also !important)
+   win. The neutral `medium` toast (undo, plain notes) keeps Ionic's slate. */
+ion-toast.ion-color-success {
+  --ion-color-base: var(--ion-color-success-wash) !important;
+  --ion-color-contrast: var(--ion-color-success-wash-contrast) !important;
+}
+
+ion-toast.ion-color-danger {
+  --ion-color-base: var(--ion-color-danger-wash) !important;
+  --ion-color-contrast: var(--ion-color-danger-wash-contrast) !important;
+}
+
+ion-toast.ion-color-warning {
+  --ion-color-base: var(--ion-color-warning-wash) !important;
+  --ion-color-contrast: var(--ion-color-warning-wash-contrast) !important;
+}

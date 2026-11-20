@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { CopyDaySource, DaySource } from './day-editor/day-source';
+
 /**
  * A plan and what it opens: the week grid, a day, who is on it, and the
  * catalog page of an exercise in it. Mounted at the root of both coach
@@ -36,5 +38,19 @@ export const programPageRoutes: Routes = [
     path: 'program/:id/assignments',
     loadComponent: () => import('./assignments/assignments').then((m) => m.Assignments),
     title: 'pageTitle.assignments',
+  },
+  {
+    // One client's copy of a plan, from their page or the plan's list of
+    // who is on it: its weeks, then a day of it in the day editor, which
+    // the route binds to the copy instead of the program.
+    path: 'copy/:assignmentId',
+    loadComponent: () => import('./client-copy/client-copy').then((m) => m.ClientCopy),
+    title: 'pageTitle.clientCopy',
+  },
+  {
+    path: 'copy/:assignmentId/day/:dayId',
+    loadComponent: () => import('./day-editor/day-editor').then((m) => m.DayEditor),
+    providers: [{ provide: DaySource, useClass: CopyDaySource }],
+    title: 'pageTitle.day',
   },
 ];

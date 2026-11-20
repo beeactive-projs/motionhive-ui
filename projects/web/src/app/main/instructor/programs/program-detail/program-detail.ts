@@ -45,6 +45,7 @@ import {
   normalizeSupersets,
   supersetChanges,
   unlinkFromNext,
+  workoutSetCount,
 } from 'core';
 
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
@@ -63,7 +64,7 @@ import {
   RailWeekDrop,
   RailWorkoutDrop,
 } from './_components/builder-rail/builder-rail';
-import { WeekGroup, nearestFreeDay, workoutSetCount } from './_components/builder.utils';
+import { WeekGroup, nearestFreeDay } from './_components/builder.utils';
 import { WorkoutEditor } from './_components/workout-editor/workout-editor';
 
 /**
@@ -1193,7 +1194,7 @@ export class ProgramDetail implements OnInit {
     const p = this.program();
     const source = this.copyWeekSource();
     if (!p || source === null) return;
-    this._track(this._programService.copyWeek(p.id, source, targetWeek)).subscribe({
+    this._track(this._programService.copyWeek(p.id, source, [targetWeek])).subscribe({
       next: (copied) => {
         this._messageService.add({
           severity: 'success',

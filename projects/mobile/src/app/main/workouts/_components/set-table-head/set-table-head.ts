@@ -50,6 +50,8 @@ export class SetTableHead {
   readonly unilateral = input(false);
   /** Off over a routine's planned sets, which have no tick column (`SetRow.tickable`). */
   readonly tickable = input(true);
+  /** Off over sets with no last time to show (`SetRow.history`): no Previous heading. */
+  readonly history = input(true);
 
   readonly labels = computed(() =>
     this.fields().map((field) => fieldHeadingKey(field, this.unilateral())),

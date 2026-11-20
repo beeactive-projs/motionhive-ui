@@ -1256,7 +1256,7 @@
         "none": "No link yet"
       },
       "leave": {
-        "body": "You'll stop seeing its posts. You can ask to join again later.",
+        "body": "You'll stop seeing its posts, and your bookings in its members-only sessions will be cancelled. You can ask to join again later.",
         "button": "Leave group",
         "title": "Leave this group?"
       },
@@ -1293,7 +1293,7 @@
       "categoriesFailed": "Couldn't load the activities.",
       "categoriesHint": "People find the group by these in Discover.",
       "delete": {
-        "body": "Its posts, members and comments go with it.",
+        "body": "Its posts, members and comments go with it, and its members-only sessions are cancelled. The people booked are told.",
         "button": "Delete group",
         "title": "Delete this group?"
       },
@@ -1492,7 +1492,7 @@
       "message": "Message",
       "remove": "Remove from group",
       "removeConfirm": {
-        "body": "They stop seeing the group's posts and members. You can invite them again later.",
+        "body": "They stop seeing the group's posts and members, and their bookings in its members-only sessions are cancelled. You can invite them again later.",
         "title": "Remove {name} from the group?"
       },
       "removeModerator": "Remove as moderator",
@@ -2131,6 +2131,7 @@
     "cancelledDeclined": "Cancelled & declined",
     "chat": "Chat",
     "client": "Client",
+    "clientCopy": "Client's copy",
     "clients": "Clients",
     "coaches": "Coaches",
     "coachingProfile": "Coaching profile",
@@ -2507,13 +2508,20 @@
       },
       "loadingClients": "Loading your clients…",
       "loadingPrograms": "Loading your programs…",
-      "more": "+ {count} more",
       "noClients": "No active clients yet. A client has to accept before they can be given work.",
       "noProgramMatch": "No program matches that.",
       "noPrograms": "No programs yet. Create one in Programs first.",
-      "note": "Note",
+      "noteForClient": "Note for the client",
+      "notePlaceholder": "Why this program, and what to watch for",
+      "assignTo": "Assign to {name}",
+      "daysPicked": "{picked} of {total} picked",
+      "firstWeek": "First week",
+      "lastDay": "Last day: {date}",
+      "otherPlan": "{name} already follows {program} ({week}). They'll have both at the same time.",
+      "otherPlans": "{name} already follows {count, plural, one {# other plan of yours} other {# other plans of yours}}. They'll have them all at the same time.",
+      "pendingInvite": "Hasn't accepted yet",
+      "seePlan": "See {name}'s plan",
       "program": "Program",
-      "schedule": "Schedule",
       "searchClients": "Search clients",
       "noClientMatch": "No client matches that.",
       "searchPrograms": "Search programs",
@@ -2523,8 +2531,7 @@
     },
     "assignment": {
       "notStarted": "Not started",
-      "pause": "Pause",
-      "pausedSubline": "Paused. Days missed during the pause are marked skipped once it resumes",
+      "pausedSubline": "Paused. Its days wait, and resuming moves them forward by whole weeks",
       "percentDone": "{percent}% done",
       "startedPercent": "Started {date} · {percent}% done",
       "starts": "Starts {date}"
@@ -2543,28 +2550,70 @@
         "statusFailed": "Could not change that assignment"
       }
     },
-    "builder": {
-      "clear": {
-        "body": "Clear {name}? The day becomes a rest day and its exercises are removed.",
-        "title": "Clear day"
+    "endPlan": {
+      "cancel": {
+        "confirm": "Cancel the plan",
+        "detail": "The days still to come leave {name}'s calendar. Finished workouts stay.",
+        "title": "Cancel the plan"
       },
+      "done": "{status, select, PAUSED {Plan paused} COMPLETED {Plan marked as finished} CANCELLED {Plan cancelled} ACTIVE {Plan resumed} other {Plan updated}}",
+      "finish": {
+        "confirm": "Mark as finished",
+        "detail": "It stays in {name}'s history as finished, at {percent}% done.",
+        "title": "Mark as finished"
+      },
+      "keep": "Not now",
+      "message": "Message for {name}",
+      "messagePlaceholder": "We send it with the notification",
+      "notice": "{name} gets a notification.",
+      "options": "Options for {name}",
+      "optionsLabel": "What to do with the plan",
+      "pause": {
+        "confirm": "Pause the plan",
+        "detail": "Resume it any time. Its days wait, and when it resumes the ones still to do move forward by whole weeks, so none counts as missed.",
+        "title": "Pause it"
+      },
+      "title": "{name}'s plan"
+    },
+    "builder": {
       "clearDayAria": "Clear {name}",
+      "clearWeek": {
+        "body": "{days, plural, one {Its # training day comes off, and the week becomes rest.} other {Its # training days come off, and the week becomes rest.}} The weeks after it stay where they are.",
+        "title": "Clear week {week}?"
+      },
+      "clientsNotice": "{count, plural, one {# client already follows this program.} other {# clients already follow this program.}} What you change here only applies to new assignments.",
       "copyDayAria": "Copy {name} to other weeks",
+      "dayEmpty": "No exercises yet",
+      "dayMeta": "{count, plural, one {# exercise} other {# exercises}} · ~{minutes} min",
       "daysFilled": "{filled} of {total} days",
       "deleteWeek": {
-        "body": "{days, plural, =0 {This week is empty.} one {Its # day of work is removed.} other {Its # days of work are removed.}} The weeks after it move up, and the program becomes {weeks, plural, one {# week} other {# weeks}} long.",
-        "title": "Delete week {week}"
+        "body": "{days, plural, =0 {Week {week} is all rest days.} one {Its # training day goes with it.} other {Its # training days go with it.}}",
+        "confirm": "Delete week {week}",
+        "ends": "The program ends up with {weeks, plural, one {# week} other {# weeks}}.",
+        "shift": "{count, plural, one {Week {from} moves up and becomes week {to}.} other {Weeks {from} to {last} move up and become weeks {to} to {newLast}.}} The program ends up with {weeks, plural, one {# week} other {# weeks}}.",
+        "title": "Delete week {week}?"
       },
-      "deleteWeekAria": "Delete week {week}",
       "emptyWeek": "No training yet",
       "error": "Couldn't open this program",
       "jumpToWeek": "Jump to week",
+      "publish": {
+        "checklist": "Before you can publish",
+        "hasDays": "At least one day with exercises",
+        "named": "Has a name",
+        "noDays": "No day has exercises yet",
+        "openFirstDay": "Open day 1",
+        "ready": "{weeks, plural, one {# week} other {# weeks}}, {days, plural, one {# day} other {# days}} with exercises. After publishing you can assign it.",
+        "unnamed": "Give the program a name"
+      },
       "restDay": "Rest · tap to add",
       "subtitle": "{weeks, plural, one {# week} other {# weeks}} · {days, plural, one {# day} other {# days}} of work",
       "titleFallback": "Program",
       "toast": {
+        "addWeekFailed": "Could not add the week",
+        "clearWeekFailed": "Could not clear the week",
         "copyDayFailed": "Could not copy the day",
         "copyWeekFailed": "Could not copy the week",
+        "dayCleared": "{day} is now a rest day",
         "dayCopiedToDay": "{name} copied to {day}, week {week}",
         "dayCopiedToWeek": "{name} copied to week {week}",
         "dayCopiedToWeeks": "{name} copied to {count, plural, one {# week} other {# weeks}}",
@@ -2572,9 +2621,20 @@
         "startFailed": "Could not start the program",
         "weekCopiedToWeek": "Week {from} copied to week {week}",
         "weekCopiedToWeeks": "Week {from} copied to {count, plural, one {# week} other {# weeks}}",
+        "weekAdded": "Week {week} added after week {after}",
+        "weekCleared": "Week {week} is now rest",
         "weekDeleted": "Week {week} deleted"
       },
-      "untitledProgram": "Untitled program"
+      "untitledProgram": "Untitled program",
+      "weekActionsAria": "Actions for week {week}",
+      "weekMenu": {
+        "clear": "Clear the week (it becomes rest)",
+        "clientsKeepCopy": "{count, plural, one {The client following it keeps their copy unchanged.} other {The # clients following it keep their copy unchanged.}}",
+        "copy": "Copy to other weeks",
+        "delete": "Delete the week",
+        "insertAfter": "Add a week after it",
+        "subtitle": "{count, plural, =0 {No exercises yet} one {# day with exercises} other {# days with exercises}}"
+      }
     },
     "common": {
       "clientFallback": "Client",
@@ -2585,6 +2645,48 @@
     "copy": {
       "toEllipsis": "Copy to…",
       "toWeeks": "Copy to {count, plural, one {# week} other {# weeks}}"
+    },
+    "clientCopy": {
+      "averageEffort": "Average effort {value} of 10",
+      "badge": {
+        "added": "Added for {name}",
+        "changed": "Changed for {name}",
+        "replaced": "Replaced"
+      },
+      "banner": "Changes reach only {name}. {program} stays as it is.",
+      "changeStatus": "Pause, finish or cancel",
+      "date": "Date",
+      "dateHint": "Move it to a free day inside the plan.",
+      "dayChanged": "Changed",
+      "dayLocked": "{lock, select, DONE {This day is done, so it can't change.} SKIPPED {This day was skipped, so it can't change.} STARTED {This day has been started, so it can't change.} PAST {This day's date has passed, so it can't change.} other {This plan is no longer running, so its days can't change.}}",
+      "doneNotice": "{name} gets one notification about your changes when you tap Done.",
+      "doneWeeks": "{count, plural, one {Week {first} is done. You see it in Training, but can't change it.} =2 {Weeks {first} and {last} are done. You see them in Training, but can't change them.} other {Weeks {first} to {last} are done. You see them in Training, but can't change them.}}",
+      "editCopy": "Edit {name}'s copy",
+      "error": "Couldn't open this copy",
+      "inProgram": "In the program: {line}",
+      "insteadOf": "Instead of {name}",
+      "lastTime": "Last time · {date}",
+      "lock": {
+        "DONE": "Done",
+        "PAST": "Past",
+        "SKIPPED": "Skipped",
+        "STARTED": "Started"
+      },
+      "planClosed": "This plan is no longer running, so its days can't change.",
+      "removeBody": "Remove {name} from {client}'s day? The program keeps it.",
+      "revert": {
+        "action": "Back to the program's values",
+        "aria": "Put {name} back to the program's values",
+        "body": "{client}'s changes to {name} are replaced by what the program asks for now.",
+        "confirm": "Use the program's values",
+        "title": "Back to the program's values?"
+      },
+      "title": "{name}'s copy",
+      "toast": {
+        "doneFailed": "Could not finish editing the copy",
+        "moveFailed": "Could not move the day",
+        "notified": "{name} gets a notification about the changes."
+      }
     },
     "copyDay": {
       "dayGroup": "Day to copy into",
@@ -2611,6 +2713,8 @@
     },
     "dayEditor": {
       "addExercises": "Add exercises",
+      "addWarmup": "Warm-up",
+      "addWarmupFor": "Add a warm-up set to {name}",
       "contextFallback": "this day",
       "dayName": "Day name",
       "dayNamePlaceholder": "Push day",
@@ -2621,20 +2725,49 @@
       },
       "exerciseFallback": "Exercise",
       "exercises": "Exercises",
+      "exercisesMeta": "{count} · ~{minutes} min",
       "noteLabel": "Note for the client",
       "remove": {
         "body": "Remove {name} from this day?",
         "title": "Remove exercise"
       },
+      "superset": {
+        "restAfter": "{count, plural, =2 {Rest after both · {value}} other {Rest after all # · {value}}}",
+        "restAria": "Rest after a round of superset {number}",
+        "title": "Superset",
+        "unlink": "Unlink",
+        "unlinkAria": "Unlink superset {number}"
+      },
+      "targets": {
+        "addNote": "Note",
+        "addRpe": "Target RPE",
+        "addTempo": "Tempo",
+        "editNote": "Edit note",
+        "mode": "How the targets are set for {name}",
+        "noRpe": "No target",
+        "noTempo": "No tempo",
+        "noteHint": "Your client sees it on this exercise.",
+        "noteLabel": "Note for the client",
+        "notePlaceholder": "Pause one second at the bottom",
+        "noteTitle": "Note for the client on {name}",
+        "rpe": "RPE {value}",
+        "rpeFootnote": "How hard the working sets should feel, out of 10: at 10 nothing is left, at 8 about two more reps are.",
+        "rpeTitle": "Target RPE for {name}",
+        "tempo": "Tempo {value}",
+        "tempoFootnote": "Seconds lowering, held at the bottom, lifting, held at the top. 3-1-1-0 is three down, one held, one up.",
+        "tempoTitle": "Tempo for {name}"
+      },
       "titleFallback": "Day",
       "toast": {
-        "saveFailed": "Could not save the day",
-        "someNotAdded": "Some exercises were not added"
+        "notAdded": "Could not add the exercises",
+        "saveFailed": "Could not save the day"
       },
       "untitledDay": "Untitled day",
       "rest": {
         "day": "Rest for this day",
-        "program": "Program default",
+        "dayRow": "Rest between sets, the day's default",
+        "dayRowHint": "Each exercise can change it",
+        "exerciseInherited": "Rest for {name}, same as the day ({value})",
         "sameAsDay": "Same as the day ({value})",
         "sameAsProgram": "Same as the program ({value})",
         "fromProgram": "Program ({value})",
@@ -2686,8 +2819,14 @@
     },
     "row": {
       "daysPerWeek": "{count} days/week",
+      "edited": {
+        "onDate": "Edited {date}",
+        "today": "Edited today",
+        "yesterday": "Edited yesterday"
+      },
       "noClients": "No clients",
-      "routine": "Routine"
+      "routine": "Routine",
+      "routineExercises": "Routine · {count, plural, one {# exercise} other {# exercises}}"
     },
     "settings": {
       "delete": {
@@ -2699,11 +2838,6 @@
       "length": "Length",
       "lengthAria": "Program length in weeks",
       "namePlaceholder": "12-week strength block",
-      "needs": {
-        "both": "Needs a name and at least one day of work before it can be assigned.",
-        "days": "Needs at least one day of work before it can be assigned.",
-        "name": "Needs a name before it can be assigned."
-      },
       "newWeeks": {
         "copy": "{built, plural, one {Copy the training from week 1 into {empty, plural, one {it} other {them}}} =2 {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 and 2} other {Fill {empty, plural, one {it} other {them}} by repeating weeks 1 to {built}}}",
         "leaveEmpty": "{empty, plural, one {Leave it empty for now} other {Leave them empty for now}}",
@@ -3396,6 +3530,26 @@
       "thisWeek": "This week",
       "title": "Plan",
       "yourCoach": "your coach"
+    },
+    "planStatus": {
+      "cancelled": {
+        "line": "{coach} cancelled it on {date}. {count, plural, =0 {You hadn't finished a workout in it yet.} one {The workout you finished stays in your history.} other {The # finished workouts stay in your history.}}",
+        "lineNoDate": "{coach} cancelled it. {count, plural, =0 {You hadn't finished a workout in it yet.} one {The workout you finished stays in your history.} other {The # finished workouts stay in your history.}}"
+      },
+      "coachMessage": "From {coach}",
+      "finished": {
+        "byCoach": "{coach} marked it as finished on {date}, at {percent}% done.",
+        "byCoachNoDate": "{coach} marked it as finished, at {percent}% done.",
+        "done": "Every day of it is behind you, {percent}% done."
+      },
+      "messageCoach": "Message {coach}",
+      "messageYourCoach": "Message your coach",
+      "openPlan": "Open the plan",
+      "paused": {
+        "noDate": "Paused. {coach} resumes it when it's time. Paused days don't count as missed.",
+        "since": "Paused since {date}. {coach} resumes it when it's time. Paused days don't count as missed."
+      },
+      "seeWhatYouDid": "See what you did"
     },
     "postToGroup": {
       "caption": "Caption",

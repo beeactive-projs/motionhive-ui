@@ -1,3 +1,7 @@
+/* The routine builder's own pieces: the set table of an exercise planned set
+   by set, and the rest and link chips. A coach's day and a person's routine
+   are the same table. */
+@use '../../workouts/_components/set-row/set-table';
 @use '../../workouts/_components/plan-chips/plan-chips';
 
 /* Where in the plan this day sits, in the honey ink: it names the position,
@@ -6,55 +10,133 @@
   color: var(--mh-color-honey-deep);
 }
 
-/* The one control under an exercise, at the card's far edge. */
-.controls {
-  display: flex;
-  justify-content: flex-end;
-}
-
 ion-card ion-skeleton-text {
   margin: 0.375rem 0;
 }
 
-/* This day's rest beside the program's: tap either to change it. */
-.rest-tiles {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.rest-tile {
+/* A block is one exercise, or a superset's cards together: the page's
+   rhythm between blocks, a tighter one between the cards of a superset. */
+.block {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
-  min-height: var(--mh-tap-target);
-  padding: 0.625rem 0.75rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-  color: var(--ion-text-color);
-  cursor: pointer;
-  text-align: start;
 }
 
-.rest-tile .mh-kicker {
-  color: var(--ion-color-medium);
+.block.superset {
+  gap: 0.5rem;
 }
 
-.rest-tile strong {
-  font-size: var(--mh-text-base);
-  font-variant-numeric: tabular-nums;
+/* The superset's head: what it is, the rest after a round, and Unlink. */
+.superset-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: var(--mh-row-gutter);
 }
 
-/* The rest and link chips' skin is shared with the routine builder; here
-   only where the rest chip sits, at the start of the controls. */
-.rest-chip {
-  margin-inline-end: auto;
+.superset-head .unlink {
+  --color: var(--mh-color-honey-deep);
+  margin: 0 0 0 auto;
+  font-weight: 400;
+}
+
+/* Same for every set, or set by set: the first thing under the card's head. */
+.target-mode {
+  margin-bottom: 0.625rem;
+}
+
+/* Under the targets: the rest chip, the optional targets, Remove at the far
+   edge. Inset like the rows above it; wraps when the text is large. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+  padding-inline: calc(0.25rem + var(--mh-ring-width));
+}
+
+.controls .text-action {
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0.5rem;
+  position: relative;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* A finger's 44px for the quiet text action, inside the controls row. */
+.controls .text-action::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--mh-tap-target) - 100%) / -2);
+  inset-inline: 0;
+}
+
+.controls .mh-remove {
+  margin-inline-start: auto;
 }
 
 .cascade {
   margin-top: 0.5rem;
+}
+
+/* A client's copy (design ClientCopy). Its label against the program and,
+   under a replaced exercise, what it stands in for. */
+.copy-flags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.copy-flags .instead {
+  font-size: var(--mh-text-sm);
+  color: var(--ion-color-medium);
+}
+
+/* The client's last time on it: a soft box on the card, the figures in
+   tabular numerals so the reps line up. */
+.last-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-bottom: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--mh-color-divider);
+}
+
+.last-result .when,
+.last-result .effort {
+  font-size: var(--mh-text-sm);
+  color: var(--ion-color-medium);
+}
+
+.last-result .sets {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+/* What the program asks for now, and the way back to it. */
+.program-line {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-top: 0.625rem;
+  padding-inline: calc(0.25rem + var(--mh-ring-width));
+  font-size: var(--mh-text-sm);
+  color: var(--ion-color-medium);
+}
+
+.program-line .revert {
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0;
 }
 
 button:focus-visible {

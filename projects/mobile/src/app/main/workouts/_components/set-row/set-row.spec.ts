@@ -53,6 +53,15 @@ function row(inputs: Record<string, unknown> = {}) {
 const texts = (setRow: SetRow) => setRow.cells().map((cell) => [cell.text, cell.prefill]);
 
 describe('SetRow', () => {
+  // A coach's program day has no last time: the Previous column goes, the
+  // fields stay as they are.
+  it('keeps the Previous column unless there is no history to show', () => {
+    expect(row({}).history()).toBe(true);
+    const planned = row({ history: false, set: set({ reps: 8 }) });
+    expect(planned.history()).toBe(false);
+    expect(planned.cells().map((cell) => cell.field)).toEqual(kgReps);
+  });
+
   it('shows what was typed, else the grey pre-fill', () => {
     const setRow = row({
       set: set({ reps: 10 }),

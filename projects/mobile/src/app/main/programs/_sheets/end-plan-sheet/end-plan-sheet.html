@@ -1,0 +1,54 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-radio-group
+        [attr.aria-label]="'programs.endPlan.optionsLabel' | translate"
+        [value]="choice()"
+        (ionChange)="pick($event.detail.value)"
+      >
+        @for (option of options(); track option.value) {
+          <ion-item [class.danger]="option.danger">
+            <ion-radio [value]="option.value" justify="start" labelPlacement="end">
+              <span class="option-title">{{ option.title }}</span>
+              <span class="option-detail">{{ option.detail }}</span>
+            </ion-radio>
+          </ion-item>
+        }
+      </ion-radio-group>
+    </ion-list>
+
+    <ion-textarea
+      mode="md"
+      fill="outline"
+      labelPlacement="stacked"
+      [label]="messageLabel()"
+      [placeholder]="'programs.endPlan.messagePlaceholder' | translate"
+      [autoGrow]="true"
+      [rows]="2"
+      [maxlength]="messageMax"
+      [value]="message()"
+      (ionInput)="message.set($event.detail.value ?? '')"
+    />
+
+    <!-- The API tells the client once the change is saved; the sheet says so. -->
+    <ion-note class="notice">
+      <ion-icon name="notifications-outline" aria-hidden="true" />
+      {{ notice() }}
+    </ion-note>
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [subtitle]="subtitle()"
+  [body]="body"
+  [saveLabel]="confirmLabel()"
+  [saveColor]="confirmColor()"
+  [dismissLabel]="'programs.endPlan.keep' | translate"
+  [canSave]="!!choice()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  (save)="submit()"
+/>

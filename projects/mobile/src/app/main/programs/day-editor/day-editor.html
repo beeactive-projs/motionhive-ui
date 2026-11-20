@@ -35,105 +35,412 @@
     </div>
   } @else if (workout()) {
     <div class="mh-page">
+      <!-- One client's copy: whose it is, and that the program stays as it is. -->
+      @if (copyHeader(); as header) {
+        <mh-copy-banner [client]="copyClient()" [title]="header.title" [line]="header.banner" />
+      }
+
       <span class="mh-kicker eyebrow">{{ eyebrow() }}</span>
 
-      <ion-input mode="md"
-        fill="outline"
-        [label]="'programs.dayEditor.dayName' | translate"
-        labelPlacement="stacked"
-        [placeholder]="'programs.dayEditor.dayNamePlaceholder' | translate"
-        [value]="name()"
-        (ionInput)="name.set($any($event).detail.value ?? '')"
-        (ionBlur)="saveFields()"
-      />
+      @if (copyLockNote(); as note) {
+        <mh-notice role="status">{{ note }}</mh-notice>
+      }
 
-      <ion-textarea mode="md"
-        fill="outline"
-        [label]="'programs.dayEditor.noteLabel' | translate"
-        labelPlacement="stacked"
-        [autoGrow]="true"
-        [placeholder]="'programs.common.notePlaceholder' | translate"
-        [value]="note()"
-        (ionInput)="note.set($any($event).detail.value ?? '')"
-        (ionBlur)="saveFields()"
-      />
+      @if (isCopy) {
+        <!-- The day's date: a free one inside the plan, never in the past. -->
+        <section class="mh-section">
+          <ion-list [inset]="true" class="mh-card-list">
+            <ion-item>
+              <ion-label>{{ 'programs.clientCopy.date' | translate }}</ion-label>
+              <ion-datetime-button slot="end" datetime="copy-day-date" [disabled]="saving()" />
+            </ion-item>
+          </ion-list>
+          <p class="mh-footnote">{{ 'programs.clientCopy.dateHint' | translate }}</p>
+        </section>
 
-      <!-- Rest: this day's, and the program's for every day that sets none. -->
-      <div class="rest-tiles">
-        <button type="button" class="rest-tile" (click)="openRest('day')">
-          <span class="mh-kicker">{{ 'programs.dayEditor.rest.day' | translate }}</span>
-          <strong>{{ dayRestLabel() }}</strong>
-        </button>
-        <button type="button" class="rest-tile" (click)="openRest('program')">
-          <span class="mh-kicker">{{ 'programs.dayEditor.rest.program' | translate }}</span>
-          <strong>{{ programRestLabel() }}</strong>
-        </button>
-      </div>
+        <!-- Detached: `ion-modal` relocates itself when it presents. -->
+        <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime
+              id="copy-day-date"
+              presentation="date"
+              [locale]="locale()"
+              [showDefaultButtons]="true"
+              [min]="copyMin()"
+              [max]="copyMax()"
+              [isDateEnabled]="dateEnabled"
+              [value]="copyDate()"
+              (ionChange)="moveDate($event.detail.value)"
+            />
+          </ng-template>
+        </ion-modal>
+      } @else {
+        <ion-input
+          mode="md"
+          fill="outline"
+          [label]="'programs.dayEditor.dayName' | translate"
+          labelPlacement="stacked"
+          [placeholder]="'programs.dayEditor.dayNamePlaceholder' | translate"
+          [value]="name()"
+          (ionFocus)="closePad()"
+          (ionInput)="name.set($event.detail.value ?? '')"
+          (ionBlur)="saveFields()"
+        />
+
+        <ion-textarea
+          mode="md"
+          fill="outline"
+          [label]="'programs.dayEditor.noteLabel' | translate"
+          labelPlacement="stacked"
+          [autoGrow]="true"
+          [placeholder]="'programs.common.notePlaceholder' | translate"
+          [value]="note()"
+          (ionFocus)="closePad()"
+          (ionInput)="note.set($event.detail.value ?? '')"
+          (ionBlur)="saveFields()"
+        />
+
+        <!-- The day's rest between sets; each exercise can set its own (its chip). -->
+        <ion-list [inset]="true" class="mh-card-list">
+          <mh-settings-row
+            [label]="'programs.dayEditor.rest.dayRow' | translate"
+            icon="time-outline"
+            iconColor="coral"
+            [value]="dayRestLabel()"
+            [note]="'programs.dayEditor.rest.dayRowHint' | translate"
+            (select)="openRest(DayRest)"
+          />
+        </ion-list>
+      }
 
       <section class="mh-section">
         <div class="mh-section-head">
           <span class="mh-kicker">{{ 'programs.dayEditor.exercises' | translate }}</span>
-          @if (exercises().length) {
-            <ion-note>{{ exercises().length }}</ion-note>
+          @if (exercisesMeta()) {
+            <ion-note>{{ exercisesMeta() }}</ion-note>
           }
         </div>
 
-        @for (row of exercises(); track row.id; let i = $index) {
-          <mh-exercise-card [name]="exerciseName(row)" [meta]="setsLabel(row)" [tag]="tags()[i]" (open)="openExercise(row)">
-            <div class="controls">
-              <button
-                type="button"
-                class="rest-chip"
-                [class.own]="!!restChip(row)"
-                [disabled]="saving()"
-                [attr.aria-label]="'workouts.routineBuilder.rest.exercise' | translate: { name: exerciseName(row) }"
-                (click)="openRest(row)"
-              >
-                <ion-icon name="time-outline" aria-hidden="true" />
-                {{ restChip(row) || ('workouts.routineBuilder.rest.chip' | translate) }}
-              </button>
-              <ion-button
-                class="mh-remove"
-                fill="outline"
-                color="danger"
-                [attr.aria-label]="'a11y.removeItem' | translate: { name: exerciseName(row) }"
-                (click)="askRemove(row)"
-              >
-                <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
-              </ion-button>
-            </div>
-          </mh-exercise-card>
+        @for (block of blocks(); track block.key; let last = $last) {
+          <!-- A superset is one block: its members' cards under one head that
+               says the rest after a round, with Unlink beside it. -->
+          <div class="block" [class.superset]="block.superset">
+            @if (block.superset) {
+              <div class="superset-head">
+                <span class="mh-kicker">{{ 'programs.dayEditor.superset.title' | translate }}</span>
+                <button
+                  type="button"
+                  class="rest-chip own"
+                  [attr.aria-label]="'programs.dayEditor.superset.restAria' | translate: { number: block.number }"
+                  (click)="openRest(block.key)"
+                >
+                  <ion-icon name="time-outline" aria-hidden="true" />
+                  {{ block.restLabel }}
+                </button>
+                @if (!isCopy) {
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    class="unlink"
+                    [disabled]="saving()"
+                    [attr.aria-label]="'programs.dayEditor.superset.unlinkAria' | translate: { number: block.number }"
+                    (click)="unlink(block)"
+                  >
+                    <ion-icon slot="start" name="unlink-outline" aria-hidden="true" />
+                    {{ 'programs.dayEditor.superset.unlink' | translate }}
+                  </ion-button>
+                }
+              </div>
+            }
 
-          @if (i < exercises().length - 1) {
+            @for (view of block.members; track view.row.key) {
+              <mh-exercise-card
+                [name]="view.row.name"
+                [meta]="view.meta"
+                [kind]="view.row.kind"
+                [imageUrl]="view.row.thumbnailUrl"
+                [tag]="view.tag"
+                [planNote]="view.row.notes"
+                [showActions]="view.canMove || isCopy"
+                (open)="openExercise(view.row)"
+                (actions)="openMove(view.row)"
+              >
+                @if (view.copy; as card) {
+                  <!-- On a client's copy: how it differs from the program, then
+                       the client's last time on it, beside the targets. -->
+                  @if (card.badge || card.insteadOf) {
+                    <div class="copy-flags">
+                      @if (card.badge) {
+                        <ion-badge data-tone="neutral">{{ card.badge }}</ion-badge>
+                      }
+                      @if (card.insteadOf) {
+                        <span class="instead">{{ card.insteadOf }}</span>
+                      }
+                    </div>
+                  }
+                  @if (card.last; as last) {
+                    <div class="last-result">
+                      <span class="when">{{ last.when }}</span>
+                      <span class="sets">{{ last.sets }}</span>
+                      @if (last.effort) {
+                        <span class="effort">{{ last.effort }}</span>
+                      }
+                    </div>
+                  }
+                }
+
+                <!-- The same targets for every set, or set by set. -->
+                <ion-segment
+                  class="target-mode"
+                  [value]="view.mode"
+                  [attr.aria-label]="'programs.dayEditor.targets.mode' | translate: { name: view.row.name }"
+                  (ionChange)="setMode(view.row, $event.detail.value)"
+                >
+                  <ion-segment-button [value]="TargetModes.All">
+                    <ion-label>{{ 'workouts.routineBuilder.plan.sameForAll' | translate }}</ion-label>
+                  </ion-segment-button>
+                  <ion-segment-button [value]="TargetModes.PerSet">
+                    <ion-label>{{ 'workouts.routineBuilder.plan.perSet' | translate }}</ion-label>
+                  </ion-segment-button>
+                </ion-segment>
+
+                @if (!view.row.perSet) {
+                  <!-- Sets, then reps or time, then weight: one row each, a
+                       value opens the number pad for every set. -->
+                  <mh-plan-steppers
+                    [exercise]="view.row"
+                    [active]="view.activeField"
+                    [preview]="view.preview"
+                    (step)="stepTarget(view.row, $event)"
+                    (edit)="editAll(view.row, $event)"
+                  />
+                } @else {
+                  <div class="sets">
+                    <mh-set-table-head
+                      [fields]="view.fields"
+                      [unilateral]="view.row.unilateral"
+                      [tickable]="false"
+                      [history]="false"
+                    />
+                    @for (row of view.rows; track row.set.key) {
+                      <!-- As in the routine builder: swipe right to copy the
+                           set, left to delete it. Never while it is in the pad. -->
+                      <ion-item-sliding
+                        #sliding
+                        class="set-slide mh-swipe-row"
+                        [disabled]="row.editing !== null"
+                      >
+                        <ion-item lines="none" class="set-item">
+                          <mh-set-row
+                            [attr.data-editing]="row.marker"
+                            [set]="row.set"
+                            [mode]="Modes.Future"
+                            [badge]="row.badge"
+                            [fields]="view.fields"
+                            [editing]="row.editing"
+                            [draft]="row.draft"
+                            [tickable]="false"
+                            [history]="false"
+                            [unilateral]="view.row.unilateral"
+                            [texts]="row.texts"
+                            (edit)="editCell(view.row, row.set, $event)"
+                            (menu)="openMenu(view.row, row.set, row.badge)"
+                          />
+                        </ion-item>
+                        <ion-item-options side="start" (ionSwipe)="swipeCopy(sliding, view.row, row.set)">
+                          <ion-item-option
+                            color="teal"
+                            [expandable]="true"
+                            (click)="swipeCopy(sliding, view.row, row.set)"
+                          >
+                            <ion-icon slot="top" name="copy-outline" aria-hidden="true" />
+                            {{ 'button.copy' | translate }}
+                          </ion-item-option>
+                        </ion-item-options>
+                        <ion-item-options side="end" (ionSwipe)="swipeDelete(sliding, view.row, row.set)">
+                          <ion-item-option
+                            color="danger"
+                            [expandable]="true"
+                            (click)="swipeDelete(sliding, view.row, row.set)"
+                          >
+                            <ion-icon slot="top" name="trash-outline" aria-hidden="true" />
+                            {{ 'button.delete' | translate }}
+                          </ion-item-option>
+                        </ion-item-options>
+                      </ion-item-sliding>
+                    }
+                  </div>
+
+                  <div class="ex-actions">
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      [attr.aria-label]="'workouts.routineBuilder.plan.addSetFor' | translate: { name: view.row.name }"
+                      (click)="addSet(view.row)"
+                    >
+                      <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                      {{ 'workouts.logger.addSet' | translate }}
+                    </ion-button>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      [attr.aria-label]="'programs.dayEditor.addWarmupFor' | translate: { name: view.row.name }"
+                      (click)="addWarmup(view.row)"
+                    >
+                      <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                      {{ 'programs.dayEditor.addWarmup' | translate }}
+                    </ion-button>
+                  </div>
+                }
+
+                @if (view.copy; as card) {
+                  <!-- What the program asks for now, and the way back to it. -->
+                  @if (card.programLine || card.canRevert) {
+                    <div class="program-line">
+                      @if (card.programLine) {
+                        <span>{{ card.programLine }}</span>
+                      }
+                      @if (card.canRevert) {
+                        <ion-button
+                          class="mh-text-link revert"
+                          fill="clear"
+                          size="small"
+                          [disabled]="saving()"
+                          [attr.aria-label]="'programs.clientCopy.revert.aria' | translate: { name: view.row.name }"
+                          (click)="askRevert(view.row)"
+                        >
+                          {{ 'programs.clientCopy.revert.action' | translate }}
+                        </ion-button>
+                      }
+                    </div>
+                  }
+                }
+
+                <!-- Its own rest (in a superset, the block's), then the
+                     optional targets, and taking it out at the far edge. -->
+                <div class="controls">
+                  @if (!view.inSuperset) {
+                    <button
+                      type="button"
+                      class="rest-chip"
+                      [class.own]="!!view.restChip"
+                      [attr.aria-label]="view.restName"
+                      (click)="openRest(view.row.key)"
+                    >
+                      <ion-icon name="time-outline" aria-hidden="true" />
+                      {{ view.restText }}
+                    </button>
+                  }
+
+                  <button
+                    type="button"
+                    class="rest-chip"
+                    [class.own]="!!view.rpe"
+                    [attr.aria-label]="'programs.dayEditor.targets.rpeTitle' | translate: { name: view.row.name }"
+                    (click)="openRpe(view.row)"
+                  >
+                    @if (view.rpe) {
+                      {{ view.rpe }}
+                    } @else {
+                      <ion-icon name="add-outline" aria-hidden="true" />
+                      {{ 'programs.dayEditor.targets.addRpe' | translate }}
+                    }
+                  </button>
+
+                  <button
+                    type="button"
+                    class="rest-chip"
+                    [class.own]="!!view.tempo"
+                    [attr.aria-label]="'programs.dayEditor.targets.tempoTitle' | translate: { name: view.row.name }"
+                    (click)="openTempo(view.row)"
+                  >
+                    @if (view.tempo) {
+                      {{ 'programs.dayEditor.targets.tempo' | translate: { value: view.tempo } }}
+                    } @else {
+                      <ion-icon name="add-outline" aria-hidden="true" />
+                      {{ 'programs.dayEditor.targets.addTempo' | translate }}
+                    }
+                  </button>
+
+                  <button
+                    type="button"
+                    class="rest-chip"
+                    [class.own]="!!view.row.notes"
+                    [attr.aria-label]="'programs.dayEditor.targets.noteTitle' | translate: { name: view.row.name }"
+                    (click)="openNote(view.row)"
+                  >
+                    @if (view.row.notes) {
+                      <ion-icon name="create-outline" aria-hidden="true" />
+                      {{ 'programs.dayEditor.targets.editNote' | translate }}
+                    } @else {
+                      <ion-icon name="add-outline" aria-hidden="true" />
+                      {{ 'programs.dayEditor.targets.addNote' | translate }}
+                    }
+                  </button>
+
+                  <!-- Weighted pull-ups and dips still deserve a target weight. -->
+                  @if (view.canAddWeight && !view.row.perSet) {
+                    <ion-button
+                      class="text-action"
+                      fill="clear"
+                      size="small"
+                      [attr.aria-label]="'workouts.routineBuilder.plan.addWeightFor' | translate: { name: view.row.name }"
+                      (click)="addWeight(view.row)"
+                    >
+                      <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                      {{ 'workouts.logger.addWeight' | translate }}
+                    </ion-button>
+                  }
+
+                  <ion-button
+                    class="mh-remove"
+                    fill="outline"
+                    color="danger"
+                    [disabled]="saving()"
+                    [attr.aria-label]="'a11y.removeItem' | translate: { name: view.row.name }"
+                    (click)="askRemove(view.row)"
+                  >
+                    <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+                  </ion-button>
+                </div>
+              </mh-exercise-card>
+            }
+          </div>
+
+          <!-- After a block: link it with the next as a superset. A client's
+               copy keeps the program's supersets as they are. -->
+          @if (!last && !isCopy) {
             <div class="link-row">
               <button
                 type="button"
                 class="link-chip"
-                [class.linked]="linkedToNext(i)"
                 [disabled]="saving()"
-                [attr.aria-label]="
-                  (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlinkFor' : 'workouts.routineBuilder.superset.linkFor')
-                    | translate: { a: exerciseName(row), b: exerciseName(exercises()[i + 1]) }
-                "
-                (click)="toggleLink(i)"
+                [attr.aria-label]="block.linkLabel"
+                (click)="linkWithNext(block)"
               >
                 <ion-icon name="link-outline" aria-hidden="true" />
-                {{ (linkedToNext(i) ? 'workouts.routineBuilder.superset.unlink' : 'workouts.routineBuilder.superset.link') | translate }}
+                {{ 'workouts.routineBuilder.superset.link' | translate }}
               </button>
             </div>
           }
         }
 
-        @if (exercises().length) {
-          <p class="mh-helper cascade">{{ 'programs.dayEditor.rest.cascade' | translate }}</p>
-        }
-
-        @if (!exercises().length) {
+        @if (drafts().length) {
+          @if (!isCopy) {
+            <p class="mh-helper cascade">{{ 'programs.dayEditor.rest.cascade' | translate }}</p>
+          }
+        } @else {
           <ion-note class="mh-note-block">{{ 'programs.dayEditor.empty' | translate }}</ion-note>
         }
       </section>
 
-      <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="pickerOpen.set(true)">
+      <ion-button
+        class="mh-add-dashed"
+        expand="block"
+        fill="outline"
+        [disabled]="saving()"
+        (click)="openPicker()"
+      >
         <ion-icon slot="start" name="add-outline" aria-hidden="true" />
         {{ 'programs.dayEditor.addExercises' | translate }}
       </ion-button>
@@ -141,10 +448,30 @@
   }
 </ion-content>
 
+@if (editing() !== null) {
+  <ion-footer>
+    <mh-numeric-keypad
+      [field]="keypadField()"
+      [label]="keypadLabel()"
+      [value]="draft()"
+      [cell]="editingKey()"
+      [replaceOnType]="true"
+      [actionLabel]="keypadAction().label"
+      [actionIcon]="keypadAction().icon"
+      [actionIconSlot]="keypadAction().slot"
+      (commit)="onPadAction($event)"
+      (preview)="typed.set($event)"
+      (dismiss)="closePad()"
+    />
+  </ion-footer>
+}
+
 <mh-exercise-picker-sheet
   [(open)]="pickerOpen"
-  [title]="'programs.dayEditor.addExercises' | translate"
+  [title]="pickerTitle()"
   [context]="name() || ('programs.dayEditor.contextFallback' | translate)"
+  [confirmVerb]="pickerVerb()"
+  [single]="swapFor() !== null"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
 />
@@ -157,6 +484,50 @@
   (picked)="pickRest($event)"
 />
 
+<mh-choice-sheet
+  [(open)]="rpeOpen"
+  [title]="rpeTitle()"
+  [options]="rpeChoices()"
+  [selected]="rpeSelected()"
+  [footnote]="'programs.dayEditor.targets.rpeFootnote' | translate"
+  (picked)="pickRpe($event)"
+/>
+
+<mh-choice-sheet
+  [(open)]="tempoOpen"
+  [title]="tempoTitle()"
+  [options]="tempoChoices()"
+  [selected]="tempoSelected()"
+  [footnote]="'programs.dayEditor.targets.tempoFootnote' | translate"
+  (picked)="pickTempo($event)"
+/>
+
+<mh-plan-note-sheet
+  [(open)]="noteOpen"
+  [exerciseName]="noteName()"
+  [note]="noteValue()"
+  [saving]="saving()"
+  (save)="saveNote($event)"
+/>
+
+<mh-action-sheet
+  [(open)]="moveOpen"
+  [title]="moveTitle()"
+  [actions]="moveActions()"
+  (chosen)="onMove($event)"
+/>
+
+<mh-set-menu-sheet
+  [(open)]="menuOpen"
+  [set]="menuSet()"
+  [badge]="menuBadge()"
+  [noteable]="true"
+  (typeChange)="onSetType($event)"
+  (noteChange)="onSetNote($event)"
+  (remove)="onSetRemove()"
+  (duplicate)="onSetCopy()"
+/>
+
 <mh-confirm-sheet
   [(open)]="removeOpen"
   [title]="'programs.dayEditor.remove.title' | translate"
@@ -165,4 +536,13 @@
   [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   (confirm)="confirmRemove()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="revertOpen"
+  [title]="'programs.clientCopy.revert.title' | translate"
+  [body]="revertBody()"
+  [confirmLabel]="'programs.clientCopy.revert.confirm' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
+  (confirm)="confirmRevert()"
 />

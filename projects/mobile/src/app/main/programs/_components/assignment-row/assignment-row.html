@@ -33,19 +33,9 @@
     </div>
   </ion-label>
 
-  <!-- The verb stops the tap here, so pausing never also opens the row.
+  <!-- The verbs stop the tap here, so they never also open the row.
        Quiet, as a person row's verb is: the screen's honey is elsewhere. -->
-  @if (canPause()) {
-    <ion-button
-      slot="end"
-      class="mh-row-action mh-quiet"
-      fill="outline"
-      [disabled]="busy()"
-      (click)="pause.emit(); $event.stopPropagation()"
-    >
-      {{ 'programs.assignment.pause' | translate }}
-    </ion-button>
-  } @else if (canResume()) {
+  @if (canResume()) {
     <ion-button
       slot="end"
       class="mh-row-action mh-quiet"
@@ -54,6 +44,20 @@
       (click)="resume.emit(); $event.stopPropagation()"
     >
       {{ 'button.resume' | translate }}
+    </ion-button>
+  }
+  @if (canChange()) {
+    <ion-button
+      slot="end"
+      class="more"
+      fill="clear"
+      shape="round"
+      color="medium"
+      [disabled]="busy()"
+      [attr.aria-label]="optionsLabel()"
+      (click)="options.emit(); $event.stopPropagation()"
+    >
+      <ion-icon slot="icon-only" name="ellipsis-horizontal-outline" aria-hidden="true" />
     </ion-button>
   }
 </ion-item>

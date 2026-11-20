@@ -6,7 +6,9 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   ClientService,
   InstructorClient,
+  ProgramAssignment,
   ProgramAssignmentService,
+  ProgramAssignmentStatus,
   RosterService,
   SessionService,
   WorkoutLogService,
@@ -51,5 +53,33 @@ describe('ClientDetailStore', () => {
     expect(listForClient).not.toHaveBeenCalled();
     expect(listForInstructor).not.toHaveBeenCalled();
     expect(roster).not.toHaveBeenCalled();
+  });
+
+  it("sends the coach's message with a plan's status change", () => {
+    const client = { id: 'rel-1', clientId: 'client-1', status: 'ARCHIVED' } as unknown as InstructorClient;
+    const update = vi.fn(() => of({ id: 'a-1', status: 'CANCELLED' }));
+    TestBed.configureTestingModule({
+      providers: [
+        ClientDetailStore,
+        { provide: ClientService, useValue: { getClient: () => of(client) } },
+        { provide: ProgramAssignmentService, useValue: { update } },
+        { provide: RosterService, useValue: { roster: () => of({ clients: [] }) } },
+        { provide: SessionService, useValue: { listInstances: () => of(EMPTY_PAGE) } },
+        { provide: WorkoutLogService, useValue: { listForClient: () => of(EMPTY_PAGE) } },
+        { provide: TranslateService, useValue: { instant: (key: string) => key } },
+      ],
+    });
+    const store = TestBed.inject(ClientDetailStore);
+
+    store
+      .setPlanStatus(
+        { id: 'a-1', status: 'ACTIVE' } as unknown as ProgramAssignment,
+        ProgramAssignmentStatus.Cancelled,
+        'Ne oprim aici.',
+      )
+      ?.subscribe();
+
+    expect(update).toHaveBeenCalledWith('a-1', { status: 'CANCELLED', message: 'Ne oprim aici.' });
+    expect(store.isPlanBusy('a-1')).toBe(false);
   });
 });

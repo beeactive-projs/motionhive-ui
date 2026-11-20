@@ -1232,16 +1232,16 @@
       "deleteGroup": {
         "accept": "Da, șterge",
         "header": "Șterge grupul",
-        "message": "Sigur vrei să ștergi „{name}”? Acțiunea nu poate fi anulată."
+        "message": "Sigur vrei să ștergi „{name}”? Sesiunile doar pentru membri se anulează, iar persoanele înscrise sunt anunțate. Acțiunea nu poate fi anulată."
       },
       "leave": {
         "header": "Părăsește grupul",
-        "message": "Sigur vrei să părăsești „{name}”?"
+        "message": "Sigur vrei să părăsești „{name}”? Rezervările tale la sesiunile doar pentru membri vor fi anulate."
       },
       "removeMember": {
         "header": "Elimină membrul",
-        "message": "Sigur vrei să elimini membrul {name} din acest grup?",
-        "messageUnknown": "Sigur vrei să elimini acest membru din grup?"
+        "message": "Sigur vrei să elimini membrul {name} din acest grup? Rezervările sale la sesiunile doar pentru membri vor fi anulate.",
+        "messageUnknown": "Sigur vrei să elimini acest membru din grup? Rezervările sale la sesiunile doar pentru membri vor fi anulate."
       },
       "revokeLink": {
         "header": "Revocă linkul de alăturare",
@@ -4414,14 +4414,18 @@
           "title": "Plan în desfășurare"
         },
         "cancelled": {
-          "message": "Acest plan nu mai este activ."
+          "message": "Acest plan nu mai este activ.",
+          "since": "{coach} l-a anulat pe {date}. {count, plural, =0 {Nu terminaseși încă niciun antrenament din el.} one {Antrenamentul făcut rămâne în istoricul tău.} few {Cele # antrenamente făcute rămân în istoricul tău.} other {Cele # de antrenamente făcute rămân în istoricul tău.}}"
         },
+        "coachMessage": "De la {coach}",
         "completed": {
+          "byCoach": "{coach} l-a marcat ca terminat pe {date}, la {percent}% realizat.",
           "message": "Bravo, ai terminat toate antrenamentele.",
           "title": "Plan finalizat"
         },
         "paused": {
-          "message": "Antrenorul îl va relua când ești gata să continui.",
+          "message": "Antrenorul tău îl reia când e cazul. Zilele din pauză nu contează ca ratate.",
+          "since": "Pe pauză din {date}. {coach} îl reia când e cazul. Zilele din pauză nu contează ca ratate.",
           "title": "Pus pe pauză de antrenorul tău"
         },
         "pending": {
@@ -4455,6 +4459,10 @@
         "openFailed": {
           "detail": "Încearcă din nou peste câteva clipe sau deschide antrenamentul din Antrenamente.",
           "summary": "Nu am putut deschide antrenamentul"
+        },
+        "closed": {
+          "detail": "{status, select, CANCELLED {Antrenorul tău a anulat acest plan, așa că antrenamentele lui nu mai pot fi începute.} COMPLETED {Planul e terminat, așa că antrenamentele lui nu mai pot fi începute.} other {Planul nu e în desfășurare, așa că antrenamentele lui nu pot fi începute.}}",
+          "summary": "{status, select, CANCELLED {Plan anulat} COMPLETED {Plan terminat} other {Plan oprit}}"
         },
         "paused": {
           "detail": "Antrenorul tău a pus planul pe pauză. Roagă-l să-l reia ca să poți continua.",

@@ -56,7 +56,7 @@
             [busy]="store.isBusy(row.id)"
             [tappable]="true"
             (select)="openClient(row)"
-            (pause)="setStatus(row, Statuses.Paused)"
+            (options)="openOptions(row)"
             (resume)="setStatus(row, Statuses.Active)"
           />
         }
@@ -76,4 +76,18 @@
   [program]="store.program()"
   [saving]="assignSaving()"
   (assign)="onAssign($event)"
+/>
+
+<mh-action-sheet
+  [(open)]="optionsOpen"
+  [title]="optionsTitle()"
+  [actions]="optionActions()"
+  (chosen)="onOption($event)"
+/>
+
+<mh-end-plan-sheet
+  [(open)]="endPlanOpen"
+  [assignment]="endPlanRow()"
+  [saving]="endPlanSaving()"
+  (confirm)="onEndPlan($event)"
 />

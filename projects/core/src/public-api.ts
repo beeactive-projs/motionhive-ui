@@ -54,6 +54,7 @@ export * from './lib/models/workout/progress.model';
 export * from './lib/models/workout/volume.enums';
 export * from './lib/models/workout/training-day.model';
 export * from './lib/models/workout/roster.model';
+export * from './lib/models/workout/client-copy.model';
 
 // Models - Client
 export * from './lib/models/client/client.enums';
@@ -183,6 +184,7 @@ export * from './lib/constants/languages.const';
 
 // Utils
 export * from './lib/utils/superset-links';
+export * from './lib/utils/program-workout.utils';
 export * from './lib/utils/url.utils';
 export * from './lib/utils/api-error.utils';
 export * from './lib/utils/image-transform.utils';
@@ -262,6 +264,7 @@ export * from './lib/services/workout/workout-settings.service';
 export * from './lib/services/workout/routine.service';
 export * from './lib/services/workout/progress.service';
 export * from './lib/services/workout/roster.service';
+export * from './lib/services/workout/client-copy.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
 export * from './lib/services/session/session.service';

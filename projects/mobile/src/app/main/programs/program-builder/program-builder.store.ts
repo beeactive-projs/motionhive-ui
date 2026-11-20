@@ -1,9 +1,15 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { Program, ProgramService, ProgramStatus, ProgramWorkout } from 'core';
+import {
+  Program,
+  ProgramService,
+  ProgramStatus,
+  ProgramWorkout,
+  workoutExerciseCount,
+} from 'core';
 
 import { DAYS_PER_WEEK, DEFAULT_PROGRAM_WEEKS, weeksOf, weeksToDays } from '../programs.config';
 
@@ -40,8 +46,27 @@ export class ProgramBuilderStore {
   private readonly _loading = signal(false);
   private readonly _error = signal(false);
   private readonly _saving = signal(false);
+  /**
+   * A day cleared on screen whose delete is held back while its undo is on
+   * offer. Only one waits at a time: clearing another sends this one first.
+   */
+  private readonly _pendingClear = signal<ProgramWorkout | null>(null);
 
   readonly program = this._program.asReadonly();
+  /** The id of the day whose delete is held, or null. */
+  readonly pendingClearId = computed(() => {
+    const day = this._pendingClear();
+    if (!day) {
+      return null;
+    }
+    return day.id;
+  });
+
+  constructor() {
+    // However the page goes (back, a tab tap, a new program), a held delete
+    // is sent rather than lost: the coach saw the day cleared.
+    inject(DestroyRef).onDestroy(() => this.flushClear());
+  }
   readonly loading = this._loading.asReadonly();
   readonly saving = this._saving.asReadonly();
 
@@ -75,6 +100,37 @@ export class ProgramBuilderStore {
   /** Total days with work — what the status card counts. */
   readonly filledDays = computed(() => this.workouts().length);
 
+  /**
+   * Days with at least one exercise. A day row with nothing in it is a rest
+   * day to a client, so this, not `filledDays`, is what publishing needs.
+   */
+  readonly exerciseDays = computed(
+    () => this.workouts().filter((w) => workoutExerciseCount(w) > 0).length,
+  );
+
+  /** Clients of this coach who still follow the program, from the detail read. */
+  readonly clientCount = computed(() => {
+    const program = this._program();
+    if (!program) {
+      return 0;
+    }
+    return program.clientCount ?? 0;
+  });
+
+  /** The first day there is, in the order a client meets them. Null when none. */
+  readonly firstDay = computed<ProgramWorkout | null>(() => {
+    const ordered = [...this.workouts()].sort((a, b) => {
+      if (a.weekIndex !== b.weekIndex) {
+        return a.weekIndex - b.weekIndex;
+      }
+      return a.dayIndex - b.dayIndex;
+    });
+    if (!ordered.length) {
+      return null;
+    }
+    return ordered[0];
+  });
+
   readonly isPublished = computed(() => this._program()?.status === ProgramStatus.Published);
 
   load(id: string, done?: () => void): void {
@@ -85,7 +141,7 @@ export class ProgramBuilderStore {
       .pipe(take(1))
       .subscribe({
         next: (program) => {
-          this._program.set(program);
+          this._program.set(this._withoutPendingClear(program));
           this._loading.set(false);
           done?.();
         },
@@ -128,6 +184,14 @@ export class ProgramBuilderStore {
     if (!program || this._saving()) return;
     this._saving.set(true);
 
+    this._afterPendingClear(() => this._saveDetails(program, change, done));
+  }
+
+  private _saveDetails(
+    program: Program,
+    change: ProgramDetailsChange,
+    done: (error?: unknown, repeatFailed?: boolean) => void,
+  ): void {
     this._programService
       .update(program.id, {
         name: change.name,
@@ -137,8 +201,12 @@ export class ProgramBuilderStore {
       .pipe(take(1))
       .subscribe({
         next: (saved) => {
-          const kept = (program.workouts ?? []).filter((w) => w.weekIndex < change.weeks);
-          this._program.set({ ...saved, workouts: saved.workouts ?? kept });
+          // The days on screen (a held clear stays cleared), minus the weeks
+          // a shorter length dropped. The answer carries the program alone,
+          // so what only the detail read knows (the client count) is kept.
+          const current = this._program() ?? program;
+          const kept = (current.workouts ?? []).filter((w) => w.weekIndex < change.weeks);
+          this._program.set({ ...current, ...saved, workouts: saved.workouts ?? kept });
           if (!change.repeatNewWeeks) {
             this._saving.set(false);
             done();
@@ -174,6 +242,15 @@ export class ProgramBuilderStore {
     const program = this._program();
     if (!program || this._saving()) return;
     this._saving.set(true);
+    // Publishing is judged on the days the server has, so a held clear lands first.
+    this._afterPendingClear(() => this._setStatus(program, status, done));
+  }
+
+  private _setStatus(
+    program: Program,
+    status: ProgramStatus,
+    done: (error?: unknown) => void,
+  ): void {
     this._programService
       .update(program.id, { status })
       .pipe(take(1))
@@ -195,6 +272,13 @@ export class ProgramBuilderStore {
     const program = this._program();
     if (!program || this._saving()) return;
     this._saving.set(true);
+    this._afterPendingClear(() => this._duplicate(program, done));
+  }
+
+  private _duplicate(
+    program: Program,
+    done: (copy: Program | null, error?: unknown) => void,
+  ): void {
     this._programService
       .duplicate(program.id)
       .pipe(take(1))
@@ -214,6 +298,8 @@ export class ProgramBuilderStore {
     const program = this._program();
     if (!program || this._saving()) return;
     this._saving.set(true);
+    // Its days go with it, so a held clear has nothing left to delete.
+    this._pendingClear.set(null);
     this._programService
       .remove(program.id)
       .pipe(take(1))
@@ -239,7 +325,16 @@ export class ProgramBuilderStore {
     const program = this._program();
     if (!program || this._saving()) return;
     this._saving.set(true);
+    // The slot may be the one just cleared: its row must be gone first.
+    this._afterPendingClear(() => this._addDay(program, weekIndex, dayIndex, done));
+  }
 
+  private _addDay(
+    program: Program,
+    weekIndex: number,
+    dayIndex: number,
+    done?: (id: string) => void,
+  ): void {
     this._programService
       .addWorkout(program.id, {
         name: this._translateService.instant('programs.common.day', { number: dayIndex + 1 }),
@@ -257,30 +352,105 @@ export class ProgramBuilderStore {
       });
   }
 
-  clearDay(workoutId: string): void {
+  /**
+   * Clear a day on screen at once and hold its delete, so it can be undone:
+   * `undoClear` puts it back with no request, `flushClear` sends the delete
+   * (the undo toast closed, the page left). A day cannot be rebuilt in one
+   * request once deleted, so holding the delete is what makes undo cheap.
+   * Answers with the day cleared, or null when there was none.
+   */
+  clearDay(workoutId: string): ProgramWorkout | null {
     const program = this._program();
-    if (!program) return;
-    this._program.update((p) =>
-      p ? { ...p, workouts: (p.workouts ?? []).filter((w) => w.id !== workoutId) } : p,
-    );
-    this._programService
-      .removeWorkout(program.id, workoutId)
-      .pipe(take(1), catchError(() => of(null)))
-      .subscribe();
+    if (!program) {
+      return null;
+    }
+    const day = (program.workouts ?? []).find((w) => w.id === workoutId);
+    if (!day) {
+      return null;
+    }
+    this.flushClear();
+    this._pendingClear.set(day);
+    this._program.set({
+      ...program,
+      workouts: (program.workouts ?? []).filter((w) => w.id !== workoutId),
+    });
+    return day;
+  }
+
+  /** Undo: the day comes back as it was, and its delete is never sent. */
+  undoClear(workoutId: string): void {
+    const day = this._pendingClear();
+    if (!day || day.id !== workoutId) {
+      return;
+    }
+    this._pendingClear.set(null);
+    const program = this._program();
+    if (!program) {
+      return;
+    }
+    this._program.set({ ...program, workouts: [...(program.workouts ?? []), day] });
   }
 
   /**
-   * Copy every day of one week into another, with the work inside it.
-   *
-   * One request. The server copies exercises and sets in a single
-   * transaction and replaces whatever the target week held, so repeating
-   * a copy is idempotent. The earlier client-side walk made one call per
-   * row — ~36 for a modest week — and tripped the global throttle the
-   * second time round.
+   * Send the held delete, if there is one. With an id, only when it is that
+   * day's: a toast closing late must not send a newer clear early.
    */
-  copyWeek(from: number, to: number, done?: (error?: unknown) => void): void {
+  flushClear(workoutId?: string): void {
+    const day = this._pendingClear();
+    if (!day) {
+      return;
+    }
+    if (workoutId !== undefined && day.id !== workoutId) {
+      return;
+    }
+    this._pendingClear.set(null);
+    this._sendClear(day).subscribe();
+  }
+
+  /**
+   * Run a write once a held delete has reached the server. The write may
+   * read or fill the same days (a copy, a new day in the cleared slot, the
+   * publish check), so it must find that day gone.
+   */
+  private _afterPendingClear(run: () => void): void {
+    const day = this._pendingClear();
+    if (!day) {
+      run();
+      return;
+    }
+    this._pendingClear.set(null);
+    this._sendClear(day).subscribe(() => run());
+  }
+
+  /** The delete itself. Silent on failure: the day is already off the screen. */
+  private _sendClear(day: ProgramWorkout): Observable<unknown> {
+    return this._programService
+      .removeWorkout(day.programId, day.id)
+      .pipe(take(1), catchError(() => of(null)));
+  }
+
+  /** A fresh read still holds a day whose delete is waiting: keep it cleared. */
+  private _withoutPendingClear(program: Program): Program {
+    const pending = this.pendingClearId();
+    if (!pending) {
+      return program;
+    }
+    return { ...program, workouts: (program.workouts ?? []).filter((w) => w.id !== pending) };
+  }
+
+  /**
+   * Copy every day of one week into other weeks, with the work inside them.
+   *
+   * One request, however many weeks it goes to. The server copies
+   * exercises and sets in a single transaction and replaces whatever the
+   * target weeks held, so repeating a copy is idempotent. The earlier walks
+   * made one call per row, then one per target week, and tripped the
+   * global throttle.
+   */
+  copyWeek(from: number, to: readonly number[], done?: (error?: unknown) => void): void {
     const program = this._program();
-    if (!program || from === to) {
+    const targets = [...new Set(to)].filter((week) => week !== from);
+    if (!program || !targets.length) {
       done?.();
       return;
     }
@@ -290,6 +460,15 @@ export class ProgramBuilderStore {
     }
 
     this._saving.set(true);
+    this._afterPendingClear(() => this._copyWeek(program, from, targets, done));
+  }
+
+  private _copyWeek(
+    program: Program,
+    from: number,
+    to: number[],
+    done?: (error?: unknown) => void,
+  ): void {
     this._programService
       .copyWeek(program.id, from, to)
       .pipe(take(1))
@@ -315,20 +494,61 @@ export class ProgramBuilderStore {
     if (!program) return;
 
     this._saving.set(true);
-    this._programService
-      .deleteWeek(program.id, weekIndex)
-      .pipe(take(1))
-      .subscribe({
-        next: (fresh) => {
-          this._saving.set(false);
-          this._program.set(fresh);
-          done?.();
-        },
-        error: (error: unknown) => {
-          this._saving.set(false);
-          done?.(error);
-        },
-      });
+    this._afterPendingClear(() => this._deleteWeek(program, weekIndex, done));
+  }
+
+  private _deleteWeek(
+    program: Program,
+    weekIndex: number,
+    done?: (error?: unknown) => void,
+  ): void {
+    this._applyWeekChange(this._programService.deleteWeek(program.id, weekIndex), done);
+  }
+
+  /**
+   * An empty week right after this one: later weeks move down one and the
+   * program is a week longer. One request; the server answers with the tree.
+   */
+  insertWeekAfter(weekIndex: number, done?: (error?: unknown) => void): void {
+    const program = this._program();
+    if (!program || this._saving()) {
+      return;
+    }
+    this._saving.set(true);
+    this._afterPendingClear(() =>
+      this._applyWeekChange(this._programService.insertWeekAfter(program.id, weekIndex), done),
+    );
+  }
+
+  /**
+   * Clear a week: every day of it goes in one request, and it becomes a week
+   * of rest. The weeks keep their places. The server answers with the tree.
+   */
+  clearWeek(weekIndex: number, done?: (error?: unknown) => void): void {
+    const program = this._program();
+    if (!program || this._saving()) {
+      return;
+    }
+    this._saving.set(true);
+    // The held day may be in this week: it goes first, then the rest.
+    this._afterPendingClear(() =>
+      this._applyWeekChange(this._programService.clearWeek(program.id, weekIndex), done),
+    );
+  }
+
+  /** A week-level write the server answers with the program as it now is. */
+  private _applyWeekChange(request: Observable<Program>, done?: (error?: unknown) => void): void {
+    request.pipe(take(1)).subscribe({
+      next: (fresh) => {
+        this._saving.set(false);
+        this._program.set(fresh);
+        done?.();
+      },
+      error: (error: unknown) => {
+        this._saving.set(false);
+        done?.(error);
+      },
+    });
   }
 
   /**
@@ -360,6 +580,19 @@ export class ProgramBuilderStore {
     }
 
     this._saving.set(true);
+    this._afterPendingClear(() =>
+      this._copyDay(program, fromWeek, dayIndex, targets, toDayIndex, done),
+    );
+  }
+
+  private _copyDay(
+    program: Program,
+    fromWeek: number,
+    dayIndex: number,
+    targets: number[],
+    toDayIndex?: number,
+    done?: (error?: unknown) => void,
+  ): void {
     this._programService
       .copyDay(program.id, fromWeek, dayIndex, targets, toDayIndex)
       .pipe(take(1))

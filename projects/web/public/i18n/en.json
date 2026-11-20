@@ -1232,16 +1232,16 @@
       "deleteGroup": {
         "accept": "Yes, delete",
         "header": "Delete group",
-        "message": "Are you sure you want to delete \"{name}\"? This action cannot be undone."
+        "message": "Are you sure you want to delete \"{name}\"? Its members-only sessions are cancelled and the people booked are told. This action cannot be undone."
       },
       "leave": {
         "header": "Leave group",
-        "message": "Are you sure you want to leave \"{name}\"?"
+        "message": "Are you sure you want to leave \"{name}\"? Your bookings in its members-only sessions will be cancelled."
       },
       "removeMember": {
         "header": "Remove member",
-        "message": "Are you sure you want to remove {name} from this group?",
-        "messageUnknown": "Are you sure you want to remove this member from this group?"
+        "message": "Are you sure you want to remove {name} from this group? Their bookings in its members-only sessions will be cancelled.",
+        "messageUnknown": "Are you sure you want to remove this member from this group? Their bookings in its members-only sessions will be cancelled."
       },
       "revokeLink": {
         "header": "Revoke join link",
@@ -4414,14 +4414,18 @@
           "title": "Plan in progress"
         },
         "cancelled": {
-          "message": "This plan is no longer active."
+          "message": "This plan is no longer active.",
+          "since": "{coach} cancelled it on {date}. {count, plural, =0 {You hadn't finished a workout in it yet.} one {The workout you finished stays in your history.} other {The # finished workouts stay in your history.}}"
         },
+        "coachMessage": "From {coach}",
         "completed": {
+          "byCoach": "{coach} marked it as finished on {date}, at {percent}% done.",
           "message": "Nice work, every workout is done.",
           "title": "Plan complete"
         },
         "paused": {
-          "message": "They'll resume it when you're ready to pick up again.",
+          "message": "Your coach resumes it when it's time. Paused days don't count as missed.",
+          "since": "Paused since {date}. {coach} resumes it when it's time. Paused days don't count as missed.",
           "title": "Paused by your coach"
         },
         "pending": {
@@ -4455,6 +4459,10 @@
         "openFailed": {
           "detail": "Try again in a moment, or open the workout from Training.",
           "summary": "Couldn't open the workout"
+        },
+        "closed": {
+          "detail": "{status, select, CANCELLED {Your coach cancelled this plan, so its workouts can't be started.} COMPLETED {This plan is finished, so its workouts can't be started.} other {This plan isn't running, so its workouts can't be started.}}",
+          "summary": "{status, select, CANCELLED {Plan cancelled} COMPLETED {Plan finished} other {Plan not running}}"
         },
         "paused": {
           "detail": "Your coach has paused this plan. Ask them to resume it to continue.",

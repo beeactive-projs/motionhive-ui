@@ -53,3 +53,33 @@ ion-item.current ion-label {
   white-space: pre-line;
   color: var(--ion-text-color);
 }
+
+/* A stopped plan's card: its state, what that means for the trainee, the
+   coach's own words, and the one thing to do. */
+.plan-status ion-badge {
+  margin-bottom: 0.5rem;
+}
+
+.plan-status .line {
+  margin: 0;
+  color: var(--ion-text-color);
+  line-height: var(--mh-leading-body);
+}
+
+.plan-status .mh-kicker {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--ion-color-medium);
+}
+
+/* Written by a person, so their line breaks are kept. */
+.plan-status .quote {
+  margin: 0.25rem 0 0;
+  white-space: pre-line;
+  color: var(--ion-text-color);
+}
+
+.plan-status .action {
+  margin: 0.5rem 0 0;
+  --padding-start: 0;
+}

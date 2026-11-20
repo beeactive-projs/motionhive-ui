@@ -15,6 +15,17 @@ export interface ToastAction {
   run: () => void;
 }
 
+/** The role the Undo button closes its toast with. */
+const UNDO_ROLE = 'undo';
+
+/** A toast that offers to take back what just happened, and says whether it was. */
+export interface UndoToast {
+  /** True once Undo was tapped; false when the toast went away any other way. */
+  readonly undone: Promise<boolean>;
+  /** Close it now, as if it had run out (the page is being left). */
+  dismiss(): Promise<void>;
+}
+
 /**
  * Toast feedback for the screens that write.
  *
@@ -45,6 +56,29 @@ export class FeedbackService {
       action ? ACTION_DURATION_MS : SUCCESS_DURATION_MS,
       action,
     );
+  }
+
+  /**
+   * "Tuesday is now a rest day · Undo". The caller holds back what the
+   * message reports until `undone` settles: true means put it back, false
+   * (the toast ran out or was dismissed) means carry it out. Neutral, not
+   * green: nothing has been saved yet.
+   */
+  async undoable(message: string, undoLabel: string): Promise<UndoToast> {
+    const toast = await this._toastController.create({
+      message,
+      color: 'medium',
+      duration: ACTION_DURATION_MS,
+      position: 'bottom',
+      buttons: [{ text: undoLabel, role: UNDO_ROLE }],
+    });
+    await toast.present();
+    return {
+      undone: toast.onDidDismiss().then((event) => event.role === UNDO_ROLE),
+      dismiss: async () => {
+        await toast.dismiss();
+      },
+    };
   }
 
   /** Neutral confirmation — "No changes", and other non-events. */

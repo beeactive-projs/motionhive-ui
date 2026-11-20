@@ -54,6 +54,8 @@ export interface PrescribedExercise {
     kind: string;
     level: string;
     thumbnailUrl: string | null;
+    /** One-sided work (a split squat): its reps read as reps each side. */
+    isUnilateral?: boolean;
   };
   sets?: PrescribedSet[];
 }
@@ -138,6 +140,19 @@ export interface Program {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+
+  // Counts `GET /programs` rows and `GET /programs/:id` carry, since a list
+  // row has no tree to count from. Absent on a create or update answer.
+
+  /** Prescribed exercises across all its days. */
+  exerciseCount?: number;
+  /** The distinct weekdays its days sit on: "trains 3 days a week". */
+  daysPerWeek?: number;
+  /**
+   * The caller's clients who still follow it (an assignment under way,
+   * paused or not started yet), each counted once.
+   */
+  clientCount?: number;
 
   // Eager-loaded on detail view
   owner?: {
@@ -264,3 +279,20 @@ export interface CreatePrescribedSetPayload {
 export type UpdatePrescribedSetPayload = {
   [K in keyof CreatePrescribedSetPayload]?: CreatePrescribedSetPayload[K] | null;
 };
+
+/**
+ * One set of `setSets` (`PUT …/exercises/:exerciseId/sets`): its whole
+ * target. A set with its `id` is updated in place, one without is added, and
+ * a field left out is cleared. Its place in the list is its order.
+ */
+export type PrescribedSetItem = Omit<CreatePrescribedSetPayload, 'orderIndex'> & {
+  id?: string;
+};
+
+/** One movement of `addExercises` (`POST …/exercises/bulk`), with its empty sets. */
+export interface AddPrescribedExerciseItem {
+  exerciseId: string;
+  defaultSets?: number;
+  restAfterSeconds?: number | null;
+  notes?: string;
+}

@@ -83,3 +83,87 @@ describe("PlanStore, the coach's note", () => {
     expect(withAssignment({ notes: 'Mine', instructor: null }).coachNote()).toBeNull();
   });
 });
+
+describe('PlanStore, a plan the coach stopped', () => {
+  const coach = { id: 'coach-1', firstName: 'Andrei', lastName: 'Pop' };
+
+  function withPlan(fields: Record<string, unknown>, workouts: AssignedWorkout[] = []): PlanStore {
+    const assignment = {
+      id: 'pa-1',
+      instructorId: 'coach-1',
+      instructor: coach,
+      completionPercent: 42,
+      workouts,
+      ...fields,
+    } as unknown as ProgramAssignment;
+    TestBed.configureTestingModule({
+      providers: [
+        PlanStore,
+        { provide: ProgramAssignmentService, useValue: { get: () => of(assignment) } },
+        { provide: TranslateService, useValue: { instant: (key: string) => key } },
+      ],
+    });
+    const plan = TestBed.inject(PlanStore);
+    plan.load('pa-1');
+    return plan;
+  }
+
+  it('says since when it is paused, that its days are not missed, and quotes the coach', () => {
+    const plan = withPlan({
+      status: 'PAUSED',
+      statusChangedAt: '2026-11-19T10:00:00Z',
+      statusChangedBy: 'coach-1',
+      statusMessage: ' Vacanță plăcută! ',
+    });
+    expect(plan.isRunning()).toBe(false);
+    expect(plan.statusLine()).toBe(
+      "Paused since 19 Nov. Andrei resumes it when it's time. Paused days don't count as missed.",
+    );
+    expect(plan.statusMessage()).toBe('Vacanță plăcută!');
+    expect(plan.statusAction()).toBe('message');
+  });
+
+  it('counts the finished workouts of a cancelled plan, which stay in the history', () => {
+    const plan = withPlan(
+      { status: 'CANCELLED', statusChangedAt: '2026-11-12T10:00:00Z', statusChangedBy: 'coach-1' },
+      [day(0, 0, WorkoutLogStatus.Completed), day(0, 2, WorkoutLogStatus.Completed), day(1, 0, null)],
+    );
+    expect(plan.statusLine()).toBe(
+      'Andrei cancelled it on 12 Nov. The 2 finished workouts stay in your history.',
+    );
+    expect(plan.statusAction()).toBe('history');
+  });
+
+  it('tells a plan the coach finished from one that finished on its own', () => {
+    const byCoach = withPlan({
+      status: 'COMPLETED',
+      statusChangedAt: '2026-11-12T10:00:00Z',
+      statusChangedBy: 'coach-1',
+    });
+    expect(byCoach.statusLine()).toBe('Andrei marked it as finished on 12 Nov, at 42% done.');
+    TestBed.resetTestingModule();
+    const onItsOwn = withPlan({
+      status: 'COMPLETED',
+      statusChangedAt: '2026-11-12T10:00:00Z',
+      statusChangedBy: null,
+      statusMessage: 'stale',
+    });
+    expect(onItsOwn.statusLine()).toBe('Every day of it is behind you, 42% done.');
+    // A message from an earlier change is not this change's.
+    expect(onItsOwn.statusMessage()).toBeNull();
+  });
+
+  it('says nothing for a running plan, which keeps its days startable', () => {
+    const plan = withPlan({ status: 'ACTIVE' });
+    expect(plan.isRunning()).toBe(true);
+    expect(plan.statusLine()).toBeNull();
+    expect(plan.statusChip()).toBeNull();
+  });
+
+  it('reads an old paused plan with no recorded date', () => {
+    const plan = withPlan({ status: 'PAUSED', statusChangedAt: null, instructor: null });
+    expect(plan.statusLine()).toBe(
+      "Paused. workouts.home.yourCoach resumes it when it's time. Paused days don't count as missed.",
+    );
+  });
+});

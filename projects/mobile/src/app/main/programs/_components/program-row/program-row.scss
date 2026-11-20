@@ -24,3 +24,10 @@ ion-item[data-tone='muted'] h2 {
 .tags {
   flex-wrap: wrap;
 }
+
+/* The starter's lock sits inside its badge, beside the word. */
+.tags ion-badge.with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}

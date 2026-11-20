@@ -104,7 +104,7 @@
     <div class="mh-section-label">{{ 'programs.assign.client' | translate }}</div>
     @if (loading()) {
       <ion-note class="mh-note-block">{{ 'programs.assign.loadingClients' | translate }}</ion-note>
-    } @else if (!clients().length) {
+    } @else if (!clients().length && !invitees().length) {
       <ion-note class="mh-note-block">
         {{ 'programs.assign.noClients' | translate }}
       </ion-note>
@@ -119,7 +119,7 @@
           (ionInput)="clientQuery.set($any($event).detail.value ?? '')"
         />
       }
-      @if (!visibleClients().length) {
+      @if (!visibleClients().length && !visibleInvitees().length) {
         <ion-note class="mh-note-block">{{ 'programs.assign.noClientMatch' | translate }}</ion-note>
       }
       <ion-list [inset]="true" class="mh-card-list">
@@ -139,8 +139,48 @@
             }
           </ion-item>
         }
+        <!-- Invited, not accepted yet: shown so the coach is not left
+             wondering where they are, greyed because only an active client
+             can be given work. -->
+        @for (row of visibleInvitees(); track row.id) {
+          <ion-item class="invitee" [disabled]="true">
+            @if (isEmailOnly(row)) {
+              <mh-hex-avatar
+                slot="start"
+                size="sm"
+                tone="wash"
+                aria-hidden="true"
+                [icon]="emailTile.icon"
+                color="medium"
+              />
+            } @else {
+              <mh-hex-avatar
+                slot="start"
+                size="sm"
+                aria-hidden="true"
+                color="medium"
+                [name]="inviteeName(row)"
+                [imageUrl]="row.client?.avatarUrl ?? null"
+              />
+            }
+            <ion-label>
+              <h3>{{ inviteeName(row) }}</h3>
+              <p>{{ 'programs.assign.pendingInvite' | translate }}</p>
+            </ion-label>
+          </ion-item>
+        }
       </ion-list>
     }
+  }
+
+  <!-- Two plans at once is allowed, and worth knowing before Assign. -->
+  @if (otherPlanNote(); as note) {
+    <div class="other-plan" role="note">
+      <p>{{ note }}</p>
+      <ion-button class="mh-text-link" fill="clear" size="small" (click)="seeOtherPlan()">
+        {{ seePlanLabel() }}
+      </ion-button>
+    </div>
   }
 
   <div class="mh-section-label">{{ 'programs.assign.starts' | translate }}</div>
@@ -159,6 +199,7 @@
       <ion-datetime
         id="assign-start-date"
         presentation="date"
+        [locale]="locale()"
         [showDefaultButtons]="true"
         [min]="minStartDate"
         [value]="startDate()"
@@ -170,7 +211,12 @@
   <!-- Which weekdays the program's days land on. Optional: left alone, the
        plan counts forward from the start date as it always has. -->
   @if (canChooseDays()) {
-    <div class="mh-section-label">{{ 'programs.assign.trainingDays' | translate }}</div>
+    <div class="mh-section-label days-label">
+      <span>{{ 'programs.assign.trainingDays' | translate }}</span>
+      @if (daysPicked()) {
+        <span class="picked" [class.warn]="!daysValid()">{{ daysPicked() }}</span>
+      }
+    </div>
     <div class="mh-chip-row days">
       @for (day of weekdayOptions; track day.iso) {
         <ion-chip
@@ -187,29 +233,30 @@
 
   <!-- The real work of this sheet: which day lands on which date. A plan that
        puts Day 1 on a Saturday is caught here, not in chat on Wednesday. -->
-  @if (preview().length) {
-    <div class="mh-section-label">{{ 'programs.assign.schedule' | translate }}</div>
+  @if (firstWeek().length) {
+    <div class="mh-section-label">{{ 'programs.assign.firstWeek' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
-      @for (row of previewHead(); track row.name + row.date) {
+      @for (row of firstWeek(); track row.name + row.date) {
         <ion-item>
-          <ion-note slot="start" class="mh-kicker week">{{ row.week }}</ion-note>
+          <ion-note slot="start" class="date">{{ row.date }}</ion-note>
           <ion-label>{{ row.name }}</ion-label>
-          <ion-note slot="end">{{ row.date }}</ion-note>
-        </ion-item>
-      }
-      @if (previewMore()) {
-        <ion-item>
-          <ion-note class="more">{{ 'programs.assign.more' | translate: { count: previewMore() } }}</ion-note>
         </ion-item>
       }
     </ion-list>
+    @if (lastDay(); as last) {
+      <p class="mh-footnote last-day">{{ last }}</p>
+    }
   }
 
-  <div class="mh-section-label">{{ 'programs.assign.note' | translate }}</div>
-  <ion-textarea mode="md"
+  <!-- The client reads it on the plan, so it is written to them. -->
+  <ion-textarea
+    class="note"
+    mode="md"
     fill="outline"
+    labelPlacement="stacked"
+    [label]="noteLabel()"
     [autoGrow]="true"
-    [placeholder]="'programs.common.notePlaceholder' | translate"
+    [placeholder]="'programs.assign.notePlaceholder' | translate"
     [value]="notes()"
     (ionInput)="notes.set($any($event).detail.value ?? '')"
   />
@@ -219,7 +266,7 @@
   [(open)]="open"
   [title]="'programs.assign.title' | translate"
   [body]="body"
-  [saveLabel]="'programs.assign.assign' | translate"
+  [saveLabel]="saveLabel()"
   [canSave]="canAssign()"
   [saving]="saving()"
   [breakpoints]="[0, 0.9]"

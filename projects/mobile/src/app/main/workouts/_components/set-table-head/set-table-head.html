@@ -1,6 +1,8 @@
-<div class="mh-set-grid head" [class.untickable]="!tickable()">
+<div class="mh-set-grid head" [class.untickable]="!tickable()" [class.no-history]="!history()">
   <span class="center">{{ 'workouts.logger.gridHead.set' | translate }}</span>
-  <span class="previous">{{ 'workouts.logger.gridHead.previous' | translate }}</span>
+  @if (history()) {
+    <span class="previous">{{ 'workouts.logger.gridHead.previous' | translate }}</span>
+  }
   @for (label of labels(); track $index) {
     <span class="center">{{ label | translate }}</span>
   }
