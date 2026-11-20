@@ -29,3 +29,15 @@ ion-toast.ion-color-warning {
   --ion-color-base: var(--ion-color-warning-wash) !important;
   --ion-color-contrast: var(--ion-color-warning-wash-contrast) !important;
 }
+
+/* The mark and the words carry the outcome together: medium weight words,
+   and a check (or alert, or info) a size up with a firmer line, so it reads
+   as a mark rather than a hairline beside the text. */
+ion-toast::part(message) {
+  font-weight: 500;
+}
+
+ion-toast::part(icon) {
+  --ionicon-stroke-width: 40px;
+  font-size: 1.375rem;
+}

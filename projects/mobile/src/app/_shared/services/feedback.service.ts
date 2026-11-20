@@ -1,6 +1,8 @@
 import { Service, inject } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { Haptics, NotificationType } from '@capacitor/haptics';
+import { addIcons } from 'ionicons';
+import { alertCircleOutline, checkmarkCircleOutline, informationCircleOutline } from 'ionicons/icons';
 
 import { ErrorDialogService, apiErrorMessage } from 'core';
 
@@ -17,6 +19,19 @@ export interface ToastAction {
 
 /** The role the Undo button closes its toast with. */
 const UNDO_ROLE = 'undo';
+
+/**
+ * The mark a toast leads with, by tone: the outcome reads before the words.
+ * No close button: a toast leaves on its own, and a swipe down sends it
+ * sooner, as the phone's own banners go.
+ */
+const TOAST_ICONS = {
+  success: 'checkmark-circle-outline',
+  danger: 'alert-circle-outline',
+  medium: 'information-circle-outline',
+} as const;
+
+type ToastTone = keyof typeof TOAST_ICONS;
 
 /** A toast that offers to take back what just happened, and says whether it was. */
 export interface UndoToast {
@@ -43,6 +58,10 @@ export class FeedbackService {
   private readonly _toastController = inject(ToastController);
   private readonly _errorDialog = inject(ErrorDialogService);
 
+  constructor() {
+    addIcons({ alertCircleOutline, checkmarkCircleOutline, informationCircleOutline });
+  }
+
   /**
    * `action` puts one button on the toast and keeps it up longer. Only for
    * an optional next step that is also reachable elsewhere: a toast goes
@@ -68,8 +87,10 @@ export class FeedbackService {
     const toast = await this._toastController.create({
       message,
       color: 'medium',
+      icon: TOAST_ICONS.medium,
       duration: ACTION_DURATION_MS,
       position: 'bottom',
+      swipeGesture: 'vertical',
       buttons: [{ text: undoLabel, role: UNDO_ROLE }],
     });
     await toast.present();
@@ -106,15 +127,17 @@ export class FeedbackService {
 
   private async _present(
     message: string,
-    color: string,
+    color: ToastTone,
     duration: number,
     action?: ToastAction,
   ): Promise<void> {
     const toast = await this._toastController.create({
       message,
       color,
+      icon: TOAST_ICONS[color],
       duration,
       position: 'bottom',
+      swipeGesture: 'vertical',
       buttons: action ? [{ text: action.label, handler: () => action.run() }] : undefined,
     });
     await toast.present();

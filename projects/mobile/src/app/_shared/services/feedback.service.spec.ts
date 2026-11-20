@@ -39,6 +39,7 @@ describe('FeedbackService.undoable', () => {
       expect.objectContaining({
         message: 'Tuesday is now a rest day',
         color: 'medium',
+        icon: 'information-circle-outline',
         duration: 5000,
         buttons: [{ text: 'Undo', role: 'undo' }],
       }),
@@ -66,5 +67,37 @@ describe('FeedbackService.undoable', () => {
     await handle.dismiss();
     expect(toast.dismiss).toHaveBeenCalled();
     await expect(handle.undone).resolves.toBe(false);
+  });
+});
+
+// The outcome reads before the words: each tone leads with its own mark, and
+// any toast can be swiped away rather than closed with a button.
+describe('FeedbackService toasts', () => {
+  it('leads a success with a check', async () => {
+    const { service, create } = setup();
+    await service.success('Saved');
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        color: 'success',
+        icon: 'checkmark-circle-outline',
+        swipeGesture: 'vertical',
+      }),
+    );
+  });
+
+  it('leads an error with an alert mark', async () => {
+    const { service, create } = setup();
+    await service.error(new Error('offline'), 'Could not save');
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({ color: 'danger', icon: 'alert-circle-outline' }),
+    );
+  });
+
+  it('leads a neutral note with an info mark', async () => {
+    const { service, create } = setup();
+    await service.info('No changes');
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({ color: 'medium', icon: 'information-circle-outline' }),
+    );
   });
 });
