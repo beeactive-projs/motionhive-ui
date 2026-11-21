@@ -12,6 +12,7 @@ export enum NotificationType {
   SessionReminder1h = 'SESSION_REMINDER_1H',
   SessionCancelled = 'SESSION_CANCELLED',
   SessionRescheduled = 'SESSION_RESCHEDULED',
+  SessionDurationChanged = 'SESSION_DURATION_CHANGED',
   SessionStatusChanged = 'SESSION_STATUS_CHANGED',
   SessionFollowUp = 'SESSION_FOLLOW_UP',
   ParticipantJoined = 'PARTICIPANT_JOINED',

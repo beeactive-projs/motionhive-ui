@@ -56,7 +56,10 @@ import {
 } from 'core';
 
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
+import { VenueSheet } from '../../../../../_shared/components/venue-sheet/venue-sheet';
+import { VenueDraft, venueCreatePayload } from '../../../../../_shared/config/venues.config';
 import { DatetimeLocaleDirective } from '../../../../../_shared/directives/datetime-locale.directive';
+import { CoachVenuesStore } from '../../../../../_shared/services/coach-venues.store';
 import { FeedbackService } from '../../../../../_shared/services/feedback.service';
 import {
   DEFAULT_GENERATED_OCCURRENCES,
@@ -69,8 +72,18 @@ import {
   SESSION_TYPE_OPTIONS,
   SessionPrefill,
   WEEKDAYS,
+  accessTakesPrice,
+  deviceTimezone,
+  endsBeforeStart,
   findOverlap,
   formatWeekdayList,
+  isValidCapacity,
+  meetingLinkFor,
+  priceCentsFor,
+  priceMissing,
+  toLocalIso,
+  wallClockInZone,
+  zonedWallClockToIso,
 } from '../../sessions.config';
 
 /**
@@ -90,21 +103,11 @@ const MAX_CUTOFF_HOURS = 168;
 
 const CURRENCY_CHOICES = ['RON', 'EUR', 'USD', 'GBP'];
 
-/** Local datetime for `ion-datetime`, which does not take a UTC instant. */
-function toLocalIso(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
 /** Next round half-hour, at least an hour out — a sane default start. */
 function defaultStart(): string {
   const date = new Date();
   date.setHours(date.getHours() + 1, date.getMinutes() < 30 ? 30 : 0, 0, 0);
   return toLocalIso(date);
-}
-
-function deviceTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Bucharest';
 }
 
 /**
@@ -121,8 +124,10 @@ function deviceTimezone(): string {
  * Passing `template` switches to edit mode, same as the web dialog. The update
  * DTO is whitelist+strict, so the PATCH must not carry `isRecurring`,
  * `firstStartAt` or the generation knobs — which is why the start pill and the
- * repeat toggle are locked in edit mode. The rule's details (days, end) remain
- * editable on a series, exactly as on web.
+ * repeat toggle are locked in edit mode. The timezone, the days and the end
+ * are locked too: the API changes only the template for them, never the
+ * dates already created, so an edit there would say one thing and do
+ * another. Duration stays editable: the API moves the end of the dates ahead.
  */
 @Component({
   selector: 'mh-session-form-sheet',
@@ -148,6 +153,7 @@ function deviceTimezone(): string {
     IonToggle,
     SheetShell,
     TranslatePipe,
+    VenueSheet,
   ],
   templateUrl: './session-form-sheet.html',
   styleUrl: './session-form-sheet.scss',
@@ -156,6 +162,7 @@ export class SessionFormSheet {
   private readonly _translateService = inject(TranslateService);
   private readonly _sessionService = inject(SessionService);
   private readonly _venueService = inject(VenueService);
+  private readonly _coachVenues = inject(CoachVenuesStore);
   private readonly _groupService = inject(GroupService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _sessionsInstructorStore = inject(SessionsInstructorStore);
@@ -189,7 +196,7 @@ export class SessionFormSheet {
   readonly title = signal('');
   readonly description = signal('');
   readonly type = signal<SessionType>(SessionType.Group);
-  readonly access = signal<SessionAccess>(SessionAccess.Open);
+  readonly access = signal<SessionAccess>(SessionAccess.Free);
   readonly approvalRequired = signal(false);
   readonly groupId = signal<string | null>(null);
   readonly locationKind = signal<SessionLocationKind>(SessionLocationKind.InPerson);
@@ -208,6 +215,13 @@ export class SessionFormSheet {
   readonly startOpen = signal(false);
   readonly durationOpen = signal(false);
 
+  /** The link field has been left once, so a half-typed link is not called wrong. */
+  readonly meetingTouched = signal(false);
+  /** The price field has been left once, or the form opened on a saved session. */
+  readonly priceTouched = signal(false);
+  /** "Now" for the start checks, pulled forward on open and on save. */
+  private readonly _now = signal(Date.now());
+
   readonly isRecurring = signal(false);
   readonly daysOfWeek = signal<number[]>([]);
   readonly endAfterOccurrences = signal(DEFAULT_GENERATED_OCCURRENCES);
@@ -217,6 +231,8 @@ export class SessionFormSheet {
 
   readonly saving = signal(false);
   readonly venues = signal<Venue[]>([]);
+  /** The list has come back, so an empty one means no places, not "not yet". */
+  readonly venuesKnown = signal(false);
   readonly groups = signal<Group[]>([]);
   private _venuesLoaded = false;
   private _groupsLoaded = false;
@@ -231,7 +247,94 @@ export class SessionFormSheet {
   /** A 1-on-1 has exactly one seat; asking for a capacity would be noise. */
   readonly showCapacity = computed(() => this.type() !== SessionType.Private);
 
+  /** Free has no price, so no field for one. */
+  readonly showPrice = computed(() => accessTakesPrice(this.access()));
+
+  /** Paid needs a price; clients only and group members may leave it empty (free). */
+  readonly priceOptional = computed(
+    () => this.showPrice() && this.access() !== SessionAccess.Open,
+  );
+
+  /**
+   * The start as the API takes it: the picked wall clock read in the picked
+   * zone, so 18:00 for Europe/London is 18:00 in London whatever the phone's
+   * own zone is.
+   */
+  readonly startIso = computed(() => zonedWallClockToIso(this.startAt(), this.timezone()));
+
+  /** The picker's floor: now, on the picked zone's clock. */
+  readonly startMin = computed(() => wallClockInZone(this._now(), this.timezone()));
+
+  /** The end picker's floor: the first session's day. */
+  readonly startDay = computed(() => this.startAt().slice(0, 10));
+
+  /** The meeting link as it will be saved, or null when it cannot be one. */
+  readonly meetingLink = computed(() => meetingLinkFor(this.meetingUrl()));
+
+  /** A new session must start ahead of now; an edit cannot move its start. */
+  readonly startError = computed(() => {
+    if (this.isEdit()) {
+      return null;
+    }
+    if (new Date(this.startIso()).getTime() >= this._now()) {
+      return null;
+    }
+    return this._t('sessions.form.errors.startPast');
+  });
+
+  readonly capacityError = computed(() => {
+    if (!this.showCapacity() || isValidCapacity(this.capacity())) {
+      return null;
+    }
+    return this._t('sessions.form.errors.capacity');
+  });
+
+  readonly meetingLinkError = computed(() => {
+    if (!this.isOnline() || !this.meetingTouched()) {
+      return null;
+    }
+    if (this.meetingUrl().trim().length === 0 || this.meetingLink() !== null) {
+      return null;
+    }
+    return this._t('sessions.form.errors.meetingLink');
+  });
+
+  /** Paid ("Paid" is OPEN) with no price above zero, once the field has been left. */
+  readonly priceError = computed(() => {
+    if (!this.priceTouched() || !priceMissing(this.access(), this.priceAmount())) {
+      return null;
+    }
+    return this._t('sessions.form.errors.price');
+  });
+
+  /** Locked in edit mode, so only a new series can get it wrong. */
+  readonly endDateError = computed(() => {
+    if (this.isEdit() || !this.isRecurring() || this.endMode() !== RecurrenceEndModes.OnDate) {
+      return null;
+    }
+    if (!endsBeforeStart(this.endDate(), this.startAt())) {
+      return null;
+    }
+    return this._t('sessions.form.errors.endBeforeStart');
+  });
+
+  /** Under the locked timezone in edit mode: what else is locked with it. */
+  readonly scheduleLockedHint = computed(() => {
+    let series = 'no';
+    if (this.isRecurring()) {
+      series = 'yes';
+    }
+    return this._t('sessions.form.scheduleLocked', { series });
+  });
+
   readonly isOnline = computed(() => this.locationKind() === SessionLocationKind.Online);
+
+  /** In person, and the coach has no place yet: say so, and offer to add one. */
+  readonly needsPlace = computed(
+    () => !this.isOnline() && this.venuesKnown() && this.venues().length === 0,
+  );
+  readonly placeOpen = signal(false);
+  readonly placeSaving = signal(false);
 
   /**
    * Whether the group picker is worth showing. Mirrors the web dialog: a
@@ -257,7 +360,17 @@ export class SessionFormSheet {
 
   readonly canSave = computed(() => {
     if (this.title().trim().length === 0) return false;
-    if (this.isOnline() && this.meetingUrl().trim().length === 0) return false;
+    // An online session needs a link the API takes, scheme added or not.
+    if (this.isOnline() && this.meetingLink() === null) {
+      return false;
+    }
+    if (this.startError() || this.capacityError() || this.endDateError()) {
+      return false;
+    }
+    // A paid session with no price would book for free under a "Paid" badge.
+    if (priceMissing(this.access(), this.priceAmount())) {
+      return false;
+    }
     // Group-members access without a group is a session nobody could book.
     if (this.access() === SessionAccess.GroupOnly && !this.groupId()) return false;
     // A weekly series with no day selected would expand to nothing.
@@ -391,7 +504,7 @@ export class SessionFormSheet {
     // from here anyway.
     if (this.isEdit()) return null;
 
-    const startIso = this.startAt();
+    const startIso = this.startIso();
     const start = new Date(startIso);
     if (Number.isNaN(start.getTime())) return null;
 
@@ -456,23 +569,34 @@ export class SessionFormSheet {
 
     effect(() => {
       const rule = this._rule();
-      const startAt = this.startAt();
+      const firstStartAt = this.startIso();
       const timezone = this.timezone();
       if (!rule) {
         this.preview.set([]);
         this.previewTruncated.set(false);
         return;
       }
-      this._preview$.next({
-        rule,
-        firstStartAt: new Date(startAt).toISOString(),
-        timezone,
-      });
+      this._preview$.next({ rule, firstStartAt, timezone });
     });
+  }
+
+  /** The picker's floor is "now", so now is read as it opens. */
+  openStart(): void {
+    this._now.set(Date.now());
+    this.startOpen.set(true);
   }
 
   onStartChange(value: string | string[] | null | undefined): void {
     if (typeof value === 'string') this.startAt.set(value);
+  }
+
+  /** Leaving the link field adds a missing `https://`, and lets a bad link say so. */
+  onMeetingBlur(): void {
+    this.meetingTouched.set(true);
+    const link = this.meetingLink();
+    if (link) {
+      this.meetingUrl.set(link);
+    }
   }
 
   /** "1 h 15 min" reads better than "75 min" once past the hour. */
@@ -549,6 +673,10 @@ export class SessionFormSheet {
   }
 
   save(): void {
+    // The start may have slipped into the past while the sheet sat open.
+    this._now.set(Date.now());
+    this.meetingTouched.set(true);
+    this.priceTouched.set(true);
     if (!this.canSave() || this.saving()) return;
     this.saving.set(true);
 
@@ -563,7 +691,13 @@ export class SessionFormSheet {
    * doc. Price and description go out unconditionally: on a PATCH, omitting a
    * field means "keep the old value", so a cleared price has to arrive as 0
    * and a cleared description as an empty string, or clearing them would
-   * silently do nothing.
+   * silently do nothing. Free clears the price the same way: 0, not null,
+   * which the API's NOT NULL column would refuse. The group, the venue, the seat limit and the meeting
+   * link go out as `null` to clear them, for the same reason.
+   *
+   * The timezone and the rule stay off the wire: both are locked here (see
+   * the class doc), and a payload without them leaves the stored ones as
+   * they are.
    */
   private _update(id: string): void {
     const payload: UpdateTemplateRequest = {
@@ -574,27 +708,22 @@ export class SessionFormSheet {
       approvalRequired: this.approvalRequired(),
       locationKind: this.locationKind(),
       durationMinutes: this.durationMinutes(),
-      timezone: this.timezone(),
       waitlistEnabled: this.waitlistEnabled(),
       cancellationCutoffHours: this.cancellationCutoffHours(),
-      priceAmountCents: Math.round((this.priceAmount() ?? 0) * 100),
+      priceAmountCents: this._priceCentsForUpdate(),
       priceCurrency: this.priceCurrency(),
+      groupId: this._groupForSave(),
+      capacity: this._capacityForSave(),
     };
 
-    if (this.needsGroup() && this.groupId()) payload.groupId = this.groupId() ?? undefined;
-
-    if (this.isOnline()) payload.meetingUrl = this.meetingUrl().trim();
-    else if (this.venueId()) payload.venueId = this.venueId() ?? undefined;
-
-    if (this.showCapacity() && this.capacity() !== null) {
-      payload.capacity = this.capacity() ?? undefined;
+    // Online keeps a link and no venue; in person, a venue (or none) and no link.
+    if (this.isOnline()) {
+      payload.meetingUrl = this.meetingLink();
+      payload.venueId = null;
+    } else {
+      payload.venueId = this.venueId();
+      payload.meetingUrl = null;
     }
-
-    // Only the rule's details can change here. A payload without a rule leaves
-    // the stored one untouched — which is also the safe fallback when the full
-    // template failed to load and the form seeded as a one-off.
-    const rule = this._rule();
-    if (rule) payload.recurrenceRule = rule;
 
     this._sessionService
       .updateTemplate(id, payload)
@@ -614,10 +743,6 @@ export class SessionFormSheet {
   }
 
   private _create(): void {
-    // `ion-datetime` hands back a local wall-clock string; the BE wants an
-    // instant, and the template's own timezone is what the series expands in.
-    const start = new Date(this.startAt());
-
     const payload: CreateTemplateRequest = {
       title: this.title().trim(),
       description: this.description().trim() || undefined,
@@ -630,20 +755,28 @@ export class SessionFormSheet {
       waitlistEnabled: this.waitlistEnabled(),
       cancellationCutoffHours: this.cancellationCutoffHours(),
       isRecurring: this.isRecurring(),
-      firstStartAt: start.toISOString(),
+      // The picked wall clock in the picked zone (`startIso`); the series
+      // expands in that zone too.
+      firstStartAt: this.startIso(),
       generateInitialInstances: true,
     };
 
     if (this.needsGroup() && this.groupId()) payload.groupId = this.groupId() ?? undefined;
 
-    if (this.isOnline()) payload.meetingUrl = this.meetingUrl().trim();
-    else if (this.venueId()) payload.venueId = this.venueId() ?? undefined;
-
-    if (this.showCapacity() && this.capacity() !== null) {
-      payload.capacity = this.capacity() ?? undefined;
+    if (this.isOnline()) {
+      payload.meetingUrl = this.meetingLink() ?? undefined;
+    } else if (this.venueId()) {
+      payload.venueId = this.venueId() ?? undefined;
     }
-    if (this.priceAmount() !== null) {
-      payload.priceAmountCents = Math.round((this.priceAmount() ?? 0) * 100);
+
+    const capacity = this._capacityForSave();
+    if (capacity !== null) {
+      payload.capacity = capacity;
+    }
+    // Free sends no price at all; elsewhere an empty field means free.
+    const priceCents = priceCentsFor(this.access(), this.priceAmount());
+    if (priceCents !== null) {
+      payload.priceAmountCents = priceCents;
       payload.priceCurrency = this.priceCurrency();
     }
 
@@ -686,6 +819,31 @@ export class SessionFormSheet {
     return this._translateService.instant(key, params);
   }
 
+  /** A 1-on-1 is one seat; otherwise the field, where empty means no limit. */
+  private _capacityForSave(): number | null {
+    if (this.type() === SessionType.Private) {
+      return 1;
+    }
+    return this.capacity();
+  }
+
+  /** The price a PATCH carries: 0 clears it, Free included. */
+  private _priceCentsForUpdate(): number {
+    const cents = priceCentsFor(this.access(), this.priceAmount());
+    if (cents === null) {
+      return 0;
+    }
+    return cents;
+  }
+
+  /** The picked group, or none once the picker is not offered. */
+  private _groupForSave(): string | null {
+    if (!this.needsGroup()) {
+      return null;
+    }
+    return this.groupId();
+  }
+
   /**
    * Clamped rather than left to the wheels: switching to 8 h while the minute
    * wheel sits on `:30` would otherwise ask for 510 minutes. Both bounds land
@@ -705,6 +863,11 @@ export class SessionFormSheet {
     this.preview.set([]);
     this.previewTruncated.set(false);
     this.timezone.set(deviceTimezone());
+    this.meetingTouched.set(false);
+    this._now.set(Date.now());
+    // A saved session opens with its problems said: an old "Paid" one with no
+    // price is told so at once, not left with a Save that will not press.
+    this.priceTouched.set(this.template() !== null || this.prefill() !== null);
 
     const editing = this.template();
     if (editing) {
@@ -716,11 +879,14 @@ export class SessionFormSheet {
       this.groupId.set(editing.groupId);
       this.locationKind.set(editing.locationKind);
       // The pill is read-only in edit mode, but the recurrence preview still
-      // expands from this anchor, so it has to be the template's own.
-      this.startAt.set(
-        editing.firstStartAt ? toLocalIso(new Date(editing.firstStartAt)) : defaultStart(),
-      );
+      // expands from this anchor, so it has to be the template's own: its
+      // wall clock in its own zone, which `startIso` reads back exactly.
       this.timezone.set(editing.timezone);
+      if (editing.firstStartAt) {
+        this.startAt.set(wallClockInZone(editing.firstStartAt, editing.timezone));
+      } else {
+        this.startAt.set(defaultStart());
+      }
       this.durationMinutes.set(editing.durationMinutes);
       this.capacity.set(editing.capacity);
       this.waitlistEnabled.set(editing.waitlistEnabled);
@@ -754,6 +920,7 @@ export class SessionFormSheet {
       this.approvalRequired.set(prefill.approvalRequired);
       this.groupId.set(prefill.groupId);
       this.locationKind.set(prefill.locationKind);
+      this.timezone.set(prefill.timezone);
       this.startAt.set(prefill.startAt);
       this.durationMinutes.set(prefill.durationMinutes);
       this.capacity.set(prefill.capacity);
@@ -774,7 +941,9 @@ export class SessionFormSheet {
     this.title.set('');
     this.description.set('');
     this.type.set(SessionType.Group);
-    this.access.set(SessionAccess.Open);
+    // A new session starts free (open to anyone, no price): starting on Paid
+    // with no price kept Create off without saying why. Paid asks for one.
+    this.access.set(SessionAccess.Free);
     this.approvalRequired.set(false);
     this.groupId.set(null);
     this.locationKind.set(SessionLocationKind.InPerson);
@@ -807,7 +976,10 @@ export class SessionFormSheet {
       .list({ silent: true })
       .pipe(take(1))
       .subscribe({
-        next: (venues) => this.venues.set(venues),
+        next: (venues) => {
+          this.venues.set(venues);
+          this.venuesKnown.set(true);
+        },
         // A missing venue list is not worth an error: the picker just stays
         // empty and the session can still be created without one.
         error: () => {
@@ -815,6 +987,36 @@ export class SessionFormSheet {
           this.venues.set([]);
         },
       });
+  }
+
+  /**
+   * In person with no place to pick: the coach adds one here, in the same
+   * sheet as the coaching profile's, and it is chosen for this session.
+   * Saved through the shared store, so the profile's list has it too.
+   */
+  addPlace(draft: VenueDraft): void {
+    if (this.placeSaving()) {
+      return;
+    }
+    this.placeSaving.set(true);
+    this._coachVenues.create(venueCreatePayload(draft)).subscribe({
+      next: (venue) => {
+        this.placeSaving.set(false);
+        this.placeOpen.set(false);
+        this.venues.update((list) => [...list, venue]);
+        if (!venue.isOnline) {
+          this.venueId.set(venue.id);
+        }
+        void this._feedbackService.success(this._translateService.instant('venues.toast.added'));
+      },
+      error: (error: unknown) => {
+        this.placeSaving.set(false);
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('venues.toast.saveFailed'),
+        );
+      },
+    });
   }
 
   /** Same contract as `_loadVenues`, for the group picker. */

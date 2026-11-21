@@ -11,7 +11,7 @@ import {
   sessionTypeLabel,
 } from 'core';
 
-import { instanceMeta, instanceTone } from '../../sessions.config';
+import { instanceMeta, rowTone } from '../../sessions.config';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 
@@ -72,8 +72,16 @@ export class SessionRow {
     () => this._template()?.locationKind === SessionLocationKind.Online,
   );
 
-  /** Drives the spine colour via a `data-tone` attribute. */
-  readonly tone = computed(() => instanceTone(this.instance()));
+  /** Drives the spine colour via a `data-tone` attribute; muted once it has ended. */
+  readonly tone = computed(() => rowTone(this.instance()));
+
+  /**
+   * Over, so the row reads as the record: the muted spine and a muted title.
+   * From the times, like `isLive`, not the status the cron moves late.
+   */
+  readonly isPast = computed(
+    () => sessionLifecycle(this.instance().startAt, this.instance().endAt) === 'past',
+  );
 
   /** Core's words for the type — the same ones the create sheet's tiles use. */
   readonly typeLabel = computed(() => {

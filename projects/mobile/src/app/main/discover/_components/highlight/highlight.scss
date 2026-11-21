@@ -6,7 +6,11 @@
   display: inline;
 }
 
+/* Inline padding grows the tint without moving the line: without it the tint
+   stopped above the tails of g, j, ș and ț, so the match read as cut off at
+   the bottom. */
 mark {
+  padding: 0 0.04em 0.2em;
   border-radius: 0.125rem;
   background: var(--mh-color-honey-tint);
   color: var(--ion-text-color);

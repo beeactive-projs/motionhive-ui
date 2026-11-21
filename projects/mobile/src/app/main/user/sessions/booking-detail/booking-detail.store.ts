@@ -96,8 +96,11 @@ export class BookingDetailStore {
     this._joinInfo.set(null);
     this._joinInfoFor = null;
     // Deep links have no router state; the index is the only chance to know
-    // this session is already booked. Idempotent when already loaded.
-    this._myBookingsIndexStore.ensureLoaded();
+    // this session is already booked. Read fresh each time: the index only
+    // changed after a book or cancel on this page, so a booking the coach
+    // approved, or a waitlist place that turned into a seat, still read as
+    // pending here.
+    this._myBookingsIndexStore.ensureLoaded(true);
     this._fetch(false);
   }
 

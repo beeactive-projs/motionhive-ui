@@ -1,0 +1,21 @@
+/* The session form's start pill (`session-form-sheet.scss`): a button
+   dressed as the field it opens, with the value as its face. */
+.field-button {
+  --background: var(--ion-card-background);
+  --color: var(--ion-text-color);
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --box-shadow: none;
+  --padding-start: 0.875rem;
+  --padding-end: 0.875rem;
+  width: 100%;
+  height: 3rem;
+  margin: 0;
+  font-size: var(--mh-text-md);
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+.field-button::part(native) {
+  justify-content: flex-start;
+}

@@ -25,8 +25,6 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
-  AuthStore,
-  SESSION_ACCESS_LEVELS,
   SESSION_INSTANCE_STATUSES,
   SESSION_PARTICIPANT_STATUSES,
   SESSION_REMINDER_KINDS,
@@ -36,6 +34,7 @@ import {
   SessionParticipant,
   SessionParticipantStatus,
   SessionsDetailStore,
+  SessionsInstructorStore,
   appLocale,
   detectMeetingProvider,
   displayName,
@@ -45,7 +44,6 @@ import {
   formatSessionTime,
   formatTimeUntil,
   meetingProviderLabel,
-  publicProfileUrl,
   sessionLifecycle,
   sessionTypeLabel,
   sessionTypeTone,
@@ -66,6 +64,7 @@ import { CapacitySheet } from '../_sheets/capacity-sheet/capacity-sheet';
 import { CancelSessionSheet } from '../_sheets/cancel-session-sheet/cancel-session-sheet';
 import { MessageSignupsSheet } from '../_sheets/message-signups-sheet/message-signups-sheet';
 import { ParticipantNoteSheet } from '../_sheets/participant-note-sheet/participant-note-sheet';
+import { RescheduleSheet } from '../_sheets/reschedule-sheet/reschedule-sheet';
 import { SessionActionsSheet } from '../_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from '../_sheets/session-form-sheet/session-form-sheet';
 import {
@@ -74,9 +73,12 @@ import {
   SessionActionIds,
   SessionPrefill,
   SessionSurfaces,
+  accessLevelFor,
   formatRecurrenceSummary,
   onTheRoster,
   prefillFromInstance,
+  sessionPriceLabel,
+  sessionShareUrl,
 } from '../sessions.config';
 
 /**
@@ -133,6 +135,7 @@ function sessionStackOf(url: string): string {
     MessageSignupsSheet,
     HexAvatar,
     ParticipantNoteSheet,
+    RescheduleSheet,
     SessionActionsSheet,
     SessionFormSheet,
     IonBackButton,
@@ -168,11 +171,12 @@ export class SessionDetail implements ViewWillEnter {
    * rather than to the agenda.
    */
   readonly stack = sessionStackOf(this._router.url);
-  private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
   private readonly _translateService = inject(TranslateService);
   readonly store = inject(SessionsDetailStore);
+  /** The agenda's store, told when a change here leaves its window stale. */
+  private readonly _sessionsInstructorStore = inject(SessionsInstructorStore);
 
   readonly cancelOpen = signal(false);
   readonly actionsOpen = signal(false);
@@ -182,15 +186,13 @@ export class SessionDetail implements ViewWillEnter {
   readonly noteOpen = signal(false);
   readonly noteParticipant = signal<SessionParticipant | null>(null);
   readonly capacityOpen = signal(false);
+  readonly rescheduleOpen = signal(false);
   readonly skeletonRows = [1, 2, 3];
   readonly joinOpensMinutes = JOIN_OPENS_MINUTES;
   readonly Surfaces = SessionSurfaces;
 
   /** Set once the coach taps "Show all" — long rosters open one row deep. */
   readonly attendeesExpanded = signal(false);
-
-  /** No handle, no public link — so the Share verb stays hidden. */
-  readonly canShare = computed(() => !!this._authStore.user()?.handle);
 
   readonly instance = this.store.instance;
   readonly template = this.store.template;
@@ -390,10 +392,13 @@ export class SessionDetail implements ViewWillEnter {
     );
   });
 
+  /** "49.50 RON", cents kept when there are any (`sessionPriceLabel`); null when free. */
   readonly price = computed(() => {
-    const cents = this.template()?.priceAmountCents ?? 0;
-    if (cents === 0) return null;
-    return `${(cents / 100).toFixed(0)} ${this.template()?.priceCurrency ?? ''}`.trim();
+    const template = this.template();
+    if (!template) {
+      return null;
+    }
+    return sessionPriceLabel(template.priceAmountCents, template.priceCurrency);
   });
 
   /** Nothing to do on a cancelled session. */
@@ -590,18 +595,36 @@ export class SessionDetail implements ViewWillEnter {
   );
 
   /**
+   * Who can book, read with the price (`accessLevelFor`): an OPEN session
+   * saved without one is free to book, so it says Free, not "Paid" beside a
+   * free price. Worded by core's `SESSION_ACCESS_LEVELS`.
+   */
+  private readonly _accessLevel = computed(() => {
+    const template = this.template();
+    if (!template || !template.access) {
+      return null;
+    }
+    return accessLevelFor(template.access, template.priceAmountCents);
+  });
+
+  /**
    * "Paid" / "Free" / "Clients only" — the access level as a hero
-   * badge, worded by core's `SESSION_ACCESS_LEVELS` (whose labels never
-   * collide with the type chip's).
+   * badge (its labels never collide with the type chip's).
    */
   readonly accessLabel = computed(() => {
-    const access = this.template()?.access;
-    return access ? SESSION_ACCESS_LEVELS[access].label : null;
+    const level = this._accessLevel();
+    if (!level) {
+      return null;
+    }
+    return level.label;
   });
 
   readonly accessTone = computed(() => {
-    const access = this.template()?.access;
-    return access ? SESSION_ACCESS_LEVELS[access].tone : null;
+    const level = this._accessLevel();
+    if (!level) {
+      return null;
+    }
+    return level.tone;
   });
 
   /** The cancel banner's second line — when it happened, who heard about it. */
@@ -637,7 +660,7 @@ export class SessionDetail implements ViewWillEnter {
       },
     ];
 
-    const access = template.access ? SESSION_ACCESS_LEVELS[template.access] : null;
+    const access = this._accessLevel();
     if (access) {
       rows.push({
         icon: access.ionIcon,
@@ -850,8 +873,22 @@ export class SessionDetail implements ViewWillEnter {
   duplicateThis(): void {
     const instance = this.instance();
     if (!instance) return;
-    this.duplicatePrefill.set(prefillFromInstance(instance));
+    this._openDuplicate(instance);
+  }
+
+  /**
+   * The copy reads the full template the store fetched, not the instance's
+   * short one: only the full one carries the repeat rule, so a weekly series
+   * would otherwise be copied as a one-off.
+   */
+  private _openDuplicate(instance: SessionInstance): void {
+    this.duplicatePrefill.set(prefillFromInstance(instance, Date.now(), this.template()));
     this.duplicateOpen.set(true);
+  }
+
+  /** The copy lands on the agenda, which reloads when it is next shown. */
+  onDuplicated(): void {
+    this._sessionsInstructorStore.markRangeStale();
   }
 
   openProfile(participant: SessionParticipant): void {
@@ -894,21 +931,38 @@ export class SessionDetail implements ViewWillEnter {
     this.capacityOpen.set(true);
   }
 
-  /** An edit changes what this whole screen shows — refetch, don't patch. */
+  /** An edit changes what this whole screen shows — refetch, don't patch. The agenda too. */
   onEdited(): void {
     this.store.reload();
+    this._sessionsInstructorStore.markRangeStale();
   }
 
+  /** The agenda's rows show the seat count, so it reloads as well. */
   onCapacityChanged(): void {
     this.store.reload();
+    this._sessionsInstructorStore.markRangeStale();
   }
 
   openCancel(): void {
     this.cancelOpen.set(true);
   }
 
-  /** Gone from the agenda, so back where it was opened from: a client stays a client. */
+  /**
+   * The date moved, its bookings with it: the page shows the new time and
+   * the agenda reloads when it is next shown.
+   */
+  onRescheduled(): void {
+    this.store.reload();
+    this._sessionsInstructorStore.markRangeStale();
+  }
+
+  /**
+   * Gone from the agenda, so back where it was opened from: a client stays a
+   * client. The agenda is told first, or it would show the cancelled session
+   * from its cached window.
+   */
   onCancelled(): void {
+    this._sessionsInstructorStore.markRangeStale();
     if (this.stack === SESSIONS_STACK) {
       void this._router.navigate([SESSIONS_STACK]);
       return;
@@ -946,12 +1000,13 @@ export class SessionDetail implements ViewWillEnter {
         // the fields the instance's eager subset omits (recurrence, anchor).
         this.editOpen.set(true);
         return;
+      case SessionActionIds.Reschedule:
+        this.rescheduleOpen.set(true);
+        return;
       case SessionActionIds.Duplicate:
         // Opened here rather than bounced back to the agenda: this screen
-        // already holds the instance and its template, so there is nothing to
-        // pass and nothing to reload.
-        this.duplicatePrefill.set(prefillFromInstance(instance));
-        this.duplicateOpen.set(true);
+        // already holds the instance and its full template.
+        this._openDuplicate(instance);
         return;
       case SessionActionIds.Share:
         await this._share(instance);
@@ -961,10 +1016,11 @@ export class SessionDetail implements ViewWillEnter {
     }
   }
 
+  /**
+   * Share the session itself (`sessionShareUrl`): the app opens it on a
+   * phone, the web app in a browser. Its name and time ride along in the text.
+   */
   private async _share(instance: SessionInstance): Promise<void> {
-    const handle = this._authStore.user()?.handle;
-    if (!handle) return;
-
     const title = this.title() || this._translateService.instant('common.session');
 
     const outcome = await shareOrCopy({
@@ -974,7 +1030,7 @@ export class SessionDetail implements ViewWillEnter {
         day: formatSessionDayShort(instance.startAt),
         time: formatSessionTime(instance.startAt),
       }),
-      url: publicProfileUrl(handle),
+      url: sessionShareUrl(instance.id),
     });
 
     if (outcome === ShareOutcomes.Copied) {

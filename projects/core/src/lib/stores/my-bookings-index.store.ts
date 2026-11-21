@@ -35,6 +35,9 @@ export class MyBookingsIndexStore {
 
   readonly count = computed(() => this._byInstanceId().size);
 
+  /** Every active booking (upcoming, pending, waitlisted), each with its session. */
+  readonly bookings = computed(() => [...this._byInstanceId().values()]);
+
   /**
    * Populate the index. Idempotent — subsequent calls re-use the cache
    * unless `force` is true. After any Book / Cancel UI action, call

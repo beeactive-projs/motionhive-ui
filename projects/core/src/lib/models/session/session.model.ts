@@ -256,7 +256,20 @@ export interface CreateTemplateRequest {
   initialInstancesCount?: number;
 }
 
-export type UpdateTemplateRequest = Partial<CreateTemplateRequest>;
+/**
+ * A PATCH: an omitted field keeps its value. The four links below also take
+ * `null`, which clears them (a session with no group, no venue, no seat limit,
+ * or an in person session that no longer has a meeting link).
+ */
+export type UpdateTemplateRequest = Omit<
+  Partial<CreateTemplateRequest>,
+  'groupId' | 'venueId' | 'capacity' | 'meetingUrl'
+> & {
+  groupId?: string | null;
+  venueId?: string | null;
+  capacity?: number | null;
+  meetingUrl?: string | null;
+};
 
 export interface PreviewRecurrenceRequest {
   rule: RecurrenceRule;
@@ -310,7 +323,8 @@ export interface ListInstancesQuery {
   templateId?: string;
   /** Narrow your own calendar to one person's bookings. */
   clientId?: string;
-  status?: SessionInstanceStatus;
+  /** One status or several (sent as repeated params); omitted, every status. */
+  status?: SessionInstanceStatus | SessionInstanceStatus[];
   /** By start time; `desc` for a past list, so page one is the latest. Default `asc`. */
   order?: 'asc' | 'desc';
   page?: number;
@@ -331,6 +345,8 @@ export interface DiscoverQuery {
   groupId?: string;
   /** Sessions in any of these categories: their group's, else their coach's. */
   categoryIds?: readonly string[];
+  /** One city, whole (case and accents aside); online sessions are in every city. */
+  city?: string;
   dateFrom?: string;
   dateTo?: string;
   page?: number;

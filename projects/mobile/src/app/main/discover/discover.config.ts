@@ -169,9 +169,18 @@ export function sessionCapacity(i: PublicSessionInstance): number | null {
   return i.capacityOverride ?? i.template?.capacity ?? null;
 }
 
+/**
+ * Seats held: confirmed plus waiting for the coach's approval, what the API
+ * books against. Confirmed alone called a session open that the API would
+ * send to the waitlist.
+ */
+export function seatsTaken(i: PublicSessionInstance): number {
+  return (i.confirmedCount ?? 0) + (i.pendingApprovalCount ?? 0);
+}
+
 export function isSessionFull(i: PublicSessionInstance): boolean {
   const capacity = sessionCapacity(i);
-  return capacity != null && capacity > 0 && i.confirmedCount >= capacity;
+  return capacity != null && capacity > 0 && seatsTaken(i) >= capacity;
 }
 
 /**
@@ -185,7 +194,7 @@ export function spotsLabel(i: PublicSessionInstance): string | null {
   if (i.template?.type === SessionType.Private) return null;
   if (isSessionFull(i)) return null;
   return translate('discover.row.spots', {
-    confirmed: Math.min(i.confirmedCount, capacity),
+    confirmed: Math.min(seatsTaken(i), capacity),
     capacity,
   });
 }
@@ -316,6 +325,8 @@ export const DISCOVER_LOCATION_OPTIONS: {
 
 export const QuickFilterIds = {
   All: 'all',
+  /** The reader's own bookings; the page draws them from the bookings store. */
+  Booked: 'booked',
   Online: 'online',
   InPerson: 'in-person',
   Group: 'group',
@@ -338,6 +349,13 @@ export const QUICK_FILTERS: DiscoverQuickFilter[] = [
     id: QuickFilterIds.All,
     get label() {
       return translate('common.all');
+    },
+    patch: { type: undefined, locationKind: undefined },
+  },
+  {
+    id: QuickFilterIds.Booked,
+    get label() {
+      return translate('discover.feed.booked');
     },
     patch: { type: undefined, locationKind: undefined },
   },
@@ -381,6 +399,9 @@ export function quickFilterSelected(filters: DiscoverFilters, id: QuickFilterId)
   switch (id) {
     case QuickFilterIds.All:
       return !filters.type && !filters.locationKind;
+    case QuickFilterIds.Booked:
+      // Not a filter the server knows: the page says whether it is on.
+      return false;
     case QuickFilterIds.Online:
       return filters.locationKind === SessionLocationKind.Online && !filters.type;
     case QuickFilterIds.InPerson:

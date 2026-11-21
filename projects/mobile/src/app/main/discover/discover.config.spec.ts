@@ -153,6 +153,7 @@ function instance(
   overrides: Partial<{
     capacityOverride: number | null;
     confirmedCount: number;
+    pendingApprovalCount: number;
     capacity: number | null;
     waitlistEnabled: boolean;
     type: SessionType;
@@ -171,6 +172,7 @@ function instance(
     titleOverride: null,
     capacityOverride: overrides.capacityOverride ?? null,
     confirmedCount: overrides.confirmedCount ?? 0,
+    pendingApprovalCount: overrides.pendingApprovalCount ?? 0,
     template: {
       id: 'tmpl-1',
       title: 'Evening yoga flow',
@@ -300,6 +302,15 @@ describe('spots and full chip', () => {
     expect(spotsLabel(i)).toBeNull();
     expect(isSessionFull(i)).toBe(false);
     expect(fullChip(i)).toBeNull();
+  });
+
+  // The API books against confirmed plus pending seats; counting confirmed
+  // alone showed a seat the API then sent to the waitlist.
+  it('counts seats waiting for approval as taken', () => {
+    const almost = instance({ capacity: 10, confirmedCount: 8, pendingApprovalCount: 1 });
+    expect(spotsLabel(almost)).toBe('9 of 10 spots');
+    const full = instance({ capacity: 10, confirmedCount: 8, pendingApprovalCount: 2 });
+    expect(isSessionFull(full)).toBe(true);
   });
 
   it('renders "n of m spots" while there is room', () => {

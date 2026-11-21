@@ -1,0 +1,11 @@
+/* The wait for the join: a spinner and one line, in the middle of the page. */
+.joining {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 60%;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+}

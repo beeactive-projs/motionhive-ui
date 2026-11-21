@@ -3,3 +3,7 @@
 
 /* Shown the first time someone takes a photo for a workout or a post. */
 "NSCameraUsageDescription" = "MotionHive uses the camera when you take a photo for a workout or a post.";
+
+/* Shown when someone taps "Add to calendar" on a session. */
+"NSCalendarsWriteOnlyAccessUsageDescription" = "MotionHive adds a session to your calendar only when you ask it to.";
+"NSCalendarsUsageDescription" = "MotionHive adds a session to your calendar only when you ask it to.";

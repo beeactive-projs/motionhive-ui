@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -75,12 +75,20 @@ export class SessionService {
     );
   }
 
+  /** `silent` opts the read out of the global error dialog, as on `listInstances`. */
   listTemplates(
     query: ListTemplatesQuery = {},
+    opts?: { silent?: boolean },
   ): Observable<PaginatedResponse<SessionTemplate>> {
+    const options: { params: HttpParams; context?: HttpContext } = {
+      params: this._toParams(query),
+    };
+    if (opts?.silent) {
+      options.context = silentRequest();
+    }
     return this._http.get<PaginatedResponse<SessionTemplate>>(
       `${this._base}${API_ENDPOINTS.SESSIONS.TEMPLATES}`,
-      { params: this._toParams(query) },
+      options,
     );
   }
 

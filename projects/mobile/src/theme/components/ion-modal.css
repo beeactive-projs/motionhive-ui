@@ -19,6 +19,20 @@ ion-modal.mh-picker-modal ion-datetime {
   height: auto;
 }
 
+/* A calendar's six week rows share the picker's height (Ionic's
+   `grid-template-rows: repeat(6, 1fr)` over a 350px minimum): about 27px a
+   row for a 40px day circle, so the selected day covered the numbers above
+   and below it. This is room for six full rows; the day itself is sized to
+   its column in ion-datetime.css. */
+ion-modal.mh-picker-modal
+  ion-datetime:is(
+    .datetime-presentation-date,
+    .datetime-presentation-date-time,
+    .datetime-presentation-time-date
+  ):not(.datetime-prefer-wheel) {
+  min-height: 29rem;
+}
+
 /* Sheets sized to their content — sheet-shell's `fit`. Ionic's documented
    auto-height sheet: the modal takes its content's height, and the page
    wrapper Ionic puts around inline content stops being an absolutely

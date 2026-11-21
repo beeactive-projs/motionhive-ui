@@ -53,10 +53,14 @@
   align-self: flex-start;
 }
 
+/* Ionic's button sets a line height of 1, and with the title's overflow
+   hidden that cut the tails of g, j, ș and ț off the name. The text takes a
+   real line height back. */
 .text {
   display: block;
   flex: 1;
   min-width: 0;
+  line-height: var(--mh-leading-tight);
 }
 
 .title {

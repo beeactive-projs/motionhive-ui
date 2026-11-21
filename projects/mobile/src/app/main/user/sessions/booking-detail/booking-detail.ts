@@ -51,9 +51,15 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
 import { ClockService } from '../../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { SendToService } from '../../../../_shared/services/send-to.service';
+import { SessionCalendarService } from '../../../../_shared/services/session-calendar.service';
 import { injectOpenDirectMessage } from '../../../../_shared/utils/direct-message';
 import { copyToClipboard } from '../../../../_shared/utils/share';
-import { ProfileStacks, sharedBase, stackRootOf } from '../../../../_shared/utils/stack-paths';
+import {
+  ProfileStacks,
+  groupLinks,
+  sharedBase,
+  stackRootOf,
+} from '../../../../_shared/utils/stack-paths';
 import { BookingOutcomeSheet } from '../_sheets/booking-outcome-sheet/booking-outcome-sheet';
 import { CancelBookingSheet } from '../_sheets/cancel-booking-sheet/cancel-booking-sheet';
 import {
@@ -127,6 +133,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
   private readonly _sendTo = inject(SendToService);
+  private readonly _sessionCalendar = inject(SessionCalendarService);
   private readonly _outlet = inject(IonRouterOutlet, { optional: true });
 
   readonly Views = DetailViews;
@@ -193,7 +200,11 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
    */
   readonly canSend = computed(() => {
     const instance = this.publicInstance();
-    if (!instance || instance.template?.access !== SessionAccess.Open) {
+    if (!instance) {
+      return false;
+    }
+    const access = instance.template?.access;
+    if (access !== SessionAccess.Open && access !== SessionAccess.Free) {
       return false;
     }
     if (instance.status === SessionInstanceStatus.Cancelled) {
@@ -451,9 +462,22 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     return instance.capacityOverride ?? instance.template?.capacity ?? null;
   });
 
+  /**
+   * Seats held: confirmed and waiting for the coach's approval, the count the
+   * API books against. Confirmed alone showed a seat free that the API then
+   * gave away to the waitlist.
+   */
+  private readonly _taken = computed(() => {
+    const instance = this.publicInstance();
+    if (!instance) {
+      return 0;
+    }
+    return (instance.confirmedCount ?? 0) + (instance.pendingApprovalCount ?? 0);
+  });
+
   readonly spotsLabel = computed(() => {
     const capacity = this.capacity();
-    const taken = this.publicInstance()?.confirmedCount ?? 0;
+    const taken = this._taken();
     return capacity === null
       ? ''
       : this._translateService.instant('mySessions.detail.spotsBooked', { taken, capacity });
@@ -462,23 +486,37 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   readonly spotsProgress = computed(() => {
     const capacity = this.capacity();
     if (!capacity) return 0;
-    return Math.min(1, (this.publicInstance()?.confirmedCount ?? 0) / capacity);
+    return Math.min(1, this._taken() / capacity);
   });
 
   readonly isFull = computed(() => {
     const capacity = this.capacity();
     if (capacity === null) return false;
-    return (this.publicInstance()?.confirmedCount ?? 0) >= capacity;
+    return this._taken() >= capacity;
   });
 
   /** What the showcase footer offers: book, join the waitlist, or nothing. */
   readonly bookAction = computed<'book' | 'waitlist' | 'full' | null>(() => {
     const instance = this.publicInstance();
     if (this.view() !== DetailViews.Showcase || !instance) return null;
-    if (sessionLifecycle(instance.startAt, instance.endAt) === 'past') return null;
+    // Started is too late to book: a session under way offered Book.
+    if (sessionLifecycle(instance.startAt, instance.endAt) !== 'upcoming') {
+      return null;
+    }
     if (!this.isFull()) return 'book';
     return instance.template?.waitlistEnabled ? 'waitlist' : 'full';
   });
+
+  /** The coach approves each booking here: Book asks rather than books. */
+  readonly needsApproval = computed(() => !!this.publicInstance()?.template?.approvalRequired);
+
+  /** A members-only session seen from outside: its group's page, where joining is. */
+  openGroup(): void {
+    const groupId = this.blockedInstance()?.template?.groupId;
+    if (groupId) {
+      void this._router.navigate(groupLinks(this._router.url).preview(groupId));
+    }
+  }
 
   readonly showFooter = computed(() => {
     const view = this.view();
@@ -619,23 +657,12 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   }
 
   addToCalendar(): void {
-    const id = this._loadedId;
-    if (!id) return;
-    this._sessionService
-      .downloadIcs(id)
-      .pipe(take(1))
-      .subscribe({
-        next: () =>
-          void this._feedbackService.success(
-            this._translateService.instant('mySessions.toast.calendarDownloaded'),
-          ),
-        error: (error: unknown) =>
-          void this._feedbackService.error(
-            error,
-            this._translateService.instant('mySessions.toast.calendarFailed'),
-          ),
-      });
+    const instance = this.publicInstance();
+    if (instance) {
+      void this._sessionCalendar.add(instance);
+    }
   }
+
 
   messageCoach(): void {
     const coach = this.coach();

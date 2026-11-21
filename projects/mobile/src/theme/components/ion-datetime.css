@@ -12,3 +12,15 @@ ion-datetime-button::part(native) {
 ion-datetime::part(calendar-days-of-week) {
   color: var(--ion-color-medium);
 }
+
+/* A day is a circle that fits its column. Ionic fixes it at 40px (42px in
+   md), wider than a column in a phone-sized picker, so the selected day ran
+   into its neighbours; here it takes the column's width up to that size and
+   stays round. The rows get their height from the picker (ion-modal.css). */
+ion-datetime::part(calendar-day) {
+  width: 100%;
+  min-width: 0;
+  max-width: 2.5rem;
+  height: auto;
+  aspect-ratio: 1;
+}

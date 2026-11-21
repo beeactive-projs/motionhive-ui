@@ -18,7 +18,9 @@
           { "/": "/sessions*" },
           { "/": "/user/sessions*" },
           { "/": "/groups*" },
-          { "/": "/profile*" }
+          { "/": "/profile*" },
+          { "/": "/@*" },
+          { "/": "/join/*" }
         ]
       }
     ]

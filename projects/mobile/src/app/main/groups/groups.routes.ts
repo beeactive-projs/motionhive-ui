@@ -23,6 +23,14 @@ export const groupsRoutes: Routes = [
     loadComponent: () => import('./groups').then((m) => m.Groups),
     title: 'pageTitle.groups',
   },
+  // A group's invite link opened in the app (`<web app>/join/:token`, see
+  // `app-link.config.ts`): joins, then swaps itself for the group. Before
+  // the group pages, or `:groupId` swallows the word.
+  {
+    path: 'join/:token',
+    loadComponent: () => import('./join-group/join-group').then((m) => m.JoinGroupPage),
+    title: 'pageTitle.joinGroup',
+  },
   // Someone named in a group: a member, a post's author, a commenter.
   // Before the group pages, or `:groupId` swallows the word.
   ...personRoutes,

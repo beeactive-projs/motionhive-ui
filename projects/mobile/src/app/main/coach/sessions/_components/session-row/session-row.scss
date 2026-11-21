@@ -6,3 +6,9 @@
   display: block;
   margin-bottom: 0.5rem;
 }
+
+/* A session that has ended reads as the record: with the muted spine
+   (`rowTone`), its title steps back to the secondary ink. */
+.past ion-label h2 {
+  color: var(--ion-color-medium);
+}

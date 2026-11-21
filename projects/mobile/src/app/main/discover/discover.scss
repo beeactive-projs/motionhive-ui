@@ -171,6 +171,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* Inside a button, whose line height is 1: without its own, the
+     overflow cut the tails of g, j, p, ș and ț. */
+  line-height: var(--mh-leading-tight);
 }
 
 .city-skeleton {
@@ -207,6 +210,8 @@
 
 /* Takes the rest of the line, so the glyph and the words start at the
    field's edge (Ionic centres a button's content). */
+/* A real line height: the button's is 1, and with the overflow hidden that
+   cut the tails of g, j, ș and ț off the placeholder. */
 .search-entry-label {
   flex: 1;
   min-width: 0;
@@ -214,6 +219,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: var(--mh-leading-tight);
 }
 
 /* The topic chips scroll sideways to the screen's edges. The strip clips

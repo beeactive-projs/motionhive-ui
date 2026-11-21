@@ -22,7 +22,7 @@
   <div class="mh-section-label">{{ 'sessions.form.when' | translate }}</div>
   <div class="when">
     <ion-button fill="outline" class="field-button" [attr.aria-label]="'sessions.form.starts' | translate"
-      [disabled]="isEdit()" (click)="startOpen.set(true)">
+      [disabled]="isEdit()" (click)="openStart()">
       {{ startLabel() }}
     </ion-button>
     <ion-button fill="outline" class="field-button" [attr.aria-label]="'form.label.duration' | translate"
@@ -30,6 +30,10 @@
       {{ durationLabel(durationMinutes()) }}
     </ion-button>
   </div>
+
+  @if (startError(); as error) {
+  <p class="mh-helper over" role="alert">{{ error }}</p>
+  }
 
   @if (isEdit()) {
   <!-- The update endpoint has no way to move `firstStartAt` — same as web,
@@ -41,7 +45,8 @@
        presents, so it cannot live inside the row it belongs to. -->
   <ion-modal class="mh-picker-modal" [isOpen]="startOpen()" (didDismiss)="startOpen.set(false)">
     <ng-template>
-      <ion-datetime presentation="date-time" [showDefaultButtons]="true" [value]="startAt()"
+      <!-- No past times: the floor is now, on the picked zone's clock. -->
+      <ion-datetime presentation="date-time" [showDefaultButtons]="true" [min]="startMin()" [value]="startAt()"
         (ionChange)="onStartChange($event.detail.value)" />
     </ng-template>
   </ion-modal>
@@ -77,13 +82,19 @@
 
   <ion-item lines="none" class="field">
     <ion-select toggleIcon="chevron-down-outline" [label]="'form.label.timezone' | translate" interface="modal"
-      [attr.aria-label]="'form.label.timezone' | translate" [value]="timezone()"
+      [attr.aria-label]="'form.label.timezone' | translate" [value]="timezone()" [disabled]="isEdit()"
       (ionChange)="timezone.set($event.detail.value)">
       @for (option of timezones; track option.value) {
       <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
       }
     </ion-select>
   </ion-item>
+
+  @if (isEdit()) {
+  <!-- The API changes only the template for these, never the dates already
+       created, so an edit here would not move a single session. -->
+  <p class="mh-helper">{{ scheduleLockedHint() }}</p>
+  }
 
   <ion-item lines="none" class="field repeat" [class.on]="isRecurring()">
     <ion-icon slot="start" name="repeat-outline" aria-hidden="true" />
@@ -102,14 +113,15 @@
     @for (day of weekdays; track day.value) {
     <button type="button" class="day" [class.selected]="daysOfWeek().includes(day.value)"
       [attr.aria-pressed]="daysOfWeek().includes(day.value)" [attr.aria-label]="day.short"
-      (click)="toggleDay(day.value)">
+      [disabled]="isEdit()" (click)="toggleDay(day.value)">
       {{ day.label }}
     </button>
     }
   </div>
 
   <div class="mh-section-label">{{ 'sessions.form.ends' | translate }}</div>
-  <ion-segment mode="ios" class="ends" [value]="endMode()" (ionChange)="onEndModeChange($event.detail.value)">
+  <ion-segment mode="ios" class="ends" [value]="endMode()" [disabled]="isEdit()"
+    (ionChange)="onEndModeChange($event.detail.value)">
     @for (option of endOptions; track option.value) {
     <ion-segment-button [value]="option.value">
       <ion-label>{{ option.label | translate }}</ion-label>
@@ -121,20 +133,23 @@
   <div class="inline-number">
     <ion-input mode="md" class="count" fill="outline" type="number" inputmode="numeric"
       [attr.aria-label]="'sessions.form.occurrences' | translate" [value]="endAfterOccurrences()"
-      (ionInput)="setOccurrences($event.detail.value)" />
+      [disabled]="isEdit()" (ionInput)="setOccurrences($event.detail.value)" />
     <span>{{ 'sessions.form.occurrencesUnit' | translate: { count: endAfterOccurrences() } }}</span>
   </div>
   } @else if (endMode() === EndModes.OnDate) {
   <ion-item lines="none" class="field">
     <ion-label>{{ 'sessions.form.lastSession' | translate }}</ion-label>
-    <ion-datetime-button slot="end" datetime="session-end-date" />
+    <ion-datetime-button slot="end" datetime="session-end-date" [disabled]="isEdit()" />
   </ion-item>
+  @if (endDateError(); as error) {
+  <p class="mh-helper over" role="alert">{{ error }}</p>
+  }
 
   <!-- Detached for the same reason as the start picker above. -->
   <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
     <ng-template>
-      <ion-datetime id="session-end-date" presentation="date" [showDefaultButtons]="true" [value]="endDate()"
-        (ionChange)="setEndDate($event.detail.value)" />
+      <ion-datetime id="session-end-date" presentation="date" [showDefaultButtons]="true" [min]="startDay()"
+        [value]="endDate()" (ionChange)="setEndDate($event.detail.value)" />
     </ng-template>
   </ion-modal>
   }
@@ -170,7 +185,10 @@
   @if (isOnline()) {
   <ion-input mode="md" fill="outline" type="url" inputmode="url" placeholder="https://meet.google.com/…"
     [attr.aria-label]="'sessions.form.meetingLink' | translate" [value]="meetingUrl()"
-    (ionInput)="meetingUrl.set($event.detail.value ?? '')" />
+    (ionInput)="meetingUrl.set($event.detail.value ?? '')" (ionBlur)="onMeetingBlur()" />
+  @if (meetingLinkError(); as error) {
+  <p class="mh-helper over" role="alert">{{ error }}</p>
+  }
   <p class="mh-helper">{{ 'sessions.form.meetingLinkHint' | translate }}</p>
   } @else if (venues().length > 0) {
   <ion-item lines="none" class="field">
@@ -183,7 +201,19 @@
       }
     </ion-select>
   </ion-item>
+  } @else if (needsPlace()) {
+  <!-- No place to pick yet: added here, chosen for this session, and kept in
+       the coaching profile's places. -->
+  <div class="no-place">
+    <p class="mh-helper">{{ 'sessions.form.noPlaces' | translate }}</p>
+    <ion-button fill="outline" size="small" (click)="placeOpen.set(true)">
+      <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+      {{ 'venues.list.add' | translate }}
+    </ion-button>
+  </div>
   }
+
+  <mh-venue-sheet [(open)]="placeOpen" [saving]="placeSaving()" (save)="addPlace($event)" />
 
   <div class="mh-section-label">{{ 'sessions.form.whoCanBook' | translate }}</div>
   <div class="tiles two">
@@ -203,6 +233,10 @@
     <ion-select toggleIcon="chevron-down-outline" [label]="'sessions.form.group' | translate" interface="action-sheet"
       [placeholder]="'sessions.form.groupPlaceholder' | translate" [value]="groupId()"
       (ionChange)="groupId.set($event.detail.value)">
+      <!-- Members only access needs its group; anything else can drop it. -->
+      @if (access() !== Accesses.GroupOnly) {
+      <ion-select-option [value]="null">{{ 'sessions.form.groupNone' | translate }}</ion-select-option>
+      }
       @for (group of groups(); track group.id) {
       <ion-select-option [value]="group.id">{{ group.name }}</ion-select-option>
       }
@@ -227,18 +261,32 @@
     @if (showCapacity()) {
     <div>
       <div class="mh-section-label">{{ 'sessions.form.capacity' | translate }}</div>
-      <ion-input mode="md" fill="outline" type="number" inputmode="numeric" placeholder="12"
+      <ion-input mode="md" fill="outline" type="number" inputmode="numeric"
+        [placeholder]="'sessions.form.capacityPlaceholder' | translate"
         [attr.aria-label]="'sessions.form.spots' | translate" [value]="capacity()"
         (ionInput)="capacity.set(toNumber($event.detail.value))">
         <span slot="end" class="unit">{{ 'sessions.form.spotsUnit' | translate }}</span>
       </ion-input>
+      @if (capacityError(); as error) {
+      <p class="mh-helper over" role="alert">{{ error }}</p>
+      } @else {
+      <p class="mh-helper">{{ 'sessions.form.capacityHint' | translate }}</p>
+      }
     </div>
     }
+    @if (showPrice()) {
+    <!-- Free has no price. Paid needs one; clients only and group members
+         may leave it empty, which is free. -->
     <div>
-      <div class="mh-section-label">{{ 'form.label.price' | translate }}</div>
+      <div class="mh-section-label">
+        {{ 'form.label.price' | translate }}
+        @if (priceOptional()) {
+        {{ 'form.hint.optional' | translate }}
+        }
+      </div>
       <ion-input mode="md" fill="outline" type="number" inputmode="decimal" placeholder="0"
         [attr.aria-label]="'form.label.price' | translate" [value]="priceAmount()"
-        (ionInput)="priceAmount.set(toNumber($event.detail.value))">
+        (ionInput)="priceAmount.set(toNumber($event.detail.value))" (ionBlur)="priceTouched.set(true)">
         <ion-select toggleIcon="chevron-down-outline" slot="end" class="currency" interface="action-sheet"
           [attr.aria-label]="'form.label.currency' | translate" [value]="priceCurrency()"
           (ionChange)="priceCurrency.set($event.detail.value)">
@@ -247,9 +295,15 @@
           }
         </ion-select>
       </ion-input>
+      @if (priceError(); as error) {
+      <p class="mh-helper over" role="alert">{{ error }}</p>
+      }
     </div>
+    }
   </div>
+  @if (showPrice()) {
   <p class="mh-helper">{{ 'sessions.form.priceHint' | translate }}</p>
+  }
 
   @if (showCapacity()) {
   <ion-item lines="none" class="field">

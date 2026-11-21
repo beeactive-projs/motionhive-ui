@@ -1,6 +1,8 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
+import type { SessionInstance, SessionTemplate } from 'core';
+
 import {
   LOCATION_KIND_OPTIONS,
   SESSION_ACCESS_OPTIONS,
@@ -214,7 +216,7 @@ describe('option constants', () => {
   // back to the item's ink, so a typo here shows up as one row quietly losing
   // its tint rather than as a failure.
   it('tints every verb with a palette colour Ionic knows', () => {
-    const palette = ['primary', 'success', 'info', 'teal', 'danger'];
+    const palette = ['primary', 'success', 'info', 'teal', 'violet', 'danger'];
     for (const action of SESSION_ACTIONS) {
       expect(palette).toContain(action.color);
     }
@@ -334,6 +336,168 @@ describe('prefillFromInstance', () => {
     expect(bare.type).toBe('GROUP');
     expect(bare.durationMinutes).toBe(60);
     expect(bare.isRecurring).toBe(false);
+  });
+
+  // The instance's nested template is the API's short field list, with no
+  // rule: a weekly series duplicated from it became a one-off.
+  it('reads the repeat from the full template when one is passed', async () => {
+    const { prefillFromInstance } = await import('./sessions.config');
+    const full = {
+      title: 'Strength club',
+      type: 'GROUP',
+      locationKind: 'IN_PERSON',
+      durationMinutes: 60,
+      capacity: 14,
+      priceAmountCents: 0,
+      timezone: 'Europe/Bucharest',
+      recurrenceRule: { frequency: 'WEEKLY', interval: 1, daysOfWeek: [2, 4], endAfterOccurrences: 8 },
+    } as unknown as SessionTemplate;
+
+    const oneOff = prefillFromInstance(instance(), NOW);
+    expect(oneOff.isRecurring).toBe(false);
+
+    const series = prefillFromInstance(instance(), NOW, full);
+    expect(series.isRecurring).toBe(true);
+    expect(series.daysOfWeek).toEqual([2, 4]);
+    expect(series.endAfterOccurrences).toBe(8);
+  });
+
+  // A copy keeps its source's zone, and the start is that zone's clock.
+  it("carries the source's timezone, with the start on its clock", async () => {
+    const { prefillFromInstance } = await import('./sessions.config');
+    const out = prefillFromInstance(
+      instance({
+        startAt: '2026-11-25T18:00:00.000Z',
+        endAt: '2026-11-25T19:00:00.000Z',
+        template: { title: 'Run', type: 'OPEN', timezone: 'Europe/Bucharest', recurrenceRule: null },
+      }),
+      new Date('2026-11-21T09:00:00Z').getTime(),
+    );
+    expect(out.timezone).toBe('Europe/Bucharest');
+    expect(out.startAt).toBe('2026-11-25T20:00');
+  });
+});
+
+describe('time zones', () => {
+  // The bug: 18:00 picked for Europe/London on a phone in Bucharest was read
+  // in the phone's zone and stored as 16:00 in London.
+  it('reads a picked wall clock in the picked zone', async () => {
+    const { zonedWallClockToIso } = await import('./sessions.config');
+    expect(zonedWallClockToIso('2026-11-21T18:00', 'Europe/London')).toBe('2026-11-21T18:00:00.000Z');
+    expect(zonedWallClockToIso('2026-11-21T18:00', 'Europe/Bucharest')).toBe(
+      '2026-11-21T16:00:00.000Z',
+    );
+    // Summer time on both sides.
+    expect(zonedWallClockToIso('2026-07-01T18:00', 'Europe/London')).toBe('2026-07-01T17:00:00.000Z');
+    expect(zonedWallClockToIso('2026-07-01T18:00:00', 'America/New_York')).toBe(
+      '2026-07-01T22:00:00.000Z',
+    );
+  });
+
+  it('lands on the right side of a clock change', async () => {
+    const { zonedWallClockToIso } = await import('./sessions.config');
+    // Bucharest moves to summer time at 03:00 on 29 March 2026.
+    expect(zonedWallClockToIso('2026-03-28T18:00', 'Europe/Bucharest')).toBe(
+      '2026-03-28T16:00:00.000Z',
+    );
+    expect(zonedWallClockToIso('2026-03-29T18:00', 'Europe/Bucharest')).toBe(
+      '2026-03-29T15:00:00.000Z',
+    );
+  });
+
+  it('shows an instant on a zone clock, the reverse of the above', async () => {
+    const { wallClockInZone, zonedWallClockToIso } = await import('./sessions.config');
+    expect(wallClockInZone('2026-11-21T16:00:00.000Z', 'Europe/Bucharest')).toBe('2026-11-21T18:00');
+    expect(wallClockInZone('2026-11-21T00:30:00.000Z', 'Europe/London')).toBe('2026-11-21T00:30');
+    const iso = '2026-07-14T05:45:00.000Z';
+    expect(zonedWallClockToIso(wallClockInZone(iso, 'Asia/Tokyo'), 'Asia/Tokyo')).toBe(iso);
+  });
+});
+
+describe('form checks', () => {
+  it('takes a seat limit of 1 to 1000 whole seats, or none', async () => {
+    const { isValidCapacity } = await import('./sessions.config');
+    expect(isValidCapacity(null)).toBe(true);
+    expect(isValidCapacity(1)).toBe(true);
+    expect(isValidCapacity(1000)).toBe(true);
+    expect(isValidCapacity(0)).toBe(false);
+    expect(isValidCapacity(1001)).toBe(false);
+    expect(isValidCapacity(2.5)).toBe(false);
+    expect(isValidCapacity(-3)).toBe(false);
+  });
+
+  it('adds https to a link pasted without it, and refuses what the API would', async () => {
+    const { meetingLinkFor } = await import('./sessions.config');
+    expect(meetingLinkFor('meet.google.com/abc-defg-hij')).toBe('https://meet.google.com/abc-defg-hij');
+    expect(meetingLinkFor(' https://zoom.us/j/123 ')).toBe('https://zoom.us/j/123');
+    expect(meetingLinkFor('http://zoom.us/j/123')).toBeNull();
+    expect(meetingLinkFor('zoom')).toBeNull();
+    expect(meetingLinkFor('javascript:alert(1)')).toBeNull();
+    expect(meetingLinkFor('')).toBeNull();
+  });
+
+  it('flags a series end before its first day, and nothing else', async () => {
+    const { endsBeforeStart } = await import('./sessions.config');
+    expect(endsBeforeStart('2026-11-20', '2026-11-21T18:00')).toBe(true);
+    expect(endsBeforeStart('2026-11-21', '2026-11-21T18:00')).toBe(false);
+    expect(endsBeforeStart(null, '2026-11-21T18:00')).toBe(false);
+  });
+
+  it('tells an hour already begun from one ahead', async () => {
+    const { hourHasStarted } = await import('./sessions.config');
+    const day = new Date(2026, 10, 21);
+    const now = new Date(2026, 10, 21, 14, 20).getTime();
+    expect(hourHasStarted(day, 14, now)).toBe(true);
+    expect(hourHasStarted(day, 15, now)).toBe(false);
+    expect(hourHasStarted(new Date(2026, 10, 22), 8, now)).toBe(false);
+  });
+});
+
+describe('sessionPriceLabel', () => {
+  // `toFixed(0)` turned 49.50 into 50.
+  it('keeps the cents when there are any, as the trainee screens do', async () => {
+    const { sessionPriceLabel } = await import('./sessions.config');
+    expect(sessionPriceLabel(4950, 'ron')).toBe('49.50 RON');
+    expect(sessionPriceLabel(5000, 'RON')).toBe('50 RON');
+    expect(sessionPriceLabel(0, 'RON')).toBeNull();
+  });
+});
+
+describe('sessionShareUrl', () => {
+  // The profile link opened the website on a phone; this path is the app's.
+  it('links the session on the web app, which the app claims', async () => {
+    const { sessionShareUrl } = await import('./sessions.config');
+    const { WEB_APP_URL } = await import('core');
+    expect(sessionShareUrl('i-42')).toBe(`${WEB_APP_URL}/sessions/i-42`);
+  });
+});
+
+describe('the agenda list', () => {
+  const HOUR = 3_600_000;
+  const at = (offsetMs: number, id: string) =>
+    ({
+      id,
+      startAt: new Date(Date.now() + offsetMs).toISOString(),
+      endAt: new Date(Date.now() + offsetMs + HOUR).toISOString(),
+      conflictingInstanceIds: null,
+      template: { type: 'PRIVATE' },
+    }) as unknown as SessionInstance;
+
+  it('mutes a row once its session has ended, and only then', async () => {
+    const { rowTone } = await import('./sessions.config');
+    expect(rowTone(at(-3 * HOUR, 'done'))).toBe('muted');
+    expect(rowTone(at(-HOUR / 2, 'live'))).toBe('navy');
+    expect(rowTone(at(2 * HOUR, 'next'))).toBe('navy');
+  });
+
+  it('runs from today, unless a date filter asks for earlier', async () => {
+    const { NO_FILTERS, agendaRows } = await import('./sessions.config');
+    const today = new Date();
+    const rows = [at(-3 * 24 * HOUR, 'old'), at(2 * HOUR, 'soon')];
+    expect(agendaRows(rows, NO_FILTERS, today).map((row) => row.id)).toEqual(['soon']);
+    expect(
+      agendaRows(rows, { ...NO_FILTERS, dateFrom: '2020-01-01' }, today).map((row) => row.id),
+    ).toEqual(['old', 'soon']);
   });
 });
 
@@ -482,5 +646,101 @@ describe('onTheRoster', () => {
     expect(onTheRoster({ status: 'CANCELLED' })).toBe(false);
     expect(onTheRoster({ status: 'DECLINED' })).toBe(false);
     expect(onTheRoster({ status: 'WAITLISTED' })).toBe(false);
+  });
+});
+
+describe('where a day opens on the hour rail', () => {
+  /** A session starting at `hour:minute` on 21 Nov 2026, on the phone's clock. */
+  function at(hour: number, minute = 0, day = 21): SessionInstance {
+    const start = new Date(2026, 10, day, hour, minute);
+    return {
+      startAt: start.toISOString(),
+      endAt: new Date(start.getTime() + 3_600_000).toISOString(),
+    } as SessionInstance;
+  }
+  const DAY = new Date(2026, 10, 21);
+
+  it("opens on the day's first session, whatever order they come in", async () => {
+    const { dayOpenHour } = await import('./sessions.config');
+    expect(dayOpenHour([at(18), at(9, 30), at(12)], DAY, Date.now())).toBe(9.5);
+  });
+
+  // Only that day's sessions place it; a late one the day before does not.
+  it("ignores another day's sessions", async () => {
+    const { dayOpenHour } = await import('./sessions.config');
+    expect(dayOpenHour([at(6, 0, 20), at(17)], DAY, Date.now())).toBe(17);
+  });
+
+  it('opens today on the hour it is now, and another quiet day on 08:00', async () => {
+    const { DAY_OPEN_HOUR, dayOpenHour } = await import('./sessions.config');
+    const now = new Date(2026, 10, 21, 14, 40).getTime();
+    expect(dayOpenHour([], DAY, now)).toBe(14);
+    expect(dayOpenHour([], new Date(2026, 10, 24), now)).toBe(DAY_OPEN_HOUR);
+    expect(DAY_OPEN_HOUR).toBe(8);
+  });
+
+  it('keeps half an hour of context above it, and stays at the top near the start', async () => {
+    const { railScrollOffset } = await import('./sessions.config');
+    // 17:30 on a rail drawn from 06:00 at 44px an hour: 11 hours down.
+    expect(railScrollOffset(17.5, 6, 44)).toBe(11 * 44);
+    expect(railScrollOffset(7, 7, 44)).toBe(0);
+    expect(railScrollOffset(6.25, 6, 44)).toBe(0);
+  });
+});
+
+describe('canReschedule', () => {
+  const HOUR = 3_600_000;
+  const NOW = new Date('2026-11-21T09:00:00Z').getTime();
+
+  function instance(status: string, startOffsetMs: number): SessionInstance {
+    return {
+      status,
+      startAt: new Date(NOW + startOffsetMs).toISOString(),
+      endAt: new Date(NOW + startOffsetMs + HOUR).toISOString(),
+    } as SessionInstance;
+  }
+
+  it('moves a scheduled date still ahead', async () => {
+    const { canReschedule } = await import('./sessions.config');
+    expect(canReschedule(instance('SCHEDULED', 2 * HOUR), NOW)).toBe(true);
+  });
+
+  // The status cron runs late, so a SCHEDULED row can already be under way.
+  it('leaves one that has started, finished or been cancelled', async () => {
+    const { canReschedule } = await import('./sessions.config');
+    expect(canReschedule(instance('SCHEDULED', -HOUR / 2), NOW)).toBe(false);
+    expect(canReschedule(instance('COMPLETED', -3 * HOUR), NOW)).toBe(false);
+    expect(canReschedule(instance('CANCELLED', 2 * HOUR), NOW)).toBe(false);
+  });
+});
+
+describe('access and price', () => {
+  it('asks Paid for a price above zero, and nobody else', async () => {
+    const { priceMissing } = await import('./sessions.config');
+    expect(priceMissing('OPEN', null)).toBe(true);
+    expect(priceMissing('OPEN', 0)).toBe(true);
+    expect(priceMissing('OPEN', 49.5)).toBe(false);
+    expect(priceMissing('FREE', null)).toBe(false);
+    expect(priceMissing('CLIENTS_ONLY', null)).toBe(false);
+    expect(priceMissing('GROUP_ONLY', null)).toBe(false);
+  });
+
+  it('saves no price for Free, and an empty field as none', async () => {
+    const { accessTakesPrice, priceCentsFor } = await import('./sessions.config');
+    expect(accessTakesPrice('FREE')).toBe(false);
+    expect(accessTakesPrice('OPEN')).toBe(true);
+    expect(priceCentsFor('FREE', 50)).toBeNull();
+    expect(priceCentsFor('CLIENTS_ONLY', null)).toBeNull();
+    expect(priceCentsFor('OPEN', 49.5)).toBe(4950);
+  });
+
+  // A "Paid" badge stood beside a free price on sessions saved without one.
+  it('names an OPEN session without a price Free', async () => {
+    const { accessLevelFor } = await import('./sessions.config');
+    expect(accessLevelFor('OPEN', 0).label).toBe('Free');
+    expect(accessLevelFor('OPEN', null).label).toBe('Free');
+    expect(accessLevelFor('OPEN', 4950).label).toBe('Paid');
+    expect(accessLevelFor('CLIENTS_ONLY', 0).label).toBe('Clients only');
+    expect(accessLevelFor('FREE', 0).label).toBe('Free');
   });
 });

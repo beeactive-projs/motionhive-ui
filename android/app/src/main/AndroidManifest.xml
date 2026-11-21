@@ -51,6 +51,9 @@
                 <data android:pathPrefix="/user/sessions" />
                 <data android:pathPrefix="/groups" />
                 <data android:pathPrefix="/profile" />
+                <!-- Shared from the app: a profile (/@handle) and a group's invite link. -->
+                <data android:pathPrefix="/@" />
+                <data android:pathPrefix="/join/" />
             </intent-filter>
 
         </activity>

@@ -142,7 +142,8 @@
     [message]="'sessions.agenda.noMatch.message' | translate" [actionLabel]="'button.clearFilters' | translate"
     (action)="clearFilters()" />
   } @else if (view() === 'day') {
-  <mh-day-rail [instances]="dayInstances()" (select)="open($event)" (pickHour)="createAt($event)" />
+  <mh-day-rail [instances]="dayInstances()" [day]="selectedDay()" [now]="clockNow()" (select)="open($event)"
+    (pickHour)="createAt($event)" />
   } @else {
   <div class="agenda">
     @if (calendarOpen()) {
@@ -162,6 +163,14 @@
       <span class="conflict">{{ 'sessions.agenda.summary.conflicts' | translate: { count: conflictCount() } }}</span>
       }
     </p>
+
+    @if (days().length === 0) {
+    <!-- Sessions exist, just none from here on in the loaded dates: the
+         calendar and the chips stay, so the coach can page elsewhere. -->
+    <mh-empty-state icon="calendar-outline" [heading]="'sessions.agenda.rangeEmpty.title' | translate"
+      [message]="'sessions.agenda.rangeEmpty.message' | translate"
+      [actionLabel]="'sessions.agenda.newSession' | translate" (action)="openCreate()" />
+    }
 
     @for (day of days(); track day.key) {
     <div class="mh-day-header" [class.today]="day.isToday">
@@ -206,7 +215,8 @@
 
 <mh-message-signups-sheet [(open)]="messageOpen" [instanceId]="messageInstanceId()" />
 
-<mh-session-actions-sheet [(open)]="actionsOpen" [instance]="actionsInstance()" [canShare]="canShare()"
-  (action)="onAction($event)" />
+<mh-session-actions-sheet [(open)]="actionsOpen" [instance]="actionsInstance()" (action)="onAction($event)" />
+
+<mh-reschedule-sheet [(open)]="rescheduleOpen" [instance]="rescheduleInstance()" (rescheduled)="onRescheduled()" />
 
 <mh-session-filter-sheet [(open)]="filterOpen" [filters]="sheetDraft()" (applied)="onFiltersApplied($event)" />

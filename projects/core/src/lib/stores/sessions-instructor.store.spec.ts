@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { SessionsInstructorStore } from './sessions-instructor.store';
+import { SessionsInstructorStore, calendarInstancesQuery } from './sessions-instructor.store';
 import { environment } from '../../environments/environment';
 
 const BASE = environment.apiUrl;
@@ -329,6 +329,107 @@ describe('SessionsInstructorStore', () => {
       .expectOne((r) => r.url === `${BASE}/sessions/instances`)
       .error(new ProgressEvent('Network'), { status: 500 });
     expect(called).toBe(true);
+  });
+
+  // The API's cron moves a session to IN_PROGRESS minutes after it starts,
+  // then to COMPLETED: asking for SCHEDULED alone emptied a 09:00 class from
+  // the agenda at 09:05 and left every past day blank.
+  it('loadRange() asks for every status but cancelled, as repeated params', () => {
+    store.loadRange({
+      start: new Date('2026-12-01T00:00:00Z'),
+      end: new Date('2026-12-08T00:00:00Z'),
+    });
+    const req = httpMock.expectOne((r) => r.url === `${BASE}/sessions/instances`);
+    expect(req.request.params.getAll('status')).toEqual(['SCHEDULED', 'IN_PROGRESS', 'COMPLETED']);
+    req.flush({
+      items: [
+        { ...(fakeInstance({ id: 'live' }) as object), status: 'IN_PROGRESS' },
+        { ...(fakeInstance({ id: 'done' }) as object), status: 'COMPLETED' },
+        { ...(fakeInstance({ id: 'next' }) as object), status: 'SCHEDULED' },
+      ],
+      total: 3,
+      page: 1,
+      pageSize: 100,
+    });
+    expect(store.rangeInstances().map((i) => i.id)).toEqual(['live', 'done', 'next']);
+    expect(store.rangeTruncated()).toBe(false);
+  });
+
+  it('calendarInstancesQuery() builds the one calendar request', () => {
+    const query = calendarInstancesQuery(
+      { start: new Date('2026-12-01T00:00:00Z'), end: new Date('2026-12-02T00:00:00Z') },
+      10,
+    );
+    expect(query).toEqual({
+      dateFrom: '2026-12-01T00:00:00.000Z',
+      dateTo: '2026-12-02T00:00:00.000Z',
+      status: ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED'],
+      limit: 10,
+    });
+  });
+
+  // The page asks for 100 rows and does not page further: say so from the
+  // API's total rather than guessing from the row count.
+  it('loadRange() reports a range the API held more of than one page', () => {
+    store.loadRange({
+      start: new Date('2026-12-01T00:00:00Z'),
+      end: new Date('2026-12-08T00:00:00Z'),
+    });
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
+      .flush({ items: [fakeInstance()], total: 140, page: 1, pageSize: 100 });
+    expect(store.rangeTruncated()).toBe(true);
+  });
+
+  it('markRangeStale() drops the cached ranges and leaves one mark to take', () => {
+    const range = {
+      start: new Date('2026-12-01T00:00:00Z'),
+      end: new Date('2026-12-08T00:00:00Z'),
+    };
+    store.loadRange(range);
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
+      .flush({ items: [fakeInstance()], total: 1, page: 1, pageSize: 100 });
+
+    expect(store.takeRangeStale()).toBe(false);
+    store.markRangeStale();
+    expect(store.takeRangeStale()).toBe(true);
+    expect(store.takeRangeStale()).toBe(false);
+
+    // The same range is asked for again rather than served from the cache.
+    store.loadRange(range);
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
+      .flush({ items: [], total: 0, page: 1, pageSize: 100 });
+    expect(store.rangeInstances().length).toBe(0);
+  });
+
+  it('checkHasAnySessions() counts templates in every state, and keeps a yes', () => {
+    expect(store.hasAnySessions()).toBeNull();
+    store.checkHasAnySessions();
+    const req = httpMock.expectOne((r) => r.url === `${BASE}/sessions/templates`);
+    expect(req.request.params.has('tab')).toBe(false);
+    expect(req.request.params.get('limit')).toBe('1');
+    req.flush({ items: [fakeTemplate()], total: 3, page: 1, pageSize: 1 });
+    expect(store.hasAnySessions()).toBe(true);
+
+    store.checkHasAnySessions();
+    httpMock.expectNone((r) => r.url === `${BASE}/sessions/templates`);
+  });
+
+  it('checkHasAnySessions() says no for an empty account, and yes when the check fails', () => {
+    store.checkHasAnySessions();
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/templates`)
+      .flush({ items: [], total: 0, page: 1, pageSize: 1 });
+    expect(store.hasAnySessions()).toBe(false);
+
+    // A no is asked again; a failure must not leave the coach on the first-run screen.
+    store.checkHasAnySessions();
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/templates`)
+      .error(new ProgressEvent('Network'), { status: 500 });
+    expect(store.hasAnySessions()).toBe(true);
   });
 
   it('prependInstanceOptimistic adds; removeInstance takes it out', () => {

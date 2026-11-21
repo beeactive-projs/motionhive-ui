@@ -42,6 +42,21 @@ export function resolveAppLink(url: string, host: string): DeepLink | null {
       : null;
   }
 
+  // Things people share from the app: a profile (`/@handle`) opens the person
+  // in Discover's stack, and a group's invite link (`/join/:token`) opens the
+  // screen that joins it. Both paths are claimed by the app (the iOS
+  // apple-app-site-association and the Android manifest), so a shared link
+  // opens here rather than in the browser.
+  if (segments.length === 1 && segments[0].startsWith('@') && segments[0].length > 1) {
+    return { commands: ['/tabs/discover', 'person', segments[0].slice(1)], queryParams };
+  }
+  if (segments[0] === 'join') {
+    if (segments.length === 2) {
+      return { commands: ['/tabs/groups', 'join', segments[1]], queryParams };
+    }
+    return null;
+  }
+
   // Two group emails link pages the push map has no screen for. The
   // rejected request links the web's group discovery, whose mobile home is
   // the Discover tab (as a group id it opened a group called "discover");

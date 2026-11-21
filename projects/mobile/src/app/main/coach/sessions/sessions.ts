@@ -1,4 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  Injector,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonBackButton,
@@ -17,15 +25,17 @@ import {
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
+  ViewDidEnter,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
+import { take } from 'rxjs';
 
 import {
-  AuthStore,
   SessionInstance,
   SessionLocationKind,
+  SessionService,
   SessionsInstructorStore,
   appLocale,
   dayFromKey,
@@ -35,7 +45,6 @@ import {
   formatTimeUntil,
   formatTotalDuration,
   localDayKey,
-  publicProfileUrl,
   sessionDayLabel,
   sessionMinutes,
   startOfDay,
@@ -60,6 +69,7 @@ import { SessionMonth } from './_components/session-month/session-month';
 import { SessionActionsSheet } from './_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from './_sheets/session-form-sheet/session-form-sheet';
 import { SessionFilterSheet } from './_sheets/session-filter-sheet/session-filter-sheet';
+import { RescheduleSheet } from './_sheets/reschedule-sheet/reschedule-sheet';
 import {
   AGENDA_DAYS_AHEAD,
   AgendaFilters,
@@ -70,10 +80,13 @@ import {
   SessionActionId,
   SessionActionIds,
   SessionPrefill,
+  agendaRows,
   fitWindow,
+  hourHasStarted,
   instanceTone,
   matchesFilters,
   prefillFromInstance,
+  sessionShareUrl,
   sheetChipCount,
   weekdayLetters,
 } from './sessions.config';
@@ -94,9 +107,11 @@ interface AgendaDay {
  * The coach's agenda: a week strip for orientation, then sessions grouped by
  * day.
  *
- * Reads `SessionsInstructorStore`, shared with web — `loadRange` returns the
- * scheduled occurrences in a window and caches recent windows, so moving
- * between weeks does not refetch.
+ * Reads `SessionsInstructorStore`, shared with web — `loadRange` returns every
+ * occurrence in a window but the cancelled ones (started and finished
+ * included) and caches recent windows, so moving between weeks does not
+ * refetch. The list runs from today; the past is on the day view and the
+ * month, its rows muted.
  *
  * Mounted in its own area (from the Menu) and in Home's stack (the Today
  * row on a busy day); back and a session's page follow the URL, so each
@@ -126,6 +141,7 @@ interface AgendaDay {
     SearchbarLabelDirective,
     SessionMonth,
     NotificationBell,
+    RescheduleSheet,
     SearchbarAutofocusDirective,
     SessionActionsSheet,
     SessionFilterSheet,
@@ -138,11 +154,12 @@ interface AgendaDay {
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
 })
-export class Sessions implements ViewWillEnter {
+export class Sessions implements ViewWillEnter, ViewDidEnter {
   readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
+  private readonly _injector = inject(Injector);
+  private readonly _sessionService = inject(SessionService);
   private readonly _clockService = inject(ClockService);
-  private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _translateService = inject(TranslateService);
 
@@ -166,9 +183,19 @@ export class Sessions implements ViewWillEnter {
   readonly messageInstanceId = signal<string | null>(null);
   readonly actionsOpen = signal(false);
   readonly actionsInstance = signal<SessionInstance | null>(null);
+  readonly rescheduleOpen = signal(false);
+  readonly rescheduleInstance = signal<SessionInstance | null>(null);
+  /** A copy's full template is being read; the sheet opens once it lands. */
+  readonly duplicating = signal(false);
 
-  /** No handle, no public link — so the Share verb stays hidden. */
-  readonly canShare = computed(() => !!this._authStore.user()?.handle);
+  private readonly _content = viewChild(IonContent);
+  /** The content's scroller, found once the page is shown. */
+  private _scroller: HTMLElement | null = null;
+  /** Where the list was when a day opened, so coming back lands there again. */
+  private _agendaScrollTop = 0;
+
+  /** The page's clock, for the day rail's hours already begun. */
+  readonly clockNow = computed(() => this._clockService.now());
 
   /**
    * Search owns the whole toolbar while it is open — a title, three actions, a
@@ -272,7 +299,12 @@ export class Sessions implements ViewWillEnter {
    * coach silently stops short. Fixing that means paging in the store, which
    * web shares — until then the list says so rather than quietly lying.
    */
-  readonly truncated = computed(() => this.store.rangeInstances().length >= 100);
+  readonly truncated = computed(() => this.store.rangeTruncated());
+
+  /** What the list shows: from today, unless a date filter asks for earlier. */
+  readonly agendaInstances = computed(() =>
+    agendaRows(this.visibleInstances(), this.filters(), this._today()),
+  );
 
   /**
    * The soonest session still ahead of us, and how long until it starts.
@@ -306,7 +338,7 @@ export class Sessions implements ViewWillEnter {
   readonly days = computed<AgendaDay[]>(() => {
     const byDay = new Map<string, SessionInstance[]>();
 
-    for (const instance of this.visibleInstances()) {
+    for (const instance of this.agendaInstances()) {
       const date = new Date(instance.startAt);
       const key = localDayKey(date);
       const bucket = byDay.get(key);
@@ -442,19 +474,32 @@ export class Sessions implements ViewWillEnter {
     () => this.store.rangeInstances().length > 0 && this.visibleInstances().length === 0,
   );
 
-  readonly showSkeleton = computed(
-    () => this.store.rangeLoading() && this.store.rangeInstances().length === 0,
-  );
+  /** Also while an empty window waits to learn whether the account is empty too. */
+  readonly showSkeleton = computed(() => {
+    if (this.store.rangeInstances().length > 0) {
+      return false;
+    }
+    if (this.store.rangeLoading()) {
+      return true;
+    }
+    return !this.store.rangeError() && this.store.hasAnySessions() === null;
+  });
 
   readonly showLoadError = computed(
     () => !!this.store.rangeError() && this.store.rangeInstances().length === 0,
   );
 
+  /**
+   * The first-run screen: the coach has no session at all. An empty window
+   * alone is not that (a month far ahead, a series that ended), and the
+   * first-run screen hides the calendar the coach would page back with.
+   */
   readonly isEmpty = computed(
     () =>
       !this.store.rangeLoading() &&
       !this.store.rangeError() &&
-      this.store.rangeInstances().length === 0,
+      this.store.rangeInstances().length === 0 &&
+      this.store.hasAnySessions() === false,
   );
 
   /** Chrome is hidden on the true-empty and error screens, but not when a
@@ -474,7 +519,23 @@ export class Sessions implements ViewWillEnter {
     // stack, so a session left open overnight would otherwise keep asking for
     // a window starting yesterday.
     this._today.set(startOfDay(new Date()));
-    this._syncWindow();
+    // A detail page cancelled, edited or duplicated a session behind this
+    // one; the unchanged window would otherwise be trusted as it is.
+    this._syncWindow({ force: this.store.takeRangeStale() });
+  }
+
+  /** Found once, so leaving the list for a day can read where it was. */
+  ionViewDidEnter(): void {
+    if (this._scroller) {
+      return;
+    }
+    const content = this._content();
+    if (!content) {
+      return;
+    }
+    void content.getScrollElement().then((scroller) => {
+      this._scroller = scroller;
+    });
   }
 
   open(instance: SessionInstance): void {
@@ -491,11 +552,34 @@ export class Sessions implements ViewWillEnter {
    * Duplicate is the create sheet opened as a copy — there is no duplicate
    * endpoint, and a one-tap clone would be worse anyway: the thing you almost
    * always want to change is the date.
+   *
+   * The row's own template is the API's short field list, with no repeat
+   * rule, so a series would be copied as a one-off. The full template is read
+   * first, as the detail page has it, and the sheet opens once it is here.
    */
   duplicate(instance: SessionInstance): void {
-    this.createStart.set(null);
-    this.createPrefill.set(prefillFromInstance(instance));
-    this.createOpen.set(true);
+    if (this.duplicating()) {
+      return;
+    }
+    this.duplicating.set(true);
+    this._sessionService
+      .getTemplate(instance.templateId)
+      .pipe(take(1))
+      .subscribe({
+        next: (template) => {
+          this.duplicating.set(false);
+          this.createStart.set(null);
+          this.createPrefill.set(prefillFromInstance(instance, Date.now(), template));
+          this.createOpen.set(true);
+        },
+        error: (error: unknown) => {
+          this.duplicating.set(false);
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('sessions.toast.duplicateFailed'),
+          );
+        },
+      });
   }
 
   /**
@@ -505,6 +589,10 @@ export class Sessions implements ViewWillEnter {
    * until Create is pressed, and a mis-tap is dismissed by swiping it away.
    */
   createAt(hour: number): void {
+    // The rail offers no hour already begun; this keeps a stale tap out too.
+    if (hourHasStarted(this.selectedDay(), hour, Date.now())) {
+      return;
+    }
     const start = new Date(this.selectedDay());
     start.setHours(hour, 0, 0, 0);
     this.createStart.set(start);
@@ -555,11 +643,26 @@ export class Sessions implements ViewWillEnter {
     this._syncWindow();
   }
 
+  /** Back on the list where it was left: the day had scrolled the content. */
   showAgenda(): void {
     this.view.set('agenda');
+    const top = this._agendaScrollTop;
+    afterNextRender(
+      () => {
+        const content = this._content();
+        if (content) {
+          void content.scrollToPoint(0, top, 0);
+        }
+      },
+      { injector: this._injector },
+    );
   }
 
+  /** The day opens at its first session (`DayRail`); the list's place is kept. */
   pickDay(date: Date): void {
+    if (this.view() === 'agenda' && this._scroller) {
+      this._agendaScrollTop = this._scroller.scrollTop;
+    }
     this.selectedDay.set(startOfDay(date));
     this.view.set('day');
   }
@@ -605,6 +708,11 @@ export class Sessions implements ViewWillEnter {
         this.messageInstanceId.set(instance.id);
         this.messageOpen.set(true);
         return;
+      case SessionActionIds.Reschedule:
+        // In place: the row's short template carries the zone the sheet needs.
+        this.rescheduleInstance.set(instance);
+        this.rescheduleOpen.set(true);
+        return;
       case SessionActionIds.Duplicate:
         this.duplicate(instance);
         return;
@@ -614,18 +722,16 @@ export class Sessions implements ViewWillEnter {
     }
   }
 
+  /** The date moved, maybe out of the loaded window: refetch it. */
+  onRescheduled(): void {
+    this._syncWindow({ force: true });
+  }
+
   /**
-   * Share what a stranger can actually open.
-   *
-   * Every session URL in the web app is behind the auth guard, so a session
-   * link would drop the recipient on a login wall — worse than no link. The
-   * profile is the one public destination, and the session's name and time ride
-   * along in the share text so the message still says what it is about.
+   * Share the session itself (`sessionShareUrl`): the app opens it on a
+   * phone, the web app in a browser. Its name and time ride along in the text.
    */
   private async _share(instance: SessionInstance): Promise<void> {
-    const handle = this._authStore.user()?.handle;
-    if (!handle) return;
-
     const title =
       instance.titleOverride ??
       instance.template?.title ??
@@ -638,7 +744,7 @@ export class Sessions implements ViewWillEnter {
         day: formatSessionDayShort(instance.startAt),
         time: formatSessionTime(instance.startAt),
       }),
-      url: publicProfileUrl(handle),
+      url: sessionShareUrl(instance.id),
     });
 
     if (outcome === ShareOutcomes.Copied) {
@@ -697,6 +803,10 @@ export class Sessions implements ViewWillEnter {
     this.store.loadRange(target, {
       force: opts.force,
       done: () => {
+        // An empty window: is the whole account empty (the first-run screen)?
+        if (this.store.rangeInstances().length === 0) {
+          this.store.checkHasAnySessions();
+        }
         opts.done?.();
         if (!this._resyncQueued) return;
         this._resyncQueued = false;

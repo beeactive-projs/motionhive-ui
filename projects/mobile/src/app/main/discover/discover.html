@@ -192,6 +192,15 @@
           </div>
         } @else if (feedEmpty()) {
           @switch (feedEmptyReason()) {
+            @case (feedEmptyReasons.Booked) {
+              <mh-empty-state
+                icon="calendar-outline"
+                [heading]="'discover.feed.noneBooked' | translate"
+                [message]="'discover.feed.noneBookedMessage' | translate"
+                [actionLabel]="'discover.feed.seeAll' | translate"
+                (action)="showAllSessions()"
+              />
+            }
             @case (feedEmptyReasons.Filtered) {
               <mh-empty-state
                 icon="calendar-outline"
@@ -267,7 +276,7 @@
       </div>
 
       @if (!showLoadError() && !showSkeleton()) {
-        <ion-infinite-scroll [disabled]="!sessionsStore.hasMore()" (ionInfinite)="onLoadMore($event)">
+        <ion-infinite-scroll [disabled]="bookedOnly() || !sessionsStore.hasMore()" (ionInfinite)="onLoadMore($event)">
           <ion-infinite-scroll-content />
         </ion-infinite-scroll>
       }

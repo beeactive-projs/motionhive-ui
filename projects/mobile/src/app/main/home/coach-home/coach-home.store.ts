@@ -14,8 +14,8 @@ import {
   RosterService,
   RosterSummary,
   SessionInstance,
-  SessionInstanceStatus,
   SessionService,
+  calendarInstancesQuery,
   localDayKey,
 } from 'core';
 
@@ -164,7 +164,12 @@ export class CoachHomeStore {
     });
   }
 
-  /** Silent: the Today row only shows on a day with sessions, so a failure leaves it away. */
+  /**
+   * Silent: the Today row only shows on a day with sessions, so a failure
+   * leaves it away. The whole day but the cancelled, started and finished
+   * sessions included (core's `calendarInstancesQuery`), so a 09:00 class
+   * does not drop off the row at 09:05 when the API moves it to IN_PROGRESS.
+   */
   private _loadAgenda(settle: () => void): void {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -173,12 +178,7 @@ export class CoachHomeStore {
 
     this._read(
       this._sessionService.listInstances(
-        {
-          dateFrom: startOfDay.toISOString(),
-          dateTo: endOfDay.toISOString(),
-          status: SessionInstanceStatus.Scheduled,
-          limit: AGENDA_LIMIT,
-        },
+        calendarInstancesQuery({ start: startOfDay, end: endOfDay }, AGENDA_LIMIT),
         { silent: true },
       ),
       settle,

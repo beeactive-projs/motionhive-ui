@@ -1,0 +1,25 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [attr.aria-label]="'a11y.back' | translate" defaultHref="/tabs/groups" />
+    </ion-buttons>
+    <ion-title>{{ 'pageTitle.joinGroup' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (error(); as message) {
+    <mh-empty-state
+      icon="link-outline"
+      [heading]="'groups.joinLink.failedHeading' | translate"
+      [message]="message"
+      [actionLabel]="'groups.joinLink.goToGroups' | translate"
+      (action)="goToGroups()"
+    />
+  } @else {
+    <div class="joining" role="status">
+      <ion-spinner name="crescent" aria-hidden="true" />
+      <p>{{ 'groups.joinLink.joining' | translate }}</p>
+    </div>
+  }
+</ion-content>

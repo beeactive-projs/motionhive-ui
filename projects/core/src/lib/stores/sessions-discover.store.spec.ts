@@ -131,6 +131,21 @@ describe('SessionsDiscoverStore', () => {
     expect(store.error()).toBeNull();
   });
 
+  // Filtered on the loaded page alone, a city whose sessions came after the
+  // first 20 read as empty.
+  it('asks the server for the city, and asks again only when it changes', () => {
+    store.setTopic({ city: 'Cluj-Napoca' });
+    httpMock.expectOne((r) => r.url === URL && r.params.get('city') === 'Cluj-Napoca').flush(page([], 0));
+
+    store.setTopic({ city: 'Cluj-Napoca' });
+    httpMock.expectNone(URL);
+
+    store.setTopic({});
+    const all = httpMock.expectOne((r) => r.url === URL);
+    expect(all.request.params.has('city')).toBe(false);
+    all.flush(page([], 0));
+  });
+
   it('setFilters with undefined values drops the params entirely', () => {
     store.setFilters({ q: 'yoga' });
     httpMock.expectOne((r) => r.url === URL).flush(page([], 0));

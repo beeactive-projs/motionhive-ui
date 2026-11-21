@@ -1,0 +1,34 @@
+<ng-template #body>
+  <div class="mh-section-label">{{ 'sessions.rescheduleSheet.newStart' | translate }}</div>
+  <!-- The form's start pill: one button for the day and the time, opening
+       the picker below. -->
+  <ion-button fill="outline" class="field-button" [attr.aria-label]="'sessions.rescheduleSheet.newStart' | translate"
+    (click)="openPicker()">
+    {{ startLabel() }}
+  </ion-button>
+
+  @if (startError(); as error) {
+  <p class="mh-helper over" role="alert">{{ error }}</p>
+  }
+
+  <p class="mh-helper">{{ 'sessions.rescheduleSheet.current' | translate: { when: currentLabel() } }}</p>
+  @if (zoneNote(); as note) {
+  <p class="mh-helper">{{ note }}</p>
+  }
+  <p class="mh-helper">{{ 'sessions.rescheduleSheet.hint' | translate }}</p>
+
+  <!-- Detached from the pill on purpose: Ionic relocates a modal when it
+       presents, so it cannot live inside the row it belongs to. -->
+  <ion-modal class="mh-picker-modal" [isOpen]="pickerOpen()" (didDismiss)="pickerOpen.set(false)">
+    <ng-template>
+      <!-- No past times: the floor is now, on the session's clock. -->
+      <ion-datetime presentation="date-time" [showDefaultButtons]="true" [min]="startMin()" [value]="startAt()"
+        (ionChange)="onStartChange($event.detail.value)" />
+    </ng-template>
+  </ion-modal>
+</ng-template>
+
+<!-- As tall as what it says: nothing here is typed into. -->
+<mh-sheet-shell [(open)]="open" [title]="'sessions.rescheduleSheet.title' | translate" [subtitle]="title()"
+  [saveLabel]="'sessions.rescheduleSheet.save' | translate" [body]="body" [fit]="true" [canSave]="canSave()"
+  [saving]="saving()" (save)="save()" />

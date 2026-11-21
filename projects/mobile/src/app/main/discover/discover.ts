@@ -28,6 +28,7 @@ import {
   MyBookingsIndexStore,
   PublicSessionInstance,
   SessionGroup,
+  DiscoverTopicFilter,
   SessionsDiscoverStore,
   groupSessionsByBucket,
   translate,
@@ -55,6 +56,7 @@ import {
   NO_SHEET_FILTERS,
   QUICK_FILTERS,
   QuickFilterId,
+  QuickFilterIds,
   coachPool,
   compileDatePreset,
   discoverCities,
@@ -80,6 +82,7 @@ const GROUP_CARD_LIMIT = 4;
 
 /** Why the agenda came back empty (`feedEmptyReason`). */
 const FeedEmptyReasons = {
+  Booked: 'booked',
   Filtered: 'filtered',
   ForYou: 'for-you',
   Online: 'online',
@@ -168,10 +171,15 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
   /**
-   * The chip the reader picked: an id, null for none, undefined until they
-   * pick (then For you is lit when there is one, see `selectedTopic`).
+   * The chip the reader picked: an id, or null for none. The tab opens on
+   * none, every session coming up: with For you lit by default the agenda
+   * showed only what matched the reader's interests under a lit "All", and
+   * often nothing (owner, 2026-11-21). For you stays one tap away.
+   * (`undefined`, "not picked yet, light For you", is no longer used.)
    */
-  private readonly _pickedTopicId = signal<string | null | undefined>(undefined);
+  private readonly _pickedTopicId = signal<string | null | undefined>(null);
+  /** The Booked chip: the agenda is the reader's own bookings. */
+  readonly bookedOnly = signal(false);
   /** The reader's welcome answers came, or could not be had in time. */
   private readonly _interestsSettled = signal(false);
   readonly citySheetOpen = signal(false);
@@ -195,16 +203,25 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
         return;
       }
       const topic = this.selectedTopic();
+      // The city narrows the agenda on the server too: filtered on the page
+      // alone, a city whose sessions came after the first 20 read as empty.
+      const city = this.city();
       untracked(() => {
         const categoryIds = topicCategoryIds(topic);
-        const agendaTopic = { categoryIds: categoryIds ?? undefined, online: !!topic?.online };
+        const agendaTopic: DiscoverTopicFilter = {
+          categoryIds: categoryIds ?? undefined,
+          online: !!topic?.online,
+        };
+        if (city) {
+          agendaTopic.city = city.label;
+        }
         if (this._agendaStarted()) {
           this.sessionsStore.setTopic(agendaTopic);
           return;
         }
         this._agendaStarted.set(true);
         this.sessionsStore.setTopic(agendaTopic);
-        if (!categoryIds && !agendaTopic.online) {
+        if (!categoryIds && !agendaTopic.online && !agendaTopic.city) {
           // No topic: the same as the store's own, so it asks here.
           this.sessionsStore.reload();
         }
@@ -289,7 +306,9 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   >({
     source: () => {
       const topic = this.sessionsStore.topic();
-      const narrowed = !!topic.online || (topic.categoryIds?.length ?? 0) > 0;
+      // A city narrows too: the list kept here is every city's, which the
+      // city pill itself is drawn from.
+      const narrowed = !!topic.online || (topic.categoryIds?.length ?? 0) > 0 || !!topic.city;
       if (this._agendaFiltered() || narrowed || this.sessionsStore.loading()) {
         return null;
       }
@@ -417,7 +436,7 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     },
   });
 
-  /** What narrows the tab: the reader's pick, else For you while it is on offer. */
+  /** What narrows the tab: the reader's pick, nothing until they make one. */
   readonly selectedTopic = computed<DiscoverTopic | null>(() => {
     const picked = this._pickedTopicId();
     const topics = this.topics();
@@ -509,6 +528,9 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
    * on its way, and makes Online and an in-person filter meet in nothing.
    */
   private readonly _agenda = computed(() => {
+    if (this.bookedOnly()) {
+      return this._bookedAgenda();
+    }
     const key = this._cityKey();
     const topic = this.selectedTopic();
     return this._sessions().filter(
@@ -516,29 +538,57 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     );
   });
 
+  /**
+   * Booked: the reader's upcoming, pending and waitlisted sessions, from the
+   * bookings store rather than the pages loaded so far, so one booked for
+   * next month is there too. Every city and topic: a booking is theirs.
+   */
+  private readonly _bookedAgenda = computed<PublicSessionInstance[]>(() => {
+    const now = Date.now();
+    const sessions: PublicSessionInstance[] = [];
+    for (const booking of this._myBookingsIndexStore.bookings()) {
+      const instance = booking.instance;
+      if (instance && new Date(instance.endAt).getTime() > now) {
+        sessions.push(instance);
+      }
+    }
+    return sessions.sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
+  });
+
   readonly days = computed<SessionGroup<PublicSessionInstance>[]>(() =>
     groupSessionsByBucket(this._agenda(), (i) => i.startAt, 'future'),
   );
 
   /** Its first page, or the wait for the topic it opens on. */
-  readonly showSkeleton = computed(
-    () =>
+  readonly showSkeleton = computed(() => {
+    if (this.bookedOnly()) {
+      return !this._myBookingsIndexStore.loaded();
+    }
+    return (
       !this._agendaStarted() ||
-      (this.sessionsStore.loading() && this.sessionsStore.items().length === 0),
-  );
+      (this.sessionsStore.loading() && this.sessionsStore.items().length === 0)
+    );
+  });
 
   readonly showLoadError = computed(
-    () => !!this.sessionsStore.error() && this.sessionsStore.items().length === 0,
+    () =>
+      !this.bookedOnly() &&
+      !!this.sessionsStore.error() &&
+      this.sessionsStore.items().length === 0,
   );
 
   /** Settled, and nothing left to show after every filter. */
-  readonly feedEmpty = computed(
-    () =>
+  readonly feedEmpty = computed(() => {
+    if (this.bookedOnly()) {
+      return this._myBookingsIndexStore.loaded() && this._bookedAgenda().length === 0;
+    }
+    return (
       this._agendaStarted() &&
       !this.sessionsStore.loading() &&
       !this.showLoadError() &&
-      this._agenda().length === 0,
-  );
+      this._agenda().length === 0
+    );
+  });
 
   /**
    * Why the agenda is empty, which decides what it says and offers: a quick
@@ -547,6 +597,9 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
    * something (show everywhere), or nothing anywhere.
    */
   readonly feedEmptyReason = computed<FeedEmptyReason>(() => {
+    if (this.bookedOnly()) {
+      return FeedEmptyReasons.Booked;
+    }
     if (this._agendaFiltered()) {
       return FeedEmptyReasons.Filtered;
     }
@@ -575,6 +628,11 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
     this._pickedTopicId.set(null);
   }
 
+  /** Booked came back empty: everything coming up instead. */
+  showAllSessions(): void {
+    this.bookedOnly.set(false);
+  }
+
   /**
    * The number on the Filters chip, only while the sheet holds more than a
    * quick chip can say. One thing is on at a time: the sheet, or a chip.
@@ -592,6 +650,12 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   );
 
   isQuickSelected(id: QuickFilterId): boolean {
+    if (id === QuickFilterIds.Booked) {
+      return this.bookedOnly();
+    }
+    if (this.bookedOnly()) {
+      return false;
+    }
     return this.filterCount() === 0 && quickFilterSelected(this.sessionsStore.filters(), id);
   }
 
@@ -601,7 +665,11 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
    */
   onQuickFilter(id: QuickFilterId): void {
     const chip = this.quickFilters.find((c) => c.id === id);
-    if (!chip) return;
+    if (!chip) {
+      return;
+    }
+    // Booked is the reader's own list; every other chip is the agenda.
+    this.bookedOnly.set(id === QuickFilterIds.Booked);
     const picks = this.filterCount() > 0 ? this.sheetFilters() : this._keptSheet();
     this.sheetFilters.set({
       ...NO_SHEET_FILTERS,
@@ -617,6 +685,7 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
   }
 
   onFiltersApplied(filters: DiscoverSheetFilters): void {
+    this.bookedOnly.set(false);
     this.sheetFilters.set(filters);
     this._keptSheet.set(null);
     const window = compileDatePreset(filters.datePreset, new Date());
@@ -630,6 +699,7 @@ export class Discover implements ViewWillEnter, ViewDidLeave {
 
   /** The agenda's filters and the topic; the city is a choice of its own. */
   clearFilters(): void {
+    this.bookedOnly.set(false);
     this._pickedTopicId.set(null);
     this.sheetFilters.set({ ...NO_SHEET_FILTERS });
     this._keptSheet.set(null);

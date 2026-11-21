@@ -1,10 +1,11 @@
-<div class="rail" [style.height.px]="railHeight()">
+<div #rail class="rail" [style.height.px]="railHeight()">
   @for (hour of hours(); track hour.hour; let i = $index) {
     <button
       type="button"
       class="hour"
       [style.top.px]="i * hourHeight"
       [style.height.px]="hourHeight"
+      [disabled]="hour.started"
       [attr.aria-label]="'sessions.dayRail.newSessionAt' | translate: { time: hour.label }"
       (click)="pickHour.emit(hour.hour)"
     >

@@ -6,14 +6,21 @@ import {
   SESSION_LOCATION_KINDS,
   SESSION_TYPES,
   SessionAccess,
+  SessionAccessMeta,
   SessionInstance,
+  SessionInstanceStatus,
+  SessionTemplate,
   SessionType,
   SessionLocationKind,
   SessionTone,
+  WEB_APP_URL,
   appLocale,
   endOfDay,
+  formatMinorUnits,
   localDayKey,
   meetingProviderLabel,
+  normalizeUrl,
+  sessionLifecycle,
   sessionTone,
   sessionTypeLabel,
   startOfDay,
@@ -154,6 +161,54 @@ export const SESSION_ACCESS_OPTIONS: readonly {
   icon: SESSION_ACCESS_LEVELS[value].ionIcon,
 }));
 
+// ─── Access and price ─────────────────────────────────────────────────────
+
+/** Free has no price: the form hides the field and sends none. */
+export function accessTakesPrice(access: SessionAccess): boolean {
+  return access !== SessionAccess.Free;
+}
+
+/**
+ * A paid session ("Paid" is OPEN) without a price above zero. Clients only
+ * and group members may leave it empty, which means free.
+ */
+export function priceMissing(access: SessionAccess, amount: number | null): boolean {
+  if (access !== SessionAccess.Open) {
+    return false;
+  }
+  if (amount === null) {
+    return true;
+  }
+  return amount <= 0;
+}
+
+/**
+ * The price in cents as it is saved, or null for none: always none when it
+ * is free, else the field, where empty means free.
+ */
+export function priceCentsFor(access: SessionAccess, amount: number | null): number | null {
+  if (!accessTakesPrice(access) || amount === null) {
+    return null;
+  }
+  return Math.round(amount * 100);
+}
+
+/**
+ * Who can book, as the coach's screens name it. An OPEN ("Paid") session
+ * saved without a price, before the form asked for one, books for free, so
+ * it reads as Free rather than "Paid" beside a free price.
+ */
+export function accessLevelFor(access: SessionAccess, priceCents: number | null | undefined): SessionAccessMeta {
+  let cents = 0;
+  if (typeof priceCents === 'number') {
+    cents = priceCents;
+  }
+  if (access === SessionAccess.Open && cents <= 0) {
+    return SESSION_ACCESS_LEVELS[SessionAccess.Free];
+  }
+  return SESSION_ACCESS_LEVELS[access];
+}
+
 /**
  * The chip row under the week strip — the one narrowing worth reaching without
  * opening the filter sheet, since "am I at a venue or on a call?" changes what
@@ -279,18 +334,15 @@ export function formatRecurrenceSummary(rule: RecurrenceRule | null | undefined)
  *
  * Only what an endpoint can actually deliver. Two are synthesized rather than
  * called: Duplicate opens the create sheet pre-filled (there is no duplicate
- * endpoint), and Share hands out a link the client builds itself.
- *
- * "Share booking link", not the design's "Share public link": every session URL
- * in the web app sits behind the auth guard, so the only genuinely public
- * destination is the coach's profile. The label should not promise a door that
- * is locked.
+ * endpoint), and Share hands out a link the client builds itself
+ * (`sessionShareUrl`).
  */
 export const SessionActionIds = {
   Open: 'open',
   CheckIn: 'checkIn',
   Message: 'message',
   Edit: 'edit',
+  Reschedule: 'reschedule',
   Duplicate: 'duplicate',
   Share: 'share',
   Cancel: 'cancel',
@@ -306,8 +358,8 @@ export type SessionActionId =
  * Honey lands on `Open`, the sheet's primary action (the same thing tapping
  * the row does), and on `Edit`, which only the detail screen shows, where
  * Open is not: one honey row per sheet. The rest take their concept's hue
- * (attendance green, sending and sharing sky, the copy teal), and destructive
- * is red. None of these encode a *state*, which is the line honey must not
+ * (attendance green, sending and sharing sky, the copy teal, a new date
+ * violet), and destructive is red. None of these encode a *state*, which is the line honey must not
  * cross.
  */
 export const SESSION_ACTIONS: readonly SheetAction<SessionActionId>[] = [
@@ -334,6 +386,12 @@ export const SESSION_ACTIONS: readonly SheetAction<SessionActionId>[] = [
     label: 'sessions.actions.edit',
     icon: 'create-outline',
     color: 'primary',
+  },
+  {
+    id: SessionActionIds.Reschedule,
+    label: 'sessions.actions.reschedule',
+    icon: 'calendar-outline',
+    color: 'violet',
   },
   {
     id: SessionActionIds.Duplicate,
@@ -413,8 +471,10 @@ export interface SessionPrefill {
   approvalRequired: boolean;
   groupId: string | null;
   locationKind: SessionLocationKind;
-  /** Local wall-clock, the format `ion-datetime` binds to. */
+  /** Wall clock in `timezone`, the format `ion-datetime` binds to. */
   startAt: string;
+  /** The source's own zone, so a copy repeats on the same clock. */
+  timezone: string;
   durationMinutes: number;
   capacity: number | null;
   waitlistEnabled: boolean;
@@ -429,11 +489,118 @@ export interface SessionPrefill {
 }
 
 /** Local wall-clock string for `ion-datetime`, which does not take an instant. */
-function toLocalIso(date: Date): string {
+export function toLocalIso(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
     date.getHours(),
   )}:${pad(date.getMinutes())}`;
+}
+
+/** The phone's own zone, the form's default. */
+export function deviceTimezone(): string {
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (zone) {
+    return zone;
+  }
+  return 'Europe/Bucharest';
+}
+
+// ─── Time zones ───────────────────────────────────────────────────────────
+
+interface WallClockParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+/**
+ * The calendar date and clock time an instant shows in `timeZone`. Read back
+ * as numbers, never displayed: Latin digits and a 0 to 23 hour are asked for,
+ * so the parts parse the same in every language.
+ */
+function wallClockParts(instant: number, timeZone: string): WallClockParts {
+  const format = new Intl.DateTimeFormat(appLocale(), {
+    timeZone,
+    numberingSystem: 'latn',
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+  const parts: WallClockParts = { year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0 };
+  for (const part of format.formatToParts(instant)) {
+    if (part.type in parts) {
+      parts[part.type as keyof WallClockParts] = Number(part.value);
+    }
+  }
+  return parts;
+}
+
+/** How far `timeZone` is ahead of UTC at `instant`, in milliseconds. */
+function zoneOffsetMs(instant: number, timeZone: string): number {
+  const parts = wallClockParts(instant, timeZone);
+  const asUtc = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  );
+  return asUtc - Math.floor(instant / 1000) * 1000;
+}
+
+const WALL_CLOCK = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/;
+
+/**
+ * A wall clock as `ion-datetime` gives it (`2026-11-21T18:00`), read in
+ * `timeZone`, as the UTC instant the API takes.
+ *
+ * `new Date(wallClock)` reads it in the phone's zone instead, so 18:00 picked
+ * for Europe/London on a phone in Bucharest was stored as 16:00 in London. The
+ * offset is measured twice because the first guess can land across a clock
+ * change; a time the change skips (03:30 on the spring night) moves an hour
+ * on, as the clocks do. An unknown zone falls back to the phone's.
+ */
+export function zonedWallClockToIso(wallClock: string, timeZone: string): string {
+  const match = WALL_CLOCK.exec(wallClock);
+  if (!match) {
+    return new Date(wallClock).toISOString();
+  }
+  const guess = Date.UTC(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+    Number(match[4]),
+    Number(match[5]),
+  );
+  try {
+    const first = guess - zoneOffsetMs(guess, timeZone);
+    const instant = guess - zoneOffsetMs(first, timeZone);
+    return new Date(instant).toISOString();
+  } catch {
+    return new Date(wallClock).toISOString();
+  }
+}
+
+/** An instant as the wall clock `ion-datetime` binds to, in `timeZone`. */
+export function wallClockInZone(instant: Date | string | number, timeZone: string): string {
+  const date = new Date(instant);
+  try {
+    const parts = wallClockParts(date.getTime(), timeZone);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${parts.year}-${pad(parts.month)}-${pad(parts.day)}T${pad(parts.hour)}:${pad(
+      parts.minute,
+    )}`;
+  } catch {
+    return toLocalIso(date);
+  }
 }
 
 /**
@@ -444,12 +611,20 @@ function toLocalIso(date: Date): string {
  * copy of last Monday's class has to land in the future or the API refuses it,
  * and the same weekday at the same time is the slot the coach is actually
  * copying — moving it to "now" would lose the thing worth duplicating.
+ *
+ * `fullTemplate` is the template read on its own, when the caller has it (the
+ * detail page). The one nested on an instance is the API's short field list,
+ * with no `recurrenceRule`, so a weekly series copied from it became a one-off.
  */
 export function prefillFromInstance(
   instance: SessionInstance,
   now: number = Date.now(),
+  fullTemplate: SessionTemplate | null = null,
 ): SessionPrefill {
-  const template = instance.template;
+  let template = instance.template;
+  if (fullTemplate) {
+    template = fullTemplate;
+  }
 
   const start = new Date(instance.startAt);
   while (start.getTime() <= now) {
@@ -458,6 +633,10 @@ export function prefillFromInstance(
 
   const priceCents = template?.priceAmountCents ?? 0;
   const rule = template?.recurrenceRule ?? null;
+  let timezone = deviceTimezone();
+  if (template?.timezone) {
+    timezone = template.timezone;
+  }
 
   return {
     title: instance.titleOverride ?? template?.title ?? '',
@@ -467,7 +646,8 @@ export function prefillFromInstance(
     approvalRequired: template?.approvalRequired ?? false,
     groupId: template?.groupId ?? null,
     locationKind: template?.locationKind ?? 'IN_PERSON',
-    startAt: toLocalIso(start),
+    startAt: wallClockInZone(start, timezone),
+    timezone,
     durationMinutes: template?.durationMinutes ?? 60,
     capacity: instance.capacityOverride ?? template?.capacity ?? null,
     waitlistEnabled: template?.waitlistEnabled ?? true,
@@ -507,6 +687,139 @@ export function findOverlap(
   );
 }
 
+// ─── Form checks ──────────────────────────────────────────────────────────
+
+/** The API's seat range (`@Min(1) @Max(1000)` on `capacity`). */
+export const MIN_CAPACITY = 1;
+export const MAX_CAPACITY = 1000;
+
+/** Empty means no limit; anything else must be a whole number the API takes. */
+export function isValidCapacity(capacity: number | null): boolean {
+  if (capacity === null) {
+    return true;
+  }
+  return Number.isInteger(capacity) && capacity >= MIN_CAPACITY && capacity <= MAX_CAPACITY;
+}
+
+/** The API's cap on a meeting link (`@MaxLength(500)`). */
+const MAX_MEETING_LINK = 500;
+
+/**
+ * A meeting link as the API takes it, or null when it cannot be one.
+ *
+ * Forgiving of a pasted link without its scheme (`zoom.us/j/1` gets
+ * `https://`), but https only: the API refuses `http:`, and refusing it here
+ * says why in the field instead of in a generic error after Save.
+ */
+export function meetingLinkFor(input: string): string | null {
+  const normalized = normalizeUrl(input);
+  if (!normalized) {
+    return null;
+  }
+  if (!normalized.startsWith('https://') || normalized.length > MAX_MEETING_LINK) {
+    return null;
+  }
+  return normalized;
+}
+
+/** A series' last date (`yyyy-mm-dd`) set before its first session's day. */
+export function endsBeforeStart(endDate: string | null, startWallClock: string): boolean {
+  if (!endDate) {
+    return false;
+  }
+  return endDate < startWallClock.slice(0, 10);
+}
+
+/** Whether an hour on `day` has already begun, so no new session is offered there. */
+export function hourHasStarted(day: Date, hour: number, now: number): boolean {
+  const slot = new Date(day);
+  slot.setHours(hour, 0, 0, 0);
+  return slot.getTime() < now;
+}
+
+/**
+ * Whether one date can move to another time: the API moves only a SCHEDULED
+ * occurrence, and one already under way or over has nothing left to move.
+ * From the times as well as the status, which the API's cron moves late.
+ */
+export function canReschedule(instance: SessionInstance, now: number = Date.now()): boolean {
+  if (instance.status !== SessionInstanceStatus.Scheduled) {
+    return false;
+  }
+  return sessionLifecycle(instance.startAt, instance.endAt, now) === 'upcoming';
+}
+
+// ─── Where a day opens on the hour rail ───────────────────────────────────
+
+/** A quiet day other than today opens on the working morning. */
+export const DAY_OPEN_HOUR = 8;
+
+/** How much of the hour before stays in view above where a day opens. */
+export const DAY_OPEN_CONTEXT_HOURS = 0.5;
+
+/**
+ * The hour a day opens on, on the phone's clock, with minutes as a fraction
+ * (17:30 is 17.5): its first session's start; with none, the hour it is now
+ * when the day is today, else 08:00.
+ */
+export function dayOpenHour(
+  instances: readonly SessionInstance[],
+  day: Date,
+  now: number,
+): number {
+  const key = localDayKey(day);
+  let first: number | null = null;
+  for (const instance of instances) {
+    const start = new Date(instance.startAt);
+    if (localDayKey(start) !== key) {
+      continue;
+    }
+    if (first === null || start.getTime() < first) {
+      first = start.getTime();
+    }
+  }
+
+  if (first !== null) {
+    const start = new Date(first);
+    return start.getHours() + start.getMinutes() / 60;
+  }
+  const today = new Date(now);
+  if (localDayKey(today) === key) {
+    return today.getHours();
+  }
+  return DAY_OPEN_HOUR;
+}
+
+/**
+ * How far down the rail the view starts, in pixels from its first hour: the
+ * hour a day opens on, with a little of the one before it above. 0 when that
+ * is already the top, so nothing is scrolled away for a few pixels.
+ */
+export function railScrollOffset(hour: number, firstHour: number, hourHeight: number): number {
+  return Math.max(0, (hour - DAY_OPEN_CONTEXT_HOURS - firstHour) * hourHeight);
+}
+
+/**
+ * "49.50 RON", "50 RON": cents only when there are some, as the trainee's
+ * screens show a price (`formatMinorUnits`). Null when it is free.
+ */
+export function sessionPriceLabel(cents: number, currency: string): string | null {
+  if (cents <= 0) {
+    return null;
+  }
+  return `${formatMinorUnits(cents, { trimWholeNumbers: true })} ${currency.toUpperCase()}`;
+}
+
+/**
+ * The link Share hands out: the session on the web app. The app claims this
+ * path (the iOS apple-app-site-association and the Android App Links), so on
+ * a phone it opens the session in the app, and in a browser it opens the
+ * session after signing in.
+ */
+export function sessionShareUrl(instanceId: string): string {
+  return `${WEB_APP_URL}/sessions/${instanceId}`;
+}
+
 /**
  * What a cancel applies to. Values are core's `CancelScope` members; the copy
  * is filled in per-session, since the details differ every time.
@@ -527,6 +840,19 @@ export const CANCEL_SCOPE_OPTIONS: readonly {
  */
 export function instanceTone(instance: SessionInstance): SessionTone {
   return instance.template ? sessionTone(instance.template, instance) : 'honey';
+}
+
+/**
+ * Spine colour for an agenda row: a session that has ended reads as the
+ * record (`muted`, the spine vocabulary's "done"), whatever it was; until then
+ * `instanceTone`. From the times rather than `status`, which the API's cron
+ * moves a few minutes late.
+ */
+export function rowTone(instance: SessionInstance, now: number = Date.now()): SessionTone {
+  if (sessionLifecycle(instance.startAt, instance.endAt, now) === 'past') {
+    return 'muted';
+  }
+  return instanceTone(instance);
 }
 
 /**
@@ -613,8 +939,8 @@ export const MONTH_LEGEND: readonly { readonly tone: SessionTone; readonly label
 /**
  * What needs your attention, rather than what state the row is in.
  *
- * All three are sub-filters of SCHEDULED — the only status `loadRange` ever
- * asks the API for — so none of them touch the store. `Scheduled` therefore
+ * All three narrow what `loadRange` already holds (every occurrence but the
+ * cancelled ones), so none of them touch the store. `Scheduled` therefore
  * means "nothing wrong with it": no clash, nobody waiting on approval.
  */
 export const AgendaStatuses = {
@@ -742,6 +1068,24 @@ export function matchesFilters(
   }
 
   return true;
+}
+
+/**
+ * The agenda list: what is on from `today`, today's finished sessions
+ * included, since the loaded window opens on the first of the month. The past
+ * stays on the day view and the month, and shows in the list once a date
+ * filter asks for it.
+ */
+export function agendaRows(
+  instances: readonly SessionInstance[],
+  filters: AgendaFilters,
+  today: Date,
+): SessionInstance[] {
+  if (filters.dateFrom) {
+    return [...instances];
+  }
+  const from = startOfDay(today).getTime();
+  return instances.filter((instance) => new Date(instance.startAt).getTime() >= from);
 }
 
 // ─── The loaded window ────────────────────────────────────────────────────

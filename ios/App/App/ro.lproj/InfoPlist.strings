@@ -3,3 +3,7 @@
 
 /* Shown the first time someone takes a photo for a workout or a post. */
 "NSCameraUsageDescription" = "MotionHive folosește camera când faci o poză pentru un antrenament sau o postare.";
+
+/* Shown when someone taps "Adaugă în calendar" on a session. */
+"NSCalendarsWriteOnlyAccessUsageDescription" = "MotionHive adaugă o sesiune în calendarul tău doar când îi ceri tu.";
+"NSCalendarsUsageDescription" = "MotionHive adaugă o sesiune în calendarul tău doar când îi ceri tu.";

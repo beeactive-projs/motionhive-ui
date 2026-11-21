@@ -889,7 +889,10 @@
       "noneInCityMessage": "Încearcă alt oraș sau caută peste tot.",
       "noneOnline": "Nicio sesiune online programată",
       "seeAll": "Vezi toate sesiunile",
-      "title": "Urmează"
+      "title": "Urmează",
+      "booked": "Rezervate",
+      "noneBooked": "Nicio rezervare în perioada următoare",
+      "noneBookedMessage": "Sesiunile pe care le rezervi sau la care aștepți un loc apar aici."
     },
     "filterSheet": {
       "anyType": "Oricare",
@@ -1403,7 +1406,11 @@
         "ready": "Linkul de invitație e gata",
         "revokeFailed": "Linkul nu a putut fi revocat.",
         "revoked": "Linkul de invitație a fost revocat"
-      }
+      },
+      "invalidOrExpired": "Linkul de invitație a expirat sau a fost revocat.",
+      "failedHeading": "Nu te-ai putut alătura grupului",
+      "goToGroups": "Mergi la grupuri",
+      "joining": "Te alături grupului…"
     },
     "joinPolicy": {
       "APPROVAL": "Necesită aprobare",
@@ -2065,7 +2072,8 @@
       },
       "blocked": {
         "message": "Intră în club ca să vezi unde are loc și să rezervi.",
-        "title": "Locația e vizibilă doar membrilor clubului"
+        "title": "Locația e vizibilă doar membrilor clubului",
+        "seeGroup": "Vezi grupul"
       },
       "cancelledBanner": {
         "detail": "Anulată pe {date} · toți cei înscriși au fost anunțați.",
@@ -2082,7 +2090,8 @@
         "joinSession": "Intră în sesiune",
         "joinWaitlist": "Intră pe lista de așteptare",
         "leaveWaitlist": "Ieși de pe lista de așteptare",
-        "withdraw": "Retrage cererea"
+        "withdraw": "Retrage cererea",
+        "requestToBook": "Cere o rezervare"
       },
       "invoiceNote": "Se plătește prin factură. Nu plătești nimic acum.",
       "link": {
@@ -2155,7 +2164,9 @@
       "cancelledOutside": "Anulată în afara termenului, așa că s-ar putea să plătești totuși.",
       "cancelledWithin": "Rezervare anulată, fără costuri.",
       "copyFailed": "Linkul nu a putut fi copiat.",
-      "linkFailed": "Linkul întâlnirii nu a putut fi obținut."
+      "linkFailed": "Linkul întâlnirii nu a putut fi obținut.",
+      "calendarAdded": "Adăugată în calendar",
+      "calendarOpenFailed": "Calendarul nu a putut fi deschis."
     }
   },
   "notifications": {
@@ -2269,7 +2280,8 @@
     "welcome": "Bun venit",
     "workoutStatus": "Starea antrenamentului",
     "messageRequests": "Solicitări de mesaje",
-    "archivedChats": "Conversații arhivate"
+    "archivedChats": "Conversații arhivate",
+    "joinGroup": "Alătură-te unui grup"
   },
   "payments": {
     "badge": {
@@ -2971,6 +2983,7 @@
       "edit": "Editează sesiunea",
       "message": "Scrie tuturor celor înscriși",
       "open": "Deschide sesiunea",
+      "reschedule": "Reprogramează",
       "share": "Distribuie linkul de rezervare"
     },
     "actionsSheet": {
@@ -2990,6 +3003,10 @@
       "newSession": "Sesiune nouă",
       "noMatch": {
         "message": "Nicio sesiune din acest interval nu se potrivește cu ce cauți."
+      },
+      "rangeEmpty": {
+        "message": "Nicio sesiune de azi încolo în aceste zile.",
+        "title": "Nimic programat"
       },
       "search": "Caută sesiuni",
       "summary": {
@@ -3131,6 +3148,8 @@
       "cancellationCutoff": "Termen de anulare",
       "cancellationHint": "ore înainte de început. Până atunci cei înscriși pot anula",
       "capacity": "Capacitate",
+      "capacityHint": "Lasă gol pentru locuri nelimitate.",
+      "capacityPlaceholder": "Nelimitat",
       "conflict": {
         "anotherSession": "altă sesiune",
         "detail": "{time} se suprapune cu „{title}”. Poți salva oricum.",
@@ -3151,12 +3170,21 @@
         "onDate": "La o anumită dată"
       },
       "ends": "Se termină",
+      "errors": {
+        "capacity": "Scrie un număr întreg de la 1 la 1000.",
+        "endBeforeStart": "Ultima sesiune nu poate fi înaintea primei.",
+        "meetingLink": "Scrie un link https complet, de exemplu https://meet.google.com/abc.",
+        "price": "Scrie un preț mai mare de 0 pentru o sesiune plătită.",
+        "startPast": "Alege o oră de început care nu a trecut."
+      },
       "group": "Grup",
+      "groupNone": "Fără grup",
       "groupPlaceholder": "Alege un grup",
       "lastSession": "Ultima sesiune",
       "meetingLink": "Link de întâlnire",
       "meetingLinkHint": "Cei înscriși văd linkul după ce sunt confirmați.",
       "noGroup": "Nu ai încă niciun grup. Ca să limitezi accesul la membrii unui grup, ai nevoie de unul.",
+      "noPlaces": "Nu ai adăugat încă niciun loc. Adaugă sala, studioul sau parcul și alege-l aici; profilul tău îl păstrează pentru data viitoare.",
       "noVenue": "Fără locație",
       "occurrences": "Număr de sesiuni",
       "occurrencesUnit": "{count, plural, one {sesiune} few {sesiuni} other {de sesiuni}}",
@@ -3177,6 +3205,7 @@
         "onDate": "În fiecare {days} până pe {date}",
         "onDateMissing": "În fiecare {days} · alege o dată de final"
       },
+      "scheduleLocked": "{series, select, yes {Fusul orar, zilele și finalul nu se mai pot schimba după creare: nu ar muta datele deja stabilite.} other {Fusul orar nu se mai poate schimba după creare: nu ar muta data deja stabilită.}}",
       "short": {
         "after": "{count, plural, one {{days} · # sesiune} few {{days} · # sesiuni} other {{days} · # de sesiuni}}",
         "never": "{days} · fără dată de final",
@@ -3236,6 +3265,14 @@
       "summary": "{frequency} · {end}",
       "until": "până pe {date}"
     },
+    "rescheduleSheet": {
+      "current": "Acum e programată {when}.",
+      "hint": "Se mută doar această dată, cu aceeași durată. Toți cei înscriși află noua oră.",
+      "newStart": "Noul început",
+      "save": "Mută sesiunea",
+      "title": "Reprogramează sesiunea",
+      "zone": "Orele sunt după fusul orar {zone}."
+    },
     "row": {
       "live": "În desfășurare"
     },
@@ -3256,9 +3293,13 @@
       "createFailed": "Sesiunea nu a putut fi creată.",
       "created": "Sesiune creată",
       "createdWithOverlap": "Sesiune creată · se suprapune cu alta",
+      "duplicateFailed": "Sesiunea nu a putut fi încărcată pentru copiere.",
       "messageFailed": "Mesajul nu a putut fi trimis.",
       "messageSent": "{count, plural, one {Trimis către # persoană} few {Trimis către # persoane} other {Trimis către # de persoane}}",
       "nobodyToNotify": "Nu e nimeni de anunțat",
+      "rescheduleFailed": "Sesiunea nu a putut fi mutată.",
+      "rescheduled": "{count, plural, =0 {Sesiune mutată} one {Sesiune mutată · # persoană anunțată} few {Sesiune mutată · # persoane anunțate} other {Sesiune mutată · # de persoane anunțate}}",
+      "rescheduledWithOverlap": "Sesiune mutată · se suprapune cu alta",
       "shareFailed": "Linkul nu a putut fi distribuit.",
       "updateFailed": "Sesiunea nu a putut fi actualizată.",
       "updated": "Sesiune actualizată"

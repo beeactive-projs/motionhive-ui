@@ -470,14 +470,20 @@
 <mh-session-actions-sheet
   [(open)]="actionsOpen"
   [instance]="instance()"
-  [canShare]="canShare()"
   [surface]="Surfaces.Detail"
   (action)="onAction($event)"
 />
 
-<mh-session-form-sheet [(open)]="duplicateOpen" [prefill]="duplicatePrefill()" />
+<mh-session-form-sheet [(open)]="duplicateOpen" [prefill]="duplicatePrefill()" (saved)="onDuplicated()" />
 
 <mh-session-form-sheet [(open)]="editOpen" [template]="template()" (saved)="onEdited()" />
+
+<mh-reschedule-sheet
+  [(open)]="rescheduleOpen"
+  [instance]="instance()"
+  [timezone]="template()?.timezone ?? null"
+  (rescheduled)="onRescheduled()"
+/>
 
 <mh-participant-note-sheet
   [(open)]="noteOpen"

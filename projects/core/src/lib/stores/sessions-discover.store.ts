@@ -44,6 +44,13 @@ export interface DiscoverFilters {
 export interface DiscoverTopicFilter {
   categoryIds?: readonly string[];
   online?: boolean;
+  /**
+   * The city as people write it; the server matches it whole, blind to case
+   * and accents, and keeps online sessions in every city. Narrowed there
+   * because the first page alone held no session in a city whose sessions
+   * came later.
+   */
+  city?: string;
 }
 
 @Injectable()
@@ -99,6 +106,9 @@ export class SessionsDiscoverStore {
           const topic = this._topic();
           if (topic.categoryIds && topic.categoryIds.length > 0) {
             query.categoryIds = topic.categoryIds;
+          }
+          if (topic.city) {
+            query.city = topic.city;
           }
           if (topic.online) {
             // Online and an in-person filter together leave nothing to ask for.
@@ -189,5 +199,5 @@ export class SessionsDiscoverStore {
 function sameTopic(a: DiscoverTopicFilter, b: DiscoverTopicFilter): boolean {
   const aIds = [...(a.categoryIds ?? [])].sort().join(',');
   const bIds = [...(b.categoryIds ?? [])].sort().join(',');
-  return aIds === bIds && !!a.online === !!b.online;
+  return aIds === bIds && !!a.online === !!b.online && (a.city ?? '') === (b.city ?? '');
 }

@@ -3,6 +3,7 @@
   button
   detail="false"
   lines="none"
+  [class.past]="isPast()"
   [attr.data-tone]="tone()"
   (click)="select.emit()"
 >

@@ -19,6 +19,7 @@ import type {
   SessionInstance,
   SessionTemplate,
 } from '../models/session/session.model';
+import { SessionInstanceStatus } from '../models/session/session.enums';
 import type {
   SessionAccess,
   SessionLocationKind,
@@ -30,6 +31,45 @@ import type {
  * Instructor-side sessions store — backs the SessionsList page and the
  * SessionsCalendar page (the latter via `rangeInstances` + `loadRange`).
  */
+
+/** The API's page cap on `/sessions/instances` (`PaginationDto`'s `@Max(100)`). */
+const CALENDAR_PAGE_LIMIT = 100;
+
+/**
+ * What a calendar shows: every occurrence but the cancelled ones, which live
+ * on the Cancelled tab. SCHEDULED alone was not enough: the API's cron moves
+ * an occurrence to IN_PROGRESS a few minutes after it starts and to COMPLETED
+ * once it ends, so a 09:00 class left the agenda at 09:05 (with its check-in)
+ * and every past day read empty.
+ */
+export const CALENDAR_STATUSES: SessionInstanceStatus[] = [
+  SessionInstanceStatus.Scheduled,
+  SessionInstanceStatus.InProgress,
+  SessionInstanceStatus.Completed,
+];
+
+/**
+ * The coach's calendar for a range, the one request the agenda and Home's
+ * Today row make. The status list is explicit because leaving `status` off
+ * returns every status, cancelled included.
+ */
+export function calendarInstancesQuery(
+  range: { start: Date; end: Date },
+  limit: number = CALENDAR_PAGE_LIMIT,
+): ListInstancesQuery {
+  return {
+    dateFrom: range.start.toISOString(),
+    dateTo: range.end.toISOString(),
+    status: [...CALENDAR_STATUSES],
+    limit,
+  };
+}
+
+/** One loaded range: what it shows, and whether the API had more than one page. */
+interface RangeEntry {
+  items: SessionInstance[];
+  truncated: boolean;
+}
 
 export interface InstructorFilters {
   q?: string;
@@ -98,9 +138,20 @@ export class SessionsInstructorStore {
   private readonly _rangeInstances = signal<SessionInstance[]>([]);
   private readonly _rangeLoading = signal<boolean>(false);
   private readonly _rangeError = signal<string | null>(null);
+  /** The API held more than the one page a range asks for. */
+  private readonly _rangeTruncated = signal<boolean>(false);
   /** Cache of last-3-loaded ranges, LRU keyed by `start.getTime()`. */
-  private readonly _rangeCache = new Map<string, SessionInstance[]>();
+  private readonly _rangeCache = new Map<string, RangeEntry>();
   private static readonly RANGE_CACHE_MAX = 3;
+  /**
+   * Set when a session changed on a screen that does not own the calendar
+   * (its detail page cancelled, edited or duplicated it), so the calendar
+   * reloads the next time it is shown instead of trusting its window.
+   */
+  private _rangeStale = false;
+  /** Whether the coach has any session at all, in any state; null until asked. */
+  private readonly _hasAnySessions = signal<boolean | null>(null);
+  private _checkingAnySessions = false;
 
   // ─── Public readonly signals ───────────────────────────────────────
 
@@ -123,6 +174,8 @@ export class SessionsInstructorStore {
   readonly rangeInstances = this._rangeInstances.asReadonly();
   readonly rangeLoading = this._rangeLoading.asReadonly();
   readonly rangeError = this._rangeError.asReadonly();
+  readonly rangeTruncated = this._rangeTruncated.asReadonly();
+  readonly hasAnySessions = this._hasAnySessions.asReadonly();
 
   /** Computed: returns the matching next instance for a template id. */
   readonly nextInstanceFor = (templateId: string): SessionInstance | null =>
@@ -410,7 +463,8 @@ export class SessionsInstructorStore {
     // Cache hit?
     const cached = this._rangeCache.get(key);
     if (cached) {
-      this._rangeInstances.set(cached);
+      this._rangeInstances.set(cached.items);
+      this._rangeTruncated.set(cached.truncated);
       this._rangeError.set(null);
       opts.done?.();
       return;
@@ -420,18 +474,17 @@ export class SessionsInstructorStore {
     this._rangeError.set(null);
     // BE caps limit=100 — pathological weeks may overflow; accept until a paginated calendar endpoint exists.
     this._service
-      .listInstances({
-        dateFrom: range.start.toISOString(),
-        dateTo: range.end.toISOString(),
-        // Calendar is a "what's on" view — cancelled instances live on the Cancelled tab.
-        status: 'SCHEDULED',
-        limit: 100,
-      })
+      .listInstances(calendarInstancesQuery(range))
       .pipe(
         tap((res) => {
-          this._rangeInstances.set(res.items);
+          const entry: RangeEntry = {
+            items: res.items,
+            truncated: res.total > res.items.length,
+          };
+          this._rangeInstances.set(entry.items);
+          this._rangeTruncated.set(entry.truncated);
           // LRU bookkeeping
-          this._rangeCache.set(key, res.items);
+          this._rangeCache.set(key, entry);
           while (this._rangeCache.size > SessionsInstructorStore.RANGE_CACHE_MAX) {
             const firstKey = this._rangeCache.keys().next().value;
             if (firstKey !== undefined) this._rangeCache.delete(firstKey);
@@ -440,6 +493,7 @@ export class SessionsInstructorStore {
         catchError((err: unknown) => {
           this._rangeError.set(apiErrorMessage(err, 'Could not load sessions'));
           this._rangeInstances.set([]);
+          this._rangeTruncated.set(false);
           return of(null);
         }),
       )
@@ -448,6 +502,49 @@ export class SessionsInstructorStore {
           this._rangeLoading.set(false);
           opts.done?.();
         },
+      });
+  }
+
+  /**
+   * A session changed where the calendar cannot see it: its detail page
+   * cancelled, edited or duplicated it. Drops every cached range and leaves a
+   * mark the calendar page reads on its way back (`takeRangeStale`).
+   */
+  markRangeStale(): void {
+    this._rangeCache.clear();
+    this._rangeStale = true;
+  }
+
+  /** Whether something changed since the calendar last looked; reading clears the mark. */
+  takeRangeStale(): boolean {
+    const stale = this._rangeStale;
+    this._rangeStale = false;
+    return stale;
+  }
+
+  /**
+   * Ask whether the coach has made any session, in any state, for the
+   * first-run screen: an empty range is not an empty account (a month far
+   * ahead, a series that ended). Once the answer is yes it stays yes, so only
+   * a coach who could still have none is asked again.
+   */
+  checkHasAnySessions(): void {
+    if (this._hasAnySessions() === true || this._checkingAnySessions) {
+      return;
+    }
+    this._checkingAnySessions = true;
+    // No `tab`: the API then counts templates in every state.
+    this._service
+      .listTemplates({ limit: 1 }, { silent: true })
+      .pipe(
+        map((page) => page.total > 0),
+        // A failed check must not trap the coach on the first-run screen,
+        // which hides the calendar: assume there is something to look at.
+        catchError(() => of(true)),
+      )
+      .subscribe((hasAny) => {
+        this._checkingAnySessions = false;
+        this._hasAnySessions.set(hasAny);
       });
   }
 

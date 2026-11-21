@@ -136,5 +136,13 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>MotionHive uses the camera when you take a photo for a workout or a post.</string>
+	<!-- Add to calendar: the system's new-event screen, filled in with the
+	     session (@ebarooni/capacitor-calendar). Add-only on iOS 17 and later;
+	     the older key covers earlier versions. The app never reads the
+	     calendar. -->
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>MotionHive adds a session to your calendar only when you ask it to.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>MotionHive adds a session to your calendar only when you ask it to.</string>
 </dict>
 </plist>

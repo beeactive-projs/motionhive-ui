@@ -60,6 +60,19 @@ describe('resolveAppLink', () => {
     });
   });
 
+  // Shared from the app: these used to open the website on a phone.
+  it('opens a shared profile in Discover and a group invite link on its join screen', () => {
+    expect(at('/@ana.pop')).toEqual({ commands: ['/tabs/discover', 'person', 'ana.pop'], queryParams: null });
+    expect(at('/join/tok123')).toEqual({ commands: ['/tabs/groups', 'join', 'tok123'], queryParams: null });
+    expect(at('/@')).toBeNull();
+    expect(at('/join')).toBeNull();
+    expect(at('/join/a/b')).toBeNull();
+  });
+
+  it('opens a shared session on the trainee session page', () => {
+    expect(at('/sessions/inst-1')).toEqual({ commands: ['/tabs/user/sessions', 'inst-1'], queryParams: null });
+  });
+
   it('returns null for a page the app does not have', () => {
     expect(at('/profile?tab=settings')).toBeNull();
     expect(at('/')).toBeNull();

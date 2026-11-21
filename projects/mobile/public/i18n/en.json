@@ -889,7 +889,10 @@
       "noneInCityMessage": "Try another city, or look everywhere.",
       "noneOnline": "No online sessions coming up",
       "seeAll": "See all sessions",
-      "title": "Coming up"
+      "title": "Coming up",
+      "booked": "Booked",
+      "noneBooked": "Nothing booked coming up",
+      "noneBookedMessage": "Sessions you book, or wait for a place in, show up here."
     },
     "filterSheet": {
       "anyType": "Any",
@@ -1403,7 +1406,11 @@
         "ready": "Invite link ready",
         "revokeFailed": "Could not revoke that link.",
         "revoked": "Invite link revoked"
-      }
+      },
+      "invalidOrExpired": "This invite link has expired or was revoked.",
+      "failedHeading": "Couldn't join the group",
+      "goToGroups": "Go to groups",
+      "joining": "Joining the group…"
     },
     "joinPolicy": {
       "APPROVAL": "Approval required",
@@ -2065,7 +2072,8 @@
       },
       "blocked": {
         "message": "Join the club to see where and book.",
-        "title": "Location is for club members"
+        "title": "Location is for club members",
+        "seeGroup": "See the group"
       },
       "cancelledBanner": {
         "detail": "Cancelled {date} · everyone booked was notified.",
@@ -2082,7 +2090,8 @@
         "joinSession": "Join session",
         "joinWaitlist": "Join waitlist",
         "leaveWaitlist": "Leave the waitlist",
-        "withdraw": "Withdraw request"
+        "withdraw": "Withdraw request",
+        "requestToBook": "Request to book"
       },
       "invoiceNote": "Settled by invoice. Nothing to pay now.",
       "link": {
@@ -2155,7 +2164,9 @@
       "cancelledOutside": "Cancelled outside the window, so charges may still apply.",
       "cancelledWithin": "Booking cancelled, no charge.",
       "copyFailed": "Couldn't copy the link.",
-      "linkFailed": "Couldn't get the meeting link."
+      "linkFailed": "Couldn't get the meeting link.",
+      "calendarAdded": "Added to your calendar",
+      "calendarOpenFailed": "Couldn't open your calendar."
     }
   },
   "notifications": {
@@ -2269,7 +2280,8 @@
     "welcome": "Welcome",
     "workoutStatus": "Workout status",
     "messageRequests": "Message requests",
-    "archivedChats": "Archived chats"
+    "archivedChats": "Archived chats",
+    "joinGroup": "Join a group"
   },
   "payments": {
     "badge": {
@@ -2971,6 +2983,7 @@
       "edit": "Edit session",
       "message": "Message all signups",
       "open": "Open session",
+      "reschedule": "Reschedule",
       "share": "Share booking link"
     },
     "actionsSheet": {
@@ -2990,6 +3003,10 @@
       "newSession": "New session",
       "noMatch": {
         "message": "No sessions in this range match what you're looking for."
+      },
+      "rangeEmpty": {
+        "message": "No sessions from today in these dates.",
+        "title": "Nothing scheduled"
       },
       "search": "Search sessions",
       "summary": {
@@ -3131,6 +3148,8 @@
       "cancellationCutoff": "Cancellation cutoff",
       "cancellationHint": "hours before start. Signups can cancel until then",
       "capacity": "Capacity",
+      "capacityHint": "Leave it empty for no limit.",
+      "capacityPlaceholder": "No limit",
       "conflict": {
         "anotherSession": "another session",
         "detail": "{time} overlaps \"{title}\". You can still save.",
@@ -3151,12 +3170,21 @@
         "onDate": "On date"
       },
       "ends": "Ends",
+      "errors": {
+        "capacity": "Enter a whole number from 1 to 1000.",
+        "endBeforeStart": "The last session can't be before the first one.",
+        "meetingLink": "Enter a full https link, like https://meet.google.com/abc.",
+        "price": "Enter a price above 0 for a paid session.",
+        "startPast": "Pick a start time that hasn't passed."
+      },
       "group": "Group",
+      "groupNone": "No group",
       "groupPlaceholder": "Pick a group",
       "lastSession": "Last session",
       "meetingLink": "Meeting link",
       "meetingLinkHint": "Signups see this link once they're confirmed.",
       "noGroup": "You don't have a group yet. Group members access needs one.",
+      "noPlaces": "You haven't added a place yet. Add your gym, studio or park and pick it here; your profile keeps it for next time.",
       "noVenue": "No venue",
       "occurrences": "Occurrences",
       "occurrencesUnit": "{count, plural, one {occurrence} other {occurrences}}",
@@ -3177,6 +3205,7 @@
         "onDate": "Every {days} until {date}",
         "onDateMissing": "Every {days} · pick an end date"
       },
+      "scheduleLocked": "{series, select, yes {Timezone, days and end can't be changed once created: they wouldn't move the dates already set.} other {Timezone can't be changed once created: it wouldn't move the date already set.}}",
       "short": {
         "after": "{count, plural, one {{days} · # occurrence} other {{days} · # occurrences}}",
         "never": "{days} · ongoing",
@@ -3236,6 +3265,14 @@
       "summary": "{frequency} · {end}",
       "until": "until {date}"
     },
+    "rescheduleSheet": {
+      "current": "Currently {when}.",
+      "hint": "Only this date moves, and it keeps its length. Everyone booked is told the new time.",
+      "newStart": "New start",
+      "save": "Move session",
+      "title": "Reschedule session",
+      "zone": "Times are on the {zone} clock."
+    },
     "row": {
       "live": "Live"
     },
@@ -3256,9 +3293,13 @@
       "createFailed": "Could not create the session.",
       "created": "Session created",
       "createdWithOverlap": "Session created · overlaps another",
+      "duplicateFailed": "Could not load the session to copy.",
       "messageFailed": "Could not send the message.",
       "messageSent": "{count, plural, one {Sent to # person} other {Sent to # people}}",
       "nobodyToNotify": "Nobody to notify",
+      "rescheduleFailed": "Could not move the session.",
+      "rescheduled": "{count, plural, =0 {Session moved} one {Session moved · # person told} other {Session moved · # people told}}",
+      "rescheduledWithOverlap": "Session moved · overlaps another",
       "shareFailed": "Could not share the link.",
       "updateFailed": "Could not update the session.",
       "updated": "Session updated"

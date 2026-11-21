@@ -1,14 +1,12 @@
 import { Component, computed, inject, input, model, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { take } from 'rxjs';
 
 import {
   PublicSessionInstance,
   SESSION_LOCATION_KINDS,
   SessionLocationKind,
   SessionParticipantStatus,
-  SessionService,
   appLocale,
   formatSessionTime,
   sessionMinutes,
@@ -16,7 +14,7 @@ import {
 
 import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
-import { FeedbackService } from '../../../../../_shared/services/feedback.service';
+import { SessionCalendarService } from '../../../../../_shared/services/session-calendar.service';
 
 /**
  * What the booking POST came back with — one sheet, three landings keyed to
@@ -35,8 +33,7 @@ import { FeedbackService } from '../../../../../_shared/services/feedback.servic
   styleUrl: './booking-outcome-sheet.scss',
 })
 export class BookingOutcomeSheet {
-  private readonly _sessionService = inject(SessionService);
-  private readonly _feedbackService = inject(FeedbackService);
+  private readonly _sessionCalendar = inject(SessionCalendarService);
   private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
@@ -132,23 +129,12 @@ export class BookingOutcomeSheet {
   });
 
   addToCalendar(): void {
-    const id = this.instance()?.id;
-    if (!id) return;
-    this._sessionService
-      .downloadIcs(id)
-      .pipe(take(1))
-      .subscribe({
-        next: () =>
-          void this._feedbackService.success(
-            this._translateService.instant('mySessions.toast.calendarDownloaded'),
-          ),
-        error: (error: unknown) =>
-          void this._feedbackService.error(
-            error,
-            this._translateService.instant('mySessions.toast.calendarFailed'),
-          ),
-      });
+    const instance = this.instance();
+    if (instance) {
+      void this._sessionCalendar.add(instance);
+    }
   }
+
 
   dismiss(): void {
     this.open.set(false);

@@ -105,6 +105,11 @@
               <h3>{{ 'mySessions.detail.blocked.title' | translate }}</h3>
               <p>{{ 'mySessions.detail.blocked.message' | translate }}</p>
             </ion-label>
+            @if (blockedInstance()?.template?.groupId) {
+              <ion-button slot="end" fill="clear" size="small" class="row-action" (click)="openGroup()">
+                {{ 'mySessions.detail.blocked.seeGroup' | translate }}
+              </ion-button>
+            }
           </ion-item>
         } @else {
           @if (view() === Views.OnlineLive) {
@@ -207,7 +212,11 @@
             @switch (bookAction()) {
               @case ('book') {
                 <ion-button expand="block" class="action" [disabled]="bookingInFlight()" (click)="book()">
-                  {{ 'mySessions.detail.footer.book' | translate }}
+                  @if (needsApproval()) {
+                    {{ 'mySessions.detail.footer.requestToBook' | translate }}
+                  } @else {
+                    {{ 'mySessions.detail.footer.book' | translate }}
+                  }
                 </ion-button>
               }
               @case ('waitlist') {

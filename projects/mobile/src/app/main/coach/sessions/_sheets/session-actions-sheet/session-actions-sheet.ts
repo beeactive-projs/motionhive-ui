@@ -18,6 +18,7 @@ import {
   SessionActionIds,
   SessionSurface,
   SessionSurfaces,
+  canReschedule,
   instanceCapacityLabel,
   instancePlaceLabel,
 } from '../../sessions.config';
@@ -40,8 +41,6 @@ export class SessionActionsSheet {
 
   readonly open = model(false);
   readonly instance = input<SessionInstance | null>(null);
-  /** Hides Share when the coach has not claimed a handle — there is no link yet. */
-  readonly canShare = input(false);
   /** Which screen opened it — the detail screen offers fewer verbs. */
   readonly surface = input<SessionSurface>(SessionSurfaces.Agenda);
 
@@ -80,7 +79,11 @@ export class SessionActionsSheet {
    *
    * Check-in is hidden before the session starts — there is nobody to tick off
    * yet — and messaging is hidden with no signups, since it would send to an
-   * empty room. Everything left is backed, so nothing here is a dead end.
+   * empty room. Cancel is offered only while the occurrence is SCHEDULED: the
+   * API refuses to cancel one that has started or finished. Reschedule only
+   * while it is SCHEDULED and still ahead (`canReschedule`), on both screens:
+   * the row carries the zone its sheet needs. Everything left is backed, so
+   * nothing here is a dead end.
    *
    * Both navigational verbs go on the detail screen: "open" and "check in" mean
    * "take me to this session", and it is already open, with attendance a
@@ -93,6 +96,7 @@ export class SessionActionsSheet {
     const started = sessionLifecycle(instance.startAt, instance.endAt) !== 'upcoming';
     const signups = instance.confirmedCount + instance.pendingApprovalCount;
     const cancelled = instance.status === SessionInstanceStatus.Cancelled;
+    const scheduled = instance.status === SessionInstanceStatus.Scheduled;
     const onDetail = this.surface() === SessionSurfaces.Detail;
 
     return SESSION_ACTIONS.filter((action) => {
@@ -107,10 +111,12 @@ export class SessionActionsSheet {
           // Detail only: editing needs the full template, which the agenda's
           // rows don't carry — their eager `template` is an allowlisted subset.
           return onDetail && !cancelled;
+        case SessionActionIds.Reschedule:
+          return canReschedule(instance);
         case SessionActionIds.Share:
-          return this.canShare() && !cancelled;
-        case SessionActionIds.Cancel:
           return !cancelled;
+        case SessionActionIds.Cancel:
+          return scheduled;
         default:
           return true;
       }
