@@ -101,7 +101,35 @@ describe('SessionFormSheet', () => {
   }
 
   // In person with no place to pick: the coach adds one here and it is chosen.
+  // With places already, the picker's last option adds another one in place.
+  describe('adding a place from the picker', () => {
+    it('opens the place sheet and keeps the picker on what it showed', () => {
+      const sheet = open();
+      sheet.venueId.set('v-1');
+      const select = { value: 'add-place' as unknown };
+      sheet.onVenueChange(sheet.addPlaceOption, select);
+
+      expect(sheet.placeOpen()).toBe(true);
+      expect(select.value).toBe('v-1');
+      expect(sheet.venueId()).toBe('v-1');
+    });
+
+    it('takes an ordinary pick as the venue', () => {
+      const sheet = open();
+      sheet.onVenueChange('v-2', { value: 'v-2' });
+      expect(sheet.venueId()).toBe('v-2');
+      expect(sheet.placeOpen()).toBe(false);
+    });
+  });
+
   describe('no places yet', () => {
+    it('counts only places with an address: an online room is no answer to "where"', () => {
+      const sheet = open();
+      sheet.venues.set([{ id: 'v-online', name: 'Zoom', isOnline: true, isActive: true } as Venue]);
+      expect(sheet.physicalVenues()).toEqual([]);
+      expect(sheet.needsPlace()).toBe(true);
+    });
+
     it('says so in person, not online', () => {
       const sheet = open();
       expect(sheet.needsPlace()).toBe(true);
@@ -278,6 +306,17 @@ describe('SessionFormSheet', () => {
       expect(sheet.canSave()).toBe(true);
       sheet.save();
       expect('priceAmountCents' in created()).toBe(false);
+    });
+
+    // The mark sits in the field's own label, and only where it can be left empty.
+    it('marks the price optional in its label only where empty means free', () => {
+      const sheet = open();
+      sheet.access.set('OPEN');
+      expect(sheet.priceLabel()).toBe('form.label.price');
+      sheet.access.set('CLIENTS_ONLY');
+      expect(sheet.priceLabel()).toBe('form.label.price form.hint.optional');
+      sheet.access.set('GROUP_ONLY');
+      expect(sheet.priceLabel()).toBe('form.label.price form.hint.optional');
     });
 
     // An old "Paid" session with no price opens with the reason Save is off.

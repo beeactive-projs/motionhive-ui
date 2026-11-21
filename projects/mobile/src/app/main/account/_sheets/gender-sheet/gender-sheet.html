@@ -1,0 +1,10 @@
+<mh-choice-sheet
+  [(open)]="open"
+  [title]="'aboutYou.gender' | translate"
+  [options]="options()"
+  [selected]="selected()"
+  [footnote]="'aboutYou.genderNote' | translate"
+  [clearLabel]="'accountSheets.gender.remove' | translate"
+  (picked)="onPicked($event)"
+  (cleared)="onCleared()"
+/>

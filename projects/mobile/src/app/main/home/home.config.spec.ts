@@ -17,6 +17,7 @@ import { HexShape, HexShapes } from '../../_shared/config/hexagon.config';
 import {
   COACH_SHORTCUTS,
   GROUP_SETUP_SNOOZE_DAYS,
+  ABOUT_YOU_CARD,
   WELCOME_CARDS,
   ClientHiveStates,
   EndDays,
@@ -74,6 +75,7 @@ import {
   withinDays,
   parseHiddenInvites,
   snoozeActive,
+  welcomeCards,
 } from './home.config';
 
 function client(overrides: Partial<RosterClient> = {}): RosterClient {
@@ -906,6 +908,22 @@ describe('welcome cards', () => {
     // Registered in HOME_ICONS (`home.icons.spec.ts` checks the templates).
     expect(WELCOME_CARDS[NavModes.Train].icon).toBe('compass-outline');
     expect(WELCOME_CARDS[NavModes.Coach].icon).toBe('ribbon-outline');
+    expect(ABOUT_YOU_CARD.title).toBe('home.welcomeCard.aboutYou.title');
+    expect(ABOUT_YOU_CARD.icon).toBe('person-outline');
+  });
+
+  it('gives a passed over about you a card of its own', () => {
+    expect(welcomeCards(NavModes.Train, ['INTERESTS', 'LEVEL', 'ABOUT_YOU'])).toEqual([
+      { copy: WELCOME_CARDS[NavModes.Train], steps: ['INTERESTS', 'LEVEL'] },
+      { copy: ABOUT_YOU_CARD, steps: ['ABOUT_YOU'] },
+    ]);
+    expect(welcomeCards(NavModes.Coach, ['ABOUT_YOU'])).toEqual([
+      { copy: ABOUT_YOU_CARD, steps: ['ABOUT_YOU'] },
+    ]);
+    expect(welcomeCards(NavModes.Coach, ['COACH_DETAILS'])).toEqual([
+      { copy: WELCOME_CARDS[NavModes.Coach], steps: ['COACH_DETAILS'] },
+    ]);
+    expect(welcomeCards(NavModes.Train, [])).toEqual([]);
   });
 });
 

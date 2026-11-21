@@ -17,6 +17,14 @@
   }
   <p class="mh-helper">{{ 'sessions.rescheduleSheet.hint' | translate }}</p>
 
+  <!-- Sent with the new time, on each notice: what the cancel sheet's
+       message is to a cancellation. -->
+  <div class="mh-section-label">{{ 'sessions.rescheduleSheet.message' | translate }}</div>
+  <ion-textarea mode="md" fill="outline" autocapitalize="sentences" [autoGrow]="true" [rows]="3" [maxlength]="500"
+    [counter]="true" [attr.aria-label]="'sessions.rescheduleSheet.message' | translate"
+    [placeholder]="'sessions.rescheduleSheet.placeholder' | translate" [value]="note()"
+    (ionInput)="note.set($event.detail.value ?? '')" />
+
   <!-- Detached from the pill on purpose: Ionic relocates a modal when it
        presents, so it cannot live inside the row it belongs to. -->
   <ion-modal class="mh-picker-modal" [isOpen]="pickerOpen()" (didDismiss)="pickerOpen.set(false)">
@@ -28,7 +36,8 @@
   </ion-modal>
 </ng-template>
 
-<!-- As tall as what it says: nothing here is typed into. -->
+<!-- Breakpoints rather than fit, like the cancel sheet: the note is typed
+     into, and the keyboard needs the room. -->
 <mh-sheet-shell [(open)]="open" [title]="'sessions.rescheduleSheet.title' | translate" [subtitle]="title()"
-  [saveLabel]="'sessions.rescheduleSheet.save' | translate" [body]="body" [fit]="true" [canSave]="canSave()"
-  [saving]="saving()" (save)="save()" />
+  [saveLabel]="'sessions.rescheduleSheet.save' | translate" [body]="body" [canSave]="canSave()"
+  [saving]="saving()" [breakpoints]="[0, 0.75, 0.95]" [initialBreakpoint]="0.75" (save)="save()" />

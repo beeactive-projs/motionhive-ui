@@ -353,9 +353,8 @@
       "userIds": "Selected people"
     },
     "gender": {
-      "FEMALE": "Female",
-      "MALE": "Male",
-      "OTHER": "Other",
+      "FEMALE": "Woman",
+      "MALE": "Man",
       "PREFER_NOT_TO_SAY": "Prefer not to say"
     },
     "groupMemberRole": {

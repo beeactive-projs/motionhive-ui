@@ -1,4 +1,11 @@
 {
+  "aboutYou": {
+    "addBirthday": "Add your birthday",
+    "birthday": "Birthday",
+    "birthdayNote": "Others see only your age, never the date. Choose who sees it in Privacy.",
+    "gender": "Gender",
+    "genderNote": "Choose who sees it in Privacy."
+  },
   "account": {
     "blockedUsers": {
       "blockedOn": "Blocked {date}",
@@ -146,6 +153,12 @@
         "COACHES_ONLY": "Only the coaches you train with",
         "ONLY_ME": "No one but you"
       },
+      "ageHint": {
+        "PUBLIC": "Anyone who opens your profile sees your age",
+        "COACHES_ONLY": "Only the coaches you train with see your age",
+        "ONLY_ME": "No one but you"
+      },
+      "birthdayNote": "Shown as your age, never the date",
       "saveFailed": "Couldn't save that. Try again.",
       "yourData": "Your data",
       "messages": {
@@ -245,6 +258,14 @@
         "updated": "About updated"
       }
     },
+    "birthday": {
+      "remove": "Remove birthday",
+      "toast": {
+        "failed": "Could not update your birthday.",
+        "removed": "Birthday removed",
+        "updated": "Birthday updated"
+      }
+    },
     "coaching": {
       "accepting": "Accepting clients",
       "acceptingHint": "Shows on your public profile so people know they can reach out.",
@@ -259,6 +280,14 @@
         "placeholder": "Add one, like Kettlebell",
         "add": "Add specialization",
         "list": "Your specializations"
+      }
+    },
+    "gender": {
+      "remove": "Remove gender",
+      "toast": {
+        "failed": "Could not update your gender.",
+        "removed": "Gender removed",
+        "updated": "Gender updated"
       }
     },
     "handle": {
@@ -1821,6 +1850,10 @@
         "title": "Finish your coach profile",
         "detail": "Say what you coach and where, so people find you."
       },
+      "aboutYou": {
+        "title": "Complete your profile",
+        "detail": "Add your birthday and gender for your coaches."
+      },
       "dismiss": "Hide this"
     }
   },
@@ -3140,13 +3173,14 @@
       "allTypes": "All types"
     },
     "form": {
+      "addPlaceOption": "Add a new place…",
       "approval": {
         "hint": "You confirm each signup before it books.",
         "title": "Approval required"
       },
-      "cancellation": "Cancellation",
       "cancellationCutoff": "Cancellation cutoff",
-      "cancellationHint": "hours before start. Signups can cancel until then",
+      "cancellationHint": "Signups can cancel until this many hours before the start.",
+      "cancellationUnit": "{count, plural, one {hour} other {hours}}",
       "capacity": "Capacity",
       "capacityHint": "Leave it empty for no limit.",
       "capacityPlaceholder": "No limit",
@@ -3157,7 +3191,7 @@
       },
       "createAndPublish": "Create & publish",
       "createSession": "Create session",
-      "descriptionPlaceholder": "What signups should know (optional)",
+      "descriptionPlaceholder": "What signups should know",
       "duration": {
         "hours": "{hours} h",
         "hoursMinutes": "{hours} h {minutes} min",
@@ -3181,13 +3215,15 @@
       "groupNone": "No group",
       "groupPlaceholder": "Pick a group",
       "lastSession": "Last session",
+      "lastsFor": "Lasts {duration}",
       "meetingLink": "Meeting link",
       "meetingLinkHint": "Signups see this link once they're confirmed.",
+      "meetingLinkPlaceholder": "https://meet.google.com/…",
       "noGroup": "You don't have a group yet. Group members access needs one.",
-      "noPlaces": "You haven't added a place yet. Add your gym, studio or park and pick it here; your profile keeps it for next time.",
+      "noPlaces": "In person sessions show where they happen from the places in your coaching profile. Add your gym, studio or park now: it is saved to your profile and picked for this session.",
+      "noPlacesTitle": "No places in your coaching profile yet",
       "noVenue": "No venue",
       "occurrences": "Occurrences",
-      "occurrencesUnit": "{count, plural, one {occurrence} other {occurrences}}",
       "onDays": "On days",
       "preview": "Preview",
       "previewMore": "+ {count} more",
@@ -3213,10 +3249,9 @@
         "onDate": "{days} · until {date}",
         "onDateMissing": "{days} · pick an end date"
       },
-      "spots": "Spots",
       "spotsUnit": "spots",
       "startLocked": "Start time can't be changed. Duplicate the session to move it.",
-      "starts": "Starts",
+      "startsAt": "Starts {date}",
       "subtitleOneOff": "One-off · {date}",
       "title": {
         "duplicate": "Duplicate session",
@@ -3225,6 +3260,7 @@
       },
       "titlePlaceholder": "Morning yoga flow",
       "venue": "Venue",
+      "venueHint": "These are the places in your coaching profile.",
       "waitlist": {
         "hint": "Queue signups once it's full.",
         "title": "Waitlist"
@@ -3267,8 +3303,10 @@
     },
     "rescheduleSheet": {
       "current": "Currently {when}.",
-      "hint": "Only this date moves, and it keeps its length. Everyone booked is told the new time.",
+      "hint": "Only this date moves, and it keeps its length. Everyone booked is told the new time, with your message if you write one.",
+      "message": "Message · optional",
       "newStart": "New start",
+      "placeholder": "The park is booked that morning, see you at 10.",
       "save": "Move session",
       "title": "Reschedule session",
       "zone": "Times are on the {zone} clock."
@@ -4396,6 +4434,10 @@
       "accepting": "Taking new clients",
       "acceptingHint": "People can ask you to coach them. Turn it off when you are full.",
       "places": "Places you coach"
+    },
+    "aboutYou": {
+      "title": "About you",
+      "intro": "Your coaches see your age and gender, so they can plan your training. Change who sees them in Privacy."
     }
   },
   "venues": {

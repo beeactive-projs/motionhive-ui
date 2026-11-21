@@ -1,3 +1,4 @@
+import type { Gender } from './profile.enums';
 import { PublicProfileAudience } from './profile.enums';
 import type { ClientRequestType } from '../client/client.enums';
 import type { MessageReportCategory } from '../messaging/report.model';
@@ -28,6 +29,13 @@ export interface PublicUserProfile {
   countryCode: string | null;
   language: string | null;
   timezone: string | null;
+  /**
+   * Worked out from the birthday, which is never sent: null (or absent from
+   * an older API) when not given or not for this viewer.
+   */
+  age?: number | null;
+  /** Null (or absent) when not given or not for this viewer. */
+  gender?: Gender | null;
   displayRoles: string[];
   memberSince: string;
   isInstructor: boolean;

@@ -9,7 +9,8 @@ export type CategoryKind = (typeof CategoryKinds)[keyof typeof CategoryKinds];
 /**
  * The welcome flow's steps. Someone who trains answers ROLE, INTERESTS,
  * LEVEL; a coach answers COACH_CATEGORIES and COACH_DETAILS, with their own
- * training offered later on the Train home.
+ * training offered later on the Train home. ABOUT_YOU (birthday and gender,
+ * both optional) comes last on both paths.
  */
 export const OnboardingSteps = {
   Role: 'ROLE',
@@ -17,6 +18,7 @@ export const OnboardingSteps = {
   Level: 'LEVEL',
   CoachCategories: 'COACH_CATEGORIES',
   CoachDetails: 'COACH_DETAILS',
+  AboutYou: 'ABOUT_YOU',
 } as const;
 
 export type OnboardingStep = (typeof OnboardingSteps)[keyof typeof OnboardingSteps];

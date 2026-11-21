@@ -12,11 +12,12 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline } from 'ionicons/icons';
+import { checkmarkOutline, trashOutline } from 'ionicons/icons';
 
 import { foldForSearch } from 'core';
 
 import { SearchbarLabelDirective } from '../../directives/searchbar-label.directive';
+import { HexAvatar } from '../hex-avatar/hex-avatar';
 import { SheetShell } from '../sheet-shell/sheet-shell';
 
 export interface ChoiceOption {
@@ -63,6 +64,7 @@ export function matchChoices(
 @Component({
   selector: 'mh-choice-sheet',
   imports: [
+    HexAvatar,
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
@@ -87,14 +89,23 @@ export class ChoiceSheet {
   readonly searchPlaceholder = input('');
   /** Translated line under the list: what the choice changes. */
   readonly footnote = input('');
+  /**
+   * Translated. Set it for a choice that may also be taken back ("Remove
+   * gender"): a red row in a card of its own, shown while something is
+   * picked, as an action sheet puts its destructive verbs.
+   */
+  readonly clearLabel = input('');
 
   /** Only fires for a value other than the current one. */
   readonly picked = output<string>();
+  /** The clear row was tapped: nothing is picked any more. */
+  readonly cleared = output<void>();
 
   readonly query = signal('');
   private readonly _shown = signal(CHOICE_PAGE_SIZE);
 
   readonly searchable = computed(() => this.searchPlaceholder() !== '');
+  readonly canClear = computed(() => this.clearLabel() !== '' && !!this.selected());
   readonly matches = computed(() =>
     matchChoices(this.options(), this.query(), this.searchable() ? this.selected() : null),
   );
@@ -109,7 +120,7 @@ export class ChoiceSheet {
   readonly initialBreakpoint = SEARCH_START;
 
   constructor() {
-    addIcons({ checkmarkOutline });
+    addIcons({ checkmarkOutline, trashOutline });
 
     // Every opening starts at the top with an empty search.
     effect(() => {
@@ -134,5 +145,12 @@ export class ChoiceSheet {
   pick(value: string): void {
     this.open.set(false);
     if (value !== this.selected()) this.picked.emit(value);
+  }
+
+  clear(): void {
+    this.open.set(false);
+    if (this.canClear()) {
+      this.cleared.emit();
+    }
   }
 }

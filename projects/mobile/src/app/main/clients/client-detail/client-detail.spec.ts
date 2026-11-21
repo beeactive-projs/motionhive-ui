@@ -22,11 +22,19 @@ const plan = (status: ProgramAssignmentStatus) =>
     completionPercent: 25,
   }) as ProgramAssignment;
 
-function setup(status: ProgramAssignmentStatus) {
+function setup(
+  status: ProgramAssignmentStatus,
+  person: Record<string, unknown> = {},
+  relation: Record<string, unknown> = {},
+) {
   const navigate = vi.fn();
   const store = {
     load: vi.fn(),
-    client: signal({ id: 'rel-1', client: { id: 'c-1', firstName: 'Anna', lastName: 'Popescu' } }),
+    client: signal({
+      id: 'rel-1',
+      ...relation,
+      client: { id: 'c-1', firstName: 'Anna', lastName: 'Popescu', ...person },
+    }),
     currentPlans: signal([plan(status)]),
     plansLoaded: signal(true),
   };
@@ -74,5 +82,27 @@ describe("ClientDetail, the door to the client's copy", () => {
   it('keeps the door shut on a plan waiting to start', () => {
     const { page } = setup(ProgramAssignmentStatus.Pending);
     expect(page.overviewPlan()?.canEditCopy).toBe(false);
+  });
+});
+
+describe("ClientDetail, the bar's muted line", () => {
+  it('says the age and gender the client shares, then how long they have been a client', () => {
+    const { page } = setup(
+      ProgramAssignmentStatus.Active,
+      { age: 32, gender: 'FEMALE' },
+      { status: 'ACTIVE', startedAt: '2026-03-04' },
+    );
+    // Each part is kept whole (no-break spaces), so a wrap falls between parts.
+    expect(page.metaLine()).toBe('32\u00a0years · Woman · clients.detail.clientSince');
+  });
+
+  it('leaves out what is not shared, and prefer not to say', () => {
+    expect(setup(ProgramAssignmentStatus.Active, { age: null, gender: 'MALE' }).page.metaLine()).toBe('Man');
+    TestBed.resetTestingModule();
+    expect(
+      setup(ProgramAssignmentStatus.Active, { age: 1, gender: 'PREFER_NOT_TO_SAY' }).page.metaLine(),
+    ).toBe('1\u00a0year');
+    TestBed.resetTestingModule();
+    expect(setup(ProgramAssignmentStatus.Active).page.metaLine()).toBe('');
   });
 });

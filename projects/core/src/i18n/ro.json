@@ -353,9 +353,8 @@
       "userIds": "Persoane selectate"
     },
     "gender": {
-      "FEMALE": "Feminin",
-      "MALE": "Masculin",
-      "OTHER": "Altul",
+      "FEMALE": "Femeie",
+      "MALE": "Bărbat",
       "PREFER_NOT_TO_SAY": "Prefer să nu spun"
     },
     "groupMemberRole": {

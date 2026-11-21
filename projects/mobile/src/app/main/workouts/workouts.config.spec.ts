@@ -18,6 +18,8 @@ import {
   LogSources,
   RoutineActionIds,
   WORKOUT_ICONS,
+  WorkoutStartActions,
+  workoutStartActions,
   assignedDayTone,
   bestTopSet,
   calendarCells,
@@ -925,5 +927,19 @@ describe('showsResumeCard', () => {
     expect(showsResumeCard({ ...shown, loading: true })).toBe(false);
     expect(showsResumeCard({ ...shown, failed: true })).toBe(false);
     expect(showsResumeCard({ ...shown, open: false })).toBe(false);
+  });
+});
+
+describe('workoutStartActions', () => {
+  // The starters used to show only on an empty page: after the first routine
+  // there was no way back to them.
+  it('always offers the starter routines, and an empty workout only when one can start', () => {
+    const ids = (canStart: boolean) => workoutStartActions(canStart).map((action) => action.id);
+    expect(ids(true)).toEqual([
+      WorkoutStartActions.StartEmpty,
+      WorkoutStartActions.NewRoutine,
+      WorkoutStartActions.BrowseStarters,
+    ]);
+    expect(ids(false)).toEqual([WorkoutStartActions.NewRoutine, WorkoutStartActions.BrowseStarters]);
   });
 });

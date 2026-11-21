@@ -262,6 +262,40 @@
             <ion-note class="mh-note-block">{{ 'welcome.coachDetails.acceptingHint' | translate }}</ion-note>
           </section>
         }
+
+        @case (Steps.AboutYou) {
+          <!-- Both optional: Done needs one of them, Skip passes the step
+               over. The birthday is a row opening the picker, like the
+               coach's city, so nobody lands on a field to type a date in. -->
+          <section class="mh-section">
+            <h2 class="mh-kicker">{{ 'aboutYou.birthday' | translate }}</h2>
+            <mh-birthday-field [(value)]="birthDate" />
+          </section>
+
+          <section class="mh-section">
+            <h2 class="mh-kicker">{{ 'aboutYou.gender' | translate }}</h2>
+            <!-- One of three, as the level is: tapping the picked one clears it. -->
+            <div class="choices" role="radiogroup" [attr.aria-label]="'aboutYou.gender' | translate">
+              @for (choice of genderChoices; track choice.gender) {
+                <button
+                  type="button"
+                  role="radio"
+                  class="choice compact mh-pick-tile"
+                  [class.on]="gender() === choice.gender"
+                  [attr.aria-checked]="gender() === choice.gender"
+                  (click)="pickGender(choice.gender)"
+                >
+                  <span class="choice-copy">
+                    <span class="label">{{ choice.label | translate }}</span>
+                  </span>
+                  @if (gender() === choice.gender) {
+                    <ion-icon class="check" name="checkmark-outline" aria-hidden="true" />
+                  }
+                </button>
+              }
+            </div>
+          </section>
+        }
       }
     </div>
   }

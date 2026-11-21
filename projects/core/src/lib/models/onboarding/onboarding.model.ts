@@ -1,4 +1,4 @@
-import type { FitnessLevel } from '../profile/profile.enums';
+import type { FitnessLevel, Gender } from '../profile/profile.enums';
 import type {
   CategoryKind,
   OnboardingRole,
@@ -44,6 +44,9 @@ export interface OnboardingState {
   fitnessLevel: FitnessLevel | null;
   /** Category ids a coach coaches. */
   coachCategoryIds: string[];
+  /** The about you answers, `YYYY-MM-DD`; absent from an API older than the step. */
+  birthDate?: string | null;
+  gender?: Gender | null;
 }
 
 export interface SetLevelPayload {
@@ -63,4 +66,11 @@ export interface SetCoachDetailsPayload {
   /** ISO 3166-1 alpha-2. */
   countryCode?: string;
   isAcceptingClients?: boolean;
+}
+
+/** Only the fields sent are saved; null removes one. */
+export interface SetAboutYouPayload {
+  /** `YYYY-MM-DD`. */
+  birthDate?: string | null;
+  gender?: Gender | null;
 }

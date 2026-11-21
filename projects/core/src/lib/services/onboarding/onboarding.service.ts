@@ -8,6 +8,7 @@ import { silentRequest } from '../../interceptors/silent-request.context';
 import type { OnboardingRole, OnboardingStep } from '../../models/onboarding/onboarding.enums';
 import type {
   OnboardingState,
+  SetAboutYouPayload,
   SetCoachCategoriesPayload,
   SetCoachDetailsPayload,
   SetLevelPayload,
@@ -48,6 +49,11 @@ export class OnboardingService {
 
   setCoachDetails(payload: SetCoachDetailsPayload): Observable<OnboardingState> {
     return this._http.put<OnboardingState>(`${this._baseUrl}/coach-details`, payload);
+  }
+
+  /** Birthday and gender, the last step on both paths. */
+  setAboutYou(payload: SetAboutYouPayload): Observable<OnboardingState> {
+    return this._http.put<OnboardingState>(`${this._baseUrl}/about`, payload);
   }
 
   /** Silent: skipping is never worth an error dialog; the flow moves on regardless. */

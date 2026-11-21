@@ -9,11 +9,12 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { IonButton, IonDatetime, IonModal } from '@ionic/angular/standalone';
+import { IonButton, IonDatetime, IonModal, IonTextarea } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import {
+  RescheduleInstanceRequest,
   RescheduleInstanceResponse,
   SessionInstance,
   SessionService,
@@ -46,7 +47,15 @@ function wallClockLabel(wallClock: string): string {
  */
 @Component({
   selector: 'mh-reschedule-sheet',
-  imports: [DatetimeLocaleDirective, IonButton, IonDatetime, IonModal, SheetShell, TranslatePipe],
+  imports: [
+    DatetimeLocaleDirective,
+    IonButton,
+    IonDatetime,
+    IonModal,
+    IonTextarea,
+    SheetShell,
+    TranslatePipe,
+  ],
   templateUrl: './reschedule-sheet.html',
   styleUrl: './reschedule-sheet.scss',
 })
@@ -67,6 +76,8 @@ export class RescheduleSheet {
 
   /** The new start, as a wall clock in `zone`. */
   readonly startAt = signal('');
+  /** A note to the people booked, sent with the new time; optional. */
+  readonly note = signal('');
   readonly pickerOpen = signal(false);
   readonly saving = signal(false);
   /** "Now" for the floor and the check, pulled forward on open and on save. */
@@ -179,7 +190,7 @@ export class RescheduleSheet {
     }
     this.saving.set(true);
     this._sessionService
-      .rescheduleInstance(instance.id, { newStartAt: this.startIso() })
+      .rescheduleInstance(instance.id, this._request())
       .pipe(take(1))
       .subscribe({
         next: (result) => {
@@ -214,9 +225,20 @@ export class RescheduleSheet {
     return this._translateService.instant('sessions.toast.rescheduled', { count: told });
   }
 
+  /** The new start, and the note when there is one. */
+  private _request(): RescheduleInstanceRequest {
+    const request: RescheduleInstanceRequest = { newStartAt: this.startIso() };
+    const note = this.note().trim();
+    if (note) {
+      request.message = note;
+    }
+    return request;
+  }
+
   private _reset(): void {
     this._now.set(Date.now());
     this.pickerOpen.set(false);
+    this.note.set('');
     const instance = this.instance();
     if (instance) {
       this.startAt.set(wallClockInZone(instance.startAt, this.zone()));

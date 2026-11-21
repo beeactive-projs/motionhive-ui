@@ -3,6 +3,7 @@ import type {
   InstructorProfile,
   UpdateInstructorProfilePayload,
 } from './instructor-profile.model';
+import type { Gender } from './profile.enums';
 import { ProfilePrivacy } from './profile.enums';
 
 /**
@@ -19,6 +20,9 @@ export type PrivacyControlledField =
   | 'city'
   | 'language'
   | 'timezone'
+  /** Others are shown the age it gives, never the date. */
+  | 'birthDate'
+  | 'gender'
   /** Not a profile field: the level new workouts start at. */
   | 'workouts';
 
@@ -45,6 +49,10 @@ export const PROFILE_PRIVACY_DEFAULTS: Record<
   city: ProfilePrivacy.Public,
   language: ProfilePrivacy.CoachesOnly,
   timezone: ProfilePrivacy.CoachesOnly,
+  // A coach sees the age and the gender, so they can plan the training;
+  // nothing of either is public until the person says so.
+  birthDate: ProfilePrivacy.CoachesOnly,
+  gender: ProfilePrivacy.CoachesOnly,
   // Training is private until the person says otherwise.
   workouts: ProfilePrivacy.OnlyMe,
 };
@@ -90,6 +98,10 @@ export interface AccountInfo {
   findByName?: boolean;
   /** "Who can message you". REQUESTS when the API omits it. */
   whoCanMessage?: WhoCanMessage;
+  /** The owner's birthday, `YYYY-MM-DD`; null when not given. Never sent to anyone else. */
+  birthDate?: string | null;
+  /** Null when not given. */
+  gender?: Gender | null;
 }
 
 export interface MyProfile {
@@ -113,6 +125,10 @@ export interface UpdateMyProfilePayload {
     timezone?: string;
     countryCode?: string | null;
     city?: string | null;
+    /** `YYYY-MM-DD`; null removes it. */
+    birthDate?: string | null;
+    /** Null removes it. */
+    gender?: Gender | null;
   };
   instructor?: UpdateInstructorProfilePayload;
 }

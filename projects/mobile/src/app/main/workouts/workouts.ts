@@ -347,8 +347,13 @@ export class Workouts implements ViewWillEnter, ViewWillLeave {
   }
 
   onStartAction(action: WorkoutStartAction): void {
-    if (action === WorkoutStartActions.StartEmpty) this.startEmpty();
-    else this.newRoutine();
+    if (action === WorkoutStartActions.StartEmpty) {
+      this.startEmpty();
+    } else if (action === WorkoutStartActions.BrowseStarters) {
+      this.openStarters();
+    } else {
+      this.newRoutine();
+    }
   }
 
   ionViewWillLeave(): void {

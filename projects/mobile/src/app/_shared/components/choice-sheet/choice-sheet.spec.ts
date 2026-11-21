@@ -75,3 +75,37 @@ describe('ChoiceSheet', () => {
     expect(choice.hasMore()).toBe(true);
   });
 });
+
+describe('ChoiceSheet, taking a choice back', () => {
+  beforeEach(() => {
+    TestBed.overrideComponent(ChoiceSheet, { set: { template: '', imports: [] } });
+  });
+
+  function sheet(selected: string | null, clearLabel = 'Remove gender'): ChoiceSheet {
+    const fixture = TestBed.createComponent(ChoiceSheet);
+    fixture.componentRef.setInput('title', 'Gender');
+    fixture.componentRef.setInput('options', zones);
+    fixture.componentRef.setInput('selected', selected);
+    fixture.componentRef.setInput('clearLabel', clearLabel);
+    fixture.componentRef.setInput('open', true);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  }
+
+  it('offers the clear row only while something is picked', () => {
+    expect(sheet('Europe/London').canClear()).toBe(true);
+    expect(sheet(null).canClear()).toBe(false);
+    expect(sheet('Europe/London', '').canClear()).toBe(false);
+  });
+
+  it('closes and reports the clear', () => {
+    const choice = sheet('Europe/London');
+    let cleared = 0;
+    choice.cleared.subscribe(() => cleared++);
+
+    choice.clear();
+
+    expect(cleared).toBe(1);
+    expect(choice.open()).toBe(false);
+  });
+});

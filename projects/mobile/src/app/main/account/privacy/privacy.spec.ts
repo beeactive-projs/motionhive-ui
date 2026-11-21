@@ -8,7 +8,7 @@ import { MessagingService, ProfileService, UserService } from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AccountStore } from '../account.store';
-import { AccountPrivacy } from './privacy';
+import { AccountPrivacy, PRIVACY_ROWS } from './privacy';
 
 describe('AccountPrivacy, your data', () => {
   it('opens Sensitive actions, where Delete account lives', () => {
@@ -74,5 +74,72 @@ describe('AccountPrivacy, messages', () => {
     page.toggleFindByName();
     expect(updateMe).toHaveBeenCalledWith({ findByName: false });
     expect(page.findByName()).toBe(false);
+  });
+});
+
+describe('AccountPrivacy, birthday and gender', () => {
+  function setup(privacySettings: Record<string, string>) {
+    const updatePrivacy = vi.fn((patch: Record<string, string>) => ({
+      pipe: () => ({
+        subscribe: (o: { next: (answer: { privacySettings: Record<string, string> }) => void }) =>
+          o.next({ privacySettings: { ...privacySettings, ...patch } }),
+      }),
+    }));
+    const accountSignal = signal<Record<string, unknown> | null>({ privacySettings });
+    const patchAccount = vi.fn((patch: Record<string, unknown>) =>
+      accountSignal.update((current) => {
+        if (!current) {
+          return current;
+        }
+        return { ...current, ...patch };
+      }),
+    );
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: ProfileService, useValue: { updatePrivacy } },
+        { provide: MessagingService, useValue: {} },
+        { provide: UserService, useValue: {} },
+        { provide: FeedbackService, useValue: { error: vi.fn() } },
+        { provide: TranslateService, useValue: { instant: (key: string) => key } },
+        { provide: Router, useValue: {} },
+        { provide: AccountStore, useValue: { account: accountSignal, patchAccount } },
+      ],
+    });
+    const page = TestBed.runInInjectionContext(() => new AccountPrivacy());
+    return { page, updatePrivacy };
+  }
+
+  const birthday = PRIVACY_ROWS.find((row) => row.field === 'birthDate')!;
+  const gender = PRIVACY_ROWS.find((row) => row.field === 'gender')!;
+
+  it('lists both after the other details, coaches only by default', () => {
+    expect(PRIVACY_ROWS.map((row) => row.field).slice(-2)).toEqual(['birthDate', 'gender']);
+    const { page } = setup({});
+    expect(page.levelOf('birthDate')).toBe('COACHES_ONLY');
+    expect(page.levelOf('gender')).toBe('COACHES_ONLY');
+  });
+
+  it('says the birthday shows as an age, in the row and in each level', () => {
+    const { page } = setup({});
+    expect(page.noteOf(birthday)).toBe('account.privacy.birthdayNote');
+    expect(page.noteOf(gender)).toBeNull();
+
+    page.choose(birthday);
+    expect(page.levelOptions().map((option) => option.hint)).toEqual([
+      'account.privacy.ageHint.PUBLIC',
+      'account.privacy.ageHint.COACHES_ONLY',
+      'account.privacy.ageHint.ONLY_ME',
+    ]);
+    page.choose(gender);
+    expect(page.levelOptions()[0].hint).toBe('account.privacy.hint.PUBLIC');
+  });
+
+  it('saves a new level for the gender', () => {
+    const { page, updatePrivacy } = setup({});
+    page.choose(gender);
+    page.onPicked('ONLY_ME');
+    expect(updatePrivacy).toHaveBeenCalledWith({ gender: 'ONLY_ME' });
+    expect(page.levelOf('gender')).toBe('ONLY_ME');
   });
 });

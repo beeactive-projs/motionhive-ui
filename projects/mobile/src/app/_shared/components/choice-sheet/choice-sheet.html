@@ -12,36 +12,49 @@
 </ng-template>
 
 <ng-template #body>
-  <section class="mh-section">
-    @if (rows().length) {
-      <ion-list [inset]="true" class="mh-card-list">
-        @for (option of rows(); track option.value) {
-          <ion-item
-            button
-            [detail]="false"
-            [attr.aria-current]="option.value === selected() ? 'true' : null"
-            (click)="pick(option.value)"
-          >
-            <ion-label class="ion-text-wrap">
-              {{ option.label }}
-              @if (option.hint) {
-                <p>{{ option.hint }}</p>
+  <div class="mh-stack">
+    <section class="mh-section">
+      @if (rows().length) {
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (option of rows(); track option.value) {
+            <ion-item
+              button
+              [detail]="false"
+              [attr.aria-current]="option.value === selected() ? 'true' : null"
+              (click)="pick(option.value)"
+            >
+              <ion-label class="ion-text-wrap">
+                {{ option.label }}
+                @if (option.hint) {
+                  <p>{{ option.hint }}</p>
+                }
+              </ion-label>
+              @if (option.value === selected()) {
+                <ion-icon slot="end" name="checkmark-outline" color="primary" aria-hidden="true" />
               }
-            </ion-label>
-            @if (option.value === selected()) {
-              <ion-icon slot="end" name="checkmark-outline" color="primary" aria-hidden="true" />
-            }
-          </ion-item>
-        }
-      </ion-list>
-    } @else {
-      <ion-note class="mh-note-block">{{ 'account.choice.noMatches' | translate }}</ion-note>
-    }
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <ion-note class="mh-note-block">{{ 'account.choice.noMatches' | translate }}</ion-note>
+      }
 
-    @if (footnote()) {
-      <p class="mh-footnote">{{ footnote() }}</p>
+      @if (footnote()) {
+        <p class="mh-footnote">{{ footnote() }}</p>
+      }
+    </section>
+
+    @if (canClear()) {
+      <!-- Its own card, red, after the choices: what an action sheet does
+           with a verb that takes something away. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="false" (click)="clear()">
+          <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
+          <ion-label color="danger">{{ clearLabel() }}</ion-label>
+        </ion-item>
+      </ion-list>
     }
-  </section>
+  </div>
 
   @if (searchable()) {
     <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($event)">

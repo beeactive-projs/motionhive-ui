@@ -1,24 +1,18 @@
 /* The chip groups are `.mh-chip-cloud` (layout.css, ion-button.css). */
 
-/* A text action on its own line. `ion-button fill="clear"` carries toolbar
-   sizing and a ripple that reads as a third control next to the chips. */
+/* A text action on its own line, at the end of the dates: the app's text
+   link (`mh-text-link`, ion-button.css), its words flush with the fields. */
 .reset-row {
   display: flex;
   justify-content: flex-end;
 }
 
 .reset-row .reset {
-  padding: 0.25rem 0;
-  border: none;
-  background: none;
-  color: var(--mh-color-honey-deep);
+  --padding-end: 0;
+  margin: 0.25rem 0 0;
   font-size: var(--mh-text-base);
   font-weight: 600;
-}
-
-.reset-row .reset:disabled {
-  color: var(--ion-color-medium);
-  opacity: 0.6;
+  letter-spacing: normal;
 }
 
 /* From and To stacked — each date gets a full-width row so the picker button
@@ -37,16 +31,17 @@
   --padding-start: 0.75rem;
   --inner-padding-end: 0.5rem;
   --min-height: 3rem;
-  border: 1px solid var(--ion-border-color);
+  border: var(--mh-hairline) solid var(--ion-border-color);
   border-radius: var(--mh-radius-control);
 }
 
-.field ion-label {
+.field ion-label,
+.field ion-select::part(label) {
   font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
-.mh-helper.error {
-  color: var(--mh-color-danger-deep);
-  font-weight: 600;
+/* The group row has no section label over it, so it keeps that label's room. */
+.field.group {
+  margin-top: 1rem;
 }

@@ -33,7 +33,9 @@ describe('enumLabelMap / withEnumLabels', () => {
   });
 
   it('backs the core label tables', () => {
-    expect(GenderLabels.FEMALE).toBe('Female');
+    // The owner's words for the three choices (2026-11-21).
+    expect(GenderLabels.MALE).toBe('Man');
+    expect(GenderLabels.FEMALE).toBe('Woman');
     // "Paid", not "Open" — user-owned copy for the OPEN access level.
     expect(SESSION_ACCESS_LEVELS[SessionAccess.Open].label).toBe('Paid');
     expect(SESSION_ACCESS_LEVELS[SessionAccess.Open].sub).toBe('Anyone with the link can book.');

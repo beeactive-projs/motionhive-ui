@@ -52,6 +52,13 @@ interface PrivacyRow {
   levels?: readonly ProfilePrivacy[];
   /** The line under each level; the profile wording when absent. */
   hint?: (level: ProfilePrivacy) => string;
+  /** Translation key for a line under the row's label. */
+  note?: string;
+}
+
+/** The birthday's levels say what they show: the age, never the date. */
+export function ageVisibilityHint(level: ProfilePrivacy): string {
+  return `account.privacy.ageHint.${level}`;
 }
 
 /**
@@ -64,6 +71,15 @@ export const PRIVACY_ROWS: readonly PrivacyRow[] = [
   { field: 'city', labelKey: 'form.label.location', icon: DETAIL_TILES.location.icon, iconColor: DETAIL_TILES.location.color },
   { field: 'language', labelKey: 'form.label.language', icon: DETAIL_TILES.language.icon, iconColor: DETAIL_TILES.language.color },
   { field: 'timezone', labelKey: 'form.label.timezone', icon: DETAIL_TILES.timezone.icon, iconColor: DETAIL_TILES.timezone.color },
+  {
+    field: 'birthDate',
+    labelKey: 'aboutYou.birthday',
+    icon: DETAIL_TILES.birthday.icon,
+    iconColor: DETAIL_TILES.birthday.color,
+    hint: ageVisibilityHint,
+    note: 'account.privacy.birthdayNote',
+  },
+  { field: 'gender', labelKey: 'aboutYou.gender', icon: DETAIL_TILES.gender.icon, iconColor: DETAIL_TILES.gender.color },
 ];
 
 /**
@@ -223,6 +239,14 @@ export class AccountPrivacy implements OnInit {
 
   levelLabel(field: PrivacyControlledField): string {
     return ProfilePrivacyLabels[this.levelOf(field)];
+  }
+
+  /** The line under a row's label, translated; null for a row with none. */
+  noteOf(row: PrivacyRow): string | null {
+    if (!row.note) {
+      return null;
+    }
+    return this._translateService.instant(row.note);
   }
 
   isSaving(field: PrivacyControlledField): boolean {

@@ -1,4 +1,11 @@
 {
+  "aboutYou": {
+    "addBirthday": "Adaugă ziua de naștere",
+    "birthday": "Ziua de naștere",
+    "birthdayNote": "Ceilalți văd doar vârsta ta, niciodată data. Alegi cine o vede din Confidențialitate.",
+    "gender": "Gen",
+    "genderNote": "Alegi cine îl vede din Confidențialitate."
+  },
   "account": {
     "blockedUsers": {
       "blockedOn": "Blocat pe {date}",
@@ -146,6 +153,12 @@
         "COACHES_ONLY": "Doar antrenorii cu care te antrenezi",
         "ONLY_ME": "Nimeni în afară de tine"
       },
+      "ageHint": {
+        "PUBLIC": "Oricine îți deschide profilul îți vede vârsta",
+        "COACHES_ONLY": "Doar antrenorii cu care te antrenezi îți văd vârsta",
+        "ONLY_ME": "Nimeni în afară de tine"
+      },
+      "birthdayNote": "Apare ca vârstă, niciodată ca dată",
       "saveFailed": "Nu am putut salva. Încearcă din nou.",
       "yourData": "Datele tale",
       "messages": {
@@ -245,6 +258,14 @@
         "updated": "Descriere actualizată"
       }
     },
+    "birthday": {
+      "remove": "Șterge ziua de naștere",
+      "toast": {
+        "failed": "Ziua de naștere nu a putut fi actualizată.",
+        "removed": "Ziua de naștere a fost ștearsă",
+        "updated": "Ziua de naștere a fost actualizată"
+      }
+    },
     "coaching": {
       "accepting": "Accepți clienți",
       "acceptingHint": "Apare pe profilul tău public, ca oamenii să știe că te pot contacta.",
@@ -259,6 +280,14 @@
         "placeholder": "Adaugă una, de exemplu Kettlebell",
         "add": "Adaugă specializarea",
         "list": "Specializările tale"
+      }
+    },
+    "gender": {
+      "remove": "Șterge genul",
+      "toast": {
+        "failed": "Genul nu a putut fi actualizat.",
+        "removed": "Genul a fost șters",
+        "updated": "Genul a fost actualizat"
       }
     },
     "handle": {
@@ -1821,6 +1850,10 @@
         "title": "Termină profilul de antrenor",
         "detail": "Spune ce antrenezi și unde, ca să te găsească oamenii."
       },
+      "aboutYou": {
+        "title": "Completează-ți profilul",
+        "detail": "Adaugă ziua de naștere și genul pentru antrenorii tăi."
+      },
       "dismiss": "Ascunde"
     }
   },
@@ -3140,13 +3173,14 @@
       "allTypes": "Toate tipurile"
     },
     "form": {
+      "addPlaceOption": "Adaugă un loc nou…",
       "approval": {
         "hint": "Confirmi fiecare înscriere înainte să devină rezervare.",
         "title": "Necesită aprobare"
       },
-      "cancellation": "Anulare",
       "cancellationCutoff": "Termen de anulare",
-      "cancellationHint": "ore înainte de început. Până atunci cei înscriși pot anula",
+      "cancellationHint": "Cei înscriși pot anula până cu atâtea ore înainte de început.",
+      "cancellationUnit": "{count, plural, one {oră} few {ore} other {de ore}}",
       "capacity": "Capacitate",
       "capacityHint": "Lasă gol pentru locuri nelimitate.",
       "capacityPlaceholder": "Nelimitat",
@@ -3157,7 +3191,7 @@
       },
       "createAndPublish": "Creează și publică",
       "createSession": "Creează sesiunea",
-      "descriptionPlaceholder": "Ce ar trebui să știe cei înscriși (opțional)",
+      "descriptionPlaceholder": "Ce ar trebui să știe cei înscriși",
       "duration": {
         "hours": "{hours} h",
         "hoursMinutes": "{hours} h {minutes} min",
@@ -3167,7 +3201,7 @@
       "endMode": {
         "after": "După N",
         "never": "Niciodată",
-        "onDate": "La o anumită dată"
+        "onDate": "La o dată"
       },
       "ends": "Se termină",
       "errors": {
@@ -3181,13 +3215,15 @@
       "groupNone": "Fără grup",
       "groupPlaceholder": "Alege un grup",
       "lastSession": "Ultima sesiune",
+      "lastsFor": "Durează {duration}",
       "meetingLink": "Link de întâlnire",
       "meetingLinkHint": "Cei înscriși văd linkul după ce sunt confirmați.",
+      "meetingLinkPlaceholder": "https://meet.google.com/…",
       "noGroup": "Nu ai încă niciun grup. Ca să limitezi accesul la membrii unui grup, ai nevoie de unul.",
-      "noPlaces": "Nu ai adăugat încă niciun loc. Adaugă sala, studioul sau parcul și alege-l aici; profilul tău îl păstrează pentru data viitoare.",
+      "noPlaces": "Sesiunile față în față arată unde au loc din locurile din profilul tău de antrenor. Adaugă acum sala, studioul sau parcul: se salvează în profil și se alege pentru această sesiune.",
+      "noPlacesTitle": "Încă nu ai locuri în profilul de antrenor",
       "noVenue": "Fără locație",
       "occurrences": "Număr de sesiuni",
-      "occurrencesUnit": "{count, plural, one {sesiune} few {sesiuni} other {de sesiuni}}",
       "onDays": "În zilele",
       "preview": "Previzualizare",
       "previewMore": "+ încă {count}",
@@ -3213,10 +3249,9 @@
         "onDate": "{days} · până pe {date}",
         "onDateMissing": "{days} · alege o dată de final"
       },
-      "spots": "Locuri",
       "spotsUnit": "locuri",
       "startLocked": "Ora de început nu se poate schimba. Duplică sesiunea ca s-o muți.",
-      "starts": "Începe",
+      "startsAt": "Începe {date}",
       "subtitleOneOff": "O singură dată · {date}",
       "title": {
         "duplicate": "Duplică sesiunea",
@@ -3225,6 +3260,7 @@
       },
       "titlePlaceholder": "Yoga de dimineață",
       "venue": "Locație",
+      "venueHint": "Acestea sunt locurile din profilul tău de antrenor.",
       "waitlist": {
         "hint": "Pune înscrierile pe lista de așteptare când e plină.",
         "title": "Listă de așteptare"
@@ -3267,8 +3303,10 @@
     },
     "rescheduleSheet": {
       "current": "Acum e programată {when}.",
-      "hint": "Se mută doar această dată, cu aceeași durată. Toți cei înscriși află noua oră.",
+      "hint": "Se mută doar această dată, cu aceeași durată. Toți cei înscriși află noua oră, împreună cu mesajul tău, dacă scrii unul.",
+      "message": "Mesaj · opțional",
       "newStart": "Noul început",
+      "placeholder": "Parcul e ocupat în dimineața aceea, ne vedem la 10.",
       "save": "Mută sesiunea",
       "title": "Reprogramează sesiunea",
       "zone": "Orele sunt după fusul orar {zone}."
@@ -4396,6 +4434,10 @@
       "accepting": "Primesc clienți noi",
       "acceptingHint": "Oamenii îți pot cere să îi antrenezi. Dezactivează opțiunea când nu mai ai locuri.",
       "places": "Locurile unde antrenezi"
+    },
+    "aboutYou": {
+      "title": "Despre tine",
+      "intro": "Antrenorii tăi îți văd vârsta și genul, ca să îți poată planifica antrenamentele. Poți schimba cine le vede din Confidențialitate."
     }
   },
   "venues": {

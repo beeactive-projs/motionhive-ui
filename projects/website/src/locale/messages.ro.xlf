@@ -4632,6 +4632,14 @@
           <context context-type="linenumber">220</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="privacy.s2.aboutYou" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Birthday and gender.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Both are optional. We ask for them so your coaches can plan training that fits you. By default your coaches see your age and gender, never your date of birth, and nobody else sees either. You choose who sees them in your privacy settings, and you can remove them from your account at any time.</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Ziua de naștere și genul.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> Ambele sunt opționale. Le cerem ca antrenorii tăi să îți poată planifica antrenamente potrivite pentru tine. În mod implicit, antrenorii tăi îți văd vârsta și genul, niciodată data nașterii, iar nimeni altcineva nu le vede. În setările de confidențialitate alegi cine le vede și le poți șterge din cont oricând.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">221</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="privacy.s3.h2" datatype="html">
         <source>3. What legal bases do we rely on to process your information? </source>
         <target state="translated">3. Pe ce temeiuri legale ne bazăm pentru a prelucra informațiile tale?</target>

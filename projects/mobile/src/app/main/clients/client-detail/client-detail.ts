@@ -54,6 +54,7 @@ import {
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { ageAndGenderParts } from '../../../_shared/config/about-you.config';
 import { APP_HEX_SHAPE, cellFigure } from '../../../_shared/config/hexagon.config';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
@@ -488,6 +489,26 @@ export class ClientDetail implements ViewWillEnter {
       this.isActive() ? 'clients.detail.clientSince' : 'clients.detail.since',
       { date: date(client.startedAt) },
     );
+  });
+
+  /**
+   * The bar's muted line: the client's age and gender when they share them
+   * with their coaches (the default; never the birthday itself), then how
+   * long they have been a client: "32 years · Woman · Client since 4 Mar".
+   */
+  readonly metaLine = computed(() => {
+    const parts: string[] = [];
+    const person = this.store.client()?.client;
+    if (person) {
+      parts.push(...ageAndGenderParts(person.age, person.gender));
+    }
+    const since = this.sinceLine();
+    if (since) {
+      parts.push(since);
+    }
+    // Each part kept whole, so a line that wraps breaks between them and
+    // never inside one ("Client din 12 / iun.").
+    return parts.map((part) => part.replace(/ /g, '\u00a0')).join(' · ');
   });
 
   /** The Training list as a card per week: "Week of 14 Sep". */

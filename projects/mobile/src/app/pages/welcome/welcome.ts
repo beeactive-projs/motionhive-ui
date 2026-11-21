@@ -48,18 +48,28 @@ import {
 import type {
   Category,
   FitnessLevel,
+  Gender,
   OnboardingRole,
   OnboardingState,
   OnboardingStep,
   PickedLocation,
+  SetAboutYouPayload,
   SetCoachDetailsPayload,
   User,
 } from 'core';
 
+import { BirthdayField } from '../../_shared/components/birthday-field/birthday-field';
 import { ChipInput } from '../../_shared/components/chip-input/chip-input';
 import { VenueList } from '../../_shared/components/venue-list/venue-list';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
+import {
+  GENDER_CHOICES,
+  aboutYouPayload,
+  hasAboutYouAnswer,
+  pickedDay,
+  toGender,
+} from '../../_shared/config/about-you.config';
 import { ACTIVITY_ICONS, categoryIcon } from '../../_shared/config/category-icons.config';
 import { DETAIL_TILES } from '../../_shared/config/detail-tiles.config';
 import {
@@ -105,6 +115,7 @@ const PLACE_SEARCH_DEBOUNCE_MS = 400;
 @Component({
   selector: 'mh-welcome',
   imports: [
+    BirthdayField,
     ChipInput,
     EmptyState,
     HexAvatar,
@@ -149,6 +160,7 @@ export class Welcome implements OnInit {
   readonly Steps = OnboardingSteps;
   readonly roleChoices = ROLE_CHOICES;
   readonly levelChoices = LEVEL_CHOICES;
+  readonly genderChoices = GENDER_CHOICES;
   readonly maxWords = MAX_OTHER_WORDS;
   readonly maxWordLength = MAX_OTHER_WORD_LENGTH;
   readonly locationTile = DETAIL_TILES.location;
@@ -188,6 +200,14 @@ export class Welcome implements OnInit {
   private _acceptingTouched = false;
   private _coachProfileAsked = false;
   readonly place = signal<PickedLocation | null>(null);
+  /** About you: the birthday (`YYYY-MM-DD`) and the gender, both optional. */
+  readonly birthDate = signal<string | null>(null);
+  readonly gender = signal<Gender | null>(null);
+  /** What the account had, so Done sends only what changed here. */
+  private readonly _aboutBefore = signal<{ birthDate: string | null; gender: Gender | null }>({
+    birthDate: null,
+    gender: null,
+  });
 
   /** Names the coach's own words may not repeat: the list above already has them. */
   readonly otherExclusions = computed(() => categoryNames(this.categoryStore.activities()));
@@ -309,6 +329,9 @@ export class Welcome implements OnInit {
         return this.role() !== null;
       case OnboardingSteps.CoachCategories:
         return this.coachCategoryIds().length > 0;
+      case OnboardingSteps.AboutYou:
+        // Both optional, but Done needs one; Skip is the way past with none.
+        return hasAboutYouAnswer({ birthDate: this.birthDate(), gender: this.gender() });
       default:
         return true;
     }
@@ -372,6 +395,16 @@ export class Welcome implements OnInit {
         return null;
       }
       return level;
+    });
+  }
+
+  pickGender(gender: Gender): void {
+    // Tapping the picked one clears it, as the level does.
+    this.gender.update((current) => {
+      if (current === gender) {
+        return null;
+      }
+      return gender;
     });
   }
 
@@ -443,7 +476,8 @@ export class Welcome implements OnInit {
       return;
     }
     const coachDetails = this._coachDetails();
-    const save = this._save(step, coachDetails);
+    const aboutYou = this._aboutYou();
+    const save = this._save(step, coachDetails, aboutYou);
     if (!save) {
       return;
     }
@@ -452,6 +486,9 @@ export class Welcome implements OnInit {
       next: (state) => {
         if (step === OnboardingSteps.CoachDetails) {
           this._afterCoachDetails(coachDetails);
+        }
+        if (step === OnboardingSteps.AboutYou) {
+          this._afterAboutYou(aboutYou);
         }
         // Gone mid save: the answer lands in the state and moves no screen.
         if (this._gone) {
@@ -532,6 +569,7 @@ export class Welcome implements OnInit {
   private _save(
     step: OnboardingStep,
     coachDetails: SetCoachDetailsPayload,
+    aboutYou: SetAboutYouPayload,
   ): Observable<OnboardingState> | null {
     switch (step) {
       case OnboardingSteps.Role: {
@@ -557,6 +595,8 @@ export class Welcome implements OnInit {
         });
       case OnboardingSteps.CoachDetails:
         return this._onboardingService.setCoachDetails(coachDetails);
+      case OnboardingSteps.AboutYou:
+        return this._onboardingService.setAboutYou(aboutYou);
       default:
         return null;
     }
@@ -625,6 +665,29 @@ export class Welcome implements OnInit {
     this._patchUser(place);
   }
 
+  /** What the about you screen saves, read once so the save and its echo agree. */
+  private _aboutYou(): SetAboutYouPayload {
+    return aboutYouPayload({ birthDate: this.birthDate(), gender: this.gender() }, this._aboutBefore());
+  }
+
+  /**
+   * The saved answers on the signed-in user and the account's copy, as the
+   * coach details leave the city, so Account's personal details say them
+   * without a reload.
+   */
+  private _afterAboutYou(saved: SetAboutYouPayload): void {
+    const patch: Pick<User, 'birthDate' | 'gender'> = {};
+    if (saved.birthDate !== undefined) {
+      patch.birthDate = saved.birthDate;
+    }
+    if (saved.gender !== undefined) {
+      patch.gender = saved.gender;
+    }
+    this._accountStore.patchAccount(patch);
+    this._patchUser(patch);
+    this._aboutBefore.set({ birthDate: this.birthDate(), gender: this.gender() });
+  }
+
   /** The signed-in user changed here: in the app now, and in the copy it starts from. */
   private _patchUser(patch: Partial<User>): void {
     const user = this._authStore.user();
@@ -689,6 +752,28 @@ export class Welcome implements OnInit {
     if (state.role) {
       this.role.set(state.role);
     }
+    this._prefillAboutYou(state);
+  }
+
+  /**
+   * Birthday and gender as the account has them: the signed-in user's, which
+   * `GET /users/me` reads on every start and Account's sheets keep current,
+   * else the state's (a copy that can be older than an edit in Account).
+   */
+  private _prefillAboutYou(state: OnboardingState): void {
+    const user = this._authStore.user();
+    let birthDate = state.birthDate;
+    let gender = state.gender;
+    if (user && user.birthDate !== undefined) {
+      birthDate = user.birthDate;
+    }
+    if (user && user.gender !== undefined) {
+      gender = user.gender;
+    }
+    const before = { birthDate: pickedDay(birthDate), gender: toGender(gender) };
+    this._aboutBefore.set(before);
+    this.birthDate.set(before.birthDate);
+    this.gender.set(before.gender);
   }
 
   /** Before a button acts, the keyboard goes: Continue, Back, Skip and Close never act under it. */

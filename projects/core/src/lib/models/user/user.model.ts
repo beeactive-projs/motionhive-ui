@@ -1,4 +1,5 @@
 import type { OnboardingState } from '../onboarding/onboarding.model';
+import type { Gender } from '../profile/profile.enums';
 import type { UserRole } from './role.enums';
 
 export interface User {
@@ -24,6 +25,13 @@ export interface User {
    * /profile/details surfaces this.
    */
   exerciseCatalogOptIn?: boolean;
+  /**
+   * The owner's birthday, `YYYY-MM-DD`; null when not given. Only the owner
+   * gets it: anyone else is sent an `age`, never the date.
+   */
+  birthDate?: string | null;
+  /** The owner's gender; null when not given. */
+  gender?: Gender | null;
   /**
    * The welcome flow's state, sent with `GET /users/me` so the app has it
    * with the profile it loads anyway. Absent on every other answer that
@@ -56,6 +64,10 @@ export interface UpdateUserPayload {
   exerciseCatalogOptIn?: boolean;
   /** "Let people find me by name" (API migration 091). */
   findByName?: boolean;
+  /** `YYYY-MM-DD`; null removes it. */
+  birthDate?: string | null;
+  /** Null removes it. */
+  gender?: Gender | null;
 }
 
 /**

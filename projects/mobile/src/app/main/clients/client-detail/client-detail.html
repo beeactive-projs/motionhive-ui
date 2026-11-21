@@ -50,8 +50,8 @@
     <mh-hex-avatar size="sm" aria-hidden="true" [name]="name()" [imageUrl]="avatarUrl()" [color]="avatarTone()" />
     <div class="who">
       <span class="name">{{ name() }}</span>
-      @if (sinceLine()) {
-      <span class="meta">{{ sinceLine() }}</span>
+      @if (metaLine()) {
+      <span class="meta">{{ metaLine() }}</span>
       }
     </div>
   </div>

@@ -8,14 +8,15 @@ import type { NavMode } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { OnboardingStateService } from '../../../../_shared/services/onboarding-state.service';
-import { WELCOME_CARDS } from '../../home.config';
+import { WelcomeCardEntry, welcomeCards } from '../../home.config';
 import { HOME_ICONS } from '../../home.icons';
 
 /**
  * The welcome flow's questions someone passed over, offered again on Home:
  * "Tell us what you like to train" in Train mode, "Finish your coach profile"
- * in Coach mode. A tap opens the flow on just those steps; the X closes the
- * card for good. Nothing renders once there is nothing to ask.
+ * in Coach mode, and "Complete your profile" for a passed over About you, a
+ * card of its own. A tap opens the flow on just that card's steps; the X
+ * closes the card for good. Nothing renders once there is nothing to ask.
  */
 @Component({
   selector: 'mh-welcome-card',
@@ -29,8 +30,6 @@ export class WelcomeCard {
   /** The Home it sits on. */
   readonly kind = input.required<NavMode>();
 
-  readonly copy = computed(() => WELCOME_CARDS[this.kind()]);
-
   readonly steps = computed(() => {
     if (this.kind() === NavModes.Coach) {
       return this._onboarding.coachCard();
@@ -38,16 +37,18 @@ export class WelcomeCard {
     return this._onboarding.trainCard();
   });
 
+  readonly cards = computed(() => welcomeCards(this.kind(), this.steps()));
+
   constructor() {
     addIcons(HOME_ICONS);
     void this._onboarding.ensureLoaded();
   }
 
-  open(): void {
-    this._onboarding.open(this.steps());
+  open(card: WelcomeCardEntry): void {
+    this._onboarding.open(card.steps);
   }
 
-  dismiss(): void {
-    this._onboarding.dismiss(this.steps());
+  dismiss(card: WelcomeCardEntry): void {
+    this._onboarding.dismiss(card.steps);
   }
 }

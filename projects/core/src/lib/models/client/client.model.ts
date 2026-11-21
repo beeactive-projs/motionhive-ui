@@ -10,6 +10,16 @@ import type { AppLanguage } from '../common/language.enums';
 import { PaginatedResponse } from '../common/pagination.model';
 import { User } from '../user/user.model';
 
+/**
+ * The client as their coach reads them (`GET /clients/:id`). Their birthday
+ * never comes: the age does, with the gender, when the client's privacy
+ * lets their coaches see them (the default).
+ */
+export interface ClientUser extends User {
+  /** Null (or absent from an older API) when not given or not shared. */
+  age?: number | null;
+}
+
 export interface GroupMembership {
   groupId: string;
   groupName: string;
@@ -42,7 +52,7 @@ export interface InstructorClient {
   expiresAt: string | null;
   // instructor?: ClientUser;
   // instructorProfile?: InstructorProfileSummary | null;
-  client?: User;
+  client?: ClientUser;
   groupMemberships?: GroupMembership[];
 }
 

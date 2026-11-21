@@ -103,6 +103,28 @@ describe('RescheduleSheet', () => {
     expect(sheet.open()).toBe(false);
   });
 
+  it('sends the note with the new time when there is one, trimmed', () => {
+    const sheet = open();
+    sheet.onStartChange('2030-11-22T18:30');
+    sheet.note.set('  Park is booked, see you at 10.  ');
+    sheet.save();
+
+    expect(rescheduleInstance).toHaveBeenCalledWith('i-1', {
+      newStartAt: '2030-11-22T18:30:00.000Z',
+      message: 'Park is booked, see you at 10.',
+    });
+  });
+
+  it('starts each opening without the last note', () => {
+    const sheet = open();
+    sheet.note.set('old');
+    sheet.open.set(false);
+    TestBed.tick();
+    sheet.open.set(true);
+    TestBed.tick();
+    expect(sheet.note()).toBe('');
+  });
+
   // The API warns about an overlap rather than refusing the move.
   it('says when the new time overlaps another session', () => {
     rescheduleInstance.mockReturnValue(

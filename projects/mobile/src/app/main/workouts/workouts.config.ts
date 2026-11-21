@@ -181,6 +181,7 @@ export function showsResumeCard(state: {
 export const WorkoutStartActions = {
   StartEmpty: 'start-empty',
   NewRoutine: 'new-routine',
+  BrowseStarters: 'browse-starters',
 } as const;
 
 export type WorkoutStartAction = (typeof WorkoutStartActions)[keyof typeof WorkoutStartActions];
@@ -208,6 +209,14 @@ export function workoutStartActions(canStart: boolean): SheetAction<WorkoutStart
       label: 'workouts.common.newRoutine',
       icon: 'add-outline',
       color: 'teal',
+    },
+    // MotionHive's starters, reachable once the page has routines of its own
+    // (they used to show only on an empty page).
+    {
+      id: WorkoutStartActions.BrowseStarters,
+      label: 'workouts.home.coldStart.browseStarters',
+      icon: 'flash-outline',
+      color: 'primary',
     },
   ];
 }

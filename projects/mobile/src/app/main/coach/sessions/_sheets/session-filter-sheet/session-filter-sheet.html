@@ -61,20 +61,22 @@
   </ion-modal>
 
   @if (rangeBackwards()) {
-  <p class="mh-helper error">{{ 'sessions.filterSheet.rangeBackwards' | translate }}</p>
+  <p class="mh-helper over" role="alert">{{ 'sessions.filterSheet.rangeBackwards' | translate }}</p>
   } @else if (rangeTooWide()) {
-  <p class="mh-helper error">{{ 'sessions.filterSheet.rangeTooWide' | translate }}</p>
+  <p class="mh-helper over" role="alert">{{ 'sessions.filterSheet.rangeTooWide' | translate }}</p>
   } @else if (draft().dateFrom || draft().dateTo) {
   <div class="reset-row">
-    <button type="button" class="reset" (click)="clearDates()">{{ 'sessions.filterSheet.clearDates' | translate }}</button>
+    <ion-button class="reset mh-text-link" fill="clear" size="small" (click)="clearDates()">
+      {{ 'sessions.filterSheet.clearDates' | translate }}
+    </ion-button>
   </div>
   }
 
   @if (groups().length > 0) {
-  <div class="mh-section-label">{{ 'sessions.filterSheet.group' | translate }}</div>
-  <ion-item lines="none" class="field">
-    <ion-select toggleIcon="chevron-down-outline" labelPlacement="stacked" interface="action-sheet" [placeholder]="'sessions.filterSheet.anyGroup' | translate"
-      [attr.aria-label]="'sessions.filterSheet.group' | translate" [value]="draft().groupId"
+  <!-- Its name is its own label, as on the From and To rows above. -->
+  <ion-item lines="none" class="field group">
+    <ion-select [cancelText]="'button.cancel' | translate" toggleIcon="chevron-down-outline" interface="action-sheet" [label]="'sessions.filterSheet.group' | translate"
+      [placeholder]="'sessions.filterSheet.anyGroup' | translate" [value]="draft().groupId"
       (ionChange)="setGroup($event.detail.value)">
       <ion-select-option [value]="null">{{ 'sessions.filterSheet.anyGroup' | translate }}</ion-select-option>
       @for (group of groups(); track group.id) {

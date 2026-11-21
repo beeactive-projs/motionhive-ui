@@ -2,6 +2,8 @@ import {
   CoachActivityItem,
   NavMode,
   NavModes,
+  OnboardingStep,
+  OnboardingSteps,
   Post,
   ProgramAssignment,
   ProgramAssignmentStatus,
@@ -1238,6 +1240,37 @@ export const WELCOME_CARDS: Readonly<Record<NavMode, WelcomeCardCopy>> = {
     icon: 'ribbon-outline',
   },
 };
+
+/** A passed over About you (birthday and gender), on either Home. */
+export const ABOUT_YOU_CARD: WelcomeCardCopy = {
+  title: 'home.welcomeCard.aboutYou.title',
+  detail: 'home.welcomeCard.aboutYou.detail',
+  icon: 'person-outline',
+};
+
+export interface WelcomeCardEntry {
+  copy: WelcomeCardCopy;
+  /** What a tap opens the flow on, and what the X closes for good. */
+  steps: OnboardingStep[];
+}
+
+/**
+ * The cards a Home offers for the steps it was given: the mode's own
+ * questions on one card, and About you on a card of its own ("Complete your
+ * profile"), which opens just that step. Each opens and closes on its own,
+ * so closing one never takes the other away.
+ */
+export function welcomeCards(kind: NavMode, steps: readonly OnboardingStep[]): WelcomeCardEntry[] {
+  const cards: WelcomeCardEntry[] = [];
+  const own = steps.filter((step) => step !== OnboardingSteps.AboutYou);
+  if (own.length > 0) {
+    cards.push({ copy: WELCOME_CARDS[kind], steps: own });
+  }
+  if (steps.includes(OnboardingSteps.AboutYou)) {
+    cards.push({ copy: ABOUT_YOU_CARD, steps: [OnboardingSteps.AboutYou] });
+  }
+  return cards;
+}
 
 // ── Group offers on Home (design 2026-11-14) ─────────────────────────────
 

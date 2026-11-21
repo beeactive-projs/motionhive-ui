@@ -56,6 +56,7 @@ import {
 } from 'core';
 
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
+import { Notice } from '../../../../../_shared/components/notice/notice';
 import { VenueSheet } from '../../../../../_shared/components/venue-sheet/venue-sheet';
 import { VenueDraft, venueCreatePayload } from '../../../../../_shared/config/venues.config';
 import { DatetimeLocaleDirective } from '../../../../../_shared/directives/datetime-locale.directive';
@@ -85,6 +86,9 @@ import {
   wallClockInZone,
   zonedWallClockToIso,
 } from '../../sessions.config';
+
+/** The value of the place picker's "Add a new place…" option; no place has it as an id. */
+const ADD_PLACE_OPTION = 'add-place';
 
 /**
  * Duration is two wheels rather than one long list of presets: hours 0–8 and
@@ -151,6 +155,7 @@ function defaultStart(): string {
     IonSelectOption,
     IonTextarea,
     IonToggle,
+    Notice,
     SheetShell,
     TranslatePipe,
     VenueSheet,
@@ -255,6 +260,15 @@ export class SessionFormSheet {
     () => this.showPrice() && this.access() !== SessionAccess.Open,
   );
 
+  /** The price field's own label, marked optional only where empty means free. */
+  readonly priceLabel = computed(() => {
+    const label = this._t('form.label.price');
+    if (!this.priceOptional()) {
+      return label;
+    }
+    return `${label} ${this._t('form.hint.optional')}`;
+  });
+
   /**
    * The start as the API takes it: the picked wall clock read in the picked
    * zone, so 18:00 for Europe/London is 18:00 in London whatever the phone's
@@ -329,12 +343,35 @@ export class SessionFormSheet {
 
   readonly isOnline = computed(() => this.locationKind() === SessionLocationKind.Online);
 
-  /** In person, and the coach has no place yet: say so, and offer to add one. */
+  /**
+   * The places an in-person session can be at: an online place (a meeting
+   * room) is no answer to "where", so it is not offered there.
+   */
+  readonly physicalVenues = computed(() => this.venues().filter((venue) => !venue.isOnline));
+
+  /** In person, and the coach has no place to be at yet: say so, and offer to add one. */
   readonly needsPlace = computed(
-    () => !this.isOnline() && this.venuesKnown() && this.venues().length === 0,
+    () => !this.isOnline() && this.venuesKnown() && this.physicalVenues().length === 0,
   );
   readonly placeOpen = signal(false);
   readonly placeSaving = signal(false);
+
+  /** The place picker's last option: a new place, added without leaving the form. */
+  readonly addPlaceOption = ADD_PLACE_OPTION;
+
+  /**
+   * A place picked, or "Add a new place…": that one opens the place sheet and
+   * puts the picker back on what it showed, until the new place is saved and
+   * chosen (`addPlace`).
+   */
+  onVenueChange(value: string | null, select: { value?: unknown }): void {
+    if (value === ADD_PLACE_OPTION) {
+      select.value = this.venueId();
+      this.placeOpen.set(true);
+      return;
+    }
+    this.venueId.set(value);
+  }
 
   /**
    * Whether the group picker is worth showing. Mirrors the web dialog: a

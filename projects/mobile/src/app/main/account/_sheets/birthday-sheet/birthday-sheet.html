@@ -1,0 +1,30 @@
+<ng-template #body>
+  <div class="mh-stack">
+    <section class="mh-section">
+      <mh-birthday-field [(value)]="draft" />
+      <p class="mh-footnote">{{ 'aboutYou.birthdayNote' | translate }}</p>
+    </section>
+
+    @if (hasSaved()) {
+      <!-- Red, in a card of its own, like an action sheet's destructive verbs.
+           Saved on the tap: a birthday is one picker away from coming back. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button [detail]="false" [disabled]="saving()" (click)="remove()">
+          <mh-hex-avatar slot="start" size="sm" icon="trash-outline" color="danger" />
+          <ion-label color="danger">{{ 'accountSheets.birthday.remove' | translate }}</ion-label>
+        </ion-item>
+      </ion-list>
+    }
+  </div>
+</ng-template>
+
+<!-- As tall as what it says: nothing here is typed into. -->
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="'aboutYou.birthday' | translate"
+  [body]="body"
+  [fit]="true"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  (save)="save()"
+/>

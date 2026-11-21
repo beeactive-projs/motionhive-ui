@@ -1,6 +1,6 @@
 import { DestroyRef, Service, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, of, take } from 'rxjs';
+import { Observable, catchError, map, of, take, tap, throwError } from 'rxjs';
 
 import {
   AccountInfo,
@@ -8,7 +8,12 @@ import {
   InstructorProfile,
   MyProfile,
   ProfileService,
+  TokenService,
 } from 'core';
+import type { User } from 'core';
+
+/** What Account's birthday and gender sheets save. */
+export type AboutYouPatch = Pick<AccountInfo, 'birthDate' | 'gender'>;
 
 /**
  * The account area's copy of `GET /profile/me`.
@@ -26,6 +31,7 @@ import {
 export class AccountStore {
   private readonly _profileService = inject(ProfileService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _tokenService = inject(TokenService);
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _profile = signal<MyProfile | null>(null);
@@ -53,6 +59,23 @@ export class AccountStore {
     const account = this.account();
     if (!account) return '';
     return `${account.firstName} ${account.lastName}`.trim();
+  });
+
+  /** The owner's birthday, `YYYY-MM-DD`; null while not given. */
+  readonly birthDate = computed(() => {
+    const account = this.account();
+    if (!account || !account.birthDate) {
+      return null;
+    }
+    return account.birthDate;
+  });
+
+  readonly gender = computed(() => {
+    const account = this.account();
+    if (!account || !account.gender) {
+      return null;
+    }
+    return account.gender;
   });
 
   /** Idempotent — safe to call from every page's `ngOnInit`. */
@@ -117,6 +140,42 @@ export class AccountStore {
       city: account.city,
       countryCode: account.countryCode,
     });
+  }
+
+  /**
+   * Saves the birthday or the gender through `PATCH /profile/me`, as the
+   * other personal details are (null removes one). Shown at once and put
+   * back if the server refuses, which the caller says. Once saved it is on
+   * the signed-in user too, where the welcome flow starts from.
+   */
+  updateAboutYou(patch: AboutYouPatch): Observable<void> {
+    const before: AboutYouPatch = {};
+    if (patch.birthDate !== undefined) {
+      before.birthDate = this.birthDate();
+    }
+    if (patch.gender !== undefined) {
+      before.gender = this.gender();
+    }
+    this.patchAccount(patch);
+    return this._profileService.updateMyProfile({ account: patch }).pipe(
+      tap(() => this.patchUser(patch)),
+      map(() => undefined),
+      catchError((error: unknown) => {
+        this.patchAccount(before);
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  /** The signed-in user changed: in the app now, and in the copy the next start reads. */
+  patchUser(patch: Partial<User>): void {
+    const user = this._authStore.user();
+    if (!user) {
+      return;
+    }
+    const next = { ...user, ...patch };
+    this._authStore.setUser(next);
+    this._tokenService.setUser(next);
   }
 
   /**

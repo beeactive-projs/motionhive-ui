@@ -46,6 +46,7 @@ export const WELCOME_COPY: Readonly<Record<OnboardingStep, { title: string; intr
     title: 'welcome.coachDetails.title',
     intro: 'welcome.coachDetails.intro',
   },
+  [OnboardingSteps.AboutYou]: { title: 'welcome.aboutYou.title', intro: 'welcome.aboutYou.intro' },
 };
 
 export interface RoleChoice {

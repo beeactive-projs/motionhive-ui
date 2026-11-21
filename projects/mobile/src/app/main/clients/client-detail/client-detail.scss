@@ -417,3 +417,14 @@ ion-button.plan-more {
   min-height: var(--mh-tap-target);
   margin: 0;
 }
+
+/* Age, gender and how long they have been a client outgrow one line on a
+   phone ("32 de ani · Femeie · Client din 1…"): here the line may wrap to a
+   second rather than cut the last part short. */
+.peer .meta {
+  display: -webkit-box;
+  line-height: var(--mh-leading-tight);
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}

@@ -1,12 +1,12 @@
-@if (steps().length) {
-  <!-- Two controls side by side, never one inside the other: the card opens
-       the questions, the X closes it for good. -->
+<!-- Two controls side by side on each card, never one inside the other:
+     the card opens its questions, the X closes it for good. -->
+@for (card of cards(); track card.copy.title) {
   <div class="welcome-card">
-    <button type="button" class="open" (click)="open()">
-      <mh-hex-avatar size="lg" color="primary" tone="wash" aria-hidden="true" [icon]="copy().icon" />
+    <button type="button" class="open" (click)="open(card)">
+      <mh-hex-avatar size="lg" color="primary" tone="wash" aria-hidden="true" [icon]="card.copy.icon" />
       <span class="copy">
-        <span class="title">{{ copy().title | translate }}</span>
-        <span class="detail">{{ copy().detail | translate }}</span>
+        <span class="title">{{ card.copy.title | translate }}</span>
+        <span class="detail">{{ card.copy.detail | translate }}</span>
       </span>
     </button>
     <ion-button
@@ -14,7 +14,7 @@
       fill="clear"
       color="medium"
       [attr.aria-label]="'home.welcomeCard.dismiss' | translate"
-      (click)="dismiss()"
+      (click)="dismiss(card)"
     >
       <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
     </ion-button>

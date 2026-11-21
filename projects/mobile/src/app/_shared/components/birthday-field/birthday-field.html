@@ -1,0 +1,37 @@
+<ion-list [inset]="true" class="mh-card-list">
+  <!-- The date itself is the row's text; the tile says what it is once
+       there is one (the invitation says it before). -->
+  <ion-item button [detail]="true" (click)="openPicker()">
+    @if (label(); as day) {
+      <mh-hex-avatar
+        slot="start"
+        size="sm"
+        [icon]="tile.icon"
+        [color]="tile.color"
+        [name]="'aboutYou.birthday' | translate"
+      />
+      <ion-label class="ion-text-wrap">{{ day }}</ion-label>
+    } @else {
+      <mh-hex-avatar slot="start" size="sm" [icon]="tile.icon" [color]="tile.color" />
+      <ion-label class="ion-text-wrap">{{ 'aboutYou.addBirthday' | translate }}</ion-label>
+    }
+  </ion-item>
+</ion-list>
+
+<!-- Beside the row, not in it: Ionic relocates a modal when it presents.
+     `cover`: a wheel picker is 350px wide otherwise, past the picker's
+     20rem, and its Done fell off the edge. -->
+<ion-modal class="mh-picker-modal" [isOpen]="pickerOpen()" (didDismiss)="pickerOpen.set(false)">
+  <ng-template>
+    <ion-datetime
+      presentation="date"
+      size="cover"
+      [preferWheel]="true"
+      [showDefaultButtons]="true"
+      [min]="min"
+      [max]="max"
+      [value]="pickerValue()"
+      (ionChange)="onPicked($event.detail.value)"
+    />
+  </ng-template>
+</ion-modal>

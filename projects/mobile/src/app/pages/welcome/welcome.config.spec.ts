@@ -29,6 +29,7 @@ function state(flow: OnboardingState['flow']): OnboardingState {
       LEVEL: null,
       COACH_CATEGORIES: null,
       COACH_DETAILS: null,
+      ABOUT_YOU: null,
     },
     flow,
     trainCard: [],
@@ -54,7 +55,14 @@ const place = (overrides: Partial<PickedLocation> = {}): PickedLocation => ({
 
 describe('welcome copy and choices', () => {
   it('has a heading and an intro for every step', () => {
-    for (const step of ['ROLE', 'INTERESTS', 'LEVEL', 'COACH_CATEGORIES', 'COACH_DETAILS'] as const) {
+    for (const step of [
+      'ROLE',
+      'INTERESTS',
+      'LEVEL',
+      'COACH_CATEGORIES',
+      'COACH_DETAILS',
+      'ABOUT_YOU',
+    ] as const) {
       expect(WELCOME_COPY[step].title).toMatch(/^welcome\./);
       expect(WELCOME_COPY[step].intro).toMatch(/^welcome\./);
     }
@@ -97,6 +105,7 @@ describe('needsCategories', () => {
     expect(needsCategories('COACH_CATEGORIES')).toBe(true);
     expect(needsCategories('ROLE')).toBe(false);
     expect(needsCategories('COACH_DETAILS')).toBe(false);
+    expect(needsCategories('ABOUT_YOU')).toBe(false);
     expect(needsCategories(null)).toBe(false);
   });
 });
@@ -145,6 +154,17 @@ describe('remainingSteps', () => {
     expect(
       remainingSteps(state(['COACH_CATEGORIES', 'COACH_DETAILS']), null, 'ROLE'),
     ).toEqual(['COACH_CATEGORIES', 'COACH_DETAILS']);
+  });
+
+  it('ends on about you, on both paths', () => {
+    // The level, or the coach details, saved: about you is what the state has left.
+    expect(remainingSteps(state(['ABOUT_YOU']), null, 'LEVEL')).toEqual(['ABOUT_YOU']);
+    expect(remainingSteps(state(['COACH_DETAILS', 'ABOUT_YOU']), null, 'COACH_DETAILS')).toEqual([
+      'ABOUT_YOU',
+    ]);
+    // A Home card opens it alone.
+    expect(remainingSteps(state([]), ['ABOUT_YOU'], null)).toEqual(['ABOUT_YOU']);
+    expect(remainingSteps(state([]), ['ABOUT_YOU'], 'ABOUT_YOU')).toEqual([]);
   });
 
   it('walks the picked steps in order, answered or not', () => {

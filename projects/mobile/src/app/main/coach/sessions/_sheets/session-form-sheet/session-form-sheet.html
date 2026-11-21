@@ -1,31 +1,37 @@
 <ng-template #body>
   <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
-  <div class="tiles three">
+  <div class="tiles three" role="group" [attr.aria-label]="'form.label.type' | translate">
     @for (option of typeOptions; track option.value) {
-    <button type="button" class="tile" [class.selected]="type() === option.value" (click)="type.set(option.value)">
-      <ion-icon [name]="option.icon" aria-hidden="true" />
-      <span>{{ option.label }}</span>
-    </button>
+    <ion-button fill="outline" class="tile" [class.selected]="type() === option.value"
+      [attr.aria-pressed]="type() === option.value" (click)="type.set(option.value)">
+      <span class="tile-face">
+        <ion-icon [name]="option.icon" aria-hidden="true" />
+        <span class="tile-label">{{ option.label }}</span>
+      </span>
+    </ion-button>
     }
   </div>
 
-  <div class="mh-section-label">{{ 'form.label.title' | translate }}</div>
-  <ion-input mode="md" fill="outline" [placeholder]="'sessions.form.titlePlaceholder' | translate" autocapitalize="sentences"
-    [attr.aria-label]="'form.label.title' | translate" [value]="title()"
+  <ion-input mode="md" fill="outline" labelPlacement="stacked" [label]="'form.label.title' | translate"
+    [placeholder]="'sessions.form.titlePlaceholder' | translate" autocapitalize="sentences" [value]="title()"
     (ionInput)="title.set($event.detail.value ?? '')" />
 
-  <div class="mh-section-label">{{ 'form.label.description' | translate }}</div>
-  <ion-textarea mode="md" fill="outline" [placeholder]="'sessions.form.descriptionPlaceholder' | translate"
-    autocapitalize="sentences" [attr.aria-label]="'form.label.description' | translate" [autoGrow]="true" [rows]="2"
-    [value]="description()" (ionInput)="description.set($event.detail.value ?? '')" />
+  <ion-textarea mode="md" fill="outline" labelPlacement="stacked"
+    [label]="('form.label.description' | translate) + ' ' + ('form.hint.optional' | translate)"
+    [placeholder]="'sessions.form.descriptionPlaceholder' | translate" autocapitalize="sentences" [autoGrow]="true"
+    [rows]="2" [value]="description()" (ionInput)="description.set($event.detail.value ?? '')" />
 
   <div class="mh-section-label">{{ 'sessions.form.when' | translate }}</div>
   <div class="when">
-    <ion-button fill="outline" class="field-button" [attr.aria-label]="'sessions.form.starts' | translate"
-      [disabled]="isEdit()" (click)="openStart()">
+    <!-- Named with the value as well: an aria-label replaces a button's
+         words, and "Starts" alone would hide the date. -->
+    <ion-button fill="outline" class="field-button"
+      [attr.aria-label]="'sessions.form.startsAt' | translate: { date: startLabel() }" [disabled]="isEdit()"
+      (click)="openStart()">
       {{ startLabel() }}
     </ion-button>
-    <ion-button fill="outline" class="field-button" [attr.aria-label]="'form.label.duration' | translate"
+    <ion-button fill="outline" class="field-button"
+      [attr.aria-label]="'sessions.form.lastsFor' | translate: { duration: durationLabel(durationMinutes()) }"
       (click)="durationOpen.set(true)">
       {{ durationLabel(durationMinutes()) }}
     </ion-button>
@@ -81,9 +87,8 @@
   </ion-modal>
 
   <ion-item lines="none" class="field">
-    <ion-select toggleIcon="chevron-down-outline" [label]="'form.label.timezone' | translate" interface="modal"
-      [attr.aria-label]="'form.label.timezone' | translate" [value]="timezone()" [disabled]="isEdit()"
-      (ionChange)="timezone.set($event.detail.value)">
+    <ion-select [cancelText]="'button.cancel' | translate" toggleIcon="chevron-down-outline" [label]="'form.label.timezone' | translate" interface="modal"
+      [value]="timezone()" [disabled]="isEdit()" (ionChange)="timezone.set($event.detail.value)">
       @for (option of timezones; track option.value) {
       <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
       }
@@ -100,7 +105,7 @@
     <ion-icon slot="start" name="repeat-outline" aria-hidden="true" />
     <ion-toggle justify="space-between" [checked]="isRecurring()" [disabled]="isEdit()"
       (ionChange)="isRecurring.set($event.detail.checked)">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h3>{{ (isRecurring() ? 'sessions.form.repeat.on' : 'sessions.form.repeat.off') | translate }}</h3>
         <p>{{ repeatSub() }}</p>
       </ion-label>
@@ -109,13 +114,13 @@
 
   @if (isRecurring()) {
   <div class="mh-section-label">{{ 'sessions.form.onDays' | translate }}</div>
-  <div class="days">
+  <div class="days" role="group" [attr.aria-label]="'sessions.form.onDays' | translate">
     @for (day of weekdays; track day.value) {
-    <button type="button" class="day" [class.selected]="daysOfWeek().includes(day.value)"
-      [attr.aria-pressed]="daysOfWeek().includes(day.value)" [attr.aria-label]="day.short"
-      [disabled]="isEdit()" (click)="toggleDay(day.value)">
+    <ion-button class="day" [class.selected]="daysOfWeek().includes(day.value)"
+      [attr.aria-pressed]="daysOfWeek().includes(day.value)" [attr.aria-label]="day.short" [disabled]="isEdit()"
+      (click)="toggleDay(day.value)">
       {{ day.label }}
-    </button>
+    </ion-button>
     }
   </div>
 
@@ -130,12 +135,9 @@
   </ion-segment>
 
   @if (endMode() === EndModes.After) {
-  <div class="inline-number">
-    <ion-input mode="md" class="count" fill="outline" type="number" inputmode="numeric"
-      [attr.aria-label]="'sessions.form.occurrences' | translate" [value]="endAfterOccurrences()"
-      [disabled]="isEdit()" (ionInput)="setOccurrences($event.detail.value)" />
-    <span>{{ 'sessions.form.occurrencesUnit' | translate: { count: endAfterOccurrences() } }}</span>
-  </div>
+  <ion-input mode="md" fill="outline" labelPlacement="stacked" class="half" type="number" inputmode="numeric"
+    [label]="'sessions.form.occurrences' | translate" [value]="endAfterOccurrences()" [disabled]="isEdit()"
+    (ionInput)="setOccurrences($event.detail.value)" />
   } @else if (endMode() === EndModes.OnDate) {
   <ion-item lines="none" class="field">
     <ion-label>{{ 'sessions.form.lastSession' | translate }}</ion-label>
@@ -172,57 +174,69 @@
   }
 
   <div class="mh-section-label">{{ 'sessions.form.where' | translate }}</div>
-  <div class="tiles two">
+  <div class="tiles two" role="group" [attr.aria-label]="'sessions.form.where' | translate">
     @for (option of locationOptions; track option.value) {
-    <button type="button" class="tile row" [class.selected]="locationKind() === option.value"
-      (click)="locationKind.set(option.value)">
-      <ion-icon [name]="option.icon" aria-hidden="true" />
-      <span>{{ option.label }}</span>
-    </button>
+    <ion-button fill="outline" class="tile row" [class.selected]="locationKind() === option.value"
+      [attr.aria-pressed]="locationKind() === option.value" (click)="locationKind.set(option.value)">
+      <span class="tile-face">
+        <ion-icon [name]="option.icon" aria-hidden="true" />
+        <span class="tile-label">{{ option.label }}</span>
+      </span>
+    </ion-button>
     }
   </div>
 
   @if (isOnline()) {
-  <ion-input mode="md" fill="outline" type="url" inputmode="url" placeholder="https://meet.google.com/…"
-    [attr.aria-label]="'sessions.form.meetingLink' | translate" [value]="meetingUrl()"
-    (ionInput)="meetingUrl.set($event.detail.value ?? '')" (ionBlur)="onMeetingBlur()" />
+  <ion-input mode="md" fill="outline" labelPlacement="stacked" type="url" inputmode="url"
+    [label]="'sessions.form.meetingLink' | translate" [placeholder]="'sessions.form.meetingLinkPlaceholder' | translate"
+    [value]="meetingUrl()" (ionInput)="meetingUrl.set($event.detail.value ?? '')" (ionBlur)="onMeetingBlur()" />
   @if (meetingLinkError(); as error) {
   <p class="mh-helper over" role="alert">{{ error }}</p>
   }
   <p class="mh-helper">{{ 'sessions.form.meetingLinkHint' | translate }}</p>
-  } @else if (venues().length > 0) {
+  } @else if (physicalVenues().length > 0) {
   <ion-item lines="none" class="field">
-    <ion-select toggleIcon="chevron-down-outline" [label]="'sessions.form.venue' | translate" interface="action-sheet"
-      [placeholder]="'sessions.form.noVenue' | translate" [value]="venueId()"
-      (ionChange)="venueId.set($event.detail.value)">
+    <!-- The last option adds a place without leaving the form: picking it
+         opens the place sheet, and the new place is chosen. -->
+    <ion-select [cancelText]="'button.cancel' | translate" #venueSelect toggleIcon="chevron-down-outline" [label]="'sessions.form.venue' | translate"
+      interface="action-sheet" [placeholder]="'sessions.form.noVenue' | translate" [value]="venueId()"
+      (ionChange)="onVenueChange($event.detail.value, venueSelect)">
       <ion-select-option [value]="null">{{ 'sessions.form.noVenue' | translate }}</ion-select-option>
-      @for (venue of venues(); track venue.id) {
+      @for (venue of physicalVenues(); track venue.id) {
       <ion-select-option [value]="venue.id">{{ venue.name }}</ion-select-option>
       }
+      <ion-select-option [value]="addPlaceOption">{{ 'sessions.form.addPlaceOption' | translate }}</ion-select-option>
     </ion-select>
   </ion-item>
+  <p class="mh-helper">{{ 'sessions.form.venueHint' | translate }}</p>
   } @else if (needsPlace()) {
-  <!-- No place to pick yet: added here, chosen for this session, and kept in
-       the coaching profile's places. -->
-  <div class="no-place">
-    <p class="mh-helper">{{ 'sessions.form.noPlaces' | translate }}</p>
-    <ion-button fill="outline" size="small" (click)="placeOpen.set(true)">
-      <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-      {{ 'venues.list.add' | translate }}
-    </ion-button>
-  </div>
+  <!-- No place to pick yet. A coach who never added one had no way to know
+       that places come from the coaching profile: this says so, and adds one
+       here, saved to the profile and chosen for this session. -->
+  <mh-notice tone="info" class="no-place">
+    <span class="no-place-body">
+      <strong>{{ 'sessions.form.noPlacesTitle' | translate }}</strong>
+      <span>{{ 'sessions.form.noPlaces' | translate }}</span>
+      <ion-button size="small" class="no-place-add" (click)="placeOpen.set(true)">
+        <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+        {{ 'venues.list.add' | translate }}
+      </ion-button>
+    </span>
+  </mh-notice>
   }
 
   <mh-venue-sheet [(open)]="placeOpen" [saving]="placeSaving()" (save)="addPlace($event)" />
 
   <div class="mh-section-label">{{ 'sessions.form.whoCanBook' | translate }}</div>
-  <div class="tiles two">
+  <div class="tiles two" role="group" [attr.aria-label]="'sessions.form.whoCanBook' | translate">
     @for (option of accessOptions; track option.value) {
-    <button type="button" class="tile row" [class.selected]="access() === option.value"
-      (click)="access.set(option.value)">
-      <ion-icon [name]="option.icon" aria-hidden="true" />
-      <span>{{ option.label }}</span>
-    </button>
+    <ion-button fill="outline" class="tile row" [class.selected]="access() === option.value"
+      [attr.aria-pressed]="access() === option.value" (click)="access.set(option.value)">
+      <span class="tile-face">
+        <ion-icon [name]="option.icon" aria-hidden="true" />
+        <span class="tile-label">{{ option.label }}</span>
+      </span>
+    </ion-button>
     }
   </div>
   <p class="mh-helper">{{ accessSub() }}</p>
@@ -230,7 +244,7 @@
   @if (needsGroup()) {
   @if (groups().length > 0) {
   <ion-item lines="none" class="field">
-    <ion-select toggleIcon="chevron-down-outline" [label]="'sessions.form.group' | translate" interface="action-sheet"
+    <ion-select [cancelText]="'button.cancel' | translate" toggleIcon="chevron-down-outline" [label]="'sessions.form.group' | translate" interface="action-sheet"
       [placeholder]="'sessions.form.groupPlaceholder' | translate" [value]="groupId()"
       (ionChange)="groupId.set($event.detail.value)">
       <!-- Members only access needs its group; anything else can drop it. -->
@@ -250,7 +264,7 @@
   <ion-item lines="none" class="field">
     <ion-toggle justify="space-between" [checked]="approvalRequired()"
       (ionChange)="approvalRequired.set($event.detail.checked)">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h3>{{ 'sessions.form.approval.title' | translate }}</h3>
         <p>{{ 'sessions.form.approval.hint' | translate }}</p>
       </ion-label>
@@ -259,11 +273,11 @@
 
   <div class="pair">
     @if (showCapacity()) {
+    <!-- Optional: empty is no limit, which the placeholder and the hint say. -->
     <div>
-      <div class="mh-section-label">{{ 'sessions.form.capacity' | translate }}</div>
-      <ion-input mode="md" fill="outline" type="number" inputmode="numeric"
-        [placeholder]="'sessions.form.capacityPlaceholder' | translate"
-        [attr.aria-label]="'sessions.form.spots' | translate" [value]="capacity()"
+      <ion-input mode="md" fill="outline" labelPlacement="stacked" type="number" inputmode="numeric"
+        [label]="('sessions.form.capacity' | translate) + ' ' + ('form.hint.optional' | translate)"
+        [placeholder]="'sessions.form.capacityPlaceholder' | translate" [value]="capacity()"
         (ionInput)="capacity.set(toNumber($event.detail.value))">
         <span slot="end" class="unit">{{ 'sessions.form.spotsUnit' | translate }}</span>
       </ion-input>
@@ -276,18 +290,12 @@
     }
     @if (showPrice()) {
     <!-- Free has no price. Paid needs one; clients only and group members
-         may leave it empty, which is free. -->
+         may leave it empty, which is free, and only then is it marked optional. -->
     <div>
-      <div class="mh-section-label">
-        {{ 'form.label.price' | translate }}
-        @if (priceOptional()) {
-        {{ 'form.hint.optional' | translate }}
-        }
-      </div>
-      <ion-input mode="md" fill="outline" type="number" inputmode="decimal" placeholder="0"
-        [attr.aria-label]="'form.label.price' | translate" [value]="priceAmount()"
-        (ionInput)="priceAmount.set(toNumber($event.detail.value))" (ionBlur)="priceTouched.set(true)">
-        <ion-select toggleIcon="chevron-down-outline" slot="end" class="currency" interface="action-sheet"
+      <ion-input mode="md" fill="outline" labelPlacement="stacked" type="number" inputmode="decimal" placeholder="0"
+        [label]="priceLabel()" [value]="priceAmount()" (ionInput)="priceAmount.set(toNumber($event.detail.value))"
+        (ionBlur)="priceTouched.set(true)">
+        <ion-select [cancelText]="'button.cancel' | translate" toggleIcon="chevron-down-outline" slot="end" class="currency" interface="action-sheet"
           [attr.aria-label]="'form.label.currency' | translate" [value]="priceCurrency()"
           (ionChange)="priceCurrency.set($event.detail.value)">
           @for (currency of currencies; track currency) {
@@ -309,7 +317,7 @@
   <ion-item lines="none" class="field">
     <ion-toggle justify="space-between" [checked]="waitlistEnabled()"
       (ionChange)="waitlistEnabled.set($event.detail.checked)">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h3>{{ 'sessions.form.waitlist.title' | translate }}</h3>
         <p>{{ 'sessions.form.waitlist.hint' | translate }}</p>
       </ion-label>
@@ -317,13 +325,14 @@
   </ion-item>
   }
 
-  <div class="mh-section-label">{{ 'sessions.form.cancellation' | translate }}</div>
-  <div class="inline-number">
-    <ion-input mode="md" class="count" fill="outline" type="number" inputmode="numeric"
-      [attr.aria-label]="'sessions.form.cancellationCutoff' | translate" [value]="cancellationCutoffHours()"
-      (ionInput)="setCutoffHours($event.detail.value)" />
-    <span>{{ 'sessions.form.cancellationHint' | translate }}</span>
-  </div>
+  <ion-input mode="md" fill="outline" labelPlacement="stacked" class="half" type="number" inputmode="numeric"
+    [label]="'sessions.form.cancellationCutoff' | translate" [value]="cancellationCutoffHours()"
+    (ionInput)="setCutoffHours($event.detail.value)">
+    <span slot="end" class="unit">
+      {{ 'sessions.form.cancellationUnit' | translate: { count: cancellationCutoffHours() } }}
+    </span>
+  </ion-input>
+  <p class="mh-helper">{{ 'sessions.form.cancellationHint' | translate }}</p>
 
   @if (conflict(); as warning) {
   <!-- Advisory, never blocking: an overlap is the coach's call, which is how

@@ -1,9 +1,13 @@
 import { enumLabelMap } from '../../i18n/enum-label';
 
+/**
+ * A person's gender, as they choose to give it: optional, and these three
+ * only, in this order (owner decision, 2026-11-21). Mirrors the API's
+ * values; null on the user means not given.
+ */
 export const Genders = {
   Male: 'MALE',
   Female: 'FEMALE',
-  Other: 'OTHER',
   PreferNotToSay: 'PREFER_NOT_TO_SAY',
 } as const;
 

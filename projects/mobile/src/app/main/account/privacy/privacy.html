@@ -21,6 +21,7 @@
             [icon]="row.icon"
             [iconColor]="row.iconColor"
             [value]="levelLabel(row.field)"
+            [note]="noteOf(row)"
             [disabled]="isSaving(row.field)"
             (select)="choose(row)"
           />

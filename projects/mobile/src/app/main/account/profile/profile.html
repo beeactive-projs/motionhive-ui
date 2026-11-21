@@ -73,6 +73,22 @@
           (select)="locationSheetOpen.set(true)"
         />
 
+        <!-- Both optional; coaches read the age and the gender, never the
+             date, and who sees them is set in Privacy. -->
+        <mh-settings-row
+          [label]="'aboutYou.birthday' | translate"
+          [value]="birthdayValue()"
+          [valuePlaceholder]="'form.placeholder.notProvided' | translate"
+          (select)="birthdaySheetOpen.set(true)"
+        />
+
+        <mh-settings-row
+          [label]="'aboutYou.gender' | translate"
+          [value]="genderValue()"
+          [valuePlaceholder]="'form.placeholder.notProvided' | translate"
+          (select)="genderSheetOpen.set(true)"
+        />
+
         @if (isInstructor()) {
           <mh-settings-row
             [label]="'account.profile.links' | translate"
@@ -94,6 +110,8 @@
   <mh-handle-sheet [(open)]="handleSheetOpen" />
   <mh-phone-sheet [(open)]="phoneSheetOpen" />
   <mh-location-sheet [(open)]="locationSheetOpen" />
+  <mh-birthday-sheet [(open)]="birthdaySheetOpen" />
+  <mh-gender-sheet [(open)]="genderSheetOpen" />
   @if (isInstructor()) {
     <mh-about-sheet [(open)]="aboutSheetOpen" />
     <mh-links-sheet [(open)]="linksSheetOpen" />

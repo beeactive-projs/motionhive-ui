@@ -21,6 +21,7 @@ function state(overrides: Partial<OnboardingState> = {}): OnboardingState {
       LEVEL: null,
       COACH_CATEGORIES: null,
       COACH_DETAILS: null,
+      ABOUT_YOU: null,
     },
     flow: ['ROLE', 'INTERESTS', 'LEVEL'],
     trainCard: [],
@@ -61,6 +62,7 @@ describe('welcomeReturnUrl', () => {
 describe('parseWelcomeSteps', () => {
   it('reads known steps in the flow order, once each', () => {
     expect(parseWelcomeSteps('LEVEL, INTERESTS,NOPE,LEVEL')).toEqual(['INTERESTS', 'LEVEL']);
+    expect(parseWelcomeSteps('ABOUT_YOU')).toEqual(['ABOUT_YOU']);
     expect(parseWelcomeSteps('')).toEqual([]);
     expect(parseWelcomeSteps(null)).toEqual([]);
   });

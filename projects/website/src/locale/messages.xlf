@@ -4632,6 +4632,13 @@
           <context context-type="linenumber">220</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="privacy.s2.aboutYou" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Birthday and gender.<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Both are optional. We ask for them so your coaches can plan training that fits you. By default your coaches see your age and gender, never your date of birth, and nobody else sees either. You choose who sees them in your privacy settings, and you can remove them from your account at any time.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">221</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="privacy.s3.h2" datatype="html">
         <source>3. What legal bases do we rely on to process your information? </source>
         <context-group purpose="location">
